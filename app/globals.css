@@ -5,12 +5,42 @@
   --font-mono: var(--font-geist-mono);
 }
 
-html {
-  scroll-behavior: smooth;
+/* Lenis przejmuje smooth scroll — html scroll-behavior wyłączone */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Border beam — animowana świetlna linia okrążająca obwód */
+@keyframes border-beam {
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.animate-border-beam {
+  animation: border-beam 8s linear infinite;
+  offset-distance: 0%;
 }
 
 /* Subtle grain texture overlay dla "drogiego" feelu */

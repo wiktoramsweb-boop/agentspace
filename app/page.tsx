@@ -6,6 +6,12 @@ import { WaitlistForm } from "./components/waitlist-form";
 import { AiCoachMockup } from "./components/mockups/ai-coach-mockup";
 import { AgentDashboardMockup } from "./components/mockups/agent-dashboard-mockup";
 import { OwnerPanelMockup } from "./components/mockups/owner-panel-mockup";
+import { Spotlight } from "./components/effects/spotlight";
+import { TextReveal, WordReveal } from "./components/effects/text-reveal";
+import { TiltCard } from "./components/effects/tilt-card";
+import { Magnetic } from "./components/effects/magnetic-button";
+import { GlowCard } from "./components/effects/glow-card";
+import { BorderBeam } from "./components/effects/border-beam";
 
 const MOCKUPS = [AiCoachMockup, AgentDashboardMockup, OwnerPanelMockup];
 
@@ -152,8 +158,9 @@ export default function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-zinc-900 px-6 pt-32 pb-32 md:pt-40 md:pb-40">
         <AuroraBackground />
+        <Spotlight />
         <div className="relative z-10 mx-auto max-w-5xl text-center">
-          <FadeIn>
+          <WordReveal>
             <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-zinc-800/80 bg-zinc-900/50 px-4 py-2 backdrop-blur-xl">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
@@ -163,41 +170,44 @@ export default function Home() {
                 Lista oczekujących otwarta — start Q1 2026
               </span>
             </div>
-          </FadeIn>
+          </WordReveal>
 
-          <FadeIn delay={0.1}>
-            <h1 className="mb-6 text-5xl font-semibold tracking-tight text-white md:text-7xl lg:text-8xl">
-              Codzienna platforma <br className="hidden md:block" />
-              <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent shimmer">
-                dla agentów nieruchomości
-              </span>
-            </h1>
-          </FadeIn>
+          <h1 className="mb-6 text-5xl font-semibold tracking-tight text-white md:text-7xl lg:text-8xl">
+            <TextReveal delay={0.15}>Codzienna platforma</TextReveal>
+            <br className="hidden md:block" />
+            <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent shimmer">
+              <TextReveal delay={0.6}>dla agentów nieruchomości</TextReveal>
+            </span>
+          </h1>
 
-          <FadeIn delay={0.2}>
+          <WordReveal delay={1.2}>
             <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-zinc-400 md:text-xl">
               AgentSpace łączy trening cold calli z AI, dashboard dziennej pracy i ranking zespołu.
               Wszystko czego potrzebuje Twoje biuro — w jednym miejscu, po polsku, z polskim wsparciem.
             </p>
-          </FadeIn>
+          </WordReveal>
 
-          <FadeIn delay={0.3}>
+          <WordReveal delay={1.4}>
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-              <a
-                href="#waitlist"
-                className="group relative w-full overflow-hidden rounded-xl bg-emerald-500 px-8 py-4 text-base font-semibold text-zinc-950 transition hover:bg-emerald-400 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.8)] sm:w-auto"
-              >
-                <span className="relative z-10">Dołącz do listy oczekujących</span>
-                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-              </a>
-              <a
-                href="#how"
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-8 py-4 text-base font-medium text-zinc-300 backdrop-blur-sm transition hover:border-zinc-700 hover:bg-zinc-900 sm:w-auto"
-              >
-                Zobacz jak działa
-              </a>
+              <Magnetic className="w-full sm:w-auto" strength={0.25}>
+                <a
+                  href="#waitlist"
+                  className="group relative block w-full overflow-hidden rounded-xl bg-emerald-500 px-8 py-4 text-base font-semibold text-zinc-950 transition hover:bg-emerald-400 hover:shadow-[0_0_60px_-10px_rgba(16,185,129,0.9)] sm:w-auto"
+                >
+                  <span className="relative z-10">Dołącz do listy oczekujących</span>
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                </a>
+              </Magnetic>
+              <Magnetic className="w-full sm:w-auto" strength={0.2}>
+                <a
+                  href="#how"
+                  className="block w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-8 py-4 text-base font-medium text-zinc-300 backdrop-blur-sm transition hover:border-zinc-700 hover:bg-zinc-900 sm:w-auto"
+                >
+                  Zobacz jak działa
+                </a>
+              </Magnetic>
             </div>
-          </FadeIn>
+          </WordReveal>
 
           <FadeIn delay={0.4}>
             <p className="mt-6 text-sm text-zinc-500">
@@ -224,7 +234,7 @@ export default function Home() {
           <StaggerContainer className="grid gap-6 md:grid-cols-3">
             {PROBLEMS.map((problem) => (
               <StaggerItem key={problem.title}>
-                <div className="card-glow group relative h-full rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8 transition-colors hover:border-emerald-500/30 hover:bg-zinc-900/50">
+                <GlowCard className="h-full rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8 transition-colors hover:border-emerald-500/30">
                   <p className="mb-6 text-5xl font-semibold text-emerald-400 md:text-6xl">
                     {problem.statText !== undefined ? (
                       problem.statText
@@ -238,7 +248,7 @@ export default function Home() {
                   </p>
                   <h3 className="mb-3 text-xl font-semibold text-white">{problem.title}</h3>
                   <p className="text-zinc-400">{problem.body}</p>
-                </div>
+                </GlowCard>
               </StaggerItem>
             ))}
           </StaggerContainer>
@@ -284,7 +294,7 @@ export default function Home() {
                         </ul>
                       </div>
                       <div className={index % 2 === 1 ? "md:order-1" : ""}>
-                        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/5">
+                        <TiltCard className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/10">
                           {/* Browser-like top bar dla immersji */}
                           <div className="mb-2 flex items-center gap-1.5 px-2 py-1">
                             <div className="h-2 w-2 rounded-full bg-red-500/60" />
@@ -295,7 +305,7 @@ export default function Home() {
                             </div>
                           </div>
                           {MockupComponent && <MockupComponent />}
-                        </div>
+                        </TiltCard>
                       </div>
                     </div>
                   </div>
@@ -407,7 +417,9 @@ export default function Home() {
           </FadeIn>
 
           <FadeIn delay={0.1}>
-            <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 transition hover:border-emerald-500/50 hover:shadow-[0_0_60px_-10px_rgba(16,185,129,0.3)] md:p-12">
+            <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 transition hover:border-emerald-500/50 hover:shadow-[0_0_80px_-10px_rgba(16,185,129,0.4)] md:p-12">
+              <BorderBeam size={300} duration={10} colorFrom="#10b981" colorTo="#22d3ee" />
+              <BorderBeam size={300} duration={10} colorFrom="#22d3ee" colorTo="#10b981" delay={5} />
               <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" />
               <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-cyan-500/20 blur-3xl" />
 
