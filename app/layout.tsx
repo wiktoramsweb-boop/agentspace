@@ -4,17 +4,34 @@ import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 export const metadata: Metadata = {
-  title: "AgentSpace — wkrótce",
-  description: "Codzienna platforma dla agentów nieruchomości. Start 2026.",
+  title: "AgentSpace — codzienna platforma dla agentów nieruchomości",
+  description:
+    "Trening cold calli z AI, dashboard agenta i ranking zespołu — wszystko w jednym miejscu. Dla biur nieruchomości w Polsce. Start Q1 2026.",
+  metadataBase: new URL("https://agentspace.pl"),
+  openGraph: {
+    title: "AgentSpace — codzienna platforma dla agentów nieruchomości",
+    description:
+      "Trening cold calli z AI, dashboard agenta i ranking zespołu. Dla polskich biur RE.",
+    url: "https://agentspace.pl",
+    siteName: "AgentSpace",
+    locale: "pl_PL",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AgentSpace — codzienna platforma dla agentów nieruchomości",
+    description:
+      "Trening cold calli z AI, dashboard agenta i ranking zespołu. Dla polskich biur RE.",
+  },
 };
 
 export default function RootLayout({
@@ -24,10 +41,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="pl"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-zinc-950">{children}</body>
     </html>
   );
 }
