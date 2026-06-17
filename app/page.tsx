@@ -6,7 +6,7 @@ import { AiCoachMockup } from "./components/mockups/ai-coach-mockup";
 import { AgentDashboardMockup } from "./components/mockups/agent-dashboard-mockup";
 import { OwnerPanelMockup } from "./components/mockups/owner-panel-mockup";
 import { Spotlight } from "./components/effects/spotlight";
-import { TextReveal, WordReveal } from "./components/effects/text-reveal";
+import { TextReveal, WordReveal, InlineReveal } from "./components/effects/text-reveal";
 import { TiltCard } from "./components/effects/tilt-card";
 import { Magnetic } from "./components/effects/magnetic-button";
 import { GlowCard } from "./components/effects/glow-card";
@@ -101,9 +101,9 @@ const FAQ = [
       "Pierwsza wersja w Q1 2026. Aktualnie pilotujemy z grupą zaprzyjaźnionych biur (w tym Spectra Nieruchomości w Krakowie). Pierwsze 10 biur z listy oczekujących dostanie wczesny dostęp + 3 miesiące za darmo + 30% rabatu na pierwszy rok.",
   },
   {
-    question: "Czy moi agenci dostaną z tego realną korzyść, czy tylko więcej kontroli?",
+    question: "Co agenci nieruchomości dostają z AgentSpace?",
     answer:
-      "Realną korzyść. Agenci ćwiczą umiejętności które bezpośrednio przekładają się na ich prowizję. Lepiej obrabiają obiekcje = więcej zamkniętych transakcji. Plus widzą swój postęp i ranking — to motywujące. Najlepsi agenci kochają systemy które dają im przewagę.",
+      "Realną korzyść. Agenci ćwiczą umiejętności które bezpośrednio przekładają się na ich prowizję — cold calling, obiekcje cenowe, negocjacja prowizji. Lepiej obrabiają obiekcje = więcej zamkniętych transakcji. Plus widzą swój postęp i ranking biura — to motywujące. Najlepsi agenci kochają systemy które dają im przewagę.",
   },
   {
     question: "Czy musimy nagrywać prawdziwych klientów?",
@@ -116,9 +116,9 @@ const FAQ = [
       "Przeglądarka i mikrofon. Działa na laptopie, telefonie, tablecie. Bez instalacji, bez dodatkowego sprzętu. Twoi agenci mogą trenować w biurze, w domu, w aucie między spotkaniami.",
   },
   {
-    question: "Co jeśli nie zadziała w moim biurze?",
+    question: "Co jeśli AgentSpace nie zadziała w moim biurze nieruchomości?",
     answer:
-      "30 dni gwarancji zwrotu pieniędzy od dnia płatności, bez pytań. Plus pierwsze 14 dni to darmowy trial — testujesz bez ryzyka. Naszym celem jest żebyś po 30 dniach miał konkretne dane pokazujące wzrost zespołu.",
+      "30 dni gwarancji zwrotu pieniędzy od dnia płatności, bez pytań. Plus pierwsze 14 dni to darmowy trial — testujesz bez ryzyka. Naszym celem jest żebyś po 30 dniach miał konkretne dane pokazujące wzrost zespołu agentów nieruchomości.",
   },
 ];
 
@@ -151,23 +151,27 @@ export default function Home() {
                 <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
               </span>
               <span className="text-xs font-medium text-zinc-300">
-                Lista oczekujących otwarta — start Q1 2026
+                Dla biur nieruchomości — start Q1 2026
               </span>
             </div>
           </WordReveal>
 
           <h1 className="mb-6 text-4xl font-semibold leading-[1.05] tracking-tight text-white md:text-5xl lg:text-6xl">
-            <TextReveal delay={0.15}>Codzienna platforma</TextReveal>
+            <TextReveal delay={0.15}>Szkolenie agentów nieruchomości</TextReveal>
             <br />
-            <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent shimmer">
-              <TextReveal delay={0.6}>dla agentów nieruchomości</TextReveal>
-            </span>
+            <InlineReveal
+              delay={1.1}
+              className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent shimmer"
+            >
+              z AI Coachem
+            </InlineReveal>
           </h1>
 
-          <WordReveal delay={1.2}>
+          <WordReveal delay={1.5}>
             <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-zinc-400 md:text-xl">
-              AgentSpace łączy trening cold calli z AI, dashboard dziennej pracy i ranking zespołu.
-              Wszystko czego potrzebuje Twoje biuro — w jednym miejscu, po polsku, z polskim wsparciem.
+              Trenuj zespół agentów codziennie — 15 minut z AI klientem. Cold calling,
+              obiekcje cenowe, negocjacja prowizji. Scoring po polsku, ranking biura,
+              raporty dla właściciela. <span className="text-zinc-300">Dla biur nieruchomości w Polsce.</span>
             </p>
           </WordReveal>
 
@@ -195,7 +199,7 @@ export default function Home() {
 
           <FadeIn delay={0.4}>
             <p className="mt-6 text-sm text-zinc-500">
-              Pierwsze 10 biur: 3 miesiące za darmo + 30% rabatu na pierwszy rok
+              Pierwsze 10 biur nieruchomości: 3 miesiące za darmo + 30% rabatu na pierwszy rok
             </p>
           </FadeIn>
         </div>
@@ -210,7 +214,7 @@ export default function Home() {
                 Problem
               </p>
               <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                Trenowanie agentów RE jest drogie, czasochłonne i mało skuteczne
+                Szkolenie agentów nieruchomości jest drogie, czasochłonne i mało skuteczne
               </h2>
             </div>
           </FadeIn>

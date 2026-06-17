@@ -100,3 +100,24 @@ export function WordReveal({ children, className, delay = 0 }: WordRevealProps) 
     </motion.div>
   );
 }
+
+/**
+ * Inline (span) wersja WordReveal — działa wewnątrz h1, p, itd. bez łamania layoutu.
+ */
+export function InlineReveal({ children, className, delay = 0 }: WordRevealProps) {
+  return (
+    <motion.span
+      className={className}
+      initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      transition={{
+        duration: 0.8,
+        delay,
+        ease: [0.21, 0.47, 0.32, 0.98],
+      }}
+      style={{ display: "inline-block" }}
+    >
+      {children}
+    </motion.span>
+  );
+}

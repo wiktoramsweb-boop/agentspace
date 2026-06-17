@@ -14,14 +14,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgentSpace — codzienna platforma dla agentów nieruchomości",
+  title: "Szkolenie agentów nieruchomości z AI Coachem | AgentSpace",
   description:
-    "Trening cold calli z AI, dashboard agenta i ranking zespołu — wszystko w jednym miejscu. Dla biur nieruchomości w Polsce. Start Q1 2026.",
+    "Platforma do szkolenia agentów nieruchomości w Polsce. AI Coach do treningu cold calli, dashboard agenta, ranking zespołu, raporty dla właściciela biura. Start Q1 2026.",
+  keywords: [
+    "szkolenie agentów nieruchomości",
+    "trening agentów nieruchomości",
+    "AI dla nieruchomości",
+    "AI Coach",
+    "platforma dla biur nieruchomości",
+    "narzędzia dla pośrednika",
+    "szkolenie cold calling",
+    "trening sprzedaży nieruchomości",
+    "CRM dla biura nieruchomości",
+    "ranking agentów",
+    "biuro nieruchomości oprogramowanie",
+    "AgentSpace",
+  ],
   metadataBase: new URL("https://agentspace.pl"),
+  alternates: {
+    canonical: "https://agentspace.pl",
+  },
   openGraph: {
-    title: "AgentSpace — codzienna platforma dla agentów nieruchomości",
+    title: "Szkolenie agentów nieruchomości z AI Coachem | AgentSpace",
     description:
-      "Trening cold calli z AI, dashboard agenta i ranking zespołu. Dla polskich biur RE.",
+      "Trenuj zespół agentów codziennie z AI. Cold calling, obiekcje cenowe, negocjacja prowizji. Dla biur nieruchomości w Polsce.",
     url: "https://agentspace.pl",
     siteName: "AgentSpace",
     locale: "pl_PL",
@@ -29,10 +46,22 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AgentSpace — codzienna platforma dla agentów nieruchomości",
+    title: "Szkolenie agentów nieruchomości z AI Coachem | AgentSpace",
     description:
-      "Trening cold calli z AI, dashboard agenta i ranking zespołu. Dla polskich biur RE.",
+      "Trenuj zespół agentów codziennie z AI. Cold calling, obiekcje cenowe, negocjacja prowizji. Dla biur nieruchomości w Polsce.",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  authors: [{ name: "Wiktor Szostek", url: "https://agentspace.pl" }],
+  category: "Real Estate Technology",
 };
 
 export default function RootLayout({
