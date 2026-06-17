@@ -12,6 +12,8 @@ import { Magnetic } from "./components/effects/magnetic-button";
 import { GlowCard } from "./components/effects/glow-card";
 import { BorderBeam } from "./components/effects/border-beam";
 import { NumberScramble } from "./components/effects/number-scramble";
+import { CoachFlow } from "./components/coach-flow";
+import { DeploymentSteps } from "./components/deployment-steps";
 
 const MOCKUPS = [AiCoachMockup, AgentDashboardMockup, OwnerPanelMockup];
 
@@ -81,24 +83,6 @@ const FEATURES = [
   },
 ];
 
-const STEPS = [
-  {
-    number: "01",
-    title: "Zapraszasz swoich agentów",
-    body: "Wpisujesz emaile, system wysyła zaproszenia. Każdy agent loguje się w 30 sekund, ma swoje konto, swoje dane.",
-  },
-  {
-    number: "02",
-    title: "Agenci trenują codziennie",
-    body: "15 minut dziennie ćwiczenia z AI Coach. Praktyka czyni mistrza — różnica między agentem początkującym a doświadczonym to dziesiątki rozmów.",
-  },
-  {
-    number: "03",
-    title: "Widzisz wzrost zespołu w czasie",
-    body: "Po 30 dniach masz dane: kto rośnie, gdzie są luki, jakie scenariusze biuro robi słabo. Konkretne decyzje, nie przeczucia.",
-  },
-];
-
 const PRICING_FEATURES = [
   "Do 10 agentów w cenie podstawowej",
   "Każdy dodatkowy agent: +29 zł / mc",
@@ -156,12 +140,12 @@ export default function Home() {
       <StickyNav />
 
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-zinc-900 px-6 pt-32 pb-32 md:pt-40 md:pb-40">
+      <section className="relative overflow-hidden border-b border-zinc-900 px-6 pt-24 pb-24 md:pt-28 md:pb-28">
         <AuroraBackground />
         <Spotlight />
-        <div className="relative z-10 mx-auto max-w-5xl text-center">
+        <div className="relative z-10 mx-auto max-w-4xl text-center">
           <WordReveal>
-            <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-zinc-800/80 bg-zinc-900/50 px-4 py-2 backdrop-blur-xl">
+            <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-zinc-800/80 bg-zinc-900/50 px-4 py-2 backdrop-blur-xl">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
@@ -172,9 +156,9 @@ export default function Home() {
             </div>
           </WordReveal>
 
-          <h1 className="mb-6 text-5xl font-semibold tracking-tight text-white md:text-7xl lg:text-8xl">
+          <h1 className="mb-6 text-4xl font-semibold leading-[1.05] tracking-tight text-white md:text-5xl lg:text-6xl">
             <TextReveal delay={0.15}>Codzienna platforma</TextReveal>
-            <br className="hidden md:block" />
+            <br />
             <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent shimmer">
               <TextReveal delay={0.6}>dla agentów nieruchomości</TextReveal>
             </span>
@@ -317,13 +301,34 @@ export default function Home() {
         </div>
       </section>
 
-      {/* JAK TO DZIAŁA */}
+      {/* JAK DZIAŁA AI COACH — DEEP DIVE */}
+      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
+        <div className="mx-auto max-w-6xl">
+          <FadeIn>
+            <div className="mb-16 max-w-2xl">
+              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
+                AI Coach — od środka
+              </p>
+              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
+                Jak wygląda jedna sesja treningowa
+              </h2>
+              <p className="mt-4 text-lg text-zinc-400">
+                15 minut. Pięć kroków. Wiesz dokładnie co poprawić.
+              </p>
+            </div>
+          </FadeIn>
+
+          <CoachFlow />
+        </div>
+      </section>
+
+      {/* JAK TO DZIAŁA — DLA BIURA */}
       <section id="how" className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
         <div className="mx-auto max-w-6xl">
           <FadeIn>
             <div className="mb-16 max-w-2xl">
               <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Jak to działa
+                Wdrożenie
               </p>
               <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
                 Wdrożenie w 10 minut. Pierwsze wnioski w 30 dni.
@@ -331,19 +336,7 @@ export default function Home() {
             </div>
           </FadeIn>
 
-          <StaggerContainer className="grid gap-8 md:grid-cols-3" staggerDelay={0.15}>
-            {STEPS.map((step) => (
-              <StaggerItem key={step.number}>
-                <div className="group relative">
-                  <p className="mb-4 bg-gradient-to-br from-zinc-700 to-zinc-900 bg-clip-text text-7xl font-semibold text-transparent transition-all group-hover:from-emerald-400 group-hover:to-cyan-400">
-                    {step.number}
-                  </p>
-                  <h3 className="mb-3 text-xl font-semibold text-white">{step.title}</h3>
-                  <p className="text-zinc-400">{step.body}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+          <DeploymentSteps />
         </div>
       </section>
 

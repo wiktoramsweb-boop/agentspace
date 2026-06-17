@@ -5,26 +5,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Lenis przejmuje smooth scroll — html scroll-behavior wyłączone */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: clip;
-}
-
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
+html {
+  scroll-behavior: smooth;
 }
 
 body {

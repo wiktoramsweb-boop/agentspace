@@ -61,22 +61,23 @@ export function AiCoachMockup() {
       {/* Voice waveform + mic */}
       <div className="absolute inset-x-5 bottom-5">
         <div className="flex items-center justify-center gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-900/80 p-3 backdrop-blur-xl">
-          <div className="flex h-1.5 flex-1 items-center gap-1">
-            {Array.from({ length: 24 }).map((_, i) => (
+          <div className="flex h-8 flex-1 items-center justify-center gap-[3px]">
+            {Array.from({ length: 28 }).map((_, i) => (
               <motion.div
                 key={i}
-                className="flex-1 rounded-full bg-emerald-400/80"
+                className="w-[2px] rounded-full bg-emerald-400"
                 animate={{
                   height: [
-                    `${20 + Math.random() * 30}%`,
-                    `${60 + Math.random() * 40}%`,
-                    `${20 + Math.random() * 30}%`,
+                    `${15 + Math.random() * 25}%`,
+                    `${55 + Math.random() * 40}%`,
+                    `${15 + Math.random() * 25}%`,
                   ],
                 }}
                 transition={{
-                  duration: 0.8 + Math.random() * 0.6,
+                  duration: 0.7 + Math.random() * 0.5,
                   repeat: Infinity,
-                  delay: i * 0.04,
+                  delay: i * 0.05,
+                  ease: "easeInOut",
                 }}
                 style={{ height: "30%" }}
               />
