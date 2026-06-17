@@ -1,6 +1,5 @@
 import { AuroraBackground } from "./components/aurora-background";
 import { FadeIn, StaggerContainer, StaggerItem } from "./components/fade-in";
-import { AnimatedStat } from "./components/animated-stat";
 import { StickyNav } from "./components/sticky-nav";
 import { WaitlistForm } from "./components/waitlist-form";
 import { AiCoachMockup } from "./components/mockups/ai-coach-mockup";
@@ -12,6 +11,7 @@ import { TiltCard } from "./components/effects/tilt-card";
 import { Magnetic } from "./components/effects/magnetic-button";
 import { GlowCard } from "./components/effects/glow-card";
 import { BorderBeam } from "./components/effects/border-beam";
+import { NumberScramble } from "./components/effects/number-scramble";
 
 const MOCKUPS = [AiCoachMockup, AgentDashboardMockup, OwnerPanelMockup];
 
@@ -239,10 +239,11 @@ export default function Home() {
                     {problem.statText !== undefined ? (
                       problem.statText
                     ) : (
-                      <AnimatedStat
+                      <NumberScramble
                         value={problem.statValue ?? 0}
                         prefix={problem.statPrefix ?? ""}
                         suffix={problem.statSuffix ?? ""}
+                        duration={1.6}
                       />
                     )}
                   </p>
