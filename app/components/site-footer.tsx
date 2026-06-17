@@ -75,15 +75,19 @@ export function SiteFooter() {
         </div>
 
         {/* Bottom: legal */}
-        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-zinc-900 pt-8 text-xs text-zinc-600 md:flex-row md:items-center">
+        <div className="mt-12 space-y-2 border-t border-zinc-900 pt-8 text-xs text-zinc-600">
           <p>
-            © 2026 AgentSpace · Robione w Krakowie ·{" "}
+            © 2026 AgentSpace ·{" "}
             <a href="https://agentspace.pl" className="hover:text-zinc-400">
               agentspace.pl
             </a>
           </p>
           <p>
-            Operator: Spectra Nieruchomości, Kraków ·{" "}
+            Operator: <span className="text-zinc-400">Spectra Nieruchomości</span>,
+            ul. Zbożowa 2/1, 30-002 Kraków · NIP: 6772516327 · REGON: 529666353
+          </p>
+          <p>
+            Kontakt:{" "}
             <a
               href="mailto:nieruchomoscispectra@gmail.com"
               className="hover:text-zinc-400"

@@ -19,8 +19,8 @@ const CONTACT_ITEMS = [
     href: "mailto:nieruchomoscispectra@gmail.com",
   },
   {
-    label: "Lokalizacja",
-    value: "Kraków, Polska",
+    label: "Adres",
+    value: "ul. Zbożowa 2/1, 30-002 Kraków",
   },
   {
     label: "Czas odpowiedzi",
@@ -81,15 +81,19 @@ export default function Kontakt() {
                 <h3 className="mb-3 text-base font-semibold text-white">
                   Operator AgentSpace
                 </h3>
-                <p className="mb-2 text-sm text-zinc-400">
-                  AgentSpace jest budowany przez{" "}
-                  <span className="text-zinc-200">Spectra Nieruchomości</span>,
-                  biuro nieruchomości w Krakowie.
-                </p>
-                <p className="text-sm text-zinc-400">
-                  Founder:{" "}
-                  <span className="text-zinc-200">Wiktor Szostek</span>
-                </p>
+                <div className="space-y-1 text-sm text-zinc-400">
+                  <p>
+                    <span className="text-zinc-200">Spectra Nieruchomości</span>
+                  </p>
+                  <p>ul. Zbożowa 2/1</p>
+                  <p>30-002 Kraków</p>
+                  <p className="pt-2 font-mono text-xs">NIP: 6772516327</p>
+                  <p className="font-mono text-xs">REGON: 529666353</p>
+                  <p className="pt-3 text-zinc-500">
+                    Founder:{" "}
+                    <span className="text-zinc-200">Wiktor Szostek</span>
+                  </p>
+                </div>
               </div>
             </div>
 

@@ -36,9 +36,9 @@ export default function Regulamin() {
               (dalej: <em>Serwis</em> lub <em>AgentSpace</em>).
             </p>
             <p>
-              Operatorem Serwisu jest <strong>Spectra Nieruchomości</strong> z siedzibą w Krakowie,
-              ul. [adres do uzupełnienia], NIP: [do uzupełnienia], REGON: [do uzupełnienia]
-              (dalej: <em>Operator</em>).
+              Operatorem Serwisu jest <strong>Spectra Nieruchomości</strong> z siedzibą
+              w Krakowie, ul. Zbożowa 2/1, 30-002 Kraków, NIP: 6772516327,
+              REGON: 529666353 (dalej: <em>Operator</em>).
             </p>
             <p>
               Kontakt z Operatorem możliwy jest pod adresem e-mail:{" "}

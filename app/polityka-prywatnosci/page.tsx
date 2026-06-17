@@ -39,13 +39,13 @@ export default function PolitykaPrywatnosci() {
             <p>
               <strong>Spectra Nieruchomości</strong>
               <br />
-              ul. [adres do uzupełnienia]
+              ul. Zbożowa 2/1
               <br />
-              Kraków, Polska
+              30-002 Kraków, Polska
               <br />
-              NIP: [do uzupełnienia]
+              NIP: 6772516327
               <br />
-              REGON: [do uzupełnienia]
+              REGON: 529666353
               <br />
               E-mail kontaktowy:{" "}
               <a href="mailto:nieruchomoscispectra@gmail.com">nieruchomoscispectra@gmail.com</a>

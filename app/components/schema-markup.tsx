@@ -81,6 +81,7 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "AgentSpace",
+  legalName: "Spectra Nieruchomości",
   url: "https://agentspace.pl",
   description:
     "Polska platforma do szkolenia agentów nieruchomości z AI. Klient zero: Spectra Nieruchomości w Krakowie.",
@@ -92,6 +93,25 @@ const organizationSchema = {
   foundingLocation: {
     "@type": "Place",
     name: "Kraków, Polska",
+  },
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "ul. Zbożowa 2/1",
+    postalCode: "30-002",
+    addressLocality: "Kraków",
+    addressCountry: "PL",
+  },
+  taxID: "6772516327",
+  vatID: "PL6772516327",
+  identifier: [
+    { "@type": "PropertyValue", propertyID: "NIP", value: "6772516327" },
+    { "@type": "PropertyValue", propertyID: "REGON", value: "529666353" },
+  ],
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "nieruchomoscispectra@gmail.com",
+    contactType: "customer service",
+    availableLanguage: ["pl"],
   },
   areaServed: {
     "@type": "Country",
