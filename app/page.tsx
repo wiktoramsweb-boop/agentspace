@@ -336,6 +336,62 @@ export default function Home() {
         </div>
       </section>
 
+      {/* KLIENT ZERO — FOUNDER STORY */}
+      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/5 blur-3xl" />
+        </div>
+        <div className="relative mx-auto max-w-4xl">
+          <FadeIn>
+            <div className="mb-12 text-center">
+              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
+                Klient zero
+              </p>
+              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
+                Buduję to dla siebie pierwszego
+              </h2>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.1}>
+            <div className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
+              <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-center md:gap-10">
+                {/* Avatar */}
+                <div className="flex justify-center md:justify-start">
+                  <div className="relative">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 blur-xl opacity-50" />
+                    <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-3xl font-bold text-zinc-950 md:h-28 md:w-28">
+                      W
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quote */}
+                <div>
+                  <svg
+                    className="mb-4 h-8 w-8 text-emerald-400/50"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                  </svg>
+                  <p className="mb-6 text-lg leading-relaxed text-zinc-200 md:text-xl">
+                    Prowadzę biuro nieruchomości <span className="text-white font-medium">Spectra</span> w Krakowie. Widziałem zbyt wielu dobrych agentów którzy odchodzili zanim się rozwinęli — i wiem ile to kosztuje biuro. <span className="text-white">AgentSpace to system którego sam potrzebowałem od dawna.</span> Buduję go dla mojego biura i udostępniam innym biurom które mają ten sam problem.
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="h-px w-12 bg-zinc-700" />
+                    <div>
+                      <p className="font-semibold text-white">Wiktor Szostek</p>
+                      <p className="text-sm text-zinc-500">Founder · Spectra Nieruchomości</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* CENNIK */}
       <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
         <div className="mx-auto max-w-3xl">
@@ -384,6 +440,62 @@ export default function Home() {
               </div>
             </div>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* DLA KOGO NIE JEST */}
+      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
+        <div className="mx-auto max-w-5xl">
+          <FadeIn>
+            <div className="mb-16 max-w-2xl">
+              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
+                Szczerze
+              </p>
+              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
+                AgentSpace nie jest dla każdego biura
+              </h2>
+              <p className="mt-4 text-lg text-zinc-400">
+                Lepiej powiedzieć to teraz, niż zwracać pieniądze za 30 dni.
+              </p>
+            </div>
+          </FadeIn>
+
+          <StaggerContainer className="space-y-4">
+            {[
+              {
+                title: "Pracujesz solo lub w 2 osoby",
+                body: "Nie potrzebujesz rankingu, panelu właściciela, raportów. AI Coach owszem — ale wtedy taniej kupić Mentalyc albo poćwiczyć z ChatGPT za darmo. Oszczędź 299 zł.",
+              },
+              {
+                title: "Nie masz czasu prowadzić zespołu",
+                body: "AgentSpace pokazuje dane i daje narzędzia — ale nie zarządza za Ciebie. Jeśli nie zamierzasz spojrzeć w panel raz w tygodniu i pogadać z agentem który słabnie — żaden system tego nie naprawi.",
+              },
+              {
+                title: "Szukasz kolejnego CRM-a",
+                body: "To nie jest CRM. Nie zastąpi Asari, Galactici ani Twojej własnej bazy ofert. AgentSpace to warstwa rozwoju zespołu nad CRM-em który już masz — dziennik agenta, trening, analytics.",
+              },
+            ].map((item) => (
+              <StaggerItem key={item.title}>
+                <div className="flex gap-4 rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6 transition hover:border-zinc-800 md:p-8">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-red-500/30 bg-red-500/10">
+                    <svg
+                      className="h-4 w-4 text-red-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="mb-2 text-lg font-semibold text-white">{item.title}</h3>
+                    <p className="leading-relaxed text-zinc-400">{item.body}</p>
+                  </div>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
         </div>
       </section>
 
