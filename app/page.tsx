@@ -3,6 +3,11 @@ import { FadeIn, StaggerContainer, StaggerItem } from "./components/fade-in";
 import { AnimatedStat } from "./components/animated-stat";
 import { StickyNav } from "./components/sticky-nav";
 import { WaitlistForm } from "./components/waitlist-form";
+import { AiCoachMockup } from "./components/mockups/ai-coach-mockup";
+import { AgentDashboardMockup } from "./components/mockups/agent-dashboard-mockup";
+import { OwnerPanelMockup } from "./components/mockups/owner-panel-mockup";
+
+const MOCKUPS = [AiCoachMockup, AgentDashboardMockup, OwnerPanelMockup];
 
 type Problem = {
   title: string;
@@ -255,42 +260,48 @@ export default function Home() {
           </FadeIn>
 
           <div className="space-y-12">
-            {FEATURES.map((feature, index) => (
-              <FadeIn key={feature.title} delay={index * 0.05}>
-                <div className="card-glow rounded-3xl border border-zinc-900 bg-zinc-900/30 p-8 transition-colors hover:border-emerald-500/20 md:p-12">
-                  <div className="grid gap-8 md:grid-cols-2 md:items-center md:gap-16">
-                    <div className={index % 2 === 1 ? "md:order-2" : ""}>
-                      <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                        {feature.eyebrow}
-                      </p>
-                      <h3 className="mb-4 text-3xl font-semibold tracking-tight">
-                        {feature.title}
-                      </h3>
-                      <p className="mb-6 leading-relaxed text-zinc-400">{feature.body}</p>
-                      <ul className="space-y-2">
-                        {feature.bullets.map((bullet) => (
-                          <li key={bullet} className="flex items-start gap-3 text-zinc-300">
-                            <CheckIcon />
-                            <span>{bullet}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className={index % 2 === 1 ? "md:order-1" : ""}>
-                      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-900/50 to-zinc-950 p-6">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 via-transparent to-cyan-500/5" />
-                        <div className="relative flex h-full items-center justify-center">
-                          <p className="text-center text-sm text-zinc-600">
-                            Mockup ekranu —<br />
-                            dodamy w następnej sesji
-                          </p>
+            {FEATURES.map((feature, index) => {
+              const MockupComponent = MOCKUPS[index];
+              return (
+                <FadeIn key={feature.title} delay={index * 0.05}>
+                  <div className="card-glow rounded-3xl border border-zinc-900 bg-zinc-900/30 p-8 transition-colors hover:border-emerald-500/20 md:p-12">
+                    <div className="grid gap-8 md:grid-cols-2 md:items-center md:gap-16">
+                      <div className={index % 2 === 1 ? "md:order-2" : ""}>
+                        <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
+                          {feature.eyebrow}
+                        </p>
+                        <h3 className="mb-4 text-3xl font-semibold tracking-tight">
+                          {feature.title}
+                        </h3>
+                        <p className="mb-6 leading-relaxed text-zinc-400">{feature.body}</p>
+                        <ul className="space-y-2">
+                          {feature.bullets.map((bullet) => (
+                            <li key={bullet} className="flex items-start gap-3 text-zinc-300">
+                              <CheckIcon />
+                              <span>{bullet}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className={index % 2 === 1 ? "md:order-1" : ""}>
+                        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/5">
+                          {/* Browser-like top bar dla immersji */}
+                          <div className="mb-2 flex items-center gap-1.5 px-2 py-1">
+                            <div className="h-2 w-2 rounded-full bg-red-500/60" />
+                            <div className="h-2 w-2 rounded-full bg-amber-500/60" />
+                            <div className="h-2 w-2 rounded-full bg-emerald-500/60" />
+                            <div className="ml-2 flex-1 rounded-md bg-zinc-900/80 px-2 py-0.5 font-mono text-[9px] text-zinc-500">
+                              agentspace.pl/app
+                            </div>
+                          </div>
+                          {MockupComponent && <MockupComponent />}
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </FadeIn>
-            ))}
+                </FadeIn>
+              );
+            })}
           </div>
         </div>
       </section>
