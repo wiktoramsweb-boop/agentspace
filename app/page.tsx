@@ -1,6 +1,5 @@
 import { AuroraBackground } from "./components/aurora-background";
 import { FadeIn, StaggerContainer, StaggerItem } from "./components/fade-in";
-import { StickyNav } from "./components/sticky-nav";
 import { WaitlistForm } from "./components/waitlist-form";
 import { AiCoachMockup } from "./components/mockups/ai-coach-mockup";
 import { AgentDashboardMockup } from "./components/mockups/agent-dashboard-mockup";
@@ -14,6 +13,8 @@ import { BorderBeam } from "./components/effects/border-beam";
 import { NumberScramble } from "./components/effects/number-scramble";
 import { CoachFlow } from "./components/coach-flow";
 import { DeploymentSteps } from "./components/deployment-steps";
+import { SiteNav } from "./components/site-nav";
+import { SiteFooter } from "./components/site-footer";
 
 const MOCKUPS = [AiCoachMockup, AgentDashboardMockup, OwnerPanelMockup];
 
@@ -137,10 +138,10 @@ const CheckIcon = () => (
 export default function Home() {
   return (
     <div className="grain relative bg-zinc-950 text-white antialiased">
-      <StickyNav />
+      <SiteNav />
 
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-zinc-900 px-6 pt-24 pb-24 md:pt-28 md:pb-28">
+      <section className="relative overflow-hidden border-b border-zinc-900 px-6 pt-32 pb-24 md:pt-36 md:pb-28">
         <AuroraBackground />
         <Spotlight />
         <div className="relative z-10 mx-auto max-w-4xl text-center">
@@ -576,21 +577,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-zinc-900 px-6 py-12">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-zinc-600 md:flex-row">
-          <p>
-            © 2026 AgentSpace ·{" "}
-            <a href="https://agentspace.pl" className="hover:text-zinc-400">
-              agentspace.pl
-            </a>
-          </p>
-          <p>
-            Robione w Krakowie · klient zero:{" "}
-            <span className="text-zinc-400">Spectra Nieruchomości</span>
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
