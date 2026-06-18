@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteNav } from "../components/site-nav";
 import { SiteFooter } from "../components/site-footer";
+import { PageHero } from "../components/page-hero";
+import { Timeline } from "../components/timeline";
+import { FadeIn, StaggerContainer, StaggerItem } from "../components/fade-in";
+import { TiltCard } from "../components/effects/tilt-card";
 
 export const metadata: Metadata = {
   title: "O AgentSpace — Polska platforma szkolenia agentów RE | AgentSpace",
@@ -11,156 +15,6 @@ export const metadata: Metadata = {
     canonical: "https://agentspace.pl/o-nas",
   },
 };
-
-export default function ONas() {
-  return (
-    <>
-      <SiteNav />
-      <main className="bg-zinc-950 text-white">
-        {/* Header */}
-        <section className="border-b border-zinc-900 px-6 pt-32 pb-16">
-          <div className="mx-auto max-w-4xl">
-            <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-              O AgentSpace
-            </p>
-            <h1 className="mb-6 text-4xl font-semibold tracking-tight md:text-5xl">
-              Polski produkt dla polskich biur — bez kompromisów
-            </h1>
-            <p className="max-w-3xl text-lg leading-relaxed text-zinc-400 md:text-xl">
-              AgentSpace nie jest kolejnym SaaS-em &quot;dla nieruchomości&quot; tłumaczonym z angielskiego.
-              Jest budowany w Krakowie, dla biur w Polsce, przez kogoś kto na co dzień prowadzi
-              biuro nieruchomości i wie, co konkretnie boli.
-            </p>
-          </div>
-        </section>
-
-        {/* Founder story */}
-        <section className="border-b border-zinc-900 px-6 py-20">
-          <div className="mx-auto max-w-4xl">
-            <div className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 md:p-12">
-              <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-10">
-                <div className="flex justify-center md:justify-start">
-                  <div className="relative">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 blur-xl opacity-50" />
-                    <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-4xl font-bold text-zinc-950">
-                      W
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-2 text-sm font-medium uppercase tracking-[0.15em] text-emerald-400">
-                    Founder
-                  </p>
-                  <h2 className="mb-4 text-2xl font-semibold text-white">
-                    Wiktor Szostek
-                  </h2>
-                  <div className="space-y-4 leading-relaxed text-zinc-300">
-                    <p>
-                      Prowadzę biuro nieruchomości{" "}
-                      <strong className="text-white">Spectra</strong> w Krakowie. Codziennie
-                      pracuję z agentami, klientami sprzedającymi, kupującymi, doradcami
-                      kredytowymi, prawnikami. Widzę dokładnie to, czego nie widać ze świata
-                      software house&apos;ów: ile czasu agent traci, jak wygląda zła rozmowa
-                      z klientem, gdzie pęka konwersja.
-                    </p>
-                    <p>
-                      Przez ostatnie lata próbowałem różnych rozwiązań — szkolenia stacjonarne,
-                      mentoring, książki, podcasty. Większość kosztuje, mało co rzeczywiście
-                      zmienia codzienność agenta. Najlepsi w branży uczą się w bólu, przez
-                      setki spalonych leadów. Najsłabsi odchodzą po sześciu miesiącach.
-                    </p>
-                    <p>
-                      AgentSpace to system, którego sam potrzebowałem od dawna. Buduję go
-                      dla mojego biura — i otwieram go dla innych biur, które mają ten sam
-                      problem.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Filozofia */}
-        <section className="border-b border-zinc-900 px-6 py-20">
-          <div className="mx-auto max-w-4xl">
-            <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-              Filozofia produktu
-            </p>
-            <h2 className="mb-12 text-3xl font-semibold tracking-tight md:text-4xl">
-              Cztery rzeczy, w które wierzymy
-            </h2>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              {PRINCIPLES.map((principle) => (
-                <div
-                  key={principle.title}
-                  className="rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8"
-                >
-                  <p className="mb-4 text-3xl font-semibold text-emerald-400">
-                    {principle.number}
-                  </p>
-                  <h3 className="mb-3 text-xl font-semibold text-white">
-                    {principle.title}
-                  </h3>
-                  <p className="leading-relaxed text-zinc-400">{principle.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Roadmap */}
-        <section className="border-b border-zinc-900 px-6 py-20">
-          <div className="mx-auto max-w-4xl">
-            <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-              Co dalej
-            </p>
-            <h2 className="mb-12 text-3xl font-semibold tracking-tight md:text-4xl">
-              Roadmap najbliższych 12 miesięcy
-            </h2>
-
-            <div className="space-y-6">
-              {ROADMAP.map((item) => (
-                <div key={item.period} className="flex gap-6 md:gap-8">
-                  <div className="flex-shrink-0">
-                    <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-mono text-emerald-300">
-                      {item.period}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="mb-1 text-lg font-semibold text-white">{item.title}</h3>
-                    <p className="text-zinc-400">{item.body}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="px-6 py-20">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 text-center md:p-12">
-            <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
-              Chcesz dołączyć jako jedno z pierwszych 10 biur?
-            </h2>
-            <p className="mb-8 text-zinc-400">
-              3 miesiące za darmo + 30% rabatu na pierwszy rok. Plus wpływ na rozwój produktu.
-            </p>
-            <Link
-              href="/#waitlist"
-              className="inline-flex items-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400"
-            >
-              Dołącz do listy oczekujących →
-            </Link>
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
-  );
-}
 
 const PRINCIPLES = [
   {
@@ -207,3 +61,156 @@ const ROADMAP = [
     body: "Integracja z popularnymi CRM-ami (Asari, Galactica), automatyczne raporty miesięczne.",
   },
 ];
+
+export default function ONas() {
+  return (
+    <>
+      <SiteNav />
+      <main className="bg-zinc-950 text-white">
+        <PageHero
+          eyebrow="O AgentSpace"
+          title="Polski produkt dla polskich biur — bez kompromisów"
+          description="AgentSpace nie jest kolejnym SaaS-em 'dla nieruchomości' tłumaczonym z angielskiego. Jest budowany w Krakowie, dla biur w Polsce, przez kogoś kto na co dzień prowadzi biuro nieruchomości i wie, co konkretnie boli."
+        />
+
+        {/* Founder story z TiltCard */}
+        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+          <div className="mx-auto max-w-5xl">
+            <FadeIn>
+              <TiltCard className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
+                <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-12">
+                  {/* Avatar — duży, animowany glow */}
+                  <div className="flex justify-center md:justify-start">
+                    <div className="relative">
+                      {/* Outer glow rings */}
+                      <div className="absolute inset-0 -m-4 animate-pulse rounded-full bg-gradient-to-br from-emerald-400/30 to-cyan-400/30 blur-2xl" />
+                      <div className="absolute inset-0 -m-2 rounded-full bg-gradient-to-br from-emerald-400/40 to-cyan-400/40 blur-lg" />
+
+                      {/* Main avatar */}
+                      <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-5xl font-bold text-zinc-950 shadow-2xl">
+                        W
+                      </div>
+
+                      {/* Online dot */}
+                      <div className="absolute bottom-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-950">
+                        <div className="relative h-3 w-3">
+                          <div className="absolute inset-0 animate-ping rounded-full bg-emerald-400 opacity-75" />
+                          <div className="relative h-3 w-3 rounded-full bg-emerald-400" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quote */}
+                  <div>
+                    <p className="mb-2 text-sm font-medium uppercase tracking-[0.15em] text-emerald-400">
+                      Founder
+                    </p>
+                    <h2 className="mb-4 text-2xl font-semibold text-white md:text-3xl">
+                      Wiktor Szostek
+                    </h2>
+                    <div className="space-y-4 leading-relaxed text-zinc-300">
+                      <p>
+                        Prowadzę biuro nieruchomości{" "}
+                        <strong className="text-white">Spectra</strong> w Krakowie. Codziennie
+                        pracuję z agentami, klientami sprzedającymi, kupującymi, doradcami
+                        kredytowymi, prawnikami. Widzę dokładnie to, czego nie widać ze świata
+                        software house&apos;ów: ile czasu agent traci, jak wygląda zła rozmowa
+                        z klientem, gdzie pęka konwersja.
+                      </p>
+                      <p>
+                        Przez ostatnie lata próbowałem różnych rozwiązań — szkolenia stacjonarne,
+                        mentoring, książki, podcasty. Większość kosztuje, mało co rzeczywiście
+                        zmienia codzienność agenta. Najlepsi w branży uczą się w bólu, przez
+                        setki spalonych leadów. Najsłabsi odchodzą po sześciu miesiącach.
+                      </p>
+                      <p>
+                        AgentSpace to system, którego sam potrzebowałem od dawna. Buduję go dla
+                        mojego biura — i otwieram go dla innych biur, które mają ten sam problem.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </TiltCard>
+            </FadeIn>
+          </div>
+        </section>
+
+        {/* Filozofia */}
+        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+          <div className="mx-auto max-w-5xl">
+            <FadeIn>
+              <div className="mb-12 max-w-2xl">
+                <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
+                  Filozofia produktu
+                </p>
+                <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+                  Cztery rzeczy, w które wierzymy
+                </h2>
+              </div>
+            </FadeIn>
+
+            <StaggerContainer className="grid gap-6 md:grid-cols-2" staggerDelay={0.1}>
+              {PRINCIPLES.map((principle) => (
+                <StaggerItem key={principle.title}>
+                  <div className="group relative h-full overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8 transition-all hover:border-emerald-500/30 hover:bg-zinc-900/50">
+                    <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-all duration-500 group-hover:bg-emerald-500/10" />
+
+                    <div className="relative">
+                      <p className="mb-4 bg-gradient-to-br from-emerald-400 to-cyan-400 bg-clip-text text-5xl font-semibold text-transparent">
+                        {principle.number}
+                      </p>
+                      <h3 className="mb-3 text-xl font-semibold text-white">
+                        {principle.title}
+                      </h3>
+                      <p className="leading-relaxed text-zinc-400">{principle.body}</p>
+                    </div>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </section>
+
+        {/* Roadmap — animowany timeline */}
+        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+          <div className="mx-auto max-w-3xl">
+            <FadeIn>
+              <div className="mb-12 max-w-2xl">
+                <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
+                  Co dalej
+                </p>
+                <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+                  Roadmap najbliższych 12 miesięcy
+                </h2>
+              </div>
+            </FadeIn>
+
+            <Timeline items={ROADMAP} />
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="px-6 py-20">
+          <FadeIn>
+            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 text-center md:p-12">
+              <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
+                Chcesz dołączyć jako jedno z pierwszych 10 biur?
+              </h2>
+              <p className="mb-8 text-zinc-400">
+                3 miesiące za darmo + 30% rabatu na pierwszy rok. Plus wpływ na rozwój produktu.
+              </p>
+              <Link
+                href="/#waitlist"
+                className="inline-flex items-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+              >
+                Dołącz do listy oczekujących →
+              </Link>
+            </div>
+          </FadeIn>
+        </section>
+      </main>
+      <SiteFooter />
+    </>
+  );
+}

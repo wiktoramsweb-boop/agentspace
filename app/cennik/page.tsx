@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteNav } from "../components/site-nav";
 import { SiteFooter } from "../components/site-footer";
+import { PageHero } from "../components/page-hero";
+import { FadeIn } from "../components/fade-in";
+import { BorderBeam } from "../components/effects/border-beam";
 
 export const metadata: Metadata = {
   title: "Cennik — AgentSpace | Szkolenie agentów nieruchomości",
@@ -25,6 +28,30 @@ const INCLUDED = [
   "Działanie na laptopie, telefonie, tablecie",
   "Hosting w UE (zgodność z RODO)",
   "Nielimitowana liczba sesji treningowych",
+];
+
+const COMPARISON = [
+  {
+    label: "Trener zewnętrzny 1-na-1",
+    price: "~4800 zł",
+    perMonth: "/ mc / biuro 8 agentów",
+    detail: "1 godz/tydz/agent · brak danych · brak ciągłości",
+    highlight: false,
+  },
+  {
+    label: "Warsztat raz na kwartał",
+    price: "~1500 zł",
+    perMonth: "/ mc / biuro 8 agentów",
+    detail: "4 godz / kwartał · zapomniane po 2 tyg.",
+    highlight: false,
+  },
+  {
+    label: "AgentSpace",
+    price: "299 zł",
+    perMonth: "/ mc / biuro 8 agentów",
+    detail: "15 min/dzień/agent · dane real-time · konsekwencja",
+    highlight: true,
+  },
 ];
 
 const FAQ_PRICING = [
@@ -51,148 +78,162 @@ export default function Cennik() {
     <>
       <SiteNav />
       <main className="bg-zinc-950 text-white">
-        {/* Header */}
-        <section className="border-b border-zinc-900 px-6 pt-32 pb-16">
-          <div className="mx-auto max-w-4xl text-center">
-            <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-              Cennik
-            </p>
-            <h1 className="mb-4 text-4xl font-semibold tracking-tight md:text-5xl">
-              Jedna cena. Wszystkie funkcje. Bez gwiazdek.
-            </h1>
-            <p className="mx-auto max-w-2xl text-lg text-zinc-400">
-              Nie sprzedajemy &quot;pakietów&quot; ani &quot;modułów premium&quot;. Wszystko, co
-              budujemy, dostajesz w jednej cenie.
-            </p>
-          </div>
-        </section>
+        <PageHero
+          eyebrow="Cennik"
+          title="Jedna cena. Wszystkie funkcje. Bez gwiazdek."
+          description="Nie sprzedajemy 'pakietów' ani 'modułów premium'. Wszystko, co budujemy, dostajesz w jednej cenie."
+        />
 
-        {/* Pricing card */}
+        {/* Pricing card z BorderBeam */}
         <section className="border-b border-zinc-900 px-6 py-20">
           <div className="mx-auto max-w-3xl">
-            <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 md:p-12">
-              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" />
-              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-cyan-500/20 blur-3xl" />
+            <FadeIn>
+              <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 transition hover:border-emerald-500/50 hover:shadow-[0_0_80px_-10px_rgba(16,185,129,0.4)] md:p-12">
+                <BorderBeam size={350} duration={10} colorFrom="#10b981" colorTo="#22d3ee" />
+                <BorderBeam size={350} duration={10} colorFrom="#22d3ee" colorTo="#10b981" delay={5} />
 
-              <div className="relative">
-                <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300">
-                  ⚡ Promocja: pierwsze 10 biur
+                <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" />
+                <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-cyan-500/20 blur-3xl" />
+
+                <div className="relative">
+                  <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300">
+                    ⚡ Promocja: pierwsze 10 biur
+                  </div>
+
+                  <div className="mt-6 mb-8 flex flex-wrap items-baseline gap-3">
+                    <span className="bg-gradient-to-br from-white to-zinc-400 bg-clip-text text-6xl font-semibold text-transparent">
+                      299 zł
+                    </span>
+                    <span className="text-zinc-400">/ miesiąc / biuro</span>
+                    <span className="text-zinc-500">·</span>
+                    <span className="text-zinc-500">do 10 agentów</span>
+                  </div>
+
+                  <p className="mb-8 text-zinc-300">
+                    Każdy dodatkowy agent: <strong className="text-white">29 zł / mc</strong>.
+                    Roczna subskrypcja: <strong className="text-white">2990 zł</strong> (zamiast
+                    3588 zł).
+                  </p>
+
+                  <ul className="mb-8 grid gap-3 md:grid-cols-2">
+                    {INCLUDED.map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-sm text-zinc-300">
+                        <svg
+                          className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href="/#waitlist"
+                    className="group relative block w-full overflow-hidden rounded-xl bg-emerald-500 px-6 py-4 text-center font-semibold text-zinc-950 transition hover:bg-emerald-400 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.8)]"
+                  >
+                    <span className="relative z-10">Dołącz do listy oczekujących</span>
+                    <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                  </Link>
+
+                  <p className="mt-4 text-center text-sm text-zinc-500">
+                    Pierwsze 10 biur: 3 miesiące za darmo + 30% rabatu na pierwszy rok
+                  </p>
                 </div>
-
-                <div className="mt-6 mb-8 flex flex-wrap items-baseline gap-3">
-                  <span className="text-6xl font-semibold text-white">299 zł</span>
-                  <span className="text-zinc-400">/ miesiąc / biuro</span>
-                  <span className="text-zinc-500">·</span>
-                  <span className="text-zinc-500">do 10 agentów w cenie</span>
-                </div>
-
-                <p className="mb-8 text-zinc-300">
-                  Każdy dodatkowy agent: <strong className="text-white">29 zł / mc</strong>.
-                  Roczna subskrypcja: <strong className="text-white">2990 zł</strong> (zamiast
-                  3588 zł).
-                </p>
-
-                <ul className="mb-8 grid gap-3 md:grid-cols-2">
-                  {INCLUDED.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-zinc-300">
-                      <svg
-                        className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.5}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/#waitlist"
-                  className="block w-full rounded-xl bg-emerald-500 px-6 py-4 text-center font-semibold text-zinc-950 transition hover:bg-emerald-400"
-                >
-                  Dołącz do listy oczekujących
-                </Link>
-
-                <p className="mt-4 text-center text-sm text-zinc-500">
-                  Pierwsze 10 biur: 3 miesiące za darmo + 30% rabatu na pierwszy rok
-                </p>
               </div>
-            </div>
+            </FadeIn>
           </div>
         </section>
 
-        {/* Comparison */}
-        <section className="border-b border-zinc-900 px-6 py-20">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="mb-12 text-center text-3xl font-semibold tracking-tight md:text-4xl">
-              Porównaj z tradycyjnym szkoleniem
-            </h2>
+        {/* Comparison — visual */}
+        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+          <div className="mx-auto max-w-5xl">
+            <FadeIn>
+              <h2 className="mb-12 text-center text-3xl font-semibold tracking-tight md:text-4xl">
+                Porównaj z tradycyjnym szkoleniem
+              </h2>
+            </FadeIn>
 
             <div className="grid gap-6 md:grid-cols-3">
-              <div className="rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6">
-                <h3 className="mb-3 text-base font-semibold text-zinc-400">
-                  Trener zewnętrzny 1-na-1
-                </h3>
-                <p className="mb-2 text-3xl font-semibold text-white">~4800 zł</p>
-                <p className="text-sm text-zinc-500">/ mc / biuro 8 agentów</p>
-                <p className="mt-4 text-xs text-zinc-600">
-                  1 godzina/tydzień/agent · brak danych · brak ciągłości
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6">
-                <h3 className="mb-3 text-base font-semibold text-zinc-400">
-                  Warsztat raz na kwartał
-                </h3>
-                <p className="mb-2 text-3xl font-semibold text-white">~1500 zł</p>
-                <p className="text-sm text-zinc-500">/ mc / biuro 8 agentów</p>
-                <p className="mt-4 text-xs text-zinc-600">
-                  4 godziny / kwartał · zapomniane po 2 tygodniach
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 to-zinc-900/30 p-6">
-                <h3 className="mb-3 text-base font-semibold text-emerald-300">AgentSpace</h3>
-                <p className="mb-2 text-3xl font-semibold text-white">299 zł</p>
-                <p className="text-sm text-zinc-500">/ mc / biuro 8 agentów</p>
-                <p className="mt-4 text-xs text-zinc-400">
-                  15 min/dzień/agent · dane w czasie rzeczywistym · konsekwencja
-                </p>
-              </div>
+              {COMPARISON.map((item, index) => (
+                <FadeIn key={item.label} delay={index * 0.1}>
+                  <div
+                    className={`relative h-full overflow-hidden rounded-2xl p-6 transition-all ${
+                      item.highlight
+                        ? "border border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 to-zinc-900/30 shadow-[0_0_40px_-15px_rgba(16,185,129,0.4)]"
+                        : "border border-zinc-900 bg-zinc-900/30"
+                    }`}
+                  >
+                    {item.highlight && (
+                      <>
+                        <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/20 blur-2xl" />
+                        <div className="absolute -bottom-12 -left-12 h-32 w-32 rounded-full bg-cyan-500/20 blur-2xl" />
+                        <div className="absolute right-4 top-4 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
+                          Najlepszy
+                        </div>
+                      </>
+                    )}
+                    <div className="relative">
+                      <h3
+                        className={`mb-3 text-base font-semibold ${item.highlight ? "text-emerald-300" : "text-zinc-400"}`}
+                      >
+                        {item.label}
+                      </h3>
+                      <p
+                        className={`mb-2 font-semibold ${
+                          item.highlight
+                            ? "bg-gradient-to-br from-white to-emerald-200 bg-clip-text text-4xl text-transparent"
+                            : "text-3xl text-white"
+                        }`}
+                      >
+                        {item.price}
+                      </p>
+                      <p className="text-sm text-zinc-500">{item.perMonth}</p>
+                      <p
+                        className={`mt-4 text-xs ${item.highlight ? "text-zinc-400" : "text-zinc-600"}`}
+                      >
+                        {item.detail}
+                      </p>
+                    </div>
+                  </div>
+                </FadeIn>
+              ))}
             </div>
           </div>
         </section>
 
         {/* FAQ */}
-        <section className="border-b border-zinc-900 px-6 py-20">
+        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
           <div className="mx-auto max-w-3xl">
-            <h2 className="mb-12 text-center text-3xl font-semibold tracking-tight md:text-4xl">
-              Pytania o cennik
-            </h2>
+            <FadeIn>
+              <h2 className="mb-12 text-center text-3xl font-semibold tracking-tight md:text-4xl">
+                Pytania o cennik
+              </h2>
+            </FadeIn>
 
             <div className="space-y-4">
-              {FAQ_PRICING.map((item) => (
-                <details
-                  key={item.q}
-                  className="group rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6 transition-all open:bg-zinc-900/50 hover:border-zinc-800"
-                >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-white">
-                    {item.q}
-                    <svg
-                      className="h-5 w-5 flex-shrink-0 text-zinc-500 transition group-open:rotate-180 group-open:text-emerald-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </summary>
-                  <p className="mt-4 leading-relaxed text-zinc-400">{item.a}</p>
-                </details>
+              {FAQ_PRICING.map((item, index) => (
+                <FadeIn key={item.q} delay={index * 0.05}>
+                  <details className="group rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6 transition-all open:bg-zinc-900/50 hover:border-zinc-800">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-white">
+                      {item.q}
+                      <svg
+                        className="h-5 w-5 flex-shrink-0 text-zinc-500 transition group-open:rotate-180 group-open:text-emerald-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </summary>
+                    <p className="mt-4 leading-relaxed text-zinc-400">{item.a}</p>
+                  </details>
+                </FadeIn>
               ))}
             </div>
           </div>

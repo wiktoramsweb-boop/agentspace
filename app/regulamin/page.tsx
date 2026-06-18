@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteNav } from "../components/site-nav";
 import { SiteFooter } from "../components/site-footer";
+import { PageHero } from "../components/page-hero";
 
 export const metadata: Metadata = {
   title: "Regulamin | AgentSpace",
@@ -17,15 +18,12 @@ export default function Regulamin() {
     <>
       <SiteNav />
       <main className="bg-zinc-950 text-white">
-        <section className="border-b border-zinc-900 px-6 pt-32 pb-12">
-          <div className="mx-auto max-w-3xl">
-            <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-              Prawne
-            </p>
-            <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Regulamin</h1>
-            <p className="mt-4 text-zinc-500">Ostatnia aktualizacja: 15 maja 2026</p>
-          </div>
-        </section>
+        <PageHero
+          eyebrow="Prawne"
+          title="Regulamin"
+          description={<span className="text-zinc-500">Ostatnia aktualizacja: 15 maja 2026</span>}
+          compact
+        />
 
         <section className="border-b border-zinc-900 px-6 py-16">
           <article className="prose-blog mx-auto max-w-3xl">

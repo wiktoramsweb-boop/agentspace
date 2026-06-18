@@ -6,6 +6,9 @@ import { AiCoachMockup } from "../components/mockups/ai-coach-mockup";
 import { AgentDashboardMockup } from "../components/mockups/agent-dashboard-mockup";
 import { OwnerPanelMockup } from "../components/mockups/owner-panel-mockup";
 import { CoachFlow } from "../components/coach-flow";
+import { PageHero } from "../components/page-hero";
+import { FadeIn } from "../components/fade-in";
+import { TiltCard } from "../components/effects/tilt-card";
 
 export const metadata: Metadata = {
   title: "Demo AgentSpace — zobacz jak działa AI Coach",
@@ -42,21 +45,11 @@ export default function Demo() {
     <>
       <SiteNav />
       <main className="bg-zinc-950 text-white">
-        {/* Header */}
-        <section className="border-b border-zinc-900 px-6 pt-32 pb-16">
-          <div className="mx-auto max-w-4xl text-center">
-            <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-              Demo
-            </p>
-            <h1 className="mb-4 text-4xl font-semibold tracking-tight md:text-5xl">
-              Zobacz, jak wygląda AgentSpace od środka
-            </h1>
-            <p className="mx-auto max-w-2xl text-lg text-zinc-400">
-              Wszystkie trzy główne ekrany — interaktywne mockupy z mikro-animacjami.
-              Wideo demo zaraz po premierze (Q1 2026).
-            </p>
-          </div>
-        </section>
+        <PageHero
+          eyebrow="Demo"
+          title="Zobacz, jak wygląda AgentSpace od środka"
+          description="Wszystkie trzy główne ekrany — interaktywne mockupy z mikro-animacjami. Wideo demo zaraz po premierze (Q1 2026)."
+        />
 
         {/* Mockupy */}
         {MOCKUPS_LIST.map((item, index) => (
@@ -66,7 +59,7 @@ export default function Demo() {
           >
             <div className="mx-auto max-w-6xl">
               <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
-                <div className={index % 2 === 1 ? "md:order-2" : ""}>
+                <FadeIn className={index % 2 === 1 ? "md:order-2" : ""}>
                   <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
                     {item.eyebrow}
                   </p>
@@ -74,9 +67,9 @@ export default function Demo() {
                     {item.title}
                   </h2>
                   <p className="text-lg leading-relaxed text-zinc-400">{item.body}</p>
-                </div>
-                <div className={index % 2 === 1 ? "md:order-1" : ""}>
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/10">
+                </FadeIn>
+                <FadeIn delay={0.15} className={index % 2 === 1 ? "md:order-1" : ""}>
+                  <TiltCard className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/10">
                     <div className="mb-2 flex items-center gap-1.5 px-2 py-1">
                       <div className="h-2 w-2 rounded-full bg-red-500/60" />
                       <div className="h-2 w-2 rounded-full bg-amber-500/60" />
@@ -86,8 +79,8 @@ export default function Demo() {
                       </div>
                     </div>
                     <item.Mockup />
-                  </div>
-                </div>
+                  </TiltCard>
+                </FadeIn>
               </div>
             </div>
           </section>
