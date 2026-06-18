@@ -14,6 +14,7 @@ const TEAM_SIZE_OPTIONS = [
 export function WaitlistForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [alreadyOnList, setAlreadyOnList] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,15 +27,33 @@ export function WaitlistForm() {
       agencyName: formData.get("agencyName"),
       teamSize: formData.get("teamSize"),
       phone: formData.get("phone"),
+      // honeypot
+      website: formData.get("website"),
     };
 
-    // Tymczasowo: tylko log do konsoli. Backend Supabase w następnej sesji.
-    console.log("Waitlist signup:", payload);
+    try {
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    // Symulacja wysyłki (żeby user zobaczył loader)
-    await new Promise((r) => setTimeout(r, 700));
+      const data = await response.json();
 
-    setStatus("success");
+      if (!response.ok) {
+        setErrorMessage(data.error ?? "Coś poszło nie tak. Spróbuj za chwilę.");
+        setStatus("error");
+        return;
+      }
+
+      if (data.alreadyOnList) {
+        setAlreadyOnList(true);
+      }
+      setStatus("success");
+    } catch {
+      setErrorMessage("Brak połączenia. Sprawdź internet i spróbuj ponownie.");
+      setStatus("error");
+    }
   }
 
   if (status === "success") {
@@ -51,16 +70,32 @@ export function WaitlistForm() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="mb-2 text-xl font-semibold text-white">Dziękujemy!</h3>
+        <h3 className="mb-2 text-xl font-semibold text-white">
+          {alreadyOnList ? "Już jesteś na liście" : "Dziękujemy!"}
+        </h3>
         <p className="text-zinc-400">
-          Jesteś na liście. Odezwiemy się jako pierwszy, gdy AgentSpace będzie gotowy do testów.
+          {alreadyOnList
+            ? "Ten email jest już zapisany. Odezwiemy się gdy AgentSpace będzie gotowy do testów."
+            : "Jesteś na liście. Odezwiemy się jako pierwszy, gdy AgentSpace będzie gotowy do testów."}
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      {/* Honeypot — ukryte pole dla botów */}
+      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+        <label htmlFor="website">Zostaw puste</label>
+        <input
+          id="website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div>
         <label htmlFor="email" className="mb-2 block text-sm font-medium text-zinc-300">
           Email <span className="text-emerald-400">*</span>
@@ -125,7 +160,9 @@ export function WaitlistForm() {
       </div>
 
       {errorMessage && (
-        <p className="text-sm text-red-400">{errorMessage}</p>
+        <p className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          {errorMessage}
+        </p>
       )}
 
       <button

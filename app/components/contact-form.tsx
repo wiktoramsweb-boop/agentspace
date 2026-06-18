@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Status = "idle" | "submitting" | "success";
+type Status = "idle" | "submitting" | "success" | "error";
 
 const TOPIC_OPTIONS = [
   { value: "pilotaz", label: "Chcę dołączyć do pilotażu" },
@@ -14,10 +14,12 @@ const TOPIC_OPTIONS = [
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("submitting");
+    setErrorMessage("");
 
     const formData = new FormData(event.currentTarget);
     const payload = {
@@ -26,13 +28,29 @@ export function ContactForm() {
       agency: formData.get("agency"),
       topic: formData.get("topic"),
       message: formData.get("message"),
+      website: formData.get("website"), // honeypot
     };
 
-    // Backend Resend / email — w następnej sesji.
-    console.log("Contact form:", payload);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    await new Promise((r) => setTimeout(r, 700));
-    setStatus("success");
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(data.error ?? "Coś poszło nie tak. Spróbuj za chwilę.");
+        setStatus("error");
+        return;
+      }
+
+      setStatus("success");
+    } catch {
+      setErrorMessage("Brak połączenia. Sprawdź internet i spróbuj ponownie.");
+      setStatus("error");
+    }
   }
 
   if (status === "success") {
@@ -58,7 +76,19 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      {/* Honeypot */}
+      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+        <label htmlFor="website-contact">Zostaw puste</label>
+        <input
+          id="website-contact"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label htmlFor="name" className="mb-2 block text-sm font-medium text-zinc-300">
@@ -134,10 +164,17 @@ export function ContactForm() {
           name="message"
           required
           rows={5}
+          minLength={10}
           placeholder="W czym możemy pomóc?"
           className="w-full resize-y rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
+
+      {errorMessage && (
+        <p className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          {errorMessage}
+        </p>
+      )}
 
       <button
         type="submit"
