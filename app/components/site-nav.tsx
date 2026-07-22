@@ -34,12 +34,20 @@ export function SiteNav() {
           ))}
         </div>
 
-        <Link
-          href="/#waitlist"
-          className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
-        >
-          Lista oczekujących
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/login"
+            className="hidden text-sm text-zinc-400 transition hover:text-white sm:block"
+          >
+            Zaloguj
+          </Link>
+          <Link
+            href="/#waitlist"
+            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          >
+            Lista oczekujących
+          </Link>
+        </div>
       </div>
     </nav>
   );

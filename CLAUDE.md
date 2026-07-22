@@ -2,7 +2,20 @@
 
 **Owner:** Wiktor Szostek (wiktoramsweb-boop on GitHub)
 **Domena:** agentspace.pl
-**Status:** Faza 1 — landing page i waitlist (przed MVP)
+**Status:** Faza 2 — MVP aplikacji w budowie (auth + AI Coach + dashboardy gotowe)
+
+## Struktura projektu
+
+- **Landing / marketing** (`/`, `/blog`, `/cennik`, `/o-nas`, `/kontakt`, `/demo`, `/dla-agentow`, `/dla-wlascicieli`, `/polityka-prywatnosci`, `/regulamin`) — gotowe, live.
+- **Aplikacja** (`/app/*`) — produkt SaaS, chroniony auth. Zbudowane:
+  - Auth: `/login`, `/signup` (owner zakłada biuro), `/zaproszenie/[token]` (agent dołącza). Server actions w `app/auth/actions.ts`.
+  - `/app` — pulpit (role-aware), `/app/trening` — AI Coach (5 scenariuszy), `/app/sesja/[id]` — sesja + wyniki, `/app/historia`, `/app/zespol` (owner: ranking + zaproszenia), `/app/ustawienia`.
+  - AI Coach: `lib/ai/coach.ts` (roleplay + scoring z Claude API, prompt caching), streaming przez `/api/coach/message`.
+  - Dane: `lib/data.ts`, typy `lib/types.ts`, auth helper `lib/auth.ts`.
+  - Supabase SSR: `lib/supabase/{server,client,admin,middleware}.ts`, root `middleware.ts` chroni `/app`.
+- **SETUP wymaga (user):** uruchomić `lib/SETUP-uruchom-w-supabase.sql` w Supabase SQL Editor + dodać env vary (patrz `.env.example`) w Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_APP_URL`.
+
+**Wzorzec dostępu do danych:** cały dostęp przez server-side kod z service_role (`createSupabaseAdmin`), autoryzacja egzekwowana w kodzie na bazie sesji (`requireUser`/`requireOwner`). RLS włączone jako backstop. Anon key tylko do auth (login/signup/getUser).
 
 ## Co to jest
 
