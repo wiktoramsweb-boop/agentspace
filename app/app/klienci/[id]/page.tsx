@@ -9,6 +9,7 @@ import { StatusChanger } from "./status-changer";
 import { NoteForm } from "./note-form";
 import { deleteClient } from "../actions";
 import { AiWriter } from "../../components/ai-writer";
+import { googleCalendarUrl } from "@/lib/calendar";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -59,6 +60,22 @@ export default async function ClientDetailPage({ params }: Props) {
             title="Jak odpowiedzieć na obiekcję?"
             placeholder="Np. klient mówi że prowizja za wysoka..."
           />
+          <a
+            href={googleCalendarUrl({
+              title: `Spotkanie: ${client.name}`,
+              details: `Klient: ${client.name}${type?.label ? ` (${type.label})` : ""}${
+                client.property ? ` · ${client.property}` : ""
+              }${client.phone ? ` · tel. ${client.phone}` : ""}`,
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-emerald-500 hover:text-emerald-400"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Umów spotkanie
+          </a>
         </div>
       </div>
 

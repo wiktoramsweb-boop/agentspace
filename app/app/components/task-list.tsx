@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { addTask, toggleTask, deleteTask } from "../tasks-actions";
 import type { Task } from "@/lib/types";
+import { googleCalendarUrl } from "@/lib/calendar";
 
 export function TaskList({ tasks }: { tasks: Task[] }) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -70,6 +71,22 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
                 <span className={`flex-1 text-sm ${done ? "text-zinc-600 line-through" : "text-zinc-200"}`}>
                   {task.title}
                 </span>
+                <a
+                  href={googleCalendarUrl({
+                    title: task.title,
+                    date: task.due_date,
+                    details: "Zadanie z AgentSpace",
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Dodaj do Google Calendar"
+                  aria-label="Dodaj do Google Calendar"
+                  className="flex-shrink-0 text-zinc-700 opacity-0 transition group-hover:opacity-100 hover:text-emerald-400"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </a>
                 <button
                   onClick={() => deleteTask(task.id)}
                   className="text-zinc-700 opacity-0 transition group-hover:opacity-100 hover:text-red-400"
