@@ -9,31 +9,46 @@ import {
   getTodayTasks,
   getClientsNeedingContact,
   getCommissionStats,
+  getGoal,
+  getOnboardingState,
 } from "@/lib/data-platform";
+import { getGameData, getWeeklyChallenge } from "@/lib/gamification";
+import { computeFunnel } from "@/lib/funnel";
 import { CLIENT_STATUSES } from "@/lib/types";
 import { PageHeader, StatCard, ScoreBadge, Card } from "./components/ui";
 import { formatPln, daysAgo } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
 import { TaskList } from "./components/task-list";
 import { DailyAssistant } from "./components/daily-assistant";
+import { GameStrip, BadgesCard } from "./components/game-strip";
+import { OnboardingChecklist } from "./components/onboarding-checklist";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   const firstName = (user.full_name ?? "").split(" ")[0] || "Cześć";
 
-  const [stats, recent, tasks, hotClients, commission] = await Promise.all([
+  const [stats, recent, tasks, hotClients, commission, goalRow, onboarding] = await Promise.all([
     getAgentStats(user.id),
     getRecentSessions(user.id, 4),
     getTodayTasks(user.id),
     getClientsNeedingContact(user.id, 5),
     getCommissionStats(user.id),
+    getGoal(user.id),
+    getOnboardingState(user.id),
   ]);
+
+  // Cel dzienny telefonów (z lejka) → gamifikacja
+  const dailyCallTarget = goalRow ? computeFunnel(goalRow).byStage.cold_calls.daily : 0;
+  const game = await getGameData(user.id, dailyCallTarget);
 
   const goal = user.monthly_goal_pln ?? 0;
   const goalProgress = goal > 0 ? Math.min(100, Math.round((commission.monthClosed / goal) * 100)) : 0;
 
   const ownerStats =
     user.role === "owner" && user.agency_id ? await getAgencyStats(user.agency_id) : null;
+  const weeklyChallenge =
+    user.agency_id ? await getWeeklyChallenge(user.agency_id) : [];
+  const myRank = weeklyChallenge.findIndex((a) => a.agentId === user.id) + 1;
 
   return (
     <>
@@ -49,6 +64,12 @@ export default async function DashboardPage() {
           </Link>
         }
       />
+
+      {/* Onboarding (znika po ukończeniu) */}
+      <OnboardingChecklist state={onboarding} />
+
+      {/* Gamifikacja: poziom, passa, następna odznaka */}
+      <GameStrip game={game} />
 
       {/* Górne statystyki */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -133,6 +154,46 @@ export default async function DashboardPage() {
                 );
               })}
             </ul>
+          )}
+        </Card>
+      </div>
+
+      {/* Odznaki + wyzwanie tygodnia */}
+      <div className="mb-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+        <BadgesCard game={game} />
+        <Card>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Wyzwanie tygodnia</h2>
+            <span className="text-xs text-zinc-500">cold calle</span>
+          </div>
+          {weeklyChallenge.length === 0 ? (
+            <p className="py-4 text-center text-sm text-zinc-500">Brak danych zespołu.</p>
+          ) : (
+            <>
+              <ol className="space-y-2">
+                {weeklyChallenge.slice(0, 5).map((a, i) => (
+                  <li
+                    key={a.agentId}
+                    className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 ${a.agentId === user.id ? "bg-emerald-500/10" : ""}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-5 text-center font-mono text-sm font-bold text-zinc-500">
+                        {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                      </span>
+                      <span className={`text-sm ${a.agentId === user.id ? "font-semibold text-white" : "text-zinc-300"}`}>
+                        {a.agentId === user.id ? "Ty" : a.name}
+                      </span>
+                    </div>
+                    <span className="font-mono text-sm font-semibold text-emerald-400">{a.calls}</span>
+                  </li>
+                ))}
+              </ol>
+              {myRank > 5 && (
+                <p className="mt-3 border-t border-zinc-700 pt-3 text-center text-xs text-zinc-500">
+                  Twoje miejsce: {myRank}
+                </p>
+              )}
+            </>
           )}
         </Card>
       </div>

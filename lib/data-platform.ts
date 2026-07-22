@@ -21,6 +21,22 @@ export async function getTodayLog(agentId: string): Promise<DailyLog | null> {
   return (data as DailyLog) ?? null;
 }
 
+export async function getOnboardingState(agentId: string) {
+  const admin = createSupabaseAdmin();
+  const [goal, clients, sessions, deals] = await Promise.all([
+    admin.from("goals").select("id", { count: "exact", head: true }).eq("agent_id", agentId),
+    admin.from("clients").select("id", { count: "exact", head: true }).eq("agent_id", agentId),
+    admin.from("training_sessions").select("id", { count: "exact", head: true }).eq("agent_id", agentId),
+    admin.from("deals").select("id", { count: "exact", head: true }).eq("agent_id", agentId),
+  ]);
+  return {
+    hasGoal: (goal.count ?? 0) > 0,
+    hasClient: (clients.count ?? 0) > 0,
+    hasSession: (sessions.count ?? 0) > 0,
+    hasDeal: (deals.count ?? 0) > 0,
+  };
+}
+
 /** Suma prowizji z transakcji zamkniętych w tym roku (realny postęp finansowy). */
 export async function getYearClosedCommission(agentId: string): Promise<number> {
   const admin = createSupabaseAdmin();

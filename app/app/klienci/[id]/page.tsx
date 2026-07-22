@@ -8,6 +8,7 @@ import { formatPln, daysAgo } from "@/lib/format";
 import { StatusChanger } from "./status-changer";
 import { NoteForm } from "./note-form";
 import { deleteClient } from "../actions";
+import { AiWriter } from "../../components/ai-writer";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -40,6 +41,24 @@ export default async function ClientDetailPage({ params }: Props) {
               {client.property && ` · ${client.property}`}
             </p>
           </div>
+        </div>
+
+        {/* AI pisze za agenta */}
+        <div className="flex flex-wrap gap-2">
+          <AiWriter
+            kind="followup"
+            clientName={client.name}
+            presetContext={`Klient: ${client.name}, ${type?.label ?? ""}${client.property ? `, szuka/sprzedaje: ${client.property}` : ""}${client.budget_pln ? `, budżet ${client.budget_pln} zł` : ""}. Status: ${client.status}.${client.notes ? ` Notatka: ${client.notes}` : ""}`}
+            buttonLabel="Napisz follow-up"
+            title="Wiadomość follow-up do klienta"
+            placeholder="O czym była ostatnia rozmowa? Co chcesz przekazać?"
+          />
+          <AiWriter
+            kind="objection"
+            buttonLabel="Pomoc z obiekcją"
+            title="Jak odpowiedzieć na obiekcję?"
+            placeholder="Np. klient mówi że prowizja za wysoka..."
+          />
         </div>
       </div>
 
