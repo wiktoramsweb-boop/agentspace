@@ -185,6 +185,12 @@ export const DEAL_STATUSES: { value: DealStatus; label: string; color: string }[
 
 export const PERSONALITIES = [
   {
+    value: "zyczliwy",
+    label: "Życzliwy (łatwy)",
+    description: "Otwarty, sympatyczny, chętnie współpracuje — dobry na start",
+    color: "emerald",
+  },
+  {
     value: "agresywny",
     label: "Agresywny",
     description: "Napięty, nieufny, szybko traci cierpliwość",

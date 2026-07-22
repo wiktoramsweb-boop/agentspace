@@ -6,6 +6,22 @@ import { PageHeader, Card } from "../components/ui";
 import { formatPln } from "@/lib/format";
 import { GoalSetup } from "./goal-setup";
 import { DailyTracker } from "./daily-tracker";
+import { WeekView, type WeekDay, type WeekSummary } from "./week-view";
+
+const DAY_LABELS = ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"];
+
+function ymd(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+/** Poniedziałek tygodnia zawierającego datę d. */
+function mondayOf(d: Date): Date {
+  const x = new Date(d);
+  const day = (x.getDay() + 6) % 7; // 0 = poniedziałek
+  x.setDate(x.getDate() - day);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
 
 export default async function CelePage() {
   const user = await requireUser();
@@ -35,9 +51,13 @@ export default async function CelePage() {
 
   const [todayLog, recentLogs, yearCommission] = await Promise.all([
     getTodayLog(user.id),
-    getRecentLogs(user.id, 30),
+    getRecentLogs(user.id, 56),
     getYearClosedCommission(user.id),
   ]);
+
+  // Mapa data → cold_calls
+  const callsByDate = new Map<string, number>();
+  for (const l of recentLogs) callsByDate.set(l.log_date, l.cold_calls);
 
   const funnel = computeFunnel(goal);
   const dailyTargets = {
@@ -52,6 +72,45 @@ export default async function CelePage() {
 
   // Passa: ile z ostatnich dni miało wykonany cel cold calli
   const daysHitCallGoal = recentLogs.filter((l) => l.cold_calls >= dailyTargets.cold_calls).length;
+
+  // Bieżący tydzień (Pn-Nd)
+  const todayStr = ymd(new Date());
+  const monday = mondayOf(new Date());
+  const weekDays: WeekDay[] = DAY_LABELS.map((label, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const ds = ymd(d);
+    return {
+      label,
+      dayNum: String(d.getDate()),
+      calls: callsByDate.get(ds) ?? 0,
+      target: dailyTargets.cold_calls,
+      isToday: ds === todayStr,
+      isFuture: ds > todayStr,
+    };
+  });
+  const weekTotal = weekDays.filter((d) => !d.isFuture).reduce((a, d) => a + d.calls, 0);
+  const weekTarget = funnel.byStage.cold_calls.weekly;
+
+  // Historia ostatnich 6 tygodni
+  const history: WeekSummary[] = [];
+  for (let w = 1; w <= 6; w++) {
+    const wkMonday = new Date(monday);
+    wkMonday.setDate(monday.getDate() - w * 7);
+    let total = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(wkMonday);
+      d.setDate(wkMonday.getDate() + i);
+      total += callsByDate.get(ymd(d)) ?? 0;
+    }
+    const wkEnd = new Date(wkMonday);
+    wkEnd.setDate(wkMonday.getDate() + 6);
+    history.push({
+      label: `${wkMonday.getDate()}.${wkMonday.getMonth() + 1}`,
+      total,
+      target: weekTarget,
+    });
+  }
 
   const PERIODS = [
     { key: "yearly" as const, label: "Rok" },
@@ -140,6 +199,11 @@ export default async function CelePage() {
             </div>
           </Card>
         </div>
+      </div>
+
+      {/* Plan tygodnia + historia */}
+      <div className="mt-6">
+        <WeekView days={weekDays} weekTotal={weekTotal} weekTarget={weekTarget} history={history} />
       </div>
 
       {/* Edycja celu */}

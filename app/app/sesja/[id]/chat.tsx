@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { endSession } from "../../trening/actions";
 import type { ChatMessage } from "@/lib/types";
+import { useSpeechRecognition } from "@/lib/use-speech-recognition";
 
 export function SessionChat({
   sessionId,
@@ -85,11 +86,21 @@ export function SessionChat({
 
   function handleSend(e: React.FormEvent) {
     e.preventDefault();
+    if (listening) stop();
     const text = input.trim();
     if (!text || streaming) return;
     setInput("");
     void runTurn(text);
   }
+
+  // Głos — rozpoznawanie mowy PL (darmowe, w przeglądarce)
+  const { supported: voiceSupported, listening, toggle, stop } = useSpeechRecognition(
+    (text, isFinal) => {
+      if (isFinal) {
+        setInput((prev) => (prev ? prev.trim() + " " : "") + text.trim());
+      }
+    },
+  );
 
   const agentTurns = messages.filter((m) => m.role === "agent").length;
 
@@ -129,22 +140,55 @@ export function SessionChat({
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="mt-4 flex gap-2 border-t border-zinc-900 pt-4">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Napisz co mówisz do klienta..."
-          disabled={streaming}
-          className="flex-1 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-60"
-        />
-        <button
-          type="submit"
-          disabled={streaming || !input.trim()}
-          className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Wyślij
-        </button>
-      </form>
+      <div className="mt-4 border-t border-zinc-800 pt-4">
+        {listening && (
+          <p className="mb-2 flex items-center gap-2 text-sm text-emerald-400">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
+              <span className="relative h-2.5 w-2.5 rounded-full bg-emerald-500" />
+            </span>
+            Słucham... mów, a tekst pojawi się w polu. Kliknij mikrofon by zakończyć.
+          </p>
+        )}
+        <form onSubmit={handleSend} className="flex gap-2">
+          {voiceSupported && (
+            <button
+              type="button"
+              onClick={toggle}
+              disabled={streaming}
+              title={listening ? "Zakończ mówienie" : "Mów zamiast pisać"}
+              className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border transition disabled:opacity-50 ${
+                listening
+                  ? "border-emerald-400 bg-emerald-500 text-zinc-950"
+                  : "border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-emerald-500/50 hover:text-white"
+              }`}
+            >
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm5 9a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z" />
+              </svg>
+            </button>
+          )}
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={listening ? "Mów..." : "Napisz albo powiedz co mówisz do klienta..."}
+            disabled={streaming}
+            className="flex-1 rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-60"
+          />
+          <button
+            type="submit"
+            disabled={streaming || !input.trim()}
+            className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Wyślij
+          </button>
+        </form>
+        {voiceSupported && !listening && (
+          <p className="mt-2 text-xs text-zinc-500">
+            🎤 Możesz mówić zamiast pisać — kliknij mikrofon. Działa najlepiej w Chrome.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
