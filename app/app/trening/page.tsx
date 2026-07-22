@@ -63,7 +63,10 @@ export default async function TreningPage() {
       {/* Kategorie */}
       <div className="space-y-10">
         {SCENARIO_CATEGORIES.map((cat) => {
-          const catScenarios = scenarios.filter((s) => s.category === (cat.value as ScenarioCategory));
+          // Fallback: scenariusze bez kategorii (przed SETUP-v3) traktuj jak cold_calling
+          const catScenarios = scenarios.filter(
+            (s) => (s.category ?? "cold_calling") === (cat.value as ScenarioCategory),
+          );
           if (catScenarios.length === 0) return null;
           return (
             <section key={cat.value}>
