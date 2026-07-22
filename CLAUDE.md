@@ -6,18 +6,17 @@
 
 ## ⭐ GDZIE JESTEŚMY / NASTĘPNE KROKI (czytaj najpierw)
 
-**Działa na produkcji (potwierdzone):** landing + blog + SEO; aplikacja `/app` z auth (signup biuro / login / invite agentów); **AI Coach** (5 scenariuszy PL, rozmowa streaming, scoring tool-use) — przetestowane, AI gra klienta świetnie; platforma: Klienci (CRM+notatki+pipeline), Prowizje (deals+cel mc), Zadania, Pulpit "poranna odprawa", AI Asystent Dnia; panel właściciela (mocne/słabe obszary, prowizje per agent, drill-down), raport miesięczny email + cron.
+**➡️ PEŁNY STATUS PROJEKTU: `PROJEKT-STATUS.md`** (kompletny handoff — historia, mapa, pliki, SQL, env, decyzje, następne kroki). Przeczytaj go na start nowej sesji.
 
-**⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić `lib/SETUP-v2-platforma.sql` w Supabase SQL Editor (tabele tasks/clients/client_notes/deals). Bez tego Klienci/Prowizje są puste (kod odporny — nie crashuje). SETUP v1 już uruchomiony.
+**Działa na produkcji:** landing+blog+SEO; aplikacja `/app` z auth; **AI Coach** (3 kategorie: Cold Calling/Spotkania/Najem, 13+ scenariuszy PL, 9 osobowości, streaming + głos przez Web Speech API, scoring tool-use) — przetestowane; platforma: Klienci (CRM+notatki+pipeline), Prowizje, Zadania, Pulpit, AI Asystent Dnia; **Cele** (lejek roczny→dzienny, dzienny tracker z animacją, plan tygodnia, historia); **gamifikacja** (XP/poziomy/passa/odznaki/wyzwanie tygodnia); **AI pisze za agenta** (follow-up+obiekcje na karcie klienta); **onboarding** (checklist); panel właściciela (mocne/słabe obszary, prowizje per agent, drill-down), raport miesięczny + cron.
 
-**Env na Vercel:** `ANTHROPIC_API_KEY` dodany i działa (portfel API osobny od claude.ai — user doładował ~$5, 1 sesja ≈ $0.02-0.06). Publiczne wartości Supabase mają defaulty w `lib/supabase/config.ts`.
+**⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić w Supabase SQL Editor pliki `lib/SETUP-*.sql` po kolei — v1 ✅ uruchomione; **v2 (platforma), v3 (kategorie+cele), v4 (łatwe scenariusze) prawdopodobnie do uruchomienia — POTWIERDZIĆ Z USEREM**. Kod odporny na brak tabel (puste, nie crashuje).
 
-**Następne kroki (omówione, jeszcze nie zbudowane):**
-1. Moduł **Nieruchomości** (oferty + zdjęcia via Supabase Storage) + publiczna sekcja ofert na stronie czytająca z tej samej bazy. W pełni wykonalne, priorytet usera.
-2. **OtoDom / portale** — user chce auto-eksport ofert. WAŻNE: to nie problem kodu, tylko DOSTĘPU — OtoDom (Grupa OLX) nie ma otwartego API, wymaga konta Pro dla biur + umowy partnerskiej (to fosa Asari/Galactiki). Rekomendacja: budować CRM+oferty teraz, eksport portalowy jako etap 2 gdy będą płacący klienci. Do research: dokładne warunki importu OtoDom + wyjaśnić co to "agencja5000" (user wspomniał).
-3. Później: AI Coach voice (Whisper+ElevenLabs+Vapi), płatności (Stripe/Tpay), Google Calendar.
+**Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa — portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`.
 
-**Kontekst współpracy:** user chce autonomii ("rób sam bez pytania"), commituj+pushuj incrementalnie, tłumacz prosto po polsku (początkujący w kodzie). Klucze API były w czacie — do rotacji po testach.
+**Następne (omówione, NIE zbudowane):** PWA+powiadomienia (rekomendowane następne — pętla nawyku dla terenu), moduł Nieruchomości (oferty+zdjęcia), OtoDom eksport (bariera=dostęp/umowa nie kod), głos AI w Coach (ElevenLabs=koszty), płatności, Google Calendar.
+
+**Współpraca:** user chce autonomii ("rób sam bez pytania"), commituj+pushuj incrementalnie, tłumacz prosto po polsku. Klucze API były w czacie — do rotacji po testach.
 
 ## Struktura projektu
 
