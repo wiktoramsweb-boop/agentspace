@@ -13,7 +13,9 @@
   - AI Coach: `lib/ai/coach.ts` (roleplay + scoring z Claude API, prompt caching), streaming przez `/api/coach/message`.
   - Dane: `lib/data.ts`, typy `lib/types.ts`, auth helper `lib/auth.ts`.
   - Supabase SSR: `lib/supabase/{server,client,admin,middleware}.ts`, root `middleware.ts` chroni `/app`.
-- **SETUP wymaga (user):** uruchomić `lib/SETUP-uruchom-w-supabase.sql` w Supabase SQL Editor + dodać env vary (patrz `.env.example`) w Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_APP_URL`.
+- **Platforma codziennej pracy** (v2): `/app/klienci` (CRM: karty, notatki, pipeline), `/app/prowizje` (deals + cel miesięczny), zadania inline na pulpicie, **AI Asystent Dnia** (`/api/assistant/daily` — 3 priorytety z klientów/pipeline/tasków). Data: `lib/data-platform.ts`, `lib/format.ts`, akcje w `app/app/{klienci,prowizje}/actions.ts` + `app/app/tasks-actions.ts`.
+- **Panel właściciela rozbudowany:** mocne/słabe obszary per kategoria, prowizje per agent, drill-down `/app/zespol/[agentId]`. **Raport miesięczny email** (`lib/report.ts`) — przycisk manualny + cron `/api/cron/monthly-report` (vercel.json, 1. dnia mc).
+- **SETUP wymaga (user):** uruchomić `lib/SETUP-uruchom-w-supabase.sql` ORAZ `lib/SETUP-v2-platforma.sql` w Supabase SQL Editor + dodać env `ANTHROPIC_API_KEY` w Vercel (reszta publicznych ma defaulty w `lib/supabase/config.ts`). Opcjonalnie `CRON_SECRET` dla crona raportu.
 
 **Wzorzec dostępu do danych:** cały dostęp przez server-side kod z service_role (`createSupabaseAdmin`), autoryzacja egzekwowana w kodzie na bazie sesji (`requireUser`/`requireOwner`). RLS włączone jako backstop. Anon key tylko do auth (login/signup/getUser).
 

@@ -227,6 +227,99 @@ export async function getAgencyStats(agencyId: string): Promise<AgencyStats> {
   };
 }
 
+export type CategoryAvg = { key: string; label: string; avg: number };
+
+const CATEGORY_KEYS = ["opening", "qualification", "objection_handling", "closing"] as const;
+const CATEGORY_LABEL_MAP: Record<string, string> = {
+  opening: "Otwarcie",
+  qualification: "Kwalifikacja",
+  objection_handling: "Obsługa obiekcji",
+  closing: "Zamknięcie",
+};
+
+/** Średnie per kategoria dla całej agencji (posortowane malejąco). */
+export async function getAgencyCategoryAverages(agencyId: string): Promise<CategoryAvg[]> {
+  const admin = createSupabaseAdmin();
+  const { data: scores } = await admin
+    .from("session_scores")
+    .select("opening, qualification, objection_handling, closing")
+    .eq("agency_id", agencyId);
+
+  if (!scores || scores.length === 0) return [];
+
+  return CATEGORY_KEYS.map((key) => {
+    const vals = scores.map((s) => s[key]).filter((n): n is number => n != null);
+    const avg = vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : 0;
+    return { key, label: CATEGORY_LABEL_MAP[key], avg };
+  }).sort((a, b) => b.avg - a.avg);
+}
+
+export type AgentDetail = {
+  profile: Profile;
+  categoryAverages: CategoryAvg[];
+  sessions: SessionWithScore[];
+  avgScore: number | null;
+  sessionCount: number;
+  monthCommission: number;
+};
+
+/** Szczegóły jednego agenta dla właściciela. */
+export async function getAgentDetail(
+  agentId: string,
+  agencyId: string,
+): Promise<AgentDetail | null> {
+  const admin = createSupabaseAdmin();
+
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("*")
+    .eq("id", agentId)
+    .eq("agency_id", agencyId)
+    .single();
+  if (!profile) return null;
+
+  const { data: scores } = await admin
+    .from("session_scores")
+    .select("overall, opening, qualification, objection_handling, closing")
+    .eq("agent_id", agentId);
+
+  const sessions = await getRecentSessions(agentId, 10);
+
+  const overallVals = (scores ?? []).map((s) => s.overall).filter((n): n is number => n != null);
+  const avgScore = overallVals.length
+    ? Math.round((overallVals.reduce((a, b) => a + b, 0) / overallVals.length) * 10) / 10
+    : null;
+
+  const categoryAverages: CategoryAvg[] =
+    (scores ?? []).length > 0
+      ? CATEGORY_KEYS.map((key) => {
+          const vals = (scores ?? []).map((s) => s[key]).filter((n): n is number => n != null);
+          const avg = vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : 0;
+          return { key, label: CATEGORY_LABEL_MAP[key], avg };
+        })
+      : [];
+
+  // Prowizja zamknięta w tym miesiącu
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const { data: deals } = await admin
+    .from("deals")
+    .select("commission_pln")
+    .eq("agent_id", agentId)
+    .eq("status", "zamkniety")
+    .gte("closed_at", monthStart);
+  const monthCommission = (deals ?? []).reduce((a, d) => a + (d.commission_pln ?? 0), 0);
+
+  return {
+    profile: profile as Profile,
+    categoryAverages,
+    sessions,
+    avgScore,
+    sessionCount: overallVals.length,
+    monthCommission,
+  };
+}
+
 export async function getPendingInvitations(agencyId: string) {
   const admin = createSupabaseAdmin();
   const { data } = await admin

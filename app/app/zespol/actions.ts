@@ -5,8 +5,22 @@ import { Resend } from "resend";
 import { requireOwner } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { APP_URL } from "@/lib/supabase/config";
+import { sendAgencyMonthlyReport } from "@/lib/report";
 
 export type ZespolResult = { error?: string; success?: string } | undefined;
+
+/**
+ * Manualne wysłanie raportu miesięcznego na email właściciela (podgląd).
+ */
+export async function sendMonthlyReportNow(
+  _prev: ZespolResult,
+  _formData: FormData,
+): Promise<ZespolResult> {
+  const owner = await requireOwner();
+  const ok = await sendAgencyMonthlyReport(owner.agency_id!);
+  if (!ok) return { error: "Nie udało się wysłać raportu (sprawdź konfigurację email)." };
+  return { success: `Raport wysłany na ${owner.email}.` };
+}
 
 /**
  * Zaproszenie agenta: tworzy rekord invitation i wysyła email z linkiem.
