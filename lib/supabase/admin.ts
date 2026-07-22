@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { SUPABASE_URL } from "./config";
 
 /**
  * Service-role client — omija RLS. TYLKO server-side (API routes, server
@@ -7,13 +8,11 @@ import { createClient } from "@supabase/supabase-js";
  * Klucz service_role NIGDY nie trafia do przeglądarki.
  */
 export function createSupabaseAdmin() {
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = process.env.SUPABASE_URL ?? SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!url || !serviceKey) {
-    throw new Error(
-      "Brak SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY w env.",
-    );
+  if (!serviceKey) {
+    throw new Error("Brak SUPABASE_SERVICE_ROLE_KEY w env.");
   }
 
   return createClient(url, serviceKey, {

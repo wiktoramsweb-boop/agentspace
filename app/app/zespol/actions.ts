@@ -4,10 +4,9 @@ import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { requireOwner } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { APP_URL } from "@/lib/supabase/config";
 
 export type ZespolResult = { error?: string; success?: string } | undefined;
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agentspace.pl";
 
 /**
  * Zaproszenie agenta: tworzy rekord invitation i wysyła email z linkiem.
