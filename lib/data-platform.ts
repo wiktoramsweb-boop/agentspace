@@ -1,5 +1,50 @@
 import { createSupabaseAdmin } from "./supabase/admin";
-import type { Task, Client, ClientNote, Deal } from "./types";
+import type { Task, Client, ClientNote, Deal, Goal, DailyLog } from "./types";
+
+// ---------- GOALS ----------
+
+export async function getGoal(agentId: string): Promise<Goal | null> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin.from("goals").select("*").eq("agent_id", agentId).maybeSingle();
+  return (data as Goal) ?? null;
+}
+
+export async function getTodayLog(agentId: string): Promise<DailyLog | null> {
+  const admin = createSupabaseAdmin();
+  const today = new Date().toISOString().slice(0, 10);
+  const { data } = await admin
+    .from("daily_logs")
+    .select("*")
+    .eq("agent_id", agentId)
+    .eq("log_date", today)
+    .maybeSingle();
+  return (data as DailyLog) ?? null;
+}
+
+/** Suma prowizji z transakcji zamkniętych w tym roku (realny postęp finansowy). */
+export async function getYearClosedCommission(agentId: string): Promise<number> {
+  const admin = createSupabaseAdmin();
+  const yearStart = new Date(new Date().getFullYear(), 0, 1).toISOString();
+  const { data } = await admin
+    .from("deals")
+    .select("commission_pln")
+    .eq("agent_id", agentId)
+    .eq("status", "zamkniety")
+    .gte("closed_at", yearStart);
+  return (data ?? []).reduce((a, d) => a + (d.commission_pln ?? 0), 0);
+}
+
+export async function getRecentLogs(agentId: string, days = 30): Promise<DailyLog[]> {
+  const admin = createSupabaseAdmin();
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const { data } = await admin
+    .from("daily_logs")
+    .select("*")
+    .eq("agent_id", agentId)
+    .gte("log_date", since)
+    .order("log_date", { ascending: false });
+  return (data ?? []) as DailyLog[];
+}
 
 // ---------- TASKS ----------
 

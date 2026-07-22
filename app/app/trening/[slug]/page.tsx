@@ -24,17 +24,20 @@ export default async function ScenarioSetupPage({ params }: Props) {
         {scenario!.title}
       </h1>
 
-      <Card className="mb-8 !bg-zinc-900/30">
+      <Card className="mb-8 !border-emerald-500/20 !bg-emerald-500/[0.04]">
         <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400">
-          Twoje zadanie
+          Krok 1 · Twoje zadanie
         </p>
-        <p className="leading-relaxed text-zinc-300">{scenario!.brief}</p>
+        <p className="leading-relaxed text-zinc-200">{scenario!.brief}</p>
       </Card>
 
       <form action={startSession}>
         <input type="hidden" name="scenarioId" value={scenario!.id} />
 
-        <h2 className="mb-4 text-lg font-semibold text-white">Wybierz osobowość klienta</h2>
+        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400">
+          Krok 2 · Wybierz typ klienta
+        </p>
+        <h2 className="mb-4 text-lg font-semibold text-white">Jak ma zachowywać się AI?</h2>
         <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {PERSONALITIES.map((p, i) => (
             <label
@@ -59,12 +62,18 @@ export default async function ScenarioSetupPage({ params }: Props) {
           ))}
         </div>
 
+        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-emerald-400">
+          Krok 3 · Zaczynamy
+        </p>
         <button
           type="submit"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400 sm:w-auto"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400 hover:shadow-[0_0_30px_-8px_rgba(16,185,129,0.7)] sm:w-auto"
         >
-          Rozpocznij rozmowę →
+          Rozpocznij rozmowę z AI klientem →
         </button>
+        <p className="mt-2 text-sm text-zinc-500">
+          AI odezwie się pierwszy. Pisz jak do prawdziwego klienta. Na końcu kliknij „Zakończ i oceń".
+        </p>
       </form>
     </>
   );

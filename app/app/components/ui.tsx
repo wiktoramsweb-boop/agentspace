@@ -38,13 +38,13 @@ export function StatCard({
     <div
       className={`rounded-2xl border p-6 ${
         accent
-          ? "border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-zinc-900/40"
-          : "border-zinc-900 bg-zinc-900/40"
+          ? "border-emerald-500/40 bg-gradient-to-br from-emerald-500/15 to-zinc-800/40"
+          : "border-zinc-700 bg-zinc-800/40"
       }`}
     >
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">{label}</p>
       <p className="mt-2 text-3xl font-semibold text-white">{value}</p>
-      {sub && <p className="mt-1 text-sm text-zinc-500">{sub}</p>}
+      {sub && <p className="mt-1 text-sm text-zinc-400">{sub}</p>}
     </div>
   );
 }
@@ -85,9 +85,9 @@ export function EmptyState({
   ctaLabel?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/20 p-10 text-center">
+    <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-800/30 p-10 text-center">
       <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
-      <p className="mx-auto mb-6 max-w-md text-sm text-zinc-400">{body}</p>
+      <p className="mx-auto mb-6 max-w-md text-sm text-zinc-300">{body}</p>
       {ctaHref && ctaLabel && (
         <Link
           href={ctaHref}
@@ -102,7 +102,7 @@ export function EmptyState({
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl border border-zinc-900 bg-zinc-900/40 p-6 ${className ?? ""}`}>
+    <div className={`rounded-2xl border border-zinc-700 bg-zinc-800/40 p-6 ${className ?? ""}`}>
       {children}
     </div>
   );

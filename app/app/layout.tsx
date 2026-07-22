@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white md:flex">
+    <div className="min-h-screen bg-zinc-900 text-white md:flex">
       <Sidebar
         role={user.role}
         fullName={user.full_name ?? "Użytkownik"}

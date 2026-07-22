@@ -23,6 +23,8 @@ export type ProfileWithAgency = Profile & {
   agency: Agency | null;
 };
 
+export type ScenarioCategory = "cold_calling" | "spotkanie" | "najem";
+
 export type Scenario = {
   id: string;
   slug: string;
@@ -33,7 +35,34 @@ export type Scenario = {
   difficulty: "easy" | "medium" | "hard";
   order_index: number;
   is_active: boolean;
+  category: ScenarioCategory;
 };
+
+export const SCENARIO_CATEGORIES: {
+  value: ScenarioCategory;
+  label: string;
+  description: string;
+  icon: "phone" | "handshake" | "shield";
+}[] = [
+  {
+    value: "cold_calling",
+    label: "Cold Calling",
+    description: "Zimne telefony — pozyskiwanie kontaktu przez telefon",
+    icon: "phone",
+  },
+  {
+    value: "spotkanie",
+    label: "Spotkania pozyskowe",
+    description: "Spotkania u klienta — pozyskanie oferty i podpisanie umowy",
+    icon: "handshake",
+  },
+  {
+    value: "najem",
+    label: "Najem (bezpieczny)",
+    description: "Wynajem — weryfikacja najemcy, dochody, bezpieczeństwo",
+    icon: "shield",
+  },
+];
 
 export type ChatMessage = {
   role: "agent" | "client";
@@ -185,6 +214,69 @@ export const PERSONALITIES = [
     description: "Konkretny, rzeczowy, ceni Twój czas",
     color: "emerald",
   },
+  {
+    value: "nieufny",
+    label: "Nieufny",
+    description: "Podejrzliwy, był kiedyś oszukany, testuje Cię",
+    color: "orange",
+  },
+  {
+    value: "spieszacy",
+    label: "Spieszący się",
+    description: "Nie ma czasu, chce konkretów w 30 sekund",
+    color: "cyan",
+  },
+  {
+    value: "roszczeniowy",
+    label: "Roszczeniowy",
+    description: "Dużo wymaga, oczekuje że wszystko będzie po jego myśli",
+    color: "pink",
+  },
+  {
+    value: "gadatliwy",
+    label: "Gadatliwy",
+    description: "Odbiega od tematu, trzeba go umiejętnie prowadzić",
+    color: "teal",
+  },
 ] as const;
+
+// ---------- CELE (lejek sprzedażowy) ----------
+
+export type Goal = {
+  id: string;
+  agent_id: string;
+  agency_id: string;
+  annual_income_pln: number;
+  avg_commission_pln: number;
+  workdays_per_week: number;
+  calls_per_meeting: number;
+  meetings_per_listing: number;
+  listings_per_sale: number;
+  updated_at: string;
+  created_at: string;
+};
+
+export type DailyLog = {
+  id: string;
+  agent_id: string;
+  agency_id: string;
+  log_date: string;
+  cold_calls: number;
+  meetings: number;
+  listings: number;
+  buyers: number;
+  sales: number;
+  created_at: string;
+};
+
+export const FUNNEL_STAGES = [
+  { key: "cold_calls", label: "Cold calle", short: "Telefony", icon: "phone" },
+  { key: "meetings", label: "Spotkania pozyskowe", short: "Spotkania", icon: "handshake" },
+  { key: "listings", label: "Podpisane umowy", short: "Umowy", icon: "doc" },
+  { key: "buyers", label: "Znalezieni kupujący", short: "Kupujący", icon: "user" },
+  { key: "sales", label: "Sprzedaże / finalizacje", short: "Sprzedaże", icon: "trophy" },
+] as const;
+
+export type FunnelStageKey = (typeof FUNNEL_STAGES)[number]["key"];
 
 export type PersonalityValue = (typeof PERSONALITIES)[number]["value"];
