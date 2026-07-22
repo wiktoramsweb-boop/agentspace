@@ -2,7 +2,22 @@
 
 **Owner:** Wiktor Szostek (wiktoramsweb-boop on GitHub)
 **Domena:** agentspace.pl
-**Status:** Faza 2 — MVP aplikacji w budowie (auth + AI Coach + dashboardy gotowe)
+**Status:** Faza 2 — pełna platforma zbudowana i działa na produkcji
+
+## ⭐ GDZIE JESTEŚMY / NASTĘPNE KROKI (czytaj najpierw)
+
+**Działa na produkcji (potwierdzone):** landing + blog + SEO; aplikacja `/app` z auth (signup biuro / login / invite agentów); **AI Coach** (5 scenariuszy PL, rozmowa streaming, scoring tool-use) — przetestowane, AI gra klienta świetnie; platforma: Klienci (CRM+notatki+pipeline), Prowizje (deals+cel mc), Zadania, Pulpit "poranna odprawa", AI Asystent Dnia; panel właściciela (mocne/słabe obszary, prowizje per agent, drill-down), raport miesięczny email + cron.
+
+**⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić `lib/SETUP-v2-platforma.sql` w Supabase SQL Editor (tabele tasks/clients/client_notes/deals). Bez tego Klienci/Prowizje są puste (kod odporny — nie crashuje). SETUP v1 już uruchomiony.
+
+**Env na Vercel:** `ANTHROPIC_API_KEY` dodany i działa (portfel API osobny od claude.ai — user doładował ~$5, 1 sesja ≈ $0.02-0.06). Publiczne wartości Supabase mają defaulty w `lib/supabase/config.ts`.
+
+**Następne kroki (omówione, jeszcze nie zbudowane):**
+1. Moduł **Nieruchomości** (oferty + zdjęcia via Supabase Storage) + publiczna sekcja ofert na stronie czytająca z tej samej bazy. W pełni wykonalne, priorytet usera.
+2. **OtoDom / portale** — user chce auto-eksport ofert. WAŻNE: to nie problem kodu, tylko DOSTĘPU — OtoDom (Grupa OLX) nie ma otwartego API, wymaga konta Pro dla biur + umowy partnerskiej (to fosa Asari/Galactiki). Rekomendacja: budować CRM+oferty teraz, eksport portalowy jako etap 2 gdy będą płacący klienci. Do research: dokładne warunki importu OtoDom + wyjaśnić co to "agencja5000" (user wspomniał).
+3. Później: AI Coach voice (Whisper+ElevenLabs+Vapi), płatności (Stripe/Tpay), Google Calendar.
+
+**Kontekst współpracy:** user chce autonomii ("rób sam bez pytania"), commituj+pushuj incrementalnie, tłumacz prosto po polsku (początkujący w kodzie). Klucze API były w czacie — do rotacji po testach.
 
 ## Struktura projektu
 
