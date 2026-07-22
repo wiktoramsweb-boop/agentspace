@@ -88,3 +88,42 @@ export async function endSession(sessionId: string, _formData?: FormData): Promi
 
   redirect(`/app/sesja/${sessionId}`);
 }
+
+/**
+ * Ponowna ocena zakończonej sesji (gdy scoring wcześniej się nie udał).
+ */
+export async function rescoreSession(sessionId: string, _formData?: FormData): Promise<void> {
+  const user = await requireUser();
+  const admin = createSupabaseAdmin();
+
+  const { data: session } = await admin
+    .from("training_sessions")
+    .select("*")
+    .eq("id", sessionId)
+    .single();
+
+  if (!session || session.agent_id !== user.id) redirect("/app");
+
+  const transcript = (session!.transcript ?? []) as ChatMessage[];
+  const agentTurns = transcript.filter((m) => m.role === "agent").length;
+  if (agentTurns === 0) redirect(`/app/sesja/${sessionId}`);
+
+  // Usuń stary wynik (jeśli był) i policz od nowa
+  await admin.from("session_scores").delete().eq("session_id", sessionId);
+
+  const result = await scoreSession(session!.scenario_title ?? "Sesja", transcript);
+  await admin.from("session_scores").insert({
+    session_id: sessionId,
+    agent_id: user.id,
+    agency_id: session!.agency_id,
+    overall: result.overall,
+    opening: result.opening,
+    qualification: result.qualification,
+    objection_handling: result.objection_handling,
+    closing: result.closing,
+    summary: result.summary,
+    suggestions: result.suggestions,
+  });
+
+  redirect(`/app/sesja/${sessionId}`);
+}

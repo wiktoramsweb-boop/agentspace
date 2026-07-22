@@ -4,6 +4,9 @@ import { getSessionWithScore, getScenarioById } from "@/lib/data";
 import { SessionChat } from "./chat";
 import { SessionResults } from "./results";
 
+// Scoring (endSession) potrafi trwać kilka-kilkanaście sekund — daj mu czas.
+export const maxDuration = 60;
+
 type Props = { params: Promise<{ id: string }> };
 
 export default async function SessionPage({ params }: Props) {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { SessionWithScore } from "@/lib/data";
 import { scoreColor } from "../../components/ui";
+import { RescoreButton } from "./rescore-button";
 
 const CATEGORIES = [
   { key: "opening", label: "Otwarcie rozmowy" },
@@ -37,10 +38,13 @@ export function SessionResults({ session }: { session: SessionWithScore }) {
 
       {!score ? (
         <div className="mb-8 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-          <p className="text-zinc-400">
-            Ta sesja nie została oceniona (za mało wypowiedzi albo scoring był niedostępny).
-            Zobacz transkrypt poniżej.
+          <p className="mb-4 text-zinc-400">
+            Ta sesja nie została jeszcze oceniona. Kliknij poniżej, żeby AI przeanalizował
+            rozmowę i dał Ci scoring z feedbackiem.
           </p>
+          {session.transcript.some((m) => m.role === "agent") && (
+            <RescoreButton sessionId={session.id} />
+          )}
         </div>
       ) : (
         <>

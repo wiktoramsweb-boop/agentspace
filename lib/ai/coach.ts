@@ -119,7 +119,8 @@ suggestions: 2-4 KONKRETNE wskazówki po polsku. Każda odnosi się do tego co a
 Bądź sprawiedliwy ale wymagający. Jeśli rozmowa była krótka lub agent zrobił mało — niższe oceny. Odpowiadasz TYLKO w formacie JSON, bez dodatkowego tekstu.`;
 
 /**
- * Ocenia zakończoną sesję. Zwraca strukturę scoringu.
+ * Ocenia zakończoną sesję. Używa tool use — gwarantuje poprawny format
+ * (zero parsowania JSON z tekstu, brak ryzyka błędu składni).
  */
 export async function scoreSession(
   scenarioTitle: string,
@@ -133,31 +134,56 @@ export async function scoreSession(
 
   const response = await anthropic.messages.create({
     model: SCORING_MODEL,
-    max_tokens: 1024,
+    max_tokens: 1500,
     system: SCORING_SYSTEM,
+    tools: [
+      {
+        name: "zapisz_ocene",
+        description: "Zapisuje ocenę sesji treningowej agenta nieruchomości.",
+        input_schema: {
+          type: "object",
+          properties: {
+            overall: { type: "integer", description: "Ogólna ocena 1-10" },
+            opening: { type: "integer", description: "Otwarcie rozmowy 1-10" },
+            qualification: { type: "integer", description: "Kwalifikacja klienta 1-10" },
+            objection_handling: { type: "integer", description: "Obsługa obiekcji 1-10" },
+            closing: { type: "integer", description: "Zamknięcie 1-10" },
+            summary: { type: "string", description: "2-3 zdania podsumowania po polsku" },
+            suggestions: {
+              type: "array",
+              items: { type: "string" },
+              description: "2-4 konkretne wskazówki po polsku",
+            },
+          },
+          required: [
+            "overall",
+            "opening",
+            "qualification",
+            "objection_handling",
+            "closing",
+            "summary",
+            "suggestions",
+          ],
+        },
+      },
+    ],
+    tool_choice: { type: "tool", name: "zapisz_ocene" },
     messages: [
       {
         role: "user",
-        content: `Scenariusz: ${scenarioTitle}\n\nTranskrypt rozmowy:\n\n${dialogue}\n\nOceń wypowiedzi agenta. Zwróć wynik jako JSON o strukturze:\n{\n  "overall": <1-10>,\n  "opening": <1-10>,\n  "qualification": <1-10>,\n  "objection_handling": <1-10>,\n  "closing": <1-10>,\n  "summary": "<2-3 zdania>",\n  "suggestions": ["<wskazówka 1>", "<wskazówka 2>", ...]\n}`,
-      },
-      {
-        // Prefill — wymusza czysty JSON.
-        role: "assistant",
-        content: "{",
+        content: `Scenariusz: ${scenarioTitle}\n\nTranskrypt rozmowy:\n\n${dialogue}\n\nOceń wypowiedzi agenta i wywołaj narzędzie zapisz_ocene.`,
       },
     ],
   });
 
-  const text = response.content
-    .filter((b) => b.type === "text")
-    .map((b) => (b.type === "text" ? b.text : ""))
-    .join("");
+  const toolUse = response.content.find((b) => b.type === "tool_use");
+  if (!toolUse || toolUse.type !== "tool_use") {
+    throw new Error("Scoring nie zwrócił oceny");
+  }
 
-  const raw = "{" + text;
-  const parsed = JSON.parse(extractJson(raw)) as ScoringResult;
+  const parsed = toolUse.input as ScoringResult;
+  const clamp = (n: number) => Math.max(1, Math.min(10, Math.round(Number(n) || 1)));
 
-  // Sanity clamp 1-10
-  const clamp = (n: number) => Math.max(1, Math.min(10, Math.round(n || 1)));
   return {
     overall: clamp(parsed.overall),
     opening: clamp(parsed.opening),
@@ -167,12 +193,4 @@ export async function scoreSession(
     summary: parsed.summary ?? "",
     suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 5) : [],
   };
-}
-
-/** Wyciąga pierwszy pełny obiekt JSON z tekstu. */
-function extractJson(text: string): string {
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  if (start === -1 || end === -1) throw new Error("Brak JSON w odpowiedzi scoringu");
-  return text.slice(start, end + 1);
 }
