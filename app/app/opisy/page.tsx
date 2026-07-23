@@ -22,7 +22,7 @@ export default async function OpisyPage() {
     <>
       <PageHeader
         title="Opisy ogłoszeń"
-        subtitle="Wpisz parametry — opis w stylu Spectra złoży się sam. Bez kosztów AI."
+        subtitle="Wpisz parametry i kliknij ✨ — AI napisze pełny opis w stylu Spectra. Szablon bez AI działa też za darmo."
       />
       <OpisGenerator properties={prefill} />
     </>

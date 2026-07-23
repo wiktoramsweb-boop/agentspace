@@ -65,6 +65,15 @@ const DISCLAIMER_SPRZEDAZ = `Zgodnie z ustawą o gospodarce nieruchomościami pr
 
 const DISCLAIMER_WYNAJEM = `Zgodnie z ustawą o gospodarce nieruchomościami (Rozdział 2, Art. 180, pkt 3, Ustawa z dnia 21 sierpnia 1997 r. o gospodarce nieruchomościami) przed oglądnięciem nieruchomości należy podpisać standardową umowę pośrednictwa w najmie. Treść niniejszego ogłoszenia nie stanowi oferty handlowej w rozumieniu Kodeksu Cywilnego.`;
 
+/** Stałe zakończenie (Spectra + ewentualne „We speak English!" + klauzula prawna). */
+export function standardClosing(transakcja: Transakcja, english: boolean): string {
+  const blocks: string[] = [];
+  blocks.push(transakcja === "sprzedaz" ? SPECTRA_SPRZEDAZ : SPECTRA_WYNAJEM);
+  if (english) blocks.push("We speak English!");
+  blocks.push(transakcja === "sprzedaz" ? DISCLAIMER_SPRZEDAZ : DISCLAIMER_WYNAJEM);
+  return blocks.join("\n\n");
+}
+
 function t(v: string): string {
   return (v ?? "").trim();
 }

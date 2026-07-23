@@ -58,8 +58,36 @@ const EMPTY: OpisInput = {
 export function OpisGenerator({ properties }: { properties: PropertyPrefill[] }) {
   const [i, setI] = useState<OpisInput>(EMPTY);
   const [copied, setCopied] = useState(false);
+  const [aiText, setAiText] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const output = useMemo(() => generateListing(i), [i]);
+  const templateOutput = useMemo(() => generateListing(i), [i]);
+  // Gdy AI (lub ręczna edycja) nadpisze tekst — pokazujemy jego wersję,
+  // inaczej podgląd składany na żywo z pól.
+  const output = aiText !== null ? aiText : templateOutput;
+
+  async function generateAI() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/opis/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(i),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Nie udało się wygenerować.");
+      } else {
+        setAiText(data.text);
+      }
+    } catch {
+      setError("Błąd połączenia. Spróbuj ponownie.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function set<K extends keyof OpisInput>(key: K, value: OpisInput[K]) {
     setI((prev) => ({ ...prev, [key]: value }));
@@ -298,7 +326,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
 
       {/* PRAWA: podgląd */}
       <div className="lg:sticky lg:top-4 lg:h-fit">
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-3 flex items-center justify-between gap-2">
           <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">
             Gotowy opis
           </h2>
@@ -309,13 +337,38 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
             {copied ? "Skopiowano ✓" : "Kopiuj"}
           </button>
         </div>
+
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <button
+            onClick={generateAI}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+          >
+            {loading ? "AI pisze opis…" : "✨ Napisz przez AI"}
+          </button>
+          {aiText !== null && (
+            <button
+              onClick={() => setAiText(null)}
+              className="rounded-xl border border-zinc-700 px-4 py-2.5 text-sm text-zinc-300 transition hover:bg-zinc-800"
+            >
+              Wróć do szablonu
+            </button>
+          )}
+        </div>
+
+        {error && (
+          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>
+        )}
+
         <textarea
           value={output}
-          readOnly
-          className="h-[70vh] w-full resize-none rounded-2xl border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs leading-relaxed text-zinc-200 focus:outline-none"
+          onChange={(e) => setAiText(e.target.value)}
+          className="h-[70vh] w-full resize-none rounded-2xl border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs leading-relaxed text-zinc-200 focus:border-emerald-500 focus:outline-none"
         />
         <p className="mt-2 text-xs text-zinc-500">
-          Możesz zaznaczyć i edytować tekst ręcznie przed wklejeniem na portal.
+          ✨ AI napisze układ, atuty, lokalizację, potencjał i rekomendację z podanych danych.
+          Tekst możesz dowolnie edytować. <span className="text-amber-400/80">Zweryfikuj szczegóły
+          (linie, odległości, ceny) przed publikacją.</span>
         </p>
       </div>
     </div>
