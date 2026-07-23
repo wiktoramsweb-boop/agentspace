@@ -15,6 +15,7 @@ export default async function UstawieniaPage() {
           <SettingsForm
             fullName={user.full_name ?? ""}
             monthlyGoal={user.monthly_goal_pln ?? 0}
+            defaultSplit={user.default_split_pct ?? 50}
           />
         </Card>
 

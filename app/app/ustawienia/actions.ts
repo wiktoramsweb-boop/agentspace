@@ -14,13 +14,19 @@ export async function updateProfile(
   const fullName = String(formData.get("fullName") ?? "").trim();
   const goalRaw = String(formData.get("monthlyGoal") ?? "0").replace(/\s/g, "");
   const monthlyGoal = Math.max(0, parseInt(goalRaw, 10) || 0);
+  const splitRaw = parseInt(String(formData.get("defaultSplit") ?? "50"), 10);
+  const defaultSplit = Math.min(100, Math.max(1, Number.isFinite(splitRaw) ? splitRaw : 50));
 
   if (!fullName || fullName.length < 2) return { error: "Podaj imię i nazwisko" };
 
   const admin = createSupabaseAdmin();
   const { error } = await admin
     .from("profiles")
-    .update({ full_name: fullName, monthly_goal_pln: monthlyGoal })
+    .update({
+      full_name: fullName,
+      monthly_goal_pln: monthlyGoal,
+      default_split_pct: defaultSplit,
+    })
     .eq("id", user.id);
 
   if (error) return { error: "Nie udało się zapisać zmian." };

@@ -6,6 +6,11 @@ import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import type { ClientStatus, ClientType } from "@/lib/types";
 
+function floatOrNull(v: FormDataEntryValue | null): number | null {
+  const n = parseFloat(String(v ?? "").replace(",", ".").replace(/\s/g, ""));
+  return Number.isFinite(n) ? n : null;
+}
+
 export async function createClient(formData: FormData): Promise<void> {
   const user = await requireUser();
   const name = String(formData.get("name") ?? "").trim();
@@ -26,6 +31,11 @@ export async function createClient(formData: FormData): Promise<void> {
       status: (String(formData.get("status") ?? "nowy") as ClientStatus),
       budget_pln: Number.isFinite(budget) ? budget : null,
       property: String(formData.get("property") ?? "").trim() || null,
+      city: String(formData.get("city") ?? "").trim() || null,
+      address: String(formData.get("address") ?? "").trim() || null,
+      lat: floatOrNull(formData.get("lat")),
+      lng: floatOrNull(formData.get("lng")),
+      next_contact_at: String(formData.get("next_contact_at") ?? "") || null,
       last_contact_at: new Date().toISOString(),
     })
     .select("id")
@@ -33,6 +43,23 @@ export async function createClient(formData: FormData): Promise<void> {
 
   revalidatePath("/app/klienci");
   if (data) redirect(`/app/klienci/${data.id}`);
+}
+
+/** Ustawia (lub czyści) datę następnego zaplanowanego kontaktu. */
+export async function setNextContact(
+  clientId: string,
+  date: string | null,
+): Promise<void> {
+  const user = await requireUser();
+  const admin = createSupabaseAdmin();
+  await admin
+    .from("clients")
+    .update({ next_contact_at: date || null, updated_at: new Date().toISOString() })
+    .eq("id", clientId)
+    .eq("agent_id", user.id);
+  revalidatePath(`/app/klienci/${clientId}`);
+  revalidatePath("/app/klienci");
+  revalidatePath("/app");
 }
 
 export async function updateClientStatus(
@@ -74,9 +101,14 @@ export async function addClientNote(clientId: string, formData: FormData): Promi
 export async function markClientContacted(clientId: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
+  // Kontakt wykonany → czyścimy zaplanowane przypomnienie.
   await admin
     .from("clients")
-    .update({ last_contact_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .update({
+      last_contact_at: new Date().toISOString(),
+      next_contact_at: null,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", clientId)
     .eq("agent_id", user.id);
   revalidatePath("/app");

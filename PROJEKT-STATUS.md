@@ -58,6 +58,7 @@ Pliki w `lib/`, uruchamiać w SQL Editor po kolei. Status na teraz — **user ur
 2. `SETUP-v2-platforma.sql` — tasks, clients, client_notes, deals.
 3. `SETUP-v3-scenariusze-cele.sql` — +kolumna scenarios.category, goals, daily_logs, rekategoryzacja + 8 scenariuszy.
 4. `SETUP-v4-latwe-scenariusze.sql` — 3 łatwe scenariusze.
+5. **`SETUP-v5-nieruchomosci-prowizje.sql` — NOWE (do uruchomienia).** Tabele `properties` + `property_interests`; kolumny adres/mapa (`city,address,lat,lng`) i `next_contact_at` na `clients`; kolumny kalkulatora prowizji na `deals` (`property_id, transaction_value_pln, commission_seller/buyer/landlord/tenant_pln, extras_pln, extras_note, agent_split_pct, agent_earnings_pln`); `default_split_pct` na `profiles`; backfill `agent_earnings_pln = commission_pln` dla starych transakcji.
 
 Kod jest ODPORNY na brak tabel (puste dane, nie crashuje) — ale funkcje nie działają bez tabel.
 

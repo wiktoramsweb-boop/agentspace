@@ -11,12 +11,18 @@ export default async function KlienciPage() {
   const clients = await getClients(user.id);
 
   const active = clients.filter((c) => !["zamkniety", "stracony"].includes(c.status));
+  const today = new Date().toISOString().slice(0, 10);
+  const dueCount = active.filter(
+    (c) => c.next_contact_at && c.next_contact_at <= today,
+  ).length;
 
   return (
     <>
       <PageHeader
         title="Klienci"
-        subtitle={`${active.length} aktywnych · ${clients.length} łącznie`}
+        subtitle={`${active.length} aktywnych · ${clients.length} łącznie${
+          dueCount > 0 ? ` · 🔔 ${dueCount} do kontaktu` : ""
+        }`}
         action={<NewClientForm />}
       />
 
@@ -51,6 +57,11 @@ export default async function KlienciPage() {
                     </div>
                   </div>
                   <div className="flex flex-shrink-0 items-center gap-4">
+                    {c.next_contact_at && c.next_contact_at <= today && (
+                      <span className="rounded-md bg-amber-500/15 px-2 py-1 text-xs font-medium text-amber-300">
+                        🔔 do kontaktu
+                      </span>
+                    )}
                     <span className="hidden text-xs text-zinc-600 sm:block">
                       {daysAgo(c.last_contact_at)}
                     </span>

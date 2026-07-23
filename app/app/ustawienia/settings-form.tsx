@@ -6,9 +6,11 @@ import { updateProfile } from "./actions";
 export function SettingsForm({
   fullName,
   monthlyGoal,
+  defaultSplit,
 }: {
   fullName: string;
   monthlyGoal: number;
+  defaultSplit: number;
 }) {
   const [state, formAction, pending] = useActionState(updateProfile, undefined);
 
@@ -41,6 +43,25 @@ export function SettingsForm({
           className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
         <p className="mt-1.5 text-xs text-zinc-500">Pomaga śledzić postęp na pulpicie.</p>
+      </div>
+
+      <div>
+        <label htmlFor="defaultSplit" className="mb-2 block text-sm font-medium text-zinc-300">
+          Twój domyślny udział w prowizji (%)
+        </label>
+        <input
+          id="defaultSplit"
+          name="defaultSplit"
+          type="number"
+          min={1}
+          max={100}
+          defaultValue={defaultSplit || 50}
+          placeholder="np. 50"
+          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+        />
+        <p className="mt-1.5 text-xs text-zinc-500">
+          Podstawia się w kalkulatorze prowizji (możesz zmienić przy każdej transakcji).
+        </p>
       </div>
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}

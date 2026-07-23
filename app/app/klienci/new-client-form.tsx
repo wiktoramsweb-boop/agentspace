@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "./actions";
 import { CLIENT_TYPES, CLIENT_STATUSES } from "@/lib/types";
+import { AddressInput } from "../components/address-input";
 
 export function NewClientForm() {
   const [open, setOpen] = useState(false);
@@ -41,6 +42,15 @@ export function NewClientForm() {
             <Field label="Budżet (zł)" name="budget" type="number" placeholder="650000" />
             <Field label="Czego szuka / co sprzedaje" name="property" placeholder="2 pok. Krowodrza" />
           </div>
+
+          <AddressInput label="Adres / lokalizacja (opcjonalnie)" />
+
+          <Field
+            label="Następny kontakt (przypomnienie)"
+            name="next_contact_at"
+            type="date"
+          />
+
           <div className="flex gap-3 pt-2">
             <button
               type="submit"

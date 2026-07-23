@@ -1,17 +1,35 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { getClient, getClientNotes } from "@/lib/data-platform";
-import { CLIENT_TYPES } from "@/lib/types";
+import {
+  getClient,
+  getClientNotes,
+  getPropertiesOwnedByClient,
+  getPropertiesClientInterestedIn,
+} from "@/lib/data-platform";
+import { CLIENT_TYPES, PROPERTY_STATUSES, type Property } from "@/lib/types";
 import { Card } from "../../components/ui";
-import { formatPln, daysAgo } from "@/lib/format";
+import { MiniMap } from "../../components/mini-map";
+import { formatPln, daysAgo, formatDateShort } from "@/lib/format";
 import { StatusChanger } from "./status-changer";
 import { NoteForm } from "./note-form";
+import { NextContactControl } from "./next-contact-control";
 import { deleteClient } from "../actions";
 import { AiWriter } from "../../components/ai-writer";
 import { googleCalendarUrl } from "@/lib/calendar";
 
 type Props = { params: Promise<{ id: string }> };
+
+function reminderState(next: string | null): { due: boolean; label: string } | null {
+  if (!next) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const overdue = next < today;
+  const isToday = next === today;
+  return {
+    due: overdue || isToday,
+    label: overdue ? "Kontakt zaległy" : isToday ? "Kontakt dziś" : `Kontakt: ${formatDateShort(next)}`,
+  };
+}
 
 export default async function ClientDetailPage({ params }: Props) {
   const user = await requireUser();
@@ -21,8 +39,13 @@ export default async function ClientDetailPage({ params }: Props) {
   if (!client) notFound();
   if (client.agent_id !== user.id) redirect("/app/klienci");
 
-  const notes = await getClientNotes(id);
+  const [notes, owned, interested] = await Promise.all([
+    getClientNotes(id),
+    getPropertiesOwnedByClient(id),
+    getPropertiesClientInterestedIn(id),
+  ]);
   const type = CLIENT_TYPES.find((t) => t.value === client.type);
+  const reminder = reminderState(client.next_contact_at);
 
   return (
     <>
@@ -41,6 +64,17 @@ export default async function ClientDetailPage({ params }: Props) {
               {type?.label}
               {client.property && ` · ${client.property}`}
             </p>
+            {reminder && (
+              <span
+                className={`mt-1.5 inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-medium ${
+                  reminder.due
+                    ? "bg-amber-500/15 text-amber-300"
+                    : "bg-zinc-800 text-zinc-400"
+                }`}
+              >
+                🔔 {reminder.label}
+              </span>
+            )}
           </div>
         </div>
 
@@ -127,6 +161,25 @@ export default async function ClientDetailPage({ params }: Props) {
             </dl>
           </Card>
 
+          <Card>
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              Następny kontakt
+            </h2>
+            <NextContactControl clientId={client.id} current={client.next_contact_at} />
+          </Card>
+
+          {client.address && (
+            <Card>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-zinc-500">
+                Lokalizacja
+              </h2>
+              <p className="mb-3 text-sm text-zinc-300">{client.address}</p>
+              {client.lat != null && client.lng != null && (
+                <MiniMap lat={client.lat} lng={client.lng} title={client.name} />
+              )}
+            </Card>
+          )}
+
           <form action={deleteClient.bind(null, client.id)}>
             <button className="text-xs text-zinc-600 transition hover:text-red-400">
               Usuń klienta
@@ -134,8 +187,24 @@ export default async function ClientDetailPage({ params }: Props) {
           </form>
         </div>
 
-        {/* Prawa: notatki */}
+        {/* Prawa: nieruchomości + notatki */}
         <div className="space-y-6">
+          {(owned.length > 0 || interested.length > 0) && (
+            <Card>
+              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+                Powiązane nieruchomości
+              </h2>
+              <div className="space-y-4">
+                {owned.length > 0 && (
+                  <PropertyGroup label="Sprzedaje / wynajmuje" items={owned} />
+                )}
+                {interested.length > 0 && (
+                  <PropertyGroup label="Zainteresowany" items={interested} />
+                )}
+              </div>
+            </Card>
+          )}
+
           <Card>
             <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
               Nowa notatka
@@ -172,5 +241,38 @@ export default async function ClientDetailPage({ params }: Props) {
         </div>
       </div>
     </>
+  );
+}
+
+function PropertyGroup({ label, items }: { label: string; items: Property[] }) {
+  return (
+    <div>
+      <p className="mb-2 text-xs uppercase tracking-wide text-zinc-600">{label}</p>
+      <ul className="space-y-2">
+        {items.map((p) => {
+          const st = PROPERTY_STATUSES.find((s) => s.value === p.status);
+          return (
+            <li key={p.id}>
+              <Link
+                href={`/app/nieruchomosci/${p.id}`}
+                className="flex items-center justify-between gap-2 rounded-lg bg-zinc-900/50 px-3 py-2 transition hover:bg-zinc-900"
+              >
+                <span className="min-w-0 truncate text-sm text-zinc-200">
+                  {p.title}
+                  {p.price_pln != null && (
+                    <span className="text-zinc-500"> · {formatPln(p.price_pln)}</span>
+                  )}
+                </span>
+                {st && (
+                  <span className={`flex-shrink-0 rounded px-2 py-0.5 text-xs ${st.color}`}>
+                    {st.label}
+                  </span>
+                )}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
