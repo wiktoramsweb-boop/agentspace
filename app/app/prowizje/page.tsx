@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/auth";
-import { getDeals, getCommissionStats } from "@/lib/data-platform";
+import { getDeals, getCommissionStats, getPropertiesLite } from "@/lib/data-platform";
 import { DEAL_STATUSES } from "@/lib/types";
 import { PageHeader, StatCard, Card, EmptyState } from "../components/ui";
 import { formatPln, formatDateShort } from "@/lib/format";
@@ -7,9 +7,10 @@ import { NewDealButton, DealActions } from "./deal-controls";
 
 export default async function ProwizjePage() {
   const user = await requireUser();
-  const [deals, stats] = await Promise.all([
+  const [deals, stats, properties] = await Promise.all([
     getDeals(user.id),
     getCommissionStats(user.id),
+    getPropertiesLite(user.id),
   ]);
 
   const goal = user.monthly_goal_pln ?? 0;
@@ -20,7 +21,7 @@ export default async function ProwizjePage() {
       <PageHeader
         title="Prowizje"
         subtitle="Śledź transakcje i postęp do celu miesięcznego."
-        action={<NewDealButton />}
+        action={<NewDealButton properties={properties} defaultSplit={user.default_split_pct ?? 50} />}
       />
 
       {/* Cel miesięczny */}
@@ -49,13 +50,13 @@ export default async function ProwizjePage() {
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <StatCard
-          label="Zamknięte w tym mc"
+          label="Twój zarobek (mc)"
           value={formatPln(stats.monthClosed)}
-          sub={`${stats.dealsClosedThisMonth} transakcji`}
+          sub={`${stats.dealsClosedThisMonth} transakcji · biuro ${formatPln(stats.officeMonthClosed)}`}
           accent
         />
         <StatCard
-          label="W toku (pipeline)"
+          label="Twój pipeline (w toku)"
           value={formatPln(stats.pipelineValue)}
           sub={`${stats.dealsInProgress} transakcji`}
         />
@@ -81,7 +82,9 @@ export default async function ProwizjePage() {
                   <div className="min-w-0">
                     <p className="truncate font-medium text-white">{d.title}</p>
                     <p className="text-sm text-zinc-500">
-                      {formatPln(d.commission_pln)}
+                      <span className="text-emerald-400">{formatPln(d.agent_earnings_pln)}</span>
+                      {` dla Ciebie · biuro ${formatPln(d.commission_pln)}`}
+                      {d.agent_split_pct ? ` (${d.agent_split_pct}%)` : ""}
                       {d.status === "zamkniety" && d.closed_at
                         ? ` · zamknięta ${formatDateShort(d.closed_at)}`
                         : d.expected_close
