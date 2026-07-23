@@ -1,5 +1,13 @@
 import { createSupabaseAdmin } from "./supabase/admin";
-import type { Task, Client, ClientNote, Deal, Goal, DailyLog } from "./types";
+import type {
+  Task,
+  Client,
+  ClientNote,
+  Deal,
+  Goal,
+  DailyLog,
+  Property,
+} from "./types";
 
 // ---------- GOALS ----------
 
@@ -37,17 +45,17 @@ export async function getOnboardingState(agentId: string) {
   };
 }
 
-/** Suma prowizji z transakcji zamkniętych w tym roku (realny postęp finansowy). */
+/** Zarobek agenta z transakcji zamkniętych w tym roku (realny postęp finansowy). */
 export async function getYearClosedCommission(agentId: string): Promise<number> {
   const admin = createSupabaseAdmin();
   const yearStart = new Date(new Date().getFullYear(), 0, 1).toISOString();
   const { data } = await admin
     .from("deals")
-    .select("commission_pln")
+    .select("agent_earnings_pln")
     .eq("agent_id", agentId)
     .eq("status", "zamkniety")
     .gte("closed_at", yearStart);
-  return (data ?? []).reduce((a, d) => a + (d.commission_pln ?? 0), 0);
+  return (data ?? []).reduce((a, d) => a + (d.agent_earnings_pln ?? 0), 0);
 }
 
 export async function getRecentLogs(agentId: string, days = 30): Promise<DailyLog[]> {
@@ -153,8 +161,9 @@ export async function getDeals(agentId: string): Promise<Deal[]> {
 }
 
 export type CommissionStats = {
-  monthClosed: number; // suma prowizji zamkniętych w tym miesiącu
-  pipelineValue: number; // suma prowizji w toku
+  monthClosed: number; // zarobek agenta zamknięty w tym miesiącu
+  pipelineValue: number; // zarobek agenta w toku
+  officeMonthClosed: number; // prowizja biura zamknięta w tym miesiącu
   dealsInProgress: number;
   dealsClosedThisMonth: number;
 };
@@ -163,7 +172,7 @@ export async function getCommissionStats(agentId: string): Promise<CommissionSta
   const admin = createSupabaseAdmin();
   const { data: deals } = await admin
     .from("deals")
-    .select("commission_pln, status, closed_at")
+    .select("commission_pln, agent_earnings_pln, status, closed_at")
     .eq("agent_id", agentId);
 
   const now = new Date();
@@ -171,22 +180,30 @@ export async function getCommissionStats(agentId: string): Promise<CommissionSta
 
   let monthClosed = 0;
   let pipelineValue = 0;
+  let officeMonthClosed = 0;
   let dealsInProgress = 0;
   let dealsClosedThisMonth = 0;
 
   for (const d of deals ?? []) {
     if (d.status === "w_toku") {
-      pipelineValue += d.commission_pln ?? 0;
+      pipelineValue += d.agent_earnings_pln ?? 0;
       dealsInProgress += 1;
     } else if (d.status === "zamkniety" && d.closed_at) {
       if (new Date(d.closed_at) >= monthStart) {
-        monthClosed += d.commission_pln ?? 0;
+        monthClosed += d.agent_earnings_pln ?? 0;
+        officeMonthClosed += d.commission_pln ?? 0;
         dealsClosedThisMonth += 1;
       }
     }
   }
 
-  return { monthClosed, pipelineValue, dealsInProgress, dealsClosedThisMonth };
+  return {
+    monthClosed,
+    pipelineValue,
+    officeMonthClosed,
+    dealsInProgress,
+    dealsClosedThisMonth,
+  };
 }
 
 /** Prowizja zamknięta w tym miesiącu per agent (dla panelu właściciela). */
@@ -208,4 +225,114 @@ export async function getAgencyCommissionByAgent(
     map[d.agent_id] = (map[d.agent_id] ?? 0) + (d.commission_pln ?? 0);
   }
   return map;
+}
+
+// ---------- PROPERTIES (nieruchomości / oferty) ----------
+
+export async function getProperties(agentId: string): Promise<Property[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("properties")
+    .select("*")
+    .eq("agent_id", agentId)
+    .order("updated_at", { ascending: false });
+  return (data ?? []) as Property[];
+}
+
+export async function getProperty(id: string): Promise<Property | null> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin.from("properties").select("*").eq("id", id).maybeSingle();
+  return (data as Property) ?? null;
+}
+
+/** Klienci zainteresowani daną ofertą (kupujący/najemcy). */
+export async function getPropertyInterestedClients(propertyId: string): Promise<Client[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("property_interests")
+    .select("client:clients(*)")
+    .eq("property_id", propertyId);
+  return ((data ?? []).map((r) => r.client).filter(Boolean) as unknown) as Client[];
+}
+
+/** Oferty, których dany klient jest właścicielem (sprzedaje/wynajmuje). */
+export async function getPropertiesOwnedByClient(clientId: string): Promise<Property[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("properties")
+    .select("*")
+    .eq("owner_client_id", clientId)
+    .order("updated_at", { ascending: false });
+  return (data ?? []) as Property[];
+}
+
+/** Oferty, którymi dany klient jest zainteresowany (kupujący/najemca). */
+export async function getPropertiesClientInterestedIn(clientId: string): Promise<Property[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("property_interests")
+    .select("property:properties(*)")
+    .eq("client_id", clientId);
+  return ((data ?? []).map((r) => r.property).filter(Boolean) as unknown) as Property[];
+}
+
+/** Transakcje powiązane z ofertą. */
+export async function getDealsForProperty(propertyId: string): Promise<Deal[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("deals")
+    .select("*")
+    .eq("property_id", propertyId)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as Deal[];
+}
+
+/** Lekka lista klientów (id + nazwa + typ) do selectów w formularzach. */
+export async function getClientsLite(
+  agentId: string,
+): Promise<{ id: string; name: string; type: string }[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("clients")
+    .select("id, name, type")
+    .eq("agent_id", agentId)
+    .order("name", { ascending: true });
+  return (data ?? []) as { id: string; name: string; type: string }[];
+}
+
+/** Lekka lista ofert do selectów (np. w kalkulatorze prowizji). */
+export async function getPropertiesLite(
+  agentId: string,
+): Promise<{ id: string; title: string; price_pln: number | null }[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("properties")
+    .select("id, title, price_pln")
+    .eq("agent_id", agentId)
+    .order("updated_at", { ascending: false });
+  return (data ?? []) as { id: string; title: string; price_pln: number | null }[];
+}
+
+// ---------- PRZYPOMNIENIA O KONTAKCIE ----------
+
+/**
+ * Klienci z zaplanowanym kontaktem na dziś lub zaległym (next_contact_at <= dziś),
+ * wciąż aktywni. Do alertów na Pulpicie i liście klientów.
+ */
+export async function getContactReminders(
+  agentId: string,
+  limit = 20,
+): Promise<Client[]> {
+  const admin = createSupabaseAdmin();
+  const today = new Date().toISOString().slice(0, 10);
+  const { data } = await admin
+    .from("clients")
+    .select("*")
+    .eq("agent_id", agentId)
+    .not("status", "in", "(zamkniety,stracony)")
+    .not("next_contact_at", "is", null)
+    .lte("next_contact_at", today)
+    .order("next_contact_at", { ascending: true })
+    .limit(limit);
+  return (data ?? []) as Client[];
 }

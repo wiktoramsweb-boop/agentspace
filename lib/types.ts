@@ -16,6 +16,7 @@ export type Profile = {
   email: string | null;
   role: UserRole;
   monthly_goal_pln: number;
+  default_split_pct: number;
   created_at: string;
 };
 
@@ -129,6 +130,11 @@ export type Client = {
   budget_pln: number | null;
   property: string | null;
   notes: string | null;
+  city: string | null;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+  next_contact_at: string | null;
   last_contact_at: string | null;
   created_at: string;
   updated_at: string;
@@ -149,13 +155,82 @@ export type Deal = {
   agent_id: string;
   agency_id: string;
   client_id: string | null;
+  property_id: string | null;
   title: string;
-  commission_pln: number;
+  commission_pln: number; // prowizja łączna biura (suma stron + dodatki)
+  transaction_value_pln: number | null;
+  commission_seller_pln: number;
+  commission_buyer_pln: number;
+  commission_landlord_pln: number;
+  commission_tenant_pln: number;
+  extras_pln: number;
+  extras_note: string | null;
+  agent_split_pct: number;
+  agent_earnings_pln: number; // zarobek agenta (jego % + dodatki)
   status: DealStatus;
   expected_close: string | null;
   closed_at: string | null;
   created_at: string;
 };
+
+// ---------- NIERUCHOMOŚCI (oferty) ----------
+
+export type PropertyDealKind = "sprzedaz" | "wynajem";
+export type PropertyType = "mieszkanie" | "dom" | "dzialka" | "lokal" | "inne";
+export type PropertyStatus = "aktywna" | "zarezerwowana" | "sfinalizowana" | "archiwum";
+
+export type Property = {
+  id: string;
+  agent_id: string;
+  agency_id: string;
+  title: string;
+  deal_kind: PropertyDealKind;
+  property_type: PropertyType;
+  status: PropertyStatus;
+  city: string | null;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+  price_pln: number | null;
+  area_m2: number | null;
+  rooms: number | null;
+  floor: number | null;
+  description: string | null;
+  owner_client_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PropertyInterest = {
+  id: string;
+  property_id: string;
+  client_id: string;
+  created_at: string;
+};
+
+export const PROPERTY_DEAL_KINDS: { value: PropertyDealKind; label: string }[] = [
+  { value: "sprzedaz", label: "Sprzedaż" },
+  { value: "wynajem", label: "Wynajem" },
+];
+
+export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
+  { value: "mieszkanie", label: "Mieszkanie" },
+  { value: "dom", label: "Dom" },
+  { value: "dzialka", label: "Działka" },
+  { value: "lokal", label: "Lokal / komercja" },
+  { value: "inne", label: "Inne" },
+];
+
+export const PROPERTY_STATUSES: {
+  value: PropertyStatus;
+  label: string;
+  color: string;
+}[] = [
+  { value: "aktywna", label: "Aktywna", color: "bg-emerald-500/15 text-emerald-300" },
+  { value: "zarezerwowana", label: "Zarezerwowana", color: "bg-amber-500/15 text-amber-300" },
+  { value: "sfinalizowana", label: "Sfinalizowana", color: "bg-cyan-500/15 text-cyan-300" },
+  { value: "archiwum", label: "Archiwum", color: "bg-zinc-700/40 text-zinc-400" },
+];
 
 export const CLIENT_TYPES: { value: ClientType; label: string }[] = [
   { value: "kupujacy", label: "Kupujący" },
