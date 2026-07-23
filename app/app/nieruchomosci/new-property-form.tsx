@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createProperty } from "./actions";
 import { AddressInput } from "../components/address-input";
+import { Modal } from "../components/modal";
 import {
   PROPERTY_DEAL_KINDS,
   PROPERTY_TYPES,
@@ -26,15 +27,9 @@ export function NewPropertyForm({ clients }: { clients: ClientLite[] }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-950/80 p-4 backdrop-blur-sm sm:items-center">
-      <div className="w-full max-w-lg rounded-3xl border border-zinc-800 bg-zinc-900 p-6 md:p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Nowa nieruchomość</h2>
-          <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-white">
-            ✕
-          </button>
-        </div>
-        <form action={createProperty} className="space-y-4">
+    <Modal title="Nowa nieruchomość" onClose={() => setOpen(false)}>
+      <form action={createProperty} className="flex min-h-0 flex-1 flex-col">
+        <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
           <Field
             label="Nazwa oferty"
             name="title"
@@ -87,24 +82,25 @@ export function NewPropertyForm({ clients }: { clients: ClientLite[] }) {
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
-            >
-              Dodaj nieruchomość
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
-            >
-              Anuluj
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        <div className="flex flex-shrink-0 gap-3 border-t border-zinc-800 px-6 py-4">
+          <button
+            type="submit"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          >
+            Dodaj nieruchomość
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
+          >
+            Anuluj
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 

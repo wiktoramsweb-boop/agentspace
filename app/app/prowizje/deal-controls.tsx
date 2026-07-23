@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { createDeal, setDealStatus, deleteDeal } from "./actions";
 import type { DealStatus } from "@/lib/types";
 import { formatPln } from "@/lib/format";
+import { Modal } from "../components/modal";
 
 type PropertyLite = { id: string; title: string; price_pln: number | null };
 
@@ -80,16 +81,9 @@ export function NewDealButton({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-950/80 p-4 backdrop-blur-sm sm:items-center">
-      <div className="my-4 w-full max-w-lg rounded-3xl border border-zinc-800 bg-zinc-900 p-6 md:p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Nowa transakcja</h2>
-          <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-white">
-            ✕
-          </button>
-        </div>
-
-        <form action={createDeal} className="space-y-4">
+    <Modal title="Nowa transakcja" onClose={() => setOpen(false)}>
+      <form action={createDeal} className="flex min-h-0 flex-1 flex-col">
+        <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
           <Labeled label="Opis">
             <input
               name="title"
@@ -206,25 +200,25 @@ export function NewDealButton({
               className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white focus:border-emerald-500 focus:outline-none"
             />
           </Labeled>
+        </div>
 
-          <div className="flex gap-3 pt-1">
-            <button
-              type="submit"
-              className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
-            >
-              Dodaj transakcję
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
-            >
-              Anuluj
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex flex-shrink-0 gap-3 border-t border-zinc-800 px-6 py-4">
+          <button
+            type="submit"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          >
+            Dodaj transakcję
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
+          >
+            Anuluj
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 

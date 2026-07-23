@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "./actions";
 import { CLIENT_TYPES, CLIENT_STATUSES } from "@/lib/types";
 import { AddressInput } from "../components/address-input";
+import { Modal } from "../components/modal";
 
 export function NewClientForm() {
   const [open, setOpen] = useState(false);
@@ -20,15 +21,9 @@ export function NewClientForm() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-950/80 p-4 backdrop-blur-sm sm:items-center">
-      <div className="w-full max-w-lg rounded-3xl border border-zinc-800 bg-zinc-900 p-6 md:p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Nowy klient</h2>
-          <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-white">
-            ✕
-          </button>
-        </div>
-        <form action={createClient} className="space-y-4">
+    <Modal title="Nowy klient" onClose={() => setOpen(false)}>
+      <form action={createClient} className="flex min-h-0 flex-1 flex-col">
+        <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
           <Field label="Imię i nazwisko" name="name" required placeholder="Jan Kowalski" />
           <div className="grid grid-cols-2 gap-4">
             <Field label="Telefon" name="phone" placeholder="+48 600 000 000" />
@@ -51,24 +46,25 @@ export function NewClientForm() {
             type="date"
           />
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
-            >
-              Dodaj klienta
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
-            >
-              Anuluj
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        <div className="flex flex-shrink-0 gap-3 border-t border-zinc-800 px-6 py-4">
+          <button
+            type="submit"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          >
+            Dodaj klienta
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
+          >
+            Anuluj
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 
