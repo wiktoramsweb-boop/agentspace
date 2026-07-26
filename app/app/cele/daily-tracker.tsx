@@ -11,10 +11,12 @@ type Counts = Record<string, number>;
 export function DailyTracker({
   log,
   dailyTargets,
+  cadences,
   valuePerCall,
 }: {
   log: DailyLog | null;
   dailyTargets: Record<string, number>;
+  cadences: Record<string, string>;
   valuePerCall: number;
 }) {
   const [counts, setCounts] = useState<Counts>({
@@ -150,7 +152,11 @@ export function DailyTracker({
         {FUNNEL_STAGES.map((stage) => {
           const val = counts[stage.key] ?? 0;
           const target = dailyTargets[stage.key] ?? 0;
-          const met = target > 0 && val >= target;
+          const cadence = cadences[stage.key] ?? "";
+          // Etapy codzienne (target>0) — cel spełniony gdy osiągnięty. Rzadkie etapy
+          // (target=0, np. sprzedaż) — każdy odhaczony to sukces, bez presji "na dziś".
+          const met = target > 0 ? val >= target : val > 0;
+          const goalLabel = target > 0 ? `cel dziś: ${target}` : `rytm: ${cadence}`;
           return (
             <div
               key={stage.key}
@@ -158,7 +164,7 @@ export function DailyTracker({
             >
               <div className="min-w-0">
                 <p className="font-medium text-white">{stage.label}</p>
-                <p className="text-xs text-zinc-400">cel dziś: {target}{met && " · ✓"}</p>
+                <p className="text-xs text-zinc-400">{goalLabel}{met && " · ✓"}</p>
               </div>
               <div className="flex items-center gap-3">
                 <button

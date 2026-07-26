@@ -12,6 +12,8 @@ import { formatPln } from "@/lib/format";
 import { InviteForm } from "./invite-form";
 import { cancelInvitation } from "./actions";
 import { ReportButton } from "./report-button";
+import { CopyLink } from "./copy-link";
+import { APP_URL } from "@/lib/supabase/config";
 
 export default async function ZespolPage() {
   const owner = await requireOwner();
@@ -106,10 +108,17 @@ export default async function ZespolPage() {
               <div className="space-y-2">
                 {invitations.map((inv) => (
                   <div key={inv.id} className="flex items-center justify-between gap-4 text-sm">
-                    <span className="text-zinc-300">{inv.email}</span>
-                    <form action={cancelInvitation.bind(null, inv.id)}>
-                      <button className="text-xs text-zinc-500 transition hover:text-red-400">Anuluj</button>
-                    </form>
+                    <span className="min-w-0 truncate text-zinc-300">{inv.email}</span>
+                    <div className="flex flex-shrink-0 items-center gap-4">
+                      <CopyLink
+                        link={`${APP_URL}/zaproszenie/${inv.token}`}
+                        label="Kopiuj link"
+                        compact
+                      />
+                      <form action={cancelInvitation.bind(null, inv.id)}>
+                        <button className="text-xs text-zinc-500 transition hover:text-red-400">Anuluj</button>
+                      </form>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -152,10 +161,13 @@ export default async function ZespolPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`font-mono text-lg font-semibold ${scoreColor(agent.avgScore)}`}>
-                    {agent.avgScore != null ? `${agent.avgScore}` : "—"}
-                  </span>
-                  <span className="text-zinc-600">→</span>
+                  <div className="text-right">
+                    <span className={`font-mono text-lg font-semibold ${scoreColor(agent.avgScore)}`}>
+                      {agent.avgScore != null ? `${agent.avgScore}` : "—"}
+                    </span>
+                    <span className="hidden text-xs text-zinc-500 sm:block">wynik AI</span>
+                  </div>
+                  <span className="text-xs text-emerald-400/70">Sesje →</span>
                 </div>
               </Link>
             ))}

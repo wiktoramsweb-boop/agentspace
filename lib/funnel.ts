@@ -6,7 +6,14 @@ export type FunnelTargets = {
   // cele per okres dla każdego etapu lejka
   byStage: Record<
     "cold_calls" | "meetings" | "listings" | "buyers" | "sales",
-    { yearly: number; monthly: number; weekly: number; daily: number; hourly: number }
+    {
+      yearly: number;
+      monthly: number;
+      weekly: number;
+      daily: number; // realistyczny cel dzienny (0 dla rzadkich etapów)
+      hourly: number;
+      cadence: string; // czytelny rytm, np. "12/dzień", "~3/tydz.", "~1/mies."
+    }
   >;
 };
 
@@ -23,13 +30,29 @@ export function computeFunnel(goal: Goal): FunnelTargets {
   const workdaysPerYear = Math.max(1, goal.workdays_per_week) * 52;
 
   function periods(annual: number) {
-    const daily = annual / workdaysPerYear;
+    const dailyRaw = annual / workdaysPerYear;
+    const weekly = annual / 52;
+    const monthly = annual / 12;
+
+    // Realistyczny cel DZIENNY: 0 jeśli etap zdarza się rzadziej niż ~co drugi dzień
+    // (żeby nie pokazywać "1 sprzedaż dziś" codziennie).
+    const dailyTarget = dailyRaw >= 0.8 ? Math.max(1, Math.round(dailyRaw)) : 0;
+
+    // Czytelny rytm — najmniejszy sensowny okres, w którym wychodzi ≥1.
+    let cadence: string;
+    if (dailyRaw >= 1) cadence = `${Math.round(dailyRaw)}/dzień`;
+    else if (weekly >= 1) cadence = `~${Math.round(weekly)}/tydz.`;
+    else if (monthly >= 0.6) cadence = `~${Math.max(1, Math.round(monthly))}/mies.`;
+    else cadence = `~${Math.ceil(annual)}/rok`;
+
     return {
       yearly: Math.ceil(annual),
-      monthly: Math.ceil(annual / 12),
-      weekly: Math.ceil(annual / 52),
-      daily: Math.ceil(daily),
-      hourly: Math.max(1, Math.round((daily / WORK_HOURS_PER_DAY) * 10) / 10) as number,
+      monthly: Math.ceil(monthly),
+      weekly: Math.ceil(weekly),
+      daily: dailyTarget,
+      hourly:
+        dailyRaw >= 1 ? Math.max(0.1, Math.round((dailyRaw / WORK_HOURS_PER_DAY) * 10) / 10) : 0,
+      cadence,
     };
   }
 

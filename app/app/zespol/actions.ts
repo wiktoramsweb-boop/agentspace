@@ -7,7 +7,9 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { APP_URL } from "@/lib/supabase/config";
 import { sendAgencyMonthlyReport } from "@/lib/report";
 
-export type ZespolResult = { error?: string; success?: string } | undefined;
+export type ZespolResult =
+  | { error?: string; success?: string; link?: string; emailSent?: boolean }
+  | undefined;
 
 /**
  * Manualne wysłanie raportu miesięcznego na email właściciela (podgląd).
@@ -68,12 +70,15 @@ export async function inviteAgent(
 
   const link = `${APP_URL}/zaproszenie/${invitation.token}`;
 
-  // Wyślij email (jeśli Resend skonfigurowany)
+  // Spróbuj wysłać email (jeśli Resend skonfigurowany). Bez zweryfikowanej domeny
+  // Resend dostarcza tylko na adres właściciela konta — dlatego zawsze zwracamy
+  // też link do ręcznego wysłania.
+  let emailSent = false;
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
     try {
       const resend = new Resend(resendKey);
-      await resend.emails.send({
+      const { error: sendError } = await resend.emails.send({
         from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
         to: email,
         subject: `${owner.full_name ?? "Twój szef"} zaprasza Cię do AgentSpace`,
@@ -94,14 +99,21 @@ export async function inviteAgent(
           </div>
         `,
       });
+      emailSent = !sendError;
+      if (sendError) console.error("Invite email error:", sendError);
     } catch (err) {
       console.error("Invite email error:", err);
-      // Zaproszenie utworzone — link można skopiować z panelu mimo braku maila
     }
   }
 
   revalidatePath("/app/zespol");
-  return { success: `Zaproszenie wysłane do ${email}.` };
+  return {
+    success: emailSent
+      ? `Zaproszenie wysłane mailem do ${email}. Link masz też poniżej.`
+      : `Zaproszenie utworzone. Mail nie wyszedł — skopiuj link poniżej i wyślij agentowi.`,
+    link,
+    emailSent,
+  };
 }
 
 /**

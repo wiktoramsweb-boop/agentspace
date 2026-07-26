@@ -67,6 +67,13 @@ export default async function CelePage() {
     buyers: funnel.byStage.buyers.daily,
     sales: funnel.byStage.sales.daily,
   };
+  const cadences = {
+    cold_calls: funnel.byStage.cold_calls.cadence,
+    meetings: funnel.byStage.meetings.cadence,
+    listings: funnel.byStage.listings.cadence,
+    buyers: funnel.byStage.buyers.cadence,
+    sales: funnel.byStage.sales.cadence,
+  };
   const valuePerCall = goal.annual_income_pln / Math.max(1, funnel.annual.calls);
   const yearProgress = Math.min(100, Math.round((yearCommission / Math.max(1, goal.annual_income_pln)) * 100));
 
@@ -156,7 +163,7 @@ export default async function CelePage() {
           <p className="mb-5 text-sm text-zinc-400">
             Odhacz co zrobiłeś. Passa: <span className="text-emerald-400">{daysHitCallGoal} dni</span> z celem telefonów (ost. 30 dni).
           </p>
-          <DailyTracker log={todayLog} dailyTargets={dailyTargets} valuePerCall={valuePerCall} />
+          <DailyTracker log={todayLog} dailyTargets={dailyTargets} cadences={cadences} valuePerCall={valuePerCall} />
         </Card>
 
         {/* Lejek */}
@@ -174,7 +181,7 @@ export default async function CelePage() {
                       style={{ width: `${width}%` }}
                     >
                       <span className="text-sm font-medium text-white">{stage.short}</span>
-                      <span className="font-mono text-sm text-emerald-300">{s.daily}/dzień</span>
+                      <span className="font-mono text-sm text-emerald-300">{s.cadence}</span>
                     </div>
                   </div>
                 );

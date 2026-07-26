@@ -59,7 +59,9 @@ export default async function AgentDetailPage({ params }: Props) {
         </Card>
       )}
 
-      <h2 className="mb-3 text-lg font-semibold text-white">Ostatnie sesje</h2>
+      <h2 className="mb-3 text-lg font-semibold text-white">
+        Wyniki sesji ({sessions.length})
+      </h2>
       {sessions.length === 0 ? (
         <Card>
           <p className="text-center text-sm text-zinc-500">Ten agent nie ma jeszcze sesji.</p>
@@ -67,19 +69,51 @@ export default async function AgentDetailPage({ params }: Props) {
       ) : (
         <Card className="!p-0">
           <div className="divide-y divide-zinc-900">
-            {sessions.map((s) => (
-              <Link
-                key={s.id}
-                href={`/app/sesja/${s.id}`}
-                className="flex items-center justify-between gap-4 px-6 py-3.5 transition hover:bg-zinc-900/40"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-white">{s.scenario_title ?? "Sesja"}</p>
-                  <p className="text-xs text-zinc-500">{formatDate(s.started_at)}</p>
-                </div>
-                <ScoreBadge score={s.score?.overall ?? null} />
-              </Link>
-            ))}
+            {sessions.map((s) => {
+              const sc = s.score;
+              const subs = sc
+                ? [
+                    { label: "Otwarcie", v: sc.opening },
+                    { label: "Kwalifikacja", v: sc.qualification },
+                    { label: "Obiekcje", v: sc.objection_handling },
+                    { label: "Zamknięcie", v: sc.closing },
+                  ]
+                : [];
+              return (
+                <Link
+                  key={s.id}
+                  href={`/app/sesja/${s.id}`}
+                  className="block px-6 py-4 transition hover:bg-zinc-900/40"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-white">
+                        {s.scenario_title ?? "Sesja"}
+                      </p>
+                      <p className="text-xs text-zinc-500">
+                        {formatDate(s.started_at)}
+                        {s.status === "in_progress" && " · w trakcie"}
+                      </p>
+                    </div>
+                    <ScoreBadge score={sc?.overall ?? null} />
+                  </div>
+                  {subs.length > 0 && (
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {subs.map((sub) => (
+                        <div key={sub.label} className="rounded-lg bg-zinc-900/60 px-2.5 py-1.5">
+                          <p className="text-[10px] uppercase tracking-wide text-zinc-500">
+                            {sub.label}
+                          </p>
+                          <p className={`font-mono text-sm font-semibold ${scoreColor(sub.v ?? null)}`}>
+                            {sub.v != null ? `${sub.v}/10` : "—"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </Card>
       )}
