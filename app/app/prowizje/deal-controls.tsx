@@ -5,6 +5,7 @@ import { createDeal, setDealStatus, deleteDeal } from "./actions";
 import type { DealStatus } from "@/lib/types";
 import { formatPln } from "@/lib/format";
 import { Modal } from "../components/modal";
+import { useToast } from "../components/toast";
 
 type PropertyLite = { id: string; title: string; price_pln: number | null };
 
@@ -241,18 +242,25 @@ function Row({ label, value, muted }: { label: string; value: string; muted?: bo
 }
 
 export function DealActions({ dealId, status }: { dealId: string; status: DealStatus }) {
+  const toast = useToast();
   return (
     <div className="flex items-center gap-2">
       {status === "w_toku" && (
         <>
           <button
-            onClick={() => setDealStatus(dealId, "zamkniety")}
+            onClick={() => {
+              setDealStatus(dealId, "zamkniety");
+              toast("Transakcja zamknięta 🎉");
+            }}
             className="rounded-lg bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-300 transition hover:bg-emerald-500/25"
           >
             Zamknij ✓
           </button>
           <button
-            onClick={() => setDealStatus(dealId, "przepadl")}
+            onClick={() => {
+              setDealStatus(dealId, "przepadl");
+              toast("Oznaczono jako przepadła", "info");
+            }}
             className="rounded-lg bg-zinc-800/50 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-red-500/15 hover:text-red-300"
           >
             Przepadł
@@ -261,14 +269,20 @@ export function DealActions({ dealId, status }: { dealId: string; status: DealSt
       )}
       {status !== "w_toku" && (
         <button
-          onClick={() => setDealStatus(dealId, "w_toku")}
+          onClick={() => {
+            setDealStatus(dealId, "w_toku");
+            toast("Transakcja wznowiona", "info");
+          }}
           className="rounded-lg bg-zinc-800/50 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-zinc-800"
         >
           Wznów
         </button>
       )}
       <button
-        onClick={() => deleteDeal(dealId)}
+        onClick={() => {
+          deleteDeal(dealId);
+          toast("Usunięto transakcję", "info");
+        }}
         className="text-xs text-zinc-600 transition hover:text-red-400"
         title="Usuń"
       >

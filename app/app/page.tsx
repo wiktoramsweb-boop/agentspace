@@ -86,10 +86,11 @@ export default async function DashboardPage() {
           value={formatPln(commission.monthClosed)}
           sub={goal > 0 ? `${goalProgress}% celu` : undefined}
           accent
+          icon={<IconWallet />}
         />
-        <StatCard label="Pipeline" value={formatPln(commission.pipelineValue)} sub={`${commission.dealsInProgress} w toku`} />
-        <StatCard label="Średni wynik AI" value={stats.avgScore != null ? `${stats.avgScore}/10` : "—"} />
-        <StatCard label="Sesje w tym tyg." value={stats.sessionsThisWeek} />
+        <StatCard label="Pipeline" value={formatPln(commission.pipelineValue)} sub={`${commission.dealsInProgress} w toku`} icon={<IconTrend />} />
+        <StatCard label="Średni wynik AI" value={stats.avgScore != null ? `${stats.avgScore}/10` : "—"} icon={<IconSpark />} />
+        <StatCard label="Sesje w tym tyg." value={stats.sessionsThisWeek} icon={<IconBolt />} />
       </div>
 
       {/* Pasek celu */}
@@ -267,6 +268,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
+      {/* --- ikony statystyk --- */}
       {/* Snapshot zespołu (owner) */}
       {ownerStats && (
         <div>
@@ -285,4 +287,18 @@ export default async function DashboardPage() {
       )}
     </>
   );
+}
+
+/* ---------- ikony kafelków ---------- */
+function IconWallet() {
+  return <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" /></svg>;
+}
+function IconTrend() {
+  return <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.307a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>;
+}
+function IconSpark() {
+  return <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.5a.56.56 0 0 1 1.04 0l1.83 4.4 4.75.38a.56.56 0 0 1 .32.98l-3.62 3.1 1.1 4.64a.56.56 0 0 1-.83.6L12 15.6l-4.07 2.5a.56.56 0 0 1-.84-.6l1.1-4.64-3.61-3.1a.56.56 0 0 1 .32-.98l4.75-.38 1.83-4.4Z" /></svg>;
+}
+function IconBolt() {
+  return <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5 14.25 3l-1.5 7.5h7.5L9.75 21l1.5-7.5h-7.5Z" /></svg>;
 }

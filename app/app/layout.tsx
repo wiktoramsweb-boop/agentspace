@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth";
 import { Sidebar } from "./components/sidebar";
 import { OnboardingRedirect } from "./onboarding-redirect";
+import { ToastProvider } from "./components/toast";
+import { PageTransition } from "./components/page-transition";
 
 export const metadata: Metadata = {
   title: "AgentSpace — panel",
@@ -17,15 +19,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white md:flex">
-      <Sidebar
-        role={user.role}
-        fullName={user.full_name ?? "Użytkownik"}
-        agencyName={user.agency?.name ?? "Biuro"}
-      />
-      <main className="flex-1 px-5 py-8 md:px-10 md:py-10">
-        <div className="mx-auto max-w-6xl">{children}</div>
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="app-shell min-h-screen text-white md:flex">
+        <Sidebar
+          role={user.role}
+          fullName={user.full_name ?? "Użytkownik"}
+          agencyName={user.agency?.name ?? "Biuro"}
+        />
+        <main className="flex-1 px-5 py-8 md:px-10 md:py-10">
+          <div className="mx-auto max-w-6xl">
+            <PageTransition>{children}</PageTransition>
+          </div>
+        </main>
+      </div>
+    </ToastProvider>
   );
 }

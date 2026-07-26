@@ -188,6 +188,63 @@ body {
   color: rgb(52, 211, 153);
 }
 
+/* Zaznaczanie tekstu w kolorze marki */
+::selection {
+  background: rgba(16, 185, 129, 0.28);
+  color: #fff;
+}
+
+/* Tło panelu aplikacji — głęboka czerń z subtelnymi poświatami marki */
+.app-shell {
+  background-color: #09090b;
+  background-image:
+    radial-gradient(1100px 560px at 100% -8%, rgba(16, 185, 129, 0.07), transparent 60%),
+    radial-gradient(900px 520px at -8% 6%, rgba(34, 211, 238, 0.05), transparent 55%);
+  background-attachment: fixed;
+}
+
+/* Wejście treści strony */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+}
+
+/* Delikatne uniesienie karty przy hover */
+.hover-lift {
+  transition:
+    transform 0.25s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+}
+
+/* Wejście toastów */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-toast-in {
+  animation: toast-in 0.28s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+}
+
 /* Smooth scrollbar */
 ::-webkit-scrollbar {
   width: 12px;

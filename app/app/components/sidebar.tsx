@@ -39,24 +39,36 @@ export function Sidebar({
     href === "/app" ? pathname === "/app" : pathname.startsWith(href);
 
   const nav = (
-    <nav className="flex flex-1 flex-col gap-1">
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          onClick={() => setMobileOpen(false)}
-          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-            isActive(item.href)
-              ? "bg-emerald-500/10 text-emerald-300"
-              : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-          }`}
-        >
-          <span className={isActive(item.href) ? "text-emerald-400" : "text-zinc-500"}>
-            {item.icon}
-          </span>
-          {item.label}
-        </Link>
-      ))}
+    <nav className="flex flex-1 flex-col gap-0.5">
+      {items.map((item) => {
+        const active = isActive(item.href);
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={() => setMobileOpen(false)}
+            className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+              active
+                ? "bg-emerald-500/10 text-emerald-300"
+                : "text-zinc-400 hover:bg-zinc-800/70 hover:text-white"
+            }`}
+          >
+            <span
+              className={`absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-emerald-400 transition-opacity ${
+                active ? "opacity-100" : "opacity-0"
+              }`}
+            />
+            <span
+              className={`transition ${
+                active ? "text-emerald-400" : "text-zinc-500 group-hover:text-zinc-300"
+              }`}
+            >
+              {item.icon}
+            </span>
+            {item.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 

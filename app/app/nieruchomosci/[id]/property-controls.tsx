@@ -9,6 +9,7 @@ import {
   removePropertyInterest,
 } from "../actions";
 import { PROPERTY_STATUSES, type PropertyStatus } from "@/lib/types";
+import { useToast } from "../../components/toast";
 
 type ClientLite = { id: string; name: string };
 
@@ -19,12 +20,16 @@ export function StatusBar({
   propertyId: string;
   status: PropertyStatus;
 }) {
+  const toast = useToast();
   return (
     <div className="flex flex-wrap gap-2">
       {PROPERTY_STATUSES.map((s) => (
         <button
           key={s.value}
-          onClick={() => setPropertyStatus(propertyId, s.value)}
+          onClick={() => {
+            setPropertyStatus(propertyId, s.value);
+            toast(`Status oferty: ${s.label}`);
+          }}
           className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
             status === s.value
               ? s.color
@@ -47,10 +52,14 @@ export function OwnerPicker({
   ownerId: string | null;
   clients: ClientLite[];
 }) {
+  const toast = useToast();
   return (
     <select
       value={ownerId ?? ""}
-      onChange={(e) => setPropertyOwner(propertyId, e.target.value || null)}
+      onChange={(e) => {
+        setPropertyOwner(propertyId, e.target.value || null);
+        toast(e.target.value ? "Przypisano właściciela" : "Odłączono właściciela");
+      }}
       className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
     >
       <option value="">— brak właściciela —</option>
@@ -71,6 +80,7 @@ export function InterestAdder({
   clients: ClientLite[];
 }) {
   const [value, setValue] = useState("");
+  const toast = useToast();
 
   if (clients.length === 0) {
     return (
@@ -99,6 +109,7 @@ export function InterestAdder({
           if (value) {
             addPropertyInterest(propertyId, value);
             setValue("");
+            toast("Dodano zainteresowanego klienta");
           }
         }}
         className="rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"

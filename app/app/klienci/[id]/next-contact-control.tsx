@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { setNextContact, markClientContacted } from "../actions";
+import { useToast } from "../../components/toast";
 
 function isoInDays(days: number): string {
   const d = new Date();
@@ -17,10 +18,12 @@ export function NextContactControl({
   current: string | null;
 }) {
   const [value, setValue] = useState(current ?? "");
+  const toast = useToast();
 
   function set(date: string) {
     setValue(date);
     setNextContact(clientId, date || null);
+    toast(date ? "Zapisano przypomnienie o kontakcie" : "Wyczyszczono przypomnienie");
   }
 
   return (
@@ -41,6 +44,7 @@ export function NextContactControl({
         onClick={() => {
           setValue("");
           markClientContacted(clientId);
+          toast("Oznaczono kontakt jako wykonany");
         }}
         className="w-full rounded-xl bg-emerald-500/15 px-4 py-2.5 text-sm font-medium text-emerald-300 transition hover:bg-emerald-500/25"
       >

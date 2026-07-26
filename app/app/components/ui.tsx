@@ -16,9 +16,9 @@ export function PageHeader({
         <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
           {title}
         </h1>
-        {subtitle && <p className="mt-1 text-zinc-400">{subtitle}</p>}
+        {subtitle && <p className="mt-1.5 max-w-2xl text-sm text-zinc-400 md:text-base">{subtitle}</p>}
       </div>
-      {action}
+      {action && <div className="flex-shrink-0">{action}</div>}
     </div>
   );
 }
@@ -28,22 +28,35 @@ export function StatCard({
   value,
   sub,
   accent,
+  icon,
 }: {
   label: string;
   value: ReactNode;
   sub?: string;
   accent?: boolean;
+  icon?: ReactNode;
 }) {
   return (
     <div
-      className={`rounded-2xl border p-6 ${
+      className={`group relative overflow-hidden rounded-2xl border p-5 shadow-sm shadow-black/20 transition ${
         accent
-          ? "border-emerald-500/40 bg-gradient-to-br from-emerald-500/15 to-zinc-800/40"
-          : "border-zinc-700 bg-zinc-800/40"
+          ? "border-emerald-500/40 bg-gradient-to-br from-emerald-500/15 to-zinc-900/40"
+          : "border-zinc-800 bg-zinc-900/50 hover:border-zinc-700"
       }`}
     >
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">{label}</p>
-      <p className="mt-2 text-3xl font-semibold text-white">{value}</p>
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">{label}</p>
+        {icon && (
+          <span
+            className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${
+              accent ? "bg-emerald-500/20 text-emerald-300" : "bg-zinc-800 text-zinc-400"
+            }`}
+          >
+            {icon}
+          </span>
+        )}
+      </div>
+      <p className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-3xl">{value}</p>
       {sub && <p className="mt-1 text-sm text-zinc-400">{sub}</p>}
     </div>
   );
@@ -73,21 +86,46 @@ export function ScoreBadge({ score }: { score: number | null }) {
   );
 }
 
+export function Badge({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
+        className ?? "bg-zinc-800 text-zinc-300"
+      }`}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function EmptyState({
   title,
   body,
   ctaHref,
   ctaLabel,
+  icon,
 }: {
   title: string;
   body: string;
   ctaHref?: string;
   ctaLabel?: string;
+  icon?: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-800/30 p-10 text-center">
+    <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/30 p-10 text-center">
+      {icon && (
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-800/70 text-zinc-400">
+          {icon}
+        </div>
+      )}
       <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
-      <p className="mx-auto mb-6 max-w-md text-sm text-zinc-300">{body}</p>
+      <p className="mx-auto mb-6 max-w-md text-sm text-zinc-400">{body}</p>
       {ctaHref && ctaLabel && (
         <Link
           href={ctaHref}
@@ -100,9 +138,21 @@ export function EmptyState({
   );
 }
 
-export function Card({ children, className }: { children: ReactNode; className?: string }) {
+export function Card({
+  children,
+  className,
+  hover,
+}: {
+  children: ReactNode;
+  className?: string;
+  hover?: boolean;
+}) {
   return (
-    <div className={`rounded-2xl border border-zinc-700 bg-zinc-800/40 p-6 ${className ?? ""}`}>
+    <div
+      className={`rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm shadow-black/20 ${
+        hover ? "hover-lift hover:border-zinc-700 hover:bg-zinc-900" : ""
+      } ${className ?? ""}`}
+    >
       {children}
     </div>
   );

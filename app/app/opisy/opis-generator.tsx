@@ -7,6 +7,7 @@ import {
   type Pomieszczenie,
   type Transakcja,
 } from "@/lib/opis";
+import { useToast } from "../components/toast";
 
 type PropertyPrefill = {
   id: string;
@@ -61,6 +62,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
   const [aiText, setAiText] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   const templateOutput = useMemo(() => generateListing(i), [i]);
   // Gdy AI (lub ręczna edycja) nadpisze tekst — pokazujemy jego wersję,
@@ -79,11 +81,14 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Nie udało się wygenerować.");
+        toast(data.error ?? "Nie udało się wygenerować.", "error");
       } else {
         setAiText(data.text);
+        toast("Gotowe — opis napisany przez AI ✨");
       }
     } catch {
       setError("Błąd połączenia. Spróbuj ponownie.");
+      toast("Błąd połączenia. Spróbuj ponownie.", "error");
     } finally {
       setLoading(false);
     }
@@ -137,9 +142,10 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
     try {
       await navigator.clipboard.writeText(output);
       setCopied(true);
+      toast("Skopiowano opis do schowka");
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      /* ignore */
+      toast("Nie udało się skopiować", "error");
     }
   }
 
