@@ -56,7 +56,7 @@ export async function setNextContact(
     .from("clients")
     .update({ next_contact_at: date || null, updated_at: new Date().toISOString() })
     .eq("id", clientId)
-    .eq("agent_id", user.id);
+    .eq("agency_id", user.agency_id);
   revalidatePath(`/app/klienci/${clientId}`);
   revalidatePath("/app/klienci");
   revalidatePath("/app");
@@ -72,7 +72,7 @@ export async function updateClientStatus(
     .from("clients")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", clientId)
-    .eq("agent_id", user.id);
+    .eq("agency_id", user.agency_id);
   revalidatePath(`/app/klienci/${clientId}`);
   revalidatePath("/app/klienci");
 }
@@ -93,7 +93,7 @@ export async function addClientNote(clientId: string, formData: FormData): Promi
     .from("clients")
     .update({ last_contact_at: new Date().toISOString(), updated_at: new Date().toISOString() })
     .eq("id", clientId)
-    .eq("agent_id", user.id);
+    .eq("agency_id", user.agency_id);
 
   revalidatePath(`/app/klienci/${clientId}`);
 }
@@ -110,7 +110,7 @@ export async function markClientContacted(clientId: string): Promise<void> {
       updated_at: new Date().toISOString(),
     })
     .eq("id", clientId)
-    .eq("agent_id", user.id);
+    .eq("agency_id", user.agency_id);
   revalidatePath("/app");
   revalidatePath("/app/klienci");
 }
@@ -118,7 +118,7 @@ export async function markClientContacted(clientId: string): Promise<void> {
 export async function deleteClient(clientId: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  await admin.from("clients").delete().eq("id", clientId).eq("agent_id", user.id);
+  await admin.from("clients").delete().eq("id", clientId).eq("agency_id", user.agency_id);
   revalidatePath("/app/klienci");
   redirect("/app/klienci");
 }

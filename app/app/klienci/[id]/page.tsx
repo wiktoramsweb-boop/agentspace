@@ -37,7 +37,7 @@ export default async function ClientDetailPage({ params }: Props) {
 
   const client = await getClient(id);
   if (!client) notFound();
-  if (client.agent_id !== user.id) redirect("/app/klienci");
+  if (client.agency_id !== user.agency_id) redirect("/app/klienci");
 
   const [notes, owned, interested] = await Promise.all([
     getClientNotes(id),

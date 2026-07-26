@@ -111,6 +111,28 @@ export async function getClients(agentId: string): Promise<Client[]> {
   return (data ?? []) as Client[];
 }
 
+export type ClientWithOwner = Client & { opiekunName: string | null };
+
+/** Wszyscy klienci biura (współdzielona baza) + imię opiekuna. */
+export async function getAgencyClients(agencyId: string): Promise<ClientWithOwner[]> {
+  const admin = createSupabaseAdmin();
+  const [clientsRes, profilesRes] = await Promise.all([
+    admin
+      .from("clients")
+      .select("*")
+      .eq("agency_id", agencyId)
+      .order("updated_at", { ascending: false }),
+    admin.from("profiles").select("id, full_name").eq("agency_id", agencyId),
+  ]);
+  const nameById = new Map(
+    (profilesRes.data ?? []).map((p) => [p.id as string, p.full_name as string | null]),
+  );
+  return (clientsRes.data ?? []).map((c) => ({
+    ...(c as Client),
+    opiekunName: nameById.get((c as Client).agent_id) ?? null,
+  }));
+}
+
 export async function getClient(id: string): Promise<Client | null> {
   const admin = createSupabaseAdmin();
   const { data } = await admin.from("clients").select("*").eq("id", id).single();

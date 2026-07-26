@@ -6,8 +6,19 @@ import { CLIENT_TYPES, CLIENT_STATUSES } from "@/lib/types";
 import { AddressInput } from "../components/address-input";
 import { Modal } from "../components/modal";
 
-export function NewClientForm() {
+type ExistingPhone = { phone: string | null; owner: string | null };
+
+const digits = (s: string) => s.replace(/\D/g, "");
+
+export function NewClientForm({ existingPhones = [] }: { existingPhones?: ExistingPhone[] }) {
   const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+
+  const pd = digits(phone);
+  const dup =
+    pd.length >= 7
+      ? existingPhones.find((e) => e.phone && digits(e.phone) === pd)
+      : undefined;
 
   if (!open) {
     return (
@@ -26,9 +37,25 @@ export function NewClientForm() {
         <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
           <Field label="Imię i nazwisko" name="name" required placeholder="Jan Kowalski" />
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Telefon" name="phone" placeholder="+48 600 000 000" />
+            <div>
+              <label className="mb-1.5 block text-sm text-zinc-400">Telefon</label>
+              <input
+                name="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+48 600 000 000"
+                className={`w-full rounded-xl border bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none ${
+                  dup ? "border-amber-500/60 focus:border-amber-500" : "border-zinc-800 focus:border-emerald-500"
+                }`}
+              />
+            </div>
             <Field label="Email" name="email" type="email" placeholder="jan@email.pl" />
           </div>
+          {dup && (
+            <p className="-mt-2 text-xs text-amber-400">
+              ⚠️ Ten numer jest już w bazie{dup.owner ? ` (opiekun: ${dup.owner})` : ""}. Możesz dodać mimo to.
+            </p>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <Select label="Typ" name="type" options={CLIENT_TYPES} />
             <Select label="Status" name="status" options={CLIENT_STATUSES} />

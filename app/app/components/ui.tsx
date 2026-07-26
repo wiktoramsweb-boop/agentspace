@@ -40,8 +40,8 @@ export function StatCard({
     <div
       className={`group relative overflow-hidden rounded-2xl border p-5 shadow-sm shadow-black/20 transition ${
         accent
-          ? "border-emerald-500/40 bg-gradient-to-br from-emerald-500/15 to-zinc-900/40"
-          : "border-zinc-800 bg-zinc-900/50 hover:border-zinc-700"
+          ? "border-emerald-500/40 bg-gradient-to-br from-emerald-500/20 to-zinc-800/40"
+          : "border-zinc-700/60 bg-zinc-800/40 hover:border-zinc-600"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -49,7 +49,7 @@ export function StatCard({
         {icon && (
           <span
             className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${
-              accent ? "bg-emerald-500/20 text-emerald-300" : "bg-zinc-800 text-zinc-400"
+              accent ? "bg-emerald-500/25 text-emerald-300" : "bg-zinc-700/50 text-zinc-300"
             }`}
           >
             {icon}
@@ -149,8 +149,8 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm shadow-black/20 ${
-        hover ? "hover-lift hover:border-zinc-700 hover:bg-zinc-900" : ""
+      className={`rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-6 shadow-sm shadow-black/20 ${
+        hover ? "hover-lift hover:border-zinc-600 hover:bg-zinc-800/70" : ""
       } ${className ?? ""}`}
     >
       {children}
