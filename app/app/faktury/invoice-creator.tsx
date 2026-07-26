@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { SELLERS, type InvoiceItem } from "@/lib/invoice";
 import { InvoiceSheet, type SheetData } from "./invoice-sheet";
 import { createInvoice } from "./actions";
+import { printInvoice } from "./print-button";
 
 export function InvoiceCreator({
   defaults,
@@ -165,7 +166,7 @@ export function InvoiceCreator({
             {pending ? "Zapisuję…" : "Zapisz fakturę"}
           </button>
           <button
-            onClick={() => window.print()}
+            onClick={() => printInvoice(d.number)}
             className="rounded-xl border border-zinc-700 px-5 py-3 font-medium text-zinc-200 transition hover:bg-zinc-800"
           >
             Drukuj / PDF

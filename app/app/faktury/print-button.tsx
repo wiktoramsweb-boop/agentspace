@@ -1,9 +1,18 @@
 "use client";
 
-export function PrintButton() {
+export function printInvoice(number?: string) {
+  const prev = document.title;
+  if (number) document.title = `Faktura ${number.replaceAll("/", "-")}`;
+  window.print();
+  setTimeout(() => {
+    document.title = prev;
+  }, 1000);
+}
+
+export function PrintButton({ number }: { number?: string }) {
   return (
     <button
-      onClick={() => window.print()}
+      onClick={() => printInvoice(number)}
       className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
     >
       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>

@@ -42,7 +42,6 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
           <Logo />
           <div>
             <p className="text-sm font-semibold text-zinc-900">Agencja Nieruchomości Spectra</p>
-            <p className="text-xs text-zinc-500">agentspace.pl</p>
           </div>
         </div>
         <div className="text-right">
@@ -57,7 +56,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
       {/* Sprzedawca / Nabywca */}
       <div className="grid grid-cols-2 gap-8 py-6">
         <div>
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
             Sprzedawca
           </p>
           <p className="font-semibold">{seller.name}</p>
@@ -71,7 +70,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
           </p>
         </div>
         <div>
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
             Nabywca
           </p>
           <p className="font-semibold">{data.buyerName || "—"}</p>
@@ -97,7 +96,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
       {/* Pozycje */}
       <table className="mt-5 w-full border-collapse text-xs">
         <thead>
-          <tr className="border-b-2 border-zinc-300 text-left text-zinc-500">
+          <tr className="border-b-2 border-zinc-300 text-left text-zinc-600">
             <th className="py-2 pr-2 font-medium">Lp.</th>
             <th className="py-2 pr-2 font-medium">Nazwa towaru / usługi</th>
             <th className="py-2 pr-2 text-right font-medium">Ilość</th>
@@ -170,8 +169,8 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
 function Meta({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-wide text-zinc-400">{label}</p>
-      <p className="font-medium text-zinc-800">{value}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-600">{label}</p>
+      <p className="font-medium text-zinc-900">{value}</p>
     </div>
   );
 }

@@ -260,8 +260,13 @@ body {
   animation: toast-in 0.28s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
 }
 
-/* Druk faktur — chowamy interfejs, zostaje biała kartka */
+/* Druk faktur — chowamy interfejs, zostaje biała kartka.
+   @page margin:0 usuwa nagłówki/stopki przeglądarki (URL, data, tytuł strony). */
 @media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
   aside,
   .print-hide {
     display: none !important;
@@ -277,7 +282,8 @@ body {
   .invoice-sheet {
     box-shadow: none !important;
     max-width: none !important;
-    padding: 0 !important;
+    width: 100% !important;
+    padding: 14mm !important;
   }
 }
 

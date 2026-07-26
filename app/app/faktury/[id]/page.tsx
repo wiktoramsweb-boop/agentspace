@@ -44,7 +44,7 @@ export default async function InvoiceViewPage({ params }: Props) {
           ← Faktury
         </Link>
         <div className="flex items-center gap-3">
-          <PrintButton />
+          <PrintButton number={inv.number} />
           <form action={deleteInvoice.bind(null, inv.id)}>
             <button className="text-sm text-zinc-500 transition hover:text-red-400">Usuń</button>
           </form>
