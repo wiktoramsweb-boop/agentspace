@@ -89,5 +89,7 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
     };
   }, [points]);
 
-  return <div ref={ref} className="h-[380px] w-full" style={{ background: "#0e0e11" }} />;
+  // `isolate` = własny kontekst warstw — trzyma wysokie z-index Leafletu wewnątrz,
+  // żeby mapa nie przebijała okien modalnych (position:fixed).
+  return <div ref={ref} className="isolate h-[380px] w-full" style={{ background: "#0e0e11" }} />;
 }

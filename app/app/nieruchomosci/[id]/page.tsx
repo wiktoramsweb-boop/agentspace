@@ -25,6 +25,7 @@ import {
   RemoveInterestButton,
   DeletePropertyButton,
 } from "./property-controls";
+import { EditPropertyForm } from "./edit-property-form";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -87,6 +88,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             <p className="text-zinc-500">{property.address ?? property.city}</p>
           )}
         </div>
+        <EditPropertyForm property={property} clients={allClients} />
       </div>
 
       <div className="mb-6">
