@@ -9,6 +9,7 @@ import {
 import { PageHeader, Card, EmptyState } from "../components/ui";
 import { formatPln } from "@/lib/format";
 import { NewPropertyForm } from "./new-property-form";
+import { PropertiesMap } from "./properties-map";
 
 export default async function NieruchomosciPage() {
   const user = await requireUser();
@@ -18,6 +19,9 @@ export default async function NieruchomosciPage() {
   ]);
 
   const active = properties.filter((p) => p.status === "aktywna");
+  const mapPoints = active
+    .filter((p) => p.lat != null && p.lng != null)
+    .map((p) => ({ id: p.id, title: p.title, price: p.price_pln, lat: p.lat!, lng: p.lng! }));
 
   return (
     <>
@@ -26,6 +30,25 @@ export default async function NieruchomosciPage() {
         subtitle={`${active.length} aktywnych · ${properties.length} łącznie`}
         action={<NewPropertyForm clients={clients} />}
       />
+
+      {properties.length > 0 && (
+        <Card className="mb-6 !overflow-hidden !p-0">
+          <div className="flex items-center justify-between border-b border-zinc-700/60 px-5 py-3">
+            <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-400">
+              Mapa aktualnych ofert
+            </h2>
+            <span className="text-xs text-zinc-500">{mapPoints.length} na mapie</span>
+          </div>
+          {mapPoints.length > 0 ? (
+            <PropertiesMap points={mapPoints} />
+          ) : (
+            <p className="p-6 text-sm text-zinc-500">
+              Żadna aktywna oferta nie ma jeszcze lokalizacji. Przy dodawaniu/edycji oferty
+              wybierz adres z podpowiedzi, żeby pojawiła się na mapie.
+            </p>
+          )}
+        </Card>
+      )}
 
       {properties.length === 0 ? (
         <EmptyState

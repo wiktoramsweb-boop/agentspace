@@ -78,38 +78,46 @@ export default async function ProwizjePage() {
           }
         />
       ) : (
-        <Card className="!p-0">
-          <div className="divide-y divide-zinc-900">
-            {deals.map((d) => {
-              const status = DEAL_STATUSES.find((s) => s.value === d.status);
-              return (
-                <div key={d.id} className="flex items-center justify-between gap-4 px-6 py-4">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-white">{d.title}</p>
-                    <p className="text-sm text-zinc-500">
-                      <span className="text-emerald-400">{formatPln(d.agent_earnings_pln)}</span>
-                      {` dla Ciebie · biuro ${formatPln(d.commission_pln)}`}
-                      {d.agent_split_pct ? ` (${d.agent_split_pct}%)` : ""}
-                      {d.status === "zamkniety" && d.closed_at
-                        ? ` · zamknięta ${formatDateShort(d.closed_at)}`
-                        : d.expected_close
-                          ? ` · plan: ${formatDateShort(d.expected_close)}`
-                          : ""}
-                    </p>
-                  </div>
-                  <div className="flex flex-shrink-0 items-center gap-3">
-                    {status && (
-                      <span className={`hidden rounded-md px-2 py-1 text-xs font-medium sm:inline ${status.color}`}>
-                        {status.label}
-                      </span>
-                    )}
-                    <DealActions dealId={d.id} status={d.status} />
-                  </div>
+        <div className="space-y-2.5">
+          {deals.map((d) => {
+            const status = DEAL_STATUSES.find((s) => s.value === d.status);
+            const accent =
+              d.status === "zamkniety"
+                ? "bg-emerald-400"
+                : d.status === "przepadl"
+                  ? "bg-red-400"
+                  : "bg-amber-400";
+            return (
+              <div
+                key={d.id}
+                className="flex items-center gap-4 overflow-hidden rounded-2xl border border-zinc-700/50 bg-zinc-800/40 p-4 pl-0 transition hover:border-zinc-600 hover:bg-zinc-800/70"
+              >
+                <span className={`h-12 w-1.5 flex-shrink-0 rounded-r-full ${accent}`} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-white">{d.title}</p>
+                  <p className="text-sm text-zinc-400">
+                    <span className="font-medium text-emerald-400">{formatPln(d.agent_earnings_pln)}</span>
+                    {` dla Ciebie · biuro ${formatPln(d.commission_pln)}`}
+                    {d.agent_split_pct ? ` (${d.agent_split_pct}%)` : ""}
+                    {d.status === "zamkniety" && d.closed_at
+                      ? ` · zamknięta ${formatDateShort(d.closed_at)}`
+                      : d.expected_close
+                        ? ` · plan: ${formatDateShort(d.expected_close)}`
+                        : ""}
+                  </p>
                 </div>
-              );
-            })}
-          </div>
-        </Card>
+                <div className="flex flex-shrink-0 items-center gap-3 pr-4">
+                  {status && (
+                    <span className={`hidden rounded-md px-2 py-1 text-xs font-medium sm:inline ${status.color}`}>
+                      {status.label}
+                    </span>
+                  )}
+                  <DealActions dealId={d.id} status={d.status} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
     </>
   );

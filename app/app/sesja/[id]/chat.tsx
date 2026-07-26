@@ -115,11 +115,15 @@ export function SessionChat({
         <EndSessionButton sessionId={sessionId} disabled={agentTurns === 0} />
       </div>
 
-      {/* Brief collapsible */}
-      <details className="mb-4 rounded-xl border border-zinc-900 bg-zinc-900/30 px-4 py-3 text-sm">
-        <summary className="cursor-pointer font-medium text-zinc-300">Twoje zadanie</summary>
-        <p className="mt-2 text-zinc-400">{brief}</p>
-      </details>
+      {/* Zadanie — WIDOCZNE cały czas, żeby nie zapomnieć adresu / celu */}
+      {brief && (
+        <div className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] px-4 py-3">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+            Twoje zadanie
+          </p>
+          <p className="text-sm leading-relaxed text-zinc-200">{brief}</p>
+        </div>
+      )}
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto pr-2">

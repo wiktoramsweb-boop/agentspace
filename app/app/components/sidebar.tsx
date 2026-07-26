@@ -6,19 +6,55 @@ import { useState } from "react";
 import type { UserRole } from "@/lib/types";
 import { signOut } from "@/app/auth/actions";
 
-type NavItem = { href: string; label: string; icon: React.ReactNode; roles?: UserRole[] };
+type NavColor = keyof typeof TILE;
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  color: NavColor;
+  roles?: UserRole[];
+};
+type NavSection = { title: string; items: NavItem[] };
 
-const NAV: NavItem[] = [
-  { href: "/app", label: "Pulpit", icon: <HomeIcon /> },
-  { href: "/app/cele", label: "Cele", icon: <TargetIcon /> },
-  { href: "/app/trening", label: "AI Coach", icon: <MicIcon /> },
-  { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon /> },
-  { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon /> },
-  { href: "/app/opisy", label: "Opisy", icon: <DocIcon /> },
-  { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon /> },
-  { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon /> },
-  { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, roles: ["owner"] },
-  { href: "/app/ustawienia", label: "Ustawienia", icon: <CogIcon /> },
+// Kolorowe kafelki ikon (jak w ASARI). Pełne klasy — żeby Tailwind je zbudował.
+const TILE = {
+  emerald: "bg-emerald-500/15 text-emerald-400",
+  violet: "bg-violet-500/15 text-violet-400",
+  cyan: "bg-cyan-500/15 text-cyan-400",
+  rose: "bg-rose-500/15 text-rose-400",
+  blue: "bg-blue-500/15 text-blue-400",
+  amber: "bg-amber-500/15 text-amber-400",
+  green: "bg-green-500/15 text-green-400",
+  fuchsia: "bg-fuchsia-500/15 text-fuchsia-400",
+  slate: "bg-slate-500/15 text-slate-300",
+} as const;
+
+const SECTIONS: NavSection[] = [
+  {
+    title: "Główne",
+    items: [
+      { href: "/app", label: "Pulpit", icon: <HomeIcon />, color: "emerald" },
+      { href: "/app/cele", label: "Cele", icon: <TargetIcon />, color: "violet" },
+      { href: "/app/trening", label: "AI Coach", icon: <MicIcon />, color: "cyan" },
+    ],
+  },
+  {
+    title: "Sprzedaż",
+    items: [
+      { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon />, color: "rose" },
+      { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue" },
+      { href: "/app/opisy", label: "Opisy", icon: <DocIcon />, color: "amber" },
+      { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green" },
+    ],
+  },
+  {
+    title: "Więcej",
+    items: [
+      { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate" },
+      { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, color: "fuchsia", roles: ["owner"] },
+      { href: "/app/ustawienia", label: "Ustawienia", icon: <CogIcon />, color: "slate" },
+    ],
+  },
 ];
 
 export function Sidebar({
@@ -33,40 +69,51 @@ export function Sidebar({
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const items = NAV.filter((i) => !i.roles || i.roles.includes(role));
-
   const isActive = (href: string) =>
     href === "/app" ? pathname === "/app" : pathname.startsWith(href);
 
   const nav = (
-    <nav className="flex flex-1 flex-col gap-0.5">
-      {items.map((item) => {
-        const active = isActive(item.href);
+    <nav className="flex flex-1 flex-col gap-5 overflow-y-auto">
+      {SECTIONS.map((section) => {
+        const items = section.items.filter((i) => !i.roles || i.roles.includes(role));
+        if (items.length === 0) return null;
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={() => setMobileOpen(false)}
-            className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-              active
-                ? "bg-emerald-500/10 text-emerald-300"
-                : "text-zinc-400 hover:bg-zinc-800/70 hover:text-white"
-            }`}
-          >
-            <span
-              className={`absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-emerald-400 transition-opacity ${
-                active ? "opacity-100" : "opacity-0"
-              }`}
-            />
-            <span
-              className={`transition ${
-                active ? "text-emerald-400" : "text-zinc-500 group-hover:text-zinc-300"
-              }`}
-            >
-              {item.icon}
-            </span>
-            {item.label}
-          </Link>
+          <div key={section.title}>
+            <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+              {section.title}
+            </p>
+            <div className="flex flex-col gap-0.5">
+              {items.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`group relative flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium transition ${
+                      active
+                        ? "bg-zinc-800/80 text-white"
+                        : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white"
+                    }`}
+                  >
+                    <span
+                      className={`absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-emerald-400 transition-opacity ${
+                        active ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                    <span
+                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition ${TILE[item.color]} ${
+                        active ? "" : "opacity-90 group-hover:opacity-100"
+                      }`}
+                    >
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         );
       })}
     </nav>
