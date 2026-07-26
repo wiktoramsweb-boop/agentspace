@@ -71,6 +71,8 @@ export type Invoice = {
   payment_method: string | null;
   items: InvoiceItem[];
   total_pln: number;
+  paid_pln: number;
+  issuer: string | null;
   description: string | null;
   created_at: string;
 };

@@ -23,6 +23,8 @@ export type SheetData = {
   paymentMethod: string;
   items: InvoiceItem[];
   description: string;
+  paid: number;
+  issuer: string;
 };
 
 function Logo() {
@@ -137,6 +139,14 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
             <span>Do zapłaty</span>
             <span>{formatMoney(total)} zł</span>
           </div>
+          <div className="flex justify-between text-zinc-600">
+            <span>Zapłacono</span>
+            <span>{formatMoney(data.paid || 0)} zł</span>
+          </div>
+          <div className="flex justify-between font-semibold text-zinc-900">
+            <span>Pozostało do zapłaty</span>
+            <span>{formatMoney(Math.max(0, total - (data.paid || 0)))} zł</span>
+          </div>
         </div>
       </div>
 
@@ -158,6 +168,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
           Podpis osoby uprawnionej do odbioru faktury
         </div>
         <div>
+          {data.issuer && <p className="mb-1 font-medium text-zinc-800">{data.issuer}</p>}
           <div className="mx-auto mb-1 w-4/5 border-t border-zinc-300" />
           Podpis osoby upoważnionej do wystawienia faktury
         </div>

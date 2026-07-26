@@ -32,6 +32,8 @@ export default async function InvoiceViewPage({ params }: Props) {
     paymentMethod: inv.payment_method ?? "Przelew",
     items: inv.items ?? [],
     description: inv.description ?? "",
+    paid: inv.paid_pln ?? 0,
+    issuer: inv.issuer ?? "",
   };
 
   return (

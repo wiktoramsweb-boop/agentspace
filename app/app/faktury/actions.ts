@@ -22,6 +22,8 @@ export type InvoicePayload = {
   paymentMethod: string;
   items: InvoiceItem[];
   description: string;
+  paid: number;
+  issuer: string;
 };
 
 export async function createInvoice(p: InvoicePayload): Promise<void> {
@@ -53,6 +55,8 @@ export async function createInvoice(p: InvoicePayload): Promise<void> {
       items,
       total_pln: total,
       description: p.description || null,
+      paid_pln: Number(p.paid) || 0,
+      issuer: p.issuer || null,
     })
     .select("id")
     .single();

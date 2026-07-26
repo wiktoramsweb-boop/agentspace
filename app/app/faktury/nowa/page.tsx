@@ -28,7 +28,13 @@ export default async function NowaFakturaPage() {
         />
       </div>
       <InvoiceCreator
-        defaults={{ number, issueDate: iso(today), saleDate: iso(today), paymentDate: iso(pay) }}
+        defaults={{
+          number,
+          issueDate: iso(today),
+          saleDate: iso(today),
+          paymentDate: iso(pay),
+          issuer: owner.full_name ?? "",
+        }}
       />
     </>
   );

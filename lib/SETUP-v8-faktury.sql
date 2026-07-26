@@ -27,6 +27,10 @@ create table if not exists public.invoices (
   created_at timestamptz default now()
 );
 
+-- Dodane w v8.1: kwota zapłacona + osoba wystawiająca
+alter table public.invoices add column if not exists paid_pln numeric not null default 0;
+alter table public.invoices add column if not exists issuer text;
+
 create index if not exists invoices_agency_idx on public.invoices(agency_id, created_at desc);
 
 alter table public.invoices enable row level security;

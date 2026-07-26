@@ -9,7 +9,13 @@ import { printInvoice } from "./print-button";
 export function InvoiceCreator({
   defaults,
 }: {
-  defaults: { number: string; issueDate: string; saleDate: string; paymentDate: string };
+  defaults: {
+    number: string;
+    issueDate: string;
+    saleDate: string;
+    paymentDate: string;
+    issuer: string;
+  };
 }) {
   const [d, setD] = useState<SheetData>({
     number: defaults.number,
@@ -27,6 +33,8 @@ export function InvoiceCreator({
     paymentMethod: "Przelew",
     items: [{ name: "Pośrednictwo w kupnie nieruchomości", qty: 1, unitPrice: 0 }],
     description: "",
+    paid: 0,
+    issuer: defaults.issuer,
   });
   const [buyerType, setBuyerType] = useState<"firma" | "osoba">("firma");
   const [pending, startTransition] = useTransition();
@@ -101,7 +109,20 @@ export function InvoiceCreator({
             <Field label="Sprzedaży" type="date" value={d.saleDate} onChange={(v) => set("saleDate", v)} />
             <Field label="Płatności" type="date" value={d.paymentDate} onChange={(v) => set("paymentDate", v)} />
           </div>
-          <Field label="Forma płatności" value={d.paymentMethod} onChange={(v) => set("paymentMethod", v)} />
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Forma płatności" value={d.paymentMethod} onChange={(v) => set("paymentMethod", v)} />
+            <div>
+              <label className="mb-1.5 block text-sm text-zinc-400">Zapłacono (zł)</label>
+              <input
+                type="number"
+                value={d.paid || ""}
+                onChange={(e) => set("paid", Number(e.target.value))}
+                placeholder="0"
+                className={inp}
+              />
+            </div>
+          </div>
+          <Field label="Osoba wystawiająca (podpis)" value={d.issuer} onChange={(v) => set("issuer", v)} />
         </Section>
 
         <Section title="Pozycje">
