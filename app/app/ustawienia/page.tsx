@@ -1,6 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { PageHeader, Card } from "../components/ui";
 import { SettingsForm } from "./settings-form";
+import { PushToggle } from "./push-toggle";
 
 export default async function UstawieniaPage() {
   const user = await requireUser();
@@ -49,6 +50,14 @@ export default async function UstawieniaPage() {
           </dl>
         </Card>
       </div>
+
+      <Card className="mt-6">
+        <h2 className="mb-1 text-lg font-semibold text-white">Powiadomienia</h2>
+        <p className="mb-4 text-sm text-zinc-400">
+          Poranna odprawa i przypomnienia o kontakcie prosto na telefon.
+        </p>
+        <PushToggle />
+      </Card>
     </>
   );
 }
