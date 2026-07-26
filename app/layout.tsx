@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ScrollProgress } from "./components/effects/scroll-progress";
@@ -65,6 +65,15 @@ export const metadata: Metadata = {
   },
   authors: [{ name: "Wiktor Szostek", url: "https://agentspace.pl" }],
   category: "Real Estate Technology",
+  appleWebApp: {
+    capable: true,
+    title: "AgentSpace",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#09090b",
 };
 
 export default function RootLayout({

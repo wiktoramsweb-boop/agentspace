@@ -4,6 +4,7 @@ import { Sidebar } from "./components/sidebar";
 import { OnboardingRedirect } from "./onboarding-redirect";
 import { ToastProvider } from "./components/toast";
 import { PageTransition } from "./components/page-transition";
+import { PwaInstall } from "./components/pwa-install";
 
 export const metadata: Metadata = {
   title: "AgentSpace — panel",
@@ -32,6 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </main>
       </div>
+      <PwaInstall />
     </ToastProvider>
   );
 }
