@@ -56,8 +56,10 @@ export function NewDealButton({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parties, txNum]);
 
-  const officeTotal = Object.values(resolved).reduce((a, b) => a + b, 0);
-  const agentBase = Math.round((officeTotal * splitNum) / 100);
+  const officeTotal = Object.values(resolved).reduce((a, b) => a + b, 0); // brutto
+  const netto = officeTotal / 1.23;
+  const vat = officeTotal - netto;
+  const agentBase = Math.round((netto * splitNum) / 100); // udział liczony od netto
   const earnings = agentBase + extrasNum;
 
   function setParty(key: PartyKey, patch: Partial<Party>) {
@@ -185,11 +187,13 @@ export function NewDealButton({
 
           {/* Podsumowanie na żywo */}
           <div className="space-y-1.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
-            <Row label="Prowizja łączna biura" value={formatPln(officeTotal)} />
-            <Row label={`Twój udział (${splitNum}%)`} value={formatPln(agentBase)} muted />
+            <Row label="Prowizja biura (brutto)" value={formatPln(officeTotal)} />
+            <Row label="VAT (23%)" value={`− ${formatPln(vat)}`} muted />
+            <Row label="Prowizja netto" value={formatPln(netto)} muted />
+            <Row label={`Twój udział (${splitNum}% od netto)`} value={formatPln(agentBase)} muted />
             {extrasNum > 0 && <Row label="Dodatki (dla Ciebie)" value={formatPln(extrasNum)} muted />}
             <div className="mt-2 flex items-center justify-between border-t border-emerald-500/20 pt-2">
-              <span className="font-medium text-white">Twój zarobek</span>
+              <span className="font-medium text-white">Twój zarobek (netto)</span>
               <span className="text-xl font-semibold text-emerald-400">{formatPln(earnings)}</span>
             </div>
           </div>

@@ -48,12 +48,17 @@ export default async function ProwizjePage() {
         </Card>
       )}
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Twój zarobek (mc)"
           value={formatPln(stats.monthClosed)}
           sub={`${stats.dealsClosedThisMonth} transakcji · biuro ${formatPln(stats.officeMonthClosed)}`}
           accent
+        />
+        <StatCard
+          label="Prognoza (kwartał)"
+          value={formatPln(stats.forecastQuarter)}
+          sub="planowane zamknięcia do końca kwartału"
         />
         <StatCard
           label="Twój pipeline (w toku)"
@@ -97,8 +102,8 @@ export default async function ProwizjePage() {
                   <p className="truncate font-semibold text-white">{d.title}</p>
                   <p className="text-sm text-zinc-400">
                     <span className="font-medium text-emerald-400">{formatPln(d.agent_earnings_pln)}</span>
-                    {` dla Ciebie · biuro ${formatPln(d.commission_pln)}`}
-                    {d.agent_split_pct ? ` (${d.agent_split_pct}%)` : ""}
+                    {` dla Ciebie · biuro ${formatPln(d.commission_pln)} brutto (netto ${formatPln(d.commission_pln / 1.23)})`}
+                    {d.agent_split_pct ? ` · ${d.agent_split_pct}%` : ""}
                     {d.status === "zamkniety" && d.closed_at
                       ? ` · zamknięta ${formatDateShort(d.closed_at)}`
                       : d.expected_close

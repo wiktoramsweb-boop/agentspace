@@ -186,6 +186,7 @@ export type CommissionStats = {
   monthClosed: number; // zarobek agenta zamknięty w tym miesiącu
   pipelineValue: number; // zarobek agenta w toku
   officeMonthClosed: number; // prowizja biura zamknięta w tym miesiącu
+  forecastQuarter: number; // prognoza zarobku (w toku, planowane zamknięcie do końca kwartału)
   dealsInProgress: number;
   dealsClosedThisMonth: number;
 };
@@ -194,15 +195,18 @@ export async function getCommissionStats(agentId: string): Promise<CommissionSta
   const admin = createSupabaseAdmin();
   const { data: deals } = await admin
     .from("deals")
-    .select("commission_pln, agent_earnings_pln, status, closed_at")
+    .select("commission_pln, agent_earnings_pln, status, closed_at, expected_close")
     .eq("agent_id", agentId);
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const quarter = Math.floor(now.getMonth() / 3);
+  const quarterEnd = new Date(now.getFullYear(), quarter * 3 + 3, 0); // ostatni dzień kwartału
 
   let monthClosed = 0;
   let pipelineValue = 0;
   let officeMonthClosed = 0;
+  let forecastQuarter = 0;
   let dealsInProgress = 0;
   let dealsClosedThisMonth = 0;
 
@@ -210,6 +214,10 @@ export async function getCommissionStats(agentId: string): Promise<CommissionSta
     if (d.status === "w_toku") {
       pipelineValue += d.agent_earnings_pln ?? 0;
       dealsInProgress += 1;
+      // Prognoza: transakcje w toku z planowanym zamknięciem do końca kwartału
+      if (d.expected_close && new Date(d.expected_close) <= quarterEnd) {
+        forecastQuarter += d.agent_earnings_pln ?? 0;
+      }
     } else if (d.status === "zamkniety" && d.closed_at) {
       if (new Date(d.closed_at) >= monthStart) {
         monthClosed += d.agent_earnings_pln ?? 0;
@@ -219,10 +227,12 @@ export async function getCommissionStats(agentId: string): Promise<CommissionSta
     }
   }
 
+  // Prognoza obejmuje też to, co już zamknięte w tym kwartale
   return {
     monthClosed,
     pipelineValue,
     officeMonthClosed,
+    forecastQuarter,
     dealsInProgress,
     dealsClosedThisMonth,
   };

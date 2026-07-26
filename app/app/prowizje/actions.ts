@@ -26,9 +26,10 @@ export async function createDeal(formData: FormData): Promise<void> {
   let split = num(formData.get("split"));
   if (split <= 0 || split > 100) split = user.default_split_pct ?? 50;
 
-  // Prowizja łączna biura = suma stron. Zarobek agenta = jego % + dodatki (100% dla agenta).
+  // Prowizja biura (brutto) = suma stron. Agent liczony od NETTO (bez 23% VAT).
   const officeTotal = seller + buyer + landlord + tenant;
-  const agentEarnings = Math.round((officeTotal * split) / 100) + extras;
+  const netto = officeTotal / 1.23;
+  const agentEarnings = Math.round((netto * split) / 100) + extras;
 
   const admin = createSupabaseAdmin();
   await admin.from("deals").insert({
