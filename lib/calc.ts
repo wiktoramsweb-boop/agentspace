@@ -29,28 +29,68 @@ export function taksaNotarialnaNetto(value: number): number {
   return Math.min(t, 10000);
 }
 
+export type Rynek = "wtorny" | "wtorny_bez_pcc" | "pierwotny";
+
+// Stałe opłaty (brutto)
+export const OPLATA_SADOWA = 200; // wpis prawa własności do KW
+export const WNIOSEK_KW = 246; // opłata za wniosek wieczystoksięgowy (brutto)
+export const HIPOTEKA = 615; // ustanowienie hipoteki (brutto)
+
 export type PurchaseCosts = {
   pcc: number;
-  taksaNetto: number;
-  taksaBrutto: number;
-  courtFees: number;
-  prowizja: number;
+  taksaMaksBrutto: number;
+  taksaFinal: number;
+  taksaSave: number;
+  oplataSadowa: number;
+  wniosekKW: number;
+  hipoteka: number;
+  feesTotal: number;
+  prowizjaStd: number;
+  prowizjaFinal: number;
+  prowizjaSave: number;
   total: number;
+  totalSave: number;
 };
 
 export function purchaseCosts(opts: {
   price: number;
-  rynek: "wtorny" | "pierwotny";
+  rynek: Rynek;
   naKredyt: boolean;
-  prowizjaPct: number;
+  prowizjaStdPct: number;
+  prowizjaFinalPct: number;
+  taksaFinalBrutto: number | null; // null → maksymalna taksa
 }): PurchaseCosts {
   const pcc = opts.rynek === "wtorny" ? opts.price * 0.02 : 0;
-  const taksaNetto = taksaNotarialnaNetto(opts.price);
-  const taksaBrutto = taksaNetto * 1.23;
-  const courtFees = 200 + (opts.naKredyt ? 200 : 0); // wpis własności + ewentualnie hipoteka
-  const prowizja = (opts.prowizjaPct / 100) * opts.price;
-  const total = pcc + taksaBrutto + courtFees + prowizja;
-  return { pcc, taksaNetto, taksaBrutto, courtFees, prowizja, total };
+
+  const taksaMaksBrutto = taksaNotarialnaNetto(opts.price) * 1.23;
+  const taksaFinal = opts.taksaFinalBrutto != null ? opts.taksaFinalBrutto : taksaMaksBrutto;
+  const taksaSave = Math.max(0, taksaMaksBrutto - taksaFinal);
+
+  const hipoteka = opts.naKredyt ? HIPOTEKA : 0;
+  const feesTotal = OPLATA_SADOWA + WNIOSEK_KW + hipoteka;
+
+  const prowizjaStd = (opts.prowizjaStdPct / 100) * opts.price;
+  const prowizjaFinal = (opts.prowizjaFinalPct / 100) * opts.price;
+  const prowizjaSave = Math.max(0, prowizjaStd - prowizjaFinal);
+
+  const total = pcc + taksaFinal + feesTotal + prowizjaFinal;
+  const totalSave = taksaSave + prowizjaSave;
+
+  return {
+    pcc,
+    taksaMaksBrutto,
+    taksaFinal,
+    taksaSave,
+    oplataSadowa: OPLATA_SADOWA,
+    wniosekKW: WNIOSEK_KW,
+    hipoteka,
+    feesTotal,
+    prowizjaStd,
+    prowizjaFinal,
+    prowizjaSave,
+    total,
+    totalSave,
+  };
 }
 
 export type YieldResult = { gross: number; net: number; paybackYears: number; annualNet: number };

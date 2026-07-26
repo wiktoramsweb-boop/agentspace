@@ -284,6 +284,10 @@ body {
     box-shadow: none !important;
     max-width: none !important;
     width: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .invoice-sheet {
     padding: 14mm !important;
   }
 }
