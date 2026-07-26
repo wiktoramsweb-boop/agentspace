@@ -26,16 +26,8 @@ export type SheetData = {
 };
 
 function Logo() {
-  return (
-    <svg width="56" height="56" viewBox="0 0 512 512" aria-hidden>
-      <circle cx="256" cy="256" r="248" fill="#0a0a0a" />
-      <path
-        fill="#ffffff"
-        d="M256 138 L410 272 L368 272 L368 392 L296 392 L296 322 L216 322 L216 392 L144 392 L144 272 L102 272 Z"
-      />
-      <circle cx="256" cy="150" r="13" fill="#ffffff" />
-    </svg>
-  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/logo.png" alt="Logo Spectra" width={56} height={56} className="rounded-full" />;
 }
 
 export function InvoiceSheet({ data }: { data: SheetData }) {
