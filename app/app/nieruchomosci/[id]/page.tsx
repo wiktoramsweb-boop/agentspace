@@ -26,6 +26,7 @@ import {
   DeletePropertyButton,
 } from "./property-controls";
 import { EditPropertyForm } from "./edit-property-form";
+import { NearbyCard } from "./nearby-card";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -133,6 +134,10 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </p>
               </Card>
             )
+          )}
+
+          {property.lat != null && property.lng != null && (
+            <NearbyCard lat={property.lat} lng={property.lng} />
           )}
         </div>
 

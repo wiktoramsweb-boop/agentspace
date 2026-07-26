@@ -279,7 +279,8 @@ body {
   main {
     padding: 0 !important;
   }
-  .invoice-sheet {
+  .invoice-sheet,
+  .print-sheet {
     box-shadow: none !important;
     max-width: none !important;
     width: 100% !important;
