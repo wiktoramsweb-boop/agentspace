@@ -17,6 +17,7 @@ export type Profile = {
   role: UserRole;
   monthly_goal_pln: number;
   default_split_pct: number;
+  phone: string | null;
   created_at: string;
 };
 

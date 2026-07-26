@@ -16,6 +16,7 @@ export default async function KalkulatoryPage() {
         agent={{
           name: user.full_name ?? "Agent",
           email: user.email ?? "",
+          phone: user.phone ?? "",
           agency: user.agency?.name ?? "Agencja Nieruchomości Spectra",
         }}
       />

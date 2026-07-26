@@ -4,7 +4,7 @@ import { useState } from "react";
 import { mortgage, purchaseCosts, rentalYield, type Rynek } from "@/lib/calc";
 import { CalcSheet, type SheetRow } from "./calc-sheet";
 
-type Agent = { name: string; email: string; agency: string };
+type Agent = { name: string; email: string; phone?: string; agency: string };
 
 const zl0 = (n: number) =>
   new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(Math.round(n)) + " zł";
@@ -21,6 +21,7 @@ export function Calculators({ agent }: { agent: Agent }) {
   const [amount, setAmount] = useState(500000);
   const [rate, setRate] = useState(7.2);
   const [years, setYears] = useState(30);
+  const [extra, setExtra] = useState(0);
 
   // Koszty zakupu
   const [price, setPrice] = useState(650000);
@@ -35,7 +36,7 @@ export function Calculators({ agent }: { agent: Agent }) {
   const [rent, setRent] = useState(2800);
   const [rcost, setRcost] = useState(300);
 
-  const m = mortgage(amount, rate, years);
+  const m = mortgage(amount, rate, years, extra);
   const taksaFinalBrutto = taksaInput.trim() ? Number(taksaInput) : null;
   const c = purchaseCosts({ price, rynek, naKredyt, prowizjaStdPct, prowizjaFinalPct, taksaFinalBrutto });
   const y = rentalYield({ price: rprice, monthlyRent: rent, monthlyCost: rcost });
@@ -59,9 +60,33 @@ export function Calculators({ agent }: { agent: Agent }) {
         { label: "Okres", value: `${years} lat (${m.months} rat)` },
         { label: "Suma odsetek", value: zl0(m.interest), muted: true },
         { label: "Całkowity koszt", value: zl0(m.total), muted: true },
+        ...(extra > 0
+          ? [
+              { label: "Nadpłata miesięczna", value: zl0(extra) },
+              {
+                label: "Spłata z nadpłatą",
+                value: `${m.overpayMonths} rat (${Math.floor(m.overpayMonths / 12)} lat ${m.overpayMonths % 12} mies.)`,
+              },
+              {
+                label: "Odsetki z nadpłatą",
+                value: zl0(m.overpayInterest),
+                old: zl0(m.interest),
+                save: zl0(m.savedInterest),
+              },
+              {
+                label: "Krócej o",
+                value: `${Math.floor(m.savedMonths / 12)} lat ${m.savedMonths % 12} mies.`,
+                muted: true,
+              },
+            ]
+          : []),
       ],
       emphasis: { label: "Miesięczna rata", value: zl2(m.rata) },
-      note: "Szacunek dla raty równej (annuitetowej). Rzeczywiste warunki zależą od banku i zdolności kredytowej.",
+      savings:
+        extra > 0 && m.savedInterest > 0
+          ? `Nadpłacając ${zl0(extra)}/mc oszczędzasz ${zl0(m.savedInterest)} odsetek`
+          : undefined,
+      note: "Wartości szacunkowe — nie stanowią oferty. Rzeczywiste warunki zależą od banku i zdolności kredytowej.",
     };
   } else if (tab === "koszty") {
     const pccLabel =
@@ -95,17 +120,17 @@ export function Calculators({ agent }: { agent: Agent }) {
       ],
       emphasis: { label: "Razem koszty zakupu", value: zl0(c.total) },
       savings: c.totalSave > 0 ? `Kupując z nami klient oszczędza ${zl0(c.totalSave)}` : undefined,
-      note: "Taksa notarialna podana jako maksymalna, chyba że wpiszesz kwotę po rabacie. Szacunek — nie stanowi oferty.",
+      note: "Podane wartości są szacunkowe i nie stanowią oferty handlowej.",
     };
   } else {
     sheet = {
-      title: "Rentowność najmu",
+      title: "ROI z najmu",
       subtitle: `${zl0(rprice)} · najem ${zl0(rent)}/mc`,
       rows: [
         { label: "Cena zakupu", value: zl0(rprice) },
         { label: "Czynsz najmu (miesięcznie)", value: zl0(rent) },
         { label: "Koszty miesięczne", value: zl0(rcost), muted: true },
-        { label: "Rentowność netto", value: pct(y.net) },
+        { label: "ROI netto (rocznie)", value: pct(y.net) },
         { label: "Roczny dochód netto", value: zl0(y.annualNet), muted: true },
         {
           label: "Zwrot inwestycji",
@@ -113,8 +138,8 @@ export function Calculators({ agent }: { agent: Agent }) {
           muted: true,
         },
       ],
-      emphasis: { label: "Rentowność brutto", value: pct(y.gross) },
-      note: "Szacunek rentowności bez uwzględnienia podatku od najmu i pustostanów.",
+      emphasis: { label: "ROI brutto (rocznie)", value: pct(y.gross) },
+      note: "Wartości szacunkowe — bez podatku od najmu i pustostanów.",
     };
   }
 
@@ -137,9 +162,10 @@ export function Calculators({ agent }: { agent: Agent }) {
         <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-4">
           {tab === "kredyt" && (
             <div className="space-y-3">
-              <Num label="Kwota kredytu (zł)" value={amount} onChange={setAmount} step={10000} />
-              <Num label="Oprocentowanie (%)" value={rate} onChange={setRate} step={0.1} />
-              <Num label="Okres (lata)" value={years} onChange={setYears} step={1} />
+              <Num label="Kwota kredytu (zł)" value={amount} onChange={setAmount} />
+              <Num label="Oprocentowanie (%)" value={rate} onChange={setRate} />
+              <Num label="Okres (lata)" value={years} onChange={setYears} />
+              <Num label="Nadpłata miesięczna (zł) — opcjonalnie" value={extra} onChange={setExtra} />
             </div>
           )}
 
@@ -219,21 +245,28 @@ function Num({
   label,
   value,
   onChange,
-  step = 1,
 }: {
   label: string;
   value: number;
   onChange: (v: number) => void;
   step?: number;
 }) {
+  // Tekstowe pole z obsługą przecinka (np. 2,46). Wewnętrzny stan trzyma to,
+  // co wpisał użytkownik, żeby przecinek nie znikał.
+  const [raw, setRaw] = useState(value ? String(value) : "");
   return (
     <div>
       <label className={lbl}>{label}</label>
       <input
-        type="number"
-        value={Number.isFinite(value) ? value : ""}
-        step={step}
-        onChange={(e) => onChange(Number(e.target.value))}
+        type="text"
+        inputMode="decimal"
+        value={raw}
+        onChange={(e) => {
+          const v = e.target.value;
+          setRaw(v);
+          const n = parseFloat(v.replace(/\s/g, "").replace(",", "."));
+          onChange(Number.isFinite(n) ? n : 0);
+        }}
         className={inp}
       />
     </div>

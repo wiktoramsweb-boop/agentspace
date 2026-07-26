@@ -7,13 +7,55 @@ export function monthlyPayment(principal: number, annualRatePct: number, years: 
   return (principal * r) / (1 - Math.pow(1 + r, -n));
 }
 
-export type MortgageResult = { rata: number; total: number; interest: number; months: number };
+export type MortgageResult = {
+  rata: number;
+  total: number;
+  interest: number;
+  months: number;
+  // z nadpłatą (jeśli extraMonthly > 0)
+  overpayMonths: number;
+  overpayInterest: number;
+  savedInterest: number;
+  savedMonths: number;
+};
 
-export function mortgage(principal: number, rate: number, years: number): MortgageResult {
+export function mortgage(
+  principal: number,
+  rate: number,
+  years: number,
+  extraMonthly = 0,
+): MortgageResult {
   const rata = monthlyPayment(principal, rate, years);
-  const months = Math.round(years * 12);
-  const total = rata * months;
-  return { rata, total, interest: total - principal, months };
+  const baseMonths = Math.round(years * 12);
+  const baseTotal = rata * baseMonths;
+  const baseInterest = baseTotal - principal;
+
+  // Symulacja spłaty z dodatkową nadpłatą miesięczną
+  const r = rate / 100 / 12;
+  let bal = principal;
+  let months = 0;
+  let interest = 0;
+  const pay = rata + Math.max(0, extraMonthly);
+  const cap = baseMonths + 12; // bezpiecznik
+  while (bal > 0.01 && months < cap) {
+    const i = bal * r;
+    interest += i;
+    const principalPart = pay - i;
+    if (principalPart <= 0) break; // rata nie pokrywa odsetek
+    bal -= principalPart;
+    months += 1;
+  }
+
+  return {
+    rata,
+    total: baseTotal,
+    interest: baseInterest,
+    months: baseMonths,
+    overpayMonths: months,
+    overpayInterest: interest,
+    savedInterest: Math.max(0, baseInterest - interest),
+    savedMonths: Math.max(0, baseMonths - months),
+  };
 }
 
 /** Maksymalna taksa notarialna (netto) wg rozporządzenia. */
