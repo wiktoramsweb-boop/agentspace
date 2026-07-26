@@ -260,6 +260,27 @@ body {
   animation: toast-in 0.28s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
 }
 
+/* Druk faktur — chowamy interfejs, zostaje biała kartka */
+@media print {
+  aside,
+  .print-hide {
+    display: none !important;
+  }
+  html,
+  body,
+  .app-shell {
+    background: #fff !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .invoice-sheet {
+    box-shadow: none !important;
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
+
 /* Smooth scrollbar */
 ::-webkit-scrollbar {
   width: 12px;

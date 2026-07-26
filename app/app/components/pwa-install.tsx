@@ -79,7 +79,7 @@ export function PwaInstall() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-md md:left-auto md:right-4 md:mx-0">
+    <div className="print-hide fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-md md:left-auto md:right-4 md:mx-0">
       <div className="rounded-2xl border border-zinc-700 bg-zinc-900/95 p-4 shadow-2xl shadow-black/50 backdrop-blur">
         {!showIOSHelp ? (
           <div className="flex items-center gap-3">
