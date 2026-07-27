@@ -123,7 +123,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
   const priceShown = price.trim() ? (/zł|pln/i.test(price) ? price.trim() : `${price.trim()} zł`) : "";
 
   const sheetEl = (
-    <div className="print-sheet sheet-a4 mx-auto flex w-full max-w-[820px] flex-col rounded-2xl border-t-4 border-emerald-500 bg-white p-8 text-zinc-900 shadow-xl md:p-10">
+    <div className="print-sheet sheet-a4 mx-auto w-full max-w-[820px] rounded-2xl border-t-4 border-emerald-500 bg-white p-8 text-zinc-900 shadow-xl md:p-10">
       <div className="mb-4 flex items-center justify-between gap-4 border-b border-zinc-200 pb-4">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -179,7 +179,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
         </div>
       )}
 
-      <div className="mt-auto flex items-center gap-3 border-t border-zinc-200 pt-4">
+      <div className="mt-6 flex items-center gap-3 border-t border-zinc-200 pt-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.png" alt="" width={40} height={40} className="rounded-full" />
         <div className="min-w-0 text-sm">

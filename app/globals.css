@@ -291,10 +291,14 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* Ofertówka — twardo jedna strona A4 (przycina ewentualną nadwyżkę) */
+  /* Ofertówka — naturalna wysokość, ale całość trzyma się jednej strony
+     (bez dzielenia stopki/nazwy agenta między strony). */
   .sheet-a4 {
-    height: 297mm !important;
-    overflow: hidden !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
 
