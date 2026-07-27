@@ -10,13 +10,24 @@ const CATEGORIES = [
   { key: "closing", label: "Zamknięcie / następny krok" },
 ] as const;
 
-export function SessionResults({ session }: { session: SessionWithScore }) {
+export function SessionResults({
+  session,
+  backHref = "/app/historia",
+  backLabel = "← Historia sesji",
+  showTrainAgain = true,
+}: {
+  session: SessionWithScore;
+  backHref?: string;
+  backLabel?: string;
+  showTrainAgain?: boolean;
+}) {
   const score = session.score;
+  const inProgress = session.status !== "completed";
 
   return (
     <>
-      <Link href="/app/historia" className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-emerald-400">
-        ← Historia sesji
+      <Link href={backHref} className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-emerald-400">
+        {backLabel}
       </Link>
 
       <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -25,15 +36,17 @@ export function SessionResults({ session }: { session: SessionWithScore }) {
             {session.scenario_title ?? "Sesja treningowa"}
           </h1>
           <p className="mt-1 text-zinc-500">
-            Klient: {session.personality} · zakończona
+            Klient: {session.personality} · {inProgress ? "w trakcie (niedokończona)" : "zakończona"}
           </p>
         </div>
-        <Link
-          href="/app/trening"
-          className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
-        >
-          Trenuj ponownie →
-        </Link>
+        {showTrainAgain && (
+          <Link
+            href="/app/trening"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          >
+            Trenuj ponownie →
+          </Link>
+        )}
       </div>
 
       {!score ? (

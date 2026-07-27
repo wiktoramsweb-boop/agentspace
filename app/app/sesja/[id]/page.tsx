@@ -32,12 +32,20 @@ export default async function SessionPage({ params }: Props) {
   }
   if (!canView) redirect("/app");
 
-  if (session.status === "completed") {
-    return <SessionResults session={session} />;
-  }
+  // Podgląd cudzej sesji (CEO/menedżer): zawsze read-only wyniki + transkrypt,
+  // niezależnie od statusu (także sesje w toku/niedokończone).
+  const isViewer = session.agent_id !== user.id;
 
-  // Sesja w toku — tylko właściciel sesji może kontynuować
-  if (session.agent_id !== user.id) redirect("/app");
+  if (session.status === "completed" || isViewer) {
+    return (
+      <SessionResults
+        session={session}
+        backHref={isViewer ? `/app/zespol/${session.agent_id}` : "/app/historia"}
+        backLabel={isViewer ? "← Wróć do agenta" : "← Historia sesji"}
+        showTrainAgain={!isViewer}
+      />
+    );
+  }
 
   const scenario = await getScenarioById(session.scenario_id);
 

@@ -332,10 +332,16 @@ export type AgentDetail = {
   categoryAverages: CategoryAvg[];
   sessions: SessionWithScore[];
   avgScore: number | null;
-  sessionCount: number;
+  sessionCount: number; // liczba OCEN (scored)
+  totalSessions: number; // wszystkie rozpoczęte sesje
+  completedSessions: number; // ukończone sesje
   monthCommission: number;
   funnel: FunnelStageProgress[];
   hasGoal: boolean;
+  goal: Goal | null;
+  todayLog: DailyLog | null;
+  monthLogs: DailyLog[];
+  dailyCallTarget: number;
 };
 
 /** Szczegóły jednego agenta dla właściciela. */
@@ -358,7 +364,10 @@ export async function getAgentDetail(
     .select("overall, opening, qualification, objection_handling, closing")
     .eq("agent_id", agentId);
 
-  const sessions = await getRecentSessions(agentId, 10);
+  // Wszystkie sesje agenta (nie tylko 10) — CEO/menedżer chce widzieć każdą.
+  const sessions = await getRecentSessions(agentId, 500);
+  const totalSessions = sessions.length;
+  const completedSessions = sessions.filter((s) => s.status === "completed").length;
 
   const overallVals = (scores ?? []).map((s) => s.overall).filter((n): n is number => n != null);
   const avgScore = overallVals.length
@@ -385,8 +394,33 @@ export async function getAgentDetail(
     .gte("closed_at", monthStart);
   const monthCommission = (deals ?? []).reduce((a, d) => a + (d.commission_pln ?? 0), 0);
 
-  const funnelProgress = await getTeamFunnelProgress([agentId]);
-  const agentFunnel = funnelProgress[agentId];
+  // Cel + logi bieżącego miesiąca (do lejka, dzisiejszego wpisu i kalendarza).
+  const { data: goalRow } = await admin
+    .from("goals")
+    .select("*")
+    .eq("agent_id", agentId)
+    .maybeSingle();
+  const goal = (goalRow as Goal) ?? null;
+
+  const monthStartYmd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+    .toISOString()
+    .slice(0, 10);
+  const { data: logRows } = await admin
+    .from("daily_logs")
+    .select("*")
+    .eq("agent_id", agentId)
+    .gte("log_date", monthStartYmd)
+    .order("log_date");
+  const monthLogs = (logRows ?? []) as DailyLog[];
+  const todayYmd = new Date().toISOString().slice(0, 10);
+  const todayLog = monthLogs.find((l) => l.log_date === todayYmd) ?? null;
+
+  const targets = goal ? computeFunnel(goal) : null;
+  const funnel: FunnelStageProgress[] = FUNNEL_STAGE_KEYS.map((key) => ({
+    key,
+    done: monthLogs.reduce((s, l) => s + (l[key] ?? 0), 0),
+    target: targets ? targets.byStage[key].monthly : 0,
+  }));
 
   return {
     profile: profile as Profile,
@@ -394,9 +428,15 @@ export async function getAgentDetail(
     sessions,
     avgScore,
     sessionCount: overallVals.length,
+    totalSessions,
+    completedSessions,
     monthCommission,
-    funnel: agentFunnel?.stages ?? [],
-    hasGoal: agentFunnel?.hasGoal ?? false,
+    funnel,
+    hasGoal: Boolean(goal),
+    goal,
+    todayLog,
+    monthLogs,
+    dailyCallTarget: targets ? targets.byStage.cold_calls.daily : 0,
   };
 }
 

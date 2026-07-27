@@ -4,9 +4,11 @@ import { computeFunnel } from "@/lib/funnel";
 import { FUNNEL_STAGES } from "@/lib/types";
 import { PageHeader, Card } from "../components/ui";
 import { formatPln } from "@/lib/format";
+import { buildMonthCalendar } from "@/lib/goal-calendar";
 import { GoalSetup } from "./goal-setup";
 import { DailyTracker } from "./daily-tracker";
 import { WeekView, type WeekDay, type WeekSummary } from "./week-view";
+import { MonthCalendarView } from "./month-calendar";
 
 const DAY_LABELS = ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"];
 
@@ -206,6 +208,15 @@ export default async function CelePage() {
             </div>
           </Card>
         </div>
+      </div>
+
+      {/* Kalendarz miesiąca — które dni z celem */}
+      <div className="mt-6">
+        <MonthCalendarView
+          calendar={buildMonthCalendar(recentLogs, dailyTargets.cold_calls)}
+          hasTarget={dailyTargets.cold_calls > 0}
+          title="Ten miesiąc — dzień po dniu"
+        />
       </div>
 
       {/* Plan tygodnia + historia */}
