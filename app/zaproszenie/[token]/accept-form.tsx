@@ -12,6 +12,7 @@ export function AcceptInviteForm({ token, email }: { token: string; email: strin
       <input type="hidden" name="token" value={token} />
       <FormField label="Email" name="email-display" defaultValue={email} readOnly required={false} />
       <FormField label="Imię i nazwisko" name="fullName" autoComplete="name" placeholder="Jan Kowalski" />
+      <FormField label="Telefon" name="phone" type="tel" autoComplete="tel" placeholder="+48 600 000 000" />
       <FormField
         label="Hasło"
         name="password"

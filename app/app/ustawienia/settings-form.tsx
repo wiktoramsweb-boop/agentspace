@@ -5,10 +5,12 @@ import { updateProfile } from "./actions";
 
 export function SettingsForm({
   fullName,
+  phone,
   monthlyGoal,
   defaultSplit,
 }: {
   fullName: string;
+  phone: string;
   monthlyGoal: number;
   defaultSplit: number;
 }) {
@@ -26,6 +28,21 @@ export function SettingsForm({
           defaultValue={fullName}
           className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
+      </div>
+
+      <div>
+        <label htmlFor="phone" className="mb-2 block text-sm font-medium text-zinc-300">
+          Telefon
+        </label>
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          defaultValue={phone}
+          placeholder="+48 600 000 000"
+          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+        />
+        <p className="mt-1.5 text-xs text-zinc-500">Pokazuje się w PDF-ach dla klienta i w zespole.</p>
       </div>
 
       <div>

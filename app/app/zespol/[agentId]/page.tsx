@@ -26,7 +26,9 @@ export default async function AgentDetailPage({ params }: Props) {
 
       <PageHeader
         title={profile.full_name ?? profile.email ?? "Agent"}
-        subtitle={profile.role === "owner" ? "Właściciel" : "Agent"}
+        subtitle={`${profile.role === "owner" ? "Właściciel" : "Agent"}${
+          profile.phone ? ` · tel. ${profile.phone}` : ""
+        }${profile.email ? ` · ${profile.email}` : ""}`}
       />
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">

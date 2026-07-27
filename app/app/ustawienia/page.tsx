@@ -15,6 +15,7 @@ export default async function UstawieniaPage() {
           <h2 className="mb-5 text-lg font-semibold text-white">Profil</h2>
           <SettingsForm
             fullName={user.full_name ?? ""}
+            phone={user.phone ?? ""}
             monthlyGoal={user.monthly_goal_pln ?? 0}
             defaultSplit={user.default_split_pct ?? 50}
           />

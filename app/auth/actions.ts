@@ -17,6 +17,7 @@ export async function signUpOwner(
   const fullName = String(formData.get("fullName") ?? "").trim();
   const agencyName = String(formData.get("agencyName") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const phone = String(formData.get("phone") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
   if (!fullName || fullName.length < 2) return { error: "Podaj imię i nazwisko" };
@@ -61,6 +62,7 @@ export async function signUpOwner(
     agency_id: agency.id,
     full_name: fullName,
     email,
+    phone: phone || null,
     role: "owner",
   });
 
@@ -116,6 +118,7 @@ export async function acceptInvitation(
 ): Promise<AuthResult> {
   const token = String(formData.get("token") ?? "");
   const fullName = String(formData.get("fullName") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
   if (!token) return { error: "Brak tokenu zaproszenia" };
@@ -159,6 +162,7 @@ export async function acceptInvitation(
     agency_id: invitation.agency_id,
     full_name: fullName,
     email,
+    phone: phone || null,
     role: invitation.role ?? "agent",
   });
 

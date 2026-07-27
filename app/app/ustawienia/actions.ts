@@ -16,6 +16,7 @@ export async function updateProfile(
   const monthlyGoal = Math.max(0, parseInt(goalRaw, 10) || 0);
   const splitRaw = parseInt(String(formData.get("defaultSplit") ?? "50"), 10);
   const defaultSplit = Math.min(100, Math.max(1, Number.isFinite(splitRaw) ? splitRaw : 50));
+  const phone = String(formData.get("phone") ?? "").trim();
 
   if (!fullName || fullName.length < 2) return { error: "Podaj imię i nazwisko" };
 
@@ -26,6 +27,7 @@ export async function updateProfile(
       full_name: fullName,
       monthly_goal_pln: monthlyGoal,
       default_split_pct: defaultSplit,
+      phone: phone || null,
     })
     .eq("id", user.id);
 
