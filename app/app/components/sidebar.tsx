@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import type { UserRole } from "@/lib/types";
+import { ROLE_LABELS, type UserRole } from "@/lib/types";
 import { signOut } from "@/app/auth/actions";
 
 type NavColor = keyof typeof TILE;
@@ -63,7 +63,7 @@ const SECTIONS: NavSection[] = [
     title: "Więcej",
     items: [
       { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate" },
-      { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, color: "fuchsia", roles: ["owner"] },
+      { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, color: "fuchsia", roles: ["owner", "manager"] },
       { href: "/app/ustawienia", label: "Ustawienia", icon: <CogIcon />, color: "slate" },
     ],
   },
@@ -150,7 +150,7 @@ export function Sidebar({
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-white">{fullName}</p>
           <p className="truncate text-xs text-zinc-500">
-            {role === "owner" ? "Właściciel" : "Agent"} · {agencyName}
+            {ROLE_LABELS[role]} · {agencyName}
           </p>
         </div>
       </div>

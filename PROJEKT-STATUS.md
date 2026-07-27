@@ -23,7 +23,9 @@ Od czasu opisu poniżej doszło DUŻO modułów. Wszystko live na `main`/Vercel.
 
 **Wygląd:** ciemny motyw z jaśniejszymi kartami, sidebar w stylu ASARI (kolorowe kafle, sekcje), toasty, animacje wejścia, szkielet ładowania.
 
-**SQL do uruchomienia w Supabase (kolejno, idempotentne):** v1 ✅, v2, v3, v4, v5 (nieruchomości/prowizje), v6 (scenariusze obiekcji), v7 (push), v8 (faktury), v9 (telefony), v10 (trudność sesji), v11 (scenariusze archiwalne), v12 (doradca kredytowy). Pliki `lib/SETUP-v*.sql`. Potwierdź z userem, które odpalone.
+**SQL do uruchomienia w Supabase (kolejno, idempotentne):** v1 ✅, v2, v3, v4, v5 (nieruchomości/prowizje), v6 (scenariusze obiekcje), v7 (push), v8 (faktury), v9 (telefony), v10 (trudność sesji), v11 (scenariusze archiwalne), v12 (doradca kredytowy), **v13 (role CEO/Menedżer/Agent — `profiles.manager_id`, `invitations.manager_id/full_name`).** Pliki `lib/SETUP-v*.sql`. Potwierdź z userem, które odpalone.
+
+**Role (v13):** wartości `profiles.role`: `owner`=CEO (pełny dostęp; wartość nietknięta — cała autoryzacja o nią oparta), `manager`=Menedżer (widzi TYLKO swoich agentów: Cele/lejek + wyniki AI, BEZ prowizji, tylko podgląd), `agent`. CEO nadaje role i przypisuje agentów do menedżera (`/app/zespol` → „Role i przypisania"). Zaproszenia niosą rolę+manager_id → można zaprosić 2. CEO (Krystian) zanim się zarejestruje. Helper `requireManagerOrOwner`, etykiety `ROLE_LABELS` w `lib/types.ts`. Zmiana własnego maila logowania: `/app/ustawienia` → „Zmień email".
 
 **GOTOWE:** „Oferta współpracy" (`/app/oferta-wspolpracy`) — generator nadrukowujący pola na 6-str. PDF z Canvy, generacja client-side (`lib/oferta-pdf.ts`, pdf-lib `subset:false`), formularz z domyślnymi z profilu + opcjonalny mikrofon (`/api/oferta-wspolpracy/parse`), wpis w sidebarze. Zweryfikowane renderem. **Zostało tylko:** automatyczna wysyłka mailem do klienta — czeka na weryfikację domeny Resend (na razie agent pobiera PDF i wysyła sam).
 

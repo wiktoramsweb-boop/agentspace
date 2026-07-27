@@ -1,5 +1,6 @@
 import { createSupabaseAdmin } from "./supabase/admin";
-import type { Scenario, TrainingSession, SessionScore, Profile } from "./types";
+import type { Scenario, TrainingSession, SessionScore, Profile, Goal, DailyLog } from "./types";
+import { computeFunnel } from "./funnel";
 
 export async function getScenarios(): Promise<Scenario[]> {
   const admin = createSupabaseAdmin();
@@ -114,14 +115,22 @@ export type RankedAgent = Profile & {
   sessionsThisWeek: number;
 };
 
-export async function getTeamRanking(agencyId: string): Promise<RankedAgent[]> {
+export async function getTeamRanking(
+  agencyId: string,
+  opts?: { managerId?: string },
+): Promise<RankedAgent[]> {
   const admin = createSupabaseAdmin();
 
-  const { data: agents } = await admin
+  let agentsQuery = admin
     .from("profiles")
     .select("*")
     .eq("agency_id", agencyId)
     .order("created_at");
+
+  // Menedżer widzi tylko swoich przypisanych agentów.
+  if (opts?.managerId) agentsQuery = agentsQuery.eq("manager_id", opts.managerId);
+
+  const { data: agents } = await agentsQuery;
 
   const { data: sessions } = await admin
     .from("training_sessions")
@@ -163,6 +172,68 @@ export async function getTeamRanking(agencyId: string): Promise<RankedAgent[]> {
   });
 
   return ranked;
+}
+
+// ---- Postęp lejka (Cele) per agent — dla widoku zespołu/menedżera ----
+
+export type FunnelStageKeyDb = "cold_calls" | "meetings" | "listings" | "buyers" | "sales";
+
+export type FunnelStageProgress = {
+  key: FunnelStageKeyDb;
+  done: number; // zrobione w bieżącym miesiącu
+  target: number; // cel miesięczny (0 gdy agent nie ma ustawionego celu)
+};
+
+export type AgentFunnelProgress = {
+  agentId: string;
+  stages: FunnelStageProgress[];
+  hasGoal: boolean;
+};
+
+const FUNNEL_STAGE_KEYS: FunnelStageKeyDb[] = [
+  "cold_calls",
+  "meetings",
+  "listings",
+  "buyers",
+  "sales",
+];
+
+/**
+ * Postęp lejka (telefony, spotkania, umowy, kupujący, sprzedaże) w bieżącym miesiącu
+ * vs cel miesięczny — dla podanej listy agentów. Zwraca mapę agentId → postęp.
+ */
+export async function getTeamFunnelProgress(
+  agentIds: string[],
+): Promise<Record<string, AgentFunnelProgress>> {
+  if (agentIds.length === 0) return {};
+  const admin = createSupabaseAdmin();
+
+  const now = new Date();
+  const monthStartYmd = new Date(now.getFullYear(), now.getMonth(), 1)
+    .toISOString()
+    .slice(0, 10);
+
+  const [{ data: logs }, { data: goals }] = await Promise.all([
+    admin.from("daily_logs").select("*").in("agent_id", agentIds).gte("log_date", monthStartYmd),
+    admin.from("goals").select("*").in("agent_id", agentIds),
+  ]);
+
+  const goalByAgent = new Map<string, Goal>();
+  for (const g of (goals ?? []) as Goal[]) goalByAgent.set(g.agent_id, g);
+
+  const result: Record<string, AgentFunnelProgress> = {};
+  for (const agentId of agentIds) {
+    const agentLogs = ((logs ?? []) as DailyLog[]).filter((l) => l.agent_id === agentId);
+    const goal = goalByAgent.get(agentId);
+    const targets = goal ? computeFunnel(goal) : null;
+    const stages: FunnelStageProgress[] = FUNNEL_STAGE_KEYS.map((key) => ({
+      key,
+      done: agentLogs.reduce((sum, l) => sum + (l[key] ?? 0), 0),
+      target: targets ? targets.byStage[key].monthly : 0,
+    }));
+    result[agentId] = { agentId, stages, hasGoal: Boolean(goal) };
+  }
+  return result;
 }
 
 export type AgencyStats = {
@@ -263,6 +334,8 @@ export type AgentDetail = {
   avgScore: number | null;
   sessionCount: number;
   monthCommission: number;
+  funnel: FunnelStageProgress[];
+  hasGoal: boolean;
 };
 
 /** Szczegóły jednego agenta dla właściciela. */
@@ -312,6 +385,9 @@ export async function getAgentDetail(
     .gte("closed_at", monthStart);
   const monthCommission = (deals ?? []).reduce((a, d) => a + (d.commission_pln ?? 0), 0);
 
+  const funnelProgress = await getTeamFunnelProgress([agentId]);
+  const agentFunnel = funnelProgress[agentId];
+
   return {
     profile: profile as Profile,
     categoryAverages,
@@ -319,7 +395,20 @@ export async function getAgentDetail(
     avgScore,
     sessionCount: overallVals.length,
     monthCommission,
+    funnel: agentFunnel?.stages ?? [],
+    hasGoal: agentFunnel?.hasGoal ?? false,
   };
+}
+
+/** Wszyscy członkowie agencji (CEO + menedżerowie + agenci). */
+export async function getAgencyMembers(agencyId: string): Promise<Profile[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("profiles")
+    .select("*")
+    .eq("agency_id", agencyId)
+    .order("created_at");
+  return (data ?? []) as Profile[];
 }
 
 export async function getPendingInvitations(agencyId: string) {

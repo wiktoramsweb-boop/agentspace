@@ -1,7 +1,9 @@
 import { requireUser } from "@/lib/auth";
+import { ROLE_LABELS } from "@/lib/types";
 import { PageHeader, Card } from "../components/ui";
 import { SettingsForm } from "./settings-form";
 import { PushToggle } from "./push-toggle";
+import { ChangeEmail } from "./change-email";
 
 export default async function UstawieniaPage() {
   const user = await requireUser();
@@ -27,12 +29,11 @@ export default async function UstawieniaPage() {
             <div>
               <dt className="text-zinc-500">Email</dt>
               <dd className="text-zinc-200">{user.email}</dd>
+              <ChangeEmail currentEmail={user.email ?? ""} />
             </div>
             <div>
               <dt className="text-zinc-500">Rola</dt>
-              <dd className="text-zinc-200">
-                {user.role === "owner" ? "Właściciel biura" : "Agent"}
-              </dd>
+              <dd className="text-zinc-200">{ROLE_LABELS[user.role]}</dd>
             </div>
             <div>
               <dt className="text-zinc-500">Biuro</dt>

@@ -6,6 +6,9 @@ import { requireOwner } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { APP_URL } from "@/lib/supabase/config";
 import { sendAgencyMonthlyReport } from "@/lib/report";
+import { ROLE_LABELS, type UserRole } from "@/lib/types";
+
+const VALID_ROLES: UserRole[] = ["owner", "manager", "agent"];
 
 export type ZespolResult =
   | { error?: string; success?: string; link?: string; emailSent?: boolean }
@@ -25,7 +28,8 @@ export async function sendMonthlyReportNow(
 }
 
 /**
- * Zaproszenie agenta: tworzy rekord invitation i wysyła email z linkiem.
+ * Zaproszenie do zespołu z rolą (CEO / Menedżer / Agent).
+ * Dla agenta można z góry przypisać menedżera. Tworzy rekord invitation i wysyła email z linkiem.
  */
 export async function inviteAgent(
   _prev: ZespolResult,
@@ -33,6 +37,12 @@ export async function inviteAgent(
 ): Promise<ZespolResult> {
   const owner = await requireOwner();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const roleRaw = String(formData.get("role") ?? "agent").trim();
+  const role: UserRole = (VALID_ROLES as string[]).includes(roleRaw) ? (roleRaw as UserRole) : "agent";
+  const fullName = String(formData.get("fullName") ?? "").trim();
+  const managerIdRaw = String(formData.get("managerId") ?? "").trim();
+  // Menedżera przypisujemy tylko agentom.
+  const managerId = role === "agent" && managerIdRaw ? managerIdRaw : null;
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Niepoprawny email" };
 
@@ -47,6 +57,19 @@ export async function inviteAgent(
     .maybeSingle();
   if (existing) return { error: "Ta osoba jest już w Twoim zespole." };
 
+  // Walidacja menedżera (musi być w tej agencji i mieć rolę menedżera lub CEO).
+  if (managerId) {
+    const { data: mgr } = await admin
+      .from("profiles")
+      .select("id, role")
+      .eq("id", managerId)
+      .eq("agency_id", owner.agency_id!)
+      .maybeSingle();
+    if (!mgr || (mgr.role !== "manager" && mgr.role !== "owner")) {
+      return { error: "Wybrany menedżer jest nieprawidłowy." };
+    }
+  }
+
   // Usuń stare pending zaproszenia dla tego emaila w tej agencji
   await admin
     .from("invitations")
@@ -60,7 +83,9 @@ export async function inviteAgent(
     .insert({
       agency_id: owner.agency_id!,
       email,
-      role: "agent",
+      role,
+      manager_id: managerId,
+      full_name: fullName || null,
       invited_by: owner.id,
     })
     .select("token")
@@ -88,7 +113,7 @@ export async function inviteAgent(
             <p style="color:#3f3f46;font-size:15px;line-height:1.6;">
               <strong>${owner.full_name ?? "Właściciel biura"}</strong> zaprasza Cię do
               <strong>${owner.agency?.name ?? "biura"}</strong> w AgentSpace — platformie do
-              treningu sprzedaży nieruchomości z AI.
+              treningu sprzedaży nieruchomości z AI, w roli <strong>${ROLE_LABELS[role]}</strong>.
             </p>
             <p style="margin:28px 0;">
               <a href="${link}" style="background:#10b981;color:#09090b;padding:12px 24px;border-radius:12px;text-decoration:none;font-weight:600;">
@@ -151,4 +176,81 @@ export async function cancelInvitation(invitationId: string): Promise<void> {
     .eq("id", invitationId)
     .eq("agency_id", owner.agency_id!);
   revalidatePath("/app/zespol");
+}
+
+export type RoleActionResult = { error?: string } | undefined;
+
+/**
+ * Nadaje rolę członkowi zespołu (CEO only). Nie pozwala zdegradować ostatniego CEO.
+ * Zmiana na CEO/Menedżera czyści przypisanie do menedżera (oni nie mają przełożonego).
+ */
+export async function setMemberRole(memberId: string, role: UserRole): Promise<RoleActionResult> {
+  const owner = await requireOwner();
+  if (!(VALID_ROLES as string[]).includes(role)) return { error: "Nieprawidłowa rola." };
+
+  const admin = createSupabaseAdmin();
+
+  const { data: member } = await admin
+    .from("profiles")
+    .select("id, agency_id, role")
+    .eq("id", memberId)
+    .maybeSingle();
+  if (!member || member.agency_id !== owner.agency_id) return { error: "Nie znaleziono osoby." };
+
+  // Ochrona: nie da się zdegradować ostatniego CEO.
+  if (member.role === "owner" && role !== "owner") {
+    const { count } = await admin
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("agency_id", owner.agency_id!)
+      .eq("role", "owner");
+    if ((count ?? 0) <= 1) return { error: "To jedyny CEO — najpierw ustaw kogoś innego jako CEO." };
+  }
+
+  await admin
+    .from("profiles")
+    .update({
+      role,
+      // CEO i Menedżer nie mają przełożonego.
+      ...(role !== "agent" ? { manager_id: null } : {}),
+    })
+    .eq("id", memberId);
+
+  revalidatePath("/app/zespol");
+  revalidatePath(`/app/zespol/${memberId}`);
+  return {};
+}
+
+/**
+ * Przypisuje agenta do menedżera (CEO only). managerId=null → brak przełożonego.
+ */
+export async function assignManager(agentId: string, managerId: string | null): Promise<RoleActionResult> {
+  const owner = await requireOwner();
+  const admin = createSupabaseAdmin();
+
+  const { data: agent } = await admin
+    .from("profiles")
+    .select("id, agency_id, role")
+    .eq("id", agentId)
+    .maybeSingle();
+  if (!agent || agent.agency_id !== owner.agency_id) return { error: "Nie znaleziono agenta." };
+  if (agent.role !== "agent") return { error: "Menedżera można przypisać tylko agentowi." };
+  if (managerId === agentId) return { error: "Nie można przypisać agenta do samego siebie." };
+
+  if (managerId) {
+    const { data: mgr } = await admin
+      .from("profiles")
+      .select("id, role")
+      .eq("id", managerId)
+      .eq("agency_id", owner.agency_id!)
+      .maybeSingle();
+    if (!mgr || (mgr.role !== "manager" && mgr.role !== "owner")) {
+      return { error: "Wybrany menedżer jest nieprawidłowy." };
+    }
+  }
+
+  await admin.from("profiles").update({ manager_id: managerId }).eq("id", agentId);
+  revalidatePath("/app/zespol");
+  revalidatePath(`/app/zespol/${agentId}`);
+  return {};
 }

@@ -35,6 +35,7 @@ export const getCurrentUser = cache(async (): Promise<ProfileWithAgency | null> 
       monthly_goal_pln: 0,
       default_split_pct: 50,
       phone: null,
+      manager_id: null,
       created_at: user.created_at,
       agency: null,
     };
@@ -53,10 +54,20 @@ export async function requireUser(): Promise<ProfileWithAgency> {
 }
 
 /**
- * Wymusza rolę właściciela.
+ * Wymusza rolę właściciela (CEO).
  */
 export async function requireOwner(): Promise<ProfileWithAgency> {
   const user = await requireUser();
   if (user.role !== "owner") redirect("/app");
+  return user;
+}
+
+/**
+ * Wymusza rolę CEO lub menedżera (dostęp do widoku zespołu).
+ * CEO widzi całą agencję; menedżer tylko swoich przypisanych agentów (zakres egzekwowany w kodzie stron).
+ */
+export async function requireManagerOrOwner(): Promise<ProfileWithAgency> {
+  const user = await requireUser();
+  if (user.role !== "owner" && user.role !== "manager") redirect("/app");
   return user;
 }

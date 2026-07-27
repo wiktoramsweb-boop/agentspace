@@ -37,3 +37,37 @@ export async function updateProfile(
   revalidatePath("/app");
   return { success: "Zapisano zmiany." };
 }
+
+/**
+ * Zmienia email logowania zalogowanego użytkownika (Supabase Auth + profiles).
+ * Sesja pozostaje ważna (JWT po user.id); następne logowanie nowym mailem, hasło bez zmian.
+ */
+export async function changeMyEmail(
+  _prev: SettingsResult,
+  formData: FormData,
+): Promise<SettingsResult> {
+  const user = await requireUser();
+  const newEmail = String(formData.get("email") ?? "").trim().toLowerCase();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) return { error: "Niepoprawny email" };
+  if (newEmail === (user.email ?? "").toLowerCase()) return { error: "To już jest Twój obecny email." };
+
+  const admin = createSupabaseAdmin();
+
+  const { error: authErr } = await admin.auth.admin.updateUserById(user.id, {
+    email: newEmail,
+    email_confirm: true,
+  });
+  if (authErr) {
+    const msg = authErr.message?.toLowerCase() ?? "";
+    if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+      return { error: "Ten email jest już zajęty przez inne konto." };
+    }
+    return { error: "Nie udało się zmienić emaila. Spróbuj ponownie." };
+  }
+
+  await admin.from("profiles").update({ email: newEmail }).eq("id", user.id);
+
+  revalidatePath("/app/ustawienia");
+  return { success: `Email zmieniony na ${newEmail}. Następnym razem loguj się tym adresem (hasło bez zmian).` };
+}

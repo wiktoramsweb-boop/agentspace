@@ -1,4 +1,11 @@
-export type UserRole = "owner" | "agent";
+export type UserRole = "owner" | "manager" | "agent";
+
+/** Etykiety ról w UI. Wartość 'owner' w bazie = CEO (nie zmieniamy wartości, tylko etykietę). */
+export const ROLE_LABELS: Record<UserRole, string> = {
+  owner: "CEO",
+  manager: "Menedżer",
+  agent: "Agent",
+};
 
 export type Agency = {
   id: string;
@@ -18,6 +25,7 @@ export type Profile = {
   monthly_goal_pln: number;
   default_split_pct: number;
   phone: string | null;
+  manager_id: string | null;
   created_at: string;
 };
 

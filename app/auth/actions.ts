@@ -117,12 +117,12 @@ export async function acceptInvitation(
   formData: FormData,
 ): Promise<AuthResult> {
   const token = String(formData.get("token") ?? "");
-  const fullName = String(formData.get("fullName") ?? "").trim();
+  const fullNameInput = String(formData.get("fullName") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
   if (!token) return { error: "Brak tokenu zaproszenia" };
-  if (!fullName || fullName.length < 2) return { error: "Podaj imię i nazwisko" };
+  if (!fullNameInput || fullNameInput.length < 2) return { error: "Podaj imię i nazwisko" };
   if (password.length < 8) return { error: "Hasło min. 8 znaków" };
 
   const admin = createSupabaseAdmin();
@@ -140,6 +140,7 @@ export async function acceptInvitation(
   }
 
   const email = invitation.email.toLowerCase();
+  const fullName = fullNameInput || invitation.full_name || "";
 
   const { data: created, error: createErr } = await admin.auth.admin.createUser({
     email,
@@ -164,6 +165,8 @@ export async function acceptInvitation(
     email,
     phone: phone || null,
     role: invitation.role ?? "agent",
+    // Menedżera przypisujemy tylko agentom.
+    manager_id: (invitation.role ?? "agent") === "agent" ? (invitation.manager_id ?? null) : null,
   });
 
   if (profileErr) {

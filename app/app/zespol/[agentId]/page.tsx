@@ -1,22 +1,31 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireOwner } from "@/lib/auth";
+import { requireManagerOrOwner } from "@/lib/auth";
 import { getAgentDetail } from "@/lib/data";
 import { PageHeader, StatCard, Card, ScoreBadge, scoreColor } from "../../components/ui";
 import { formatPln } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
+import { ROLE_LABELS, FUNNEL_STAGES } from "@/lib/types";
 import { removeAgent } from "../actions";
+
+const STAGE_SHORT: Record<string, string> = Object.fromEntries(
+  FUNNEL_STAGES.map((s) => [s.key, s.short]),
+);
 
 type Props = { params: Promise<{ agentId: string }> };
 
 export default async function AgentDetailPage({ params }: Props) {
-  const owner = await requireOwner();
+  const user = await requireManagerOrOwner();
   const { agentId } = await params;
+  const isOwner = user.role === "owner";
 
-  const detail = await getAgentDetail(agentId, owner.agency_id!);
+  const detail = await getAgentDetail(agentId, user.agency_id!);
   if (!detail) notFound();
 
-  const { profile, categoryAverages, sessions, avgScore, sessionCount, monthCommission } = detail;
+  const { profile, categoryAverages, sessions, avgScore, sessionCount, monthCommission, funnel, hasGoal } = detail;
+
+  // Menedżer widzi tylko swoich przypisanych agentów.
+  if (!isOwner && profile.manager_id !== user.id) notFound();
 
   return (
     <>
@@ -26,16 +35,39 @@ export default async function AgentDetailPage({ params }: Props) {
 
       <PageHeader
         title={profile.full_name ?? profile.email ?? "Agent"}
-        subtitle={`${profile.role === "owner" ? "Właściciel" : "Agent"}${
+        subtitle={`${ROLE_LABELS[profile.role]}${
           profile.phone ? ` · tel. ${profile.phone}` : ""
         }${profile.email ? ` · ${profile.email}` : ""}`}
       />
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <StatCard label="Średni wynik" value={avgScore != null ? `${avgScore}/10` : "—"} sub={`${sessionCount} ocen`} accent />
-        <StatCard label="Prowizja w tym mc" value={formatPln(monthCommission)} />
+        {isOwner && <StatCard label="Prowizja w tym mc" value={formatPln(monthCommission)} />}
         <StatCard label="Cel miesięczny" value={profile.monthly_goal_pln ? formatPln(profile.monthly_goal_pln) : "—"} />
       </div>
+
+      {/* Cele / lejek — bieżący miesiąc */}
+      {funnel.length > 0 && (
+        <Card className="mb-8">
+          <h2 className="mb-5 text-sm font-medium uppercase tracking-wider text-zinc-500">
+            Cele / lejek — ten miesiąc
+          </h2>
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+            {funnel.map((s) => (
+              <div key={s.key} className="rounded-xl bg-zinc-900/60 px-3 py-2.5 text-center">
+                <p className="text-[10px] uppercase tracking-wide text-zinc-500">{STAGE_SHORT[s.key]}</p>
+                <p className="mt-0.5 font-mono text-lg font-semibold text-white">
+                  {s.done}
+                  {hasGoal && s.target > 0 && <span className="text-sm text-zinc-500">/{s.target}</span>}
+                </p>
+              </div>
+            ))}
+          </div>
+          {!hasGoal && (
+            <p className="mt-3 text-xs text-zinc-600">Agent nie ustawił jeszcze celu — pokazujemy same wykonania.</p>
+          )}
+        </Card>
+      )}
 
       {categoryAverages.length > 0 && (
         <Card className="mb-8">
@@ -120,10 +152,10 @@ export default async function AgentDetailPage({ params }: Props) {
         </Card>
       )}
 
-      {profile.role !== "owner" && (
+      {isOwner && profile.role !== "owner" && (
         <form action={removeAgent.bind(null, profile.id)} className="mt-8">
           <button className="text-xs text-zinc-600 transition hover:text-red-400">
-            Usuń agenta z zespołu
+            Usuń z zespołu
           </button>
         </form>
       )}

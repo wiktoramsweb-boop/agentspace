@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getSessionWithScore, getScenarioById } from "@/lib/data";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { SessionChat } from "./chat";
 import { SessionResults } from "./results";
 
@@ -16,9 +17,20 @@ export default async function SessionPage({ params }: Props) {
   const session = await getSessionWithScore(id);
   if (!session) notFound();
 
-  // Autoryzacja: właściciel sesji, albo owner tej samej agencji (podgląd)
-  const isOwnerOfAgency = user.role === "owner" && user.agency_id === session.agency_id;
-  if (session.agent_id !== user.id && !isOwnerOfAgency) redirect("/app");
+  // Autoryzacja: właściciel sesji, CEO tej samej agencji, albo menedżer agenta sesji.
+  let canView =
+    session.agent_id === user.id ||
+    (user.role === "owner" && user.agency_id === session.agency_id);
+  if (!canView && user.role === "manager" && user.agency_id === session.agency_id) {
+    const admin = createSupabaseAdmin();
+    const { data: agent } = await admin
+      .from("profiles")
+      .select("manager_id")
+      .eq("id", session.agent_id)
+      .maybeSingle();
+    canView = agent?.manager_id === user.id;
+  }
+  if (!canView) redirect("/app");
 
   if (session.status === "completed") {
     return <SessionResults session={session} />;
