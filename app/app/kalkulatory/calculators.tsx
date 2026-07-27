@@ -16,6 +16,7 @@ type Tab = "kredyt" | "koszty" | "najem";
 
 export function Calculators({ agent }: { agent: Agent }) {
   const [tab, setTab] = useState<Tab>("koszty");
+  const [preview, setPreview] = useState(false);
 
   // Kredyt
   const [amount, setAmount] = useState(500000);
@@ -150,6 +151,41 @@ export function Calculators({ agent }: { agent: Agent }) {
     setTimeout(() => (document.title = prev), 1000);
   }
 
+  const sheetEl = (
+    <CalcSheet
+      title={sheet.title}
+      subtitle={sheet.subtitle}
+      rows={sheet.rows}
+      emphasis={sheet.emphasis}
+      savings={sheet.savings}
+      note={sheet.note}
+      agent={agent}
+    />
+  );
+
+  // Widok pełnoekranowego podglądu (jak faktura) — czysty druk na całą stronę A4.
+  if (preview) {
+    return (
+      <div>
+        <div className="print-hide mb-4 flex items-center justify-between gap-4">
+          <button
+            onClick={() => setPreview(false)}
+            className="inline-flex items-center gap-1 text-sm text-zinc-400 transition hover:text-white"
+          >
+            ← Wróć do edycji
+          </button>
+          <button
+            onClick={print}
+            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          >
+            Drukuj / Zapisz PDF
+          </button>
+        </div>
+        {sheetEl}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
       <div className="print-hide space-y-5">
@@ -215,24 +251,14 @@ export function Calculators({ agent }: { agent: Agent }) {
         </div>
 
         <button
-          onClick={print}
+          onClick={() => setPreview(true)}
           className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
         >
-          Stwórz PDF dla klienta
+          Podgląd i PDF dla klienta →
         </button>
       </div>
 
-      <div className="lg:sticky lg:top-4 lg:h-fit">
-        <CalcSheet
-          title={sheet.title}
-          subtitle={sheet.subtitle}
-          rows={sheet.rows}
-          emphasis={sheet.emphasis}
-          savings={sheet.savings}
-          note={sheet.note}
-          agent={agent}
-        />
-      </div>
+      <div className="lg:sticky lg:top-4 lg:h-fit">{sheetEl}</div>
     </div>
   );
 }
