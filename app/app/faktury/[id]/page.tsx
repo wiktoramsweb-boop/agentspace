@@ -46,6 +46,12 @@ export default async function InvoiceViewPage({ params }: Props) {
           ← Faktury
         </Link>
         <div className="flex items-center gap-3">
+          <Link
+            href={`/app/faktury/${inv.id}/edytuj`}
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800/60 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-emerald-500/50 hover:text-white"
+          >
+            Edytuj
+          </Link>
           <PrintButton number={inv.number} />
           <form action={deleteInvoice.bind(null, inv.id)}>
             <button className="text-sm text-zinc-500 transition hover:text-red-400">Usuń</button>

@@ -3,40 +3,20 @@
 import { useState, useTransition } from "react";
 import { SELLERS, type InvoiceItem } from "@/lib/invoice";
 import { InvoiceSheet, type SheetData } from "./invoice-sheet";
-import { createInvoice } from "./actions";
+import { createInvoice, updateInvoice } from "./actions";
 import { printInvoice } from "./print-button";
 
 export function InvoiceCreator({
-  defaults,
+  initial,
+  editId,
 }: {
-  defaults: {
-    number: string;
-    issueDate: string;
-    saleDate: string;
-    paymentDate: string;
-    issuer: string;
-  };
+  initial: SheetData;
+  editId?: string;
 }) {
-  const [d, setD] = useState<SheetData>({
-    number: defaults.number,
-    sellerKey: SELLERS[0].key,
-    buyerName: "",
-    buyerAddress: "",
-    buyerCity: "",
-    buyerPostcode: "",
-    buyerNip: "",
-    buyerPesel: "",
-    place: "Kraków",
-    issueDate: defaults.issueDate,
-    saleDate: defaults.saleDate,
-    paymentDate: defaults.paymentDate,
-    paymentMethod: "Przelew",
-    items: [{ name: "Pośrednictwo w kupnie nieruchomości", qty: 1, unitPrice: 0 }],
-    description: "",
-    paid: 0,
-    issuer: defaults.issuer,
-  });
-  const [buyerType, setBuyerType] = useState<"firma" | "osoba">("firma");
+  const [d, setD] = useState<SheetData>(initial);
+  const [buyerType, setBuyerType] = useState<"firma" | "osoba">(
+    initial.buyerPesel && !initial.buyerNip ? "osoba" : "firma",
+  );
   const [pending, startTransition] = useTransition();
 
   function set<K extends keyof SheetData>(k: K, v: SheetData[K]) {
@@ -53,7 +33,7 @@ export function InvoiceCreator({
   }
 
   function save() {
-    startTransition(() => createInvoice({ ...d }));
+    startTransition(() => (editId ? updateInvoice(editId, { ...d }) : createInvoice({ ...d })));
   }
 
   return (
@@ -184,7 +164,7 @@ export function InvoiceCreator({
             disabled={pending}
             className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
           >
-            {pending ? "Zapisuję…" : "Zapisz fakturę"}
+            {pending ? "Zapisuję…" : editId ? "Zapisz zmiany" : "Zapisz fakturę"}
           </button>
           <button
             onClick={() => printInvoice(d.number)}

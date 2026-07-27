@@ -28,11 +28,23 @@ export default async function NowaFakturaPage() {
         />
       </div>
       <InvoiceCreator
-        defaults={{
+        initial={{
           number,
+          sellerKey: "spectra",
+          buyerName: "",
+          buyerAddress: "",
+          buyerCity: "",
+          buyerPostcode: "",
+          buyerNip: "",
+          buyerPesel: "",
+          place: "Kraków",
           issueDate: iso(today),
           saleDate: iso(today),
           paymentDate: iso(pay),
+          paymentMethod: "Przelew",
+          items: [{ name: "Pośrednictwo w kupnie nieruchomości", qty: 1, unitPrice: 0 }],
+          description: "",
+          paid: 0,
           issuer: owner.full_name ?? "",
         }}
       />
