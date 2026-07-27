@@ -281,10 +281,11 @@ body {
   }
   .invoice-sheet,
   .print-sheet {
+    box-sizing: border-box !important;
     box-shadow: none !important;
     max-width: none !important;
     width: 100% !important;
-    min-height: 100vh !important;
+    min-height: 297mm !important; /* pełna wysokość A4 (deterministyczne przy druku) */
     border-radius: 0 !important;
     padding: 14mm !important;
     -webkit-print-color-adjust: exact !important;

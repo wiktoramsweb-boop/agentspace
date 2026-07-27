@@ -7,18 +7,34 @@ type Photo = { id: string; url: string };
 
 const MAX_PHOTOS = 8;
 
+// Parametry oferty (wszystkie opcjonalne — na karcie pokazują się tylko wypełnione).
+const PARAMS: { key: string; label: string; placeholder?: string }[] = [
+  { key: "area", label: "Powierzchnia (m²)", placeholder: "70" },
+  { key: "rooms", label: "Liczba pokoi", placeholder: "3" },
+  { key: "floor", label: "Piętro", placeholder: "2/4" },
+  { key: "year", label: "Rok budowy", placeholder: "2014" },
+  { key: "market", label: "Rynek", placeholder: "wtórny" },
+  { key: "condition", label: "Standard", placeholder: "do wprowadzenia" },
+  { key: "heating", label: "Ogrzewanie", placeholder: "miejskie" },
+  { key: "ownership", label: "Forma własności", placeholder: "pełna własność" },
+  { key: "plot", label: "Działka (m²)", placeholder: "—" },
+  { key: "balcony", label: "Balkon / taras", placeholder: "taras 20 m²" },
+  { key: "parking", label: "Parking", placeholder: "garaż podziemny" },
+  { key: "elevator", label: "Winda", placeholder: "tak" },
+  { key: "rent", label: "Czynsz administracyjny", placeholder: "900 zł/mc" },
+  { key: "available", label: "Dostępne od", placeholder: "od zaraz" },
+];
+
 export function OfferBuilder({ agent }: { agent: Agent }) {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [location, setLocation] = useState("");
-  const [area, setArea] = useState("");
-  const [rooms, setRooms] = useState("");
-  const [floor, setFloor] = useState("");
-  const [year, setYear] = useState("");
-  const [heating, setHeating] = useState("");
-  const [description, setDescription] = useState("");
+  const [params, setParams] = useState<Record<string, string>>({});
   const [photos, setPhotos] = useState<Photo[]>([]);
 
+  function setParam(k: string, v: string) {
+    setParams((p) => ({ ...p, [k]: v }));
+  }
   function addPhotos(files: FileList | null) {
     if (!files) return;
     const room = MAX_PHOTOS - photos.length;
@@ -34,7 +50,6 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
       return p.filter((x) => x.id !== id);
     });
   }
-
   function print() {
     const prev = document.title;
     document.title = title ? `Oferta — ${title}` : "Oferta";
@@ -42,31 +57,18 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
     setTimeout(() => (document.title = prev), 1000);
   }
 
-  const params = [
-    area && `${area} m²`,
-    rooms && `${rooms} pok.`,
-    floor && `piętro ${floor}`,
-    year && `rok ${year}`,
-    heating && heating,
-  ].filter(Boolean);
-
   const hero = photos[0];
   const rest = photos.slice(1);
+  const filledParams = PARAMS.filter((p) => (params[p.key] ?? "").trim());
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
       {/* FORMULARZ */}
       <div className="print-hide space-y-5">
         <Section title="Zdjęcia (3–8)">
           <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-zinc-700 py-4 text-sm text-zinc-400 transition hover:border-emerald-500 hover:text-emerald-400">
             + Dodaj zdjęcia z komputera
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(e) => addPhotos(e.target.files)}
-            />
+            <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
           </label>
           {photos.length > 0 && (
             <div className="mt-3 grid grid-cols-4 gap-2">
@@ -93,25 +95,20 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
             <Field label="Cena" value={price} onChange={setPrice} placeholder="799 000 zł" />
             <Field label="Lokalizacja" value={location} onChange={setLocation} placeholder="Kraków, Krowodrza" />
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Field label="Metraż (m²)" value={area} onChange={setArea} placeholder="70" />
-            <Field label="Pokoje" value={rooms} onChange={setRooms} placeholder="3" />
-            <Field label="Piętro" value={floor} onChange={setFloor} placeholder="2/4" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Rok budowy" value={year} onChange={setYear} placeholder="2014" />
-            <Field label="Ogrzewanie" value={heating} onChange={setHeating} placeholder="miejskie" />
-          </div>
         </Section>
 
-        <Section title="Opis (wklej z ogłoszenia)">
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={7}
-            placeholder="Wklej tu opis i parametry skopiowane z OLX / Otodom…"
-            className={inp}
-          />
+        <Section title="Parametry">
+          <div className="grid grid-cols-2 gap-3">
+            {PARAMS.map((p) => (
+              <Field
+                key={p.key}
+                label={p.label}
+                value={params[p.key] ?? ""}
+                onChange={(v) => setParam(p.key, v)}
+                placeholder={p.placeholder}
+              />
+            ))}
+          </div>
         </Section>
 
         <button
@@ -124,7 +121,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
 
       {/* PODGLĄD */}
       <div className="lg:sticky lg:top-4 lg:h-fit">
-        <div className="print-sheet mx-auto w-full max-w-[760px] rounded-2xl border-t-4 border-emerald-500 bg-white p-8 text-zinc-900 shadow-xl md:p-10">
+        <div className="print-sheet mx-auto w-full max-w-[820px] rounded-2xl border-t-4 border-emerald-500 bg-white p-8 text-zinc-900 shadow-xl md:p-10">
           <div className="mb-5 flex items-center justify-between gap-4 border-b border-zinc-200 pb-4">
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -136,15 +133,15 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
 
           {hero ? (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={hero.url} alt="" className="mb-3 h-72 w-full rounded-xl object-cover" />
+            <img src={hero.url} alt="" className="mb-2 h-80 w-full rounded-xl object-cover" />
           ) : (
-            <div className="mb-3 flex h-72 w-full items-center justify-center rounded-xl bg-zinc-100 text-sm text-zinc-400">
+            <div className="mb-2 flex h-80 w-full items-center justify-center rounded-xl bg-zinc-100 text-sm text-zinc-400">
               Dodaj zdjęcia — pierwsze będzie główne
             </div>
           )}
 
           {rest.length > 0 && (
-            <div className="mb-4 grid grid-cols-4 gap-2">
+            <div className="mb-5 grid grid-cols-4 gap-2">
               {rest.map((p) => (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img key={p.id} src={p.url} alt="" className="h-20 w-full rounded-lg object-cover" />
@@ -154,33 +151,34 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
 
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-xl font-bold tracking-tight">{title || "Tytuł oferty"}</h1>
-              {location && <p className="text-sm text-zinc-500">{location}</p>}
+              <h1 className="text-2xl font-bold tracking-tight">{title || "Tytuł oferty"}</h1>
+              {location && <p className="text-zinc-500">{location}</p>}
             </div>
             {price && <p className="whitespace-nowrap text-2xl font-bold text-emerald-700">{price}</p>}
           </div>
 
-          {params.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {params.map((p, i) => (
-                <span key={i} className="rounded-lg bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700">
-                  {p}
-                </span>
+          {filledParams.length > 0 && (
+            <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-2.5 sm:grid-cols-3">
+              {filledParams.map((p) => (
+                <div key={p.key} className="border-b border-zinc-100 pb-1.5">
+                  <p className="text-[11px] uppercase tracking-wide text-zinc-400">{p.label}</p>
+                  <p className="font-medium text-zinc-900">{params[p.key]}</p>
+                </div>
               ))}
             </div>
           )}
 
-          {description && (
-            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700">{description}</p>
-          )}
-
-          <div className="mt-8 border-t border-zinc-200 pt-4 text-sm">
-            <p className="font-semibold text-zinc-900">{agent.name}</p>
-            <p className="text-zinc-500">
-              {agent.phone && `tel. ${agent.phone}`}
-              {agent.phone && agent.email && " · "}
-              {agent.email}
-            </p>
+          <div className="mt-8 flex items-center gap-3 border-t border-zinc-200 pt-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="" width={36} height={36} className="rounded-full" />
+            <div className="text-sm">
+              <p className="font-semibold text-zinc-900">{agent.name}</p>
+              <p className="text-zinc-600">
+                {agent.phone && <span className="font-medium text-emerald-700">tel. {agent.phone}</span>}
+                {agent.phone && agent.email && " · "}
+                {agent.email}
+              </p>
+            </div>
           </div>
         </div>
       </div>

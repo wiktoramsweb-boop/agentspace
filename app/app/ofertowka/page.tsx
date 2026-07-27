@@ -9,7 +9,7 @@ export default async function OfertowkaPage() {
       <div className="print-hide">
         <PageHeader
           title="Ofertówka"
-          subtitle="Zbuduj ładną kartę oferty (także z OLX/Otodom): wgraj zdjęcia, wklej opis → PDF dla klienta."
+          subtitle="Zbuduj ładną kartę oferty: wgraj zdjęcia, uzupełnij parametry → PDF dla klienta."
         />
       </div>
       <OfferBuilder
