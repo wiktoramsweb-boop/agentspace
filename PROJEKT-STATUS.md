@@ -1,7 +1,36 @@
 # AgentSpace — pełny status projektu (handoff)
 
 > Ten dokument to kompletny zapis projektu do przekazania nowej sesji Claude.
-> Czytaj razem z `CLAUDE.md` (architektura + zasady). Aktualne na koniec sesji budowy gamifikacji/AI-writer/onboarding.
+> Czytaj razem z `CLAUDE.md` (architektura + zasady).
+
+## 🔵 NAJNOWSZY STAN (czytaj to najpierw)
+
+Od czasu opisu poniżej doszło DUŻO modułów. Wszystko live na `main`/Vercel. Skróty:
+
+**Nowe moduły/zakładki:**
+- **Nieruchomości** (`/app/nieruchomosci`) — oferty + mapa wszystkich aktywnych (Leaflet CDN), karta oferty z edycją, powiązanie z klientem (właściciel/zainteresowani), karta „Co w okolicy" (Overpass/OSM).
+- **Opisy** (`/app/opisy`) — generator opisów ogłoszeń (szablon + „✨ AI" przez `/api/opis/generate`).
+- **Ofertówka** (`/app/ofertowka`) — one-pager oferty (zdjęcia + parametry) → druk/PDF, bez AI. `sheet-a4` = 1 strona.
+- **Kalkulatory** (`/app/kalkulatory`) — rata kredytu (+nadpłata), koszty zakupu (rynek/rabaty/opłaty), ROI najmu → PDF dla klienta (przez druk; podgląd pełnoekranowy „Podgląd i PDF").
+- **Faktury** (`/app/faktury`, owner) — 3 sprzedawców, nabywca firma/osoba, kwota słownie, VAT zw, edycja, druk/PDF. `lib/invoice.ts`.
+- **Szybki wpis głosem** (`/app/szybki-wpis`) — dyktujesz relację ze spotkania → `/api/quick-entry/parse` (Claude tool-use) → klient + notatka + nieruchomość do CRM.
+- **Prowizje** — kalkulator z VAT (brutto→netto, zarobek od netto), prognoza kwartału.
+- **Klienci** — WSPÓŁDZIELONY CRM (cała agencja), wyszukiwarka po telefonie, przypomnienia, styl ASARI.
+
+**AI Coach:** poziom trudności (łatwy/średni/trudny, wybierany przy starcie — `session.difficulty` → prompt), scenariusze pogrupowane kolorami; nowe scenariusze (archiwalne telefony, negocjacja oferty, gdybanie, doradca kredytowy). Ranking WYKLUCZA właściciela.
+
+**PWA:** instalowalna apka + powiadomienia push (VAPID, `/api/push/*`, cron `morning-brief`). Wymaga env VAPID w Vercel.
+
+**Wygląd:** ciemny motyw z jaśniejszymi kartami, sidebar w stylu ASARI (kolorowe kafle, sekcje), toasty, animacje wejścia, szkielet ładowania.
+
+**SQL do uruchomienia w Supabase (kolejno, idempotentne):** v1 ✅, v2, v3, v4, v5 (nieruchomości/prowizje), v6 (scenariusze obiekcji), v7 (push), v8 (faktury), v9 (telefony), v10 (trudność sesji), v11 (scenariusze archiwalne), v12 (doradca kredytowy). Pliki `lib/SETUP-v*.sql`. Potwierdź z userem, które odpalone.
+
+**W TOKU (do dokończenia):** „Oferta współpracy" — generator nadrukowujący 7 pól na PDF z Canvy. Assety gotowe (`public/oferta/wzor.pdf`, `public/oferta/fonts/`, deps pdf-lib). **Pełna instrukcja + zweryfikowane współrzędne: `lib/OFERTA-WSPOLPRACY-HANDOFF.md`.** Zostało: zakładka `/app/oferta-wspolpracy` + generowanie client-side.
+
+**Konfiguracja usera do zrobienia:** weryfikacja domeny agentspace.pl w Resend (DNS Hostinger) → automatyczne maile; env VAPID w Vercel → push. Do czasu: linki/pliki kopiuje/wysyła się ręcznie.
+
+---
+
 
 ## 1. Kim jest owner i cel
 
