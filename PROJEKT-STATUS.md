@@ -25,7 +25,7 @@ Od czasu opisu poniżej doszło DUŻO modułów. Wszystko live na `main`/Vercel.
 
 **SQL do uruchomienia w Supabase (kolejno, idempotentne):** v1 ✅, v2, v3, v4, v5 (nieruchomości/prowizje), v6 (scenariusze obiekcji), v7 (push), v8 (faktury), v9 (telefony), v10 (trudność sesji), v11 (scenariusze archiwalne), v12 (doradca kredytowy). Pliki `lib/SETUP-v*.sql`. Potwierdź z userem, które odpalone.
 
-**W TOKU (do dokończenia):** „Oferta współpracy" — generator nadrukowujący 7 pól na PDF z Canvy. Assety gotowe (`public/oferta/wzor.pdf`, `public/oferta/fonts/`, deps pdf-lib). **Pełna instrukcja + zweryfikowane współrzędne: `lib/OFERTA-WSPOLPRACY-HANDOFF.md`.** Zostało: zakładka `/app/oferta-wspolpracy` + generowanie client-side.
+**GOTOWE:** „Oferta współpracy" (`/app/oferta-wspolpracy`) — generator nadrukowujący pola na 6-str. PDF z Canvy, generacja client-side (`lib/oferta-pdf.ts`, pdf-lib `subset:false`), formularz z domyślnymi z profilu + opcjonalny mikrofon (`/api/oferta-wspolpracy/parse`), wpis w sidebarze. Zweryfikowane renderem. **Zostało tylko:** automatyczna wysyłka mailem do klienta — czeka na weryfikację domeny Resend (na razie agent pobiera PDF i wysyła sam).
 
 **Konfiguracja usera do zrobienia:** weryfikacja domeny agentspace.pl w Resend (DNS Hostinger) → automatyczne maile; env VAPID w Vercel → push. Do czasu: linki/pliki kopiuje/wysyła się ręcznie.
 
