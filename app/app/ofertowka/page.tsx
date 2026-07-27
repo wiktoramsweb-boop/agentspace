@@ -15,7 +15,7 @@ export default async function OfertowkaPage() {
       <OfferBuilder
         agent={{
           name: user.full_name ?? "Agent",
-          email: user.email ?? "",
+          email: "biuro@spectranieruchomosci.pl",
           phone: user.phone ?? "",
           agency: user.agency?.name ?? "Agencja Nieruchomości Spectra",
         }}

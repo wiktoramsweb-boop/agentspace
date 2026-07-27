@@ -8,26 +8,43 @@ type Photo = { id: string; url: string };
 const MAX_PHOTOS = 8;
 
 // Parametry oferty. `options` → lista wyboru; brak → wpisywanie ręczne.
-const PARAMS: { key: string; label: string; placeholder?: string; options?: string[] }[] = [
-  { key: "area", label: "Powierzchnia (m²)", placeholder: "70" },
-  { key: "rooms", label: "Liczba pokoi", placeholder: "3" },
-  { key: "floor", label: "Piętro", placeholder: "2/4" },
-  { key: "year", label: "Rok budowy", placeholder: "2014" },
-  { key: "market", label: "Rynek", options: ["wtórny", "pierwotny"] },
+// `suffix` doklejany na karcie (np. m², zł/mc). `icon` pokazywany przy parametrze.
+const PARAMS: {
+  key: string;
+  label: string;
+  placeholder?: string;
+  options?: string[];
+  suffix?: string;
+  icon: string;
+}[] = [
+  { key: "area", label: "Powierzchnia", placeholder: "70", suffix: " m²", icon: "📐" },
+  { key: "rooms", label: "Liczba pokoi", placeholder: "3", icon: "🛏️" },
+  { key: "floor", label: "Piętro", placeholder: "2/4", icon: "🏢" },
+  { key: "year", label: "Rok budowy", placeholder: "2014", icon: "🗓️" },
+  { key: "market", label: "Rynek", options: ["wtórny", "pierwotny"], icon: "🏷️" },
   {
     key: "condition",
     label: "Standard",
     options: ["do wprowadzenia", "do odświeżenia", "do remontu", "stan deweloperski"],
+    icon: "✨",
   },
-  { key: "heating", label: "Ogrzewanie", options: ["miejskie", "gazowe", "elektryczne", "kominkowe", "inne"] },
-  { key: "ownership", label: "Forma własności", options: ["pełna własność", "spółdzielcze własnościowe", "udział"] },
-  { key: "plot", label: "Działka (m²)", placeholder: "np. 450" },
-  { key: "balcony", label: "Balkon / taras", options: ["balkon", "taras", "loggia", "ogródek", "brak"] },
-  { key: "parking", label: "Parking", options: ["garaż podziemny", "miejsce naziemne", "w cenie", "brak"] },
-  { key: "elevator", label: "Winda", options: ["tak", "nie"] },
-  { key: "rent", label: "Czynsz administracyjny", placeholder: "900 zł/mc" },
-  { key: "available", label: "Dostępne od", placeholder: "od zaraz" },
+  { key: "heating", label: "Ogrzewanie", options: ["miejskie", "gazowe", "elektryczne", "kominkowe", "inne"], icon: "🔥" },
+  { key: "ownership", label: "Forma własności", options: ["pełna własność", "spółdzielcze własnościowe", "udział"], icon: "📜" },
+  { key: "plot", label: "Działka", placeholder: "np. 450", suffix: " m²", icon: "🌳" },
+  { key: "balcony", label: "Balkon / taras", options: ["balkon", "taras", "loggia", "ogródek", "brak"], icon: "🌇" },
+  { key: "parking", label: "Parking", options: ["garaż podziemny", "miejsce naziemne", "w cenie", "brak"], icon: "🚗" },
+  { key: "elevator", label: "Winda", options: ["tak", "nie"], icon: "↕️" },
+  { key: "rent", label: "Czynsz administracyjny", placeholder: "900", suffix: " zł/mc", icon: "💳" },
+  { key: "available", label: "Dostępne od", placeholder: "od zaraz", icon: "🔑" },
 ];
+
+function paramDisplay(value: string, suffix?: string): string {
+  const v = value.trim();
+  if (!suffix) return v;
+  // nie doklejaj jednostki, jeśli już jest
+  if (/m²|zł|%|mc/i.test(v)) return v;
+  return v + suffix;
+}
 
 export function OfferBuilder({ agent }: { agent: Agent }) {
   const [title, setTitle] = useState("");
@@ -67,8 +84,8 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
   const filledParams = PARAMS.filter((p) => (params[p.key] ?? "").trim());
 
   const sheetEl = (
-    <div className="print-sheet mx-auto w-full max-w-[820px] rounded-2xl border-t-4 border-emerald-500 bg-white p-8 text-zinc-900 shadow-xl md:p-10">
-      <div className="mb-5 flex items-center justify-between gap-4 border-b border-zinc-200 pb-4">
+    <div className="print-sheet sheet-a4 mx-auto flex w-full max-w-[820px] flex-col rounded-2xl border-t-4 border-emerald-500 bg-white p-8 text-zinc-900 shadow-xl md:p-10">
+      <div className="mb-4 flex items-center justify-between gap-4 border-b border-zinc-200 pb-4">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="Logo" width={44} height={44} className="rounded-full" />
@@ -79,18 +96,18 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
 
       {hero ? (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={hero.url} alt="" className="mb-2 h-80 w-full rounded-xl object-cover" />
+        <img src={hero.url} alt="" className="mb-2 h-60 w-full rounded-xl object-cover" />
       ) : (
-        <div className="mb-2 flex h-80 w-full items-center justify-center rounded-xl bg-zinc-100 text-sm text-zinc-400">
+        <div className="mb-2 flex h-60 w-full items-center justify-center rounded-xl bg-zinc-100 text-sm text-zinc-400">
           Dodaj zdjęcia — pierwsze będzie główne
         </div>
       )}
 
       {rest.length > 0 && (
-        <div className="mb-5 grid grid-cols-4 gap-2">
+        <div className="mb-4 grid grid-cols-4 gap-2">
           {rest.map((p) => (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img key={p.id} src={p.url} alt="" className="h-20 w-full rounded-lg object-cover" />
+            <img key={p.id} src={p.url} alt="" className="h-16 w-full rounded-lg object-cover" />
           ))}
         </div>
       )}
@@ -98,31 +115,36 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{title || "Tytuł oferty"}</h1>
-          {location && <p className="text-zinc-500">{location}</p>}
+          {location && <p className="flex items-center gap-1 text-zinc-500">📍 {location}</p>}
         </div>
         {price && <p className="whitespace-nowrap text-2xl font-bold text-emerald-700">{price}</p>}
       </div>
 
       {filledParams.length > 0 && (
-        <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-2.5 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
           {filledParams.map((p) => (
-            <div key={p.key} className="border-b border-zinc-100 pb-1.5">
-              <p className="text-[11px] uppercase tracking-wide text-zinc-400">{p.label}</p>
-              <p className="font-medium text-zinc-900">{params[p.key]}</p>
+            <div key={p.key} className="flex items-center gap-2.5 rounded-lg bg-zinc-50 px-3 py-2">
+              <span className="text-base">{p.icon}</span>
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wide text-zinc-400">{p.label}</p>
+                <p className="truncate text-sm font-semibold text-zinc-900">
+                  {paramDisplay(params[p.key], p.suffix)}
+                </p>
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      <div className="mt-8 flex items-center gap-3 border-t border-zinc-200 pt-4">
+      <div className="mt-auto flex items-center gap-3 border-t border-zinc-200 pt-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="" width={36} height={36} className="rounded-full" />
+        <img src="/logo.png" alt="" width={40} height={40} className="rounded-full" />
         <div className="text-sm">
           <p className="font-semibold text-zinc-900">{agent.name}</p>
           <p className="text-zinc-600">
-            {agent.phone && <span className="font-medium text-emerald-700">tel. {agent.phone}</span>}
-            {agent.phone && agent.email && " · "}
-            {agent.email}
+            {agent.phone && <span className="font-medium text-emerald-700">📞 {agent.phone}</span>}
+            {agent.phone && " · "}
+            ✉️ {agent.email}
           </p>
         </div>
       </div>
