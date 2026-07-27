@@ -31,11 +31,12 @@ type FieldDef = {
 // Zweryfikowane pola (patrz handoff). „miesiac" i „agent" występują na 2 stronach.
 const FIELDS: FieldDef[] = [
   { k: "adres", page: 0, x: 132.3, y: 1190.7, size: 150, font: "cgReg", color: "f8f5ef", prefix: "ul. " },
-  { k: "miesiac", page: 0, x: 841.9, y: 2101.2, size: 30, font: "arReg", color: "e8e3de", align: "center" },
-  { k: "miesiac", page: 5, x: 841.9, y: 2101.2, size: 30, font: "arReg", color: "e8e3de", align: "center" },
+  { k: "miesiac", page: 0, x: 841.9, y: 2101.2, size: 38, font: "arReg", color: "e8e3de", align: "center" },
+  { k: "miesiac", page: 5, x: 841.9, y: 2101.2, size: 38, font: "arReg", color: "e8e3de", align: "center" },
   { k: "agent", page: 0, x: 130.3, y: 118.8, size: 38, font: "arBold", color: "f8f5ef" },
   { k: "agent", page: 5, x: 109.2, y: 157.9, size: 38, font: "arBold", color: "f8f5ef" },
-  { k: "telefon", page: 5, x: 1356.5, y: 119.7, size: 30, font: "arReg", color: "dcd6d1" },
+  // telefon: wyśrodkowany pod mailem (środek maila x=1321.2), żeby nie uciekał w prawo
+  { k: "telefon", page: 5, x: 1321.2, y: 119.7, size: 30, font: "arReg", color: "dcd6d1", align: "center" },
   { k: "czas", page: 4, x: 132.3, y: 1760.7, size: 55.1, font: "cgBold", color: "150e0a" },
   { k: "prowizja", page: 4, x: 975.1, y: 1760.7, size: 55.1, font: "cgBold", color: "150e0a" },
 ];

@@ -25,11 +25,11 @@ Wartości wejściowe: `adres`, `miesiac`, `agent`, `telefon`, `czas`, `prowizja`
 | pole | strona | x | y | size | font | color | uwagi |
 |---|---|---|---|---|---|---|---|
 | adres | 0 | 132.3 | 1190.7 | 150 | CormorantGaramond-Regular | #f8f5ef | tekst = "ul. " + adres |
-| miesiac | 0 | 841.9 | 2101.2 | 30 | Arimo-Regular | #e8e3de | WYŚRODKOWANY (x = 841.9 - szer/2) |
-| miesiac | 5 | 841.9 | 2101.2 | 30 | Arimo-Regular | #e8e3de | WYŚRODKOWANY — TE SAME współrzędne co str.0 |
+| miesiac | 0 | 841.9 | 2101.2 | 38 | Arimo-Regular | #e8e3de | WYŚRODKOWANY (x = 841.9 - szer/2) |
+| miesiac | 5 | 841.9 | 2101.2 | 38 | Arimo-Regular | #e8e3de | WYŚRODKOWANY — TE SAME współrzędne co str.0 |
 | agent | 0 | 130.3 | 118.8 | 38 | Arimo-Bold | #f8f5ef | |
 | agent | 5 | 109.2 | 157.9 | 38 | Arimo-Bold | #f8f5ef | |
-| telefon | 5 | 1356.5 | 119.7 | 30 | Arimo-Regular | #dcd6d1 | |
+| telefon | 5 | 1321.2 | 119.7 | 30 | Arimo-Regular | #dcd6d1 | WYŚRODKOWANY pod mailem (środek maila x=1321.2) |
 | czas | 4 | 132.3 | 1760.7 | 55.1 | CormorantGaramond-Bold | #150e0a | np. "3 miesiące" |
 | prowizja | 4 | 975.1 | 1760.7 | 55.1 | CormorantGaramond-Bold | #150e0a | np. "2% brutto" |
 
