@@ -193,13 +193,14 @@ export async function getWeeklyChallenge(
       .select("agent_id, cold_calls")
       .eq("agency_id", agencyId)
       .gte("log_date", monday.toISOString().slice(0, 10)),
-    admin.from("profiles").select("id, full_name, email").eq("agency_id", agencyId),
+    admin.from("profiles").select("id, full_name, email, role").eq("agency_id", agencyId),
   ]);
 
   const byAgent = new Map<string, number>();
   for (const l of logs ?? []) byAgent.set(l.agent_id, (byAgent.get(l.agent_id) ?? 0) + (l.cold_calls ?? 0));
 
   return (profiles ?? [])
+    .filter((p) => p.role !== "owner") // właściciel poza rankingiem
     .map((p) => ({
       agentId: p.id,
       name: p.full_name ?? p.email ?? "Agent",

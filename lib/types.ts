@@ -78,6 +78,7 @@ export type TrainingSession = {
   scenario_id: string;
   scenario_title: string | null;
   personality: string | null;
+  difficulty: string | null;
   transcript: ChatMessage[];
   status: "in_progress" | "completed";
   started_at: string;

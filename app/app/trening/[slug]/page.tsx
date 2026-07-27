@@ -62,8 +62,43 @@ export default async function ScenarioSetupPage({ params }: Props) {
           ))}
         </div>
 
+        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400">
+          Krok 3 · Poziom trudności
+        </p>
+        <h2 className="mb-1 text-lg font-semibold text-white">Jak trudny ma być klient?</h2>
+        <p className="mb-4 text-sm text-zinc-500">
+          Zacznij od łatwego, żeby złapać pewność — potem podnoś poprzeczkę. Nie każdy klient jest trudny.
+        </p>
+        <div className="mb-8 grid gap-3 sm:grid-cols-3">
+          {[
+            { value: "latwy", label: "Łatwy", desc: "Życzliwy, daje się przekonać — na rozgrzewkę" },
+            { value: "sredni", label: "Średni", desc: "Realistyczny opór, ustępuje przy dobrych argumentach" },
+            { value: "trudny", label: "Trudny", desc: "Wymagający, trzyma obiekcję twardo" },
+          ].map((d) => (
+            <label
+              key={d.value}
+              className="group relative cursor-pointer rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 transition-all has-[:checked]:border-emerald-500/50 has-[:checked]:bg-emerald-500/5 hover:border-zinc-700"
+            >
+              <input
+                type="radio"
+                name="difficulty"
+                value={d.value}
+                defaultChecked={d.value === "sredni"}
+                className="peer sr-only"
+              />
+              <div className="mb-2 flex items-center justify-between">
+                <span className="font-semibold text-white">{d.label}</span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-zinc-700 peer-checked:border-emerald-400 peer-checked:bg-emerald-400">
+                  <span className="h-2 w-2 rounded-full bg-transparent peer-checked:bg-zinc-950" />
+                </span>
+              </div>
+              <p className="text-sm text-zinc-400">{d.desc}</p>
+            </label>
+          ))}
+        </div>
+
         <p className="mb-3 text-xs font-medium uppercase tracking-wider text-emerald-400">
-          Krok 3 · Zaczynamy
+          Krok 4 · Zaczynamy
         </p>
         <button
           type="submit"

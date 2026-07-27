@@ -63,7 +63,11 @@ export async function POST(request: Request) {
     messages.push({ role: "user", content: "[System: rozpocznij rozmowę zgodnie z instrukcją.]" });
   }
 
-  const system = buildClientSystemPrompt(scenarioSystemPrompt, session.personality ?? "");
+  const system = buildClientSystemPrompt(
+    scenarioSystemPrompt,
+    session.personality ?? "",
+    session.difficulty ?? "sredni",
+  );
 
   let anthropic;
   try {

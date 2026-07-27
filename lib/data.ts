@@ -135,7 +135,9 @@ export async function getTeamRanking(agencyId: string): Promise<RankedAgent[]> {
 
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const ranked: RankedAgent[] = (agents ?? []).map((agent) => {
+  const ranked: RankedAgent[] = (agents ?? [])
+    .filter((a) => a.role !== "owner") // właściciel poza rankingiem agentów
+    .map((agent) => {
     const agentSessions = (sessions ?? []).filter((s) => s.agent_id === agent.id);
     const agentScores = (scores ?? [])
       .filter((s) => s.agent_id === agent.id)

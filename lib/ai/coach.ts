@@ -5,15 +5,26 @@ import { PERSONALITIES, type ChatMessage } from "../types";
  * Buduje system prompt dla AI grającego klienta: wstawia opis osobowości
  * w miejsce placeholdera {{PERSONALITY}}.
  */
+const DIFFICULTY_BLOCK: Record<string, string> = {
+  latwy:
+    "\n\nPOZIOM TRUDNOŚCI: ŁATWY. To najważniejsza instrukcja — jesteś życzliwym, otwartym klientem. Obiekcje zgłaszasz miękko i szybko dajesz się przekonać każdemu sensownemu argumentowi. Nagradzaj nawet niedoskonałe próby agenta, bądź wyrozumiały. Celem jest zbudowanie pewności początkującego agenta, więc doprowadź rozmowę do pozytywnego zakończenia, jeśli agent w ogóle się stara.",
+  sredni:
+    "\n\nPOZIOM TRUDNOŚCI: ŚREDNI. Standardowy, realistyczny opór — trzymasz swoją obiekcję, ale ustępujesz przy dobrych, konkretnych argumentach. Nie oddawaj za łatwo, ale też nie bądź nadmiernie trudny.",
+  trudny:
+    "\n\nPOZIOM TRUDNOŚCI: TRUDNY. Jesteś wymagającym klientem — trzymasz obiekcję twardo i ustępujesz tylko przy naprawdę mocnych, konkretnych i dobrze poprowadzonych argumentach. Testuj agenta.",
+};
+
 export function buildClientSystemPrompt(
   scenarioSystemPrompt: string,
   personality: string,
+  difficulty = "sredni",
 ): string {
   const p = PERSONALITIES.find((x) => x.value === personality);
   const desc = p
     ? `${p.label} — ${p.description}. Graj konsekwentnie tę postawę przez całą rozmowę.`
     : "Neutralny, przeciętny klient.";
-  return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc);
+  const diff = DIFFICULTY_BLOCK[difficulty] ?? DIFFICULTY_BLOCK.sredni;
+  return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc) + diff;
 }
 
 /**
@@ -35,9 +46,10 @@ export async function streamClientReply(
   scenarioSystemPrompt: string,
   personality: string,
   transcript: ChatMessage[],
+  difficulty = "sredni",
 ): Promise<ReadableStream<Uint8Array>> {
   const anthropic = createAnthropic();
-  const system = buildClientSystemPrompt(scenarioSystemPrompt, personality);
+  const system = buildClientSystemPrompt(scenarioSystemPrompt, personality, difficulty);
   const messages = toAnthropicMessages(transcript);
 
   // Jeśli transkrypt pusty lub ostatni był od klienta — zaczynamy rozmowę

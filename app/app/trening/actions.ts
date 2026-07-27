@@ -14,6 +14,7 @@ export async function startSession(formData: FormData): Promise<void> {
   const user = await requireUser();
   const scenarioId = String(formData.get("scenarioId") ?? "");
   const personality = String(formData.get("personality") ?? "biznesowy");
+  const difficulty = String(formData.get("difficulty") ?? "sredni");
 
   const scenario = await getScenarioById(scenarioId);
   if (!scenario || !user.agency_id) redirect("/app/trening");
@@ -27,6 +28,7 @@ export async function startSession(formData: FormData): Promise<void> {
       scenario_id: scenarioId,
       scenario_title: scenario!.title,
       personality,
+      difficulty,
       transcript: [],
       status: "in_progress",
     })
