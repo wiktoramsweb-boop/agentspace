@@ -4,12 +4,6 @@ import { getScenarios } from "@/lib/data";
 import { SCENARIO_CATEGORIES, type ScenarioCategory } from "@/lib/types";
 import { PageHeader, EmptyState } from "../components/ui";
 
-const DIFFICULTY: Record<string, { label: string; className: string }> = {
-  easy: { label: "Łatwy", className: "bg-emerald-500/15 text-emerald-300" },
-  medium: { label: "Średni", className: "bg-amber-500/15 text-amber-300" },
-  hard: { label: "Trudny", className: "bg-red-500/15 text-red-300" },
-};
-
 function CategoryIcon({ icon }: { icon: string }) {
   if (icon === "phone")
     return <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" /></svg>;
@@ -44,8 +38,8 @@ export default async function TreningPage() {
       {/* Instrukcja — jak to działa */}
       <div className="mb-8 grid gap-3 sm:grid-cols-3">
         {[
-          { n: "1", t: "Wybierz scenariusz", d: "Z jednej z trzech kategorii poniżej" },
-          { n: "2", t: "Wybierz typ klienta", d: "AI zagra go z daną osobowością" },
+          { n: "1", t: "Wybierz scenariusz", d: "Z jednej z kategorii poniżej" },
+          { n: "2", t: "Ustaw klienta i poziom", d: "Typ klienta + trudność (łatwy → trudny)" },
           { n: "3", t: "Rozmawiaj i oceń", d: "Na końcu scoring + wskazówki" },
         ].map((s) => (
           <div key={s.n} className="flex items-center gap-3 rounded-xl border border-zinc-700 bg-zinc-800/40 p-3">
@@ -82,27 +76,21 @@ export default async function TreningPage() {
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
-                {catScenarios.map((s) => {
-                  const diff = DIFFICULTY[s.difficulty] ?? DIFFICULTY.medium;
-                  return (
-                    <Link
-                      key={s.id}
-                      href={`/app/trening/${s.slug}`}
-                      className="group relative overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-800/40 p-5 transition-all hover:-translate-y-0.5 hover:border-emerald-500/40 hover:bg-zinc-800/70"
-                    >
-                      <div className="mb-2 flex items-center justify-between">
-                        <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${diff.className}`}>
-                          {diff.label}
-                        </span>
-                        <span className="text-sm font-medium text-emerald-400 opacity-0 transition group-hover:opacity-100">
-                          Trenuj →
-                        </span>
-                      </div>
-                      <h3 className="mb-1.5 font-semibold text-white">{s.title}</h3>
-                      <p className="text-sm leading-relaxed text-zinc-400">{s.description}</p>
-                    </Link>
-                  );
-                })}
+                {catScenarios.map((s) => (
+                  <Link
+                    key={s.id}
+                    href={`/app/trening/${s.slug}`}
+                    className="group relative overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-800/40 p-5 transition-all hover:-translate-y-0.5 hover:border-emerald-500/40 hover:bg-zinc-800/70"
+                  >
+                    <div className="mb-1.5 flex items-start justify-between gap-3">
+                      <h3 className="font-semibold text-white">{s.title}</h3>
+                      <span className="flex-shrink-0 text-sm font-medium text-emerald-400 opacity-0 transition group-hover:opacity-100">
+                        Trenuj →
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed text-zinc-400">{s.description}</p>
+                  </Link>
+                ))}
               </div>
             </section>
           );
