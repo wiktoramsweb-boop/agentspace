@@ -94,7 +94,7 @@ export function SessionChat({
   }
 
   // Głos — rozpoznawanie mowy PL (darmowe, w przeglądarce)
-  const { supported: voiceSupported, listening, toggle, stop } = useSpeechRecognition(
+  const { supported: voiceSupported, listening, error: voiceError, toggle, stop } = useSpeechRecognition(
     (text, isFinal) => {
       if (isFinal) {
         setInput((prev) => (prev ? prev.trim() + " " : "") + text.trim());
@@ -154,6 +154,9 @@ export function SessionChat({
             Słucham... mów, a tekst pojawi się w polu. Kliknij mikrofon by zakończyć.
           </p>
         )}
+        {voiceError && (
+          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">🎤 {voiceError}</p>
+        )}
         <form onSubmit={handleSend} className="flex gap-2">
           {voiceSupported && (
             <button
@@ -190,6 +193,12 @@ export function SessionChat({
         {voiceSupported && !listening && (
           <p className="mt-2 text-xs text-zinc-500">
             🎤 Możesz mówić zamiast pisać — kliknij mikrofon. Działa najlepiej w Chrome.
+          </p>
+        )}
+        {!voiceSupported && (
+          <p className="mt-2 text-xs text-amber-400/80">
+            🎤 Ta przeglądarka nie ma wbudowanego dyktowania. Na iPhone dotknij pola tekstowego i użyj
+            ikony mikrofonu na klawiaturze iOS. Na komputerze użyj Chrome.
           </p>
         )}
       </div>

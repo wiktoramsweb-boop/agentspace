@@ -1,5 +1,7 @@
 "use client";
 
+import { SubmitButton } from "../components/submit-button";
+
 import { useState } from "react";
 import { createProperty } from "./actions";
 import { AddressInput } from "../components/address-input";
@@ -85,12 +87,12 @@ export function NewPropertyForm({ clients }: { clients: ClientLite[] }) {
         </div>
 
         <div className="flex flex-shrink-0 gap-3 border-t border-zinc-800 px-6 py-4">
-          <button
-            type="submit"
-            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          <SubmitButton
+            pendingText="Dodaję…"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 hover:bg-emerald-400"
           >
             Dodaj nieruchomość
-          </button>
+          </SubmitButton>
           <button
             type="button"
             onClick={() => setOpen(false)}

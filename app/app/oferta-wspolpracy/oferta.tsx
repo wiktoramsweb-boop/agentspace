@@ -26,7 +26,7 @@ export function OfertaWspolpracy({
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  const { supported, listening, toggle } = useSpeechRecognition((text, isFinal) => {
+  const { supported, listening, error: voiceError, toggle } = useSpeechRecognition((text, isFinal) => {
     if (isFinal) setTranscript((prev) => (prev ? prev.trim() + " " : "") + text.trim());
   });
 
@@ -128,6 +128,9 @@ export function OfertaWspolpracy({
           placeholder="Kliknij mikrofon i mów, albo wpisz tutaj i naciśnij „Wypełnij przez AI”."
           className={inp}
         />
+        {voiceError && (
+          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300">🎤 {voiceError}</p>
+        )}
         {!supported && (
           <p className="mt-2 text-xs text-amber-400">
             Ta przeglądarka nie ma dyktowania. Na iPhone użyj ikony mikrofonu na klawiaturze iOS, na komputerze — Chrome. Możesz też po prostu wypełnić pola niżej ręcznie.

@@ -23,7 +23,7 @@ export function QuickEntry() {
   const [form, setForm] = useState<QuickEntryPayload | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const { supported, listening, toggle } = useSpeechRecognition((text, isFinal) => {
+  const { supported, listening, error: voiceError, toggle } = useSpeechRecognition((text, isFinal) => {
     if (isFinal) setTranscript((prev) => (prev ? prev.trim() + " " : "") + text.trim());
   });
 
@@ -162,6 +162,9 @@ export function QuickEntry() {
           placeholder='Np. "Dodaj spotkanie pozyskowe, Prądnicka 34/23, klient Marcin Dąbski, notatka: spotkanie ok, musi przegadać z żoną, prosił o podsumowanie na maila"'
           className={inp}
         />
+        {voiceError && (
+          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300">🎤 {voiceError}</p>
+        )}
         {!supported && (
           <p className="mt-2 text-xs text-amber-400">
             Ta przeglądarka nie ma wbudowanego dyktowania. Na iPhone: dotknij pola tekstowego i użyj

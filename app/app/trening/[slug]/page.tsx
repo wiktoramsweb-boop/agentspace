@@ -5,6 +5,7 @@ import { getScenarioBySlug } from "@/lib/data";
 import { PERSONALITIES } from "@/lib/types";
 import { startSession } from "../actions";
 import { Card } from "../../components/ui";
+import { SubmitButton } from "../../components/submit-button";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -100,12 +101,14 @@ export default async function ScenarioSetupPage({ params }: Props) {
         <p className="mb-3 text-xs font-medium uppercase tracking-wider text-emerald-400">
           Krok 4 · Zaczynamy
         </p>
-        <button
-          type="submit"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400 hover:shadow-[0_0_30px_-8px_rgba(16,185,129,0.7)] sm:w-auto"
+        <SubmitButton
+          overlay
+          overlayText="Uruchamiam sesję z AI…"
+          pendingText="Uruchamiam…"
+          className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 hover:bg-emerald-400 hover:shadow-[0_0_30px_-8px_rgba(16,185,129,0.7)] sm:w-auto"
         >
           Rozpocznij rozmowę z AI klientem →
-        </button>
+        </SubmitButton>
         <p className="mt-2 text-sm text-zinc-500">
           AI odezwie się pierwszy. Pisz jak do prawdziwego klienta. Na końcu kliknij „Zakończ i oceń".
         </p>

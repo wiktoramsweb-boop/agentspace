@@ -302,6 +302,24 @@ body {
   }
 }
 
+/* Dotykowy feedback: każdy przycisk „wciska się" po kliknięciu, żeby użytkownik
+   od razu widział, że klik zadziałał (agenci na telefonie tego potrzebują). */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  transition:
+    transform 0.08s ease,
+    filter 0.15s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active {
+  transform: scale(0.97);
+}
+
 /* Smooth scrollbar */
 ::-webkit-scrollbar {
   width: 12px;

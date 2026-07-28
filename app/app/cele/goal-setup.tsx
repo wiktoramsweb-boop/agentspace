@@ -1,5 +1,7 @@
 "use client";
 
+import { SubmitButton } from "../components/submit-button";
+
 import { useState } from "react";
 import { saveGoal } from "./actions";
 import type { Goal } from "@/lib/types";
@@ -49,12 +51,12 @@ export function GoalSetup({ goal }: { goal: Goal | null }) {
         </div>
       )}
 
-      <button
-        type="submit"
-        className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+      <SubmitButton
+        pendingText="Zapisuję…"
+        className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-zinc-950 hover:bg-emerald-400"
       >
         {goal ? "Zapisz cel" : "Ustaw mój cel →"}
-      </button>
+      </SubmitButton>
     </form>
   );
 }
