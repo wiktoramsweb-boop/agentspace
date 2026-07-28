@@ -47,6 +47,7 @@ const SECTIONS: NavSection[] = [
       { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon />, color: "rose" },
       { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue" },
       { href: "/app/opisy", label: "Opisy", icon: <DocIcon />, color: "amber" },
+      { href: "/app/maile", label: "Asystent mailowy", icon: <MailIcon />, color: "cyan" },
       { href: "/app/ofertowka", label: "Ofertówka", icon: <PhotoIcon />, color: "fuchsia" },
       { href: "/app/oferta-wspolpracy", label: "Oferta współpracy", icon: <HandshakeIcon />, color: "teal" },
       { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green" },
@@ -224,6 +225,9 @@ function InvoiceIcon() {
 }
 function DocIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>;
+}
+function MailIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>;
 }
 function HandshakeIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>;

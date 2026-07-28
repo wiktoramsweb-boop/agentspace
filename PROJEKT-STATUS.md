@@ -10,6 +10,7 @@ Od czasu opisu poniżej doszło DUŻO modułów. Wszystko live na `main`/Vercel.
 **Nowe moduły/zakładki:**
 - **Nieruchomości** (`/app/nieruchomosci`) — oferty + mapa wszystkich aktywnych (Leaflet CDN), karta oferty z edycją, powiązanie z klientem (właściciel/zainteresowani), karta „Co w okolicy" (Overpass/OSM).
 - **Opisy** (`/app/opisy`) — generator opisów ogłoszeń (szablon + „✨ AI" przez `/api/opis/generate`).
+- **Asystent mailowy** (`/app/maile`) — AI pisze maile do klientów w tonie Spectry. 7 typów (raport, podsumowanie+umowa, propozycja współpracy, obiekcje/negocjacja, follow-up, niezadowolony właściciel, własny). `/api/maile/generate` (tool-use `napisz_mail` → temat+treść). KLUCZOWE: AI używa TYLKO faktów podanych przez agenta, nie wymyśla liczb (braki jako `[nawiasy]`). Ton zakodowany w SYSTEM prompcie na bazie realnych maili. Nie wymaga klienta z CRM. Wynik edytowalny + kopiuj.
 - **Ofertówka** (`/app/ofertowka`) — one-pager oferty (zdjęcia + parametry) → druk/PDF, bez AI. `sheet-a4` = 1 strona.
 - **Kalkulatory** (`/app/kalkulatory`) — rata kredytu (+nadpłata), koszty zakupu (rynek/rabaty/opłaty), ROI najmu → PDF dla klienta (przez druk; podgląd pełnoekranowy „Podgląd i PDF").
 - **Faktury** (`/app/faktury`, owner) — 3 sprzedawców, nabywca firma/osoba, kwota słownie, VAT zw, edycja, druk/PDF. `lib/invoice.ts`.
