@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { getScenarios } from "@/lib/data";
+import { getScenarios, getWeeklySessionCount } from "@/lib/data";
 import { SCENARIO_CATEGORIES, type ScenarioCategory } from "@/lib/types";
 import { PageHeader, EmptyState } from "../components/ui";
 
@@ -34,9 +34,20 @@ function CategoryIcon({ icon }: { icon: string }) {
   return <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>;
 }
 
-export default async function TreningPage() {
-  await requireUser();
+export default async function TreningPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ limit?: string }>;
+}) {
+  const user = await requireUser();
+  const { limit: limitParam } = await searchParams;
   const scenarios = await getScenarios();
+
+  // Tygodniowy limit rozmów AI (ustawiany przez CEO).
+  const weeklyLimit = user.weekly_ai_limit;
+  const usedThisWeek = weeklyLimit != null ? await getWeeklySessionCount(user.id) : 0;
+  const remaining = weeklyLimit != null ? Math.max(0, weeklyLimit - usedThisWeek) : null;
+  const limitReached = remaining === 0;
 
   if (scenarios.length === 0) {
     return (
@@ -56,6 +67,34 @@ export default async function TreningPage() {
         title="AI Coach"
         subtitle="Wybierz kategorię i scenariusz. Ćwicz rozmowę z AI klientem, dostań scoring i feedback."
       />
+
+      {/* Limit tygodniowy (jeśli CEO ustawił) */}
+      {weeklyLimit != null && (
+        <div
+          className={`mb-6 rounded-xl border px-4 py-3 text-sm ${
+            limitReached
+              ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
+              : "border-zinc-700 bg-zinc-800/40 text-zinc-300"
+          }`}
+        >
+          {limitReached ? (
+            <>
+              <strong>Wykorzystałeś limit rozmów AI na ten tydzień</strong> ({usedThisWeek}/{weeklyLimit}).
+              Limit odnowi się w poniedziałek. Chcesz więcej — poproś CEO.
+            </>
+          ) : (
+            <>
+              Rozmowy AI w tym tygodniu: <strong className="text-white">{usedThisWeek}/{weeklyLimit}</strong>{" "}
+              — zostało <strong className="text-emerald-400">{remaining}</strong>.
+            </>
+          )}
+        </div>
+      )}
+      {limitParam === "reached" && !limitReached && (
+        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+          Ta rozmowa przekroczyłaby Twój tygodniowy limit.
+        </div>
+      )}
 
       {/* Instrukcja — jak to działa */}
       <div className="mb-8 grid gap-3 sm:grid-cols-3">

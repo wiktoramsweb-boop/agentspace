@@ -23,7 +23,9 @@ Od czasu opisu poniżej doszło DUŻO modułów. Wszystko live na `main`/Vercel.
 
 **Wygląd:** ciemny motyw z jaśniejszymi kartami, sidebar w stylu ASARI (kolorowe kafle, sekcje), toasty, animacje wejścia, szkielet ładowania.
 
-**SQL do uruchomienia w Supabase (kolejno, idempotentne):** v1 ✅, v2, v3, v4, v5 (nieruchomości/prowizje), v6 (scenariusze obiekcje), v7 (push), v8 (faktury), v9 (telefony), v10 (trudność sesji), v11 (scenariusze archiwalne), v12 (doradca kredytowy), **v13 (role CEO/Menedżer/Agent — `profiles.manager_id`, `invitations.manager_id/full_name`).** Pliki `lib/SETUP-v*.sql`. Potwierdź z userem, które odpalone.
+**SQL do uruchomienia w Supabase (kolejno, idempotentne):** v1 ✅, v2, v3, v4, v5 (nieruchomości/prowizje), v6 (scenariusze obiekcje), v7 (push), v8 (faktury), v9 (telefony), v10 (trudność sesji), v11 (scenariusze archiwalne), v12 (doradca kredytowy), **v13 (role CEO/Menedżer/Agent — `profiles.manager_id`, `invitations.manager_id/full_name`), v14 (tygodniowe limity AI — `profiles.weekly_ai_limit`).** Pliki `lib/SETUP-v*.sql`. Potwierdź z userem, które odpalone.
+
+**Limity AI (v14):** CEO ustawia w Zespół → „Role i przypisania" tygodniowy limit rozmów AI Coach per osoba (puste=bez limitu, 0=blokada). Egzekwowane w `startSession` (liczba sesji od poniedziałku). **Alerty/trendy:** `getTeamInsights` — karta „⚠️ Wymaga uwagi" (nie dzwoni 3+ dni / wynik AI spadł / nie trenuje), strzałki trendu przy wyniku, słupki aktywności zespołu (4 tyg.) na `/app/zespol`.
 
 **Role (v13):** wartości `profiles.role`: `owner`=CEO (pełny dostęp; wartość nietknięta — cała autoryzacja o nią oparta), `manager`=Menedżer (widzi TYLKO swoich agentów: Cele/lejek + wyniki AI, BEZ prowizji, tylko podgląd), `agent`. CEO nadaje role i przypisuje agentów do menedżera (`/app/zespol` → „Role i przypisania"). Zaproszenia niosą rolę+manager_id → można zaprosić 2. CEO (Krystian) zanim się zarejestruje. Helper `requireManagerOrOwner`, etykiety `ROLE_LABELS` w `lib/types.ts`. Zmiana własnego maila logowania: `/app/ustawienia` → „Zmień email".
 

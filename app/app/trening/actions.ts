@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
-import { getScenarioById } from "@/lib/data";
+import { getScenarioById, getWeeklySessionCount } from "@/lib/data";
 import { scoreSession } from "@/lib/ai/coach";
 import type { ChatMessage } from "@/lib/types";
 
@@ -18,6 +18,12 @@ export async function startSession(formData: FormData): Promise<void> {
 
   const scenario = await getScenarioById(scenarioId);
   if (!scenario || !user.agency_id) redirect("/app/trening");
+
+  // Tygodniowy limit rozmów AI (ustawiany przez CEO). null = bez limitu.
+  if (user.weekly_ai_limit != null) {
+    const used = await getWeeklySessionCount(user.id);
+    if (used >= user.weekly_ai_limit) redirect("/app/trening?limit=reached");
+  }
 
   const admin = createSupabaseAdmin();
   const { data: session } = await admin

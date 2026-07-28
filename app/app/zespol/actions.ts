@@ -254,3 +254,24 @@ export async function assignManager(agentId: string, managerId: string | null): 
   revalidatePath(`/app/zespol/${agentId}`);
   return {};
 }
+
+/**
+ * Ustawia tygodniowy limit rozmów AI Coach dla członka zespołu (CEO only).
+ * limit=null → bez limitu; liczba >=0 → maksymalna liczba rozmów na tydzień.
+ */
+export async function setWeeklyLimit(memberId: string, limit: number | null): Promise<RoleActionResult> {
+  const owner = await requireOwner();
+  const admin = createSupabaseAdmin();
+
+  const { data: member } = await admin
+    .from("profiles")
+    .select("id, agency_id")
+    .eq("id", memberId)
+    .maybeSingle();
+  if (!member || member.agency_id !== owner.agency_id) return { error: "Nie znaleziono osoby." };
+
+  const clean = limit == null || Number.isNaN(limit) ? null : Math.max(0, Math.min(999, Math.round(limit)));
+  await admin.from("profiles").update({ weekly_ai_limit: clean }).eq("id", memberId);
+  revalidatePath("/app/zespol");
+  return {};
+}

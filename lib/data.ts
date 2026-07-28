@@ -109,6 +109,26 @@ export async function getSessionWithScore(
   } as SessionWithScore;
 }
 
+/** Poniedziałek bieżącego tygodnia (lokalnie, 00:00) — początek okna limitu. */
+export function mondayOfThisWeek(ref = new Date()): Date {
+  const d = new Date(ref);
+  const day = (d.getDay() + 6) % 7; // 0 = poniedziałek
+  d.setDate(d.getDate() - day);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/** Liczba sesji treningowych rozpoczętych w tym tygodniu (Pn–Nd) przez agenta. */
+export async function getWeeklySessionCount(agentId: string): Promise<number> {
+  const admin = createSupabaseAdmin();
+  const { count } = await admin
+    .from("training_sessions")
+    .select("id", { count: "exact", head: true })
+    .eq("agent_id", agentId)
+    .gte("started_at", mondayOfThisWeek().toISOString());
+  return count ?? 0;
+}
+
 export type RankedAgent = Profile & {
   avgScore: number | null;
   sessionCount: number;
@@ -234,6 +254,113 @@ export async function getTeamFunnelProgress(
     result[agentId] = { agentId, stages, hasGoal: Boolean(goal) };
   }
   return result;
+}
+
+// ---- Alerty proaktywne + trendy dla widoku zespołu (CEO/menedżer) ----
+
+export type TeamAlert = {
+  agentId: string;
+  agentName: string;
+  message: string;
+  severity: "warn" | "info";
+};
+export type AgentTrend = { scoreTrend: "up" | "down" | "flat" | null; drop: number };
+export type WeeklyActivity = { label: string; total: number };
+export type TeamInsights = {
+  alerts: TeamAlert[];
+  trends: Record<string, AgentTrend>;
+  weeklyActivity: WeeklyActivity[];
+};
+
+/**
+ * Sygnały dla CEO/menedżera: kto nie dzwoni, komu spadł wynik AI, kto nie trenuje,
+ * plus trend wyniku per agent i aktywność zespołu (cold calle) w 4 tygodniach.
+ * Wszystko w kilku zbiorczych zapytaniach (bez N+1).
+ */
+export async function getTeamInsights(
+  agents: { id: string; name: string }[],
+): Promise<TeamInsights> {
+  const ids = agents.map((a) => a.id);
+  if (ids.length === 0) return { alerts: [], trends: {}, weeklyActivity: [] };
+  const admin = createSupabaseAdmin();
+
+  const since35 = new Date(Date.now() - 35 * 86400000).toISOString().slice(0, 10);
+  const since28 = new Date(Date.now() - 28 * 86400000).toISOString();
+
+  const [{ data: logs }, { data: scores }, { data: sess }] = await Promise.all([
+    admin.from("daily_logs").select("agent_id, log_date, cold_calls").in("agent_id", ids).gte("log_date", since35),
+    admin
+      .from("session_scores")
+      .select("agent_id, overall, created_at")
+      .in("agent_id", ids)
+      .order("created_at", { ascending: true }),
+    admin.from("training_sessions").select("agent_id, started_at").in("agent_id", ids).gte("started_at", since28),
+  ]);
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const monday = mondayOfThisWeek();
+
+  const trends: Record<string, AgentTrend> = {};
+  const alerts: TeamAlert[] = [];
+  const avg = (arr: number[]) => arr.reduce((x, y) => x + y, 0) / arr.length;
+
+  for (const a of agents) {
+    const aLogs = (logs ?? []).filter((l) => l.agent_id === a.id);
+    const aScores = (scores ?? [])
+      .filter((s) => s.agent_id === a.id && s.overall != null)
+      .map((s) => s.overall as number);
+    const aSess = (sess ?? []).filter((s) => s.agent_id === a.id);
+
+    // Trend wyniku: średnia z ostatnich 3 ocen vs poprzednie 3.
+    let scoreTrend: AgentTrend["scoreTrend"] = null;
+    let drop = 0;
+    if (aScores.length >= 4) {
+      const diff = avg(aScores.slice(-3)) - avg(aScores.slice(-6, -3));
+      scoreTrend = diff >= 0.5 ? "up" : diff <= -0.5 ? "down" : "flat";
+      drop = -diff;
+    }
+    trends[a.id] = { scoreTrend, drop };
+
+    if (scoreTrend === "down" && drop >= 1.0) {
+      alerts.push({ agentId: a.id, agentName: a.name, severity: "warn", message: `Wynik AI spadł o ${drop.toFixed(1)} pkt.` });
+    }
+
+    // Nie dzwoni: dni od ostatniego dnia z cold_calls > 0.
+    const callDays = aLogs.filter((l) => (l.cold_calls ?? 0) > 0).map((l) => l.log_date);
+    if (callDays.length === 0) {
+      alerts.push({ agentId: a.id, agentName: a.name, severity: "info", message: "Brak zalogowanych telefonów (35+ dni)." });
+    } else {
+      const last = callDays.sort()[callDays.length - 1];
+      const days = Math.round((Date.parse(todayStr) - Date.parse(last)) / 86400000);
+      if (days >= 3) {
+        alerts.push({ agentId: a.id, agentName: a.name, severity: "warn", message: `Nie logował telefonów od ${days} dni.` });
+      }
+    }
+
+    // Nie trenuje w tym tygodniu (ma jakąś historię ocen).
+    const thisWeekSess = aSess.filter((s) => new Date(s.started_at) >= monday).length;
+    if (thisWeekSess === 0 && aScores.length > 0) {
+      alerts.push({ agentId: a.id, agentName: a.name, severity: "info", message: "Nie trenował w tym tygodniu." });
+    }
+  }
+
+  // Aktywność zespołu — cold calle w 4 kolejnych tygodniach.
+  const weeklyActivity: WeeklyActivity[] = [];
+  for (let w = 3; w >= 0; w--) {
+    const start = new Date(monday);
+    start.setDate(monday.getDate() - w * 7);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 7);
+    const startStr = start.toISOString().slice(0, 10);
+    const endStr = end.toISOString().slice(0, 10);
+    const total = (logs ?? [])
+      .filter((l) => l.log_date >= startStr && l.log_date < endStr)
+      .reduce((x, l) => x + (l.cold_calls ?? 0), 0);
+    weeklyActivity.push({ label: `${start.getDate()}.${start.getMonth() + 1}`, total });
+  }
+
+  alerts.sort((a, b) => (a.severity === b.severity ? 0 : a.severity === "warn" ? -1 : 1));
+  return { alerts, trends, weeklyActivity };
 }
 
 export type AgencyStats = {

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { UserRole } from "@/lib/types";
-import { setMemberRole, assignManager } from "./actions";
+import { setMemberRole, assignManager, setWeeklyLimit } from "./actions";
 import type { ManagerOption } from "./invite-form";
 
 export type TeamMember = {
@@ -11,6 +11,7 @@ export type TeamMember = {
   email: string | null;
   role: UserRole;
   manager_id: string | null;
+  weekly_ai_limit: number | null;
 };
 
 export function TeamRoles({
@@ -76,6 +77,25 @@ export function TeamRoles({
                     ))}
                 </select>
               )}
+
+              <div className="flex items-center gap-1.5" title="Tygodniowy limit rozmów z AI Coach (puste = bez limitu)">
+                <span className="text-xs text-zinc-500">Limit AI/tydz.</span>
+                <input
+                  type="number"
+                  min={0}
+                  aria-label="Tygodniowy limit rozmów AI"
+                  defaultValue={m.weekly_ai_limit ?? ""}
+                  placeholder="∞"
+                  disabled={pending}
+                  onBlur={(e) => {
+                    const raw = e.target.value.trim();
+                    const val = raw === "" ? null : parseInt(raw, 10);
+                    const current = m.weekly_ai_limit;
+                    if ((val ?? null) !== (current ?? null)) run(() => setWeeklyLimit(m.id, val));
+                  }}
+                  className="w-16 rounded-lg border border-zinc-700 bg-zinc-900 px-2 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none disabled:opacity-60"
+                />
+              </div>
             </div>
           </div>
         ))}

@@ -36,6 +36,7 @@ export const getCurrentUser = cache(async (): Promise<ProfileWithAgency | null> 
       default_split_pct: 50,
       phone: null,
       manager_id: null,
+      weekly_ai_limit: null,
       created_at: user.created_at,
       agency: null,
     };

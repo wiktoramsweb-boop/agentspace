@@ -7,7 +7,9 @@ import {
   getAgencyCategoryAverages,
   getTeamFunnelProgress,
   getAgencyMembers,
+  getTeamInsights,
   type FunnelStageProgress,
+  type AgentTrend,
 } from "@/lib/data";
 import { getAgencyCommissionByAgent } from "@/lib/data-platform";
 import { PageHeader, StatCard, Card, scoreColor } from "../components/ui";
@@ -42,6 +44,13 @@ function FunnelChips({ stages, hasGoal }: { stages: FunnelStageProgress[]; hasGo
   );
 }
 
+function TrendArrow({ trend }: { trend?: AgentTrend }) {
+  if (!trend || trend.scoreTrend == null) return null;
+  if (trend.scoreTrend === "up") return <span title="wynik rośnie" className="text-sm text-emerald-400">↑</span>;
+  if (trend.scoreTrend === "down") return <span title="wynik spada" className="text-sm text-red-400">↓</span>;
+  return <span title="wynik stabilny" className="text-sm text-zinc-500">→</span>;
+}
+
 export default async function ZespolPage() {
   const user = await requireManagerOrOwner();
   const agencyId = user.agency_id!;
@@ -50,6 +59,9 @@ export default async function ZespolPage() {
   // Zakres: CEO widzi całą agencję; menedżer tylko swoich agentów.
   const ranking = await getTeamRanking(agencyId, isOwner ? undefined : { managerId: user.id });
   const funnelByAgent = await getTeamFunnelProgress(ranking.map((a) => a.id));
+  const insights = await getTeamInsights(
+    ranking.map((a) => ({ id: a.id, name: a.full_name ?? a.email ?? "Agent" })),
+  );
 
   // Dane tylko dla CEO.
   const [stats, invitations, categories, commissions, members] = isOwner
@@ -72,6 +84,7 @@ export default async function ZespolPage() {
     email: m.email,
     role: m.role,
     manager_id: m.manager_id,
+    weekly_ai_limit: m.weekly_ai_limit,
   }));
 
   // Statystyki nagłówka — dla menedżera liczone z jego zakresu.
@@ -118,6 +131,71 @@ export default async function ZespolPage() {
           />
         )}
       </div>
+
+      {/* Alerty proaktywne — kto wymaga uwagi */}
+      {insights.alerts.length > 0 ? (
+        <Card className="mb-8 !border-amber-500/20 !bg-amber-500/[0.04]">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-amber-400">
+            ⚠️ Wymaga uwagi
+          </h2>
+          <div className="space-y-2">
+            {insights.alerts.map((a, i) => (
+              <Link
+                key={i}
+                href={`/app/zespol/${a.agentId}`}
+                className="flex items-center justify-between gap-3 rounded-lg bg-zinc-900/50 px-3 py-2 text-sm transition hover:bg-zinc-900"
+              >
+                <span className="min-w-0 truncate">
+                  <span className="font-medium text-white">{a.agentName}</span>
+                  <span className="text-zinc-400"> — {a.message}</span>
+                </span>
+                <span
+                  className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                    a.severity === "warn" ? "bg-amber-500/20 text-amber-300" : "bg-zinc-700/60 text-zinc-300"
+                  }`}
+                >
+                  {a.severity === "warn" ? "pilne" : "info"}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </Card>
+      ) : (
+        ranking.length > 0 && (
+          <Card className="mb-8 !border-emerald-500/20 !bg-emerald-500/[0.04]">
+            <p className="text-sm text-emerald-300">✅ Wszystko gra — brak sygnałów wymagających uwagi.</p>
+          </Card>
+        )
+      )}
+
+      {/* Aktywność zespołu — cold calle w 4 tygodniach */}
+      {insights.weeklyActivity.some((w) => w.total > 0) && (
+        <Card className="mb-8">
+          <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+            Aktywność zespołu — telefony (4 tygodnie)
+          </h2>
+          <div className="flex items-end gap-3">
+            {insights.weeklyActivity.map((w, i) => {
+              const max = Math.max(1, ...insights.weeklyActivity.map((x) => x.total));
+              const h = Math.round((w.total / max) * 100);
+              const isCurrent = i === insights.weeklyActivity.length - 1;
+              return (
+                <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                  <span className="text-xs font-mono text-zinc-300">{w.total}</span>
+                  <div className="flex h-24 w-full items-end">
+                    <div
+                      className={`w-full rounded-t-md ${isCurrent ? "bg-emerald-400/70" : "bg-zinc-600/60"}`}
+                      style={{ height: `${Math.max(4, h)}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-zinc-500">{w.label}</span>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs text-zinc-600">Ostatni słupek (zielony) = bieżący tydzień.</p>
+        </Card>
+      )}
 
       {/* Mocne / słabe obszary — tylko CEO */}
       {isOwner && categories.length > 0 && (
@@ -236,8 +314,9 @@ export default async function ZespolPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="text-right">
-                          <span className={`font-mono text-lg font-semibold ${scoreColor(agent.avgScore)}`}>
+                          <span className={`inline-flex items-center gap-1 font-mono text-lg font-semibold ${scoreColor(agent.avgScore)}`}>
                             {agent.avgScore != null ? `${agent.avgScore}` : "—"}
+                            <TrendArrow trend={insights.trends[agent.id]} />
                           </span>
                           <span className="hidden text-xs text-zinc-500 sm:block">wynik AI</span>
                         </div>

@@ -26,6 +26,7 @@ export type Profile = {
   default_split_pct: number;
   phone: string | null;
   manager_id: string | null;
+  weekly_ai_limit: number | null; // null = bez limitu; liczba = maks. rozmów AI/tydzień
   created_at: string;
 };
 

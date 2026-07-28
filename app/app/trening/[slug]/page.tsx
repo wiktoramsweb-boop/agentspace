@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { getScenarioBySlug } from "@/lib/data";
+import { getScenarioBySlug, getWeeklySessionCount } from "@/lib/data";
 import { PERSONALITIES } from "@/lib/types";
 import { startSession } from "../actions";
 import { Card } from "../../components/ui";
@@ -10,10 +10,14 @@ import { SubmitButton } from "../../components/submit-button";
 type Props = { params: Promise<{ slug: string }> };
 
 export default async function ScenarioSetupPage({ params }: Props) {
-  await requireUser();
+  const user = await requireUser();
   const { slug } = await params;
   const scenario = await getScenarioBySlug(slug);
   if (!scenario) notFound();
+
+  // Tygodniowy limit rozmów AI — jeśli wyczerpany, nie pozwól zacząć.
+  const limitReached =
+    user.weekly_ai_limit != null && (await getWeeklySessionCount(user.id)) >= user.weekly_ai_limit;
 
   return (
     <>
@@ -31,6 +35,15 @@ export default async function ScenarioSetupPage({ params }: Props) {
         </p>
         <p className="leading-relaxed text-zinc-200">{scenario!.brief}</p>
       </Card>
+
+      {limitReached && (
+        <Card className="mb-8 !border-amber-500/30 !bg-amber-500/10">
+          <p className="font-semibold text-amber-200">Wykorzystałeś limit rozmów AI na ten tydzień.</p>
+          <p className="mt-1 text-sm text-amber-200/80">
+            Limit odnowi się w poniedziałek. Jeśli potrzebujesz więcej — poproś CEO o zwiększenie limitu.
+          </p>
+        </Card>
+      )}
 
       <form action={startSession}>
         <input type="hidden" name="scenarioId" value={scenario!.id} />
@@ -105,9 +118,10 @@ export default async function ScenarioSetupPage({ params }: Props) {
           overlay
           overlayText="Uruchamiam sesję z AI…"
           pendingText="Uruchamiam…"
+          disabled={limitReached}
           className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 hover:bg-emerald-400 hover:shadow-[0_0_30px_-8px_rgba(16,185,129,0.7)] sm:w-auto"
         >
-          Rozpocznij rozmowę z AI klientem →
+          {limitReached ? "Limit wyczerpany na ten tydzień" : "Rozpocznij rozmowę z AI klientem →"}
         </SubmitButton>
         <p className="mt-2 text-sm text-zinc-500">
           AI odezwie się pierwszy. Pisz jak do prawdziwego klienta. Na końcu kliknij „Zakończ i oceń".
