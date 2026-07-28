@@ -22,6 +22,7 @@ const EMAIL_TYPES: TypeDef[] = [
   { value: "propozycja", label: "Propozycja współpracy", desc: "Oferta + warunki + wycena", cat: "wlasciciel" },
   { value: "niezadowolenie", label: "Niezadowolony właściciel", desc: "Spokojna, dojrzała odpowiedź + plan", cat: "wlasciciel" },
   { value: "aktualizacja", label: "Aktualizacja statusu", desc: "Gdy mało nowości, a trzeba dać znać", cat: "wlasciciel" },
+  { value: "slaby_okres", label: "Trudny / słaby okres", desc: "Mało ruchu — uczciwie i z klasą", cat: "wlasciciel" },
   { value: "zapytanie", label: "Odpowiedź na zapytanie", desc: "Do kupującego pytającego o ofertę", cat: "kupujacy" },
   { value: "prezentacja_zaproszenie", label: "Zaproszenie na prezentację", desc: "Umówienie oglądania", cat: "kupujacy" },
   { value: "followup", label: "Follow-up / odświeżenie", desc: "Delikatne przypomnienie się", cat: "kupujacy" },
@@ -51,6 +52,8 @@ const PLACEHOLDERS: Record<string, string> = {
   podsumowanie: "Np.: piątkowe spotkanie, mieszkanie ul. Słońskiego, załączam podsumowanie i wzór umowy. Czas i prowizja do dogadania.",
   propozycja: "Np.: wyłączność 3 mies., prowizja 3% brutto, cena startowa 679 000 zł, wartość rynkowa ~533 tys. Pełna obsługa: zdjęcia, dron, kampanie, negocjacje.",
   niezadowolenie: "Np.: właściciel grozi wypowiedzeniem. Fakty: kilkanaście prezentacji, 3 oferty 680–685 tys., jego cena min. 720 tys. Plan: reset oferty, outreach, cotygodniowy raport.",
+  slaby_okres:
+    "Np.: 2 tyg. po publikacji, ~180 wyświetleń, brak zapytań o prezentację. Kontekst: górna półka cenowa, sezon urlopowy. Zrobione: wyróżnienie Otodom, dystrybucja MLS, mail do bazy inwestorów. Plan: reset oferty, materiał video, outreach do agentów.",
   oferta_cenowa: "Np.: kupujący złożył ofertę 685 tys. (gotówka, termin do końca września). Cena ofertowa 720 tys. Proszę o decyzję właściciela.",
   potwierdzenie_terminu:
     "Np.: umowa przedwstępna, piątek 31.07 o 19:00, notariusz ul. Kalwaryjska 62/2 Kraków, link do map: https://maps.app.goo.gl/...",

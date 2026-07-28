@@ -33,6 +33,8 @@ const EMAIL_GUIDE: Record<string, string> = {
     "Podziękowanie (po prezentacji / po transakcji / za współpracę). Ciepło, personalnie, z otwarciem na dalszy kontakt lub kolejne kroki.",
   aktualizacja:
     "Aktualizacja statusu, gdy brak dużych nowości. Uczciwie: co się działo (mało/dużo ruchu), dlaczego, co planujemy dalej. Utrzymanie zaufania mimo braku przełomu.",
+  slaby_okres:
+    "Trudny/słaby okres — uczciwie i profesjonalnie. Gdy jest mało zapytań i ruchu. ZASADA NADRZĘDNA: NIE ukrywaj słabego wyniku i NIGDY nie wymyślaj zainteresowanych klientów, ofert ani statystyk. Zamiast tego: (1) przekaż stan wprost i spokojnie; (2) osadź go w rzetelnym kontekście (sezon urlopowy, naturalny cykl budowania widoczności 4–8 tygodni, selektywna grupa docelowa przy wyższej cenie lub nietypowej nieruchomości) — tylko jeśli faktycznie pasuje; (3) wyeksponuj KONKRETNE, realne działania, które agent podał, że wykonano; (4) jasny plan na najbliższy czas; (5) utrzymanie zaufania i poczucia kontroli u właściciela. Ton dojrzałego doradcy, który panuje nad sytuacją — nie kogoś, kto się tłumaczy. Jeśli agent nie podał działań ani kontekstu, użyj placeholderów [w nawiasach], nie zmyślaj.",
   ogolny: "Profesjonalny mail w tonie Spectry na temat podany przez agenta.",
 };
 
