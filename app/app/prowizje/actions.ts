@@ -76,3 +76,22 @@ export async function deleteDeal(dealId: string): Promise<void> {
   revalidatePath("/app/prowizje");
   revalidatePath("/app");
 }
+
+/** Zapis karty transakcji (etapy + dokumenty). Autozapis z detalu transakcji. */
+export async function updateTransactionCard(
+  dealId: string,
+  card: unknown,
+): Promise<{ error?: string } | undefined> {
+  const user = await requireUser();
+  const admin = createSupabaseAdmin();
+  const { error } = await admin
+    .from("deals")
+    .update({ transaction_card: card })
+    .eq("id", dealId)
+    .eq("agent_id", user.id);
+  if (error) {
+    return { error: "Nie zapisano. Uruchom w Supabase migrację SETUP-v15 (kolumna transaction_card)." };
+  }
+  revalidatePath(`/app/prowizje/${dealId}`);
+  return {};
+}

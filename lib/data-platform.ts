@@ -172,6 +172,14 @@ export async function getClientsNeedingContact(
 
 // ---------- DEALS ----------
 
+export type DealWithCard = Deal & { transaction_card: unknown };
+
+export async function getDeal(id: string): Promise<DealWithCard | null> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin.from("deals").select("*").eq("id", id).maybeSingle();
+  return (data as DealWithCard) ?? null;
+}
+
 export async function getDeals(agentId: string): Promise<Deal[]> {
   const admin = createSupabaseAdmin();
   const { data } = await admin

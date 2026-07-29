@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { getDeals, getCommissionStats, getPropertiesLite } from "@/lib/data-platform";
 import { DEAL_STATUSES } from "@/lib/types";
@@ -98,7 +99,7 @@ export default async function ProwizjePage() {
                 className="flex items-center gap-4 overflow-hidden rounded-2xl border border-zinc-700/50 bg-zinc-800/40 p-4 pl-0 transition hover:border-zinc-600 hover:bg-zinc-800/70"
               >
                 <span className={`h-12 w-1.5 flex-shrink-0 rounded-r-full ${accent}`} />
-                <div className="min-w-0 flex-1">
+                <Link href={`/app/prowizje/${d.id}`} className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-white">{d.title}</p>
                   <p className="text-sm text-zinc-400">
                     <span className="font-medium text-emerald-400">{formatPln(d.agent_earnings_pln)}</span>
@@ -110,7 +111,8 @@ export default async function ProwizjePage() {
                         ? ` · plan: ${formatDateShort(d.expected_close)}`
                         : ""}
                   </p>
-                </div>
+                  <p className="mt-0.5 text-xs text-emerald-400/70">Otwórz kartę transakcji →</p>
+                </Link>
                 <div className="flex flex-shrink-0 items-center gap-3 pr-4">
                   {status && (
                     <span className={`hidden rounded-md px-2 py-1 text-xs font-medium sm:inline ${status.color}`}>
