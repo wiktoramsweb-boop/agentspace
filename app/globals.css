@@ -302,6 +302,58 @@ body {
   }
 }
 
+/* Głębia tła aplikacji — delikatne kolorowe poświaty, żeby nie było płasko. */
+.app-shell {
+  background:
+    radial-gradient(1100px 550px at 100% -8%, rgba(16, 185, 129, 0.07), transparent 60%),
+    radial-gradient(900px 500px at -8% 108%, rgba(56, 189, 248, 0.06), transparent 62%),
+    radial-gradient(700px 400px at 50% 120%, rgba(139, 92, 246, 0.04), transparent 60%),
+    #09090b;
+  background-attachment: fixed;
+}
+
+/* Dostępność: wyraźny, spójny pierścień focusa dla nawigacji klawiaturą. */
+:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid rgba(52, 211, 153, 0.85);
+  outline-offset: 2px;
+}
+
+/* Tekst z gradientem (nagłówki „z duszą"). */
+.text-gradient {
+  background: linear-gradient(100deg, #fff 0%, #a7f3d0 55%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Poświata na hover kart (delikatne uniesienie + blask akcentu). */
+.card-glow {
+  transition: transform 0.25s cubic-bezier(0.21, 0.47, 0.32, 0.98), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-glow:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -18px var(--glow, rgba(16, 185, 129, 0.45));
+}
+
+/* Ciemne dymki Leafleta (mapa nieruchomości) — spójne z motywem. */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #18181b !important;
+  color: #e4e4e7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.7) !important;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 14px !important;
+}
+.leaflet-popup-content a {
+  color: #34d399 !important;
+  font-weight: 600;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  color: #a1a1aa !important;
+}
+
 /* iOS Safari auto-zoomuje na polach z fontem < 16px (pole „ucieka" za klawiaturę,
    użytkownik nie widzi co wpisuje). Wymuszamy min. 16px na telefonach. */
 @media (max-width: 640px) {

@@ -9,7 +9,27 @@ export type MapPoint = {
   price: number | null;
   lat: number;
   lng: number;
+  kind?: string; // "sprzedaz" | "wynajem"
 };
+
+/** Krótka, czytelna cena na pinezce. */
+function shortPrice(n: number | null, kind?: string): string {
+  if (n == null) return "cena?";
+  if (kind === "wynajem") return new Intl.NumberFormat("pl-PL").format(n) + " zł/mc";
+  if (n >= 1_000_000) {
+    const m = n / 1_000_000;
+    return (Number.isInteger(m) ? String(m) : m.toFixed(1).replace(".", ",")) + " mln";
+  }
+  if (n >= 1000) return Math.round(n / 1000) + " tys.";
+  return new Intl.NumberFormat("pl-PL").format(n) + " zł";
+}
+
+function pinHtml(label: string, color: string): string {
+  return `<div style="transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 3px 5px rgba(0,0,0,.5))">
+    <div style="background:${color};color:#0a0a0a;font:700 12px/1 system-ui,-apple-system,sans-serif;padding:6px 9px;border-radius:9px;white-space:nowrap;border:1.5px solid rgba(255,255,255,.35)">${label}</div>
+    <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid ${color};margin-top:-1px"></div>
+  </div>`;
+}
 
 declare global {
   interface Window {
@@ -59,18 +79,28 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
       if (cancelled || !ref.current || mapRef.current) return;
       const map = L.map(ref.current, { scrollWheelZoom: false }).setView([50.0647, 19.945], 11);
       mapRef.current = map;
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap",
-        maxZoom: 19,
+      // Ciemne kafelki (CARTO dark) — spójne z motywem aplikacji.
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: "© OpenStreetMap © CARTO",
+        subdomains: "abcd",
+        maxZoom: 20,
       }).addTo(map);
 
       const markers: any[] = [];
       for (const p of points) {
-        const m = L.marker([p.lat, p.lng]).addTo(map);
-        const price = p.price != null ? new Intl.NumberFormat("pl-PL").format(p.price) + " zł" : "—";
+        const color = p.kind === "wynajem" ? "#38bdf8" : "#34d399"; // sky / emerald
+        const icon = L.divIcon({
+          html: pinHtml(shortPrice(p.price, p.kind), color),
+          className: "",
+          iconSize: [0, 0],
+          iconAnchor: [0, 0],
+        });
+        const m = L.marker([p.lat, p.lng], { icon }).addTo(map);
+        const full = p.price != null ? new Intl.NumberFormat("pl-PL").format(p.price) + " zł" : "—";
         m.bindPopup(
-          `<strong>${escapeHtml(p.title)}</strong><br>${price}<br>` +
-            `<a href="/app/nieruchomosci/${p.id}">Otwórz ofertę →</a>`,
+          `<div style="min-width:150px"><strong>${escapeHtml(p.title)}</strong><br>` +
+            `<span style="color:#a1a1aa">${p.kind === "wynajem" ? "Wynajem" : "Sprzedaż"} · ${full}${p.kind === "wynajem" ? "/mc" : ""}</span><br>` +
+            `<a href="/app/nieruchomosci/${p.id}">Otwórz ofertę →</a></div>`,
         );
         markers.push(m);
       }

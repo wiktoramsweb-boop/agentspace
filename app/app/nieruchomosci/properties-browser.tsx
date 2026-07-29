@@ -1,12 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { PROPERTY_STATUSES, PROPERTY_TYPES, PROPERTY_DEAL_KINDS } from "@/lib/types";
+import { useMemo, useState, type CSSProperties } from "react";
+import { PROPERTY_STATUSES, PROPERTY_DEAL_KINDS } from "@/lib/types";
 import type { PropertyWithOwner } from "@/lib/data-platform";
 import { formatPln } from "@/lib/format";
 import { Card } from "../components/ui";
+import { SegmentedToggle } from "../components/kit";
 import { PropertiesMap } from "./properties-map";
+
+const TYPE_EMOJI: Record<string, string> = {
+  mieszkanie: "🏢",
+  dom: "🏠",
+  dzialka: "🌳",
+  lokal: "🏬",
+  inne: "📍",
+};
+
+function kindVisual(kind: string) {
+  return kind === "wynajem"
+    ? { bar: "from-sky-400 to-indigo-400", glow: "rgba(56,189,248,0.4)", chip: "text-sky-300" }
+    : { bar: "from-emerald-400 to-cyan-400", glow: "rgba(16,185,129,0.4)", chip: "text-emerald-300" };
+}
 
 export function PropertiesBrowser({
   properties,
@@ -36,7 +51,7 @@ export function PropertiesBrowser({
   const active = filtered.filter((p) => p.status === "aktywna");
   const mapPoints = active
     .filter((p) => p.lat != null && p.lng != null)
-    .map((p) => ({ id: p.id, title: p.title, price: p.price_pln, lat: p.lat!, lng: p.lng! }));
+    .map((p) => ({ id: p.id, title: p.title, price: p.price_pln, lat: p.lat!, lng: p.lng!, kind: p.deal_kind }));
 
   return (
     <div>
@@ -48,17 +63,24 @@ export function PropertiesBrowser({
           placeholder="Szukaj po nazwie, adresie, mieście lub agencie…"
           className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
         />
-        <div className="inline-flex rounded-xl border border-zinc-800 bg-zinc-900/60 p-1">
-          <ScopeBtn active={scope === "all"} onClick={() => setScope("all")} label={`Wszystkie (${properties.length})`} />
-          <ScopeBtn active={scope === "mine"} onClick={() => setScope("mine")} label={`Moje (${mineCount})`} />
-        </div>
+        <SegmentedToggle
+          value={scope}
+          onChange={setScope}
+          accent="emerald"
+          options={[
+            { value: "all", label: `Wszystkie (${properties.length})` },
+            { value: "mine", label: `Moje (${mineCount})` },
+          ]}
+        />
       </div>
 
       {/* Mapa */}
       {filtered.length > 0 && (
         <Card className="mb-6 !overflow-hidden !p-0">
-          <div className="flex items-center justify-between border-b border-zinc-700/60 px-5 py-3">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-400">Mapa ofert</h2>
+          <div className="flex items-center justify-between border-b border-zinc-700/60 bg-gradient-to-r from-emerald-500/10 via-sky-500/5 to-transparent px-5 py-3">
+            <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-zinc-300">
+              🗺️ Mapa ofert
+            </h2>
             <span className="text-xs text-zinc-500">{mapPoints.length} na mapie</span>
           </div>
           {mapPoints.length > 0 ? (
@@ -79,60 +101,64 @@ export function PropertiesBrowser({
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((p) => {
             const status = PROPERTY_STATUSES.find((s) => s.value === p.status);
-            const type = PROPERTY_TYPES.find((t) => t.value === p.property_type);
             const kind = PROPERTY_DEAL_KINDS.find((k) => k.value === p.deal_kind);
             const params = [
-              type?.label,
               p.area_m2 != null ? `${p.area_m2} m²` : null,
               p.rooms != null ? `${p.rooms} pok.` : null,
             ]
               .filter(Boolean)
               .join(" · ");
             const mine = p.agent_id === currentUserId;
+            const kv = kindVisual(p.deal_kind);
             return (
-              <Link key={p.id} href={`/app/nieruchomosci/${p.id}`}>
-                <Card className="h-full transition hover:border-emerald-500/40 hover:bg-zinc-800/70">
-                  <div className="mb-3 flex items-start justify-between gap-3">
-                    <span className="text-xs font-medium uppercase tracking-wide text-emerald-400">{kind?.label}</span>
-                    {status && (
-                      <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${status.color}`}>{status.label}</span>
+              <Link key={p.id} href={`/app/nieruchomosci/${p.id}`} className="block">
+                <div
+                  className="card-glow group h-full overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-800/50 to-zinc-900/60"
+                  style={{ ["--glow"]: kv.glow } as CSSProperties}
+                >
+                  <div className={`h-1.5 w-full bg-gradient-to-r ${kv.bar}`} />
+                  <div className="p-5">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-zinc-700/60 bg-zinc-800/70 text-xl">
+                          {TYPE_EMOJI[p.property_type] ?? "📍"}
+                        </span>
+                        <span className={`text-xs font-semibold uppercase tracking-wide ${kv.chip}`}>{kind?.label}</span>
+                      </div>
+                      {status && (
+                        <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${status.color}`}>{status.label}</span>
+                      )}
+                    </div>
+
+                    <h3 className="mb-1 truncate font-semibold text-white">{p.title}</h3>
+                    {(p.city || p.address) && (
+                      <p className="mb-3 truncate text-sm text-zinc-500">📍 {p.city ?? p.address}</p>
                     )}
-                  </div>
-                  <h3 className="mb-1 font-semibold text-white">{p.title}</h3>
-                  {(p.city || p.address) && (
-                    <p className="mb-3 truncate text-sm text-zinc-500">{p.city ?? p.address}</p>
-                  )}
-                  <p className="text-lg font-semibold text-white">
-                    {p.price_pln != null ? formatPln(p.price_pln) : "—"}
-                    {p.deal_kind === "wynajem" && p.price_pln != null && (
-                      <span className="text-sm font-normal text-zinc-500"> /mc</span>
-                    )}
-                  </p>
-                  {params && <p className="mt-1 text-sm text-zinc-500">{params}</p>}
-                  {p.opiekunName && (
-                    <p className="mt-2 text-xs text-zinc-500">
-                      Agent: <span className={mine ? "text-emerald-400" : "text-zinc-400"}>{mine ? "Ty" : p.opiekunName}</span>
+
+                    <p className="text-2xl font-bold text-white">
+                      {p.price_pln != null ? formatPln(p.price_pln) : "—"}
+                      {p.deal_kind === "wynajem" && p.price_pln != null && (
+                        <span className="text-sm font-medium text-zinc-500"> /mc</span>
+                      )}
                     </p>
-                  )}
-                </Card>
+                    {params && <p className="mt-1 text-sm text-zinc-400">{params}</p>}
+
+                    <div className="mt-4 flex items-center justify-between border-t border-zinc-800 pt-3">
+                      <span className="flex items-center gap-2 text-xs text-zinc-400">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-[10px] font-bold text-zinc-950">
+                          {(p.opiekunName ?? "?").charAt(0).toUpperCase()}
+                        </span>
+                        {mine ? "Ty" : p.opiekunName ?? "—"}
+                      </span>
+                      <span className="text-xs font-medium text-emerald-400/80 opacity-0 transition group-hover:opacity-100">Otwórz →</span>
+                    </div>
+                  </div>
+                </div>
               </Link>
             );
           })}
         </div>
       )}
     </div>
-  );
-}
-
-function ScopeBtn({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-        active ? "bg-emerald-500 text-zinc-950" : "text-zinc-400 hover:text-white"
-      }`}
-    >
-      {label}
-    </button>
   );
 }
