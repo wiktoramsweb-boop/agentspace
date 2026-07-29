@@ -263,6 +263,13 @@ body {
 /* Druk faktur — chowamy interfejs, zostaje biała kartka.
    @page margin:0 usuwa nagłówki/stopki przeglądarki (URL, data, tytuł strony). */
 @media print {
+  /* Żaden pierścień focusa/obrys nie może przebić do wydruku (zielona kreska). */
+  *,
+  *::before,
+  *::after {
+    outline: none !important;
+    box-shadow: none !important;
+  }
   @page {
     size: A4;
     margin: 0;

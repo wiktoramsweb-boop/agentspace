@@ -29,6 +29,7 @@ export type ReservationData = {
   rentMonths: number;
   targetForm: "sprzedaz" | "przedwstepna";
   notaryCost: "kupujacy" | "strony";
+  customClauses: string[]; // dodatkowe zapisy (np. dopisane przez AI)
 };
 
 export type ResSection = { h: string; items: string[] };
@@ -136,7 +137,6 @@ export function buildReservation(d: ReservationData): ResDoc {
   const sellerBack = isZad
     ? `${payer} może żądać zwrotu wpłaconego zadatku w wysokości nominalnej w terminie 7 dni od dnia złożenia oświadczenia o rezygnacji; Strony zgodnie wyłączają obowiązek zapłaty sumy dwukrotnie wyższej, o którym mowa w art. 394 § 1 Kodeksu cywilnego.`
     : `${fNom} zostanie zwrócona ${secondRoleDat} w pełnej wysokości w terminie 7 dni od dnia złożenia oświadczenia o rezygnacji, na wskazany przez niego rachunek bankowy.`;
-  const neither = `${fNom} podlega zwrotowi ${secondRoleDat} w terminie 7 dni od dnia ustania możliwości zawarcia umowy.`;
 
   const sections: ResSection[] = [];
 
@@ -172,7 +172,6 @@ export function buildReservation(d: ReservationData): ResDoc {
       items: [
         `W przypadku rezygnacji Kupującego z zawarcia umowy sprzedaży albo niedopełnienia przez niego formalności niezbędnych do jej zawarcia w terminie wskazanym w § 4 ust. 1 — ${forfeit}`,
         `W przypadku rezygnacji Sprzedającego ze sprzedaży ${gen} przed upływem terminu, o którym mowa w § 4 ust. 1 — ${sellerBack}`,
-        `Jeżeli do zawarcia umowy nie dojdzie z przyczyn niezależnych od żadnej ze Stron (np. brak zdolności kredytowej Kupującego mimo dochowania należytej staranności, ujawniona wada prawna ${gen}, zdarzenie losowe) — ${neither}`,
       ],
     });
 
@@ -216,7 +215,6 @@ export function buildReservation(d: ReservationData): ResDoc {
       items: [
         `W przypadku rezygnacji Najemcy z podpisania umowy najmu albo niedopełnienia przez niego formalności wymaganych do jej zawarcia w terminie wskazanym w § 4 ust. 1 — ${forfeit}`,
         `W przypadku rezygnacji Wynajmującego z oddania ${gen} w najem przed upływem terminu, o którym mowa w § 4 ust. 1 — ${sellerBack}`,
-        `Jeżeli do zawarcia umowy najmu nie dojdzie z przyczyn niezależnych od żadnej ze Stron (np. zdarzenie losowe uniemożliwiające najem ${gen}) — ${neither}`,
       ],
     });
 
@@ -235,8 +233,16 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push({ h: "§ 6. Postanowienia dotyczące przyszłej umowy najmu", items: przyszla });
   }
 
+  // Dodatkowe zapisy (np. dopisane przez AI) — przed postanowieniami końcowymi,
+  // żeby nie ruszać numeracji §1–§6 (do których odwołują się inne paragrafy).
+  const custom = (d.customClauses ?? []).map((c) => c.trim()).filter(Boolean);
+  if (custom.length) {
+    sections.push({ h: "§ 7. Postanowienia dodatkowe", items: custom });
+  }
+  const koncoweNum = custom.length ? 8 : 7;
+
   sections.push({
-    h: "§ 7. Postanowienia końcowe",
+    h: `§ ${koncoweNum}. Postanowienia końcowe`,
     items: [
       `Wszelkie zmiany niniejszej umowy wymagają formy pisemnej pod rygorem nieważności.`,
       `W sprawach nieuregulowanych niniejszą umową zastosowanie mają przepisy Kodeksu cywilnego${

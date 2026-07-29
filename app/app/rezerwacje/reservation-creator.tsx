@@ -33,10 +33,49 @@ export function ReservationCreator({ city }: { city: string }) {
     rentMonths: 12,
     targetForm: "sprzedaz",
     notaryCost: "kupujacy",
+    customClauses: [],
   });
+
+  // Stan boxa AI do dopisywania zapisów.
+  const [aiReq, setAiReq] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   function set<K extends keyof ReservationData>(k: K, v: ReservationData[K]) {
     setD((p) => ({ ...p, [k]: v }));
+  }
+
+  async function addClause() {
+    const req = aiReq.trim();
+    if (!req) return;
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const res = await fetch("/api/rezerwacja/klauzula", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ request: req, mode: d.mode, depositType: d.depositType }),
+      });
+      const data = await res.json();
+      if (!res.ok) setAiError(data.error ?? "Nie udało się.");
+      else {
+        const clause = (data.data?.clause ?? "").trim();
+        if (clause) {
+          setD((p) => ({ ...p, customClauses: [...p.customClauses, clause] }));
+          setAiReq("");
+        }
+      }
+    } catch {
+      setAiError("Błąd połączenia.");
+    } finally {
+      setAiLoading(false);
+    }
+  }
+  function removeClause(i: number) {
+    setD((p) => ({ ...p, customClauses: p.customClauses.filter((_, n) => n !== i) }));
+  }
+  function editClause(i: number, v: string) {
+    setD((p) => ({ ...p, customClauses: p.customClauses.map((c, n) => (n === i ? v : c)) }));
   }
   function setParty(side: "owners" | "buyers", i: number, patch: Partial<Party>) {
     setD((p) => ({ ...p, [side]: p[side].map((x, n) => (n === i ? { ...x, ...patch } : x)) }));
@@ -53,7 +92,10 @@ export function ReservationCreator({ city }: { city: string }) {
 
   function print() {
     const prev = document.title;
-    document.title = `Umowa rezerwacyjna - ${d.propAddress.trim() || "Spectra"}`;
+    // „/", „\\", „:" są niedozwolone w nazwach plików (system zamienia „/" na „:") —
+    // podmieniamy na „-", żeby nazwa pobranego PDF była czysta.
+    const safe = (d.propAddress.trim() || "Spectra").replace(/[\\/:*?"<>|]/g, "-");
+    document.title = `Umowa rezerwacyjna - ${safe}`;
     window.print();
     setTimeout(() => (document.title = prev), 1000);
   }
@@ -157,6 +199,42 @@ export function ReservationCreator({ city }: { city: string }) {
             </div>
           </Section>
         )}
+
+        <Section title="Dodatkowe zapisy (opcjonalnie)">
+          <p className="text-xs text-zinc-500">
+            Napisz własnymi słowami, co dopisać do umowy — AI ujmie to formalnie i doda przed postanowieniami końcowymi.
+          </p>
+          <textarea
+            value={aiReq}
+            onChange={(e) => setAiReq(e.target.value)}
+            rows={2}
+            placeholder={'np. „kupujący pokrywa koszt świadectwa energetycznego"'}
+            className={inp}
+          />
+          {aiError && <p className="text-xs text-red-400">{aiError}</p>}
+          <button
+            onClick={addClause}
+            disabled={aiLoading || !aiReq.trim()}
+            className="w-full rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/20 disabled:opacity-50"
+          >
+            {aiLoading ? "Redaguję…" : "✨ Dopisz zapis przez AI"}
+          </button>
+          {d.customClauses.length > 0 && (
+            <div className="space-y-2 pt-1">
+              {d.customClauses.map((c, i) => (
+                <div key={i} className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-2">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-[11px] text-zinc-500">Zapis {i + 1} (możesz poprawić)</span>
+                    <button onClick={() => removeClause(i)} className="text-[11px] text-zinc-500 transition hover:text-red-400">
+                      usuń
+                    </button>
+                  </div>
+                  <textarea value={c} onChange={(e) => editClause(i, e.target.value)} rows={3} className={`${inp} text-xs`} />
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
 
         <button
           onClick={print}
