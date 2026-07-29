@@ -307,15 +307,9 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* Umowa (tekst prawny) — margines liczony na poziomie STRONY (@page), żeby był
-     jednakowy na każdej stronie (także na górze strony 2, 3…). Padding elementu tego
-     nie robi — działa tylko na górze 1. i dole ostatniej strony. */
-  @page contract {
-    size: A4;
-    margin: 18mm 16mm;
-  }
+  /* Umowa (tekst prawny) — margines daje wstrzyknięty w trybie podglądu zwykły
+     @page{margin:16mm} (działa na każdej stronie). Tu tylko czcionka/typografia druku. */
   .contract-sheet {
-    page: contract;
     min-height: 0 !important;
     padding: 0 !important;
     font-size: 11pt !important;

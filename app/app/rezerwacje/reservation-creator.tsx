@@ -36,6 +36,8 @@ export function ReservationCreator({ city }: { city: string }) {
     customClauses: [],
   });
 
+  const [preview, setPreview] = useState(false);
+
   // Stan boxa AI do dopisywania zapisów.
   const [aiReq, setAiReq] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -100,8 +102,73 @@ export function ReservationCreator({ city }: { city: string }) {
     setTimeout(() => (document.title = prev), 1000);
   }
 
+  const sheetEl = (
+    <div className="print-sheet contract-sheet mx-auto max-w-[210mm] rounded-xl bg-white px-10 py-10 text-[13px] leading-relaxed text-zinc-900 shadow-2xl">
+      <h1 className="mb-6 text-center text-lg font-bold tracking-wide">{doc.title}</h1>
+      <p className="mb-3"><Rich text={doc.intro} /></p>
+      <p className="mb-2"><Rich text={doc.ownerText} />,</p>
+      <p className="mb-2 text-center">a</p>
+      <p className="mb-2"><Rich text={doc.buyerText} />,</p>
+      <p className="mb-5">{doc.jointly}</p>
+
+      <p className="mb-6">
+        <span className="font-semibold">Przedmiot rezerwacji: </span>
+        <Rich text={doc.subjectText} />
+      </p>
+
+      {doc.sections.map((s, i) => (
+        <div key={i} className="mb-5">
+          <h3 className="mb-2 break-after-avoid text-center font-bold">{s.h}</h3>
+          {s.items.length > 1 ? (
+            <div className="space-y-2">
+              {s.items.map((it, n) => (
+                <p key={n}>
+                  <span className="font-medium">{n + 1}. </span>
+                  <Rich text={it} />
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p><Rich text={s.items[0]} /></p>
+          )}
+        </div>
+      ))}
+
+      {/* Podpisy — linia kropkowana + „Podpis …" + imię */}
+      <div className="mt-16 grid grid-cols-2 gap-12 break-inside-avoid">
+        <SignBlock roleGen={doc.ownerRoleGen} names={doc.ownerNames} />
+        <SignBlock roleGen={doc.buyerRoleGen} names={doc.buyerNames} />
+      </div>
+    </div>
+  );
+
+  // Tryb podglądu (jak w kalkulatorze) — arkusz poza siatką, na całą stronę.
+  // Wstrzyknięty @page{margin} daje równe marginesy na KAŻDEJ stronie (zwykły @page działa).
+  if (preview) {
+    return (
+      <div>
+        <style>{`@media print { @page { size: A4; margin: 16mm } }`}</style>
+        <div className="print-hide mb-4 flex items-center justify-between gap-4">
+          <button
+            onClick={() => setPreview(false)}
+            className="inline-flex items-center gap-1 text-sm text-zinc-400 transition hover:text-white"
+          >
+            ← Wróć do edycji
+          </button>
+          <button
+            onClick={print}
+            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          >
+            Zapisz jako PDF / Drukuj
+          </button>
+        </div>
+        {sheetEl}
+      </div>
+    );
+  }
+
   return (
-    <div className="print-root grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
       {/* FORMULARZ */}
       <div className="print-hide space-y-5">
         {/* Tryb */}
@@ -237,56 +304,20 @@ export function ReservationCreator({ city }: { city: string }) {
         </Section>
 
         <button
-          onClick={print}
+          onClick={() => setPreview(true)}
           className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 active:scale-[0.99]"
         >
-          Drukuj / Zapisz PDF
+          Podgląd i PDF dla klienta →
         </button>
         <p className="text-xs text-zinc-600">
           Gotowy, prawnie kompletny wzór. Przy „Zadatek" kwota jest bezzwrotna w razie rezygnacji Kupującego/Najemcy (art. 394 KC). Przy nietypowych transakcjach warto dać wzór do wglądu prawnikowi.
         </p>
       </div>
 
-      {/* PODGLĄD / DOKUMENT */}
-      <div>
-        <p className="print-hide mb-2 text-xs uppercase tracking-wider text-zinc-500">Podgląd umowy</p>
-        <div className="print-sheet contract-sheet mx-auto max-w-[210mm] rounded-xl bg-white px-10 py-10 text-[13px] leading-relaxed text-zinc-900 shadow-2xl">
-          <h1 className="mb-6 text-center text-lg font-bold tracking-wide">{doc.title}</h1>
-          <p className="mb-3"><Rich text={doc.intro} /></p>
-          <p className="mb-2"><Rich text={doc.ownerText} />,</p>
-          <p className="mb-2 text-center">a</p>
-          <p className="mb-2"><Rich text={doc.buyerText} />,</p>
-          <p className="mb-5">{doc.jointly}</p>
-
-          <p className="mb-6">
-            <span className="font-semibold">Przedmiot rezerwacji: </span>
-            <Rich text={doc.subjectText} />
-          </p>
-
-          {doc.sections.map((s, i) => (
-            <div key={i} className="mb-5">
-              <h3 className="mb-2 break-after-avoid text-center font-bold">{s.h}</h3>
-              {s.items.length > 1 ? (
-                <div className="space-y-2">
-                  {s.items.map((it, n) => (
-                    <p key={n}>
-                      <span className="font-medium">{n + 1}. </span>
-                      <Rich text={it} />
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                <p><Rich text={s.items[0]} /></p>
-              )}
-            </div>
-          ))}
-
-          {/* Podpisy — linia kropkowana + „Podpis …" + imię */}
-          <div className="mt-16 grid grid-cols-2 gap-12 break-inside-avoid">
-            <SignBlock roleGen={doc.ownerRoleGen} names={doc.ownerNames} />
-            <SignBlock roleGen={doc.buyerRoleGen} names={doc.buyerNames} />
-          </div>
-        </div>
+      {/* PODGLĄD NA ŻYWO */}
+      <div className="lg:sticky lg:top-4 lg:h-fit">
+        <p className="mb-2 text-xs uppercase tracking-wider text-zinc-500">Podgląd umowy</p>
+        {sheetEl}
       </div>
     </div>
   );
