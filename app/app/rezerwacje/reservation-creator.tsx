@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { buildReservation, type Party, type ReservationData, type ResMode, type PropType, type DepositType, type DocType } from "@/lib/reservation";
+import { generateReservationPdf } from "@/lib/reservation-pdf";
 
 const PROP_OPTIONS: { value: PropType; label: string }[] = [
   { value: "mieszkanie", label: "Mieszkanie" },
@@ -92,14 +93,28 @@ export function ReservationCreator({ city }: { city: string }) {
   const isSale = d.mode === "sprzedaz";
   const doc = buildReservation(d);
 
-  function print() {
-    const prev = document.title;
-    // „/", „\\", „:" są niedozwolone w nazwach plików (system zamienia „/" na „:") —
-    // podmieniamy na „-", żeby nazwa pobranego PDF była czysta.
-    const safe = (d.propAddress.trim() || "Spectra").replace(/[\\/:*?"<>|]/g, "-");
-    document.title = `Umowa rezerwacyjna - ${safe}`;
-    window.print();
-    setTimeout(() => (document.title = prev), 1000);
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  async function downloadPdf() {
+    setPdfLoading(true);
+    try {
+      const bytes = await generateReservationPdf(doc);
+      const blob = new Blob([bytes.slice()], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const safe = (d.propAddress.trim() || "Spectra").replace(/[\\/:*?"<>|]/g, "-");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Umowa rezerwacyjna - ${safe}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    } catch (e) {
+      console.error(e);
+      alert("Nie udało się wygenerować PDF. Odśwież stronę i spróbuj ponownie.");
+    } finally {
+      setPdfLoading(false);
+    }
   }
 
   const sheetEl = (
@@ -155,10 +170,11 @@ export function ReservationCreator({ city }: { city: string }) {
             ← Wróć do edycji
           </button>
           <button
-            onClick={print}
-            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+            onClick={downloadPdf}
+            disabled={pdfLoading}
+            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
           >
-            Zapisz jako PDF / Drukuj
+            {pdfLoading ? "Generuję PDF…" : "Pobierz PDF"}
           </button>
         </div>
         {sheetEl}
