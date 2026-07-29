@@ -270,6 +270,15 @@ body {
     outline: none !important;
     box-shadow: none !important;
   }
+  /* Rozbij układ dwukolumnowy (formularz + podgląd) — po ukryciu formularza
+     arkusz nie może zostać wciśnięty do wąskiej kolumny siatki. Ma zająć całą stronę. */
+  .print-root {
+    display: block !important;
+  }
+  .print-root > * {
+    width: 100% !important;
+    max-width: none !important;
+  }
   @page {
     size: A4;
     margin: 0;

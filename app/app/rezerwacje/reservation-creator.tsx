@@ -101,7 +101,7 @@ export function ReservationCreator({ city }: { city: string }) {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
+    <div className="print-root grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
       {/* FORMULARZ */}
       <div className="print-hide space-y-5">
         {/* Tryb */}
