@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { CLIENT_STATUSES, CLIENT_TYPES, type ClientStatus } from "@/lib/types";
+import { CLIENT_STATUSES, CLIENT_TYPES, CLIENT_TYPE_LABELS, type ClientStatus, type ClientType } from "@/lib/types";
 import type { ClientWithOwner } from "@/lib/data-platform";
 import { formatPln, daysAgo } from "@/lib/format";
 
@@ -43,6 +43,7 @@ export function ClientsBrowser({
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<"all" | "mine">("all");
   const [statusFilter, setStatusFilter] = useState<ClientStatus | "">("");
+  const [typeFilter, setTypeFilter] = useState<ClientType | "">("");
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -52,13 +53,20 @@ export function ClientsBrowser({
     return clients.filter((c) => {
       if (scope === "mine" && c.agent_id !== currentUserId) return false;
       if (statusFilter && c.status !== statusFilter) return false;
+      if (typeFilter && c.type !== typeFilter) return false;
       if (!q) return true;
       const byName = c.name.toLowerCase().includes(q);
       const byEmail = (c.email ?? "").toLowerCase().includes(q);
       const byPhone = qd.length >= 3 && digits(c.phone).includes(qd);
       return byName || byEmail || byPhone;
     });
-  }, [clients, query, scope, statusFilter, currentUserId]);
+  }, [clients, query, scope, statusFilter, typeFilter, currentUserId]);
+
+  const typeCounts = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const c of clients) m[c.type] = (m[c.type] ?? 0) + 1;
+    return m;
+  }, [clients]);
 
   const mineCount = clients.filter((c) => c.agent_id === currentUserId).length;
 
@@ -93,6 +101,23 @@ export function ClientsBrowser({
         </div>
       </div>
 
+      {/* Filtr typu klienta */}
+      <div className="mb-3 flex flex-wrap gap-2">
+        <Chip active={typeFilter === ""} onClick={() => setTypeFilter("")}>
+          Wszyscy
+        </Chip>
+        {CLIENT_TYPES.map((t) => (
+          <Chip
+            key={t.value}
+            active={typeFilter === t.value}
+            onClick={() => setTypeFilter(typeFilter === t.value ? "" : t.value)}
+          >
+            {t.label}
+            {typeCounts[t.value] ? ` (${typeCounts[t.value]})` : ""}
+          </Chip>
+        ))}
+      </div>
+
       {/* Filtr statusu */}
       <div className="mb-5 flex flex-wrap gap-2">
         <Chip active={statusFilter === ""} onClick={() => setStatusFilter("")}>
@@ -117,7 +142,7 @@ export function ClientsBrowser({
         <div className="space-y-2.5">
           {filtered.map((c) => {
             const status = CLIENT_STATUSES.find((s) => s.value === c.status);
-            const type = CLIENT_TYPES.find((t) => t.value === c.type);
+            const typeLabel = CLIENT_TYPE_LABELS[c.type] ?? c.type;
             const due = c.next_contact_at && c.next_contact_at <= today;
             return (
               <Link
@@ -136,14 +161,14 @@ export function ClientsBrowser({
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-white">{c.name}</p>
                     <p className="truncate text-sm text-zinc-400">
-                      {type?.label}
+                      {typeLabel}
                       {c.property && ` · ${c.property}`}
                     </p>
                   </div>
                   <div className="min-w-0 text-sm">
                     <p className="truncate text-zinc-300">{c.phone ?? "—"}</p>
                     <p className="truncate text-xs text-zinc-500">
-                      {c.budget_pln != null ? formatPln(c.budget_pln) : "budżet —"}
+                      {c.budget_pln != null ? formatPln(c.budget_pln) : "—"}
                     </p>
                   </div>
                   <div className="hidden min-w-0 text-sm sm:block">

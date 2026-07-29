@@ -120,7 +120,17 @@ export type Task = {
   completed_at: string | null;
 };
 
-export type ClientType = "kupujacy" | "sprzedajacy" | "najem" | "inny";
+export type ClientType = "sprzedajacy" | "kupujacy" | "wynajmujacy" | "najemca" | "najem" | "inny";
+
+/** Etykiety typów (z „najem" dla starych rekordów sprzed rozdzielenia). */
+export const CLIENT_TYPE_LABELS: Record<string, string> = {
+  sprzedajacy: "Sprzedający",
+  kupujacy: "Kupujący",
+  wynajmujacy: "Wynajmujący",
+  najemca: "Najemca",
+  najem: "Najem",
+  inny: "Inny",
+};
 export type ClientStatus =
   | "nowy"
   | "w_kontakcie"
@@ -244,9 +254,10 @@ export const PROPERTY_STATUSES: {
 ];
 
 export const CLIENT_TYPES: { value: ClientType; label: string }[] = [
-  { value: "kupujacy", label: "Kupujący" },
   { value: "sprzedajacy", label: "Sprzedający" },
-  { value: "najem", label: "Najem" },
+  { value: "kupujacy", label: "Kupujący" },
+  { value: "wynajmujacy", label: "Wynajmujący" },
+  { value: "najemca", label: "Najemca" },
   { value: "inny", label: "Inny" },
 ];
 

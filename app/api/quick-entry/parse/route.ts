@@ -8,7 +8,7 @@ const SYSTEM = `Jesteś asystentem agenta nieruchomości. Agent po spotkaniu dyk
 Zasady:
 - client_name: imię i nazwisko klienta (popraw oczywiste błędy rozpoznawania mowy).
 - phone: numer telefonu jeśli podany, inaczej null.
-- client_type: "sprzedajacy" dla spotkania pozyskowego / sprzedaży, "kupujacy" dla kupującego, "najem" dla najmu, "inny" gdy niejasne. Spotkanie pozyskowe = sprzedajacy.
+- client_type: "sprzedajacy" (właściciel chcący sprzedać / spotkanie pozyskowe), "kupujacy" (szuka do kupna), "wynajmujacy" (właściciel chcący wynająć), "najemca" (szuka do wynajęcia), "inny" gdy niejasne. Spotkanie pozyskowe = sprzedajacy.
 - address: pełny adres nieruchomości jeśli podany (np. "ul. Prądnicka 34/23"), inaczej null.
 - city: miasto jeśli wynika z kontekstu, inaczej null (domyślnie okolica to Kraków, ale nie zgaduj jeśli nie ma).
 - create_property: true jeśli podano adres nieruchomości (wtedy warto dodać ją do bazy), inaczej false.
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
             properties: {
               client_name: { type: "string" },
               phone: { type: ["string", "null"] },
-              client_type: { type: "string", enum: ["sprzedajacy", "kupujacy", "najem", "inny"] },
+              client_type: { type: "string", enum: ["sprzedajacy", "kupujacy", "wynajmujacy", "najemca", "inny"] },
               address: { type: ["string", "null"] },
               city: { type: ["string", "null"] },
               create_property: { type: "boolean" },

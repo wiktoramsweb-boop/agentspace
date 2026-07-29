@@ -7,7 +7,7 @@ import {
   getPropertiesOwnedByClient,
   getPropertiesClientInterestedIn,
 } from "@/lib/data-platform";
-import { CLIENT_TYPES, PROPERTY_STATUSES, type Property } from "@/lib/types";
+import { CLIENT_TYPE_LABELS, PROPERTY_STATUSES, type Property } from "@/lib/types";
 import { Card } from "../../components/ui";
 import { MiniMap } from "../../components/mini-map";
 import { formatPln, daysAgo, formatDateShort } from "@/lib/format";
@@ -44,7 +44,7 @@ export default async function ClientDetailPage({ params }: Props) {
     getPropertiesOwnedByClient(id),
     getPropertiesClientInterestedIn(id),
   ]);
-  const type = CLIENT_TYPES.find((t) => t.value === client.type);
+  const type = { label: CLIENT_TYPE_LABELS[client.type] ?? client.type };
   const reminder = reminderState(client.next_contact_at);
 
   return (

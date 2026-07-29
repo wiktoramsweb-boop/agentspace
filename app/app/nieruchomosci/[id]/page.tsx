@@ -12,7 +12,7 @@ import {
   PROPERTY_STATUSES,
   PROPERTY_TYPES,
   PROPERTY_DEAL_KINDS,
-  CLIENT_TYPES,
+  CLIENT_TYPE_LABELS,
   DEAL_STATUSES,
 } from "@/lib/types";
 import { Card } from "../../components/ui";
@@ -170,7 +170,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             {interested.length > 0 && (
               <ul className="mb-4 space-y-2">
                 {interested.map((c) => {
-                  const ct = CLIENT_TYPES.find((t) => t.value === c.type);
+                  const ct = { label: CLIENT_TYPE_LABELS[c.type] ?? c.type };
                   return (
                     <li
                       key={c.id}
