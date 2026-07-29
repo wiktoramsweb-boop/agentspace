@@ -307,13 +307,14 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* Umowa (tekst prawny) — margines daje wstrzyknięty w trybie podglądu zwykły
-     @page{margin:16mm} (działa na każdej stronie). Tu tylko czcionka/typografia druku. */
+  /* Umowa (tekst prawny) — margines robi PADDING arkusza (a @page{margin:0} zostaje,
+     dzięki czemu przeglądarka NIE wstawia własnego nagłówka/stopki: URL, data, nr strony).
+     Czcionka zagęszczona, żeby całość zmieściła się na 2 stronach z podpisami. */
   .contract-sheet {
     min-height: 0 !important;
-    padding: 0 !important;
-    font-size: 11pt !important;
-    line-height: 1.6 !important;
+    padding: 14mm 15mm !important;
+    font-size: 10pt !important;
+    line-height: 1.42 !important;
     color: #18181b !important;
   }
 

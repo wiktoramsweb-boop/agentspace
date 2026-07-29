@@ -104,23 +104,23 @@ export function ReservationCreator({ city }: { city: string }) {
 
   const sheetEl = (
     <div className="print-sheet contract-sheet mx-auto max-w-[210mm] rounded-xl bg-white px-10 py-10 text-[13px] leading-relaxed text-zinc-900 shadow-2xl">
-      <h1 className="mb-6 text-center text-lg font-bold tracking-wide">{doc.title}</h1>
-      <p className="mb-3"><Rich text={doc.intro} /></p>
-      <p className="mb-2"><Rich text={doc.ownerText} />,</p>
-      <p className="mb-2 text-center">a</p>
-      <p className="mb-2"><Rich text={doc.buyerText} />,</p>
-      <p className="mb-5">{doc.jointly}</p>
+      <h1 className="mb-4 text-center text-lg font-bold tracking-wide">{doc.title}</h1>
+      <p className="mb-2"><Rich text={doc.intro} /></p>
+      <p className="mb-1.5"><Rich text={doc.ownerText} />,</p>
+      <p className="mb-1.5 text-center">a</p>
+      <p className="mb-1.5"><Rich text={doc.buyerText} />,</p>
+      <p className="mb-3">{doc.jointly}</p>
 
-      <p className="mb-6">
+      <p className="mb-3">
         <span className="font-semibold">Przedmiot rezerwacji: </span>
         <Rich text={doc.subjectText} />
       </p>
 
       {doc.sections.map((s, i) => (
-        <div key={i} className="mb-5">
-          <h3 className="mb-2 break-after-avoid text-center font-bold">{s.h}</h3>
+        <div key={i} className="mb-3">
+          <h3 className="mb-1 break-after-avoid text-center font-bold">{s.h}</h3>
           {s.items.length > 1 ? (
-            <div className="space-y-2">
+            <div className="space-y-1">
               {s.items.map((it, n) => (
                 <p key={n}>
                   <span className="font-medium">{n + 1}. </span>
@@ -135,7 +135,7 @@ export function ReservationCreator({ city }: { city: string }) {
       ))}
 
       {/* Podpisy — linia kropkowana + „Podpis …" + imię */}
-      <div className="mt-16 grid grid-cols-2 gap-12 break-inside-avoid">
+      <div className="mt-10 grid grid-cols-2 gap-12 break-inside-avoid">
         <SignBlock roleGen={doc.ownerRoleGen} names={doc.ownerNames} />
         <SignBlock roleGen={doc.buyerRoleGen} names={doc.buyerNames} />
       </div>
@@ -147,7 +147,6 @@ export function ReservationCreator({ city }: { city: string }) {
   if (preview) {
     return (
       <div>
-        <style>{`@media print { @page { size: A4; margin: 16mm } }`}</style>
         <div className="print-hide mb-4 flex items-center justify-between gap-4">
           <button
             onClick={() => setPreview(false)}
@@ -340,7 +339,7 @@ function SignBlock({ roleGen, names }: { roleGen: string; names: string[] }) {
   return (
     <div className="text-center">
       {/* puste miejsce na odręczny podpis */}
-      <div className="h-14" />
+      <div className="h-10" />
       <div className="border-b border-dotted border-zinc-500" />
       <p className="mt-2 text-sm text-zinc-800">Podpis {roleGen}</p>
       {real.length > 0 ? (
