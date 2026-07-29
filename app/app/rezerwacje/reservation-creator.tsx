@@ -1,0 +1,307 @@
+"use client";
+
+import { useState } from "react";
+import { buildReservation, type Party, type ReservationData, type ResMode, type PropType } from "@/lib/reservation";
+
+const PROP_OPTIONS: { value: PropType; label: string }[] = [
+  { value: "mieszkanie", label: "Mieszkanie" },
+  { value: "dom", label: "Dom" },
+  { value: "dzialka", label: "Działka" },
+  { value: "lokal", label: "Lokal użytkowy" },
+  { value: "inne", label: "Inne" },
+];
+
+const emptyParty = (): Party => ({ name: "", pesel: "", address: "" });
+
+export function ReservationCreator({ city }: { city: string }) {
+  const [d, setD] = useState<ReservationData>({
+    city,
+    date: new Date().toISOString().slice(0, 10),
+    mode: "sprzedaz",
+    propType: "mieszkanie",
+    propAddress: "",
+    propDetails: "",
+    owners: [emptyParty()],
+    buyers: [emptyParty()],
+    fee: 0,
+    account: "",
+    payDays: 2,
+    price: 0,
+    deadline: "",
+    rentType: "okazjonalny",
+    rentMonths: 12,
+    targetForm: "sprzedaz",
+    notaryCost: "kupujacy",
+  });
+
+  function set<K extends keyof ReservationData>(k: K, v: ReservationData[K]) {
+    setD((p) => ({ ...p, [k]: v }));
+  }
+  function setParty(side: "owners" | "buyers", i: number, patch: Partial<Party>) {
+    setD((p) => ({ ...p, [side]: p[side].map((x, n) => (n === i ? { ...x, ...patch } : x)) }));
+  }
+  function addParty(side: "owners" | "buyers") {
+    setD((p) => ({ ...p, [side]: [...p[side], emptyParty()] }));
+  }
+  function removeParty(side: "owners" | "buyers", i: number) {
+    setD((p) => ({ ...p, [side]: p[side].length > 1 ? p[side].filter((_, n) => n !== i) : p[side] }));
+  }
+
+  const isSale = d.mode === "sprzedaz";
+  const doc = buildReservation(d);
+
+  function print() {
+    const prev = document.title;
+    document.title = `Umowa rezerwacyjna - ${d.propAddress.trim() || "Spectra"}`;
+    window.print();
+    setTimeout(() => (document.title = prev), 1000);
+  }
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
+      {/* FORMULARZ */}
+      <div className="print-hide space-y-5">
+        {/* Tryb */}
+        <div className="inline-flex rounded-2xl border border-zinc-800 bg-zinc-900/60 p-1">
+          <ModeBtn active={isSale} onClick={() => set("mode", "sprzedaz" as ResMode)} label="Sprzedaż" />
+          <ModeBtn active={!isSale} onClick={() => set("mode", "najem" as ResMode)} label="Najem" />
+        </div>
+
+        <Section title="Nieruchomość">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={lbl}>Typ</label>
+              <select value={d.propType} onChange={(e) => set("propType", e.target.value as PropType)} className={inp}>
+                {PROP_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            <Field label="Miejscowość zawarcia" value={d.city} onChange={(v) => set("city", v)} />
+          </div>
+          <Field label="Adres nieruchomości" value={d.propAddress} onChange={(v) => set("propAddress", v)} placeholder="os. Spółdzielcze 8/40, 31-994 Kraków" />
+          <Field label="Szczegóły (opcjonalnie)" value={d.propDetails} onChange={(v) => set("propDetails", v)} placeholder="nr KW, powierzchnia m²…" />
+          <Field label="Data umowy" type="date" value={d.date} onChange={(v) => set("date", v)} />
+        </Section>
+
+        <PartyEditor
+          title={isSale ? "Sprzedający (właściciel)" : "Wynajmujący (właściciel)"}
+          parties={d.owners}
+          onChange={(i, patch) => setParty("owners", i, patch)}
+          onAdd={() => addParty("owners")}
+          onRemove={(i) => removeParty("owners", i)}
+        />
+        <PartyEditor
+          title={isSale ? "Kupujący (rezerwujący)" : "Najemca (rezerwujący)"}
+          parties={d.buyers}
+          onChange={(i, patch) => setParty("buyers", i, patch)}
+          onAdd={() => addParty("buyers")}
+          onRemove={(i) => removeParty("buyers", i)}
+        />
+
+        <Section title="Warunki rezerwacji">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Opłata rezerwacyjna (zł)" type="number" value={String(d.fee || "")} onChange={(v) => set("fee", Math.max(0, parseInt(v || "0", 10)))} />
+            <Field label="Termin wpłaty (dni rob.)" type="number" value={String(d.payDays)} onChange={(v) => set("payDays", Math.max(1, parseInt(v || "1", 10)))} />
+          </div>
+          <Field label="Nr rachunku właściciela" value={d.account} onChange={(v) => set("account", v)} placeholder="09 1240 1024 1111 0000 0260 4516" />
+          <div className="grid grid-cols-2 gap-3">
+            <Field
+              label={isSale ? "Cena sprzedaży (zł)" : "Miesięczny czynsz (zł)"}
+              type="number"
+              value={String(d.price || "")}
+              onChange={(v) => set("price", Math.max(0, parseInt(v || "0", 10)))}
+            />
+            <Field label="Umowę zawrzeć do" type="date" value={d.deadline} onChange={(v) => set("deadline", v)} />
+          </div>
+        </Section>
+
+        {isSale ? (
+          <Section title="Umowa sprzedaży">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={lbl}>Umowa docelowa</label>
+                <select value={d.targetForm} onChange={(e) => set("targetForm", e.target.value as "sprzedaz" | "przedwstepna")} className={inp}>
+                  <option value="sprzedaz">Umowa sprzedaży (akt not.)</option>
+                  <option value="przedwstepna">Umowa przedwstępna</option>
+                </select>
+              </div>
+              <div>
+                <label className={lbl}>Koszty notarialne</label>
+                <select value={d.notaryCost} onChange={(e) => set("notaryCost", e.target.value as "kupujacy" | "strony")} className={inp}>
+                  <option value="kupujacy">Kupujący</option>
+                  <option value="strony">Po połowie</option>
+                </select>
+              </div>
+            </div>
+          </Section>
+        ) : (
+          <Section title="Umowa najmu">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={lbl}>Rodzaj najmu</label>
+                <select value={d.rentType} onChange={(e) => set("rentType", e.target.value as "okazjonalny" | "zwykly")} className={inp}>
+                  <option value="okazjonalny">Najem okazjonalny</option>
+                  <option value="zwykly">Najem zwykły</option>
+                </select>
+              </div>
+              <Field label="Okres najmu (mies.)" type="number" value={String(d.rentMonths)} onChange={(v) => set("rentMonths", Math.max(1, parseInt(v || "1", 10)))} />
+            </div>
+          </Section>
+        )}
+
+        <button
+          onClick={print}
+          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 active:scale-[0.99]"
+        >
+          Drukuj / Zapisz PDF
+        </button>
+        <p className="text-xs text-zinc-600">
+          Umowa to gotowy, prawnie kompletny wzór (opłata rezerwacyjna nie jest zadatkiem — art. 394 KC). Przy nietypowych transakcjach warto dać ją do wglądu prawnikowi.
+        </p>
+      </div>
+
+      {/* PODGLĄD / DOKUMENT */}
+      <div>
+        <p className="print-hide mb-2 text-xs uppercase tracking-wider text-zinc-500">Podgląd umowy</p>
+        <div className="print-sheet mx-auto max-w-[210mm] rounded-xl bg-white px-10 py-10 text-[13px] leading-relaxed text-zinc-900 shadow-2xl">
+          <h1 className="mb-5 text-center text-lg font-bold tracking-wide">{doc.title}</h1>
+          <p className="mb-3">{doc.intro}</p>
+          <p className="mb-2">{doc.ownerText},</p>
+          <p className="mb-2 text-center">a</p>
+          <p className="mb-2">{doc.buyerText},</p>
+          <p className="mb-4">{doc.jointly}</p>
+
+          <p className="mb-4">
+            <span className="font-semibold">Przedmiot rezerwacji: </span>
+            {doc.subjectText}
+          </p>
+
+          {doc.sections.map((s, i) => (
+            <div key={i} className="mb-4 break-inside-avoid">
+              <h3 className="mb-1.5 font-semibold">{s.h}</h3>
+              {s.items.length > 1 ? (
+                <div className="space-y-1.5">
+                  {s.items.map((it, n) => (
+                    <p key={n}>
+                      <span className="font-medium">{n + 1}. </span>
+                      {it}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p>{s.items[0]}</p>
+              )}
+            </div>
+          ))}
+
+          {/* Podpisy */}
+          <div className="mt-10 grid grid-cols-2 gap-10 break-inside-avoid">
+            <SignBlock role={doc.ownerRole} names={doc.ownerNames} d={d.date} />
+            <SignBlock role={doc.buyerRole} names={doc.buyerNames} d={d.date} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- podkomponenty ---------- */
+
+function SignBlock({ role, names, d }: { role: string; names: string[]; d: string }) {
+  const dateFmt = d ? `${d.split("-")[2]}.${d.split("-")[1]}.${d.split("-")[0]} r.` : "…………";
+  return (
+    <div className="text-center">
+      <div className="mb-2 border-t border-zinc-400 pt-2 text-xs text-zinc-600">{role}</div>
+      {names.map((n, i) => (
+        <p key={i} className="text-sm">{n}</p>
+      ))}
+      <p className="mt-2 text-xs text-zinc-500">Data: {dateFmt}</p>
+    </div>
+  );
+}
+
+function ModeBtn({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-xl px-5 py-2 text-sm font-semibold transition ${
+        active ? "bg-emerald-500 text-zinc-950" : "text-zinc-400 hover:text-white"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{title}</p>
+      {children}
+    </div>
+  );
+}
+
+function PartyEditor({
+  title,
+  parties,
+  onChange,
+  onAdd,
+  onRemove,
+}: {
+  title: string;
+  parties: Party[];
+  onChange: (i: number, patch: Partial<Party>) => void;
+  onAdd: () => void;
+  onRemove: (i: number) => void;
+}) {
+  return (
+    <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{title}</p>
+        <button onClick={onAdd} className="text-xs font-medium text-emerald-400 hover:text-emerald-300">+ dodaj osobę</button>
+      </div>
+      {parties.map((p, i) => (
+        <div key={i} className="space-y-2 rounded-xl border border-zinc-800/70 bg-zinc-950/40 p-3">
+          {parties.length > 1 && (
+            <div className="flex justify-between">
+              <span className="text-[11px] text-zinc-600">Osoba {i + 1}</span>
+              <button onClick={() => onRemove(i)} className="text-[11px] text-zinc-500 hover:text-red-400">usuń</button>
+            </div>
+          )}
+          <Field label="Imię i nazwisko" value={p.name} onChange={(v) => onChange(i, { name: v })} />
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="PESEL" value={p.pesel} onChange={(v) => onChange(i, { pesel: v })} />
+            <Field label="Adres zamieszkania" value={p.address} onChange={(v) => onChange(i, { address: v })} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+}) {
+  return (
+    <div>
+      <label className={lbl}>{label}</label>
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />
+    </div>
+  );
+}
+
+const lbl = "mb-1 block text-xs text-zinc-400";
+const inp =
+  "w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
