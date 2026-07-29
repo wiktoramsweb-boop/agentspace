@@ -277,6 +277,24 @@ export async function getProperty(id: string): Promise<Property | null> {
   return (data as Property) ?? null;
 }
 
+export type PropertyWithOwner = Property & { opiekunName: string | null };
+
+/** Wszystkie oferty biura (współdzielona baza) + imię agenta-opiekuna. */
+export async function getAgencyProperties(agencyId: string): Promise<PropertyWithOwner[]> {
+  const admin = createSupabaseAdmin();
+  const [propsRes, profilesRes] = await Promise.all([
+    admin.from("properties").select("*").eq("agency_id", agencyId).order("updated_at", { ascending: false }),
+    admin.from("profiles").select("id, full_name").eq("agency_id", agencyId),
+  ]);
+  const nameById = new Map(
+    (profilesRes.data ?? []).map((p) => [p.id as string, p.full_name as string | null]),
+  );
+  return (propsRes.data ?? []).map((p) => ({
+    ...(p as Property),
+    opiekunName: nameById.get((p as Property).agent_id) ?? null,
+  }));
+}
+
 /** Klienci zainteresowani daną ofertą (kupujący/najemcy). */
 export async function getPropertyInterestedClients(propertyId: string): Promise<Client[]> {
   const admin = createSupabaseAdmin();
@@ -328,6 +346,19 @@ export async function getClientsLite(
     .from("clients")
     .select("id, name, type")
     .eq("agent_id", agentId)
+    .order("name", { ascending: true });
+  return (data ?? []) as { id: string; name: string; type: string }[];
+}
+
+/** Lekka lista klientów CAŁEGO biura (do selectów, np. wybór właściciela oferty). */
+export async function getAgencyClientsLite(
+  agencyId: string,
+): Promise<{ id: string; name: string; type: string }[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("clients")
+    .select("id, name, type")
+    .eq("agency_id", agencyId)
     .order("name", { ascending: true });
   return (data ?? []) as { id: string; name: string; type: string }[];
 }

@@ -36,7 +36,8 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   const property = await getProperty(id);
   if (!property) notFound();
-  if (property.agent_id !== user.id) redirect("/app/nieruchomosci");
+  // Baza ofert jest wspólna dla biura — dostęp mają wszyscy z tej agencji.
+  if (property.agency_id !== user.agency_id) redirect("/app/nieruchomosci");
 
   const [owner, interested, deals, allClients] = await Promise.all([
     property.owner_client_id ? getClient(property.owner_client_id) : Promise.resolve(null),

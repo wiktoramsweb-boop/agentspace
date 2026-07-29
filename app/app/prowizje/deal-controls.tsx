@@ -132,26 +132,31 @@ export function NewDealButton({
           <div className="space-y-2">
             <p className="text-sm text-zinc-400">Prowizja od stron</p>
             {PARTY_DEFS.map((d) => (
-              <div key={d.key} className="flex items-center gap-2">
-                <span className="w-36 flex-shrink-0 text-sm text-zinc-400">{d.label}</span>
-                <input
-                  value={parties[d.key].val}
-                  onChange={(e) => setParty(d.key, { val: e.target.value })}
-                  inputMode="decimal"
-                  placeholder="0"
-                  className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-base text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
-                />
-                <select
-                  value={parties[d.key].mode}
-                  onChange={(e) => setParty(d.key, { mode: e.target.value as Mode })}
-                  className="flex-shrink-0 rounded-lg border border-zinc-800 bg-zinc-950 px-2 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
-                >
-                  <option value="pln">zł</option>
-                  <option value="pct">%</option>
-                </select>
-                <span className="w-20 flex-shrink-0 text-right text-xs text-zinc-500">
-                  {parties[d.key].mode === "pct" ? formatPln(resolved[d.key]) : ""}
-                </span>
+              <div key={d.key} className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-3">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-sm text-zinc-300">{d.label}</span>
+                  {resolved[d.key] > 0 && (
+                    <span className="text-sm font-semibold text-emerald-400">{formatPln(resolved[d.key])}</span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    value={parties[d.key].val}
+                    onChange={(e) => setParty(d.key, { val: e.target.value })}
+                    inputMode="decimal"
+                    placeholder="0"
+                    className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-base text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+                  />
+                  <select
+                    value={parties[d.key].mode}
+                    onChange={(e) => setParty(d.key, { mode: e.target.value as Mode })}
+                    className="flex-shrink-0 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-base text-white focus:border-emerald-500 focus:outline-none"
+                    aria-label={`Jednostka prowizji ${d.label}`}
+                  >
+                    <option value="pln">zł</option>
+                    <option value="pct">%</option>
+                  </select>
+                </div>
                 <input type="hidden" name={d.name} value={resolved[d.key]} />
               </div>
             ))}

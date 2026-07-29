@@ -61,7 +61,7 @@ export async function updateProperty(id: string, formData: FormData): Promise<vo
     .from("properties")
     .update({ ...fields, updated_at: new Date().toISOString() })
     .eq("id", id)
-    .eq("agent_id", user.id);
+    .eq("agency_id", user.agency_id);
 
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");
@@ -77,7 +77,7 @@ export async function setPropertyStatus(
     .from("properties")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id)
-    .eq("agent_id", user.id);
+    .eq("agency_id", user.agency_id);
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");
 }
@@ -85,7 +85,7 @@ export async function setPropertyStatus(
 export async function deleteProperty(id: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  await admin.from("properties").delete().eq("id", id).eq("agent_id", user.id);
+  await admin.from("properties").delete().eq("id", id).eq("agency_id", user.agency_id);
   revalidatePath("/app/nieruchomosci");
   redirect("/app/nieruchomosci");
 }
@@ -101,7 +101,7 @@ export async function setPropertyOwner(
     .from("properties")
     .update({ owner_client_id: clientId, updated_at: new Date().toISOString() })
     .eq("id", propertyId)
-    .eq("agent_id", user.id);
+    .eq("agency_id", user.agency_id);
   revalidatePath(`/app/nieruchomosci/${propertyId}`);
 }
 
