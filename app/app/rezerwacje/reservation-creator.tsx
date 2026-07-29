@@ -251,40 +251,40 @@ export function ReservationCreator({ city }: { city: string }) {
       <div>
         <p className="print-hide mb-2 text-xs uppercase tracking-wider text-zinc-500">Podgląd umowy</p>
         <div className="print-sheet contract-sheet mx-auto max-w-[210mm] rounded-xl bg-white px-10 py-10 text-[13px] leading-relaxed text-zinc-900 shadow-2xl">
-          <h1 className="mb-5 text-center text-lg font-bold tracking-wide">{doc.title}</h1>
-          <p className="mb-3">{doc.intro}</p>
-          <p className="mb-2">{doc.ownerText},</p>
+          <h1 className="mb-6 text-center text-lg font-bold tracking-wide">{doc.title}</h1>
+          <p className="mb-3"><Rich text={doc.intro} /></p>
+          <p className="mb-2"><Rich text={doc.ownerText} />,</p>
           <p className="mb-2 text-center">a</p>
-          <p className="mb-2">{doc.buyerText},</p>
-          <p className="mb-4">{doc.jointly}</p>
+          <p className="mb-2"><Rich text={doc.buyerText} />,</p>
+          <p className="mb-5">{doc.jointly}</p>
 
-          <p className="mb-4">
+          <p className="mb-6">
             <span className="font-semibold">Przedmiot rezerwacji: </span>
-            {doc.subjectText}
+            <Rich text={doc.subjectText} />
           </p>
 
           {doc.sections.map((s, i) => (
-            <div key={i} className="mb-4">
-              <h3 className="mb-1.5 break-after-avoid text-center font-semibold">{s.h}</h3>
+            <div key={i} className="mb-5">
+              <h3 className="mb-2 break-after-avoid text-center font-bold">{s.h}</h3>
               {s.items.length > 1 ? (
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {s.items.map((it, n) => (
                     <p key={n}>
                       <span className="font-medium">{n + 1}. </span>
-                      {it}
+                      <Rich text={it} />
                     </p>
                   ))}
                 </div>
               ) : (
-                <p>{s.items[0]}</p>
+                <p><Rich text={s.items[0]} /></p>
               )}
             </div>
           ))}
 
-          {/* Podpisy — z miejscem na odręczny podpis */}
+          {/* Podpisy — linia kropkowana + „Podpis …" + imię */}
           <div className="mt-16 grid grid-cols-2 gap-12 break-inside-avoid">
-            <SignBlock role={doc.ownerRole} names={doc.ownerNames} />
-            <SignBlock role={doc.buyerRole} names={doc.buyerNames} />
+            <SignBlock roleGen={doc.ownerRoleGen} names={doc.ownerNames} />
+            <SignBlock roleGen={doc.buyerRoleGen} names={doc.buyerNames} />
           </div>
         </div>
       </div>
@@ -294,14 +294,24 @@ export function ReservationCreator({ city }: { city: string }) {
 
 /* ---------- podkomponenty ---------- */
 
-function SignBlock({ role, names }: { role: string; names: string[] }) {
+/** Prosty parser pogrubień: fragmenty między **…** stają się <strong>. */
+function Rich({ text }: { text: string }) {
+  const parts = text.split("**");
+  return (
+    <>
+      {parts.map((p, i) => (i % 2 === 1 ? <strong key={i}>{p}</strong> : <span key={i}>{p}</span>))}
+    </>
+  );
+}
+
+function SignBlock({ roleGen, names }: { roleGen: string; names: string[] }) {
   const real = names.filter((n) => n && !n.startsWith("…"));
   return (
     <div className="text-center">
       {/* puste miejsce na odręczny podpis */}
-      <div className="h-16" />
-      <div className="border-t border-zinc-500" />
-      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-zinc-600">{role}</p>
+      <div className="h-14" />
+      <div className="border-b border-dotted border-zinc-500" />
+      <p className="mt-2 text-sm text-zinc-800">Podpis {roleGen}</p>
       {real.length > 0 ? (
         real.map((n, i) => (
           <p key={i} className="text-sm text-zinc-800">{n}</p>

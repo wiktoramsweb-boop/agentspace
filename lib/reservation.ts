@@ -43,6 +43,8 @@ export type ResDoc = {
   sections: ResSection[];
   ownerRole: string;
   buyerRole: string;
+  ownerRoleGen: string; // dopełniacz do podpisu: „Podpis Sprzedającego"
+  buyerRoleGen: string;
   ownerNames: string[];
   buyerNames: string[];
 };
@@ -77,7 +79,7 @@ function partyText(parties: Party[], role: string): string {
   const list = arr
     .map(
       (p) =>
-        `${p.name.trim() || "[imię i nazwisko]"}, PESEL: ${p.pesel.trim() || "[PESEL]"}, ${docText(p)}, zam. ${
+        `**${p.name.trim() || "[imię i nazwisko]"}**, PESEL: ${p.pesel.trim() || "[PESEL]"}, ${docText(p)}, zam. ${
           p.address.trim() || "[adres zamieszkania]"
         }`,
     )
@@ -95,6 +97,8 @@ export function buildReservation(d: ReservationData): ResDoc {
   const isSale = d.mode === "sprzedaz";
   const ownerRole = isSale ? "Sprzedający" : "Wynajmujący";
   const buyerRole = isSale ? "Kupujący" : "Najemca";
+  const ownerRoleGen = isSale ? "Sprzedającego" : "Wynajmującego";
+  const buyerRoleGen = isSale ? "Kupującego" : "Najemcy";
   const secondRoleGen = isSale ? "Kupującego" : "Najemcy"; // „na rzecz ..." (dopełniacz)
   const secondRoleDat = isSale ? "Kupującemu" : "Najemcy"; // „zwrócona/zwrotowi ..." (celownik)
 
@@ -111,9 +115,9 @@ export function buildReservation(d: ReservationData): ResDoc {
 
   const subjectText = `${P.label} ${
     term === "Lokal" ? "położony" : "położona"
-  } pod adresem: ${d.propAddress.trim() || "[adres nieruchomości]"}${
+  } pod adresem: **${d.propAddress.trim() || "[adres nieruchomości]"}${
     d.propDetails.trim() ? `, ${d.propDetails.trim()}` : ""
-  } (dalej: „${term}”).`;
+  }** (dalej: „${term}”).`;
 
   // § 2 — wspólny dla sprzedaży i najmu (płatnik zależny od roli)
   const payer = isSale ? "Kupujący" : "Najemca";
@@ -126,7 +130,7 @@ export function buildReservation(d: ReservationData): ResDoc {
   const paragraf2: ResSection = {
     h: "§ 2. " + (isZad ? "Zadatek" : "Opłata rezerwacyjna"),
     items: [
-      `${payer} zobowiązuje się do zapłaty ${fGen} w wysokości ${feeS} na rachunek bankowy ${payTo} nr ${account}, w terminie ${d.payDays} dni roboczych od dnia podpisania niniejszej umowy.`,
+      `${payer} zobowiązuje się do zapłaty ${fGen} w wysokości **${feeS}** na rachunek bankowy ${payTo} nr **${account}**, w terminie **${d.payDays} dni roboczych** od dnia podpisania niniejszej umowy.`,
       `${fNom} stanowi potwierdzenie zamiaru zawarcia ${przyszlaUmowa} i rezerwuje ${nom} na rzecz ${secondRoleGen} do czasu jej zawarcia, z zastrzeżeniem zasad określonych w § 5.`,
       natureItem,
     ],
@@ -154,7 +158,7 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push(paragraf2);
 
     const cena: string[] = [];
-    if (d.price > 0) cena.push(`Strony zgodnie ustalają cenę sprzedaży ${gen} na kwotę ${money(d.price)} zł (słownie: ${slownie(d.price)}).`);
+    if (d.price > 0) cena.push(`Strony zgodnie ustalają cenę sprzedaży ${gen} na kwotę **${money(d.price)} zł (słownie: ${slownie(d.price)})**.`);
     cena.push(`Sprzedający zobowiązuje się, że w okresie rezerwacji nie zaoferuje ani nie sprzeda ${gen} innym osobom.`);
     cena.push(`Po zawarciu ${targetGen} ${fLow} ${d.depositType === "zadatek" ? "zostanie zaliczony" : "zostanie zaliczona"} na poczet ceny sprzedaży ${gen}.`);
     sections.push({ h: `§ 3. Cena i zaliczenie ${isZad ? "zadatku" : "opłaty rezerwacyjnej"}`, items: cena });
@@ -162,7 +166,7 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push({
       h: "§ 4. Okres rezerwacji",
       items: [
-        `Rezerwacja obowiązuje do dnia ${deadline}, w którym to terminie Strony zobowiązują się zawrzeć ${targetAcc} ${gen}.`,
+        `Rezerwacja obowiązuje do dnia **${deadline}**, w którym to terminie Strony zobowiązują się zawrzeć ${targetAcc} ${gen}.`,
         `Strony mogą, za zgodnym porozumieniem, przedłużyć termin wskazany w ust. 1; przedłużenie wymaga formy pisemnej (w tym wymiany wiadomości e-mail z adresów wskazanych przez Strony) pod rygorem nieważności.`,
       ],
     });
@@ -198,14 +202,14 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push(paragraf2);
 
     const czynsz: string[] = [];
-    if (d.price > 0) czynsz.push(`Strony zgodnie ustalają miesięczny czynsz najmu na kwotę ${money(d.price)} zł (słownie: ${slownie(d.price)}).`);
+    if (d.price > 0) czynsz.push(`Strony zgodnie ustalają miesięczny czynsz najmu na kwotę **${money(d.price)} zł (słownie: ${slownie(d.price)})**.`);
     czynsz.push(`Po podpisaniu umowy najmu ${fLow} ${d.depositType === "zadatek" ? "zostanie zaliczony" : "zostanie zaliczona"} na poczet pierwszego miesięcznego czynszu najmu należnego Wynajmującemu.`);
     sections.push({ h: `§ 3. Czynsz i zaliczenie ${isZad ? "zadatku" : "opłaty rezerwacyjnej"}`, items: czynsz });
 
     sections.push({
       h: "§ 4. Okres rezerwacji",
       items: [
-        `Rezerwacja obowiązuje do dnia ${deadline}, w którym to terminie Strony zobowiązują się zawrzeć ${najemAcc} ${gen}.`,
+        `Rezerwacja obowiązuje do dnia **${deadline}**, w którym to terminie Strony zobowiązują się zawrzeć ${najemAcc} ${gen}.`,
         `Strony mogą, za zgodnym porozumieniem, przedłużyć termin wskazany w ust. 1; przedłużenie wymaga formy pisemnej (w tym wymiany wiadomości e-mail z adresów wskazanych przez Strony) pod rygorem nieważności.`,
       ],
     });
@@ -258,7 +262,7 @@ export function buildReservation(d: ReservationData): ResDoc {
 
   return {
     title: "UMOWA REZERWACYJNA",
-    intro: `Zawarta w dniu ${dateStr(d.date)} w ${d.city.trim() || "[miejscowość]"}, pomiędzy:`,
+    intro: `Zawarta w dniu **${dateStr(d.date)}** w ${d.city.trim() || "[miejscowość]"}, pomiędzy:`,
     ownerText: partyText(d.owners, ownerRole),
     buyerText: partyText(d.buyers, buyerRole),
     jointly: `zwani dalej łącznie „Stronami”.`,
@@ -266,6 +270,8 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections,
     ownerRole,
     buyerRole,
+    ownerRoleGen,
+    buyerRoleGen,
     ownerNames,
     buyerNames,
   };
