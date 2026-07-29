@@ -264,8 +264,8 @@ export function ReservationCreator({ city }: { city: string }) {
           </p>
 
           {doc.sections.map((s, i) => (
-            <div key={i} className="mb-4 break-inside-avoid">
-              <h3 className="mb-1.5 font-semibold">{s.h}</h3>
+            <div key={i} className="mb-4">
+              <h3 className="mb-1.5 break-after-avoid text-center font-semibold">{s.h}</h3>
               {s.items.length > 1 ? (
                 <div className="space-y-1.5">
                   {s.items.map((it, n) => (
