@@ -2,8 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { UserRole } from "@/lib/types";
-import { setMemberRole, assignManager, setWeeklyLimit } from "./actions";
-import type { ManagerOption } from "./invite-form";
+import { setMemberRole, setWeeklyLimit } from "./actions";
 
 export type TeamMember = {
   id: string;
@@ -16,11 +15,9 @@ export type TeamMember = {
 
 export function TeamRoles({
   members,
-  managers,
   currentUserId,
 }: {
   members: TeamMember[];
-  managers: ManagerOption[];
   currentUserId: string;
 }) {
   const [pending, startTransition] = useTransition();
@@ -60,23 +57,6 @@ export function TeamRoles({
                 <option value="manager">Menedżer</option>
                 <option value="owner">CEO</option>
               </select>
-
-              {m.role === "agent" && (
-                <select
-                  aria-label="Menedżer"
-                  value={m.manager_id ?? ""}
-                  disabled={pending}
-                  onChange={(e) => run(() => assignManager(m.id, e.target.value || null))}
-                  className={sel}
-                >
-                  <option value="">— bez menedżera —</option>
-                  {managers
-                    .filter((mgr) => mgr.id !== m.id)
-                    .map((mgr) => (
-                      <option key={mgr.id} value={mgr.id}>{mgr.label}</option>
-                    ))}
-                </select>
-              )}
 
               <div className="flex items-center gap-1.5" title="Tygodniowy limit rozmów z AI Coach (puste = bez limitu)">
                 <span className="text-xs text-zinc-500">Limit AI/tydz.</span>

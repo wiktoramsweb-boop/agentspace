@@ -249,7 +249,11 @@ export async function assignManager(agentId: string, managerId: string | null): 
     }
   }
 
-  await admin.from("profiles").update({ manager_id: managerId }).eq("id", agentId);
+  const { error } = await admin.from("profiles").update({ manager_id: managerId }).eq("id", agentId);
+  if (error) {
+    // Najczęstsza przyczyna: brak kolumny manager_id → nieuruchomiony SETUP-v13-role.sql.
+    return { error: "Nie udało się zapisać. Uruchom w Supabase migrację SETUP-v13 (kolumna manager_id)." };
+  }
   revalidatePath("/app/zespol");
   revalidatePath(`/app/zespol/${agentId}`);
   return {};

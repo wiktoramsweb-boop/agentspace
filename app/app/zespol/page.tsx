@@ -20,6 +20,7 @@ import { cancelInvitation } from "./actions";
 import { ReportButton } from "./report-button";
 import { CopyLink } from "./copy-link";
 import { TeamRoles, type TeamMember } from "./team-roles";
+import { ManagerTeams } from "./manager-teams";
 import { APP_URL } from "@/lib/supabase/config";
 
 // Krótkie etykiety etapów lejka (klucz DB → skrót).
@@ -255,11 +256,24 @@ export default async function ZespolPage() {
           </div>
 
           <div className="mb-8">
-            <h2 className="mb-1 text-lg font-semibold text-white">Role i przypisania</h2>
+            <h2 className="mb-1 text-lg font-semibold text-white">Role i limity</h2>
             <p className="mb-3 text-sm text-zinc-400">
-              Nadaj rolę i przypisz agentów do menedżera. Menedżer widzi cele i wyniki AI swoich agentów.
+              Nadaj rolę (CEO / Menedżer / Agent) i ustaw tygodniowy limit rozmów z AI Coach.
             </p>
-            <TeamRoles members={teamMembers} managers={managerOptions} currentUserId={user.id} />
+            <TeamRoles members={teamMembers} currentUserId={user.id} />
+          </div>
+
+          <div className="mb-8">
+            <h2 className="mb-1 text-lg font-semibold text-white">Zespoły menedżerów</h2>
+            <p className="mb-3 text-sm text-zinc-400">
+              Przypisz każdemu menedżerowi osoby, które ma widzieć (cele, telefony, wyniki AI — bez prowizji).
+            </p>
+            <ManagerTeams
+              managers={teamMembers.filter((m) => m.role === "manager").map((m) => ({ id: m.id, name: m.label }))}
+              agents={teamMembers
+                .filter((m) => m.role === "agent")
+                .map((m) => ({ id: m.id, name: m.label, manager_id: m.manager_id }))}
+            />
           </div>
         </>
       )}
