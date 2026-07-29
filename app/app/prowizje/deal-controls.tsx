@@ -42,9 +42,10 @@ export function NewDealButton({
     tenant: { val: "", mode: "pln" },
   });
 
-  const txNum = parseInt(tx.replace(/\s/g, ""), 10) || 0;
-  const splitNum = Math.min(100, Math.max(0, parseInt(split, 10) || 0));
-  const extrasNum = parseInt(extras.replace(/\s/g, ""), 10) || 0;
+  // Kwoty tolerują przecinek (klawiatura PL) i spacje.
+  const txNum = Math.round(parseFloat(tx.replace(",", ".").replace(/\s/g, "")) || 0);
+  const splitNum = Math.min(100, Math.max(0, parseInt(split.replace(",", "."), 10) || 0));
+  const extrasNum = Math.round(parseFloat(extras.replace(",", ".").replace(/\s/g, "")) || 0);
 
   function resolve(p: Party): number {
     const v = parseFloat(p.val.replace(",", ".").replace(/\s/g, "")) || 0;
@@ -120,7 +121,7 @@ export function NewDealButton({
             <input
               value={tx}
               onChange={(e) => setTx(e.target.value)}
-              inputMode="numeric"
+              inputMode="decimal"
               placeholder="650000"
               className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
             />
@@ -136,9 +137,9 @@ export function NewDealButton({
                 <input
                   value={parties[d.key].val}
                   onChange={(e) => setParty(d.key, { val: e.target.value })}
-                  inputMode="numeric"
+                  inputMode="decimal"
                   placeholder="0"
-                  className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+                  className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-base text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
                 />
                 <select
                   value={parties[d.key].mode}
@@ -163,7 +164,7 @@ export function NewDealButton({
                 name="split"
                 value={split}
                 onChange={(e) => setSplit(e.target.value)}
-                inputMode="numeric"
+                inputMode="decimal"
                 placeholder="50"
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white focus:border-emerald-500 focus:outline-none"
               />
@@ -173,7 +174,7 @@ export function NewDealButton({
                 name="extras"
                 value={extras}
                 onChange={(e) => setExtras(e.target.value)}
-                inputMode="numeric"
+                inputMode="decimal"
                 placeholder="np. 1000"
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
               />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { buildReservation, type Party, type ReservationData, type ResMode, type PropType } from "@/lib/reservation";
+import { buildReservation, type Party, type ReservationData, type ResMode, type PropType, type DepositType, type DocType } from "@/lib/reservation";
 
 const PROP_OPTIONS: { value: PropType; label: string }[] = [
   { value: "mieszkanie", label: "Mieszkanie" },
@@ -11,7 +11,7 @@ const PROP_OPTIONS: { value: PropType; label: string }[] = [
   { value: "inne", label: "Inne" },
 ];
 
-const emptyParty = (): Party => ({ name: "", pesel: "", address: "" });
+const emptyParty = (): Party => ({ name: "", pesel: "", docType: "dowod", docNumber: "", address: "" });
 
 export function ReservationCreator({ city }: { city: string }) {
   const [d, setD] = useState<ReservationData>({
@@ -23,6 +23,7 @@ export function ReservationCreator({ city }: { city: string }) {
     propDetails: "",
     owners: [emptyParty()],
     buyers: [emptyParty()],
+    depositType: "zadatek",
     fee: 0,
     account: "",
     payDays: 2,
@@ -100,8 +101,15 @@ export function ReservationCreator({ city }: { city: string }) {
         />
 
         <Section title="Warunki rezerwacji">
+          <div>
+            <label className={lbl}>Rodzaj wpłaty</label>
+            <select value={d.depositType} onChange={(e) => set("depositType", e.target.value as DepositType)} className={inp}>
+              <option value="zadatek">Zadatek (bezzwrotny — art. 394 KC)</option>
+              <option value="oplata">Opłata rezerwacyjna</option>
+            </select>
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Opłata rezerwacyjna (zł)" type="number" value={String(d.fee || "")} onChange={(v) => set("fee", Math.max(0, parseInt(v || "0", 10)))} />
+            <Field label={d.depositType === "zadatek" ? "Kwota zadatku (zł)" : "Opłata rezerwacyjna (zł)"} type="number" value={String(d.fee || "")} onChange={(v) => set("fee", Math.max(0, parseInt(v || "0", 10)))} />
             <Field label="Termin wpłaty (dni rob.)" type="number" value={String(d.payDays)} onChange={(v) => set("payDays", Math.max(1, parseInt(v || "1", 10)))} />
           </div>
           <Field label="Nr rachunku właściciela" value={d.account} onChange={(v) => set("account", v)} placeholder="09 1240 1024 1111 0000 0260 4516" />
@@ -157,7 +165,7 @@ export function ReservationCreator({ city }: { city: string }) {
           Drukuj / Zapisz PDF
         </button>
         <p className="text-xs text-zinc-600">
-          Umowa to gotowy, prawnie kompletny wzór (opłata rezerwacyjna nie jest zadatkiem — art. 394 KC). Przy nietypowych transakcjach warto dać ją do wglądu prawnikowi.
+          Gotowy, prawnie kompletny wzór. Przy „Zadatek" kwota jest bezzwrotna w razie rezygnacji Kupującego/Najemcy (art. 394 KC). Przy nietypowych transakcjach warto dać wzór do wglądu prawnikowi.
         </p>
       </div>
 
@@ -274,6 +282,24 @@ function PartyEditor({
           <div className="grid grid-cols-2 gap-2">
             <Field label="PESEL" value={p.pesel} onChange={(v) => onChange(i, { pesel: v })} />
             <Field label="Adres zamieszkania" value={p.address} onChange={(v) => onChange(i, { address: v })} />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className={lbl}>Dokument</label>
+              <select
+                value={p.docType}
+                onChange={(e) => onChange(i, { docType: e.target.value as DocType })}
+                className={inp}
+              >
+                <option value="dowod">Dowód osobisty</option>
+                <option value="paszport">Paszport</option>
+              </select>
+            </div>
+            <Field
+              label={p.docType === "paszport" ? "Nr paszportu" : "Seria i nr dowodu"}
+              value={p.docNumber}
+              onChange={(v) => onChange(i, { docNumber: v })}
+            />
           </div>
         </div>
       ))}

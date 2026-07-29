@@ -302,6 +302,16 @@ body {
   }
 }
 
+/* iOS Safari auto-zoomuje na polach z fontem < 16px (pole „ucieka" za klawiaturę,
+   użytkownik nie widzi co wpisuje). Wymuszamy min. 16px na telefonach. */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
 /* Dotykowy feedback: każdy przycisk „wciska się" po kliknięciu, żeby użytkownik
    od razu widział, że klik zadziałał (agenci na telefonie tego potrzebują). */
 button:not(:disabled),

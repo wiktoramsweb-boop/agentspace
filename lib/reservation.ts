@@ -4,9 +4,11 @@ import { amountToWordsPL } from "./invoice";
 // Definicje stron w formie standardowej (Sprzedający/Kupujący, Wynajmujący/Najemca) —
 // to terminy zdefiniowane w umowie, poprawne niezależnie od płci/liczby stron.
 
-export type Party = { name: string; pesel: string; address: string };
+export type DocType = "dowod" | "paszport";
+export type Party = { name: string; pesel: string; docType: DocType; docNumber: string; address: string };
 export type ResMode = "sprzedaz" | "najem";
 export type PropType = "mieszkanie" | "dom" | "dzialka" | "lokal" | "inne";
+export type DepositType = "zadatek" | "oplata";
 
 export type ReservationData = {
   city: string;
@@ -14,14 +16,15 @@ export type ReservationData = {
   mode: ResMode;
   propType: PropType;
   propAddress: string;
-  propDetails: string; // opcjonalnie: nr KW, powierzchnia itp.
+  propDetails: string;
   owners: Party[];
   buyers: Party[];
+  depositType: DepositType;
   fee: number;
   account: string;
   payDays: number;
   price: number; // cena sprzedaży (sprzedaż) LUB miesięczny czynsz (najem)
-  deadline: string; // yyyy-mm-dd — do kiedy zawrzeć umowę
+  deadline: string; // yyyy-mm-dd
   rentType: "okazjonalny" | "zwykly";
   rentMonths: number;
   targetForm: "sprzedaz" | "przedwstepna";
@@ -62,13 +65,18 @@ function dateStr(iso: string): string {
   const [y, m, d] = iso.split("-");
   return `${d}.${m}.${y} r.`;
 }
+function docText(p: Party): string {
+  return p.docType === "paszport"
+    ? `paszport nr ${p.docNumber.trim() || "[nr paszportu]"}`
+    : `dowód osobisty seria i nr ${p.docNumber.trim() || "[seria i nr dowodu]"}`;
+}
 function partyText(parties: Party[], role: string): string {
-  const valid = parties.filter((p) => p.name.trim() || p.pesel.trim() || p.address.trim());
-  const arr = valid.length ? valid : [{ name: "", pesel: "", address: "" }];
+  const valid = parties.filter((p) => p.name.trim() || p.pesel.trim() || p.address.trim() || p.docNumber.trim());
+  const arr = valid.length ? valid : [{ name: "", pesel: "", docType: "dowod" as DocType, docNumber: "", address: "" }];
   const list = arr
     .map(
       (p) =>
-        `${p.name.trim() || "[imię i nazwisko]"}, PESEL: ${p.pesel.trim() || "[PESEL]"}, zam. ${
+        `${p.name.trim() || "[imię i nazwisko]"}, PESEL: ${p.pesel.trim() || "[PESEL]"}, ${docText(p)}, zam. ${
           p.address.trim() || "[adres zamieszkania]"
         }`,
     )
@@ -78,14 +86,23 @@ function partyText(parties: Party[], role: string): string {
 
 export function buildReservation(d: ReservationData): ResDoc {
   const P = PROP[d.propType];
-  const term = P.term; // „Lokal" | „Nieruchomość"
-  const nom = term; // mianownik/biernik
+  const term = P.term;
+  const nom = term;
   const gen = term === "Lokal" ? "Lokalu" : "Nieruchomości";
   const ins = term === "Lokal" ? "Lokalem" : "Nieruchomością";
 
   const isSale = d.mode === "sprzedaz";
   const ownerRole = isSale ? "Sprzedający" : "Wynajmujący";
   const buyerRole = isSale ? "Kupujący" : "Najemca";
+  const secondRoleGen = isSale ? "Kupującego" : "Najemcy"; // „na rzecz ..." (dopełniacz)
+  const secondRoleDat = isSale ? "Kupującemu" : "Najemcy"; // „zwrócona/zwrotowi ..." (celownik)
+
+  // Zadatek vs opłata rezerwacyjna
+  const isZad = d.depositType === "zadatek";
+  const fNom = isZad ? "Zadatek" : "Opłata rezerwacyjna"; // początek zdania
+  const fLow = isZad ? "zadatek" : "opłata rezerwacyjna"; // w środku zdania
+  const fGen = isZad ? "zadatku" : "opłaty rezerwacyjnej"; // „do zapłaty ..."
+  const fPast = isZad ? "zaliczony" : "zaliczona"; // „zostanie ..."
 
   const feeS = `${money(d.fee)} zł (słownie: ${slownie(d.fee)})`;
   const account = d.account.trim() || "[numer rachunku bankowego]";
@@ -96,6 +113,30 @@ export function buildReservation(d: ReservationData): ResDoc {
   } pod adresem: ${d.propAddress.trim() || "[adres nieruchomości]"}${
     d.propDetails.trim() ? `, ${d.propDetails.trim()}` : ""
   } (dalej: „${term}”).`;
+
+  // § 2 — wspólny dla sprzedaży i najmu (płatnik zależny od roli)
+  const payer = isSale ? "Kupujący" : "Najemca";
+  const payTo = isSale ? "Sprzedającego" : "Wynajmującego";
+  const przyszlaUmowa = isSale ? "umowy sprzedaży" : "umowy najmu";
+  const natureItem = isZad
+    ? `Kwota, o której mowa w ust. 1, stanowi zadatek w rozumieniu art. 394 Kodeksu cywilnego i ma charakter bezzwrotny w zakresie określonym w § 5.`
+    : `${fNom} nie stanowi zadatku w rozumieniu art. 394 Kodeksu cywilnego.`;
+
+  const paragraf2: ResSection = {
+    h: "§ 2. " + (isZad ? "Zadatek" : "Opłata rezerwacyjna"),
+    items: [
+      `${payer} zobowiązuje się do zapłaty ${fGen} w wysokości ${feeS} na rachunek bankowy ${payTo} nr ${account}, w terminie ${d.payDays} dni roboczych od dnia podpisania niniejszej umowy.`,
+      `${fNom} stanowi potwierdzenie zamiaru zawarcia ${przyszlaUmowa} i rezerwuje ${nom} na rzecz ${secondRoleGen} do czasu jej zawarcia, z zastrzeżeniem zasad określonych w § 5.`,
+      natureItem,
+    ],
+  };
+
+  // § 5 — skutki niedojścia (zależne od typu wpłaty)
+  const forfeit = `${fLow} przepada w całości na rzecz ${payTo}${isZad ? " (charakter bezzwrotny)" : ""} tytułem rekompensaty za wyłączenie ${gen} z oferty${isSale ? "" : " najmu"}.`;
+  const sellerBack = isZad
+    ? `${payer} może żądać zwrotu wpłaconego zadatku w wysokości nominalnej w terminie 7 dni od dnia złożenia oświadczenia o rezygnacji; Strony zgodnie wyłączają obowiązek zapłaty sumy dwukrotnie wyższej, o którym mowa w art. 394 § 1 Kodeksu cywilnego.`
+    : `${fNom} zostanie zwrócona ${secondRoleDat} w pełnej wysokości w terminie 7 dni od dnia złożenia oświadczenia o rezygnacji, na wskazany przez niego rachunek bankowy.`;
+  const neither = `${fNom} podlega zwrotowi ${secondRoleDat} w terminie 7 dni od dnia ustania możliwości zawarcia umowy.`;
 
   const sections: ResSection[] = [];
 
@@ -110,22 +151,13 @@ export function buildReservation(d: ReservationData): ResDoc {
       ],
     });
 
-    sections.push({
-      h: "§ 2. Opłata rezerwacyjna",
-      items: [
-        `Kupujący zobowiązuje się do zapłaty opłaty rezerwacyjnej w wysokości ${feeS} na rachunek bankowy Sprzedającego nr ${account}, w terminie ${d.payDays} dni roboczych od dnia podpisania niniejszej umowy.`,
-        `Opłata rezerwacyjna stanowi potwierdzenie zamiaru zawarcia umowy sprzedaży i rezerwuje ${nom} na rzecz Kupującego do czasu jej zawarcia, z zastrzeżeniem zasad zwrotu i zatrzymania określonych w § 5.`,
-        `Opłata rezerwacyjna nie stanowi zadatku w rozumieniu art. 394 Kodeksu cywilnego.`,
-      ],
-    });
+    sections.push(paragraf2);
 
-    const cenaItems: string[] = [];
-    if (d.price > 0) {
-      cenaItems.push(`Strony zgodnie ustalają cenę sprzedaży ${gen} na kwotę ${money(d.price)} zł (słownie: ${slownie(d.price)}).`);
-    }
-    cenaItems.push(`Sprzedający zobowiązuje się, że w okresie rezerwacji nie zaoferuje ani nie sprzeda ${gen} innym osobom.`);
-    cenaItems.push(`Po zawarciu ${targetGen} opłata rezerwacyjna zostanie zaliczona na poczet ceny sprzedaży ${gen}.`);
-    sections.push({ h: "§ 3. Cena i zaliczenie opłaty rezerwacyjnej", items: cenaItems });
+    const cena: string[] = [];
+    if (d.price > 0) cena.push(`Strony zgodnie ustalają cenę sprzedaży ${gen} na kwotę ${money(d.price)} zł (słownie: ${slownie(d.price)}).`);
+    cena.push(`Sprzedający zobowiązuje się, że w okresie rezerwacji nie zaoferuje ani nie sprzeda ${gen} innym osobom.`);
+    cena.push(`Po zawarciu ${targetGen} ${fLow} ${d.depositType === "zadatek" ? "zostanie zaliczony" : "zostanie zaliczona"} na poczet ceny sprzedaży ${gen}.`);
+    sections.push({ h: `§ 3. Cena i zaliczenie ${isZad ? "zadatku" : "opłaty rezerwacyjnej"}`, items: cena });
 
     sections.push({
       h: "§ 4. Okres rezerwacji",
@@ -138,28 +170,22 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push({
       h: "§ 5. Skutki niedojścia do zawarcia umowy",
       items: [
-        `W przypadku rezygnacji Kupującego z zawarcia umowy sprzedaży albo niedopełnienia przez niego formalności niezbędnych do jej zawarcia w terminie wskazanym w § 4 ust. 1 — opłata rezerwacyjna przepada w całości na rzecz Sprzedającego tytułem rekompensaty za wyłączenie ${gen} z oferty.`,
-        `W przypadku rezygnacji Sprzedającego ze sprzedaży ${gen} przed upływem terminu, o którym mowa w § 4 ust. 1 — opłata rezerwacyjna zostanie zwrócona Kupującemu w pełnej wysokości w terminie 7 dni od dnia złożenia oświadczenia o rezygnacji, na wskazany przez niego rachunek bankowy.`,
-        `Jeżeli do zawarcia umowy nie dojdzie z przyczyn niezależnych od żadnej ze Stron (np. brak zdolności kredytowej Kupującego mimo dochowania należytej staranności, ujawniona wada prawna ${gen}, zdarzenie losowe) — opłata rezerwacyjna podlega zwrotowi Kupującemu w terminie 7 dni od dnia ustania możliwości zawarcia umowy.`,
+        `W przypadku rezygnacji Kupującego z zawarcia umowy sprzedaży albo niedopełnienia przez niego formalności niezbędnych do jej zawarcia w terminie wskazanym w § 4 ust. 1 — ${forfeit}`,
+        `W przypadku rezygnacji Sprzedającego ze sprzedaży ${gen} przed upływem terminu, o którym mowa w § 4 ust. 1 — ${sellerBack}`,
+        `Jeżeli do zawarcia umowy nie dojdzie z przyczyn niezależnych od żadnej ze Stron (np. brak zdolności kredytowej Kupującego mimo dochowania należytej staranności, ujawniona wada prawna ${gen}, zdarzenie losowe) — ${neither}`,
       ],
     });
 
-    const notary =
-      d.notaryCost === "strony"
-        ? "obie Strony po połowie"
-        : "Kupujący";
+    const notary = d.notaryCost === "strony" ? "obie Strony po połowie" : "Kupujący";
     sections.push({
       h: "§ 6. Oświadczenia i przyszła umowa sprzedaży",
       items: [
-        `Sprzedający oświadcza, że przysługuje mu prawo do rozporządzania ${ins} oraz że ${nom} jest ${
-          term === "Lokal" ? "wolny" : "wolna"
-        } od wad prawnych i obciążeń uniemożliwiających sprzedaż, poza ujawnionymi Kupującemu przed zawarciem niniejszej umowy.`,
+        `Sprzedający oświadcza, że przysługuje mu prawo do rozporządzania ${ins} oraz że ${nom} jest ${term === "Lokal" ? "wolny" : "wolna"} od wad prawnych i obciążeń uniemożliwiających sprzedaż, poza ujawnionymi Kupującemu przed zawarciem niniejszej umowy.`,
         `Umowa sprzedaży ${gen} zostanie zawarta w formie aktu notarialnego, zgodnie z art. 158 Kodeksu cywilnego.`,
         `Koszty zawarcia umowy sprzedaży w formie aktu notarialnego (taksa notarialna, podatek od czynności cywilnoprawnych, opłaty sądowe) ponosi ${notary}, o ile Strony nie postanowią inaczej w umowie sprzedaży.`,
       ],
     });
   } else {
-    // NAJEM
     const najemLabel = d.rentType === "okazjonalny" ? "umowy najmu okazjonalnego" : "umowy najmu";
     const najemAcc = d.rentType === "okazjonalny" ? "umowę najmu okazjonalnego" : "umowę najmu";
 
@@ -170,21 +196,12 @@ export function buildReservation(d: ReservationData): ResDoc {
       ],
     });
 
-    sections.push({
-      h: "§ 2. Opłata rezerwacyjna",
-      items: [
-        `Najemca zobowiązuje się do zapłaty opłaty rezerwacyjnej w wysokości ${feeS} na rachunek bankowy Wynajmującego nr ${account}, w terminie ${d.payDays} dni roboczych od dnia podpisania niniejszej umowy.`,
-        `Opłata rezerwacyjna stanowi potwierdzenie zamiaru zawarcia umowy najmu i rezerwuje ${nom} na rzecz Najemcy do czasu jej zawarcia, z zastrzeżeniem zasad zwrotu i zatrzymania określonych w § 5.`,
-        `Opłata rezerwacyjna nie stanowi zadatku w rozumieniu art. 394 Kodeksu cywilnego.`,
-      ],
-    });
+    sections.push(paragraf2);
 
-    const czynszItems: string[] = [];
-    if (d.price > 0) {
-      czynszItems.push(`Strony zgodnie ustalają miesięczny czynsz najmu na kwotę ${money(d.price)} zł (słownie: ${slownie(d.price)}).`);
-    }
-    czynszItems.push(`Po podpisaniu umowy najmu opłata rezerwacyjna zostanie zaliczona na poczet pierwszego miesięcznego czynszu najmu należnego Wynajmującemu.`);
-    sections.push({ h: "§ 3. Czynsz i zaliczenie opłaty rezerwacyjnej", items: czynszItems });
+    const czynsz: string[] = [];
+    if (d.price > 0) czynsz.push(`Strony zgodnie ustalają miesięczny czynsz najmu na kwotę ${money(d.price)} zł (słownie: ${slownie(d.price)}).`);
+    czynsz.push(`Po podpisaniu umowy najmu ${fLow} ${d.depositType === "zadatek" ? "zostanie zaliczony" : "zostanie zaliczona"} na poczet pierwszego miesięcznego czynszu najmu należnego Wynajmującemu.`);
+    sections.push({ h: `§ 3. Czynsz i zaliczenie ${isZad ? "zadatku" : "opłaty rezerwacyjnej"}`, items: czynsz });
 
     sections.push({
       h: "§ 4. Okres rezerwacji",
@@ -197,9 +214,9 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push({
       h: "§ 5. Skutki niedojścia do zawarcia umowy najmu",
       items: [
-        `W przypadku rezygnacji Najemcy z podpisania umowy najmu albo niedopełnienia przez niego formalności wymaganych do jej zawarcia w terminie wskazanym w § 4 ust. 1 — opłata rezerwacyjna przepada w całości na rzecz Wynajmującego tytułem rekompensaty za wyłączenie ${gen} z oferty najmu.`,
-        `W przypadku rezygnacji Wynajmującego z oddania ${gen} w najem przed upływem terminu, o którym mowa w § 4 ust. 1 — opłata rezerwacyjna zostanie zwrócona Najemcy w pełnej wysokości w terminie 7 dni od dnia złożenia oświadczenia o rezygnacji, na wskazany przez niego rachunek bankowy.`,
-        `Jeżeli do zawarcia umowy najmu nie dojdzie z przyczyn niezależnych od żadnej ze Stron (np. zdarzenie losowe uniemożliwiające najem ${gen}) — opłata rezerwacyjna podlega zwrotowi Najemcy w terminie 7 dni od dnia ustania możliwości zawarcia umowy.`,
+        `W przypadku rezygnacji Najemcy z podpisania umowy najmu albo niedopełnienia przez niego formalności wymaganych do jej zawarcia w terminie wskazanym w § 4 ust. 1 — ${forfeit}`,
+        `W przypadku rezygnacji Wynajmującego z oddania ${gen} w najem przed upływem terminu, o którym mowa w § 4 ust. 1 — ${sellerBack}`,
+        `Jeżeli do zawarcia umowy najmu nie dojdzie z przyczyn niezależnych od żadnej ze Stron (np. zdarzenie losowe uniemożliwiające najem ${gen}) — ${neither}`,
       ],
     });
 
@@ -210,9 +227,7 @@ export function buildReservation(d: ReservationData): ResDoc {
         `Najemca zobowiązuje się dostarczyć Wynajmującemu, najpóźniej w dniu podpisania umowy najmu, dokumenty wymagane dla umowy najmu okazjonalnego, w tym oświadczenie w formie aktu notarialnego o poddaniu się egzekucji oraz oświadczenie wskazujące inny lokal, w którym mógłby zamieszkać w razie wykonania egzekucji, wraz ze zgodą właściciela tego lokalu.`,
       );
     } else {
-      przyszla.push(
-        `Umowa najmu zostanie zawarta na zasadach określonych w Kodeksie cywilnym, na okres ${d.rentMonths} miesięcy z możliwością przedłużenia.`,
-      );
+      przyszla.push(`Umowa najmu zostanie zawarta na zasadach określonych w Kodeksie cywilnym, na okres ${d.rentMonths} miesięcy z możliwością przedłużenia.`);
     }
     przyszla.push(
       `Pozostałe szczegółowe warunki najmu (w tym wysokość kaucji, termin rozpoczęcia najmu, opłaty eksploatacyjne) zostaną określone w treści umowy najmu, w sposób nieodbiegający istotnie od warunków zaprezentowanych Najemcy przed zawarciem niniejszej umowy.`,
@@ -220,7 +235,6 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push({ h: "§ 6. Postanowienia dotyczące przyszłej umowy najmu", items: przyszla });
   }
 
-  // § końcowe — wspólne
   sections.push({
     h: "§ 7. Postanowienia końcowe",
     items: [
@@ -233,8 +247,8 @@ export function buildReservation(d: ReservationData): ResDoc {
     ],
   });
 
-  const validOwnerNames = d.owners.map((p) => p.name.trim()).filter(Boolean);
-  const validBuyerNames = d.buyers.map((p) => p.name.trim()).filter(Boolean);
+  const ownerNames = d.owners.map((p) => p.name.trim()).filter(Boolean);
+  const buyerNames = d.buyers.map((p) => p.name.trim()).filter(Boolean);
 
   return {
     title: "UMOWA REZERWACYJNA",
@@ -246,7 +260,7 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections,
     ownerRole,
     buyerRole,
-    ownerNames: validOwnerNames.length ? validOwnerNames : ["……………………………"],
-    buyerNames: validBuyerNames.length ? validBuyerNames : ["……………………………"],
+    ownerNames: ownerNames.length ? ownerNames : ["……………………………"],
+    buyerNames: buyerNames.length ? buyerNames : ["……………………………"],
   };
 }
