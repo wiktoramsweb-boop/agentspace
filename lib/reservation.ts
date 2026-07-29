@@ -266,7 +266,7 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections,
     ownerRole,
     buyerRole,
-    ownerNames: ownerNames.length ? ownerNames : ["……………………………"],
-    buyerNames: buyerNames.length ? buyerNames : ["……………………………"],
+    ownerNames,
+    buyerNames,
   };
 }

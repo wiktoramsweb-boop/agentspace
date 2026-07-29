@@ -250,7 +250,7 @@ export function ReservationCreator({ city }: { city: string }) {
       {/* PODGLĄD / DOKUMENT */}
       <div>
         <p className="print-hide mb-2 text-xs uppercase tracking-wider text-zinc-500">Podgląd umowy</p>
-        <div className="print-sheet mx-auto max-w-[210mm] rounded-xl bg-white px-10 py-10 text-[13px] leading-relaxed text-zinc-900 shadow-2xl">
+        <div className="print-sheet contract-sheet mx-auto max-w-[210mm] rounded-xl bg-white px-10 py-10 text-[13px] leading-relaxed text-zinc-900 shadow-2xl">
           <h1 className="mb-5 text-center text-lg font-bold tracking-wide">{doc.title}</h1>
           <p className="mb-3">{doc.intro}</p>
           <p className="mb-2">{doc.ownerText},</p>
@@ -281,10 +281,10 @@ export function ReservationCreator({ city }: { city: string }) {
             </div>
           ))}
 
-          {/* Podpisy */}
-          <div className="mt-10 grid grid-cols-2 gap-10 break-inside-avoid">
-            <SignBlock role={doc.ownerRole} names={doc.ownerNames} d={d.date} />
-            <SignBlock role={doc.buyerRole} names={doc.buyerNames} d={d.date} />
+          {/* Podpisy — z miejscem na odręczny podpis */}
+          <div className="mt-16 grid grid-cols-2 gap-12 break-inside-avoid">
+            <SignBlock role={doc.ownerRole} names={doc.ownerNames} />
+            <SignBlock role={doc.buyerRole} names={doc.buyerNames} />
           </div>
         </div>
       </div>
@@ -294,15 +294,21 @@ export function ReservationCreator({ city }: { city: string }) {
 
 /* ---------- podkomponenty ---------- */
 
-function SignBlock({ role, names, d }: { role: string; names: string[]; d: string }) {
-  const dateFmt = d ? `${d.split("-")[2]}.${d.split("-")[1]}.${d.split("-")[0]} r.` : "…………";
+function SignBlock({ role, names }: { role: string; names: string[] }) {
+  const real = names.filter((n) => n && !n.startsWith("…"));
   return (
     <div className="text-center">
-      <div className="mb-2 border-t border-zinc-400 pt-2 text-xs text-zinc-600">{role}</div>
-      {names.map((n, i) => (
-        <p key={i} className="text-sm">{n}</p>
-      ))}
-      <p className="mt-2 text-xs text-zinc-500">Data: {dateFmt}</p>
+      {/* puste miejsce na odręczny podpis */}
+      <div className="h-16" />
+      <div className="border-t border-zinc-500" />
+      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-zinc-600">{role}</p>
+      {real.length > 0 ? (
+        real.map((n, i) => (
+          <p key={i} className="text-sm text-zinc-800">{n}</p>
+        ))
+      ) : (
+        <p className="text-xs text-zinc-400">(imię i nazwisko)</p>
+      )}
     </div>
   );
 }
