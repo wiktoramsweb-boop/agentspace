@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { addTask, toggleTask, deleteTask } from "../tasks-actions";
 import type { Task } from "@/lib/types";
 import { googleCalendarUrl } from "@/lib/calendar";
@@ -52,10 +53,19 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
         </p>
       ) : (
         <ul className="space-y-1">
+          <AnimatePresence initial={false}>
           {sorted.map((task) => {
             const done = optimistic[task.id] ?? task.is_done;
             return (
-              <li key={task.id} className="group flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-zinc-900/40">
+              <motion.li
+                key={task.id}
+                layout
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
+                className="group flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-zinc-900/40"
+              >
                 <button
                   onClick={() => toggle(task)}
                   className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition ${
@@ -93,9 +103,10 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
                 >
                   ✕
                 </button>
-              </li>
+              </motion.li>
             );
           })}
+          </AnimatePresence>
         </ul>
       )}
     </div>

@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "motion/react";
 import type { DailySuggestion } from "@/lib/ai/assistant";
+
+// Wejście priorytetów, gdy AI je zwróci — delikatny stagger (raz dziennie, warto).
+const listVariants = { show: { transition: { staggerChildren: 0.06 } } };
+const itemVariants = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: [0.21, 0.47, 0.32, 0.98] as const } },
+};
 
 const CATEGORY_STYLE: Record<string, { label: string; className: string }> = {
   klient: { label: "Klient", className: "bg-cyan-500/15 text-cyan-300" },
@@ -68,11 +76,11 @@ export function DailyAssistant() {
       {state === "error" && <p className="py-2 text-sm text-red-400">{error}</p>}
 
       {state === "done" && suggestions.length > 0 && (
-        <ol className="space-y-3">
+        <motion.ol className="space-y-3" initial="hidden" animate="show" variants={listVariants}>
           {suggestions.map((s, i) => {
             const cat = CATEGORY_STYLE[s.category] ?? CATEGORY_STYLE.zadanie;
             return (
-              <li key={i} className="flex gap-3 rounded-xl bg-zinc-900/40 p-4">
+              <motion.li key={i} variants={itemVariants} className="flex gap-3 rounded-xl bg-zinc-900/40 p-4">
                 <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-xs font-bold text-violet-300">
                   {i + 1}
                 </span>
@@ -85,10 +93,10 @@ export function DailyAssistant() {
                   </div>
                   <p className="text-sm text-zinc-400">{s.reason}</p>
                 </div>
-              </li>
+              </motion.li>
             );
           })}
-        </ol>
+        </motion.ol>
       )}
 
       {state === "done" && suggestions.length === 0 && (
