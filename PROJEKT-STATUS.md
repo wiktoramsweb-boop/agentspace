@@ -3,6 +3,28 @@
 > Ten dokument to kompletny zapis projektu do przekazania nowej sesji Claude.
 > Czytaj razem z `CLAUDE.md` (architektura + zasady).
 
+## 🟢 SESJA LIPIEC 2026 — co dodaliśmy w tym czacie (najświeższe)
+
+Wszystko live na `main`/Vercel. W tej sesji doszło:
+- **System ról CEO / Menedżer / Agent** (SQL v13). CEO nadaje role i przypisuje agentów do menedżera (`/app/zespol` → „Zespoły menedżerów" — od strony menedżera wybierasz jego osoby). Menedżer widzi TYLKO swoich agentów: Cele/lejek + wyniki AI, BEZ prowizji, tylko podgląd. Można zaprosić 2. CEO (Krystian Sławęta) z góry nadaną rolą. Helper `requireManagerOrOwner`, etykiety `ROLE_LABELS`. **Fix buga:** klik w sesję agenta (też w toku) nie wyrzuca już na pulpit — CEO/menedżer widzi read-only. Drill-down agenta: Cele/lejek + WSZYSTKIE sesje + kalendarz „dzień po dniu".
+- **Tygodniowe limity AI Coach** (SQL v14) — CEO ustawia per osoba; egzekwowane w `startSession`.
+- **Alerty proaktywne + trendy** — `getTeamInsights`: „⚠️ Wymaga uwagi" (nie dzwoni 3+ dni / wynik AI spadł / nie trenuje) + strzałki trendu + słupki aktywności zespołu (4 tyg.).
+- **Zmiana własnego maila logowania** — `/app/ustawienia` → „Zmień email" (`changeMyEmail`, admin API).
+- **Asystent wiadomości** (`/app/maile`) — AI pisze maile i SMS-y w tonie Spectry (patrz niżej). Zawiera typ „Trudny/słaby okres — uczciwie" (zamiast zmyślania danych — user prosił o zmyślanie, ODMÓWIŁEM, dałem uczciwą alternatywę).
+- **Karta transakcji** (SQL v15) — `/app/prowizje/[id]`: 5 etapów + checklista dokumentów, autozapis (patrz niżej).
+- **Klienci — podział na typy**: sprzedający/kupujący/wynajmujący/najemca (+inny). Formularz najpierw pyta o typ, pola dopasowane (sprzedający ma „oczekiwaną cenę" nie „budżet"). Filtr typu na liście. `CLIENT_TYPE_LABELS` (stary „najem" = legacy). Bez migracji.
+- **Nieruchomości WSPÓLNE dla biura** (jak Klienci) — `getAgencyProperties`, browser z filtrem Wszystkie/Moje, edycja agency-scoped. Karty z gradientem/ikoną typu/opiekunem, **mapa ciemna (CARTO) + kolorowe pinezki z ceną**.
+- **Umowa rezerwacyjna** — pełny moduł + **PDF przez pdf-lib** (kluczowa lekcja, patrz wpis modułu i [[pdf-generowanie-dokumentow]]).
+- **Wizualny lifting** — design kit `components/kit.tsx` (Button/SegmentedToggle z akcentem koloru — moduły MAJĄ się różnić kolorami, user tego chce), gradienty tła, `focus-visible`, `.text-gradient` na nagłówkach.
+- **RLS** (SQL v16) — backstop izolacji biur (service_role omija; user może uruchomić).
+- **Perf/mobile fixy:** region Vercela → **fra1** (obok Supabase, duży zysk szybkości), globalne 16px na polach (koniec auto-zoom iOS), modal `dvh` + scroll-do-pola (pola nie chowają się za klawiaturą), przyciski „wciskają się" + spinnery (`SubmitButton`), inputMode decimal + przecinek w prowizjach.
+
+**⚠️ USER MUSI URUCHOMIĆ w Supabase (potwierdzić które):** v13 (role), v14 (limity AI), v15 (karta transakcji), v16 (RLS — opcjonalne). Kod odporny na brak kolumn (pokazuje czytelny błąd).
+
+**PLANY DALEJ (omówione, priorytety usera):** (1) **Kalendarz spotkań + realne powiadomienia** (rekomendowane — codzienna lepkość; push wymaga env VAPID). (2) **Matching kupujący↔nieruchomość**. (3) **Analiza PRAWDZIWEJ rozmowy** (nagranie → Whisper transkrypcja → scoring jak AI Coach; wyróżnik, koszt Whisper). (4) **Automatyczna wysyłka maili/SMS** — czeka na weryfikację domeny **spectranieruchomosci.pl** w Resend (user wybrał podmianę agentspace.pl→spectranieruchomosci.pl; z gmaila NIE da się wysyłać). (5) **Płatności (Stripe/Tpay)** do monetyzacji. (6) Design kit rozlać na resztę modułów (~46 przycisków), więcej aria-label. (7) Sekwencje follow-up, podłączenie CRM do asystenta maili.
+
+---
+
 ## 🔵 NAJNOWSZY STAN (czytaj to najpierw)
 
 Od czasu opisu poniżej doszło DUŻO modułów. Wszystko live na `main`/Vercel. Skróty:
@@ -12,7 +34,7 @@ Od czasu opisu poniżej doszło DUŻO modułów. Wszystko live na `main`/Vercel.
 - **Opisy** (`/app/opisy`) — generator opisów ogłoszeń (szablon + „✨ AI" przez `/api/opis/generate`).
 - **Asystent wiadomości** (`/app/maile`) — AI pisze **maile i SMS-y** do klientów w tonie Spectry. Przełącznik Mail/SMS. Maile: ~15 typów pogrupowanych kolorami (Właściciel/Kupujący/Negocjacje/Formalności/Relacja/Inne). SMS: 8 typów + podgląd „dymek" + licznik znaków/segmentów (polskie znaki→70/SMS). `/api/maile/generate` (mode mail/sms; tool-use `napisz_mail`{subject,body} / `napisz_sms`{text}). KLUCZOWE: AI używa TYLKO faktów agenta, nie wymyśla liczb/dat/adresów (braki jako `[nawiasy]`), linki/adresy przepisuje 1:1. Ton w SYSTEM prompcie na bazie realnych maili. Nie wymaga CRM. Wynik edytowalny + kopiuj.
 - **Ofertówka** (`/app/ofertowka`) — one-pager oferty (zdjęcia + parametry) → druk/PDF, bez AI. `sheet-a4` = 1 strona.
-- **Umowa rezerwacyjna** (`/app/rezerwacje`) — generator umowy rezerwacyjnej **sprzedaż/najem** (wybór), typ nieruchomości, powtarzalne strony (właściciele/kupujący). Prawnie kompletna. Wybór **Zadatek (bezzwrotny, art. 394 KC — przepada gdy Kupujący/Najemca rezygnuje; przy rezygnacji właściciela zwrot nominalny, wyłączenie dwukrotności)** lub Opłata rezerwacyjna. Strony: PESEL + **dowód osobisty LUB paszport** (do wyboru) + adres. Akt notarialny (art. 158 KC) dla sprzedaży, najem okazjonalny (art. 19a). Definicje stron w formie standardowej (Sprzedający/Kupujący, Wynajmujący/Najemca) z poprawną deklinacją. `lib/reservation.ts` = builder treści; druk/PDF przez `print-sheet` (window.print). Bez DB, client-side.
+- **Umowa rezerwacyjna** (`/app/rezerwacje`) — generator umowy rezerwacyjnej **sprzedaż/najem** (wybór), typ nieruchomości, powtarzalne strony (właściciele/kupujący). Prawnie kompletna. Wybór **Zadatek (bezzwrotny, art. 394 KC — przepada gdy Kupujący/Najemca rezygnuje; przy rezygnacji właściciela zwrot nominalny, wyłączenie dwukrotności)** lub Opłata rezerwacyjna. Strony: PESEL + **dowód osobisty LUB paszport** (do wyboru) + adres. Akt notarialny (art. 158 KC) dla sprzedaży, najem okazjonalny (art. 19a). Definicje stron w formie standardowej (Sprzedający/Kupujący, Wynajmujący/Najemca) z poprawną deklinacją. **Dodatkowe zapisy przez AI** (`/api/rezerwacja/klauzula` → wstawia jako „§ dodatkowe" przed końcowymi). `lib/reservation.ts` = builder treści (pogrubienia jako `**...**`). **PDF: `lib/reservation-pdf.ts` (pdf-lib, NIE druk przeglądarki!)** — real PDF, równe marginesy na każdej stronie, brak nagłówka przeglądarki, 2 strony, podpisy. Przycisk „Podgląd i PDF" → „Pobierz PDF". [[pdf-generowanie-dokumentow]]. Bez DB, client-side.
 - **Kalkulatory** (`/app/kalkulatory`) — rata kredytu (+nadpłata), koszty zakupu (rynek/rabaty/opłaty), ROI najmu → PDF dla klienta (przez druk; podgląd pełnoekranowy „Podgląd i PDF").
 - **Faktury** (`/app/faktury`, owner) — 3 sprzedawców, nabywca firma/osoba, kwota słownie, VAT zw, edycja, druk/PDF. `lib/invoice.ts`.
 - **Szybki wpis głosem** (`/app/szybki-wpis`) — dyktujesz relację ze spotkania → `/api/quick-entry/parse` (Claude tool-use) → klient + notatka + nieruchomość do CRM.
