@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { useToast } from "../../components/toast";
+
+// Wejście kategorii, gdy dane o okolicy doskoczą (fetch async) — delikatny stagger.
+const listVariants = { show: { transition: { staggerChildren: 0.05 } } };
+const itemVariants = {
+  hidden: { opacity: 0, y: 6 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.2, ease: [0.21, 0.47, 0.32, 0.98] as const } },
+};
 
 type Cat = { key: string; label: string; items: { name: string; dist: number }[] };
 
@@ -72,9 +80,9 @@ export function NearbyCard({ lat, lng }: { lat: number; lng: number }) {
       )}
 
       {cats && cats.length > 0 && (
-        <div className="space-y-3">
+        <motion.div className="space-y-3" initial="hidden" animate="show" variants={listVariants}>
           {cats.map((c) => (
-            <div key={c.key}>
+            <motion.div key={c.key} variants={itemVariants}>
               <p className="mb-1 text-xs font-medium text-zinc-400">
                 {ICONS[c.key] ?? "•"} {c.label}
               </p>
@@ -88,9 +96,9 @@ export function NearbyCard({ lat, lng }: { lat: number; lng: number }) {
                   </span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );
