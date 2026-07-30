@@ -338,21 +338,25 @@ export type SpzooPayout = {
   powolanieRazem: number;
   pitPowolaniePerOsoba: number; // PIT skala
   zdrowotnaPowolaniePerOsoba: number; // 9%
-  nettoPowolanieRazem: number;
-  zyskPoWynagrodzeniach: number;
+  nettoPowolanieRazem: number; // to trafia do prywatnej kieszeni
+  zyskPoWynagrodzeniach: number; // podstawa CIT
   cit: number;
-  poCit: number;
-  dywidendaPodatek: number;
-  nettoDywidenda: number;
-  nettoRazem: number;
-  daninyRazem: number;
-  efektywna: number;
+  poCit: number; // zysk po CIT
+  wyplacDywidende: boolean;
+  dywidendaPodatek: number; // 0 gdy zysk zostaje w spółce
+  nettoDywidenda: number; // wypłacona dywidenda netto (0 gdy zatrzymany)
+  zatrzymaneWSpolce: number; // zysk po CIT zostający w firmie (gdy bez dywidendy)
+  doKieszeni: number; // powołanie netto + ew. dywidenda netto
+  wartoscPoOpodatkowaniu: number; // do kieszeni + zatrzymane w spółce
+  daninyRazem: number; // wszystkie podatki/składki
+  efektywna: number; // daniny / zysk brutto
 };
 
 export function computeSpzooPayout(
   zyskBrutto: number,
   powolaniePerOsoba: number,
   malyPodatnikCit: boolean,
+  wyplacDywidende: boolean,
   c: TaxConstants,
 ): SpzooPayout {
   const zysk = Math.max(0, zyskBrutto);
@@ -364,16 +368,19 @@ export function computeSpzooPayout(
   const pitPow = pitSkala(powPerOsoba, c);
   const zdrowotnaPow = powPerOsoba * c.zdrowotnaSkalaStawka;
   const nettoPowPerOsoba = powPerOsoba - pitPow - zdrowotnaPow;
+  const nettoPowolanieRazem = nettoPowPerOsoba * 2;
 
-  // Reszta zysku przez spółkę.
+  // Reszta zysku przez spółkę → CIT. Dywidenda tylko jeśli wypłacamy.
   const zyskPoWynagrodzeniach = zysk - powolanieRazem;
   const citStawka = malyPodatnikCit ? c.citMaly : c.citStandard;
   const cit = Math.max(0, zyskPoWynagrodzeniach) * citStawka;
   const poCit = zyskPoWynagrodzeniach - cit;
-  const dywidendaPodatek = Math.max(0, poCit) * c.stawkaDywidendy;
-  const nettoDywidenda = poCit - dywidendaPodatek;
+  const dywidendaPodatek = wyplacDywidende ? Math.max(0, poCit) * c.stawkaDywidendy : 0;
+  const nettoDywidenda = wyplacDywidende ? poCit - dywidendaPodatek : 0;
+  const zatrzymaneWSpolce = wyplacDywidende ? 0 : poCit;
 
-  const nettoRazem = nettoPowPerOsoba * 2 + nettoDywidenda;
+  const doKieszeni = nettoPowolanieRazem + nettoDywidenda;
+  const wartoscPoOpodatkowaniu = doKieszeni + zatrzymaneWSpolce;
   const daninyRazem = (pitPow + zdrowotnaPow) * 2 + cit + dywidendaPodatek;
 
   return {
@@ -382,13 +389,16 @@ export function computeSpzooPayout(
     powolanieRazem,
     pitPowolaniePerOsoba: pitPow,
     zdrowotnaPowolaniePerOsoba: zdrowotnaPow,
-    nettoPowolanieRazem: nettoPowPerOsoba * 2,
+    nettoPowolanieRazem,
     zyskPoWynagrodzeniach,
     cit,
     poCit,
+    wyplacDywidende,
     dywidendaPodatek,
     nettoDywidenda,
-    nettoRazem,
+    zatrzymaneWSpolce,
+    doKieszeni,
+    wartoscPoOpodatkowaniu,
     daninyRazem,
     efektywna: zysk > 0 ? daninyRazem / zysk : 0,
   };

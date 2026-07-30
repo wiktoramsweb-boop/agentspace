@@ -454,14 +454,17 @@ function VatTab({ c }: { c: TaxConstants }) {
 // ═══════════════════════════════════════════════════════════════════════════
 // ZAKŁADKA 4 — JDG vs SP. Z O.O.
 // ═══════════════════════════════════════════════════════════════════════════
-type Wyplata = "dywidenda" | "powolanie";
+// Co zrobić z zyskiem, który zostaje po wynagrodzeniu z powołania:
+// „zatrzymane" = zostaje w spółce (tylko CIT, bez dywidendy) — najkorzystniej.
+// „dywidenda"  = wypłacić wspólnikom (dochodzi 19% podatku od dywidendy).
+type Wyplata = "zatrzymane" | "dywidenda";
 
 function SpzooTab({ c }: { c: TaxConstants }) {
   const [zysk, setZysk] = usePersistedState("as_tax_spzoo_zysk", 300000);
   const [forma, setForma] = usePersistedState<TaxForm>("as_tax_spzoo_forma", "liniowy");
   const [zusStage, setZusStage] = usePersistedState<ZusStage>("as_tax_spzoo_zus", "duzy");
   const [malyPodatnik, setMalyPodatnik] = usePersistedState("as_tax_spzoo_maly", true);
-  const [wyplata, setWyplata] = usePersistedState<Wyplata>("as_tax_spzoo_wyplata", "powolanie");
+  const [wyplata, setWyplata] = usePersistedState<Wyplata>("as_tax_spzoo_wyplata2", "zatrzymane");
   const [powolanie, setPowolanie] = usePersistedState("as_tax_spzoo_powolanie", 120000); // per osoba — domyślnie do progu 12%
 
   const s = useMemo(
@@ -469,13 +472,14 @@ function SpzooTab({ c }: { c: TaxConstants }) {
     [zysk, forma, zusStage, malyPodatnik, c],
   );
   const pay = useMemo(
-    () => computeSpzooPayout(zysk, powolanie, malyPodatnik, c),
-    [zysk, powolanie, malyPodatnik, c],
+    () => computeSpzooPayout(zysk, powolanie, malyPodatnik, wyplata === "dywidenda", c),
+    [zysk, powolanie, malyPodatnik, wyplata, c],
   );
 
-  const spolkaNetto = wyplata === "dywidenda" ? s.spzooNetto : pay.nettoRazem;
-  const spolkaEfekt = wyplata === "dywidenda" ? s.spzooEfektywna : pay.efektywna;
-  const roznica = spolkaNetto - s.jdgNetto;
+  // Do porównania z JDG bierzemy łączną wartość po opodatkowaniu
+  // (kieszeń + zysk zatrzymany w spółce po CIT).
+  const spolkaWartosc = pay.wartoscPoOpodatkowaniu;
+  const roznica = spolkaWartosc - s.jdgNetto;
   const spolkaLepsza = roznica > 0;
 
   return (
@@ -507,44 +511,68 @@ function SpzooTab({ c }: { c: TaxConstants }) {
           />
         </Panel>
 
-        <Panel title="Sposób wypłaty ze spółki">
-          <div className="flex rounded-xl border border-zinc-700/60 bg-zinc-900/60 p-1">
-            <MiniTab active={wyplata === "dywidenda"} onClick={() => setWyplata("dywidenda")}>
-              Dywidenda
-            </MiniTab>
-            <MiniTab active={wyplata === "powolanie"} onClick={() => setWyplata("powolanie")}>
-              Powołanie + dywidenda
-            </MiniTab>
+        <Panel title="Wypłata: wynagrodzenie z powołania">
+          <Num label="Powołanie / osobę (rocznie)" value={powolanie} onChange={setPowolanie} />
+          <div className="flex flex-wrap gap-1.5">
+            <QuickBtn onClick={() => setPowolanie(120000)}>do progu 12% (120k)</QuickBtn>
+            <QuickBtn onClick={() => setPowolanie(Math.floor(zysk / 2))}>cały zysk</QuickBtn>
+            <QuickBtn onClick={() => setPowolanie(0)}>0</QuickBtn>
           </div>
-          {wyplata === "powolanie" && (
-            <>
-              <Num label="Wynagrodzenie z powołania / osobę (rocznie)" value={powolanie} onChange={setPowolanie} />
-              <div className="flex flex-wrap gap-1.5">
-                <QuickBtn onClick={() => setPowolanie(120000)}>do progu 12% (120k)</QuickBtn>
-                <QuickBtn onClick={() => setPowolanie(Math.floor(zysk / 2))}>cały zysk</QuickBtn>
-                <QuickBtn onClick={() => setPowolanie(0)}>0 (sama dywidenda)</QuickBtn>
-              </div>
-              <p className="text-xs text-zinc-500">
-                Powołanie uchwałą (art. 201 KSH): skala 12%/32% + zdrowotna 9%, <b>bez ZUS społecznego</b>.
-                Jest kosztem spółki → obniża CIT. Trzymając ≤ 120k/os. płacisz tylko 12%.
-              </p>
-            </>
-          )}
+          <p className="text-xs text-zinc-500">
+            Powołanie uchwałą (art. 201 KSH): skala 12%/32% + zdrowotna 9%, <b>bez ZUS społecznego</b>. Jest
+            kosztem spółki → obniża CIT. Trzymając ≤ 120k/os. płacisz tylko 12%.
+          </p>
+
+          <div className="pt-1">
+            <Label>Reszta zysku (po powołaniu)</Label>
+            <div className="flex rounded-xl border border-zinc-700/60 bg-zinc-900/60 p-1">
+              <MiniTab active={wyplata === "zatrzymane"} onClick={() => setWyplata("zatrzymane")}>
+                Zostaje w spółce
+              </MiniTab>
+              <MiniTab active={wyplata === "dywidenda"} onClick={() => setWyplata("dywidenda")}>
+                Dywidenda
+              </MiniTab>
+            </div>
+            <p className="mt-2 text-xs text-zinc-500">
+              {wyplata === "zatrzymane" ? (
+                <>
+                  <b className="text-emerald-400">Najkorzystniej.</b> Reszta zysku płaci tylko 9% CIT i zostaje w
+                  firmie (na rozwój / rezerwę). 19% dywidendy zapłacisz dopiero, jeśli kiedyś ją wypłacisz.
+                </>
+              ) : (
+                <>Reszta wypłacona wspólnikom — dochodzi 19% podatku od dywidendy (podwójne opodatkowanie).</>
+              )}
+            </p>
+          </div>
         </Panel>
       </div>
 
       <div className="space-y-4">
+        {/* Kluczowe liczby dla spółki: kieszeń + spółka + efektywny podatek */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Stat label="Do prywatnej kieszeni (powołanie)" value={zl0(pay.doKieszeni)} />
+          <Stat
+            label={wyplata === "zatrzymane" ? "Zostaje w spółce (po CIT)" : "Wypłacona dywidenda (netto)"}
+            value={zl0(wyplata === "zatrzymane" ? pay.zatrzymaneWSpolce : pay.nettoDywidenda)}
+          />
+          <Stat label="Efektywny podatek" value={pct1(pay.efektywna)} tone="warn" />
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <BigCard
             title={`JDG — 2× ${FORM_SHORT[forma]}`}
             value={zl0(s.jdgNetto)}
-            sub={`efektywnie ${pct1(s.jdgEfektywna)} · z ubezpieczeniem ZUS`}
+            sub={`efektywnie ${pct1(s.jdgEfektywna)} · wszystko w kieszeni, z ubezpieczeniem ZUS`}
             best={!spolkaLepsza}
           />
           <BigCard
-            title={wyplata === "dywidenda" ? "Sp. z o.o. (dywidenda)" : "Sp. z o.o. (powołanie + dywidenda)"}
-            value={zl0(spolkaNetto)}
-            sub={`efektywnie ${pct1(spolkaEfekt)} · 0 ZUS społ., brak ubezpieczenia`}
+            title="Sp. z o.o. — wartość po podatku"
+            value={zl0(spolkaWartosc)}
+            sub={
+              wyplata === "zatrzymane"
+                ? `${zl0(pay.doKieszeni)} w kieszeni + ${zl0(pay.zatrzymaneWSpolce)} w spółce`
+                : `wszystko w kieszeni · efektywnie ${pct1(pay.efektywna)}`
+            }
             best={spolkaLepsza}
           />
         </div>
@@ -553,39 +581,25 @@ function SpzooTab({ c }: { c: TaxConstants }) {
           <table className="w-full text-sm">
             <tbody className="text-zinc-400">
               <TR label="Zysk firmy (przed wypłatą zarządu)" value={zl0(zysk)} />
-              {wyplata === "powolanie" ? (
+              <TR label={`Wynagrodzenie z powołania (2× ${zl0(pay.powolaniePerOsoba)})`} value={`−${zl0(pay.powolanieRazem)}`} />
+              <TR label="PIT skala od powołania (2 os.)" value={`−${zl0(pay.pitPowolaniePerOsoba * 2)}`} />
+              <TR label="Zdrowotna 9% od powołania (2 os.)" value={`−${zl0(pay.zdrowotnaPowolaniePerOsoba * 2)}`} />
+              <TR label="= Do prywatnej kieszeni (powołanie netto)" value={zl0(pay.nettoPowolanieRazem)} strong />
+              <TR label="Zysk po wynagrodzeniach (podstawa CIT)" value={zl0(pay.zyskPoWynagrodzeniach)} />
+              <TR label={`CIT (${pct1(s.citStawka)})`} value={`−${zl0(pay.cit)}`} />
+              {wyplata === "dywidenda" ? (
                 <>
-                  <TR label={`Wynagrodzenie z powołania (2× ${zl0(pay.powolaniePerOsoba)})`} value={`−${zl0(pay.powolanieRazem)}`} />
-                  <TR label="PIT skala od powołania (2 os.)" value={`−${zl0(pay.pitPowolaniePerOsoba * 2)}`} />
-                  <TR label="Zdrowotna 9% od powołania (2 os.)" value={`−${zl0(pay.zdrowotnaPowolaniePerOsoba * 2)}`} />
-                  <TR label="Zysk po wynagrodzeniach (podstawa CIT)" value={zl0(pay.zyskPoWynagrodzeniach)} />
-                  <TR label={`CIT (${pct1(s.citStawka)})`} value={`−${zl0(pay.cit)}`} />
                   <TR label="Dywidenda (19%)" value={`−${zl0(pay.dywidendaPodatek)}`} />
-                  <TR label="Sp. z o.o. — do kieszeni razem" value={zl0(pay.nettoRazem)} strong />
+                  <TR label="= Dywidenda do kieszeni (netto)" value={zl0(pay.nettoDywidenda)} strong />
                 </>
               ) : (
-                <>
-                  <TR label={`CIT (${pct1(s.citStawka)})`} value={`−${zl0(s.cit)}`} />
-                  <TR label="Po CIT" value={zl0(s.poCit)} />
-                  <TR label="Dywidenda (19%)" value={`−${zl0(s.dywidenda)}`} />
-                  <TR label="Sp. z o.o. — do kieszeni" value={zl0(s.spzooNetto)} strong />
-                </>
+                <TR label="= Zostaje w spółce (po CIT, bez dywidendy)" value={zl0(pay.zatrzymaneWSpolce)} strong />
               )}
+              <TR label="Łączna wartość po opodatkowaniu" value={zl0(pay.wartoscPoOpodatkowaniu)} strong />
               <TR label={`JDG — do kieszeni (2× ${FORM_SHORT[forma]})`} value={zl0(s.jdgNetto)} strong />
             </tbody>
           </table>
         </div>
-
-        {wyplata === "powolanie" && s.spzooNetto !== pay.nettoRazem && (
-          <p className="text-xs text-zinc-500">
-            Dla porównania: sama dywidenda (bez powołania) dałaby {zl0(s.spzooNetto)}. Powołanie zmienia wynik o{" "}
-            <span className={pay.nettoRazem >= s.spzooNetto ? "text-emerald-400" : "text-red-400"}>
-              {pay.nettoRazem >= s.spzooNetto ? "+" : ""}
-              {zl0(pay.nettoRazem - s.spzooNetto)}
-            </span>
-            .
-          </p>
-        )}
 
         <div
           className={`rounded-2xl border p-5 ${
@@ -595,24 +609,32 @@ function SpzooTab({ c }: { c: TaxConstants }) {
           <p className="text-white">
             {spolkaLepsza ? (
               <>
-                <span className="font-semibold text-emerald-300">Spółka wygrywa o {zl0(roznica)}/rok</span> —
-                ale pamiętaj: sp. z o.o. wymusza pełną księgowość i zwykle wchodzi w parze z VAT-em. Policz to
-                razem z kosztem utraty nie-VAT (zakładka VAT).
+                <span className="font-semibold text-emerald-300">Spółka wygrywa o {zl0(roznica)}/rok</span>{" "}
+                (łączna wartość po podatku).
+                {wyplata === "zatrzymane" && (
+                  <>
+                    {" "}
+                    Pamiętaj: {zl0(pay.zatrzymaneWSpolce)} jest w spółce, nie na Twoim koncie — 19% dywidendy
+                    zapłacisz przy ewentualnej wypłacie.
+                  </>
+                )}{" "}
+                Dochodzi też pełna księgowość i zwykle VAT (zakładka VAT).
               </>
             ) : (
               <>
                 <span className="font-semibold text-white">JDG wygrywa o {zl0(-roznica)}/rok</span> — przy tej
-                skali spółka się nie opłaca, zwłaszcza że dochodzi koszt VAT i księgowości. Zostań na JDG.
+                skali spółka się nie opłaca, zwłaszcza z kosztem VAT i księgowości. Zostań na JDG.
               </>
             )}
           </p>
         </div>
 
         <p className="text-xs text-zinc-500">
-          Wynagrodzenie z powołania to zwykle najtańszy sposób wypłaty ze spółki — unika podwójnego
-          opodatkowania (jest kosztem, obniża CIT) i nie ma ZUS. Estoński CIT pominięto (wymaga min. 3 osób na
-          UoP — agenci na B2B się nie liczą). W spółce dochodzi pełna księgowość (~800–1500 zł/mc) i brak
-          ubezpieczenia ZUS wspólników (dokupujesz prywatnie).
+          Strategia „powołanie do 120k/os. + reszta w spółce" daje najniższy podatek dziś: 12% od powołania i
+          tylko 9% CIT od reszty, bez ZUS i bez 19% dywidendy. Minus: część pieniędzy zostaje w firmie (nie w
+          prywatnej kieszeni), dochodzi pełna księgowość (~800–1500 zł/mc) i brak ubezpieczenia ZUS wspólników
+          (dokupujesz prywatnie). Estoński CIT pominięto (wymaga min. 3 osób na UoP — agenci na B2B się nie
+          liczą).
         </p>
       </div>
     </div>
