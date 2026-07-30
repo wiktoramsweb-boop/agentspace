@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "motion/react";
 import {
   compareForms,
   compareSpzoo,
@@ -63,11 +64,19 @@ export function TaxCalculator() {
         ))}
       </div>
 
-      {tab === "forma" && <FormaTab c={c} />}
-      {tab === "zus" && <ZusTab c={c} />}
-      {tab === "vat" && <VatTab c={c} />}
-      {tab === "spzoo" && <SpzooTab c={c} />}
-      {tab === "zalozenia" && <ZalozeniaTab c={c} setC={setC} />}
+      {/* Delikatny fade przy zmianie zakładki — treść „ustawia się", bez fajerwerków. */}
+      <motion.div
+        key={tab}
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.18, ease: [0.21, 0.47, 0.32, 0.98] }}
+      >
+        {tab === "forma" && <FormaTab c={c} />}
+        {tab === "zus" && <ZusTab c={c} />}
+        {tab === "vat" && <VatTab c={c} />}
+        {tab === "spzoo" && <SpzooTab c={c} />}
+        {tab === "zalozenia" && <ZalozeniaTab c={c} setC={setC} />}
+      </motion.div>
     </div>
   );
 }
@@ -386,7 +395,7 @@ function VatTab({ c }: { c: TaxConstants }) {
                 </div>
                 <div className="h-2.5 overflow-hidden rounded-full bg-zinc-950">
                   <div
-                    className={`h-full rounded-full ${
+                    className={`h-full rounded-full transition-[width] duration-300 ease-[cubic-bezier(0.21,0.47,0.32,0.98)] ${
                       fill >= 100 ? "bg-red-500" : fill >= 85 ? "bg-amber-500" : "bg-emerald-500"
                     }`}
                     style={{ width: `${fill}%` }}

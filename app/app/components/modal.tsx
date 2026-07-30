@@ -55,13 +55,13 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex h-[100dvh] items-center justify-center bg-zinc-950/80 p-4 backdrop-blur-sm"
+      className="modal-overlay fixed inset-0 z-50 flex h-[100dvh] items-center justify-center bg-zinc-950/80 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
         ref={boxRef}
         onClick={(e) => e.stopPropagation()}
-        className={`flex max-h-[90dvh] w-full ${maxWidth} flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900`}
+        className={`modal-box flex max-h-[90dvh] w-full ${maxWidth} flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900`}
       >
         <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-800 px-6 py-4">
           <h2 className="text-lg font-semibold text-white">{title}</h2>
