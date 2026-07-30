@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import {
   compareForms,
   compareSpzoo,
+  computeSpzooPayout,
   computeVat,
   progSkalaLiniowy,
   zusTimeline,
@@ -453,45 +454,84 @@ function VatTab({ c }: { c: TaxConstants }) {
 // ═══════════════════════════════════════════════════════════════════════════
 // ZAKŁADKA 4 — JDG vs SP. Z O.O.
 // ═══════════════════════════════════════════════════════════════════════════
+type Wyplata = "dywidenda" | "powolanie";
+
 function SpzooTab({ c }: { c: TaxConstants }) {
   const [zysk, setZysk] = useState(300000);
   const [forma, setForma] = useState<TaxForm>("liniowy");
   const [zusStage, setZusStage] = useState<ZusStage>("duzy");
   const [malyPodatnik, setMalyPodatnik] = useState(true);
+  const [wyplata, setWyplata] = useState<Wyplata>("powolanie");
+  const [powolanie, setPowolanie] = useState(120000); // per osoba — domyślnie do progu 12%
 
   const s = useMemo(
     () => compareSpzoo(zysk, forma, zusStage, malyPodatnik, c),
     [zysk, forma, zusStage, malyPodatnik, c],
   );
-  const spolkaLepsza = s.roznica > 0;
+  const pay = useMemo(
+    () => computeSpzooPayout(zysk, powolanie, malyPodatnik, c),
+    [zysk, powolanie, malyPodatnik, c],
+  );
+
+  const spolkaNetto = wyplata === "dywidenda" ? s.spzooNetto : pay.nettoRazem;
+  const spolkaEfekt = wyplata === "dywidenda" ? s.spzooEfektywna : pay.efektywna;
+  const roznica = spolkaNetto - s.jdgNetto;
+  const spolkaLepsza = roznica > 0;
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,380px)_1fr]">
-      <Panel title="Zysk firmy (rocznie)">
-        <Num label="Zysk do podziału (2 wspólników)" value={zysk} onChange={setZysk} />
-        <div>
-          <Label>Forma JDG do porównania</Label>
-          <Select value={forma} onChange={(v) => setForma(v as TaxForm)}>
-            <option value="liniowy">Liniowy 19%</option>
-            <option value="skala">Skala 12/32%</option>
-            <option value="ryczalt">Ryczałt 15%</option>
-          </Select>
-        </div>
-        <div>
-          <Label>Etap ZUS (JDG)</Label>
-          <Select value={zusStage} onChange={(v) => setZusStage(v as ZusStage)}>
-            <option value="duzy">Duży ZUS</option>
-            <option value="preferencyjny">Mały ZUS</option>
-            <option value="ulga_start">Ulga na start</option>
-          </Select>
-        </div>
-        <Toggle
-          checked={malyPodatnik}
-          onChange={setMalyPodatnik}
-          label="Mały podatnik CIT (9%)"
-          hint="przychód < 2 mln EUR → CIT 9%, inaczej 19%"
-        />
-      </Panel>
+      <div className="space-y-4">
+        <Panel title="Zysk firmy (rocznie)">
+          <Num label="Zysk do podziału (2 wspólników)" value={zysk} onChange={setZysk} />
+          <div>
+            <Label>Forma JDG do porównania</Label>
+            <Select value={forma} onChange={(v) => setForma(v as TaxForm)}>
+              <option value="liniowy">Liniowy 19%</option>
+              <option value="skala">Skala 12/32%</option>
+              <option value="ryczalt">Ryczałt 15%</option>
+            </Select>
+          </div>
+          <div>
+            <Label>Etap ZUS (JDG)</Label>
+            <Select value={zusStage} onChange={(v) => setZusStage(v as ZusStage)}>
+              <option value="duzy">Duży ZUS</option>
+              <option value="preferencyjny">Mały ZUS</option>
+              <option value="ulga_start">Ulga na start</option>
+            </Select>
+          </div>
+          <Toggle
+            checked={malyPodatnik}
+            onChange={setMalyPodatnik}
+            label="Mały podatnik CIT (9%)"
+            hint="przychód < 2 mln EUR → CIT 9%, inaczej 19%"
+          />
+        </Panel>
+
+        <Panel title="Sposób wypłaty ze spółki">
+          <div className="flex rounded-xl border border-zinc-700/60 bg-zinc-900/60 p-1">
+            <MiniTab active={wyplata === "dywidenda"} onClick={() => setWyplata("dywidenda")}>
+              Dywidenda
+            </MiniTab>
+            <MiniTab active={wyplata === "powolanie"} onClick={() => setWyplata("powolanie")}>
+              Powołanie + dywidenda
+            </MiniTab>
+          </div>
+          {wyplata === "powolanie" && (
+            <>
+              <Num label="Wynagrodzenie z powołania / osobę (rocznie)" value={powolanie} onChange={setPowolanie} />
+              <div className="flex flex-wrap gap-1.5">
+                <QuickBtn onClick={() => setPowolanie(120000)}>do progu 12% (120k)</QuickBtn>
+                <QuickBtn onClick={() => setPowolanie(Math.floor(zysk / 2))}>cały zysk</QuickBtn>
+                <QuickBtn onClick={() => setPowolanie(0)}>0 (sama dywidenda)</QuickBtn>
+              </div>
+              <p className="text-xs text-zinc-500">
+                Powołanie uchwałą (art. 201 KSH): skala 12%/32% + zdrowotna 9%, <b>bez ZUS społecznego</b>.
+                Jest kosztem spółki → obniża CIT. Trzymając ≤ 120k/os. płacisz tylko 12%.
+              </p>
+            </>
+          )}
+        </Panel>
+      </div>
 
       <div className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -502,9 +542,9 @@ function SpzooTab({ c }: { c: TaxConstants }) {
             best={!spolkaLepsza}
           />
           <BigCard
-            title="Sp. z o.o. (CIT + dywidenda)"
-            value={zl0(s.spzooNetto)}
-            sub={`efektywnie ${pct1(s.spzooEfektywna)} · 0 ZUS, ale brak ubezpieczenia`}
+            title={wyplata === "dywidenda" ? "Sp. z o.o. (dywidenda)" : "Sp. z o.o. (powołanie + dywidenda)"}
+            value={zl0(spolkaNetto)}
+            sub={`efektywnie ${pct1(spolkaEfekt)} · 0 ZUS społ., brak ubezpieczenia`}
             best={spolkaLepsza}
           />
         </div>
@@ -512,15 +552,40 @@ function SpzooTab({ c }: { c: TaxConstants }) {
         <div className="overflow-x-auto rounded-2xl border border-zinc-700/60">
           <table className="w-full text-sm">
             <tbody className="text-zinc-400">
-              <TR label="Zysk firmy" value={zl0(s.zyskFirmy)} />
-              <TR label={`CIT (${pct1(s.citStawka)})`} value={`−${zl0(s.cit)}`} />
-              <TR label="Po CIT" value={zl0(s.poCit)} />
-              <TR label="Dywidenda (19%)" value={`−${zl0(s.dywidenda)}`} />
-              <TR label="Sp. z o.o. — do kieszeni" value={zl0(s.spzooNetto)} strong />
+              <TR label="Zysk firmy (przed wypłatą zarządu)" value={zl0(zysk)} />
+              {wyplata === "powolanie" ? (
+                <>
+                  <TR label={`Wynagrodzenie z powołania (2× ${zl0(pay.powolaniePerOsoba)})`} value={`−${zl0(pay.powolanieRazem)}`} />
+                  <TR label="PIT skala od powołania (2 os.)" value={`−${zl0(pay.pitPowolaniePerOsoba * 2)}`} />
+                  <TR label="Zdrowotna 9% od powołania (2 os.)" value={`−${zl0(pay.zdrowotnaPowolaniePerOsoba * 2)}`} />
+                  <TR label="Zysk po wynagrodzeniach (podstawa CIT)" value={zl0(pay.zyskPoWynagrodzeniach)} />
+                  <TR label={`CIT (${pct1(s.citStawka)})`} value={`−${zl0(pay.cit)}`} />
+                  <TR label="Dywidenda (19%)" value={`−${zl0(pay.dywidendaPodatek)}`} />
+                  <TR label="Sp. z o.o. — do kieszeni razem" value={zl0(pay.nettoRazem)} strong />
+                </>
+              ) : (
+                <>
+                  <TR label={`CIT (${pct1(s.citStawka)})`} value={`−${zl0(s.cit)}`} />
+                  <TR label="Po CIT" value={zl0(s.poCit)} />
+                  <TR label="Dywidenda (19%)" value={`−${zl0(s.dywidenda)}`} />
+                  <TR label="Sp. z o.o. — do kieszeni" value={zl0(s.spzooNetto)} strong />
+                </>
+              )}
               <TR label={`JDG — do kieszeni (2× ${FORM_SHORT[forma]})`} value={zl0(s.jdgNetto)} strong />
             </tbody>
           </table>
         </div>
+
+        {wyplata === "powolanie" && s.spzooNetto !== pay.nettoRazem && (
+          <p className="text-xs text-zinc-500">
+            Dla porównania: sama dywidenda (bez powołania) dałaby {zl0(s.spzooNetto)}. Powołanie zmienia wynik o{" "}
+            <span className={pay.nettoRazem >= s.spzooNetto ? "text-emerald-400" : "text-red-400"}>
+              {pay.nettoRazem >= s.spzooNetto ? "+" : ""}
+              {zl0(pay.nettoRazem - s.spzooNetto)}
+            </span>
+            .
+          </p>
+        )}
 
         <div
           className={`rounded-2xl border p-5 ${
@@ -530,13 +595,13 @@ function SpzooTab({ c }: { c: TaxConstants }) {
           <p className="text-white">
             {spolkaLepsza ? (
               <>
-                <span className="font-semibold text-emerald-300">Spółka wygrywa o {zl0(s.roznica)}/rok</span> —
+                <span className="font-semibold text-emerald-300">Spółka wygrywa o {zl0(roznica)}/rok</span> —
                 ale pamiętaj: sp. z o.o. wymusza pełną księgowość i zwykle wchodzi w parze z VAT-em. Policz to
                 razem z kosztem utraty nie-VAT (zakładka VAT).
               </>
             ) : (
               <>
-                <span className="font-semibold text-white">JDG wygrywa o {zl0(-s.roznica)}/rok</span> — przy tej
+                <span className="font-semibold text-white">JDG wygrywa o {zl0(-roznica)}/rok</span> — przy tej
                 skali spółka się nie opłaca, zwłaszcza że dochodzi koszt VAT i księgowości. Zostań na JDG.
               </>
             )}
@@ -544,12 +609,37 @@ function SpzooTab({ c }: { c: TaxConstants }) {
         </div>
 
         <p className="text-xs text-zinc-500">
-          Estoński CIT (najniższa efektywna stawka) pominięto — wymaga min. 3 osób na UoP, a agenci na B2B się
-          nie liczą. W spółce dochodzi koszt pełnej księgowości (~800–1500 zł/mc) i brak ubezpieczenia ZUS
-          wspólników (trzeba dokupić prywatnie).
+          Wynagrodzenie z powołania to zwykle najtańszy sposób wypłaty ze spółki — unika podwójnego
+          opodatkowania (jest kosztem, obniża CIT) i nie ma ZUS. Estoński CIT pominięto (wymaga min. 3 osób na
+          UoP — agenci na B2B się nie liczą). W spółce dochodzi pełna księgowość (~800–1500 zł/mc) i brak
+          ubezpieczenia ZUS wspólników (dokupujesz prywatnie).
         </p>
       </div>
     </div>
+  );
+}
+
+function MiniTab({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+        active ? "bg-emerald-500 text-zinc-950" : "text-zinc-400 hover:text-white"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function QuickBtn({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-full border border-zinc-700/60 bg-zinc-950 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:text-white"
+    >
+      {children}
+    </button>
   );
 }
 

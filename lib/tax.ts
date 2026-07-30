@@ -329,6 +329,71 @@ export type SpzooResult = {
   roznica: number;
 };
 
+// Wypłata ze spółki przez wynagrodzenie z powołania (skala, bez ZUS społecznego,
+// ale ze składką zdrowotną 9%). Wynagrodzenie to KOSZT spółki → obniża CIT.
+// Reszta zysku (po wynagrodzeniach) idzie przez CIT → dywidendę.
+export type SpzooPayout = {
+  zyskBrutto: number; // zysk firmy przed wynagrodzeniem zarządu
+  powolaniePerOsoba: number;
+  powolanieRazem: number;
+  pitPowolaniePerOsoba: number; // PIT skala
+  zdrowotnaPowolaniePerOsoba: number; // 9%
+  nettoPowolanieRazem: number;
+  zyskPoWynagrodzeniach: number;
+  cit: number;
+  poCit: number;
+  dywidendaPodatek: number;
+  nettoDywidenda: number;
+  nettoRazem: number;
+  daninyRazem: number;
+  efektywna: number;
+};
+
+export function computeSpzooPayout(
+  zyskBrutto: number,
+  powolaniePerOsoba: number,
+  malyPodatnikCit: boolean,
+  c: TaxConstants,
+): SpzooPayout {
+  const zysk = Math.max(0, zyskBrutto);
+  // Nie da się wypłacić więcej wynagrodzeń niż jest zysku.
+  const powPerOsoba = Math.max(0, Math.min(powolaniePerOsoba, zysk / 2));
+  const powolanieRazem = powPerOsoba * 2;
+
+  // Powołanie: PIT skala + zdrowotna 9% (bez odliczeń, bez ZUS społ.).
+  const pitPow = pitSkala(powPerOsoba, c);
+  const zdrowotnaPow = powPerOsoba * c.zdrowotnaSkalaStawka;
+  const nettoPowPerOsoba = powPerOsoba - pitPow - zdrowotnaPow;
+
+  // Reszta zysku przez spółkę.
+  const zyskPoWynagrodzeniach = zysk - powolanieRazem;
+  const citStawka = malyPodatnikCit ? c.citMaly : c.citStandard;
+  const cit = Math.max(0, zyskPoWynagrodzeniach) * citStawka;
+  const poCit = zyskPoWynagrodzeniach - cit;
+  const dywidendaPodatek = Math.max(0, poCit) * c.stawkaDywidendy;
+  const nettoDywidenda = poCit - dywidendaPodatek;
+
+  const nettoRazem = nettoPowPerOsoba * 2 + nettoDywidenda;
+  const daninyRazem = (pitPow + zdrowotnaPow) * 2 + cit + dywidendaPodatek;
+
+  return {
+    zyskBrutto: zysk,
+    powolaniePerOsoba: powPerOsoba,
+    powolanieRazem,
+    pitPowolaniePerOsoba: pitPow,
+    zdrowotnaPowolaniePerOsoba: zdrowotnaPow,
+    nettoPowolanieRazem: nettoPowPerOsoba * 2,
+    zyskPoWynagrodzeniach,
+    cit,
+    poCit,
+    dywidendaPodatek,
+    nettoDywidenda,
+    nettoRazem,
+    daninyRazem,
+    efektywna: zysk > 0 ? daninyRazem / zysk : 0,
+  };
+}
+
 export function compareSpzoo(
   zyskFirmy: number,
   jdgForma: TaxForm,
