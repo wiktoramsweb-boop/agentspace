@@ -25,6 +25,11 @@ export default function LoginPage() {
       <form action={formAction} className="space-y-4">
         <FormField label="Email" name="email" type="email" autoComplete="email" placeholder="ty@biuro.pl" />
         <FormField label="Hasło" name="password" type="password" autoComplete="current-password" placeholder="••••••••" />
+        <div className="-mt-1 text-right">
+          <Link href="/reset-hasla" className="text-sm text-zinc-400 hover:text-emerald-300">
+            Nie pamiętasz hasła?
+          </Link>
+        </div>
         <FormError message={state?.error} />
         <SubmitButton pending={pending}>Zaloguj się</SubmitButton>
       </form>
