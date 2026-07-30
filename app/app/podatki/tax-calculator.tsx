@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   compareForms,
   compareSpzoo,
@@ -34,8 +34,8 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export function TaxCalculator() {
-  const [tab, setTab] = useState<Tab>("forma");
-  const [c, setC] = useState<TaxConstants>(DEFAULT_CONSTANTS);
+  const [tab, setTab] = usePersistedState<Tab>("as_tax_tab", "forma");
+  const [c, setC] = usePersistedState<TaxConstants>("as_tax_constants", DEFAULT_CONSTANTS);
 
   return (
     <div className="space-y-5">
@@ -76,10 +76,10 @@ export function TaxCalculator() {
 // ZAKŁADKA 1 — FORMA OPODATKOWANIA (per wspólnik)
 // ═══════════════════════════════════════════════════════════════════════════
 function FormaTab({ c }: { c: TaxConstants }) {
-  const [przychod, setPrzychod] = useState(230000);
-  const [koszty, setKoszty] = useState(20000);
-  const [zusStage, setZusStage] = useState<ZusStage>("duzy");
-  const [vatPayer, setVatPayer] = useState(false);
+  const [przychod, setPrzychod] = usePersistedState("as_tax_forma_przychod", 230000);
+  const [koszty, setKoszty] = usePersistedState("as_tax_forma_koszty", 20000);
+  const [zusStage, setZusStage] = usePersistedState<ZusStage>("as_tax_forma_zus", "duzy");
+  const [vatPayer, setVatPayer] = usePersistedState("as_tax_forma_vat", false);
 
   // Jako VATowiec Twoja prowizja brutto zawiera VAT — realny przychód firmy to netto.
   const przychodEfekt = vatPayer ? przychod / (1 + c.stawkaVat) : przychod;
@@ -233,10 +233,10 @@ function BreakdownTable({ results, bestForm }: { results: FormResult[]; bestForm
 // ZAKŁADKA 2 — ZUS (oś czasu)
 // ═══════════════════════════════════════════════════════════════════════════
 function ZusTab({ c }: { c: TaxConstants }) {
-  const [rok, setRok] = useState(2024);
-  const [miesiac, setMiesiac] = useState(9); // wrzesień
-  const [ulgaStart, setUlgaStart] = useState(false);
-  const [osob, setOsob] = useState(2);
+  const [rok, setRok] = usePersistedState("as_tax_zus_rok", 2024);
+  const [miesiac, setMiesiac] = usePersistedState("as_tax_zus_miesiac", 9); // wrzesień
+  const [ulgaStart, setUlgaStart] = usePersistedState("as_tax_zus_ulga", false);
+  const [osob, setOsob] = usePersistedState("as_tax_zus_osob", 2);
 
   const data = new Date(rok, miesiac - 1, 1);
   const t = useMemo(() => zusTimeline(data, ulgaStart, c), [rok, miesiac, ulgaStart, c]);
@@ -346,10 +346,10 @@ const MIESIACE = [
 // ZAKŁADKA 3 — VAT
 // ═══════════════════════════════════════════════════════════════════════════
 function VatTab({ c }: { c: TaxConstants }) {
-  const [sc, setSc] = useState(200000);
-  const [w, setW] = useState(150000);
-  const [k, setK] = useState(150000);
-  const [kosztyVat, setKosztyVat] = useState(40000);
+  const [sc, setSc] = usePersistedState("as_tax_vat_sc", 200000);
+  const [w, setW] = usePersistedState("as_tax_vat_w", 150000);
+  const [k, setK] = usePersistedState("as_tax_vat_k", 150000);
+  const [kosztyVat, setKosztyVat] = usePersistedState("as_tax_vat_koszty", 40000);
 
   const subjects = [
     { name: "s.c. Spectra", przychod: sc },
@@ -457,12 +457,12 @@ function VatTab({ c }: { c: TaxConstants }) {
 type Wyplata = "dywidenda" | "powolanie";
 
 function SpzooTab({ c }: { c: TaxConstants }) {
-  const [zysk, setZysk] = useState(300000);
-  const [forma, setForma] = useState<TaxForm>("liniowy");
-  const [zusStage, setZusStage] = useState<ZusStage>("duzy");
-  const [malyPodatnik, setMalyPodatnik] = useState(true);
-  const [wyplata, setWyplata] = useState<Wyplata>("powolanie");
-  const [powolanie, setPowolanie] = useState(120000); // per osoba — domyślnie do progu 12%
+  const [zysk, setZysk] = usePersistedState("as_tax_spzoo_zysk", 300000);
+  const [forma, setForma] = usePersistedState<TaxForm>("as_tax_spzoo_forma", "liniowy");
+  const [zusStage, setZusStage] = usePersistedState<ZusStage>("as_tax_spzoo_zus", "duzy");
+  const [malyPodatnik, setMalyPodatnik] = usePersistedState("as_tax_spzoo_maly", true);
+  const [wyplata, setWyplata] = usePersistedState<Wyplata>("as_tax_spzoo_wyplata", "powolanie");
+  const [powolanie, setPowolanie] = usePersistedState("as_tax_spzoo_powolanie", 120000); // per osoba — domyślnie do progu 12%
 
   const s = useMemo(
     () => compareSpzoo(zysk, forma, zusStage, malyPodatnik, c),
@@ -693,6 +693,34 @@ function ZalozeniaTab({ c, setC }: { c: TaxConstants; setC: (c: TaxConstants) =>
       </button>
     </div>
   );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Trwały stan — zapis do localStorage (zostaje po odświeżeniu, per przeglądarka)
+// ═══════════════════════════════════════════════════════════════════════════
+function usePersistedState<T>(key: string, initial: T) {
+  const [state, setState] = useState<T>(initial);
+  const [loaded, setLoaded] = useState(false);
+  // Wczytanie po zamontowaniu (unikamy niezgodności SSR/hydracji).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw != null) setState(JSON.parse(raw) as T);
+    } catch {
+      /* ignore */
+    }
+    setLoaded(true);
+  }, [key]);
+  // Zapis przy każdej zmianie (dopiero po wczytaniu, by nie nadpisać domyślnymi).
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(key, JSON.stringify(state));
+    } catch {
+      /* ignore */
+    }
+  }, [key, state, loaded]);
+  return [state, setState] as const;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
