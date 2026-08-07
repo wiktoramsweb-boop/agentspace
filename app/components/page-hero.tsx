@@ -1,7 +1,6 @@
-"use client";
-
-import { motion } from "motion/react";
 import { type ReactNode } from "react";
+import { AuroraBackground } from "./aurora-background";
+import { Spotlight } from "./effects/spotlight";
 
 type PageHeroProps = {
   eyebrow?: string;
@@ -13,9 +12,10 @@ type PageHeroProps = {
 };
 
 /**
- * Nagłówek podstrony marketingowej.
- * Jedna delikatna poświata zamiast aurory + spotlightu — spójne z landingiem.
- * Typografia dziedziczy z `.mk` (globals.css), więc h1 ma gradient i skalę.
+ * Nagłówek podstrony marketingowej: aurora + spotlight w tle.
+ *
+ * Wejścia robi CSS (`.mk-reveal`), nie motion — treść nagłówka nie może
+ * zależeć od tego, czy JS zdążył się zhydratować. To komponent serwerowy.
  */
 export function PageHero({
   eyebrow,
@@ -29,67 +29,40 @@ export function PageHero({
       className={`relative overflow-hidden px-6 ${
         compact
           ? "pt-[120px] pb-14 md:pt-[148px] md:pb-16"
-          : "pt-[136px] pb-20 md:pt-[168px] md:pb-24"
+          : "pt-[132px] pb-18 md:pt-[156px] md:pb-22"
       }`}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[760px] -translate-x-1/2 opacity-[0.22]"
-        style={{
-          background:
-            "radial-gradient(50% 50% at 50% 40%, rgba(47,109,246,0.35) 0%, transparent 70%)",
-        }}
-      />
+      <AuroraBackground />
+      <Spotlight />
 
-      <div className="relative z-10 mx-auto max-w-[1080px]">
+      <div className="relative z-10 mx-auto max-w-[1120px]">
         {eyebrow && (
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="mk-eyebrow mb-6"
-          >
-            {eyebrow}
-          </motion.p>
+          <p className="mk-reveal mk-eyebrow mb-6">{eyebrow}</p>
         )}
 
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.6,
-            delay: 0.06,
-            ease: [0.21, 0.47, 0.32, 0.98],
-          }}
-          className="max-w-[20ch]"
+        <h1
+          className="mk-reveal max-w-[20ch]"
+          style={{ "--mk-delay": "0.08s" } as React.CSSProperties}
         >
           {title}
-        </motion.h1>
+        </h1>
 
         {description && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.6,
-              delay: 0.14,
-              ease: [0.21, 0.47, 0.32, 0.98],
-            }}
-            className="mt-6 max-w-[56ch] text-lg leading-relaxed text-[var(--color-mk-muted)]"
+          <div
+            className="mk-reveal mt-6 max-w-[56ch] text-lg leading-relaxed text-[var(--color-mk-muted)]"
+            style={{ "--mk-delay": "0.16s" } as React.CSSProperties}
           >
             {description}
-          </motion.div>
+          </div>
         )}
 
         {children && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.22 }}
-            className="mt-10"
+          <div
+            className="mk-reveal mt-10"
+            style={{ "--mk-delay": "0.24s" } as React.CSSProperties}
           >
             {children}
-          </motion.div>
+          </div>
         )}
       </div>
     </section>

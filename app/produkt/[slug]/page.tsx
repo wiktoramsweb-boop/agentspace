@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { SiteNav } from "../../components/site-nav";
 import { SiteFooter } from "../../components/site-footer";
 import { PageHero } from "../../components/page-hero";
-import { Frame, FrameRule } from "../../components/mk/frame";
-import { Button, Section, SectionHead } from "../../components/mk/ui";
+import { FrameRule } from "../../components/mk/frame";
+import { Card, Button, Section, SectionHead } from "../../components/mk/ui";
 import { MODULES, getModule } from "@/lib/marketing/modules";
 
 export function generateStaticParams() {
@@ -72,14 +72,14 @@ export default async function ProduktPage({
       <Section>
         <SectionHead eyebrow="Możliwości" title={`Co robi ${mod.name}`} />
 
-        <div className="mt-14 grid gap-0 md:grid-cols-2">
+        <div className="mt-14 grid gap-5 md:grid-cols-2">
           {mod.capabilities.map((cap) => (
-            <Frame key={cap.title} className="h-full p-8">
+            <Card key={cap.title} className="h-full p-8">
               <h4 className="mb-3">{cap.title}</h4>
               <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
                 {cap.body}
               </p>
-            </Frame>
+            </Card>
           ))}
         </div>
       </Section>
@@ -87,12 +87,12 @@ export default async function ProduktPage({
       {/* Dla kogo */}
       <Section>
         <div className="mx-auto max-w-3xl">
-          <Frame className="bg-[var(--color-mk-surface)] p-8 md:p-12">
+          <Card accent className="p-8 md:p-12">
             <p className="mk-eyebrow mb-5">Dla kogo</p>
             <p className="text-lg leading-relaxed text-[var(--color-mk-text)]">
               {mod.forWhom}
             </p>
-          </Frame>
+          </Card>
         </div>
       </Section>
 
@@ -106,17 +106,17 @@ export default async function ProduktPage({
           lead="AgentSpace działa jako całość, ale wdrażasz go stopniowo — w tempie, które wytrzyma zespół."
         />
 
-        <div className="mt-12 grid gap-0 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {others.map((other) => (
             <Link key={other.slug} href={`/produkt/${other.slug}`}>
-              <Frame interactive className="h-full p-6">
+              <Card className="h-full p-6">
                 <p className="mb-2 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
                   {other.name}
                 </p>
                 <p className="text-sm leading-snug text-[var(--color-mk-muted)]">
                   {other.headline}
                 </p>
-              </Frame>
+              </Card>
             </Link>
           ))}
         </div>

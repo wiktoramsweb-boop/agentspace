@@ -5,7 +5,7 @@ import { SiteFooter } from "../components/site-footer";
 import { PageHero } from "../components/page-hero";
 import { Timeline } from "../components/timeline";
 import { FadeIn, StaggerContainer, StaggerItem } from "../components/fade-in";
-import { Frame } from "../components/mk/frame";
+import { TiltCard } from "../components/effects/tilt-card";
 
 export const metadata: Metadata = {
   title: "O AgentSpace — polski system dla biur nieruchomości",
@@ -77,7 +77,7 @@ export default function ONas() {
         <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
-              <Frame className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
+              <TiltCard className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
                 <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-12">
                   {/* Avatar — duży, animowany glow */}
                   <div className="flex justify-center md:justify-start">
@@ -131,7 +131,7 @@ export default function ONas() {
                     </div>
                   </div>
                 </div>
-              </Frame>
+              </TiltCard>
             </FadeIn>
           </div>
         </section>

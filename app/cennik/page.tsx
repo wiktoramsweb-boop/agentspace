@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { SiteNav } from "../components/site-nav";
 import { SiteFooter } from "../components/site-footer";
-import { Frame, FrameRule } from "../components/mk/frame";
-import { Button, Section, SectionHead } from "../components/mk/ui";
+import { FrameRule } from "../components/mk/frame";
+import { Card, Button, Section, SectionHead } from "../components/mk/ui";
 import { Pricing } from "../components/mk/pricing";
 import { FadeIn } from "../components/fade-in";
 
@@ -79,7 +79,7 @@ export default function CennikPage() {
 
           <div className="mt-12">
             {FAQ.map((item, i) => (
-              <Frame key={item.q} className={i > 0 ? "border-t-0" : ""}>
+              <Card key={item.q} className={i > 0 ? "border-t-0" : ""}>
                 <details className="group px-6 py-5 md:px-8">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
                     {item.q}
@@ -102,7 +102,7 @@ export default function CennikPage() {
                     {item.a}
                   </p>
                 </details>
-              </Frame>
+              </Card>
             ))}
           </div>
         </div>

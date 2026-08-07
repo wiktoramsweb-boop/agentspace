@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { SiteNav } from "../../components/site-nav";
 import { SiteFooter } from "../../components/site-footer";
 import { PageHero } from "../../components/page-hero";
-import { Frame, FrameRule } from "../../components/mk/frame";
-import { Button, Section, SectionHead, Tick } from "../../components/mk/ui";
+import { FrameRule } from "../../components/mk/frame";
+import { Card, Button, Section, SectionHead, Tick } from "../../components/mk/ui";
 import {
   INTEGRATIONS,
   STATUS_LABEL,
@@ -65,7 +65,7 @@ export default async function IntegracjaPage({
       {/* Uczciwy komunikat o statusie — nie udajemy gotowej integracji. */}
       {!isLive && (
         <Section className="py-0">
-          <Frame className="bg-[var(--color-mk-surface)] p-6 md:p-8">
+          <Card accent className="p-6 md:p-8">
             <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
               <span className="font-medium text-[var(--color-mk-text)]">
                 Ta integracja jest {STATUS_LABEL[integration.status].toLowerCase()}.
@@ -74,7 +74,7 @@ export default async function IntegracjaPage({
               na {integration.name}, daj znać. Biura, które zgłoszą się teraz,
               wdrażamy jako pierwsze i konsultujemy z nimi zakres synchronizacji.
             </p>
-          </Frame>
+          </Card>
         </Section>
       )}
 
@@ -123,17 +123,17 @@ export default async function IntegracjaPage({
           lead="Systemy się nie dublują — każdy odpowiada za inny etap pracy biura."
         />
 
-        <div className="mt-14 grid gap-0 md:grid-cols-2">
-          <Frame className="p-8">
+        <div className="mt-14 grid gap-5 md:grid-cols-2">
+          <Card className="p-8">
             <h4 className="mb-5">{integration.name}</h4>
             <ul className="flex flex-col gap-3 text-[0.9375rem] text-[var(--color-mk-muted)]">
               <li>Baza ofert i ich prezentacja</li>
               <li>Eksport na portale ogłoszeniowe</li>
               <li>Dokumentacja oferty</li>
             </ul>
-          </Frame>
+          </Card>
 
-          <Frame className="bg-[var(--color-mk-surface)] p-8">
+          <Card accent className="p-8">
             <h4 className="mb-5">AgentSpace</h4>
             <ul className="flex flex-col gap-3 text-[0.9375rem] text-[var(--color-mk-muted)]">
               <li>Praca zespołu: cele, lejek, zadania dnia</li>
@@ -141,7 +141,7 @@ export default async function IntegracjaPage({
               <li>Trening rozmów z AI Coachem</li>
               <li>Panel właściciela i raporty</li>
             </ul>
-          </Frame>
+          </Card>
         </div>
       </Section>
 
@@ -165,17 +165,17 @@ export default async function IntegracjaPage({
 
       <Section className="pb-32">
         <SectionHead eyebrow="Pozostałe" title="Inne integracje" />
-        <div className="mt-12 grid gap-0 md:grid-cols-3">
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
           {others.map((other) => (
             <Link key={other.slug} href={`/integracje/${other.slug}`}>
-              <Frame interactive className="h-full p-6">
+              <Card className="h-full p-6">
                 <p className="mb-1 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
                   {other.name}
                 </p>
                 <p className="text-sm text-[var(--color-mk-muted)]">
                   {STATUS_LABEL[other.status]}
                 </p>
-              </Frame>
+              </Card>
             </Link>
           ))}
         </div>

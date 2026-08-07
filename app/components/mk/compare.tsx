@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Frame } from "./frame";
+import { Card } from "./ui";
 
 /**
  * Przełącznik „z systemem / bez systemu” — ten sam layout, dwa stany.
@@ -38,11 +38,12 @@ type StateKey = keyof typeof STATES;
 export function Compare() {
   const [state, setState] = useState<StateKey>("with");
   const active = STATES[state];
+  const isWith = state === "with";
 
   return (
     <div className="flex flex-col items-center">
       {/* Przełącznik */}
-      <div className="mb-10 inline-flex items-center gap-[2px] rounded-full border border-[var(--color-mk-line)] bg-[var(--color-mk-surface)] p-[2px]">
+      <div className="mb-12 inline-flex items-center gap-[2px] rounded-full border border-white/10 bg-white/[0.04] p-[3px] backdrop-blur-sm">
         {(Object.keys(STATES) as StateKey[]).map((key) => {
           const isActive = key === state;
           return (
@@ -51,9 +52,11 @@ export function Compare() {
               type="button"
               onClick={() => setState(key)}
               aria-pressed={isActive}
-              className={`h-12 rounded-full px-6 text-[0.9375rem] font-medium transition-colors duration-200 ${
+              className={`h-12 rounded-full px-7 text-[0.9375rem] font-medium transition-all duration-300 ${
                 isActive
-                  ? "bg-[var(--color-mk-accent)] text-white"
+                  ? key === "with"
+                    ? "bg-gradient-to-r from-emerald-400 to-cyan-400 text-zinc-950 shadow-[0_8px_28px_-10px_rgba(16,185,129,0.8)]"
+                    : "bg-white/10 text-[var(--color-mk-text)]"
                   : "text-[var(--color-mk-muted)] hover:text-[var(--color-mk-text)]"
               }`}
             >
@@ -63,31 +66,38 @@ export function Compare() {
         })}
       </div>
 
-      <Frame className="w-full max-w-3xl">
+      <Card
+        accent={isWith}
+        className="w-full max-w-3xl overflow-hidden transition-colors duration-500"
+      >
         <ul>
           {active.rows.map(([label, value], i) => (
             <li
               key={label}
               className={`grid gap-2 px-6 py-5 md:grid-cols-[minmax(0,15rem)_1fr] md:gap-8 md:px-8 ${
-                i > 0 ? "border-t border-[var(--color-mk-line)]" : ""
+                i > 0 ? "border-t border-white/[0.06]" : ""
               }`}
             >
               <span className="text-[0.9375rem] text-[var(--color-mk-muted)]">
                 {label}
               </span>
               <span
-                className={`text-[0.9375rem] leading-snug ${
-                  state === "with"
-                    ? "text-[var(--color-mk-text)]"
-                    : "text-[var(--color-mk-muted)]"
+                className={`flex items-start gap-3 text-[0.9375rem] leading-snug ${
+                  isWith ? "text-[var(--color-mk-text)]" : "text-[var(--color-mk-muted)]"
                 }`}
               >
+                <span
+                  aria-hidden="true"
+                  className={`mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full ${
+                    isWith ? "bg-emerald-400" : "bg-zinc-600"
+                  }`}
+                />
                 {value}
               </span>
             </li>
           ))}
         </ul>
-      </Frame>
+      </Card>
     </div>
   );
 }

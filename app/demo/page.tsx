@@ -8,7 +8,7 @@ import { OwnerPanelMockup } from "../components/mockups/owner-panel-mockup";
 import { CoachFlow } from "../components/coach-flow";
 import { PageHero } from "../components/page-hero";
 import { FadeIn } from "../components/fade-in";
-import { Frame } from "../components/mk/frame";
+import { TiltCard } from "../components/effects/tilt-card";
 
 export const metadata: Metadata = {
   title: "Demo AgentSpace — zobacz jak działa AI Coach",
@@ -69,7 +69,7 @@ export default function Demo() {
                   <p className="text-lg leading-relaxed text-zinc-400">{item.body}</p>
                 </FadeIn>
                 <FadeIn delay={0.15} className={index % 2 === 1 ? "md:order-1" : ""}>
-                  <Frame className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/10">
+                  <TiltCard className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/10">
                     <div className="mb-2 flex items-center gap-1.5 px-2 py-1">
                       <div className="h-2 w-2 rounded-full bg-red-500/60" />
                       <div className="h-2 w-2 rounded-full bg-amber-500/60" />
@@ -79,7 +79,7 @@ export default function Demo() {
                       </div>
                     </div>
                     <item.Mockup />
-                  </Frame>
+                  </TiltCard>
                 </FadeIn>
               </div>
             </div>

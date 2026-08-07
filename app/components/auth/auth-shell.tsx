@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { AuroraBackground } from "../aurora-background";
 
 /**
  * Wspólna oprawa stron auth: aurora tło, logo, wycentrowana karta.
@@ -17,14 +18,7 @@ export function AuthShell({
 }) {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-6 py-12">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[820px] -translate-x-1/2 opacity-25"
-        style={{
-          background:
-            "radial-gradient(50% 50% at 50% 40%, rgba(47,109,246,0.35) 0%, transparent 70%)",
-        }}
-      />
+      <AuroraBackground />
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}

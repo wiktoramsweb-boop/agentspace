@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "../../components/site-footer";
-import { Frame, FrameRule } from "../../components/mk/frame";
-import { Button, Section, SectionHead, Tick } from "../../components/mk/ui";
+import { FrameRule } from "../../components/mk/frame";
+import { Card, Button, Section, SectionHead, Tick } from "../../components/mk/ui";
 import { FadeIn } from "../../components/fade-in";
 import { OFFERS, getOffer, getOfferPlan } from "@/lib/marketing/offers";
 
@@ -129,7 +129,7 @@ export default async function OfertaPage({
             title={`Pakiet ${plan.name} dla ${offer.agents} agentów`}
           />
 
-          <Frame className="mt-12 bg-[var(--color-mk-surface)] p-8 md:p-12">
+          <Card accent className="mt-12 p-8 md:p-12">
             <div className="flex flex-col gap-8">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="text-5xl font-medium text-[var(--color-mk-text)] md:text-6xl">
@@ -181,7 +181,7 @@ export default async function OfertaPage({
                 ))}
               </ul>
             </div>
-          </Frame>
+          </Card>
 
           <p className="mt-6 text-center text-sm text-[var(--color-mk-muted)]">
             Oferta ważna do {offer.validUntil}.
@@ -194,9 +194,9 @@ export default async function OfertaPage({
       {/* Jak to wygląda */}
       <Section>
         <SectionHead eyebrow="Co dalej" title="Jak wygląda start" />
-        <div className="mt-14 grid gap-0 md:grid-cols-3">
+        <div className="mt-14 grid gap-5 md:grid-cols-3">
           {STEPS.map((step) => (
-            <Frame key={step.n} className="h-full p-8">
+            <Card key={step.n} className="h-full p-8">
               <p className="mb-6 font-mono text-sm text-[var(--color-mk-accent)]">
                 {step.n}
               </p>
@@ -204,7 +204,7 @@ export default async function OfertaPage({
               <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
                 {step.body}
               </p>
-            </Frame>
+            </Card>
           ))}
         </div>
       </Section>

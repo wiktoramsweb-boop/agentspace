@@ -3,8 +3,8 @@ import Link from "next/link";
 import { SiteNav } from "../components/site-nav";
 import { SiteFooter } from "../components/site-footer";
 import { PageHero } from "../components/page-hero";
-import { Frame, FrameRule } from "../components/mk/frame";
-import { Button, Section, SectionHead } from "../components/mk/ui";
+import { FrameRule } from "../components/mk/frame";
+import { Card, Button, Section, SectionHead } from "../components/mk/ui";
 import { INTEGRATIONS, STATUS_LABEL } from "@/lib/marketing/integrations";
 
 export const metadata: Metadata = {
@@ -46,14 +46,14 @@ export default function IntegracjePage() {
           lead="Status aktualizujemy na bieżąco. Jeśli Twojego systemu nie ma na liście — napisz, sprawdzimy możliwość połączenia."
         />
 
-        <div className="mt-14 grid gap-0 md:grid-cols-2">
+        <div className="mt-14 grid gap-5 md:grid-cols-2">
           {INTEGRATIONS.map((integration) => (
             <Link
               key={integration.slug}
               href={`/integracje/${integration.slug}`}
               className="group block"
             >
-              <Frame interactive className="h-full p-8">
+              <Card className="h-full p-8">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <h4>{integration.name}</h4>
                   <span
@@ -84,7 +84,7 @@ export default function IntegracjePage() {
                     />
                   </svg>
                 </p>
-              </Frame>
+              </Card>
             </Link>
           ))}
         </div>

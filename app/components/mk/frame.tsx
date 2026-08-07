@@ -64,21 +64,13 @@ export function Frame({ children, className = "", interactive = false }: FramePr
  */
 export function FrameRule({ className = "" }: { className?: string }) {
   return (
-    <svg
+    <div
       aria-hidden="true"
-      className={`block w-full ${className}`}
-      viewBox="0 0 1200 8"
-      preserveAspectRatio="none"
-      height="8"
-      fill="none"
-    >
-      <path
-        d="M0 1h72l38 6V1h1090"
-        stroke="var(--color-mk-line-lit)"
-        strokeOpacity="0.35"
-        strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
+      className={`mx-auto h-px w-full max-w-[1120px] ${className}`}
+      style={{
+        background:
+          "linear-gradient(90deg, transparent, rgba(16,185,129,0.28) 30%, rgba(34,211,238,0.22) 62%, transparent)",
+      }}
+    />
   );
 }

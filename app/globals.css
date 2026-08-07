@@ -4,15 +4,19 @@
   --font-sans: var(--font-inter-tight);
   --font-mono: var(--font-geist-mono);
 
-  /* Marketing (landing + podstrony) — ciepła czerń, jeden akcent.
+  /* Marketing (landing + podstrony).
      Aplikacja /app ma własną paletę (app-shell) i tych tokenów nie używa. */
-  --color-mk-bg: #0a0a0a;
-  --color-mk-surface: #0f0d0c;
-  --color-mk-line: #241f1c;
-  --color-mk-line-lit: #6b625c;
-  --color-mk-text: #fff2ea;
-  --color-mk-muted: #a3948b;
-  --color-mk-accent: #2f6df6;
+  --color-mk-bg: #08090b;
+  --color-mk-surface: rgba(24, 24, 27, 0.5);
+  --color-mk-line: #23262b;
+  --color-mk-line-lit: #6b7280;
+  --color-mk-text: #f4f7f6;
+  --color-mk-muted: #9aa3a8;
+
+  /* Akcent marki: emerald → cyan. Gradient jest sygnaturą, nie ozdobą. */
+  --color-mk-accent: #10b981;
+  --color-mk-accent-2: #22d3ee;
+  --color-mk-accent-soft: rgba(16, 185, 129, 0.14);
 }
 
 html {
@@ -28,22 +32,74 @@ body {
    Scoped pod .mk, żeby NIE ruszyć interfejsu aplikacji /app.
    Nagłówki: duża skala, ujemny tracking, gradient fill.
    ───────────────────────────────────────────────────────────── */
+/* Tło marketingu — nigdy płaska czerń. Kilka miękkich poświat w kolorach
+   marki daje głębię; bez nich strona wygląda tanio i „sucho". */
 .mk {
+  position: relative;
   background-color: var(--color-mk-bg);
   color: var(--color-mk-muted);
+  background-image:
+    radial-gradient(1100px 640px at 82% 8%, rgba(16, 185, 129, 0.055), transparent 62%),
+    radial-gradient(950px 580px at 10% 34%, rgba(34, 211, 238, 0.04), transparent 60%),
+    radial-gradient(900px 560px at 62% 66%, rgba(139, 92, 246, 0.035), transparent 62%),
+    radial-gradient(1050px 660px at 22% 94%, rgba(16, 185, 129, 0.045), transparent 64%);
+  background-attachment: fixed;
+}
+
+/* Ziarno — cienka warstwa szumu. Zdejmuje z ciemnego tła „cyfrową płaskość". */
+.mk::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Treść musi być nad ziarnem. */
+.mk > * {
+  position: relative;
+  z-index: 2;
 }
 
 .mk h1,
 .mk h2,
 .mk h3,
 .mk h4 {
-  background: linear-gradient(180deg, #fffaf7 0%, rgba(255, 242, 234, 0.72) 100%);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(228, 240, 236, 0.78) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.022em;
   font-weight: 400;
   text-wrap: balance;
+}
+
+/* Fragment nagłówka w kolorach marki — używany na jedno–dwa słowa,
+   żeby nagłówek miał punkt zaczepienia dla oka. */
+.mk .grad {
+  background: linear-gradient(
+    100deg,
+    var(--color-mk-accent) 0%,
+    var(--color-mk-accent-2) 55%,
+    var(--color-mk-accent) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: mk-shimmer 6s linear infinite;
+}
+
+@keyframes mk-shimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 .mk h1 {
@@ -88,7 +144,7 @@ body {
 }
 
 .mk-reveal {
-  animation: mk-reveal 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+  animation: mk-reveal 0.85s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
   animation-delay: var(--mk-delay, 0s);
 }
 
@@ -98,24 +154,128 @@ body {
 @supports (animation-timeline: view()) {
   .mk-reveal {
     animation-timeline: view();
-    animation-range: entry 0% entry 60%;
+    animation-range: entry 0% entry 58%;
     animation-delay: 0s;
     animation-duration: auto;
   }
 }
 
-/* Etykieta sekcji (pigułka nad nagłówkiem) */
+/* Świetlna linia okrążająca obwód karty (komponent BorderBeam). */
+@keyframes border-beam {
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.animate-border-beam {
+  animation: border-beam 8s linear infinite;
+  offset-distance: 0%;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   KARTA MARKETINGOWA
+   Gradient + obramowanie, które ożywa pod kursorem. To ona robi
+   różnicę między „ciemna strona” a „droga ciemna strona”.
+   ───────────────────────────────────────────────────────────── */
+.mk-card {
+  position: relative;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 45%, transparent 100%),
+    rgba(18, 20, 23, 0.62);
+  backdrop-filter: blur(6px);
+  transition:
+    transform 0.35s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+/* Cienka świetlna krecha na górnej krawędzi — detal, który czyta się jako jakość. */
+.mk-card::after {
+  content: "";
+  position: absolute;
+  inset-inline: 18%;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(16, 185, 129, 0.55),
+    rgba(34, 211, 238, 0.4),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.mk-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(16, 185, 129, 0.32);
+  box-shadow:
+    0 20px 50px -24px rgba(16, 185, 129, 0.5),
+    0 0 0 1px rgba(16, 185, 129, 0.06);
+}
+
+.mk-card:hover::after {
+  opacity: 1;
+}
+
+/* Wariant wyróżniony (polecany pakiet, główne CTA). */
+.mk-card-accent {
+  border-color: rgba(16, 185, 129, 0.28);
+  background:
+    linear-gradient(160deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 211, 238, 0.045) 40%, transparent 100%),
+    rgba(18, 20, 23, 0.72);
+  box-shadow: 0 24px 60px -30px rgba(16, 185, 129, 0.55);
+}
+
+.mk-card-accent::after {
+  opacity: 0.75;
+}
+
+/* Etykieta sekcji — pigułka z akcentem, nie szara plama. */
 .mk-eyebrow {
   display: inline-flex;
   align-items: center;
-  padding: 6px 16px;
+  gap: 8px;
+  padding: 7px 16px;
   border-radius: 500px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--color-mk-line);
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.12),
+    rgba(34, 211, 238, 0.08)
+  );
+  border: 1px solid rgba(16, 185, 129, 0.22);
   font-size: 0.8125rem;
+  font-weight: 500;
   line-height: 1.25rem;
-  letter-spacing: 0.01em;
-  color: var(--color-mk-muted);
+  letter-spacing: 0.02em;
+  color: #6ee7b7;
+}
+
+/* Kropka pulsująca w etykiecie — sygnał „to żyje”. */
+.mk-eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-mk-accent);
+  box-shadow: 0 0 10px 1px rgba(16, 185, 129, 0.9);
+  animation: mk-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes mk-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
 }
 
 /* Blog article typography */
