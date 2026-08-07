@@ -1,581 +1,462 @@
-import { AuroraBackground } from "./components/aurora-background";
 import { FadeIn, StaggerContainer, StaggerItem } from "./components/fade-in";
-import { WaitlistForm } from "./components/waitlist-form";
-import { AiCoachMockup } from "./components/mockups/ai-coach-mockup";
-import { AgentDashboardMockup } from "./components/mockups/agent-dashboard-mockup";
-import { OwnerPanelMockup } from "./components/mockups/owner-panel-mockup";
-import { Spotlight } from "./components/effects/spotlight";
-import { TextReveal, WordReveal, InlineReveal } from "./components/effects/text-reveal";
-import { TiltCard } from "./components/effects/tilt-card";
-import { Magnetic } from "./components/effects/magnetic-button";
-import { GlowCard } from "./components/effects/glow-card";
-import { BorderBeam } from "./components/effects/border-beam";
-import { NumberScramble } from "./components/effects/number-scramble";
-import { CoachFlow } from "./components/coach-flow";
-import { DeploymentSteps } from "./components/deployment-steps";
 import { SiteNav } from "./components/site-nav";
 import { SiteFooter } from "./components/site-footer";
+import { Frame, FrameRule } from "./components/mk/frame";
+import { Button, Section, SectionHead, Tick } from "./components/mk/ui";
+import { Pricing } from "./components/mk/pricing";
+import { Compare } from "./components/mk/compare";
 
-const MOCKUPS = [AiCoachMockup, AgentDashboardMockup, OwnerPanelMockup];
+/* ── Treść ─────────────────────────────────────────────────── */
 
-type Problem = {
-  title: string;
-  body: string;
-  statValue?: number;
-  statPrefix?: string;
-  statSuffix?: string;
-  statText?: string;
-};
-
-const PROBLEMS: Problem[] = [
+const VALUES = [
   {
-    statValue: 60,
-    statSuffix: "%",
-    title: "agentów wypada w pierwszych 6 miesiącach",
-    body: "Brak systemu treningu = chaotyczny start, brak wzorca, brak feedbacku. Najlepsi się frustrują i odchodzą, słabi nie wiedzą czego im brakuje.",
+    title: "Więcej domkniętych transakcji",
+    body: "Żaden lead nie ginie w Excelu ani w telefonie agenta. Follow-upy przypominają się same, a agent wie codziennie, co jest dziś najważniejsze.",
   },
   {
-    statValue: 30,
-    statPrefix: "15–",
-    statSuffix: "k zł",
-    title: "tracisz na każdym nieudanym agencie",
-    body: "Rekrutacja, ogłoszenia, czas zespołu, biuro, leady które rozdałeś. Każdy agent który nie rozwija się w sprzedaży to wprost koszt biura.",
+    title: "Mniej chaosu w biurze",
+    body: "Klienci, nieruchomości, zadania, prowizje i dokumenty w jednym miejscu. Koniec z bazą rozrzuconą po arkuszach, WhatsAppie i notesach.",
   },
   {
-    statText: "0",
-    title: "obiektywnych danych jak naprawdę pracują",
-    body: "Wiesz ile transakcji zamknęli. Nie wiesz jak rozmawiają, gdzie tracą leady, kto faktycznie potrzebuje wsparcia. Decydujesz przeczuciem.",
+    title: "Widzisz, kto naprawdę pracuje",
+    body: "Cele dzienne, realizacja lejka i ranking zespołu liczone z prawdziwych danych. Decydujesz na liczbach, nie na przeczuciu.",
   },
 ];
 
-const FEATURES = [
+const MODULES = [
   {
-    eyebrow: "AI Coach",
-    title: "Trening cold calli z AI klientem",
-    body: "Agent ćwiczy realne scenariusze: zimny telefon do właściciela, follow-up, obiekcje cenowe, negocjacja prowizji. AI gra klienta o określonej osobowości (agresywny, wahający, biznesowy). Po sesji dostaje scoring 1–10 w 4 kategoriach i konkretny feedback po polsku.",
-    bullets: [
-      "5 scenariuszy dopasowanych do polskiego rynku RE",
-      "Naturalny polski głos AI klienta",
-      "Transkrypcja i nagranie każdej sesji",
-      "Trening 15 minut dziennie, w pracy lub w aucie",
-    ],
+    name: "CRM klientów",
+    body: "Karty klientów z historią, notatkami i pipeline. Osobne typy: sprzedający, kupujący, wynajmujący, najemca. Baza zostaje w biurze, nie w telefonie agenta.",
   },
   {
-    eyebrow: "Dashboard agenta",
-    title: "Codzienna platforma do pracy",
-    body: "Każdy agent ma swoje konto z planem dnia, celami miesięcznymi, statystykami i notatkami. Widzi swój postęp w czasie rzeczywistym i wie co dziś jest najważniejsze. Mniej Excela i WhatsAppa, więcej zamknięć.",
-    bullets: [
-      "Plan dnia i lista zadań",
-      "Cele miesięczne i tracking prowizji",
-      "Notatki per klient i oferta",
-      "Wkrótce: integracja z kalendarzem Google",
-    ],
+    name: "Wspólna baza nieruchomości",
+    body: "Oferty widoczne dla całego zespołu, ze zdjęciami i statusem. Agent od kupującego widzi, co ma kolega od sprzedającego.",
   },
   {
-    eyebrow: "Twój panel właściciela",
-    title: "Pełen obraz zespołu — dane, nie przeczucia",
-    body: "Ranking agentów, średni score sesji treningowych, gdzie zespół ma luki, kto rośnie a kto słabnie. Wiesz z kim porozmawiać i co konkretnie poprawić, zanim stracisz dobrego agenta lub leada.",
-    bullets: [
-      "Ranking i trendy zespołu",
-      "Statystyki biura i poszczególnych agentów",
-      "Najsłabsze i najsilniejsze obszary",
-      "Raporty miesięczne na email",
-    ],
+    name: "Cele i lejek sprzedaży",
+    body: "Cel roczny rozbity na dzienny: telefony → spotkania → umowy → sprzedaże. Dzienny tracker, plan tygodnia i historia realizacji.",
+  },
+  {
+    name: "Prowizje i transakcje",
+    body: "Karta transakcji z pięcioma etapami i dokumentami. Prowizje liczą się same, cel miesięczny widać na bieżąco. Umowa rezerwacyjna generuje się do PDF.",
+  },
+  {
+    name: "AI Coach",
+    body: "Agent trenuje rozmowy z klientem AI — cold call, spotkanie pozyskowe, najem. 13 scenariuszy, 9 osobowości klienta, głos, scoring i feedback po polsku.",
+  },
+  {
+    name: "Panel właściciela",
+    body: "Ranking, mocne i słabe obszary zespołu, prowizje per agent, drill-down do pojedynczej osoby. Raport miesięczny przychodzi na e-mail.",
   },
 ];
 
-const PRICING_FEATURES = [
-  "Do 10 agentów w cenie podstawowej",
-  "Każdy dodatkowy agent: +29 zł / mc",
-  "AI Coach z 5 polskimi scenariuszami",
-  "Dashboard agenta i panel właściciela",
-  "Ranking, statystyki, raporty miesięczne",
-  "Polskie wsparcie w godzinach 9–17",
-  "14 dni za darmo, bez karty kredytowej",
-  "30 dni gwarancji zwrotu pieniędzy",
+const STEPS = [
+  {
+    n: "01",
+    title: "Rozmowa i audyt biura",
+    body: "30 minut. Sprawdzamy, jak dziś wygląda obieg leada w Twoim biurze i gdzie realnie tracisz transakcje. Dostajesz wnioski niezależnie od tego, czy zaczniemy współpracę.",
+  },
+  {
+    n: "02",
+    title: "Wdrożenie w jeden dzień",
+    body: "Zakładamy konto biura, wgrywamy bazę klientów i nieruchomości, zapraszamy agentów. Konfigurujemy cele i lejek pod Twój model pracy. Bez instalacji, bez działu IT.",
+  },
+  {
+    n: "03",
+    title: "Pierwsze wnioski w 30 dni",
+    body: "Po miesiącu masz komplet danych: kto realizuje cele, gdzie zespół traci leady, jak wyglądają rozmowy. Od tego momentu zarządzasz liczbami, nie wrażeniem.",
+  },
+];
+
+const PROBLEMS = [
+  {
+    title: "Baza biura jest w telefonach agentów",
+    body: "Agent odchodzi i zabiera ze sobą kontakty, historię rozmów i relacje. Zostaje Ci arkusz, który nikt nie uzupełniał od pół roku.",
+  },
+  {
+    title: "Nie wiesz, co się dzieje między odprawami",
+    body: "Wiesz, ile było transakcji. Nie wiesz, ile było telefonów, ile spotkań i który agent utknął dwa tygodnie temu — dopóki nie jest za późno.",
+  },
+  {
+    title: "Nowy agent uczy się na Twoich klientach",
+    body: "Pierwsze rozmowy nowej osoby to spalone leady. Bez miejsca do trenowania każdy błąd kosztuje realną prowizję.",
+  },
+];
+
+const NOT_FOR = [
+  {
+    title: "Pracujesz solo lub we dwójkę",
+    body: "Ranking, panel właściciela i raporty zespołowe nie mają wtedy sensu. Zapłacisz za funkcje, których nie użyjesz.",
+  },
+  {
+    title: "Nie chcesz prowadzić zespołu",
+    body: "AgentSpace pokazuje dane i daje narzędzia, ale nie zarządza za Ciebie. Jeśli nikt nie spojrzy w panel raz w tygodniu i nie porozmawia z agentem, który słabnie — żaden system tego nie naprawi.",
+  },
+  {
+    title: "Szukasz portalu z eksportem ofert",
+    body: "Nie jesteśmy systemem do masowego wystawiania na portale. Eksport do OtoDom jest na mapie drogowej, ale dziś AgentSpace jest systemem pracy biura, nie wystawiarką ogłoszeń.",
+  },
 ];
 
 const FAQ = [
   {
-    question: "Kiedy AgentSpace startuje?",
+    question: "Czy AgentSpace działa już dziś?",
     answer:
-      "Pierwsza wersja w Q1 2026. Aktualnie pilotujemy z grupą zaprzyjaźnionych biur (w tym Spectra Nieruchomości w Krakowie). Pierwsze 10 biur z listy oczekujących dostanie wczesny dostęp + 3 miesiące za darmo + 30% rabatu na pierwszy rok.",
+      "Tak. Platforma działa na produkcji i jest codziennie używana w biurze Spectra Nieruchomości w Krakowie — to biuro założyciela i pierwszy klient produktu. Przyjmujemy kolejne biura w ramach Programu Pierwszych 10 Biur.",
   },
   {
-    question: "Co agenci nieruchomości dostają z AgentSpace?",
+    question: "Czy AgentSpace zastąpi mój obecny system?",
     answer:
-      "Realną korzyść. Agenci ćwiczą umiejętności które bezpośrednio przekładają się na ich prowizję — cold calling, obiekcje cenowe, negocjacja prowizji. Lepiej obrabiają obiekcje = więcej zamkniętych transakcji. Plus widzą swój postęp i ranking biura — to motywujące. Najlepsi agenci kochają systemy które dają im przewagę.",
+      "W większości biur tak — AgentSpace obejmuje CRM klientów, wspólną bazę nieruchomości, cele, prowizje, zadania i dokumenty. Jeśli korzystasz z systemu do masowego eksportu ofert na portale, na razie warto zostawić go obok. Na rozmowie sprawdzamy to konkretnie na Twoim przypadku.",
   },
   {
-    question: "Czy musimy nagrywać prawdziwych klientów?",
+    question: "Ile trwa wdrożenie i kto je robi?",
     answer:
-      "Nie. AI Coach to symulacje — agent ćwiczy z AI klientem, nie z prawdziwym. Pełna prywatność, zero ryzyka RODO ze strony klientów. Możemy w przyszłości dodać opcję analizy prawdziwych nagrań, ale tylko za zgodą i tylko jeśli sam tego chcesz.",
+      "Jeden dzień roboczy. Zakładamy konto, wgrywamy bazę klientów i nieruchomości, zapraszamy agentów i konfigurujemy cele pod Twój model pracy. Robimy to razem z Tobą — nie zostawiamy Cię z pustym systemem.",
   },
   {
-    question: "Jakie są wymagania techniczne?",
+    question: "Czy agenci to zaakceptują?",
     answer:
-      "Przeglądarka i mikrofon. Działa na laptopie, telefonie, tablecie. Bez instalacji, bez dodatkowego sprzętu. Twoi agenci mogą trenować w biurze, w domu, w aucie między spotkaniami.",
+      "Agenci przyjmują narzędzia, które im pomagają, i odrzucają te, które ich kontrolują. Dlatego AgentSpace zaczyna od tego, co daje agentowi: plan dnia, gotowe follow-upy pisane przez AI, widoczny postęp celu i trening przed trudną rozmową. Panel właściciela jest efektem ubocznym ich codziennej pracy, a nie osobnym raportowaniem.",
   },
   {
-    question: "Co jeśli AgentSpace nie zadziała w moim biurze nieruchomości?",
+    question: "Czy musimy nagrywać rozmowy z prawdziwymi klientami?",
     answer:
-      "30 dni gwarancji zwrotu pieniędzy od dnia płatności, bez pytań. Plus pierwsze 14 dni to darmowy trial — testujesz bez ryzyka. Naszym celem jest żebyś po 30 dniach miał konkretne dane pokazujące wzrost zespołu agentów nieruchomości.",
+      "Nie. AI Coach to symulacje — agent ćwiczy z klientem AI, nie z prawdziwym. Zero ryzyka RODO po stronie Twoich klientów. Analiza prawdziwych nagrań jest na mapie drogowej i będzie opcjonalna.",
+  },
+  {
+    question: "Gdzie są przechowywane dane biura?",
+    answer:
+      "Na serwerach w Unii Europejskiej (Frankfurt). Dane Twojego biura są odseparowane od danych innych biur, a dostęp do nich mają wyłącznie zaproszeni przez Ciebie użytkownicy, zgodnie z rolą: CEO, menedżer, agent.",
+  },
+  {
+    question: "Czy jest umowa na czas określony?",
+    answer:
+      "Nie. Rozliczenie miesięczne, rezygnujesz kiedy chcesz. Nie chcemy trzymać biura umową — jeśli system nie daje wartości, powinieneś móc odejść.",
   },
 ];
 
-const CheckIcon = () => (
-  <svg
-    className="mt-1 h-5 w-5 flex-shrink-0 text-emerald-400"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2.5}
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-  </svg>
-);
+/* ── Strona ────────────────────────────────────────────────── */
 
 export default function Home() {
   return (
-    <div className="grain relative bg-zinc-950 text-white antialiased">
+    <div className="mk relative min-h-screen">
       <SiteNav />
 
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b border-zinc-900 px-6 pt-32 pb-24 md:pt-36 md:pb-28">
-        <AuroraBackground />
-        <Spotlight />
-        <div className="relative z-10 mx-auto max-w-4xl text-center">
-          <WordReveal>
-            <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-zinc-800/80 bg-zinc-900/50 px-4 py-2 backdrop-blur-xl">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              <span className="text-xs font-medium text-zinc-300">
-                Dla biur nieruchomości — start Q1 2026
-              </span>
-            </div>
-          </WordReveal>
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden px-6 pt-[136px] pb-24 md:pt-[168px] md:pb-32">
+        {/* Jedna, delikatna poświata — zamiast aurory i spotlightu */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-0 h-[560px] w-[900px] -translate-x-1/2 opacity-[0.28]"
+          style={{
+            background:
+              "radial-gradient(50% 50% at 50% 40%, rgba(47,109,246,0.35) 0%, transparent 70%)",
+          }}
+        />
 
-          <h1 className="mb-6 text-4xl font-semibold leading-[1.05] tracking-tight text-white md:text-5xl lg:text-6xl">
-            <TextReveal delay={0.15}>Szkolenie agentów nieruchomości</TextReveal>
-            <br />
-            <InlineReveal
-              delay={1.1}
-              className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent shimmer"
-            >
-              z AI Coachem
-            </InlineReveal>
-          </h1>
+        <div className="relative mx-auto flex max-w-[1080px] flex-col items-center text-center">
+          <FadeIn>
+            <p className="mk-eyebrow mb-6">Dla biur nieruchomości w Polsce</p>
+          </FadeIn>
 
-          <WordReveal delay={1.5}>
-            <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-zinc-400 md:text-xl">
-              Trenuj zespół agentów codziennie — 15 minut z AI klientem. Cold calling,
-              obiekcje cenowe, negocjacja prowizji. Scoring po polsku, ranking biura,
-              raporty dla właściciela. <span className="text-zinc-300">Dla biur nieruchomości w Polsce.</span>
+          <FadeIn delay={0.06}>
+            <h1 className="max-w-[18ch]">
+              System operacyjny dla biura nieruchomości
+            </h1>
+          </FadeIn>
+
+          <FadeIn delay={0.12}>
+            <p className="mt-6 max-w-[54ch] text-lg leading-relaxed text-[var(--color-mk-muted)]">
+              Klienci, nieruchomości, cele, prowizje i trening zespołu w jednym
+              miejscu. Twoi agenci pracują w jednym systemie, a Ty pierwszy raz
+              widzisz biuro w liczbach.
             </p>
-          </WordReveal>
+          </FadeIn>
 
-          <WordReveal delay={1.4}>
-            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-              <Magnetic className="w-full sm:w-auto" strength={0.25}>
-                <a
-                  href="#waitlist"
-                  className="group relative block w-full overflow-hidden rounded-xl bg-emerald-500 px-8 py-4 text-base font-semibold text-zinc-950 transition hover:bg-emerald-400 hover:shadow-[0_0_60px_-10px_rgba(16,185,129,0.9)] sm:w-auto"
-                >
-                  <span className="relative z-10">Dołącz do listy oczekujących</span>
-                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                </a>
-              </Magnetic>
-              <Magnetic className="w-full sm:w-auto" strength={0.2}>
-                <a
-                  href="#how"
-                  className="block w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-8 py-4 text-base font-medium text-zinc-300 backdrop-blur-sm transition hover:border-zinc-700 hover:bg-zinc-900 sm:w-auto"
-                >
-                  Zobacz jak działa
-                </a>
-              </Magnetic>
+          <FadeIn delay={0.18}>
+            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
+              <Button href="/kontakt">Umów rozmowę</Button>
+              <Button href="#moduly" variant="ghost">
+                Zobacz, co jest w środku
+              </Button>
             </div>
-          </WordReveal>
+          </FadeIn>
 
-          <FadeIn delay={0.4}>
-            <p className="mt-6 text-sm text-zinc-500">
-              Pierwsze 10 biur nieruchomości: 3 miesiące za darmo + 30% rabatu na pierwszy rok
+          <FadeIn delay={0.24}>
+            <p className="mt-6 text-sm text-[var(--color-mk-muted)]">
+              Wdrożenie w jeden dzień · Bez umowy na czas określony
             </p>
           </FadeIn>
         </div>
       </section>
 
-      {/* PROBLEM */}
-      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <FadeIn>
-            <div className="mb-16 max-w-2xl">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Problem
-              </p>
-              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                Szkolenie agentów nieruchomości jest drogie, czasochłonne i mało skuteczne
-              </h2>
-            </div>
-          </FadeIn>
+      <FrameRule />
 
-          <StaggerContainer className="grid gap-6 md:grid-cols-3">
-            {PROBLEMS.map((problem) => (
-              <StaggerItem key={problem.title}>
-                <GlowCard className="h-full rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8 transition-colors hover:border-emerald-500/30">
-                  <p className="mb-6 text-5xl font-semibold text-emerald-400 md:text-6xl">
-                    {problem.statText !== undefined ? (
-                      problem.statText
-                    ) : (
-                      <NumberScramble
-                        value={problem.statValue ?? 0}
-                        prefix={problem.statPrefix ?? ""}
-                        suffix={problem.statSuffix ?? ""}
-                        duration={1.6}
-                      />
-                    )}
-                  </p>
-                  <h3 className="mb-3 text-xl font-semibold text-white">{problem.title}</h3>
-                  <p className="text-zinc-400">{problem.body}</p>
-                </GlowCard>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+      {/* ── WARTOŚCI ── */}
+      <Section>
+        <SectionHead
+          eyebrow="Po co to biuru"
+          title="Trzy rzeczy, które zmieniają się od pierwszego miesiąca"
+        />
+
+        <StaggerContainer className="mt-14 grid gap-0 md:grid-cols-3">
+          {VALUES.map((value) => (
+            <StaggerItem key={value.title}>
+              <Frame className="h-full p-8">
+                <h4 className="mb-3">{value.title}</h4>
+                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                  {value.body}
+                </p>
+              </Frame>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </Section>
+
+      {/* ── MODUŁY ── */}
+      <Section id="moduly">
+        <SectionHead
+          eyebrow="Moduły"
+          title="Sześć modułów, jeden system"
+          lead="Nie musisz wdrażać wszystkiego naraz. Większość biur zaczyna od CRM i celów, resztę włącza w kolejnych tygodniach."
+        />
+
+        <StaggerContainer className="mt-14 grid gap-0 md:grid-cols-2 lg:grid-cols-3">
+          {MODULES.map((mod) => (
+            <StaggerItem key={mod.name}>
+              <Frame interactive className="h-full p-8">
+                <h4 className="mb-3">{mod.name}</h4>
+                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                  {mod.body}
+                </p>
+              </Frame>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </Section>
+
+      {/* ── JAK TO DZIAŁA ── */}
+      <Section id="jak-to-dziala">
+        <SectionHead
+          eyebrow="Krok po kroku"
+          title="Od rozmowy do pierwszych wniosków — 30 dni"
+        />
+
+        <div className="mt-14 grid gap-0 md:grid-cols-3">
+          {STEPS.map((step, i) => (
+            <FadeIn key={step.n} delay={i * 0.06}>
+              <Frame className="h-full p-8">
+                <p className="mb-6 font-mono text-sm text-[var(--color-mk-accent)]">
+                  {step.n}
+                </p>
+                <h4 className="mb-3">{step.title}</h4>
+                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                  {step.body}
+                </p>
+              </Frame>
+            </FadeIn>
+          ))}
         </div>
-      </section>
+      </Section>
 
-      {/* ROZWIĄZANIE */}
-      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <FadeIn>
-            <div className="mb-16 max-w-2xl">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Rozwiązanie
-              </p>
-              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                Trzy narzędzia. Jedna platforma. Jeden cel: lepszy zespół.
-              </h2>
-            </div>
-          </FadeIn>
+      <FrameRule />
 
-          <div className="space-y-12">
-            {FEATURES.map((feature, index) => {
-              const MockupComponent = MOCKUPS[index];
-              return (
-                <FadeIn key={feature.title} delay={index * 0.05}>
-                  <div className="card-glow rounded-3xl border border-zinc-900 bg-zinc-900/30 p-8 transition-colors hover:border-emerald-500/20 md:p-12">
-                    <div className="grid gap-8 md:grid-cols-2 md:items-center md:gap-16">
-                      <div className={index % 2 === 1 ? "md:order-2" : ""}>
-                        <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                          {feature.eyebrow}
-                        </p>
-                        <h3 className="mb-4 text-3xl font-semibold tracking-tight">
-                          {feature.title}
-                        </h3>
-                        <p className="mb-6 leading-relaxed text-zinc-400">{feature.body}</p>
-                        <ul className="space-y-2">
-                          {feature.bullets.map((bullet) => (
-                            <li key={bullet} className="flex items-start gap-3 text-zinc-300">
-                              <CheckIcon />
-                              <span>{bullet}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className={index % 2 === 1 ? "md:order-1" : ""}>
-                        <TiltCard className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/10">
-                          {/* Browser-like top bar dla immersji */}
-                          <div className="mb-2 flex items-center gap-1.5 px-2 py-1">
-                            <div className="h-2 w-2 rounded-full bg-red-500/60" />
-                            <div className="h-2 w-2 rounded-full bg-amber-500/60" />
-                            <div className="h-2 w-2 rounded-full bg-emerald-500/60" />
-                            <div className="ml-2 flex-1 rounded-md bg-zinc-900/80 px-2 py-0.5 font-mono text-[9px] text-zinc-500">
-                              agentspace.pl/app
-                            </div>
-                          </div>
-                          {MockupComponent && <MockupComponent />}
-                        </TiltCard>
-                      </div>
-                    </div>
-                  </div>
-                </FadeIn>
-              );
-            })}
-          </div>
+      {/* ── PROBLEMY ── */}
+      <Section>
+        <SectionHead
+          eyebrow="Znasz to"
+          title="Trzy rzeczy, które kosztują biuro najwięcej"
+          lead="Żadna z nich nie widać w rachunku wyników. Wszystkie widać w liczbie transakcji."
+        />
+
+        <StaggerContainer className="mt-14 grid gap-0 md:grid-cols-3">
+          {PROBLEMS.map((problem) => (
+            <StaggerItem key={problem.title}>
+              <Frame className="h-full p-8">
+                <h4 className="mb-3">{problem.title}</h4>
+                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                  {problem.body}
+                </p>
+              </Frame>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </Section>
+
+      {/* ── PORÓWNANIE ── */}
+      <Section>
+        <SectionHead
+          eyebrow="Porównanie"
+          title="Ten sam dzień w biurze, dwa scenariusze"
+        />
+        <div className="mt-14">
+          <Compare />
         </div>
-      </section>
+      </Section>
 
-      {/* JAK DZIAŁA AI COACH — DEEP DIVE */}
-      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <FadeIn>
-            <div className="mb-16 max-w-2xl">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                AI Coach — od środka
+      <FrameRule />
+
+      {/* ── PROGRAM PIERWSZYCH 10 BIUR ── */}
+      <Section>
+        <div className="mx-auto max-w-3xl">
+          <Frame className="p-8 md:p-14">
+            <div className="flex flex-col items-center text-center">
+              <p className="mk-eyebrow mb-6">Program Pierwszych 10 Biur</p>
+              <h3 className="max-w-[20ch]">
+                Przyjmujemy jedno biuro na miasto
+              </h3>
+              <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                Wdrażamy powoli i z każdym biurem pracujemy indywidualnie —
+                dlatego przyjmujemy ograniczoną liczbę biur, po jednym na miasto
+                (w Warszawie i Krakowie po jednym na dzielnicę).
               </p>
-              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                Jak wygląda jedna sesja treningowa
-              </h2>
-              <p className="mt-4 text-lg text-zinc-400">
-                15 minut. Pięć kroków. Wiesz dokładnie co poprawić.
-              </p>
-            </div>
-          </FadeIn>
 
-          <CoachFlow />
-        </div>
-      </section>
-
-      {/* JAK TO DZIAŁA — DLA BIURA */}
-      <section id="how" className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <FadeIn>
-            <div className="mb-16 max-w-2xl">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Wdrożenie
-              </p>
-              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                Wdrożenie w 10 minut. Pierwsze wnioski w 30 dni.
-              </h2>
-            </div>
-          </FadeIn>
-
-          <DeploymentSteps />
-        </div>
-      </section>
-
-      {/* KLIENT ZERO — FOUNDER STORY */}
-      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/5 blur-3xl" />
-        </div>
-        <div className="relative mx-auto max-w-4xl">
-          <FadeIn>
-            <div className="mb-12 text-center">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Klient zero
-              </p>
-              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                Buduję to dla siebie pierwszego
-              </h2>
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.1}>
-            <div className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
-              <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-center md:gap-10">
-                {/* Avatar */}
-                <div className="flex justify-center md:justify-start">
-                  <div className="relative">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 blur-xl opacity-50" />
-                    <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-3xl font-bold text-zinc-950 md:h-28 md:w-28">
-                      W
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quote */}
-                <div>
-                  <svg
-                    className="mb-4 h-8 w-8 text-emerald-400/50"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
+              <ul className="mt-10 flex w-full max-w-md flex-col gap-4 text-left">
+                {[
+                  "Wyłączność na Twoje miasto na czas trwania umowy",
+                  "Wdrożenie 1:1 z założycielem, nie z działem supportu",
+                  "Wpływ na mapę drogową — budujemy pod realne potrzeby biur",
+                  "Cena zamrożona na 24 miesiące",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 text-[0.9375rem] leading-snug text-[var(--color-mk-muted)]"
                   >
-                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                  </svg>
-                  <p className="mb-6 text-lg leading-relaxed text-zinc-200 md:text-xl">
-                    Prowadzę biuro nieruchomości <span className="text-white font-medium">Spectra</span> w Krakowie. Widziałem zbyt wielu dobrych agentów którzy odchodzili zanim się rozwinęli — i wiem ile to kosztuje biuro. <span className="text-white">AgentSpace to system którego sam potrzebowałem od dawna.</span> Buduję go dla mojego biura i udostępniam innym biurom które mają ten sam problem.
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="h-px w-12 bg-zinc-700" />
-                    <div>
-                      <p className="font-semibold text-white">Wiktor Szostek</p>
-                      <p className="text-sm text-zinc-500">Founder · Spectra Nieruchomości</p>
-                    </div>
-                  </div>
-                </div>
+                    <Tick />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-10">
+                <Button href="/kontakt">Sprawdź, czy Twoje miasto jest wolne</Button>
               </div>
             </div>
-          </FadeIn>
+          </Frame>
         </div>
-      </section>
+      </Section>
 
-      {/* CENNIK */}
-      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
+      {/* ── KLIENT ZERO ── */}
+      <Section>
         <div className="mx-auto max-w-3xl">
-          <FadeIn>
-            <div className="mb-12 text-center">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Cennik
-              </p>
-              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                Jeden plan. Bez kombinowania.
-              </h2>
-            </div>
-          </FadeIn>
+          <SectionHead eyebrow="Klient zero" title="Buduję to dla własnego biura" />
 
-          <FadeIn delay={0.1}>
-            <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 transition hover:border-emerald-500/50 hover:shadow-[0_0_80px_-10px_rgba(16,185,129,0.4)] md:p-12">
-              <BorderBeam size={300} duration={10} colorFrom="#10b981" colorTo="#22d3ee" />
-              <BorderBeam size={300} duration={10} colorFrom="#22d3ee" colorTo="#10b981" delay={5} />
-              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" />
-              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-cyan-500/20 blur-3xl" />
+          <Frame className="mt-12 p-8 md:p-12">
+            <p className="text-lg leading-relaxed text-[var(--color-mk-text)] md:text-xl">
+              Prowadzę biuro nieruchomości Spectra w Krakowie. Znam ten moment,
+              w którym dobry agent odchodzi i zabiera ze sobą pół bazy — i wiem,
+              ile to kosztuje biuro.{" "}
+              <span className="text-[var(--color-mk-text)]">
+                AgentSpace to system, którego sam potrzebowałem od lat.
+              </span>{" "}
+              Buduję go dla swojego biura i udostępniam biurom, które mierzą się
+              z tym samym.
+            </p>
 
-              <div className="relative">
-                <div className="mb-8 flex items-baseline gap-2">
-                  <span className="text-6xl font-semibold text-white">299 zł</span>
-                  <span className="text-zinc-400">/ miesiąc / biuro</span>
-                </div>
-
-                <ul className="mb-8 space-y-3 text-zinc-300">
-                  {PRICING_FEATURES.map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <CheckIcon />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <a
-                  href="#waitlist"
-                  className="group relative block w-full overflow-hidden rounded-xl bg-emerald-500 px-6 py-4 text-center font-semibold text-zinc-950 transition hover:bg-emerald-400 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.8)]"
-                >
-                  <span className="relative z-10">Dołącz do listy oczekujących</span>
-                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                </a>
-
-                <p className="mt-4 text-center text-sm text-zinc-500">
-                  Pierwsze 10 biur: 3 miesiące za darmo + 30% rabatu na pierwszy rok
+            <div className="mt-8 flex items-center gap-4">
+              <div className="h-px w-10 bg-[var(--color-mk-line-lit)]" />
+              <div>
+                <p className="text-[0.9375rem] font-medium text-[var(--color-mk-text)]">
+                  Wiktor Szostek
+                </p>
+                <p className="text-sm text-[var(--color-mk-muted)]">
+                  Założyciel · Spectra Nieruchomości, Kraków
                 </p>
               </div>
             </div>
-          </FadeIn>
+          </Frame>
         </div>
-      </section>
+      </Section>
 
-      {/* DLA KOGO NIE JEST */}
-      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <FadeIn>
-            <div className="mb-16 max-w-2xl">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Szczerze
-              </p>
-              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                AgentSpace nie jest dla każdego biura
-              </h2>
-              <p className="mt-4 text-lg text-zinc-400">
-                Lepiej powiedzieć to teraz, niż zwracać pieniądze za 30 dni.
-              </p>
-            </div>
-          </FadeIn>
+      <FrameRule />
 
-          <StaggerContainer className="space-y-4">
-            {[
-              {
-                title: "Pracujesz solo lub w 2 osoby",
-                body: "Nie potrzebujesz rankingu, panelu właściciela, raportów. AI Coach owszem — ale wtedy taniej kupić Mentalyc albo poćwiczyć z ChatGPT za darmo. Oszczędź 299 zł.",
-              },
-              {
-                title: "Nie masz czasu prowadzić zespołu",
-                body: "AgentSpace pokazuje dane i daje narzędzia — ale nie zarządza za Ciebie. Jeśli nie zamierzasz spojrzeć w panel raz w tygodniu i pogadać z agentem który słabnie — żaden system tego nie naprawi.",
-              },
-              {
-                title: "Szukasz kolejnego CRM-a",
-                body: "To nie jest CRM. Nie zastąpi Asari, Galactici ani Twojej własnej bazy ofert. AgentSpace to warstwa rozwoju zespołu nad CRM-em który już masz — dziennik agenta, trening, analytics.",
-              },
-            ].map((item) => (
-              <StaggerItem key={item.title}>
-                <div className="flex gap-4 rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6 transition hover:border-zinc-800 md:p-8">
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-red-500/30 bg-red-500/10">
-                    <svg
-                      className="h-4 w-4 text-red-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="mb-2 text-lg font-semibold text-white">{item.title}</h3>
-                    <p className="leading-relaxed text-zinc-400">{item.body}</p>
-                  </div>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+      {/* ── CENNIK ── */}
+      <Section id="cennik">
+        <SectionHead
+          eyebrow="Cennik"
+          title="Płacisz za wielkość biura, nie za moduły"
+          lead="Każdy pakiet zawiera komplet funkcji ze swojego poziomu. Bez dopłat za użytkownika w trakcie miesiąca."
+        />
+        <div className="mt-14">
+          <Pricing />
         </div>
-      </section>
+      </Section>
 
-      {/* FAQ */}
-      <section className="relative border-b border-zinc-900 px-6 py-24 md:py-32">
+      {/* ── DLA KOGO NIE JEST ── */}
+      <Section>
+        <SectionHead
+          eyebrow="Szczerze"
+          title="AgentSpace nie jest dla każdego biura"
+          lead="Lepiej powiedzieć to teraz niż po trzech miesiącach."
+        />
+
+        <StaggerContainer className="mt-14 grid gap-0 md:grid-cols-3">
+          {NOT_FOR.map((item) => (
+            <StaggerItem key={item.title}>
+              <Frame className="h-full p-8">
+                <h4 className="mb-3">{item.title}</h4>
+                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                  {item.body}
+                </p>
+              </Frame>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </Section>
+
+      {/* ── FAQ ── */}
+      <Section id="faq">
         <div className="mx-auto max-w-3xl">
-          <FadeIn>
-            <div className="mb-12 text-center">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Pytania
-              </p>
-              <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                Najczęściej pytają o to
-              </h2>
-            </div>
-          </FadeIn>
+          <SectionHead eyebrow="Pytania" title="Najczęściej pytają o to" />
 
-          <StaggerContainer className="space-y-4" staggerDelay={0.05}>
-            {FAQ.map((item) => (
-              <StaggerItem key={item.question}>
-                <details className="group rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6 transition-all open:bg-zinc-900/50 hover:border-zinc-800">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-white">
+          <div className="mt-12">
+            {FAQ.map((item, i) => (
+              <Frame key={item.question} className={i > 0 ? "border-t-0" : ""}>
+                <details className="group px-6 py-5 md:px-8">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
                     {item.question}
                     <svg
-                      className="h-5 w-5 flex-shrink-0 text-zinc-500 transition group-open:rotate-180 group-open:text-emerald-400"
+                      aria-hidden="true"
+                      className="h-5 w-5 flex-shrink-0 text-[var(--color-mk-muted)] transition-transform duration-200 group-open:rotate-180"
+                      viewBox="0 0 20 20"
                       fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      <path
+                        d="M5 7.5 10 12.5 15 7.5"
+                        stroke="currentColor"
+                        strokeWidth="1.3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </summary>
-                  <p className="mt-4 leading-relaxed text-zinc-400">{item.answer}</p>
+                  <p className="mt-4 max-w-[62ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                    {item.answer}
+                  </p>
                 </details>
-              </StaggerItem>
+              </Frame>
             ))}
-          </StaggerContainer>
+          </div>
         </div>
-      </section>
+      </Section>
 
-      {/* WAITLIST FORM */}
-      <section id="waitlist" className="relative px-6 py-24 md:py-32">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/5 blur-3xl" />
+      {/* ── CTA ── */}
+      <Section className="pb-32">
+        <div className="flex flex-col items-center text-center">
+          <h2 className="max-w-[20ch]">
+            Gotowy uporządkować biuro
+            <span className="accent">?</span>
+          </h2>
+          <p className="mt-5 max-w-[48ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+            30 minut rozmowy. Sprawdzimy, gdzie Twoje biuro traci transakcje —
+            wnioski dostajesz niezależnie od tego, czy zaczniemy współpracę.
+          </p>
+          <div className="mt-10">
+            <Button href="/kontakt">Umów rozmowę</Button>
+          </div>
         </div>
-
-        <div className="relative mx-auto max-w-2xl">
-          <FadeIn>
-            <div className="mb-10 text-center">
-              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
-                Lista oczekujących
-              </p>
-              <h2 className="mb-4 text-4xl font-semibold tracking-tight md:text-5xl">
-                Bądź wśród pierwszych 10 biur
-              </h2>
-              <p className="text-lg text-zinc-400">
-                3 miesiące za darmo + 30% rabatu na pierwszy rok dla biur które dołączą teraz.
-              </p>
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.1}>
-            <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8 backdrop-blur-xl md:p-10">
-              <WaitlistForm />
-            </div>
-          </FadeIn>
-        </div>
-      </section>
+      </Section>
 
       <SiteFooter />
     </div>

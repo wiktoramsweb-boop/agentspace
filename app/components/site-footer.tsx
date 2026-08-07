@@ -44,7 +44,7 @@ export function SiteFooter() {
               <span className="text-lg font-semibold text-white">AgentSpace</span>
             </Link>
             <p className="mb-6 max-w-xs text-sm leading-relaxed text-zinc-500">
-              Polska platforma do szkolenia agentów nieruchomości z AI Coachem. Start Q1 2026.
+              Polski system operacyjny dla biur nieruchomości. Zbudowany w działającym biurze w Krakowie.
             </p>
             <p className="text-xs text-zinc-600">
               Klient zero: <span className="text-zinc-400">Spectra Nieruchomości</span>,

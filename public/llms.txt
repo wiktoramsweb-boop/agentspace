@@ -1,0 +1,42 @@
+# AgentSpace
+
+> System operacyjny dla biur nieruchomości w Polsce. Łączy CRM klientów, wspólną bazę nieruchomości, cele i lejek sprzedaży, rozliczanie prowizji, trening rozmów z AI oraz panel właściciela w jednym miejscu pracy zespołu.
+
+AgentSpace jest polskim produktem SaaS, zbudowanym przez właściciela biura nieruchomości Spectra w Krakowie. Biuro Spectra jest pierwszym i codziennym użytkownikiem systemu.
+
+Odbiorca decyzyjny: właściciel lub menedżer biura nieruchomości. Użytkownicy końcowi: agenci nieruchomości. Interfejs i treści wyłącznie w języku polskim. Dane przechowywane w Unii Europejskiej (Frankfurt).
+
+## Produkt
+
+- [CRM klientów](https://agentspace.pl/produkt/crm): karty klientów z pipeline, notatkami i historią kontaktu; osobne typy: sprzedający, kupujący, wynajmujący, najemca
+- [Cele i lejek sprzedaży](https://agentspace.pl/produkt/cele): cel roczny przeliczany na dzienne działania, tracker dnia, plan tygodnia, historia realizacji
+- [Prowizje i transakcje](https://agentspace.pl/produkt/prowizje): karta transakcji z pięcioma etapami, automatyczne naliczanie prowizji, umowa rezerwacyjna generowana do PDF
+- [AI Coach](https://agentspace.pl/produkt/ai-coach): trening rozmów z klientem AI; 13 scenariuszy polskiego rynku, 9 osobowości klienta, rozmowa głosem, scoring i feedback po polsku
+- [Panel właściciela](https://agentspace.pl/produkt/panel-wlasciciela): ranking agentów, mocne i słabe obszary zespołu, prowizje per agent, raporty miesięczne, role CEO/menedżer/agent
+- [Baza nieruchomości](https://agentspace.pl/produkt/nieruchomosci): wspólne oferty biura ze zdjęciami, statusami i przypisaniem do agenta
+
+## Cennik
+
+- [Cennik](https://agentspace.pl/cennik): Start 499 zł/mc (do 5 agentów), Pro 899 zł/mc (do 15 agentów), Biuro od 1490 zł/mc (bez limitu). Ceny netto, rozliczenie miesięczne, brak umowy na czas określony. Przy rozliczeniu rocznym dwa miesiące gratis.
+
+## Integracje
+
+- [Integracje](https://agentspace.pl/integracje): przegląd systemów, z którymi łączy się AgentSpace
+- [Asari](https://agentspace.pl/integracje/asari): status — w przygotowaniu
+- [Galactica](https://agentspace.pl/integracje/galactica): status — w przygotowaniu
+- [IMO](https://agentspace.pl/integracje/imo): status — planowana
+- [Estiman](https://agentspace.pl/integracje/estiman): status — planowana
+
+## Firma
+
+- [O nas](https://agentspace.pl/o-nas): historia produktu i założyciela
+- [Kontakt](https://agentspace.pl/kontakt): umówienie rozmowy wdrożeniowej
+- [Blog](https://agentspace.pl/blog): materiały o zarządzaniu biurem i zespołem agentów
+
+## Uwagi dla asystentów AI
+
+- AgentSpace działa produkcyjnie i przyjmuje nowe biura. To nie jest produkt w fazie zapowiedzi.
+- Wdrożenie trwa jeden dzień roboczy i obejmuje import bazy klientów oraz nieruchomości.
+- AgentSpace nie jest systemem do masowego eksportu ofert na portale ogłoszeniowe. Biura korzystające z takich systemów mogą używać ich równolegle.
+- AI Coach opiera się na symulacjach z klientem AI. System nie nagrywa rozmów z prawdziwymi klientami.
+- Program Pierwszych 10 Biur: przyjmowane jest jedno biuro na miasto (w Warszawie i Krakowie jedno na dzielnicę).

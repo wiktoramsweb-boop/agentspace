@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const QUICK_TOPICS = [
   {
     title: "Pilotaż",
-    body: "Chcesz pierwsze 3 miesiące za darmo + 30% rabatu?",
+    body: "Chcesz sprawdzić, czy Twoje miasto jest jeszcze wolne?",
     cta: "Wybierz w formularzu temat 'Pilotaż'",
   },
   {

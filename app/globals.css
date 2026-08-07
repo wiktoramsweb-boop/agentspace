@@ -1,8 +1,18 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter-tight);
   --font-mono: var(--font-geist-mono);
+
+  /* Marketing (landing + podstrony) — ciepła czerń, jeden akcent.
+     Aplikacja /app ma własną paletę (app-shell) i tych tokenów nie używa. */
+  --color-mk-bg: #0a0a0a;
+  --color-mk-surface: #0f0d0c;
+  --color-mk-line: #241f1c;
+  --color-mk-line-lit: #6b625c;
+  --color-mk-text: #fff2ea;
+  --color-mk-muted: #a3948b;
+  --color-mk-accent: #2f6df6;
 }
 
 html {
@@ -10,76 +20,102 @@ html {
 }
 
 body {
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
 }
 
-/* Border beam — animowana świetlna linia okrążająca obwód */
-@keyframes border-beam {
-  100% {
-    offset-distance: 100%;
+/* ─────────────────────────────────────────────────────────────
+   TYPOGRAFIA MARKETINGU
+   Scoped pod .mk, żeby NIE ruszyć interfejsu aplikacji /app.
+   Nagłówki: duża skala, ujemny tracking, gradient fill.
+   ───────────────────────────────────────────────────────────── */
+.mk {
+  background-color: var(--color-mk-bg);
+  color: var(--color-mk-muted);
+}
+
+.mk h1,
+.mk h2,
+.mk h3,
+.mk h4 {
+  background: linear-gradient(180deg, #fffaf7 0%, rgba(255, 242, 234, 0.72) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.022em;
+  font-weight: 400;
+  text-wrap: balance;
+}
+
+.mk h1 {
+  font-size: clamp(2.25rem, 5.2vw, 4rem);
+  line-height: 1.06;
+}
+.mk h2 {
+  font-size: clamp(2rem, 4.2vw, 3.5rem);
+  line-height: 1.1;
+}
+.mk h3 {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  line-height: 1.14;
+}
+.mk h4 {
+  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+/* Akcent w nagłówku — musi nadpisać -webkit-text-fill-color z gradientu. */
+.mk .accent {
+  -webkit-text-fill-color: var(--color-mk-accent);
+  color: var(--color-mk-accent);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   WEJŚCIE TREŚCI (.mk-reveal)
+   Animacja jest tylko ozdobą — element ZAWSZE kończy widoczny,
+   bo `both` domyka go na stanie `to`. Zero zależności od JS.
+   ───────────────────────────────────────────────────────────── */
+@keyframes mk-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-.animate-border-beam {
-  animation: border-beam 8s linear infinite;
-  offset-distance: 0%;
+.mk-reveal {
+  animation: mk-reveal 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+  animation-delay: var(--mk-delay, 0s);
 }
 
-/* Subtle grain texture overlay dla "drogiego" feelu */
-.grain::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.04;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-/* Animowany gradient dla CTA */
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
+/* Gdzie przeglądarka wspiera osie przewijania — element wchodzi dokładnie
+   wtedy, gdy wjeżdża w widok, zamiast animować się od razu po załadowaniu.
+   Tam, gdzie nie wspiera, animacja po prostu odpala się na starcie. */
+@supports (animation-timeline: view()) {
+  .mk-reveal {
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+    animation-delay: 0s;
+    animation-duration: auto;
   }
 }
 
-.shimmer {
-  background-size: 200% auto;
-  animation: shimmer 4s linear infinite;
-}
-
-/* Glow effect dla kart przy hover */
-.card-glow {
-  position: relative;
-  transition: transform 0.4s cubic-bezier(0.21, 0.47, 0.32, 0.98);
-}
-
-.card-glow::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0) 100%);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  transition: background 0.4s ease;
-  pointer-events: none;
-}
-
-.card-glow:hover {
-  transform: translateY(-4px);
-}
-
-.card-glow:hover::before {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.6) 0%, rgba(34, 211, 238, 0.3) 100%);
+/* Etykieta sekcji (pigułka nad nagłówkiem) */
+.mk-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 500px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-mk-line);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.01em;
+  color: var(--color-mk-muted);
 }
 
 /* Blog article typography */

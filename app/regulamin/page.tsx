@@ -99,19 +99,28 @@ export default function Regulamin() {
               AgentSpace. Zgodę można w dowolnym momencie wycofać poprzez kontakt mailowy.
             </p>
 
-            <h2>§5. Pierwsze 10 biur (warunki promocyjne)</h2>
+            <h2>§5. Program Pierwszych 10 Biur (warunki szczególne)</h2>
             <p>
-              Pierwsze 10 biur nieruchomości, które wezmą udział w programie pilotażowym
-              AgentSpace, otrzyma:
+              Biura nieruchomości przyjęte do Programu Pierwszych 10 Biur otrzymują:
             </p>
             <ul>
-              <li>3 miesiące bezpłatnego dostępu od momentu startu Usługi,</li>
-              <li>30% rabatu na pierwszy rok subskrypcji (przy zachowaniu ciągłości umowy).</li>
+              <li>
+                wyłączność terytorialną — w okresie obowiązywania umowy Operator nie
+                zawrze umowy z innym biurem nieruchomości z tego samego miasta
+                (w Warszawie i Krakowie: z tej samej dzielnicy),
+              </li>
+              <li>
+                cenę abonamentu niezmienną przez 24 miesiące od dnia zawarcia umowy,
+                przy zachowaniu ciągłości subskrypcji,
+              </li>
+              <li>wdrożenie i import danych bez dodatkowej opłaty.</li>
             </ul>
             <p>
-              Operator zastrzega sobie prawo do wyboru biur uczestniczących w programie na
-              podstawie informacji podanych w formularzu listy oczekujących oraz dodatkowej
-              kwalifikacji telefonicznej lub mailowej.
+              Liczba miejsc w Programie jest ograniczona. Operator zastrzega sobie prawo
+              do wyboru biur uczestniczących w Programie na podstawie informacji podanych
+              w formularzu kontaktowym oraz dodatkowej kwalifikacji telefonicznej lub
+              mailowej. Utrata ciągłości subskrypcji powoduje wygaśnięcie warunków
+              szczególnych, w tym wyłączności terytorialnej.
             </p>
 
             <h2>§6. Wymagania techniczne</h2>

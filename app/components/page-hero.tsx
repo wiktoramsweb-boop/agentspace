@@ -2,18 +2,21 @@
 
 import { motion } from "motion/react";
 import { type ReactNode } from "react";
-import { AuroraBackground } from "./aurora-background";
-import { Spotlight } from "./effects/spotlight";
 
 type PageHeroProps = {
   eyebrow?: string;
   title: ReactNode;
   description?: ReactNode;
   children?: ReactNode;
-  /** Wersja kompaktowa — mniejsze paddingi, lepsze dla compliance/static stron */
+  /** Wersja kompaktowa — mniejsze paddingi, dla stron statycznych/prawnych. */
   compact?: boolean;
 };
 
+/**
+ * Nagłówek podstrony marketingowej.
+ * Jedna delikatna poświata zamiast aurory + spotlightu — spójne z landingiem.
+ * Typografia dziedziczy z `.mk` (globals.css), więc h1 ma gradient i skalę.
+ */
 export function PageHero({
   eyebrow,
   title,
@@ -23,50 +26,56 @@ export function PageHero({
 }: PageHeroProps) {
   return (
     <section
-      className={`relative overflow-hidden border-b border-zinc-900 px-6 ${
-        compact ? "pt-32 pb-16 md:pt-36 md:pb-20" : "pt-32 pb-20 md:pt-40 md:pb-28"
+      className={`relative overflow-hidden px-6 ${
+        compact
+          ? "pt-[120px] pb-14 md:pt-[148px] md:pb-16"
+          : "pt-[136px] pb-20 md:pt-[168px] md:pb-24"
       }`}
     >
-      <AuroraBackground />
-      <Spotlight />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[760px] -translate-x-1/2 opacity-[0.22]"
+        style={{
+          background:
+            "radial-gradient(50% 50% at 50% 40%, rgba(47,109,246,0.35) 0%, transparent 70%)",
+        }}
+      />
 
-      <div className="relative z-10 mx-auto max-w-4xl">
+      <div className="relative z-10 mx-auto max-w-[1080px]">
         {eyebrow && (
           <motion.p
-            initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="mb-4 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mk-eyebrow mb-6"
           >
             {eyebrow}
           </motion.p>
         )}
 
         <motion.h1
-          initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{
-            duration: 0.8,
-            delay: 0.1,
+            duration: 0.6,
+            delay: 0.06,
             ease: [0.21, 0.47, 0.32, 0.98],
           }}
-          className={`mb-6 font-semibold leading-[1.1] tracking-tight text-white ${
-            compact ? "text-3xl md:text-4xl lg:text-5xl" : "text-4xl md:text-5xl lg:text-6xl"
-          }`}
+          className="max-w-[20ch]"
         >
           {title}
         </motion.h1>
 
         {description && (
           <motion.div
-            initial={{ opacity: 0, y: 16, filter: "blur(6px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
-              duration: 0.7,
-              delay: 0.25,
+              duration: 0.6,
+              delay: 0.14,
               ease: [0.21, 0.47, 0.32, 0.98],
             }}
-            className="max-w-2xl text-lg leading-relaxed text-zinc-400 md:text-xl"
+            className="mt-6 max-w-[56ch] text-lg leading-relaxed text-[var(--color-mk-muted)]"
           >
             {description}
           </motion.div>
@@ -74,10 +83,10 @@ export function PageHero({
 
         {children && (
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-            className="mt-8"
+            transition={{ duration: 0.6, delay: 0.22 }}
+            className="mt-10"
           >
             {children}
           </motion.div>

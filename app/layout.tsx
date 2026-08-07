@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter_Tight, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ScrollProgress } from "./components/effects/scroll-progress";
 import { SchemaMarkup } from "./components/schema-markup";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const interTight = Inter_Tight({
+  variable: "--font-inter-tight",
   subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -17,21 +18,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Szkolenie agentów nieruchomości z AI Coachem | AgentSpace",
+  title: "AgentSpace — system operacyjny dla biura nieruchomości",
   description:
-    "Platforma do szkolenia agentów nieruchomości w Polsce. AI Coach do treningu cold calli, dashboard agenta, ranking zespołu, raporty dla właściciela biura. Start Q1 2026.",
+    "Jedno miejsce pracy całego biura: CRM klientów, wspólna baza nieruchomości, cele i lejek sprzedaży, rozliczanie prowizji, AI Coach do treningu rozmów i panel właściciela. Polski produkt, działa od pierwszego dnia.",
   keywords: [
-    "szkolenie agentów nieruchomości",
-    "trening agentów nieruchomości",
-    "AI dla nieruchomości",
-    "AI Coach",
-    "platforma dla biur nieruchomości",
-    "narzędzia dla pośrednika",
-    "szkolenie cold calling",
-    "trening sprzedaży nieruchomości",
+    "system dla biura nieruchomości",
     "CRM dla biura nieruchomości",
-    "ranking agentów",
-    "biuro nieruchomości oprogramowanie",
+    "oprogramowanie dla pośredników",
+    "program dla biura nieruchomości",
+    "rozliczanie prowizji nieruchomości",
+    "cele sprzedażowe agenta nieruchomości",
+    "szkolenie agentów nieruchomości",
+    "AI Coach",
+    "trening cold calling nieruchomości",
+    "zarządzanie zespołem agentów",
+    "baza nieruchomości dla biura",
     "AgentSpace",
   ],
   metadataBase: new URL("https://agentspace.pl"),
@@ -39,9 +40,9 @@ export const metadata: Metadata = {
     canonical: "https://agentspace.pl",
   },
   openGraph: {
-    title: "Szkolenie agentów nieruchomości z AI Coachem | AgentSpace",
+    title: "AgentSpace — system operacyjny dla biura nieruchomości",
     description:
-      "Trenuj zespół agentów codziennie z AI. Cold calling, obiekcje cenowe, negocjacja prowizji. Dla biur nieruchomości w Polsce.",
+      "CRM, wspólna baza nieruchomości, cele, prowizje, AI Coach i panel właściciela w jednym miejscu. Dla biur nieruchomości w Polsce.",
     url: "https://agentspace.pl",
     siteName: "AgentSpace",
     locale: "pl_PL",
@@ -49,9 +50,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Szkolenie agentów nieruchomości z AI Coachem | AgentSpace",
+    title: "AgentSpace — system operacyjny dla biura nieruchomości",
     description:
-      "Trenuj zespół agentów codziennie z AI. Cold calling, obiekcje cenowe, negocjacja prowizji. Dla biur nieruchomości w Polsce.",
+      "CRM, wspólna baza nieruchomości, cele, prowizje, AI Coach i panel właściciela w jednym miejscu. Dla biur nieruchomości w Polsce.",
   },
   robots: {
     index: true,
@@ -84,7 +85,7 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${interTight.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-950">
         <SchemaMarkup />

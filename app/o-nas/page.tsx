@@ -5,10 +5,10 @@ import { SiteFooter } from "../components/site-footer";
 import { PageHero } from "../components/page-hero";
 import { Timeline } from "../components/timeline";
 import { FadeIn, StaggerContainer, StaggerItem } from "../components/fade-in";
-import { TiltCard } from "../components/effects/tilt-card";
+import { Frame } from "../components/mk/frame";
 
 export const metadata: Metadata = {
-  title: "O AgentSpace — Polska platforma szkolenia agentów RE | AgentSpace",
+  title: "O AgentSpace — polski system dla biur nieruchomości",
   description:
     "Kto, dlaczego i po co buduje AgentSpace. Historia foundera, klient zero, filozofia produktu. Polska platforma dla biur nieruchomości.",
   alternates: {
@@ -41,8 +41,8 @@ const PRINCIPLES = [
 
 const ROADMAP = [
   {
-    period: "Q1 2026",
-    title: "Wczesny dostęp dla pierwszych 10 biur",
+    period: "2026",
+    title: "Program Pierwszych 10 Biur",
     body: "AI Coach z 5 podstawowymi scenariuszami, dashboard agenta, panel właściciela.",
   },
   {
@@ -73,11 +73,11 @@ export default function ONas() {
           description="AgentSpace nie jest kolejnym SaaS-em 'dla nieruchomości' tłumaczonym z angielskiego. Jest budowany w Krakowie, dla biur w Polsce, przez kogoś kto na co dzień prowadzi biuro nieruchomości i wie, co konkretnie boli."
         />
 
-        {/* Founder story z TiltCard */}
+        {/* Founder story */}
         <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
-              <TiltCard className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
+              <Frame className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
                 <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-12">
                   {/* Avatar — duży, animowany glow */}
                   <div className="flex justify-center md:justify-start">
@@ -131,7 +131,7 @@ export default function ONas() {
                     </div>
                   </div>
                 </div>
-              </TiltCard>
+              </Frame>
             </FadeIn>
           </div>
         </section>
@@ -195,16 +195,16 @@ export default function ONas() {
           <FadeIn>
             <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 text-center md:p-12">
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
-                Chcesz dołączyć jako jedno z pierwszych 10 biur?
+                Chcesz dołączyć do Programu Pierwszych 10 Biur?
               </h2>
               <p className="mb-8 text-zinc-400">
-                3 miesiące za darmo + 30% rabatu na pierwszy rok. Plus wpływ na rozwój produktu.
+                Jedno biuro na miasto, cena zamrożona na 24 miesiące, wpływ na rozwój produktu.
               </p>
               <Link
                 href="/#waitlist"
                 className="inline-flex items-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400"
               >
-                Dołącz do listy oczekujących →
+                Umów rozmowę →
               </Link>
             </div>
           </FadeIn>

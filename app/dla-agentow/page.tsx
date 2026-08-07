@@ -148,7 +148,7 @@ export default function DlaAgentow() {
               </h2>
               <p className="mb-8 text-zinc-400">
                 Jeśli prowadzisz/pracujesz w biurze, które chciałbyś, żeby wdrożyło AgentSpace —
-                wyślij szefowi link do strony. Pierwsze 10 biur dostaje 3 miesiące za darmo.
+                wyślij szefowi link do strony. Przyjmujemy jedno biuro na miasto.
               </p>
               <Link
                 href="/#waitlist"

@@ -1,29 +1,40 @@
 /**
- * JSON-LD structured data dla Google rich snippets.
- * 3 schemy: SoftwareApplication, Organization, FAQPage.
+ * JSON-LD structured data dla Google rich snippets i crawlerów LLM.
+ * Schemy: SoftwareApplication, Organization, FAQPage, HowTo, ItemList (nawigacja).
  * Bez "use client" — to czysty HTML w SSR.
+ *
+ * FAQ_ENTRIES musi odpowiadać treści widocznej na stronie (app/page.tsx).
+ * Google karze za schema, która nie zgadza się z widoczną treścią.
  */
 
 const FAQ_ENTRIES = [
   {
-    q: "Kiedy AgentSpace startuje?",
-    a: "Pierwsza wersja w Q1 2026. Aktualnie pilotujemy z grupą zaprzyjaźnionych biur nieruchomości (w tym Spectra Nieruchomości w Krakowie). Pierwsze 10 biur z listy oczekujących dostanie wczesny dostęp + 3 miesiące za darmo + 30% rabatu na pierwszy rok.",
+    q: "Czy AgentSpace działa już dziś?",
+    a: "Tak. Platforma działa na produkcji i jest codziennie używana w biurze Spectra Nieruchomości w Krakowie — to biuro założyciela i pierwszy klient produktu. Przyjmujemy kolejne biura w ramach Programu Pierwszych 10 Biur.",
   },
   {
-    q: "Co agenci nieruchomości dostają z AgentSpace?",
-    a: "Realną korzyść. Agenci ćwiczą umiejętności które bezpośrednio przekładają się na ich prowizję — cold calling, obiekcje cenowe, negocjacja prowizji. Lepiej obrabiają obiekcje = więcej zamkniętych transakcji. Plus widzą swój postęp i ranking biura.",
+    q: "Czy AgentSpace zastąpi mój obecny system?",
+    a: "W większości biur tak — AgentSpace obejmuje CRM klientów, wspólną bazę nieruchomości, cele, prowizje, zadania i dokumenty. Jeśli korzystasz z systemu do masowego eksportu ofert na portale, na razie warto zostawić go obok.",
   },
   {
-    q: "Czy musimy nagrywać prawdziwych klientów?",
-    a: "Nie. AI Coach to symulacje — agent ćwiczy z AI klientem, nie z prawdziwym. Pełna prywatność, zero ryzyka RODO ze strony klientów.",
+    q: "Ile trwa wdrożenie i kto je robi?",
+    a: "Jeden dzień roboczy. Zakładamy konto, wgrywamy bazę klientów i nieruchomości, zapraszamy agentów i konfigurujemy cele pod Twój model pracy. Wdrożenie prowadzimy razem z klientem.",
   },
   {
-    q: "Jakie są wymagania techniczne?",
-    a: "Przeglądarka i mikrofon. Działa na laptopie, telefonie, tablecie. Bez instalacji, bez dodatkowego sprzętu.",
+    q: "Czy agenci to zaakceptują?",
+    a: "AgentSpace zaczyna od tego, co daje agentowi: plan dnia, gotowe follow-upy pisane przez AI, widoczny postęp celu i trening przed trudną rozmową. Panel właściciela jest efektem ubocznym ich codziennej pracy, a nie osobnym raportowaniem.",
   },
   {
-    q: "Co jeśli AgentSpace nie zadziała w moim biurze nieruchomości?",
-    a: "30 dni gwarancji zwrotu pieniędzy od dnia płatności, bez pytań. Plus pierwsze 14 dni to darmowy trial — testujesz bez ryzyka.",
+    q: "Czy musimy nagrywać rozmowy z prawdziwymi klientami?",
+    a: "Nie. AI Coach to symulacje — agent ćwiczy z klientem AI, nie z prawdziwym. Zero ryzyka RODO po stronie klientów biura.",
+  },
+  {
+    q: "Gdzie są przechowywane dane biura?",
+    a: "Na serwerach w Unii Europejskiej (Frankfurt). Dane biura są odseparowane od danych innych biur, a dostęp mają wyłącznie zaproszeni użytkownicy zgodnie z rolą: CEO, menedżer, agent.",
+  },
+  {
+    q: "Czy jest umowa na czas określony?",
+    a: "Nie. Rozliczenie miesięczne, rezygnacja w dowolnym momencie.",
   },
 ];
 
@@ -32,43 +43,71 @@ const softwareApplicationSchema = {
   "@type": "SoftwareApplication",
   name: "AgentSpace",
   description:
-    "Platforma do szkolenia agentów nieruchomości z AI Coachem. Trening cold calli, dashboard agenta, ranking zespołu, raporty dla właściciela biura.",
+    "System operacyjny dla biura nieruchomości: CRM klientów, wspólna baza nieruchomości, cele i lejek sprzedaży, rozliczanie prowizji, AI Coach do treningu rozmów oraz panel właściciela.",
   url: "https://agentspace.pl",
   applicationCategory: "BusinessApplication",
-  applicationSubCategory: "Real Estate Training Software",
+  applicationSubCategory: "Real Estate Agency Management Software",
   operatingSystem: "Web",
   inLanguage: "pl-PL",
-  offers: {
-    "@type": "Offer",
-    price: "299",
-    priceCurrency: "PLN",
-    priceSpecification: {
-      "@type": "UnitPriceSpecification",
-      price: "299",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Start",
+      price: "499",
       priceCurrency: "PLN",
-      unitText: "MONTH",
-      referenceQuantity: {
-        "@type": "QuantitativeValue",
-        value: 10,
-        unitCode: "C62",
-        unitText: "agentów",
+      availability: "https://schema.org/InStock",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: "499",
+        priceCurrency: "PLN",
+        unitText: "MONTH",
+        referenceQuantity: {
+          "@type": "QuantitativeValue",
+          value: 5,
+          unitCode: "C62",
+          unitText: "agentów",
+        },
       },
+      eligibleRegion: { "@type": "Country", name: "Poland" },
     },
-    availability: "https://schema.org/PreOrder",
-    priceValidUntil: "2026-12-31",
-    eligibleRegion: {
-      "@type": "Country",
-      name: "Poland",
+    {
+      "@type": "Offer",
+      name: "Pro",
+      price: "899",
+      priceCurrency: "PLN",
+      availability: "https://schema.org/InStock",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: "899",
+        priceCurrency: "PLN",
+        unitText: "MONTH",
+        referenceQuantity: {
+          "@type": "QuantitativeValue",
+          value: 15,
+          unitCode: "C62",
+          unitText: "agentów",
+        },
+      },
+      eligibleRegion: { "@type": "Country", name: "Poland" },
     },
-  },
+    {
+      "@type": "Offer",
+      name: "Biuro",
+      price: "1490",
+      priceCurrency: "PLN",
+      availability: "https://schema.org/InStock",
+      eligibleRegion: { "@type": "Country", name: "Poland" },
+    },
+  ],
   featureList: [
-    "AI Coach do treningu cold calli",
-    "5 polskich scenariuszy sprzedażowych",
-    "Naturalny polski głos AI klienta",
-    "Scoring po polsku w 4 kategoriach",
-    "Dashboard dziennej pracy agenta",
-    "Ranking agentów w biurze",
-    "Raporty miesięczne dla właściciela",
+    "CRM klientów z pipeline i notatkami",
+    "Wspólna baza nieruchomości dla biura",
+    "Cele i lejek sprzedażowy — roczny do dziennego",
+    "Rozliczanie prowizji i karta transakcji",
+    "Umowy rezerwacyjne generowane do PDF",
+    "AI Coach — trening rozmów z klientem AI",
+    "Panel właściciela z rankingiem i raportami",
+    "Role: CEO, menedżer, agent",
   ],
   publisher: {
     "@type": "Organization",
@@ -84,7 +123,7 @@ const organizationSchema = {
   legalName: "Spectra Nieruchomości",
   url: "https://agentspace.pl",
   description:
-    "Polska platforma do szkolenia agentów nieruchomości z AI. Klient zero: Spectra Nieruchomości w Krakowie.",
+    "Polski system operacyjny dla biur nieruchomości. Klient zero: Spectra Nieruchomości w Krakowie.",
   founder: {
     "@type": "Person",
     name: "Wiktor Szostek",
@@ -113,12 +152,8 @@ const organizationSchema = {
     contactType: "customer service",
     availableLanguage: ["pl"],
   },
-  areaServed: {
-    "@type": "Country",
-    name: "Poland",
-  },
+  areaServed: { "@type": "Country", name: "Poland" },
   knowsLanguage: ["pl-PL"],
-  sameAs: ["https://github.com/wiktoramsweb-boop/agentspace"],
 };
 
 const faqPageSchema = {
@@ -127,21 +162,71 @@ const faqPageSchema = {
   mainEntity: FAQ_ENTRIES.map((entry) => ({
     "@type": "Question",
     name: entry.q,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: entry.a,
+    acceptedAnswer: { "@type": "Answer", text: entry.a },
+  })),
+};
+
+const howToSchema = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "Jak wdrożyć AgentSpace w biurze nieruchomości",
+  description:
+    "Wdrożenie systemu operacyjnego AgentSpace w biurze nieruchomości w trzech krokach — od rozmowy do pierwszych wniosków z danych.",
+  totalTime: "P30D",
+  step: [
+    {
+      "@type": "HowToStep",
+      position: 1,
+      name: "Rozmowa i audyt biura",
+      text: "30 minut rozmowy. Sprawdzamy, jak dziś wygląda obieg leada w biurze i gdzie realnie giną transakcje. Wnioski otrzymujesz niezależnie od decyzji o współpracy.",
     },
+    {
+      "@type": "HowToStep",
+      position: 2,
+      name: "Wdrożenie w jeden dzień",
+      text: "Zakładamy konto biura, wgrywamy bazę klientów i nieruchomości, zapraszamy agentów i konfigurujemy cele oraz lejek pod model pracy biura.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 3,
+      name: "Pierwsze wnioski w 30 dni",
+      text: "Po miesiącu biuro ma komplet danych: kto realizuje cele, gdzie zespół traci leady i jak wyglądają rozmowy z klientami.",
+    },
+  ],
+};
+
+const navigationSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Nawigacja główna",
+  itemListElement: [
+    { name: "Produkt", url: "https://agentspace.pl/#moduly" },
+    { name: "Integracje", url: "https://agentspace.pl/integracje" },
+    { name: "Cennik", url: "https://agentspace.pl/cennik" },
+    { name: "Blog", url: "https://agentspace.pl/blog" },
+    { name: "O nas", url: "https://agentspace.pl/o-nas" },
+  ].map((item, i) => ({
+    "@type": "SiteNavigationElement",
+    position: i + 1,
+    name: item.name,
+    url: item.url,
   })),
 };
 
 export function SchemaMarkup() {
-  const combined = [softwareApplicationSchema, organizationSchema, faqPageSchema];
+  const combined = [
+    softwareApplicationSchema,
+    organizationSchema,
+    faqPageSchema,
+    howToSchema,
+    navigationSchema,
+  ];
 
   return (
     <script
       type="application/ld+json"
-      // JSON-LD wymaga dangerouslySetInnerHTML — jest to oficjalnie rekomendowany
-      // sposób przez React i Google. Treść jest statyczna, zero ryzyka XSS.
+      // JSON-LD wymaga dangerouslySetInnerHTML — oficjalnie rekomendowany
+      // sposób przez React i Google. Treść statyczna, zero ryzyka XSS.
       dangerouslySetInnerHTML={{ __html: JSON.stringify(combined) }}
     />
   );

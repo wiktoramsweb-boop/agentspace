@@ -170,7 +170,7 @@ export function WaitlistForm() {
         disabled={status === "submitting"}
         className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {status === "submitting" ? "Wysyłam..." : "Dołącz do listy oczekujących"}
+        {status === "submitting" ? "Wysyłam..." : "Wyślij zgłoszenie"}
       </button>
 
       <p className="text-center text-xs text-zinc-500">

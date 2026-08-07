@@ -176,14 +176,14 @@ export default async function BlogPost({ params }: Props) {
               Zbuduj systematyczny trening agentów w swoim biurze
             </h2>
             <p className="mb-6 text-zinc-400">
-              AI Coach + dashboard agenta + ranking zespołu. Premiera Q1 2026. Pierwsze 10 biur:
-              3 miesiące za darmo + 30% rabatu na pierwszy rok.
+              CRM, cele, prowizje, AI Coach i panel właściciela w jednym systemie.
+              Przyjmujemy jedno biuro na miasto.
             </p>
             <Link
               href="/#waitlist"
               className="inline-flex items-center rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
             >
-              Dołącz do listy oczekujących →
+              Umów rozmowę →
             </Link>
           </div>
         </section>

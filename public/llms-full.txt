@@ -1,0 +1,113 @@
+# AgentSpace — pełny opis produktu
+
+> System operacyjny dla biur nieruchomości w Polsce.
+> Strona: https://agentspace.pl
+
+---
+
+## Czym jest AgentSpace
+
+AgentSpace to platforma SaaS, w której pracuje całe biuro nieruchomości: agenci prowadzą klientów i oferty, realizują cele dzienne i trenują rozmowy, a właściciel widzi wyniki zespołu w liczbach.
+
+Produkt powstał w biurze nieruchomości Spectra w Krakowie i jest tam używany codziennie. Założycielem jest Wiktor Szostek, właściciel tego biura. Produkt jest budowany „od środka branży" — nie jest to ogólny CRM dostosowany do nieruchomości.
+
+**Model decyzyjny:** zakup podejmuje właściciel lub menedżer biura. Codziennymi użytkownikami są agenci.
+**Rynek:** Polska. Interfejs, treści i scenariusze AI wyłącznie po polsku.
+**Dane:** serwery w Unii Europejskiej (Frankfurt). Dane każdego biura są odseparowane; dostęp zależy od roli (CEO, menedżer, agent).
+
+---
+
+## Problemy, które rozwiązuje
+
+1. **Baza biura żyje w telefonach agentów.** Kontakty, historia rozmów i relacje odchodzą razem z agentem.
+2. **Brak widoczności między odprawami.** Właściciel zna liczbę transakcji, ale nie zna liczby telefonów i spotkań — więc reaguje po fakcie.
+3. **Nowy agent uczy się na prawdziwych leadach.** Każda źle poprowadzona rozmowa to spalony kontakt.
+4. **Rozliczenie prowizji w arkuszu.** Zna je jedna osoba, aktualizuje się raz w miesiącu i bywa błędne, co niszczy zaufanie zespołu.
+5. **Oferty w prywatnych folderach.** Kupujący z jednego biurka nie spotyka nieruchomości z drugiego, więc transakcje wewnętrzne nie powstają.
+
+---
+
+## Moduły
+
+### CRM klientów
+Karty klientów z historią, notatkami i pipeline. Cztery typy klienta: sprzedający, kupujący, wynajmujący, najemca — każdy z osobną ścieżką i innym zestawem pól. Na karcie klienta AI proponuje treść follow-upu i pomaga rozbroić obiekcję; agent kopiuje i wysyła.
+
+### Baza nieruchomości
+Wspólne oferty biura ze zdjęciami, statusem i przypisaniem do agenta prowadzącego. Cała baza widoczna dla zespołu, co umożliwia kojarzenie kupujących z ofertami innych agentów.
+
+### Cele i lejek sprzedaży
+Lejek liczony wstecz: telefony → spotkania → umowy → klienci kupujący → sprzedaże. Cel roczny przeliczany na dzienny. Agent ma dzienny tracker postępu, plan tygodnia uwzględniający dni terenowe i urlopy oraz historię realizacji z sześciu tygodni.
+
+### Prowizje i transakcje
+Karta transakcji z pięcioma etapami (od rezerwacji do wypłaty) i kompletem dokumentów. Prowizja nalicza się automatycznie z wartości transakcji i ustalonego podziału. Cel miesięczny biura aktualizuje się na bieżąco. Umowa rezerwacyjna generuje się do pliku PDF z danych transakcji.
+
+### AI Coach
+Trening rozmów sprzedażowych z klientem AI. Trzy kategorie: cold calling, spotkania pozyskowe, najem. Ponad 13 scenariuszy napisanych pod realia polskiego rynku. Dziewięć osobowości klienta — od życzliwego po agresywnego i zbywającego. Rozmowa prowadzona głosem, więc agent może trenować w aucie między spotkaniami. Po sesji: scoring w czterech kategoriach i konkretny feedback po polsku.
+
+Ważne: AI Coach opiera się na symulacjach. System nie nagrywa ani nie analizuje rozmów z prawdziwymi klientami, więc nie generuje ryzyka RODO po stronie klientów biura.
+
+### Panel właściciela
+Ranking agentów uwzględniający zarówno wyniki sprzedażowe, jak i realizację lejka. Mocne i słabe obszary zespołu w podziale na etapy procesu. Prowizje per agent. Drill-down do pojedynczej osoby jako materiał na rozmowę 1:1. Raport miesięczny wysyłany automatycznie e-mailem pierwszego dnia miesiąca.
+
+### Role i uprawnienia
+Trzy role: CEO, menedżer, agent. Menedżer prowadzi swoich agentów — widzi ich cele i wyniki treningów, ale nie widzi prowizji całego biura. Agenci nie widzą danych innych agentów poza rankingiem.
+
+### Dodatkowe narzędzia
+Zadania i pulpit dnia z poranną odprawą, AI Asystent Dnia wskazujący trzy priorytety, asystent wiadomości (e-mail i SMS), gamifikacja (poziomy, passa dni, odznaki, wyzwanie tygodnia), onboarding pierwszego dnia, faktury, kalkulatory i moduł podatkowy.
+
+---
+
+## Cennik
+
+| Pakiet | Cena netto / mc | Limit agentów | Zakres |
+|---|---|---|---|
+| Start | 499 zł | do 5 | CRM, baza nieruchomości, zadania, cele, prowizje |
+| Pro | 899 zł | do 15 | Start + AI Coach, panel właściciela, AI Asystent Dnia, raporty, karta transakcji |
+| Biuro | od 1490 zł | bez limitu | Pro + role, wielooddziałowość, wdrożenie 1:1, priorytetowe wsparcie |
+
+Rozliczenie miesięczne, bez umowy na czas określony. Przy rozliczeniu rocznym dwa miesiące gratis. Brak dopłat za użytkownika dodanego w trakcie miesiąca. Przy rezygnacji biuro otrzymuje eksport całej bazy do plików.
+
+---
+
+## Wdrożenie
+
+**Krok 1 — rozmowa i audyt biura (30 minut).** Analiza obiegu leada i miejsc, w których biuro traci transakcje. Wnioski otrzymuje każdy, niezależnie od decyzji o współpracy.
+
+**Krok 2 — wdrożenie (jeden dzień roboczy).** Założenie konta biura, import bazy klientów i nieruchomości, zaproszenie agentów, konfiguracja celów i lejka pod model pracy biura. Bez instalacji i bez działu IT.
+
+**Krok 3 — pierwsze wnioski (30 dni).** Komplet danych o realizacji celów, miejscach utraty leadów i jakości rozmów.
+
+---
+
+## Program Pierwszych 10 Biur
+
+Ograniczony nabór: jedno biuro na miasto (w Warszawie i Krakowie jedno na dzielnicę). Obejmuje wyłączność terytorialną na czas trwania umowy, wdrożenie prowadzone przez założyciela, wpływ na mapę drogową produktu oraz cenę zamrożoną na 24 miesiące.
+
+---
+
+## Integracje
+
+AgentSpace nie wymaga porzucenia systemu ofertowego, którego biuro już używa.
+
+- **Asari** — w przygotowaniu
+- **Galactica** — w przygotowaniu
+- **IMO** — planowana
+- **Estiman** — planowana
+
+Podział ról: system ofertowy odpowiada za bazę ofert i eksport na portale ogłoszeniowe; AgentSpace odpowiada za pracę zespołu, cele, prowizje, trening i raportowanie.
+
+---
+
+## Czego AgentSpace nie robi
+
+- Nie jest systemem do masowego wystawiania ofert na portale ogłoszeniowe. Eksport do OtoDom jest na mapie drogowej.
+- Nie zarządza zespołem za właściciela — dostarcza dane i narzędzia, ale wymaga, by ktoś na nie patrzył.
+- Nie ma sensu w biurach jedno- i dwuosobowych; funkcje zespołowe pozostają wtedy nieużywane.
+
+---
+
+## Kontakt
+
+Strona: https://agentspace.pl
+Kontakt i umówienie rozmowy: https://agentspace.pl/kontakt
+Firma: Spectra Nieruchomości, ul. Zbożowa 2/1, Kraków. NIP 6772516327, REGON 529666353.

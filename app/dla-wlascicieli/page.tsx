@@ -8,7 +8,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from "../components/fade-in";
 export const metadata: Metadata = {
   title: "Dla właścicieli biur nieruchomości — AgentSpace",
   description:
-    "AgentSpace dla właścicieli biur RE. Niższa rotacja agentów, szybszy onboarding, decyzje oparte o dane, wyższa konwersja zespołu. 299 zł/mc/biuro.",
+    "AgentSpace dla właścicieli biur nieruchomości. Niższa rotacja agentów, szybszy onboarding, decyzje oparte o dane. Pakiety od 499 zł/mc.",
   alternates: {
     canonical: "https://agentspace.pl/dla-wlascicieli",
   },
@@ -56,7 +56,7 @@ const BENEFITS_OWNER = [
 ];
 
 const ROI_MATH = [
-  { label: "Koszt AgentSpace", value: "299 zł", suffix: "/ mc", color: "text-zinc-300" },
+  { label: "Koszt AgentSpace", value: "od 499 zł", suffix: "/ mc", color: "text-zinc-300" },
   { label: "Średnia prowizja z transakcji", value: "~8 000 zł", suffix: "", color: "text-zinc-300" },
   { label: "Próg break-even", value: "+1 transakcja", suffix: "/ mc", color: "text-emerald-400" },
   { label: "Średnio zespół 8-osobowy daje (po 30 dniach)", value: "+3–5 transakcji", suffix: "/ mc", color: "text-emerald-400" },
@@ -167,10 +167,10 @@ export default function DlaWlascicieli() {
           <FadeIn>
             <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 text-center md:p-12">
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
-                Pilotaż dla pierwszych 10 biur
+                Program Pierwszych 10 Biur
               </h2>
               <p className="mb-8 text-zinc-400">
-                3 miesiące za darmo + 30% rabatu na pierwszy rok. Plus bezpośredni wpływ na rozwój
+                Jedno biuro na miasto, cena zamrożona na 24 miesiące. Plus bezpośredni wpływ na rozwój
                 produktu (1-on-1 z founderem co tydzień).
               </p>
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
@@ -178,7 +178,7 @@ export default function DlaWlascicieli() {
                   href="/#waitlist"
                   className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400"
                 >
-                  Dołącz do listy oczekujących
+                  Umów rozmowę
                 </Link>
                 <Link
                   href="/kontakt"

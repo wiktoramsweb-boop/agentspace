@@ -90,13 +90,13 @@ export default function BlogIndex() {
               Buduj wiedzę. Buduj zespół.
             </h2>
             <p className="mb-6 text-zinc-400">
-              AgentSpace startuje w Q1 2026. Pierwsze 10 biur dostaje 3 miesiące za darmo + 30% rabatu.
+              AgentSpace działa na produkcji. Przyjmujemy jedno biuro na miasto w ramach Programu Pierwszych 10 Biur.
             </p>
             <Link
               href="/#waitlist"
               className="inline-flex items-center rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
             >
-              Dołącz do listy oczekujących →
+              Umów rozmowę →
             </Link>
           </div>
         </section>

@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllPostsMeta } from "@/lib/blog";
+import { INTEGRATIONS } from "@/lib/marketing/integrations";
+import { MODULES } from "@/lib/marketing/modules";
 
 const BASE_URL = "https://agentspace.pl";
 
@@ -57,12 +59,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
     {
+      url: `${BASE_URL}/integracje`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${BASE_URL}/regulamin`,
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.3,
     },
   ];
+
+  // Strony modułów — długi ogon fraz produktowych.
+  const modulePages: MetadataRoute.Sitemap = MODULES.map((mod) => ({
+    url: `${BASE_URL}/produkt/${mod.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  // Strony integracji — łapią wyszukiwania „[system] + integracja".
+  const integrationPages: MetadataRoute.Sitemap = INTEGRATIONS.map((item) => ({
+    url: `${BASE_URL}/integracje/${item.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
 
   const blogPages: MetadataRoute.Sitemap = getAllPostsMeta().map((post) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
@@ -71,5 +95,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...blogPages];
+  return [...staticPages, ...modulePages, ...integrationPages, ...blogPages];
 }
