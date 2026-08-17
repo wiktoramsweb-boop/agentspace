@@ -38,13 +38,13 @@ export function GoalSetup({ goal }: { goal: Goal | null }) {
       <button
         type="button"
         onClick={() => setAdvanced((v) => !v)}
-        className="text-sm text-emerald-400 hover:text-emerald-300"
+        className="text-sm text-emerald-600 hover:text-emerald-700"
       >
         {advanced ? "− Ukryj" : "+ Dostosuj"} współczynniki lejka (zaawansowane)
       </button>
 
       {advanced && (
-        <div className="grid gap-4 rounded-2xl border border-zinc-700 bg-zinc-800/40 p-4 sm:grid-cols-3">
+        <div className="grid gap-4 rounded-2xl border border-slate-300 bg-white p-4 sm:grid-cols-3">
           <Field label="Cold calle na 1 spotkanie" name="callsPerMeeting" type="number" step="0.5" defaultValue={goal?.calls_per_meeting ?? 12} />
           <Field label="Spotkania na 1 umowę" name="meetingsPerListing" type="number" step="0.5" defaultValue={goal?.meetings_per_listing ?? 3} />
           <Field label="Umowy na 1 sprzedaż" name="listingsPerSale" type="number" step="0.1" defaultValue={goal?.listings_per_sale ?? 1.6} />
@@ -53,7 +53,7 @@ export function GoalSetup({ goal }: { goal: Goal | null }) {
 
       <SubmitButton
         pendingText="Zapisuję…"
-        className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-zinc-950 hover:bg-emerald-400"
+        className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-400"
       >
         {goal ? "Zapisz cel" : "Ustaw mój cel →"}
       </SubmitButton>
@@ -78,15 +78,15 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-zinc-200">{label}</label>
+      <label className="mb-1.5 block text-sm font-medium text-slate-800">{label}</label>
       <input
         name={name}
         type={type}
         step={step}
         defaultValue={defaultValue}
-        className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-white focus:border-emerald-500 focus:outline-none"
+        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none"
       />
-      {hint && <p className="mt-1 text-xs text-zinc-500">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
     </div>
   );
 }

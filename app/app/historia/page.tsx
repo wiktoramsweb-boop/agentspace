@@ -35,13 +35,13 @@ export default async function HistoriaPage() {
               <Link
                 key={s.id}
                 href={s.status === "completed" ? `/app/sesja/${s.id}` : `/app/sesja/${s.id}`}
-                className="flex items-center justify-between gap-4 px-6 py-4 transition hover:bg-zinc-900/40"
+                className="flex items-center justify-between gap-4 px-6 py-4 transition hover:bg-slate-50"
               >
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-white">
+                  <p className="truncate font-medium text-slate-900">
                     {s.scenario_title ?? "Sesja treningowa"}
                   </p>
-                  <p className="text-sm text-zinc-500">
+                  <p className="text-sm text-slate-500">
                     {formatDate(s.started_at)}
                     {s.personality && ` · klient ${s.personality}`}
                     {s.status === "in_progress" && " · w trakcie"}

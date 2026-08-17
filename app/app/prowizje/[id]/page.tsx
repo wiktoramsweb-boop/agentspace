@@ -23,7 +23,7 @@ export default async function DealDetailPage({ params }: Props) {
 
   return (
     <>
-      <Link href="/app/prowizje" className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-emerald-400">
+      <Link href="/app/prowizje" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Prowizje
       </Link>
 
@@ -53,8 +53,8 @@ export default async function DealDetailPage({ params }: Props) {
 function Fin({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div>
-      <p className="text-xs text-zinc-500">{label}</p>
-      <p className={`mt-0.5 font-semibold ${accent ? "text-emerald-400" : "text-white"}`}>{value}</p>
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className={`mt-0.5 font-semibold ${accent ? "text-emerald-600" : "text-slate-900"}`}>{value}</p>
     </div>
   );
 }

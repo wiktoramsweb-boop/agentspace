@@ -33,7 +33,7 @@ export function StatusBar({
           className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
             status === s.value
               ? s.color
-              : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800"
+              : "bg-white text-slate-500 hover:bg-slate-100"
           }`}
         >
           {s.label}
@@ -60,7 +60,7 @@ export function OwnerPicker({
         setPropertyOwner(propertyId, e.target.value || null);
         toast(e.target.value ? "Przypisano właściciela" : "Odłączono właściciela");
       }}
-      className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
+      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
     >
       <option value="">- brak właściciela -</option>
       {clients.map((c) => (
@@ -84,7 +84,7 @@ export function InterestAdder({
 
   if (clients.length === 0) {
     return (
-      <p className="text-sm text-zinc-600">
+      <p className="text-sm text-slate-400">
         Brak innych klientów do dodania.
       </p>
     );
@@ -95,7 +95,7 @@ export function InterestAdder({
       <select
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
+        className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
       >
         <option value="">- wybierz klienta -</option>
         {clients.map((c) => (
@@ -112,7 +112,7 @@ export function InterestAdder({
             toast("Dodano zainteresowanego klienta");
           }
         }}
-        className="rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+        className="rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
       >
         Dodaj
       </button>
@@ -130,7 +130,7 @@ export function RemoveInterestButton({
   return (
     <button
       onClick={() => removePropertyInterest(propertyId, clientId)}
-      className="text-zinc-600 transition hover:text-red-400"
+      className="text-slate-400 transition hover:text-red-600"
       title="Usuń z zainteresowanych"
     >
       ✕
@@ -144,7 +144,7 @@ export function DeletePropertyButton({ propertyId }: { propertyId: string }) {
     return (
       <button
         onClick={() => setConfirm(true)}
-        className="text-sm text-zinc-500 transition hover:text-red-400"
+        className="text-sm text-slate-500 transition hover:text-red-600"
       >
         Usuń ofertę
       </button>
@@ -152,16 +152,16 @@ export function DeletePropertyButton({ propertyId }: { propertyId: string }) {
   }
   return (
     <span className="flex items-center gap-2 text-sm">
-      <span className="text-zinc-400">Na pewno?</span>
+      <span className="text-slate-500">Na pewno?</span>
       <button
         onClick={() => deleteProperty(propertyId)}
-        className="font-medium text-red-400 hover:text-red-300"
+        className="font-medium text-red-600 hover:text-red-700"
       >
         Tak, usuń
       </button>
       <button
         onClick={() => setConfirm(false)}
-        className="text-zinc-500 hover:text-white"
+        className="text-slate-500 hover:text-slate-900"
       >
         Anuluj
       </button>

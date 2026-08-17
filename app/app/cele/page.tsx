@@ -39,8 +39,8 @@ export default async function CelePage() {
         />
         <Card className="max-w-2xl">
           <div className="mb-6">
-            <h2 className="mb-2 text-lg font-semibold text-white">Zacznij od celu finansowego</h2>
-            <p className="text-sm text-zinc-400">
+            <h2 className="mb-2 text-lg font-semibold text-slate-900">Zacznij od celu finansowego</h2>
+            <p className="text-sm text-slate-500">
               Powiedz ile chcesz zarobić w rok. Policzymy ile cold calli, spotkań i umów potrzebujesz -
               dziennie, tygodniowo, miesięcznie.
             </p>
@@ -137,33 +137,33 @@ export default async function CelePage() {
       />
 
       {/* Roczny cel + postęp */}
-      <Card className="mb-6 !border-emerald-500/30 !bg-gradient-to-br !from-emerald-500/10 !to-zinc-800/40">
+      <Card className="mb-6 !border-emerald-500/30 !bg-gradient-to-br !from-emerald-500/10 !to-slate-50">
         <div className="mb-3 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">Roczny cel</p>
-            <p className="text-3xl font-semibold text-white">
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Roczny cel</p>
+            <p className="text-3xl font-semibold text-slate-900">
               {formatPln(yearCommission)}{" "}
-              <span className="text-lg text-zinc-500">/ {formatPln(goal.annual_income_pln)}</span>
+              <span className="text-lg text-slate-500">/ {formatPln(goal.annual_income_pln)}</span>
             </p>
           </div>
-          <p className="text-3xl font-bold text-emerald-400">{yearProgress}%</p>
+          <p className="text-3xl font-bold text-emerald-600">{yearProgress}%</p>
         </div>
-        <div className="h-2.5 overflow-hidden rounded-full bg-zinc-800">
+        <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
           <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400" style={{ width: `${yearProgress}%` }} />
         </div>
-        <p className="mt-3 text-sm text-zinc-400">
-          Aby to osiągnąć potrzebujesz ~<strong className="text-white">{funnel.annual.sales}</strong> sprzedaży,{" "}
-          <strong className="text-white">{funnel.annual.listings}</strong> umów,{" "}
-          <strong className="text-white">{funnel.annual.calls}</strong> cold calli w rok.
+        <p className="mt-3 text-sm text-slate-500">
+          Aby to osiągnąć potrzebujesz ~<strong className="text-slate-900">{funnel.annual.sales}</strong> sprzedaży,{" "}
+          <strong className="text-slate-900">{funnel.annual.listings}</strong> umów,{" "}
+          <strong className="text-slate-900">{funnel.annual.calls}</strong> cold calli w rok.
         </p>
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         {/* Dzienny tracker */}
         <Card>
-          <h2 className="mb-1 text-lg font-semibold text-white">Dziś</h2>
-          <p className="mb-5 text-sm text-zinc-400">
-            Odhacz co zrobiłeś. Passa: <span className="text-emerald-400">{daysHitCallGoal} dni</span> z celem telefonów (ost. 30 dni).
+          <h2 className="mb-1 text-lg font-semibold text-slate-900">Dziś</h2>
+          <p className="mb-5 text-sm text-slate-500">
+            Odhacz co zrobiłeś. Passa: <span className="text-emerald-600">{daysHitCallGoal} dni</span> z celem telefonów (ost. 30 dni).
           </p>
           <DailyTracker log={todayLog} dailyTargets={dailyTargets} cadences={cadences} valuePerCall={valuePerCall} />
         </Card>
@@ -171,7 +171,7 @@ export default async function CelePage() {
         {/* Lejek */}
         <div>
           <Card className="mb-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">Twój lejek</h2>
+            <h2 className="mb-4 text-lg font-semibold text-slate-900">Twój lejek</h2>
             <div className="space-y-2">
               {FUNNEL_STAGES.map((stage, i) => {
                 const s = funnel.byStage[stage.key];
@@ -182,8 +182,8 @@ export default async function CelePage() {
                       className="flex items-center justify-between rounded-lg bg-gradient-to-r from-emerald-500/20 to-emerald-500/5 px-3 py-2.5"
                       style={{ width: `${width}%` }}
                     >
-                      <span className="text-sm font-medium text-white">{stage.short}</span>
-                      <span className="font-mono text-sm text-emerald-300">{s.cadence}</span>
+                      <span className="text-sm font-medium text-slate-900">{stage.short}</span>
+                      <span className="font-mono text-sm text-emerald-700">{s.cadence}</span>
                     </div>
                   </div>
                 );
@@ -193,14 +193,14 @@ export default async function CelePage() {
 
           {/* Rozbicie okresów */}
           <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-400">
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
               Cold calle w liczbach
             </h2>
             <div className="grid grid-cols-5 gap-2 text-center">
               {PERIODS.map((p) => (
-                <div key={p.key} className="rounded-lg bg-zinc-800/50 p-2">
-                  <p className="text-[10px] uppercase text-zinc-500">{p.label}</p>
-                  <p className="font-mono text-base font-semibold text-white">
+                <div key={p.key} className="rounded-lg bg-white p-2">
+                  <p className="text-[10px] uppercase text-slate-500">{p.label}</p>
+                  <p className="font-mono text-base font-semibold text-slate-900">
                     {funnel.byStage.cold_calls[p.key]}
                   </p>
                 </div>
@@ -226,7 +226,7 @@ export default async function CelePage() {
 
       {/* Edycja celu */}
       <details className="mt-6">
-        <summary className="cursor-pointer text-sm text-zinc-400 hover:text-white">
+        <summary className="cursor-pointer text-sm text-slate-500 hover:text-slate-900">
           Zmień cel lub współczynniki
         </summary>
         <Card className="mt-4 max-w-2xl">

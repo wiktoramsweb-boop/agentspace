@@ -22,7 +22,7 @@ export function NoteForm({ clientId }: { clientId: string }) {
         required
         rows={3}
         placeholder="Dodaj notatkę z kontaktu - o czym rozmawialiście, co dalej..."
-        className="w-full resize-y rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+        className="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
       />
       <SubmitButton />
     </form>
@@ -35,7 +35,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
+      className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
     >
       {pending ? "Zapisuję..." : "Dodaj notatkę"}
     </button>

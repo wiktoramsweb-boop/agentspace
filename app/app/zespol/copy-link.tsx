@@ -31,7 +31,7 @@ export function CopyLink({
       <button
         type="button"
         onClick={copy}
-        className="text-xs font-medium text-emerald-400 transition hover:text-emerald-300"
+        className="text-xs font-medium text-emerald-600 transition hover:text-emerald-700"
       >
         {copied ? "Skopiowano ✓" : label}
       </button>
@@ -39,12 +39,12 @@ export function CopyLink({
   }
 
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 p-1.5">
-      <span className="min-w-0 flex-1 truncate px-2 text-xs text-zinc-400">{link}</span>
+    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-1.5">
+      <span className="min-w-0 flex-1 truncate px-2 text-xs text-slate-500">{link}</span>
       <button
         type="button"
         onClick={copy}
-        className="flex-shrink-0 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-zinc-950 transition hover:bg-emerald-400"
+        className="flex-shrink-0 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-400"
       >
         {copied ? "Skopiowano ✓" : label}
       </button>

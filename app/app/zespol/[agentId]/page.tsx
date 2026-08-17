@@ -59,7 +59,7 @@ export default async function AgentDetailPage({ params }: Props) {
 
   return (
     <>
-      <Link href="/app/zespol" className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-emerald-400">
+      <Link href="/app/zespol" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Zespół
       </Link>
 
@@ -87,36 +87,36 @@ export default async function AgentDetailPage({ params }: Props) {
 
       {/* Cele i wykonanie: dziś + ten miesiąc */}
       <Card className="mb-8">
-        <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+        <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
           Cele i wykonanie
         </h2>
 
-        <p className="mb-2 text-xs font-medium text-zinc-400">Dziś</p>
+        <p className="mb-2 text-xs font-medium text-slate-500">Dziś</p>
         <div className="mb-5 grid grid-cols-3 gap-2 sm:grid-cols-5">
           {STAGE_KEYS.map((key) => {
             const daily = targets ? targets.byStage[key].daily : 0;
             return (
-              <div key={key} className="rounded-xl bg-zinc-900/60 px-3 py-2.5 text-center">
-                <p className="text-[10px] uppercase tracking-wide text-zinc-500">{STAGE_SHORT[key]}</p>
-                <p className="mt-0.5 font-mono text-lg font-semibold text-white">
+              <div key={key} className="rounded-xl bg-white px-3 py-2.5 text-center">
+                <p className="text-[10px] uppercase tracking-wide text-slate-500">{STAGE_SHORT[key]}</p>
+                <p className="mt-0.5 font-mono text-lg font-semibold text-slate-900">
                   {todayVals[key]}
-                  {daily > 0 && <span className="text-sm text-zinc-500">/{daily}</span>}
+                  {daily > 0 && <span className="text-sm text-slate-500">/{daily}</span>}
                 </p>
               </div>
             );
           })}
         </div>
 
-        <p className="mb-2 text-xs font-medium text-zinc-400">Ten miesiąc</p>
+        <p className="mb-2 text-xs font-medium text-slate-500">Ten miesiąc</p>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
           {STAGE_KEYS.map((key) => {
             const s = monthDone.get(key);
             return (
-              <div key={key} className="rounded-xl bg-zinc-900/60 px-3 py-2.5 text-center">
-                <p className="text-[10px] uppercase tracking-wide text-zinc-500">{STAGE_SHORT[key]}</p>
-                <p className="mt-0.5 font-mono text-lg font-semibold text-white">
+              <div key={key} className="rounded-xl bg-white px-3 py-2.5 text-center">
+                <p className="text-[10px] uppercase tracking-wide text-slate-500">{STAGE_SHORT[key]}</p>
+                <p className="mt-0.5 font-mono text-lg font-semibold text-slate-900">
                   {s?.done ?? 0}
-                  {hasGoal && (s?.target ?? 0) > 0 && <span className="text-sm text-zinc-500">/{s!.target}</span>}
+                  {hasGoal && (s?.target ?? 0) > 0 && <span className="text-sm text-slate-500">/{s!.target}</span>}
                 </p>
               </div>
             );
@@ -124,7 +124,7 @@ export default async function AgentDetailPage({ params }: Props) {
         </div>
 
         {!hasGoal && (
-          <p className="mt-3 text-xs text-zinc-600">
+          <p className="mt-3 text-xs text-slate-400">
             Agent nie ustawił jeszcze celu w zakładce „Cele" - pokazujemy same wykonania.
           </p>
         )}
@@ -137,14 +137,14 @@ export default async function AgentDetailPage({ params }: Props) {
 
       {categoryAverages.length > 0 && (
         <Card className="mb-8">
-          <h2 className="mb-5 text-sm font-medium uppercase tracking-wider text-zinc-500">
+          <h2 className="mb-5 text-sm font-medium uppercase tracking-wider text-slate-500">
             Obszary AI Coach
           </h2>
           <div className="space-y-4">
             {categoryAverages.map((c) => (
               <div key={c.key} className="flex items-center gap-4">
-                <span className="w-40 flex-shrink-0 text-sm text-zinc-300">{c.label}</span>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                <span className="w-40 flex-shrink-0 text-sm text-slate-700">{c.label}</span>
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
                   <div
                     className={`h-full rounded-full ${c.avg >= 8 ? "bg-emerald-400" : c.avg >= 6 ? "bg-amber-400" : "bg-red-400"}`}
                     style={{ width: `${c.avg * 10}%` }}
@@ -160,14 +160,14 @@ export default async function AgentDetailPage({ params }: Props) {
       )}
 
       <div className="mb-3 flex items-end justify-between">
-        <h2 className="text-lg font-semibold text-white">Wszystkie sesje AI Coach</h2>
-        <span className="text-sm text-zinc-500">
+        <h2 className="text-lg font-semibold text-slate-900">Wszystkie sesje AI Coach</h2>
+        <span className="text-sm text-slate-500">
           {completedSessions} ukończonych z {totalSessions} rozpoczętych
         </span>
       </div>
       {sessions.length === 0 ? (
         <Card>
-          <p className="text-center text-sm text-zinc-500">Ten agent nie ma jeszcze żadnej sesji.</p>
+          <p className="text-center text-sm text-slate-500">Ten agent nie ma jeszcze żadnej sesji.</p>
         </Card>
       ) : (
         <Card className="!p-0">
@@ -187,27 +187,27 @@ export default async function AgentDetailPage({ params }: Props) {
                 <Link
                   key={s.id}
                   href={`/app/sesja/${s.id}`}
-                  className="block px-6 py-4 transition hover:bg-zinc-900/40"
+                  className="block px-6 py-4 transition hover:bg-slate-50"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-white">
+                      <p className="truncate text-sm font-medium text-slate-900">
                         {s.scenario_title ?? "Sesja"}
                         {inProgress && (
-                          <span className="ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-300">
+                          <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
                             niedokończona
                           </span>
                         )}
                       </p>
-                      <p className="text-xs text-zinc-500">{formatDate(s.started_at)}</p>
+                      <p className="text-xs text-slate-500">{formatDate(s.started_at)}</p>
                     </div>
                     <ScoreBadge score={sc?.overall ?? null} />
                   </div>
                   {subs.length > 0 && (
                     <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                       {subs.map((sub) => (
-                        <div key={sub.label} className="rounded-lg bg-zinc-900/60 px-2.5 py-1.5">
-                          <p className="text-[10px] uppercase tracking-wide text-zinc-500">{sub.label}</p>
+                        <div key={sub.label} className="rounded-lg bg-white px-2.5 py-1.5">
+                          <p className="text-[10px] uppercase tracking-wide text-slate-500">{sub.label}</p>
                           <p className={`font-mono text-sm font-semibold ${scoreColor(sub.v ?? null)}`}>
                             {sub.v != null ? `${sub.v}/10` : "-"}
                           </p>
@@ -224,7 +224,7 @@ export default async function AgentDetailPage({ params }: Props) {
 
       {isOwner && profile.role !== "owner" && (
         <form action={removeAgent.bind(null, profile.id)} className="mt-8">
-          <button className="text-xs text-zinc-600 transition hover:text-red-400">
+          <button className="text-xs text-slate-400 transition hover:text-red-600">
             Usuń z zespołu
           </button>
         </form>

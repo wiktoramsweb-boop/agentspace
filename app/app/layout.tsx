@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <ToastProvider>
-      <div className="app-shell min-h-screen text-white md:flex">
+      <div className="app-shell min-h-screen text-slate-900 md:flex">
         <Sidebar
           role={user.role}
           fullName={user.full_name ?? "Użytkownik"}

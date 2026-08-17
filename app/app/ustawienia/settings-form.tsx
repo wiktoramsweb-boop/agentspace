@@ -19,19 +19,19 @@ export function SettingsForm({
   return (
     <form action={formAction} className="space-y-5">
       <div>
-        <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-slate-700">
           Imię i nazwisko
         </label>
         <input
           id="fullName"
           name="fullName"
           defaultValue={fullName}
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
 
       <div>
-        <label htmlFor="phone" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="phone" className="mb-2 block text-sm font-medium text-slate-700">
           Telefon
         </label>
         <input
@@ -40,13 +40,13 @@ export function SettingsForm({
           type="tel"
           defaultValue={phone}
           placeholder="+48 600 000 000"
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
-        <p className="mt-1.5 text-xs text-zinc-500">Pokazuje się w PDF-ach dla klienta i w zespole.</p>
+        <p className="mt-1.5 text-xs text-slate-500">Pokazuje się w PDF-ach dla klienta i w zespole.</p>
       </div>
 
       <div>
-        <label htmlFor="monthlyGoal" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="monthlyGoal" className="mb-2 block text-sm font-medium text-slate-700">
           Cel prowizji miesięcznej (zł)
         </label>
         <input
@@ -57,13 +57,13 @@ export function SettingsForm({
           step={1000}
           defaultValue={monthlyGoal || ""}
           placeholder="np. 20000"
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
-        <p className="mt-1.5 text-xs text-zinc-500">Pomaga śledzić postęp na pulpicie.</p>
+        <p className="mt-1.5 text-xs text-slate-500">Pomaga śledzić postęp na pulpicie.</p>
       </div>
 
       <div>
-        <label htmlFor="defaultSplit" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="defaultSplit" className="mb-2 block text-sm font-medium text-slate-700">
           Twój domyślny udział w prowizji (%)
         </label>
         <input
@@ -74,20 +74,20 @@ export function SettingsForm({
           max={100}
           defaultValue={defaultSplit || 50}
           placeholder="np. 50"
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
-        <p className="mt-1.5 text-xs text-zinc-500">
+        <p className="mt-1.5 text-xs text-slate-500">
           Podstawia się w kalkulatorze prowizji (możesz zmienić przy każdej transakcji).
         </p>
       </div>
 
-      {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
-      {state?.success && <p className="text-sm text-emerald-400">{state.success}</p>}
+      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state?.success && <p className="text-sm text-emerald-600">{state.success}</p>}
 
       <button
         type="submit"
         disabled={pending}
-        className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
+        className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
       >
         {pending ? "Zapisuję..." : "Zapisz zmiany"}
       </button>

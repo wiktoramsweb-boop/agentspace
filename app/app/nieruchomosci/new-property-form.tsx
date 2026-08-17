@@ -21,7 +21,7 @@ export function NewPropertyForm({ clients }: { clients: ClientLite[] }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+        className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
       >
         + Dodaj nieruchomość
       </button>
@@ -56,12 +56,12 @@ export function NewPropertyForm({ clients }: { clients: ClientLite[] }) {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm text-zinc-400">
-              Właściciel <span className="text-zinc-600">(klient sprzedający/wynajmujący)</span>
+            <label className="mb-1.5 block text-sm text-slate-500">
+              Właściciel <span className="text-slate-400">(klient sprzedający/wynajmujący)</span>
             </label>
             <select
               name="owner_client_id"
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none"
             >
               <option value="">- brak / dodaj później -</option>
               {clients.map((c) => (
@@ -73,30 +73,30 @@ export function NewPropertyForm({ clients }: { clients: ClientLite[] }) {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm text-zinc-400">
-              Opis <span className="text-zinc-600">(opcjonalnie)</span>
+            <label className="mb-1.5 block text-sm text-slate-500">
+              Opis <span className="text-slate-400">(opcjonalnie)</span>
             </label>
             <textarea
               name="description"
               rows={3}
               placeholder="Rozkładowe, po remoncie, balkon, blisko tramwaju..."
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
         </div>
 
-        <div className="flex flex-shrink-0 gap-3 border-t border-zinc-800 px-6 py-4">
+        <div className="flex flex-shrink-0 gap-3 border-t border-slate-200 px-6 py-4">
           <SubmitButton
             pendingText="Dodaję…"
-            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 hover:bg-emerald-400"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-400"
           >
             Dodaj nieruchomość
           </SubmitButton>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
+            className="rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition hover:bg-slate-100"
           >
             Anuluj
           </button>
@@ -121,13 +121,13 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
       <input
         name={name}
         type={type}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
       />
     </div>
   );
@@ -144,10 +144,10 @@ function Select({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
       <select
         name={name}
-        className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
+        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>

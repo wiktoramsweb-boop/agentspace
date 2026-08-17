@@ -172,7 +172,7 @@ export function Sidebar({
   return (
     <>
       {/* Mobile top bar */}
-      <div className="print-hide sticky top-0 z-30 flex items-center justify-between border-b border-zinc-800 bg-zinc-950/90 px-4 py-3 backdrop-blur-xl md:hidden">
+      <div className="app-sidebar print-hide sticky top-0 z-30 flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
         {brand}
         <button
           onClick={() => setMobileOpen((v) => !v)}
@@ -185,14 +185,14 @@ export function Sidebar({
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-20 flex flex-col bg-zinc-950/95 px-4 pb-6 pt-20 backdrop-blur-xl md:hidden">
+        <div className="app-sidebar fixed inset-0 z-20 flex flex-col px-4 pb-6 pt-20 md:hidden">
           {nav}
           {account}
         </div>
       )}
 
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-zinc-800 bg-zinc-950 p-4 md:flex">
+      <aside className="app-sidebar sticky top-0 hidden h-screen w-64 flex-col border-r border-white/10 p-4 md:flex">
         <div className="mb-6">{brand}</div>
         {nav}
         {account}

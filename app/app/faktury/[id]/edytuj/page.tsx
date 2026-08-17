@@ -19,7 +19,7 @@ export default async function EdytujFakturaPage({ params }: Props) {
     <>
       <Link
         href={`/app/faktury/${id}`}
-        className="print-hide mb-4 inline-flex items-center gap-1 text-sm text-zinc-500 transition hover:text-white"
+        className="print-hide mb-4 inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
       >
         ← Faktura
       </Link>

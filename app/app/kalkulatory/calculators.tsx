@@ -170,13 +170,13 @@ export function Calculators({ agent }: { agent: Agent }) {
         <div className="print-hide mb-4 flex items-center justify-between gap-4">
           <button
             onClick={() => setPreview(false)}
-            className="inline-flex items-center gap-1 text-sm text-zinc-400 transition hover:text-white"
+            className="inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
           >
             ← Wróć do edycji
           </button>
           <button
             onClick={print}
-            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
           >
             Drukuj / Zapisz PDF
           </button>
@@ -189,13 +189,13 @@ export function Calculators({ agent }: { agent: Agent }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
       <div className="print-hide space-y-5">
-        <div className="flex rounded-xl border border-zinc-700/60 bg-zinc-900/60 p-1">
+        <div className="flex rounded-xl border border-slate-200 bg-white p-1">
           <TabBtn active={tab === "kredyt"} onClick={() => setTab("kredyt")}>Kredyt</TabBtn>
           <TabBtn active={tab === "koszty"} onClick={() => setTab("koszty")}>Koszty zakupu</TabBtn>
           <TabBtn active={tab === "najem"} onClick={() => setTab("najem")}>Najem</TabBtn>
         </div>
 
-        <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-4">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4">
           {tab === "kredyt" && (
             <div className="space-y-3">
               <Num label="Kwota kredytu (zł)" value={amount} onChange={setAmount} />
@@ -216,13 +216,13 @@ export function Calculators({ agent }: { agent: Agent }) {
                   <Pill active={rynek === "pierwotny"} onClick={() => setRynek("pierwotny")}>Pierwotny</Pill>
                 </div>
               </div>
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
                 <input type="checkbox" checked={naKredyt} onChange={(e) => setNaKredyt(e.target.checked)} className="h-4 w-4 accent-emerald-500" />
                 Zakup na kredyt (ustanowienie hipoteki)
               </label>
 
-              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-3">
-                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">Rabaty (pokaż klientowi)</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Rabaty (pokaż klientowi)</p>
                 <div className="grid grid-cols-2 gap-3">
                   <Num label="Prowizja standard (%)" value={prowizjaStdPct} onChange={setProwizjaStdPct} step={0.5} />
                   <Num label="Prowizja z rabatem (%)" value={prowizjaFinalPct} onChange={setProwizjaFinalPct} step={0.5} />
@@ -252,7 +252,7 @@ export function Calculators({ agent }: { agent: Agent }) {
 
         <button
           onClick={() => setPreview(true)}
-          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400"
         >
           Podgląd i PDF dla klienta →
         </button>
@@ -263,9 +263,9 @@ export function Calculators({ agent }: { agent: Agent }) {
   );
 }
 
-const lbl = "mb-1.5 block text-sm text-zinc-400";
+const lbl = "mb-1.5 block text-sm text-slate-500";
 const inp =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 
 function Num({
   label,
@@ -304,7 +304,7 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
     <button
       onClick={onClick}
       className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-        active ? "bg-emerald-500 text-zinc-950" : "text-zinc-400 hover:text-white"
+        active ? "bg-emerald-500 text-white" : "text-slate-500 hover:text-slate-900"
       }`}
     >
       {children}
@@ -318,8 +318,8 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
       onClick={onClick}
       className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
         active
-          ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-300"
-          : "border-zinc-700/60 bg-zinc-950 text-zinc-400 hover:text-white"
+          ? "border-emerald-500/50 bg-emerald-100 text-emerald-700"
+          : "border-slate-200 bg-white text-slate-500 hover:text-slate-900"
       }`}
     >
       {children}

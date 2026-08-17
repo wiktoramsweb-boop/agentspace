@@ -19,8 +19,8 @@ const TYPE_EMOJI: Record<string, string> = {
 
 function kindVisual(kind: string) {
   return kind === "wynajem"
-    ? { bar: "from-sky-400 to-indigo-400", glow: "rgba(56,189,248,0.4)", chip: "text-sky-300" }
-    : { bar: "from-emerald-400 to-cyan-400", glow: "rgba(16,185,129,0.4)", chip: "text-emerald-300" };
+    ? { bar: "from-sky-400 to-indigo-400", glow: "rgba(56,189,248,0.4)", chip: "text-sky-700" }
+    : { bar: "from-emerald-400 to-cyan-400", glow: "rgba(16,185,129,0.4)", chip: "text-emerald-700" };
 }
 
 export function PropertiesBrowser({
@@ -61,7 +61,7 @@ export function PropertiesBrowser({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Szukaj po nazwie, adresie, mieście lub agencie…"
-          className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+          className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
         />
         <SegmentedToggle
           value={scope}
@@ -77,16 +77,16 @@ export function PropertiesBrowser({
       {/* Mapa */}
       {filtered.length > 0 && (
         <Card className="mb-6 !overflow-hidden !p-0">
-          <div className="flex items-center justify-between border-b border-zinc-700/60 bg-gradient-to-r from-emerald-500/10 via-sky-500/5 to-transparent px-5 py-3">
-            <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-zinc-300">
+          <div className="flex items-center justify-between border-b border-slate-200 bg-gradient-to-r from-emerald-500/10 via-sky-500/5 to-transparent px-5 py-3">
+            <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-slate-700">
               🗺️ Mapa ofert
             </h2>
-            <span className="text-xs text-zinc-500">{mapPoints.length} na mapie</span>
+            <span className="text-xs text-slate-500">{mapPoints.length} na mapie</span>
           </div>
           {mapPoints.length > 0 ? (
             <PropertiesMap points={mapPoints} />
           ) : (
-            <p className="p-6 text-sm text-zinc-500">
+            <p className="p-6 text-sm text-slate-500">
               Żadna oferta w tym widoku nie ma lokalizacji. Przy dodawaniu/edycji wybierz adres z podpowiedzi.
             </p>
           )}
@@ -95,7 +95,7 @@ export function PropertiesBrowser({
 
       {filtered.length === 0 ? (
         <Card>
-          <p className="text-center text-sm text-zinc-500">Brak ofert dla tego filtra.</p>
+          <p className="text-center text-sm text-slate-500">Brak ofert dla tego filtra.</p>
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -113,14 +113,14 @@ export function PropertiesBrowser({
             return (
               <Link key={p.id} href={`/app/nieruchomosci/${p.id}`} className="block">
                 <div
-                  className="card-glow group h-full overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-800/50 to-zinc-900/60"
+                  className="card-glow group h-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50"
                   style={{ ["--glow"]: kv.glow } as CSSProperties}
                 >
                   <div className={`h-1.5 w-full bg-gradient-to-r ${kv.bar}`} />
                   <div className="p-5">
                     <div className="mb-3 flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2.5">
-                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-zinc-700/60 bg-zinc-800/70 text-xl">
+                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-xl">
                           {TYPE_EMOJI[p.property_type] ?? "📍"}
                         </span>
                         <span className={`text-xs font-semibold uppercase tracking-wide ${kv.chip}`}>{kind?.label}</span>
@@ -130,22 +130,22 @@ export function PropertiesBrowser({
                       )}
                     </div>
 
-                    <h3 className="mb-1 truncate font-semibold text-white">{p.title}</h3>
+                    <h3 className="mb-1 truncate font-semibold text-slate-900">{p.title}</h3>
                     {(p.city || p.address) && (
-                      <p className="mb-3 truncate text-sm text-zinc-500">📍 {p.city ?? p.address}</p>
+                      <p className="mb-3 truncate text-sm text-slate-500">📍 {p.city ?? p.address}</p>
                     )}
 
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-slate-900">
                       {p.price_pln != null ? formatPln(p.price_pln) : "-"}
                       {p.deal_kind === "wynajem" && p.price_pln != null && (
-                        <span className="text-sm font-medium text-zinc-500"> /mc</span>
+                        <span className="text-sm font-medium text-slate-500"> /mc</span>
                       )}
                     </p>
-                    {params && <p className="mt-1 text-sm text-zinc-400">{params}</p>}
+                    {params && <p className="mt-1 text-sm text-slate-500">{params}</p>}
 
-                    <div className="mt-4 flex items-center justify-between border-t border-zinc-800 pt-3">
-                      <span className="flex items-center gap-2 text-xs text-zinc-400">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-[10px] font-bold text-zinc-950">
+                    <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-3">
+                      <span className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-[10px] font-bold text-white">
                           {(p.opiekunName ?? "?").charAt(0).toUpperCase()}
                         </span>
                         {mine ? "Ty" : p.opiekunName ?? "-"}

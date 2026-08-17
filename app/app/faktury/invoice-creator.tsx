@@ -52,13 +52,13 @@ export function InvoiceCreator({
               </option>
             ))}
           </select>
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-slate-500">
             Konto i dane podstawią się automatycznie na fakturze.
           </p>
         </Section>
 
         <Section title="Nabywca">
-          <div className="mb-3 flex rounded-xl border border-zinc-700/60 bg-zinc-900/60 p-1">
+          <div className="mb-3 flex rounded-xl border border-slate-200 bg-white p-1">
             <Toggle active={buyerType === "firma"} onClick={() => setBuyerType("firma")}>
               Firma
             </Toggle>
@@ -92,7 +92,7 @@ export function InvoiceCreator({
           <div className="grid grid-cols-2 gap-3">
             <Field label="Forma płatności" value={d.paymentMethod} onChange={(v) => set("paymentMethod", v)} />
             <div>
-              <label className="mb-1.5 block text-sm text-zinc-400">Zapłacono (zł)</label>
+              <label className="mb-1.5 block text-sm text-slate-500">Zapłacono (zł)</label>
               <input
                 type="number"
                 value={d.paid || ""}
@@ -108,7 +108,7 @@ export function InvoiceCreator({
         <Section title="Pozycje">
           <div className="space-y-3">
             {d.items.map((it, i) => (
-              <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-3">
+              <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <input
                   value={it.name}
                   onChange={(e) => setItem(i, { name: e.target.value })}
@@ -130,9 +130,9 @@ export function InvoiceCreator({
                     placeholder="Kwota (zł)"
                     className={`${inp} flex-1`}
                   />
-                  <span className="w-8 text-center text-xs text-zinc-500">zw</span>
+                  <span className="w-8 text-center text-xs text-slate-500">zw</span>
                   {d.items.length > 1 && (
-                    <button onClick={() => removeItem(i)} className="px-1 text-zinc-600 hover:text-red-400">
+                    <button onClick={() => removeItem(i)} className="px-1 text-slate-400 hover:text-red-600">
                       ✕
                     </button>
                   )}
@@ -142,12 +142,12 @@ export function InvoiceCreator({
           </div>
           <button
             onClick={addItem}
-            className="mt-2 w-full rounded-xl border border-dashed border-zinc-700 py-2 text-sm text-zinc-400 transition hover:border-emerald-500 hover:text-emerald-400"
+            className="mt-2 w-full rounded-xl border border-dashed border-slate-300 py-2 text-sm text-slate-500 transition hover:border-emerald-500 hover:text-emerald-600"
           >
             + Dodaj pozycję
           </button>
           <div className="mt-3">
-            <label className="mb-1.5 block text-sm text-zinc-400">Uwagi dodatkowe (opcjonalnie)</label>
+            <label className="mb-1.5 block text-sm text-slate-500">Uwagi dodatkowe (opcjonalnie)</label>
             <textarea
               value={d.description}
               onChange={(e) => set("description", e.target.value)}
@@ -162,13 +162,13 @@ export function InvoiceCreator({
           <button
             onClick={save}
             disabled={pending}
-            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
           >
             {pending ? "Zapisuję…" : editId ? "Zapisz zmiany" : "Zapisz fakturę"}
           </button>
           <button
             onClick={() => printInvoice(d.number)}
-            className="rounded-xl border border-zinc-700 px-5 py-3 font-medium text-zinc-200 transition hover:bg-zinc-800"
+            className="rounded-xl border border-slate-300 px-5 py-3 font-medium text-slate-800 transition hover:bg-slate-100"
           >
             Drukuj / PDF
           </button>
@@ -184,14 +184,14 @@ export function InvoiceCreator({
 }
 
 const inp =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 const sel =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-4">
-      <h3 className="mb-3 text-sm font-semibold text-white">{title}</h3>
+    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <h3 className="mb-3 text-sm font-semibold text-slate-900">{title}</h3>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -210,7 +210,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
       <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={inp} />
     </div>
   );
@@ -229,7 +229,7 @@ function Toggle({
     <button
       onClick={onClick}
       className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-        active ? "bg-emerald-500 text-zinc-950" : "text-zinc-400 hover:text-white"
+        active ? "bg-emerald-500 text-white" : "text-slate-500 hover:text-slate-900"
       }`}
     >
       {children}

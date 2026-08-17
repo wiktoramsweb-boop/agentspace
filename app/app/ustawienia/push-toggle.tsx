@@ -102,12 +102,12 @@ export function PushToggle() {
   }
 
   if (status === "loading") {
-    return <p className="text-sm text-zinc-500">Sprawdzam…</p>;
+    return <p className="text-sm text-slate-500">Sprawdzam…</p>;
   }
 
   if (status === "unsupported") {
     return (
-      <p className="text-sm text-zinc-400">
+      <p className="text-sm text-slate-500">
         Ta przeglądarka nie obsługuje powiadomień push. Użyj Chrome (Android/komputer)
         lub zainstaluj apkę na iPhone.
       </p>
@@ -126,10 +126,10 @@ export function PushToggle() {
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
-        <p className="font-medium text-white">
+        <p className="font-medium text-slate-900">
           Powiadomienia {status === "on" ? "włączone" : "wyłączone"}
         </p>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-slate-500">
           Poranna odprawa i przypomnienia o kontakcie z klientem.
         </p>
       </div>
@@ -138,8 +138,8 @@ export function PushToggle() {
         disabled={busy}
         className={`flex-shrink-0 rounded-xl px-5 py-2.5 text-sm font-semibold transition disabled:opacity-60 ${
           status === "on"
-            ? "border border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-            : "bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+            ? "border border-slate-300 text-slate-700 hover:bg-slate-100"
+            : "bg-emerald-500 text-white hover:bg-emerald-400"
         }`}
       >
         {busy ? "…" : status === "on" ? "Wyłącz" : "Włącz powiadomienia"}

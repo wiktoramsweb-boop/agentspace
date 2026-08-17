@@ -14,7 +14,7 @@ export default async function UstawieniaPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <h2 className="mb-5 text-lg font-semibold text-white">Profil</h2>
+          <h2 className="mb-5 text-lg font-semibold text-slate-900">Profil</h2>
           <SettingsForm
             fullName={user.full_name ?? ""}
             phone={user.phone ?? ""}
@@ -24,25 +24,25 @@ export default async function UstawieniaPage() {
         </Card>
 
         <Card>
-          <h2 className="mb-5 text-lg font-semibold text-white">Konto</h2>
+          <h2 className="mb-5 text-lg font-semibold text-slate-900">Konto</h2>
           <dl className="space-y-4 text-sm">
             <div>
-              <dt className="text-zinc-500">Email</dt>
-              <dd className="text-zinc-200">{user.email}</dd>
+              <dt className="text-slate-500">Email</dt>
+              <dd className="text-slate-800">{user.email}</dd>
               <ChangeEmail currentEmail={user.email ?? ""} />
             </div>
             <div>
-              <dt className="text-zinc-500">Rola</dt>
-              <dd className="text-zinc-200">{ROLE_LABELS[user.role]}</dd>
+              <dt className="text-slate-500">Rola</dt>
+              <dd className="text-slate-800">{ROLE_LABELS[user.role]}</dd>
             </div>
             <div>
-              <dt className="text-zinc-500">Biuro</dt>
-              <dd className="text-zinc-200">{user.agency?.name ?? "-"}</dd>
+              <dt className="text-slate-500">Biuro</dt>
+              <dd className="text-slate-800">{user.agency?.name ?? "-"}</dd>
             </div>
             {user.agency?.trial_ends_at && user.agency.plan === "trial" && (
               <div>
-                <dt className="text-zinc-500">Okres próbny do</dt>
-                <dd className="text-zinc-200">
+                <dt className="text-slate-500">Okres próbny do</dt>
+                <dd className="text-slate-800">
                   {new Intl.DateTimeFormat("pl-PL", { dateStyle: "long" }).format(
                     new Date(user.agency.trial_ends_at),
                   )}
@@ -54,8 +54,8 @@ export default async function UstawieniaPage() {
       </div>
 
       <Card className="mt-6">
-        <h2 className="mb-1 text-lg font-semibold text-white">Powiadomienia</h2>
-        <p className="mb-4 text-sm text-zinc-400">
+        <h2 className="mb-1 text-lg font-semibold text-slate-900">Powiadomienia</h2>
+        <p className="mb-4 text-sm text-slate-500">
           Poranna odprawa i przypomnienia o kontakcie prosto na telefon.
         </p>
         <PushToggle />

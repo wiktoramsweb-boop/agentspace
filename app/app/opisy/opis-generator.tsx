@@ -241,7 +241,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
           <Area label="Zdanie wprowadzające (opcjonalnie)" value={i.ukladWstep} onChange={(v) => set("ukladWstep", v)} rows={2} placeholder="Mieszkanie zaprojektowano w pełni rozkładowo..." />
           <div className="space-y-3">
             {i.rooms.map((r, idx) => (
-              <div key={idx} className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3">
+              <div key={idx} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <div className="mb-2 flex gap-2">
                   <input
                     value={r.name}
@@ -255,7 +255,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
                     placeholder="m²"
                     className={inputCls + " w-20"}
                   />
-                  <button onClick={() => removeRoom(idx)} className="px-2 text-zinc-600 hover:text-red-400" title="Usuń">
+                  <button onClick={() => removeRoom(idx)} className="px-2 text-slate-400 hover:text-red-600" title="Usuń">
                     ✕
                   </button>
                 </div>
@@ -282,7 +282,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
                   placeholder="Ogrzewanie miejskie - niższe koszty, brak przeglądów gazowych"
                   className={inputCls + " flex-1"}
                 />
-                <button onClick={() => removeAtut(idx)} className="px-2 text-zinc-600 hover:text-red-400" title="Usuń">
+                <button onClick={() => removeAtut(idx)} className="px-2 text-slate-400 hover:text-red-600" title="Usuń">
                   ✕
                 </button>
               </div>
@@ -323,7 +323,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
           <Area label="Nasza rekomendacja" value={i.rekomendacja} onChange={(v) => set("rekomendacja", v)} rows={3} />
           <Field label="Dostępność / wezwanie do kontaktu" value={i.dostepnosc} onChange={(v) => set("dostepnosc", v)} placeholder="Mieszkanie dostępne od zaraz. Zadzwoń lub napisz!" />
           <Toggle label="Dopisz 'We speak English!'" checked={i.english} onChange={(v) => set("english", v)} />
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-slate-500">
             Zakończenie Spectra oraz klauzula prawna dodają się automatycznie (wersja dla{" "}
             {sprzedaz ? "sprzedaży" : "najmu"}).
           </p>
@@ -333,12 +333,12 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
       {/* PRAWA: podgląd */}
       <div className="lg:sticky lg:top-4 lg:h-fit">
         <div className="mb-3 flex items-center justify-between gap-2">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
             Gotowy opis
           </h2>
           <button
             onClick={copy}
-            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-400"
           >
             {copied ? "Skopiowano ✓" : "Kopiuj"}
           </button>
@@ -348,14 +348,14 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
           <button
             onClick={generateAI}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:opacity-90 disabled:opacity-60"
           >
             {loading ? "AI pisze opis…" : "✨ Napisz przez AI"}
           </button>
           {aiText !== null && (
             <button
               onClick={() => setAiText(null)}
-              className="rounded-xl border border-zinc-700 px-4 py-2.5 text-sm text-zinc-300 transition hover:bg-zinc-800"
+              className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-100"
             >
               Wróć do szablonu
             </button>
@@ -363,15 +363,15 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
         </div>
 
         {error && (
-          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>
+          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
 
         <textarea
           value={output}
           onChange={(e) => setAiText(e.target.value)}
-          className="h-[70vh] w-full resize-none rounded-2xl border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs leading-relaxed text-zinc-200 focus:border-emerald-500 focus:outline-none"
+          className="h-[70vh] w-full resize-none rounded-2xl border border-slate-200 bg-white p-4 font-mono text-xs leading-relaxed text-slate-800 focus:border-emerald-500 focus:outline-none"
         />
-        <p className="mt-2 text-xs text-zinc-500">
+        <p className="mt-2 text-xs text-slate-500">
           ✨ AI napisze układ, atuty, lokalizację, potencjał i rekomendację z podanych danych.
           Tekst możesz dowolnie edytować. <span className="text-amber-400/80">Zweryfikuj szczegóły
           (linie, odległości, ceny) przed publikacją.</span>
@@ -384,14 +384,14 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
 /* ---------- małe komponenty pomocnicze ---------- */
 
 const inputCls =
-  "rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 const selectCls =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
-      <h3 className="mb-3 text-sm font-semibold text-white">{title}</h3>
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <h3 className="mb-3 text-sm font-semibold text-slate-900">{title}</h3>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -400,7 +400,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Labeled({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-xs text-slate-500">{label}</label>
       {children}
     </div>
   );
@@ -465,7 +465,7 @@ function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+    <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
       <input
         type="checkbox"
         checked={checked}
@@ -491,8 +491,8 @@ function TransButton({
       onClick={onClick}
       className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
         active
-          ? "bg-emerald-500 text-zinc-950"
-          : "border border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white"
+          ? "bg-emerald-500 text-white"
+          : "border border-slate-200 bg-white text-slate-500 hover:text-slate-900"
       }`}
     >
       {label}
@@ -504,7 +504,7 @@ function AddButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-full rounded-xl border border-dashed border-zinc-700 py-2 text-sm text-zinc-400 transition hover:border-emerald-500 hover:text-emerald-400"
+      className="w-full rounded-xl border border-dashed border-slate-300 py-2 text-sm text-slate-500 transition hover:border-emerald-500 hover:text-emerald-600"
     >
       {label}
     </button>

@@ -247,10 +247,10 @@ export const PROPERTY_STATUSES: {
   label: string;
   color: string;
 }[] = [
-  { value: "aktywna", label: "Aktywna", color: "bg-emerald-500/15 text-emerald-300" },
-  { value: "zarezerwowana", label: "Zarezerwowana", color: "bg-amber-500/15 text-amber-300" },
-  { value: "sfinalizowana", label: "Sfinalizowana", color: "bg-cyan-500/15 text-cyan-300" },
-  { value: "archiwum", label: "Archiwum", color: "bg-zinc-700/40 text-zinc-400" },
+  { value: "aktywna", label: "Aktywna", color: "bg-emerald-100 text-emerald-700" },
+  { value: "zarezerwowana", label: "Zarezerwowana", color: "bg-amber-100 text-amber-700" },
+  { value: "sfinalizowana", label: "Sfinalizowana", color: "bg-cyan-100 text-cyan-700" },
+  { value: "archiwum", label: "Archiwum", color: "bg-slate-200 text-slate-600" },
 ];
 
 export const CLIENT_TYPES: { value: ClientType; label: string }[] = [
@@ -266,18 +266,18 @@ export const CLIENT_STATUSES: {
   label: string;
   color: string;
 }[] = [
-  { value: "nowy", label: "Nowy", color: "bg-blue-500/15 text-blue-300" },
-  { value: "w_kontakcie", label: "W kontakcie", color: "bg-cyan-500/15 text-cyan-300" },
-  { value: "oglada", label: "Ogląda", color: "bg-violet-500/15 text-violet-300" },
-  { value: "negocjacje", label: "Negocjacje", color: "bg-amber-500/15 text-amber-300" },
-  { value: "zamkniety", label: "Zamknięty", color: "bg-emerald-500/15 text-emerald-300" },
-  { value: "stracony", label: "Stracony", color: "bg-red-500/15 text-red-300" },
+  { value: "nowy", label: "Nowy", color: "bg-blue-100 text-blue-700" },
+  { value: "w_kontakcie", label: "W kontakcie", color: "bg-cyan-100 text-cyan-700" },
+  { value: "oglada", label: "Ogląda", color: "bg-violet-100 text-violet-700" },
+  { value: "negocjacje", label: "Negocjacje", color: "bg-amber-100 text-amber-700" },
+  { value: "zamkniety", label: "Zamknięty", color: "bg-emerald-100 text-emerald-700" },
+  { value: "stracony", label: "Stracony", color: "bg-red-100 text-red-700" },
 ];
 
 export const DEAL_STATUSES: { value: DealStatus; label: string; color: string }[] = [
-  { value: "w_toku", label: "W toku", color: "bg-amber-500/15 text-amber-300" },
-  { value: "zamkniety", label: "Zamknięty", color: "bg-emerald-500/15 text-emerald-300" },
-  { value: "przepadl", label: "Przepadł", color: "bg-red-500/15 text-red-300" },
+  { value: "w_toku", label: "W toku", color: "bg-amber-100 text-amber-700" },
+  { value: "zamkniety", label: "Zamknięty", color: "bg-emerald-100 text-emerald-700" },
+  { value: "przepadl", label: "Przepadł", color: "bg-red-100 text-red-700" },
 ];
 
 export const PERSONALITIES = [

@@ -88,26 +88,26 @@ export function AddressInput({
 
   return (
     <div className="relative" ref={boxRef}>
-      <label className="mb-1.5 block text-sm text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
       <input
         value={query}
         onChange={(e) => onType(e.target.value)}
         onFocus={() => items.length > 0 && setOpen(true)}
         autoComplete="off"
         placeholder={placeholder}
-        className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
       />
       {loading && (
-        <span className="absolute right-3 top-9 text-xs text-zinc-600">szukam…</span>
+        <span className="absolute right-3 top-9 text-xs text-slate-400">szukam…</span>
       )}
       {open && items.length > 0 && (
-        <ul className="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-zinc-800 bg-zinc-900 shadow-xl">
+        <ul className="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl">
           {items.map((s, i) => (
             <li key={i}>
               <button
                 type="button"
                 onClick={() => pick(s)}
-                className="block w-full px-3 py-2 text-left text-sm text-zinc-300 transition hover:bg-emerald-500/10 hover:text-emerald-300"
+                className="block w-full px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700"
               >
                 {s.label}
               </button>

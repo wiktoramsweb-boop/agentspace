@@ -16,7 +16,7 @@ export function MiniMap({
   const fullUrl = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-800">
+    <div className="overflow-hidden rounded-xl border border-slate-200">
       <iframe
         src={src}
         title={title ?? "Mapa lokalizacji"}
@@ -27,7 +27,7 @@ export function MiniMap({
         href={fullUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="block border-t border-zinc-800 bg-zinc-950 px-3 py-2 text-center text-xs text-zinc-400 transition hover:text-emerald-400"
+        className="block border-t border-slate-200 bg-white px-3 py-2 text-center text-xs text-slate-500 transition hover:text-emerald-600"
       >
         Otwórz większą mapę ↗
       </a>

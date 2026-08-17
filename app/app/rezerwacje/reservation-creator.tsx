@@ -165,14 +165,14 @@ export function ReservationCreator({ city }: { city: string }) {
         <div className="print-hide mb-4 flex items-center justify-between gap-4">
           <button
             onClick={() => setPreview(false)}
-            className="inline-flex items-center gap-1 text-sm text-zinc-400 transition hover:text-white"
+            className="inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
           >
             ← Wróć do edycji
           </button>
           <button
             onClick={downloadPdf}
             disabled={pdfLoading}
-            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
+            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
           >
             {pdfLoading ? "Generuję PDF…" : "Pobierz PDF"}
           </button>
@@ -187,7 +187,7 @@ export function ReservationCreator({ city }: { city: string }) {
       {/* FORMULARZ */}
       <div className="print-hide space-y-5">
         {/* Tryb */}
-        <div className="inline-flex rounded-2xl border border-zinc-800 bg-zinc-900/60 p-1">
+        <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1">
           <ModeBtn active={isSale} onClick={() => set("mode", "sprzedaz" as ResMode)} label="Sprzedaż" />
           <ModeBtn active={!isSale} onClick={() => set("mode", "najem" as ResMode)} label="Najem" />
         </div>
@@ -283,7 +283,7 @@ export function ReservationCreator({ city }: { city: string }) {
         )}
 
         <Section title="Dodatkowe zapisy (opcjonalnie)">
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-slate-500">
             Napisz własnymi słowami, co dopisać do umowy - AI ujmie to formalnie i doda przed postanowieniami końcowymi.
           </p>
           <textarea
@@ -293,21 +293,21 @@ export function ReservationCreator({ city }: { city: string }) {
             placeholder={'np. „kupujący pokrywa koszt świadectwa energetycznego"'}
             className={inp}
           />
-          {aiError && <p className="text-xs text-red-400">{aiError}</p>}
+          {aiError && <p className="text-xs text-red-600">{aiError}</p>}
           <button
             onClick={addClause}
             disabled={aiLoading || !aiReq.trim()}
-            className="w-full rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/20 disabled:opacity-50"
+            className="w-full rounded-lg border border-emerald-500/40 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
           >
             {aiLoading ? "Redaguję…" : "✨ Dopisz zapis przez AI"}
           </button>
           {d.customClauses.length > 0 && (
             <div className="space-y-2 pt-1">
               {d.customClauses.map((c, i) => (
-                <div key={i} className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-2">
+                <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 p-2">
                   <div className="mb-1 flex items-center justify-between">
-                    <span className="text-[11px] text-zinc-500">Zapis {i + 1} (możesz poprawić)</span>
-                    <button onClick={() => removeClause(i)} className="text-[11px] text-zinc-500 transition hover:text-red-400">
+                    <span className="text-[11px] text-slate-500">Zapis {i + 1} (możesz poprawić)</span>
+                    <button onClick={() => removeClause(i)} className="text-[11px] text-slate-500 transition hover:text-red-600">
                       usuń
                     </button>
                   </div>
@@ -320,18 +320,18 @@ export function ReservationCreator({ city }: { city: string }) {
 
         <button
           onClick={() => setPreview(true)}
-          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 active:scale-[0.99]"
+          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400 active:scale-[0.99]"
         >
           Podgląd i PDF dla klienta →
         </button>
-        <p className="text-xs text-zinc-600">
+        <p className="text-xs text-slate-400">
           Gotowy, prawnie kompletny wzór. Przy „Zadatek" kwota jest bezzwrotna w razie rezygnacji Kupującego/Najemcy (art. 394 KC). Przy nietypowych transakcjach warto dać wzór do wglądu prawnikowi.
         </p>
       </div>
 
       {/* PODGLĄD NA ŻYWO */}
       <div className="lg:sticky lg:top-4 lg:h-fit">
-        <p className="mb-2 text-xs uppercase tracking-wider text-zinc-500">Podgląd umowy</p>
+        <p className="mb-2 text-xs uppercase tracking-wider text-slate-500">Podgląd umowy</p>
         {sheetEl}
       </div>
     </div>
@@ -356,14 +356,14 @@ function SignBlock({ roleGen, names }: { roleGen: string; names: string[] }) {
     <div className="text-center">
       {/* puste miejsce na odręczny podpis */}
       <div className="h-10" />
-      <div className="border-b border-dotted border-zinc-500" />
+      <div className="border-b border-dotted border-slate-300" />
       <p className="mt-2 text-sm text-zinc-800">Podpis {roleGen}</p>
       {real.length > 0 ? (
         real.map((n, i) => (
           <p key={i} className="text-sm text-zinc-800">{n}</p>
         ))
       ) : (
-        <p className="text-xs text-zinc-400">(imię i nazwisko)</p>
+        <p className="text-xs text-slate-500">(imię i nazwisko)</p>
       )}
     </div>
   );
@@ -374,7 +374,7 @@ function ModeBtn({ active, onClick, label }: { active: boolean; onClick: () => v
     <button
       onClick={onClick}
       className={`rounded-xl px-5 py-2 text-sm font-semibold transition ${
-        active ? "bg-emerald-500 text-zinc-950" : "text-zinc-400 hover:text-white"
+        active ? "bg-emerald-500 text-white" : "text-slate-500 hover:text-slate-900"
       }`}
     >
       {label}
@@ -384,8 +384,8 @@ function ModeBtn({ active, onClick, label }: { active: boolean; onClick: () => v
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
-      <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{title}</p>
+    <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</p>
       {children}
     </div>
   );
@@ -405,17 +405,17 @@ function PartyEditor({
   onRemove: (i: number) => void;
 }) {
   return (
-    <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+    <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{title}</p>
-        <button onClick={onAdd} className="text-xs font-medium text-emerald-400 hover:text-emerald-300">+ dodaj osobę</button>
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</p>
+        <button onClick={onAdd} className="text-xs font-medium text-emerald-600 hover:text-emerald-700">+ dodaj osobę</button>
       </div>
       {parties.map((p, i) => (
-        <div key={i} className="space-y-2 rounded-xl border border-zinc-800/70 bg-zinc-950/40 p-3">
+        <div key={i} className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
           {parties.length > 1 && (
             <div className="flex justify-between">
-              <span className="text-[11px] text-zinc-600">Osoba {i + 1}</span>
-              <button onClick={() => onRemove(i)} className="text-[11px] text-zinc-500 hover:text-red-400">usuń</button>
+              <span className="text-[11px] text-slate-400">Osoba {i + 1}</span>
+              <button onClick={() => onRemove(i)} className="text-[11px] text-slate-500 hover:text-red-600">usuń</button>
             </div>
           )}
           <Field label="Imię i nazwisko" value={p.name} onChange={(v) => onChange(i, { name: v })} />
@@ -468,6 +468,6 @@ function Field({
   );
 }
 
-const lbl = "mb-1 block text-xs text-zinc-400";
+const lbl = "mb-1 block text-xs text-slate-500";
 const inp =
-  "w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";

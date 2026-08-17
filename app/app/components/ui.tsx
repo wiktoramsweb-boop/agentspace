@@ -16,7 +16,7 @@ export function PageHeader({
         <h1 className="text-gradient text-2xl font-semibold tracking-tight md:text-3xl">
           {title}
         </h1>
-        {subtitle && <p className="mt-1.5 max-w-2xl text-sm text-zinc-400 md:text-base">{subtitle}</p>}
+        {subtitle && <p className="mt-1.5 max-w-2xl text-sm text-slate-500 md:text-base">{subtitle}</p>}
       </div>
       {action && <div className="flex-shrink-0">{action}</div>}
     </div>
@@ -38,42 +38,42 @@ export function StatCard({
 }) {
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border p-5 shadow-sm shadow-black/20 transition ${
+      className={`group relative overflow-hidden rounded-2xl border p-5 shadow-sm shadow-slate-900/5 transition ${
         accent
-          ? "border-emerald-500/40 bg-gradient-to-br from-emerald-500/20 to-zinc-800/40"
-          : "border-zinc-700/60 bg-zinc-800/40 hover:border-zinc-600"
+          ? "border-emerald-500/40 bg-gradient-to-br from-emerald-500/20 to-slate-50"
+          : "border-slate-200 bg-white hover:border-slate-300"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">{label}</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">{label}</p>
         {icon && (
           <span
             className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${
-              accent ? "bg-emerald-500/25 text-emerald-300" : "bg-zinc-700/50 text-zinc-300"
+              accent ? "bg-emerald-500/25 text-emerald-700" : "bg-slate-200 text-slate-700"
             }`}
           >
             {icon}
           </span>
         )}
       </div>
-      <p className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-3xl">{value}</p>
-      {sub && <p className="mt-1 text-sm text-zinc-400">{sub}</p>}
+      <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">{value}</p>
+      {sub && <p className="mt-1 text-sm text-slate-500">{sub}</p>}
     </div>
   );
 }
 
 export function scoreColor(score: number | null): string {
-  if (score == null) return "text-zinc-500";
-  if (score >= 8) return "text-emerald-400";
-  if (score >= 6) return "text-amber-400";
-  return "text-red-400";
+  if (score == null) return "text-slate-500";
+  if (score >= 8) return "text-emerald-600";
+  if (score >= 6) return "text-amber-600";
+  return "text-red-600";
 }
 
 export function scoreBg(score: number | null): string {
-  if (score == null) return "bg-zinc-800 text-zinc-400";
-  if (score >= 8) return "bg-emerald-500/15 text-emerald-300";
-  if (score >= 6) return "bg-amber-500/15 text-amber-300";
-  return "bg-red-500/15 text-red-300";
+  if (score == null) return "bg-slate-100 text-slate-500";
+  if (score >= 8) return "bg-emerald-100 text-emerald-700";
+  if (score >= 6) return "bg-amber-100 text-amber-700";
+  return "bg-red-100 text-red-700";
 }
 
 export function ScoreBadge({ score }: { score: number | null }) {
@@ -96,7 +96,7 @@ export function Badge({
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
-        className ?? "bg-zinc-800 text-zinc-300"
+        className ?? "bg-slate-100 text-slate-700"
       }`}
     >
       {children}
@@ -118,18 +118,18 @@ export function EmptyState({
   icon?: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/30 p-10 text-center">
+    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
       {icon && (
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-800/70 text-zinc-400">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
           {icon}
         </div>
       )}
-      <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
-      <p className="mx-auto mb-6 max-w-md text-sm text-zinc-400">{body}</p>
+      <h3 className="mb-2 text-lg font-semibold text-slate-900">{title}</h3>
+      <p className="mx-auto mb-6 max-w-md text-sm text-slate-500">{body}</p>
       {ctaHref && ctaLabel && (
         <Link
           href={ctaHref}
-          className="inline-flex items-center rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          className="inline-flex items-center rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
         >
           {ctaLabel}
         </Link>
@@ -149,8 +149,8 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-6 shadow-sm shadow-black/20 ${
-        hover ? "hover-lift hover:border-zinc-600 hover:bg-zinc-800/70" : ""
+      className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 ${
+        hover ? "hover-lift hover:border-slate-300 hover:bg-slate-100" : ""
       } ${className ?? ""}`}
     >
       {children}

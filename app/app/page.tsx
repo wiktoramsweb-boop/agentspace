@@ -66,7 +66,7 @@ export default async function DashboardPage() {
         action={
           <Link
             href="/app/trening"
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
           >
             Zacznij trening →
           </Link>
@@ -97,12 +97,12 @@ export default async function DashboardPage() {
       {goal > 0 && (
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="text-zinc-400">Cel miesięczny</span>
-            <span className="text-zinc-300">
+            <span className="text-slate-500">Cel miesięczny</span>
+            <span className="text-slate-700">
               {formatPln(commission.monthClosed)} / {formatPln(goal)}
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all"
               style={{ width: `${goalProgress}%` }}
@@ -119,19 +119,19 @@ export default async function DashboardPage() {
       {/* Plan dnia + Klienci do kontaktu */}
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
         <Card>
-          <h2 className="mb-4 text-lg font-semibold text-white">Plan dnia</h2>
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">Plan dnia</h2>
           <TaskList tasks={tasks} />
         </Card>
 
         <Card>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Do kontaktu</h2>
-            <Link href="/app/klienci" className="text-sm text-emerald-400 hover:text-emerald-300">
+            <h2 className="text-lg font-semibold text-slate-900">Do kontaktu</h2>
+            <Link href="/app/klienci" className="text-sm text-emerald-600 hover:text-emerald-700">
               Wszyscy →
             </Link>
           </div>
           {reminders.length === 0 && hotClients.length === 0 ? (
-            <p className="py-4 text-center text-sm text-zinc-600">
+            <p className="py-4 text-center text-sm text-slate-400">
               Wszyscy klienci na bieżąco. 👌
             </p>
           ) : (
@@ -140,15 +140,15 @@ export default async function DashboardPage() {
                 <li key={c.id}>
                   <Link
                     href={`/app/klienci/${c.id}`}
-                    className="flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 transition hover:bg-zinc-900/40"
+                    className="flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 transition hover:bg-slate-50"
                   >
                     <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-xs font-bold text-amber-300">
+                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
                         {c.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-white">{c.name}</p>
-                        <p className="text-xs text-amber-400">🔔 zaplanowany kontakt</p>
+                        <p className="truncate text-sm font-medium text-slate-900">{c.name}</p>
+                        <p className="text-xs text-amber-600">🔔 zaplanowany kontakt</p>
                       </div>
                     </div>
                   </Link>
@@ -160,15 +160,15 @@ export default async function DashboardPage() {
                   <li key={c.id}>
                     <Link
                       href={`/app/klienci/${c.id}`}
-                      className="flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 transition hover:bg-zinc-900/40"
+                      className="flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 transition hover:bg-slate-50"
                     >
                       <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-bold text-zinc-300">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700">
                           {c.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-white">{c.name}</p>
-                          <p className="text-xs text-amber-400">{daysAgo(c.last_contact_at)}</p>
+                          <p className="truncate text-sm font-medium text-slate-900">{c.name}</p>
+                          <p className="text-xs text-amber-600">{daysAgo(c.last_contact_at)}</p>
                         </div>
                       </div>
                       {status && (
@@ -190,33 +190,33 @@ export default async function DashboardPage() {
         <BadgesCard game={game} />
         <Card>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Wyzwanie tygodnia</h2>
-            <span className="text-xs text-zinc-500">cold calle</span>
+            <h2 className="text-lg font-semibold text-slate-900">Wyzwanie tygodnia</h2>
+            <span className="text-xs text-slate-500">cold calle</span>
           </div>
           {weeklyChallenge.length === 0 ? (
-            <p className="py-4 text-center text-sm text-zinc-500">Brak danych zespołu.</p>
+            <p className="py-4 text-center text-sm text-slate-500">Brak danych zespołu.</p>
           ) : (
             <>
               <ol className="space-y-2">
                 {weeklyChallenge.slice(0, 5).map((a, i) => (
                   <li
                     key={a.agentId}
-                    className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 ${a.agentId === user.id ? "bg-emerald-500/10" : ""}`}
+                    className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 ${a.agentId === user.id ? "bg-emerald-50" : ""}`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="w-5 text-center font-mono text-sm font-bold text-zinc-500">
+                      <span className="w-5 text-center font-mono text-sm font-bold text-slate-500">
                         {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                       </span>
-                      <span className={`text-sm ${a.agentId === user.id ? "font-semibold text-white" : "text-zinc-300"}`}>
+                      <span className={`text-sm ${a.agentId === user.id ? "font-semibold text-slate-900" : "text-slate-700"}`}>
                         {a.agentId === user.id ? "Ty" : a.name}
                       </span>
                     </div>
-                    <span className="font-mono text-sm font-semibold text-emerald-400">{a.calls}</span>
+                    <span className="font-mono text-sm font-semibold text-emerald-600">{a.calls}</span>
                   </li>
                 ))}
               </ol>
               {myRank > 5 && (
-                <p className="mt-3 border-t border-zinc-700 pt-3 text-center text-xs text-zinc-500">
+                <p className="mt-3 border-t border-slate-300 pt-3 text-center text-xs text-slate-500">
                   Twoje miejsce: {myRank}
                 </p>
               )}
@@ -228,16 +228,16 @@ export default async function DashboardPage() {
       {/* Ostatnie sesje */}
       <div className="mb-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Ostatnie treningi</h2>
-          <Link href="/app/historia" className="text-sm text-emerald-400 hover:text-emerald-300">
+          <h2 className="text-lg font-semibold text-slate-900">Ostatnie treningi</h2>
+          <Link href="/app/historia" className="text-sm text-emerald-600 hover:text-emerald-700">
             Historia →
           </Link>
         </div>
         {recent.length === 0 ? (
           <Card>
-            <p className="text-center text-sm text-zinc-400">
+            <p className="text-center text-sm text-slate-500">
               Nie masz jeszcze treningów.{" "}
-              <Link href="/app/trening" className="text-emerald-400 hover:text-emerald-300">
+              <Link href="/app/trening" className="text-emerald-600 hover:text-emerald-700">
                 Zacznij pierwszy →
               </Link>
             </p>
@@ -249,13 +249,13 @@ export default async function DashboardPage() {
                 <Link
                   key={s.id}
                   href={`/app/sesja/${s.id}`}
-                  className="flex items-center justify-between gap-4 px-6 py-3.5 transition hover:bg-zinc-900/40"
+                  className="flex items-center justify-between gap-4 px-6 py-3.5 transition hover:bg-slate-50"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-white">
+                    <p className="truncate text-sm font-medium text-slate-900">
                       {s.scenario_title ?? "Sesja"}
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-slate-500">
                       {formatDate(s.started_at)}
                       {s.status === "in_progress" && " · w trakcie"}
                     </p>
@@ -273,8 +273,8 @@ export default async function DashboardPage() {
       {ownerStats && (
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Twój zespół</h2>
-            <Link href="/app/zespol" className="text-sm text-emerald-400 hover:text-emerald-300">
+            <h2 className="text-lg font-semibold text-slate-900">Twój zespół</h2>
+            <Link href="/app/zespol" className="text-sm text-emerald-600 hover:text-emerald-700">
               Panel zespołu →
             </Link>
           </div>

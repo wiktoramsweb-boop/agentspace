@@ -29,7 +29,7 @@ const TYPES: TypeMeta[] = [
     value: "sprzedajacy",
     label: "Sprzedający",
     desc: "Właściciel, który chce sprzedać",
-    color: "border-emerald-500/60 bg-emerald-500/10",
+    color: "border-emerald-500/60 bg-emerald-50",
     propertyLabel: "Co sprzedaje (nieruchomość)",
     propertyPh: "np. 3 pok. 64 m², Krowodrza",
     amountLabel: "Oczekiwana cena (zł)",
@@ -77,7 +77,7 @@ const TYPES: TypeMeta[] = [
     value: "inny",
     label: "Inny",
     desc: "Inny kontakt",
-    color: "border-zinc-500/60 bg-zinc-700/30",
+    color: "border-slate-300 bg-slate-100",
     propertyLabel: "Czego dotyczy (opcjonalnie)",
     propertyPh: "krótki opis",
     amountLabel: "Kwota (zł, opcjonalnie)",
@@ -100,7 +100,7 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
     return (
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+        className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
       >
         + Dodaj klienta
       </button>
@@ -122,11 +122,11 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
                   type="button"
                   onClick={() => setType(t.value)}
                   className={`rounded-xl border p-2.5 text-left transition ${
-                    type === t.value ? t.color : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
+                    type === t.value ? t.color : "border-slate-200 bg-slate-50 hover:border-slate-300"
                   }`}
                 >
-                  <p className="text-sm font-medium text-white">{t.label}</p>
-                  <p className="mt-0.5 text-xs text-zinc-500">{t.desc}</p>
+                  <p className="text-sm font-medium text-slate-900">{t.label}</p>
+                  <p className="mt-0.5 text-xs text-slate-500">{t.desc}</p>
                 </button>
               ))}
             </div>
@@ -143,15 +143,15 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+48 600 000 000"
                 inputMode="tel"
-                className={`w-full rounded-xl border bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none ${
-                  dup ? "border-amber-500/60 focus:border-amber-500" : "border-zinc-800 focus:border-emerald-500"
+                className={`w-full rounded-xl border bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:outline-none ${
+                  dup ? "border-amber-500/60 focus:border-amber-500" : "border-slate-200 focus:border-emerald-500"
                 }`}
               />
             </div>
             <Field label="Email" name="email" type="email" placeholder="jan@email.pl" />
           </div>
           {dup && (
-            <p className="-mt-2 text-xs text-amber-400">
+            <p className="-mt-2 text-xs text-amber-600">
               ⚠️ Ten numer jest już w bazie{dup.owner ? ` (opiekun: ${dup.owner})` : ""}. Możesz dodać mimo to.
             </p>
           )}
@@ -172,17 +172,17 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
           <Field label="Następny kontakt (przypomnienie)" name="next_contact_at" type="date" />
         </div>
 
-        <div className="flex flex-shrink-0 gap-3 border-t border-zinc-800 px-6 py-4">
+        <div className="flex flex-shrink-0 gap-3 border-t border-slate-200 px-6 py-4">
           <SubmitButton
             pendingText="Dodaję…"
-            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 hover:bg-emerald-400"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-400"
           >
             Dodaj {meta.label.toLowerCase()}
           </SubmitButton>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
+            className="rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition hover:bg-slate-100"
           >
             Anuluj
           </button>
@@ -192,9 +192,9 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
   );
 }
 
-const lbl = "mb-1.5 block text-sm text-zinc-400";
+const lbl = "mb-1.5 block text-sm text-slate-500";
 const inp =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 
 function Field({
   label,

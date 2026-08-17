@@ -57,18 +57,18 @@ export function InviteForm({ managers }: { managers: ManagerOption[] }) {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60 sm:w-auto"
+          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60 sm:w-auto"
         >
           {pending ? "Tworzę..." : "Utwórz zaproszenie"}
         </button>
       </form>
 
-      {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
+      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.success && (
         <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] p-3">
-          <p className="mb-2 text-sm text-emerald-300">{state.success}</p>
+          <p className="mb-2 text-sm text-emerald-700">{state.success}</p>
           {state.link && <CopyLink link={state.link} label="Kopiuj link" />}
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-slate-500">
             Wyślij ten link zaproszonej osobie (WhatsApp, SMS, mail). Po kliknięciu założy konto z nadaną rolą.
           </p>
         </div>
@@ -77,6 +77,6 @@ export function InviteForm({ managers }: { managers: ManagerOption[] }) {
   );
 }
 
-const lbl = "mb-1.5 block text-xs text-zinc-500";
+const lbl = "mb-1.5 block text-xs text-slate-500";
 const inp =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30";
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30";

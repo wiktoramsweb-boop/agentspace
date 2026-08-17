@@ -76,7 +76,7 @@ export function ClientsBrowser({
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <svg
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -88,10 +88,10 @@ export function ClientsBrowser({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Szukaj po nazwisku lub numerze telefonu…"
-            className="w-full rounded-xl border border-zinc-700/60 bg-zinc-900/60 py-2.5 pl-10 pr-3 text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:outline-none"
+            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-slate-900 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none"
           />
         </div>
-        <div className="flex rounded-xl border border-zinc-700/60 bg-zinc-900/60 p-1">
+        <div className="flex rounded-xl border border-slate-200 bg-white p-1">
           <ScopeBtn active={scope === "all"} onClick={() => setScope("all")}>
             Całe biuro ({clients.length})
           </ScopeBtn>
@@ -135,7 +135,7 @@ export function ClientsBrowser({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-800/30 p-10 text-center text-sm text-zinc-400">
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center text-sm text-slate-500">
           {query ? "Brak wyników dla tego wyszukiwania." : "Brak klientów w tym widoku."}
         </div>
       ) : (
@@ -148,41 +148,41 @@ export function ClientsBrowser({
               <Link
                 key={c.id}
                 href={`/app/klienci/${c.id}`}
-                className="hover-lift group flex items-center gap-4 overflow-hidden rounded-2xl border border-zinc-700/50 bg-zinc-800/40 p-4 pl-0 transition hover:border-zinc-600 hover:bg-zinc-800/70"
+                className="hover-lift group flex items-center gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 pl-0 transition hover:border-slate-300 hover:bg-slate-100"
               >
                 <span className={`h-14 w-1.5 flex-shrink-0 rounded-r-full ${ACCENT[c.status]}`} />
                 <div
-                  className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(c.name)} text-sm font-bold text-zinc-950`}
+                  className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(c.name)} text-sm font-bold text-white`}
                 >
                   {c.name.charAt(0).toUpperCase()}
                 </div>
 
                 <div className="grid min-w-0 flex-1 grid-cols-1 gap-x-6 gap-y-0.5 sm:grid-cols-[1.4fr_1fr_1fr]">
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-white">{c.name}</p>
-                    <p className="truncate text-sm text-zinc-400">
+                    <p className="truncate font-semibold text-slate-900">{c.name}</p>
+                    <p className="truncate text-sm text-slate-500">
                       {typeLabel}
                       {c.property && ` · ${c.property}`}
                     </p>
                   </div>
                   <div className="min-w-0 text-sm">
-                    <p className="truncate text-zinc-300">{c.phone ?? "-"}</p>
-                    <p className="truncate text-xs text-zinc-500">
+                    <p className="truncate text-slate-700">{c.phone ?? "-"}</p>
+                    <p className="truncate text-xs text-slate-500">
                       {c.budget_pln != null ? formatPln(c.budget_pln) : "-"}
                     </p>
                   </div>
                   <div className="hidden min-w-0 text-sm sm:block">
-                    <p className="truncate text-zinc-400">
-                      <span className="text-zinc-600">Opiekun: </span>
+                    <p className="truncate text-slate-500">
+                      <span className="text-slate-400">Opiekun: </span>
                       {c.opiekunName ?? "-"}
                     </p>
-                    <p className="truncate text-xs text-zinc-500">{daysAgo(c.last_contact_at)}</p>
+                    <p className="truncate text-xs text-slate-500">{daysAgo(c.last_contact_at)}</p>
                   </div>
                 </div>
 
                 <div className="flex flex-shrink-0 items-center gap-3 pr-4">
                   {due && (
-                    <span className="rounded-md bg-amber-500/15 px-2 py-1 text-xs font-medium text-amber-300">
+                    <span className="rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
                       🔔
                     </span>
                   )}
@@ -214,7 +214,7 @@ function ScopeBtn({
     <button
       onClick={onClick}
       className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-        active ? "bg-emerald-500 text-zinc-950" : "text-zinc-400 hover:text-white"
+        active ? "bg-emerald-500 text-white" : "text-slate-500 hover:text-slate-900"
       }`}
     >
       {children}
@@ -236,8 +236,8 @@ function Chip({
       onClick={onClick}
       className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
         active
-          ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-300"
-          : "border-zinc-700/60 bg-zinc-900/40 text-zinc-400 hover:text-white"
+          ? "border-emerald-500/50 bg-emerald-100 text-emerald-700"
+          : "border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900"
       }`}
     >
       {children}

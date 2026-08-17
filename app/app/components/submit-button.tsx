@@ -37,11 +37,11 @@ export function SubmitButton({
       </button>
 
       {overlay && pending && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-zinc-700 border-t-emerald-400" />
-            <p className="font-medium text-white">{overlayText}</p>
-            <p className="mt-1 text-sm text-zinc-500">Chwilę to potrwa…</p>
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-400" />
+            <p className="font-medium text-slate-900">{overlayText}</p>
+            <p className="mt-1 text-sm text-slate-500">Chwilę to potrwa…</p>
           </div>
         </div>
       )}

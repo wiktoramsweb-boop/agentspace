@@ -21,19 +21,19 @@ export default async function ScenarioSetupPage({ params }: Props) {
 
   return (
     <>
-      <Link href="/app/trening" className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-emerald-400">
+      <Link href="/app/trening" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Wszystkie scenariusze
       </Link>
 
-      <h1 className="mb-3 text-2xl font-semibold tracking-tight text-white md:text-3xl">
+      <h1 className="mb-3 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
         {scenario!.title}
       </h1>
 
       <Card className="mb-8 !border-emerald-500/20 !bg-emerald-500/[0.04]">
-        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
           Krok 1 · Twoje zadanie
         </p>
-        <p className="leading-relaxed text-zinc-200">{scenario!.brief}</p>
+        <p className="leading-relaxed text-slate-800">{scenario!.brief}</p>
       </Card>
 
       {limitReached && (
@@ -48,15 +48,15 @@ export default async function ScenarioSetupPage({ params }: Props) {
       <form action={startSession}>
         <input type="hidden" name="scenarioId" value={scenario!.id} />
 
-        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
           Krok 2 · Wybierz typ klienta
         </p>
-        <h2 className="mb-4 text-lg font-semibold text-white">Jak ma zachowywać się AI?</h2>
+        <h2 className="mb-4 text-lg font-semibold text-slate-900">Jak ma zachowywać się AI?</h2>
         <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {PERSONALITIES.map((p, i) => (
             <label
               key={p.value}
-              className="group relative cursor-pointer rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 transition-all has-[:checked]:border-emerald-500/50 has-[:checked]:bg-emerald-500/5 hover:border-zinc-700"
+              className="group relative cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all has-[:checked]:border-emerald-500/50 has-[:checked]:bg-emerald-500/5 hover:border-slate-300"
             >
               <input
                 type="radio"
@@ -66,21 +66,21 @@ export default async function ScenarioSetupPage({ params }: Props) {
                 className="peer sr-only"
               />
               <div className="mb-2 flex items-center justify-between">
-                <span className="font-semibold text-white">{p.label}</span>
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-zinc-700 peer-checked:border-emerald-400 peer-checked:bg-emerald-400">
-                  <span className="h-2 w-2 rounded-full bg-transparent peer-checked:bg-zinc-950" />
+                <span className="font-semibold text-slate-900">{p.label}</span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 peer-checked:border-emerald-400 peer-checked:bg-emerald-400">
+                  <span className="h-2 w-2 rounded-full bg-transparent peer-checked:bg-white" />
                 </span>
               </div>
-              <p className="text-sm text-zinc-400">{p.description}</p>
+              <p className="text-sm text-slate-500">{p.description}</p>
             </label>
           ))}
         </div>
 
-        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
           Krok 3 · Poziom trudności
         </p>
-        <h2 className="mb-1 text-lg font-semibold text-white">Jak trudny ma być klient?</h2>
-        <p className="mb-4 text-sm text-zinc-500">
+        <h2 className="mb-1 text-lg font-semibold text-slate-900">Jak trudny ma być klient?</h2>
+        <p className="mb-4 text-sm text-slate-500">
           Zacznij od łatwego, żeby złapać pewność - potem podnoś poprzeczkę. Nie każdy klient jest trudny.
         </p>
         <div className="mb-8 grid gap-3 sm:grid-cols-3">
@@ -91,7 +91,7 @@ export default async function ScenarioSetupPage({ params }: Props) {
           ].map((d) => (
             <label
               key={d.value}
-              className="group relative cursor-pointer rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 transition-all has-[:checked]:border-emerald-500/50 has-[:checked]:bg-emerald-500/5 hover:border-zinc-700"
+              className="group relative cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all has-[:checked]:border-emerald-500/50 has-[:checked]:bg-emerald-500/5 hover:border-slate-300"
             >
               <input
                 type="radio"
@@ -101,17 +101,17 @@ export default async function ScenarioSetupPage({ params }: Props) {
                 className="peer sr-only"
               />
               <div className="mb-2 flex items-center justify-between">
-                <span className="font-semibold text-white">{d.label}</span>
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-zinc-700 peer-checked:border-emerald-400 peer-checked:bg-emerald-400">
-                  <span className="h-2 w-2 rounded-full bg-transparent peer-checked:bg-zinc-950" />
+                <span className="font-semibold text-slate-900">{d.label}</span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 peer-checked:border-emerald-400 peer-checked:bg-emerald-400">
+                  <span className="h-2 w-2 rounded-full bg-transparent peer-checked:bg-white" />
                 </span>
               </div>
-              <p className="text-sm text-zinc-400">{d.desc}</p>
+              <p className="text-sm text-slate-500">{d.desc}</p>
             </label>
           ))}
         </div>
 
-        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-emerald-400">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-emerald-600">
           Krok 4 · Zaczynamy
         </p>
         <SubmitButton
@@ -119,11 +119,11 @@ export default async function ScenarioSetupPage({ params }: Props) {
           overlayText="Uruchamiam sesję z AI…"
           pendingText="Uruchamiam…"
           disabled={limitReached}
-          className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 hover:bg-emerald-400 hover:shadow-[0_0_30px_-8px_rgba(16,185,129,0.7)] sm:w-auto"
+          className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-white hover:bg-emerald-400 hover:shadow-[0_0_30px_-8px_rgba(16,185,129,0.7)] sm:w-auto"
         >
           {limitReached ? "Limit wyczerpany na ten tydzień" : "Rozpocznij rozmowę z AI klientem →"}
         </SubmitButton>
-        <p className="mt-2 text-sm text-zinc-500">
+        <p className="mt-2 text-sm text-slate-500">
           AI odezwie się pierwszy. Pisz jak do prawdziwego klienta. Na końcu kliknij „Zakończ i oceń".
         </p>
       </form>

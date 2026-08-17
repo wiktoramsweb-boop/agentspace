@@ -55,21 +55,21 @@ export function Modal({
 
   return (
     <div
-      className="modal-overlay fixed inset-0 z-50 flex h-[100dvh] items-center justify-center bg-zinc-950/80 p-4 backdrop-blur-sm"
+      className="modal-overlay fixed inset-0 z-50 flex h-[100dvh] items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
         ref={boxRef}
         onClick={(e) => e.stopPropagation()}
-        className={`modal-box flex max-h-[90dvh] w-full ${maxWidth} flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900`}
+        className={`modal-box flex max-h-[90dvh] w-full ${maxWidth} flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white`}
       >
-        <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-800 px-6 py-4">
-          <h2 className="text-lg font-semibold text-white">{title}</h2>
+        <div className="flex flex-shrink-0 items-center justify-between border-b border-slate-200 px-6 py-4">
+          <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Zamknij"
-            className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />

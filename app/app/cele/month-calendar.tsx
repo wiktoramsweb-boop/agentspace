@@ -19,13 +19,13 @@ export function MonthCalendarView({
   return (
     <Card>
       <div className="mb-4 flex items-end justify-between">
-        <h2 className="text-lg font-semibold text-white">{title}</h2>
-        <span className="text-sm text-zinc-400">{calendar.monthLabel}</span>
+        <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+        <span className="text-sm text-slate-500">{calendar.monthLabel}</span>
       </div>
 
       <div className="mb-2 grid grid-cols-7 gap-1.5">
         {WEEKDAYS.map((w) => (
-          <div key={w} className="text-center text-[10px] font-medium uppercase tracking-wide text-zinc-600">
+          <div key={w} className="text-center text-[10px] font-medium uppercase tracking-wide text-slate-400">
             {w}
           </div>
         ))}
@@ -36,15 +36,15 @@ export function MonthCalendarView({
           const base = "flex aspect-square flex-col items-center justify-center rounded-lg border text-center";
           let cls: string;
           if (!d.inMonth) {
-            cls = "border-transparent bg-transparent text-zinc-700";
+            cls = "border-transparent bg-transparent text-slate-400";
           } else if (d.isFuture) {
-            cls = "border-zinc-800/60 bg-zinc-900/30 text-zinc-700";
+            cls = "border-slate-200 bg-slate-50 text-slate-400";
           } else if (d.met) {
-            cls = "border-emerald-500/40 bg-emerald-500/20 text-emerald-200";
+            cls = "border-emerald-500/40 bg-emerald-100 text-emerald-200";
           } else if (d.partial) {
-            cls = "border-amber-500/30 bg-amber-500/15 text-amber-200";
+            cls = "border-amber-500/30 bg-amber-100 text-amber-200";
           } else {
-            cls = "border-zinc-800 bg-zinc-900/40 text-zinc-500";
+            cls = "border-slate-200 bg-slate-50 text-slate-500";
           }
           return (
             <div
@@ -61,11 +61,11 @@ export function MonthCalendarView({
         })}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-zinc-500">
-        <Legend cls="bg-emerald-500/20 border-emerald-500/40" label="cel wykonany" />
-        <Legend cls="bg-amber-500/15 border-amber-500/30" label="częściowo" />
-        <Legend cls="bg-zinc-900/40 border-zinc-800" label="brak / 0" />
-        {!hasTarget && <span className="text-zinc-600">· agent bez ustawionego celu - liczby to same wykonania</span>}
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
+        <Legend cls="bg-emerald-100 border-emerald-500/40" label="cel wykonany" />
+        <Legend cls="bg-amber-100 border-amber-500/30" label="częściowo" />
+        <Legend cls="bg-slate-50 border-slate-200" label="brak / 0" />
+        {!hasTarget && <span className="text-slate-400">· agent bez ustawionego celu - liczby to same wykonania</span>}
       </div>
     </Card>
   );

@@ -5,12 +5,12 @@ import { useMemo, useState } from "react";
 type Cat = "wlasciciel" | "kupujacy" | "negocjacje" | "formalnosci" | "relacja" | "inne";
 
 const CAT: Record<Cat, { label: string; dot: string; sel: string }> = {
-  wlasciciel: { label: "Właściciel / sprzedaż", dot: "bg-emerald-400", sel: "border-emerald-500/60 bg-emerald-500/10" },
+  wlasciciel: { label: "Właściciel / sprzedaż", dot: "bg-emerald-400", sel: "border-emerald-500/60 bg-emerald-50" },
   kupujacy: { label: "Kupujący", dot: "bg-sky-400", sel: "border-sky-500/60 bg-sky-500/10" },
   negocjacje: { label: "Negocjacje", dot: "bg-amber-400", sel: "border-amber-500/60 bg-amber-500/10" },
   formalnosci: { label: "Transakcja / formalności", dot: "bg-violet-400", sel: "border-violet-500/60 bg-violet-500/10" },
   relacja: { label: "Relacja", dot: "bg-rose-400", sel: "border-rose-500/60 bg-rose-500/10" },
-  inne: { label: "Inne", dot: "bg-zinc-400", sel: "border-zinc-500/60 bg-zinc-700/30" },
+  inne: { label: "Inne", dot: "bg-slate-300", sel: "border-slate-300 bg-slate-100" },
 };
 const CAT_ORDER: Cat[] = ["wlasciciel", "kupujacy", "negocjacje", "formalnosci", "relacja", "inne"];
 
@@ -128,7 +128,7 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
   return (
     <div className="space-y-6">
       {/* Przełącznik Mail / SMS */}
-      <div className="inline-flex rounded-2xl border border-zinc-800 bg-zinc-900/60 p-1">
+      <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1">
         <ModeBtn active={!isSms} onClick={() => switchMode("mail")} color="emerald" icon="✉️" label="Maile" />
         <ModeBtn active={isSms} onClick={() => switchMode("sms")} color="sky" icon="💬" label="SMS-y" />
       </div>
@@ -151,7 +151,7 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
           <div>
             <label className={lbl}>
               {isSms ? "Szczegóły (godzina, adres, link…)" : "Co przekazać / fakty"}
-              <span className="ml-1 text-xs text-zinc-600">- AI użyje tylko tego, nie wymyśli liczb</span>
+              <span className="ml-1 text-xs text-slate-400">- AI użyje tylko tego, nie wymyśli liczb</span>
             </label>
             <textarea
               value={facts}
@@ -176,12 +176,12 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
             </div>
           )}
 
-          {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+          {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>}
 
           <button
             onClick={generate}
             disabled={loading}
-            className={`w-full rounded-xl px-5 py-3 font-semibold text-zinc-950 transition active:scale-[0.99] disabled:opacity-60 ${
+            className={`w-full rounded-xl px-5 py-3 font-semibold text-white transition active:scale-[0.99] disabled:opacity-60 ${
               accent === "sky" ? "bg-sky-400 hover:bg-sky-300" : "bg-emerald-500 hover:bg-emerald-400"
             }`}
           >
@@ -212,12 +212,12 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
 /* ---------- podkomponenty ---------- */
 
 function ModeBtn({ active, onClick, color, icon, label }: { active: boolean; onClick: () => void; color: "emerald" | "sky"; icon: string; label: string }) {
-  const on = color === "sky" ? "bg-sky-400 text-zinc-950" : "bg-emerald-500 text-zinc-950";
+  const on = color === "sky" ? "bg-sky-400 text-white" : "bg-emerald-500 text-white";
   return (
     <button
       onClick={onClick}
       className={`flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold transition ${
-        active ? on : "text-zinc-400 hover:text-white"
+        active ? on : "text-slate-500 hover:text-slate-900"
       }`}
     >
       <span>{icon}</span>
@@ -237,7 +237,7 @@ function TypePicker({ types, value, onChange }: { types: TypeDef[]; value: strin
           <div key={catKey}>
             <div className="mb-2 flex items-center gap-2">
               <span className={`h-2 w-2 rounded-full ${cat.dot}`} />
-              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{cat.label}</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{cat.label}</span>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               {items.map((t) => {
@@ -248,11 +248,11 @@ function TypePicker({ types, value, onChange }: { types: TypeDef[]; value: strin
                     type="button"
                     onClick={() => onChange(t.value)}
                     className={`rounded-xl border p-3 text-left transition ${
-                      active ? cat.sel : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
+                      active ? cat.sel : "border-slate-200 bg-slate-50 hover:border-slate-300"
                     }`}
                   >
-                    <p className="text-sm font-medium text-white">{t.label}</p>
-                    <p className="mt-0.5 text-xs text-zinc-500">{t.desc}</p>
+                    <p className="text-sm font-medium text-slate-900">{t.label}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">{t.desc}</p>
                   </button>
                 );
               })}
@@ -274,18 +274,18 @@ function EmptyState({ isSms }: { isSms: boolean }) {
         isSms ? "border-sky-500/20 bg-sky-500/[0.03]" : "border-emerald-500/20 bg-emerald-500/[0.03]"
       }`}
     >
-      <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl ${isSms ? "bg-sky-500/15" : "bg-emerald-500/15"}`}>
+      <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl ${isSms ? "bg-sky-100" : "bg-emerald-100"}`}>
         {isSms ? "💬" : "✉️"}
       </div>
-      <p className="text-sm font-medium text-white">
+      <p className="text-sm font-medium text-slate-900">
         Twój {isSms ? "SMS" : "mail"} pojawi się tutaj
       </p>
-      <p className="mt-1 max-w-xs text-sm text-zinc-500">
+      <p className="mt-1 max-w-xs text-sm text-slate-500">
         Wypełnij lewą stronę i kliknij „Napisz {isSms ? "SMS" : "mail"}". Wynik będzie do edycji i skopiowania.
       </p>
       <div className="mt-5 flex flex-wrap justify-center gap-2">
         {tips.map((t, i) => (
-          <span key={i} className="rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-1 text-xs text-zinc-400">
+          <span key={i} className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs text-slate-500">
             {i + 1}. {t}
           </span>
         ))}
@@ -296,7 +296,7 @@ function EmptyState({ isSms }: { isSms: boolean }) {
 
 function MailResult({ result, onChange, onCopy, copied }: { result: Result; onChange: (r: Result) => void; onCopy: () => void; copied: boolean }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-emerald-500/20 bg-zinc-900/40">
+    <div className="overflow-hidden rounded-2xl border border-emerald-500/20 bg-slate-50">
       <div className="flex items-center gap-2 border-b border-emerald-500/20 bg-emerald-500/[0.06] px-5 py-3">
         <span>✉️</span>
         <span className="text-sm font-semibold text-emerald-200">Mail gotowy</span>
@@ -310,10 +310,10 @@ function MailResult({ result, onChange, onCopy, copied }: { result: Result; onCh
           <label className={lbl}>Treść (możesz edytować)</label>
           <textarea value={result.body} onChange={(e) => onChange({ ...result, body: e.target.value })} rows={16} className={`${inp} leading-relaxed`} />
         </div>
-        <button onClick={onCopy} className="w-full rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400">
+        <button onClick={onCopy} className="w-full rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400">
           {copied ? "✓ Skopiowano" : "Kopiuj treść"}
         </button>
-        <p className="text-xs text-zinc-600">
+        <p className="text-xs text-slate-400">
           Sprawdź maila przed wysłaniem - zwłaszcza liczby i miejsca w [nawiasach]. Wklej do Gmaila i wyślij.
         </p>
       </div>
@@ -330,15 +330,15 @@ function SmsResult({ text, onChange, onCopy, copied }: { text: string; onChange:
   }, [text]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-sky-500/20 bg-zinc-900/40">
+    <div className="overflow-hidden rounded-2xl border border-sky-500/20 bg-slate-50">
       <div className="flex items-center gap-2 border-b border-sky-500/20 bg-sky-500/[0.06] px-5 py-3">
         <span>💬</span>
         <span className="text-sm font-semibold text-sky-200">SMS gotowy</span>
       </div>
       <div className="space-y-3 p-5">
         {/* Podgląd „dymek" */}
-        <div className="rounded-2xl bg-zinc-950/60 p-4">
-          <div className="ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-sky-500/90 px-4 py-2.5 text-sm leading-relaxed text-zinc-950">
+        <div className="rounded-2xl bg-slate-50 p-4">
+          <div className="ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-sky-500/90 px-4 py-2.5 text-sm leading-relaxed text-white">
             {text || "…"}
           </div>
         </div>
@@ -347,11 +347,11 @@ function SmsResult({ text, onChange, onCopy, copied }: { text: string; onChange:
           <textarea value={text} onChange={(e) => onChange(e.target.value)} rows={5} className={inp} />
         </div>
         <div className="flex items-center justify-between text-xs">
-          <span className="text-zinc-500">
+          <span className="text-slate-500">
             {count} znaków · {segments} SMS{segments > 1 ? " (dłuższy = kilka wiadomości)" : ""}
           </span>
         </div>
-        <button onClick={onCopy} className="w-full rounded-xl bg-sky-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-sky-300">
+        <button onClick={onCopy} className="w-full rounded-xl bg-sky-400 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-300">
           {copied ? "✓ Skopiowano" : "Kopiuj SMS"}
         </button>
       </div>
@@ -368,6 +368,6 @@ function Field({ label, value, onChange, placeholder }: { label: string; value: 
   );
 }
 
-const lbl = "mb-1.5 block text-sm text-zinc-400";
+const lbl = "mb-1.5 block text-sm text-slate-500";
 const inp =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";

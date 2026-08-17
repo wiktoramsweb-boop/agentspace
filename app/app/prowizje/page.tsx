@@ -27,20 +27,20 @@ export default async function ProwizjePage() {
 
       {/* Cel miesięczny */}
       {goal > 0 && (
-        <Card className="mb-6 !border-emerald-500/30 !bg-gradient-to-br !from-emerald-500/10 !to-zinc-900/40">
+        <Card className="mb-6 !border-emerald-500/30 !bg-gradient-to-br !from-emerald-500/10 !to-slate-50">
           <div className="mb-2 flex items-end justify-between">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                 Cel miesięczny
               </p>
-              <p className="text-3xl font-semibold text-white">
+              <p className="text-3xl font-semibold text-slate-900">
                 {formatPln(stats.monthClosed)}{" "}
-                <span className="text-lg text-zinc-500">/ {formatPln(goal)}</span>
+                <span className="text-lg text-slate-500">/ {formatPln(goal)}</span>
               </p>
             </div>
-            <p className="text-2xl font-semibold text-emerald-400">{progress}%</p>
+            <p className="text-2xl font-semibold text-emerald-600">{progress}%</p>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all"
               style={{ width: `${progress}%` }}
@@ -96,13 +96,13 @@ export default async function ProwizjePage() {
             return (
               <div
                 key={d.id}
-                className="flex items-center gap-4 overflow-hidden rounded-2xl border border-zinc-700/50 bg-zinc-800/40 p-4 pl-0 transition hover:border-zinc-600 hover:bg-zinc-800/70"
+                className="flex items-center gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 pl-0 transition hover:border-slate-300 hover:bg-slate-100"
               >
                 <span className={`h-12 w-1.5 flex-shrink-0 rounded-r-full ${accent}`} />
                 <Link href={`/app/prowizje/${d.id}`} className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-white">{d.title}</p>
-                  <p className="text-sm text-zinc-400">
-                    <span className="font-medium text-emerald-400">{formatPln(d.agent_earnings_pln)}</span>
+                  <p className="truncate font-semibold text-slate-900">{d.title}</p>
+                  <p className="text-sm text-slate-500">
+                    <span className="font-medium text-emerald-600">{formatPln(d.agent_earnings_pln)}</span>
                     {` dla Ciebie · biuro ${formatPln(d.commission_pln)} brutto (netto ${formatPln(d.commission_pln / 1.23)})`}
                     {d.agent_split_pct ? ` · ${d.agent_split_pct}%` : ""}
                     {d.status === "zamkniety" && d.closed_at

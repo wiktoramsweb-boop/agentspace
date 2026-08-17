@@ -84,7 +84,7 @@ export function DailyTracker({
               <motion.p animate={{ scale: [1, 1.25, 1], rotate: [0, 8, -8, 0] }} transition={{ duration: 0.6, repeat: 2 }} className="text-5xl">
                 🎯
               </motion.p>
-              <p className="mt-2 text-lg font-bold text-zinc-950">Cel dnia wykonany!</p>
+              <p className="mt-2 text-lg font-bold text-white">Cel dnia wykonany!</p>
               <p className="text-sm text-zinc-900">Bliżej rocznego celu 💪</p>
             </div>
             {[...Array(16)].map((_, i) => (
@@ -103,7 +103,7 @@ export function DailyTracker({
       </AnimatePresence>
 
       {/* Duży animowany ring postępu telefonów */}
-      <div className="mb-6 flex items-center gap-6 rounded-2xl border border-zinc-700 bg-zinc-800/40 p-5">
+      <div className="mb-6 flex items-center gap-6 rounded-2xl border border-slate-300 bg-white p-5">
         <div className="relative flex-shrink-0">
           <svg width="128" height="128" viewBox="0 0 128 128" className="-rotate-90">
             <circle cx="64" cy="64" r={R} fill="none" stroke="#3f3f46" strokeWidth="10" />
@@ -122,25 +122,25 @@ export function DailyTracker({
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={`text-2xl font-bold ${callGoalMet ? "text-emerald-400" : "text-amber-400"}`}>
+            <span className={`text-2xl font-bold ${callGoalMet ? "text-emerald-600" : "text-amber-600"}`}>
               {callPct}%
             </span>
-            <span className="text-[10px] text-zinc-400">
+            <span className="text-[10px] text-slate-500">
               {callsDone}/{callTarget}
             </span>
           </div>
         </div>
         <div className="min-w-0">
-          <p className="text-sm text-zinc-300">
+          <p className="text-sm text-slate-700">
             Każdy cold call wart dziś{" "}
-            <span className="font-bold text-emerald-400">{formatPln(valuePerCall)}</span>
+            <span className="font-bold text-emerald-600">{formatPln(valuePerCall)}</span>
           </p>
-          <p className="mt-1 text-2xl font-semibold text-white">{formatPln(earnedToday)}</p>
-          <p className="text-xs text-zinc-500">wypracowane dziś telefonami</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">{formatPln(earnedToday)}</p>
+          <p className="text-xs text-slate-500">wypracowane dziś telefonami</p>
           {callGoalMet ? (
-            <p className="mt-2 text-sm font-medium text-emerald-400">✓ Cel telefonów wykonany!</p>
+            <p className="mt-2 text-sm font-medium text-emerald-600">✓ Cel telefonów wykonany!</p>
           ) : (
-            <p className="mt-2 text-sm text-amber-400">
+            <p className="mt-2 text-sm text-amber-600">
               Jeszcze {Math.max(0, callTarget - callsDone)} telefonów do celu
             </p>
           )}
@@ -160,28 +160,28 @@ export function DailyTracker({
           return (
             <div
               key={stage.key}
-              className={`flex items-center justify-between gap-4 rounded-xl border p-3 transition ${met ? "border-emerald-500/40 bg-emerald-500/10" : "border-zinc-700 bg-zinc-800/40"}`}
+              className={`flex items-center justify-between gap-4 rounded-xl border p-3 transition ${met ? "border-emerald-500/40 bg-emerald-50" : "border-slate-300 bg-white"}`}
             >
               <div className="min-w-0">
-                <p className="font-medium text-white">{stage.label}</p>
-                <p className="text-xs text-zinc-400">{goalLabel}{met && " · ✓"}</p>
+                <p className="font-medium text-slate-900">{stage.label}</p>
+                <p className="text-xs text-slate-500">{goalLabel}{met && " · ✓"}</p>
               </div>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => change(stage.key, -1)}
                   disabled={val === 0}
-                  className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-700 text-2xl text-white transition active:scale-90 hover:bg-zinc-600 disabled:opacity-30"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-200 text-2xl text-slate-900 transition active:scale-90 hover:bg-slate-300 disabled:opacity-30"
                 >
                   −
                 </button>
-                <span className={`w-8 text-center font-mono text-xl font-bold ${met ? "text-emerald-400" : "text-white"}`}>
+                <span className={`w-8 text-center font-mono text-xl font-bold ${met ? "text-emerald-600" : "text-slate-900"}`}>
                   {val}
                 </span>
                 <button
                   type="button"
                   onClick={() => change(stage.key, 1)}
-                  className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500 text-2xl font-bold text-zinc-950 transition active:scale-90 hover:bg-emerald-400"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500 text-2xl font-bold text-white transition active:scale-90 hover:bg-emerald-400"
                 >
                   +
                 </button>
@@ -190,7 +190,7 @@ export function DailyTracker({
           );
         })}
       </div>
-      <p className="mt-2 text-right text-xs text-zinc-600">{saved ? "✓ zapisano" : "zmiany zapisują się automatycznie"}</p>
+      <p className="mt-2 text-right text-xs text-slate-400">{saved ? "✓ zapisano" : "zmiany zapisują się automatycznie"}</p>
     </div>
   );
 }

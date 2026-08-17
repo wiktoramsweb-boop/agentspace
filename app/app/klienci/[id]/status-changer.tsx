@@ -29,7 +29,7 @@ export function StatusChanger({
           className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
             status === s.value
               ? s.color + " ring-1 ring-inset ring-white/20"
-              : "bg-zinc-800/50 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
+              : "bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-700"
           }`}
         >
           {s.label}

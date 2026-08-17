@@ -72,7 +72,7 @@ export function QuickEntry() {
           ✅ Rozpoznane. Sprawdź i popraw, potem zapisz do CRM.
         </div>
 
-        <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5 space-y-4">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4">
           <Field label="Klient" value={form.clientName} onChange={(v) => set("clientName", v)} />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Telefon" value={form.phone} onChange={(v) => set("phone", v)} placeholder="opcjonalnie" />
@@ -93,7 +93,7 @@ export function QuickEntry() {
             <Field label="Adres" value={form.address} onChange={(v) => set("address", v)} />
             <Field label="Miasto" value={form.city} onChange={(v) => set("city", v)} placeholder="Kraków" />
           </div>
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
             <input
               type="checkbox"
               checked={form.createProperty}
@@ -112,13 +112,13 @@ export function QuickEntry() {
           <button
             onClick={() => startTransition(() => createQuickEntry(form))}
             disabled={pending || !form.clientName.trim()}
-            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
           >
             {pending ? "Zapisuję…" : "Zapisz do CRM"}
           </button>
           <button
             onClick={() => setForm(null)}
-            className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
+            className="rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition hover:bg-slate-100"
           >
             Wróć
           </button>
@@ -130,13 +130,13 @@ export function QuickEntry() {
   // ---- Krok 1: dyktowanie ----
   return (
     <div className="max-w-xl space-y-4">
-      <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="mb-4 flex flex-col items-center gap-3 py-4">
           <button
             onClick={toggle}
             disabled={!supported}
             className={`flex h-20 w-20 items-center justify-center rounded-full transition disabled:opacity-40 ${
-              listening ? "bg-red-500 text-white" : "bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+              listening ? "bg-red-500 text-slate-900" : "bg-emerald-500 text-white hover:bg-emerald-400"
             }`}
           >
             {listening ? (
@@ -150,7 +150,7 @@ export function QuickEntry() {
               </svg>
             )}
           </button>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-slate-500">
             {listening ? "Słucham… mów naturalnie. Kliknij, by zakończyć." : "Kliknij i powiedz relację ze spotkania"}
           </p>
         </div>
@@ -163,22 +163,22 @@ export function QuickEntry() {
           className={inp}
         />
         {voiceError && (
-          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300">🎤 {voiceError}</p>
+          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-700">🎤 {voiceError}</p>
         )}
         {!supported && (
-          <p className="mt-2 text-xs text-amber-400">
+          <p className="mt-2 text-xs text-amber-600">
             Ta przeglądarka nie ma wbudowanego dyktowania. Na iPhone: dotknij pola tekstowego i użyj
             <strong> ikony mikrofonu na klawiaturze iOS</strong> (dyktowanie), potem „Przetwórz". Na komputerze - Chrome.
           </p>
         )}
       </div>
 
-      {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <button
         onClick={process}
         disabled={parsing || !transcript.trim()}
-        className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
+        className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
       >
         {parsing ? "Przetwarzam…" : "Przetwórz przez AI →"}
       </button>
@@ -186,9 +186,9 @@ export function QuickEntry() {
   );
 }
 
-const lbl = "mb-1.5 block text-sm text-zinc-400";
+const lbl = "mb-1.5 block text-sm text-slate-500";
 const inp =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 
 function Field({
   label,

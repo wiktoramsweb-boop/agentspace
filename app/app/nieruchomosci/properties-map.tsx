@@ -79,8 +79,8 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
       if (cancelled || !ref.current || mapRef.current) return;
       const map = L.map(ref.current, { scrollWheelZoom: false }).setView([50.0647, 19.945], 11);
       mapRef.current = map;
-      // Ciemne kafelki (CARTO dark) - spójne z motywem aplikacji.
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      // Jasne kafelki (CARTO light) - spójne z jasnym motywem aplikacji.
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         attribution: "© OpenStreetMap © CARTO",
         subdomains: "abcd",
         maxZoom: 20,
@@ -99,7 +99,7 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
         const full = p.price != null ? new Intl.NumberFormat("pl-PL").format(p.price) + " zł" : "-";
         m.bindPopup(
           `<div style="min-width:150px"><strong>${escapeHtml(p.title)}</strong><br>` +
-            `<span style="color:#a1a1aa">${p.kind === "wynajem" ? "Wynajem" : "Sprzedaż"} · ${full}${p.kind === "wynajem" ? "/mc" : ""}</span><br>` +
+            `<span style="color:#64748b">${p.kind === "wynajem" ? "Wynajem" : "Sprzedaż"} · ${full}${p.kind === "wynajem" ? "/mc" : ""}</span><br>` +
             `<a href="/app/nieruchomosci/${p.id}">Otwórz ofertę →</a></div>`,
         );
         markers.push(m);
@@ -121,5 +121,5 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
 
   // `isolate` = własny kontekst warstw - trzyma wysokie z-index Leafletu wewnątrz,
   // żeby mapa nie przebijała okien modalnych (position:fixed).
-  return <div ref={ref} className="isolate h-[380px] w-full" style={{ background: "#0e0e11" }} />;
+  return <div ref={ref} className="isolate h-[380px] w-full" style={{ background: "#eef2f7" }} />;
 }

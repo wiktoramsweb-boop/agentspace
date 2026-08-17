@@ -392,12 +392,13 @@ body {
 
 /* Tło panelu aplikacji - ciemny grafit (jaśniejszy niż sidebar) z poświatami marki.
    Sidebar jest ciemniejszy (zinc-950), więc treść ładnie się od niego odcina. */
-.app-shell {
-  background-color: #101014;
-  background-image:
-    radial-gradient(1100px 560px at 100% -8%, rgba(16, 185, 129, 0.08), transparent 60%),
-    radial-gradient(900px 520px at -8% 6%, rgba(34, 211, 238, 0.06), transparent 55%);
-  background-repeat: no-repeat;
+/* Karta aplikacji: biel + delikatna kreska + miękki cień (czytelność ASARI).
+   Tło powłoki .app-shell ustawia reguła niżej w pliku (jasne, jak w ASARI). */
+.app-card {
+  background: #ffffff;
+  border: 1px solid #e6eaf1;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -16px rgba(15, 23, 42, 0.12);
 }
 
 /* Wejście treści strony */
@@ -525,13 +526,14 @@ body {
   }
 }
 
-/* Głębia tła aplikacji - delikatne kolorowe poświaty, żeby nie było płasko. */
+/* Głębia jasnego tła aplikacji - ledwie wyczuwalne poświaty, żeby nie było płasko.
+   (Ta reguła jest później w pliku, więc ona ustala tło - patrz .app-shell wyżej.) */
 .app-shell {
   background:
     radial-gradient(1100px 550px at 100% -8%, rgba(16, 185, 129, 0.07), transparent 60%),
-    radial-gradient(900px 500px at -8% 108%, rgba(56, 189, 248, 0.06), transparent 62%),
-    radial-gradient(700px 400px at 50% 120%, rgba(139, 92, 246, 0.04), transparent 60%),
-    #09090b;
+    radial-gradient(900px 500px at -8% 108%, rgba(59, 130, 246, 0.06), transparent 62%),
+    radial-gradient(700px 400px at 50% 120%, rgba(139, 92, 246, 0.035), transparent 60%),
+    #f1f4f9;
   background-attachment: fixed;
 }
 
@@ -541,9 +543,9 @@ body {
   outline-offset: 2px;
 }
 
-/* Tekst z gradientem (nagłówki „z duszą"). */
+/* Tekst z gradientem (nagłówki „z duszą"). Ciemny wariant pod jasny motyw aplikacji. */
 .text-gradient {
-  background: linear-gradient(100deg, #fff 0%, #a7f3d0 55%, #67e8f9 100%);
+  background: linear-gradient(100deg, #0f172a 0%, #0f766e 60%, #0e7490 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -554,27 +556,28 @@ body {
   transition: transform 0.25s cubic-bezier(0.21, 0.47, 0.32, 0.98), box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .card-glow:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 40px -18px var(--glow, rgba(16, 185, 129, 0.45));
+  transform: translateY(-3px);
+  /* Na jasnym tle działa cień, nie blask - poświata koloru tylko jako akcent. */
+  box-shadow: 0 16px 34px -18px rgba(15, 23, 42, 0.28), 0 0 0 1px var(--glow, rgba(16, 185, 129, 0.35));
 }
 
-/* Ciemne dymki Leafleta (mapa nieruchomości) - spójne z motywem. */
+/* Jasne dymki Leafleta (mapa nieruchomości) - spójne z jasnym motywem. */
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  background: #18181b !important;
-  color: #e4e4e7 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.7) !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #e6eaf1 !important;
+  box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.25) !important;
 }
 .leaflet-popup-content-wrapper {
   border-radius: 14px !important;
 }
 .leaflet-popup-content a {
-  color: #34d399 !important;
+  color: #059669 !important;
   font-weight: 600;
 }
 .leaflet-container a.leaflet-popup-close-button {
-  color: #a1a1aa !important;
+  color: #94a3b8 !important;
 }
 
 /* iOS Safari auto-zoomuje na polach z fontem < 16px (pole „ucieka" za klawiaturę,
@@ -653,4 +656,22 @@ button:not(:disabled):active,
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Pasek przewijania w aplikacji: jasny (globalny jest ciemny pod marketing). */
+.app-shell ::-webkit-scrollbar-track {
+  background: #f1f4f9;
+}
+.app-shell ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border: 3px solid #f1f4f9;
+}
+.app-shell ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Sidebar aplikacji: granat przechodzący w purpurę (układ i klimat jak w ASARI).
+   Ciemny pasek obok jasnej treści daje czytelny kontrast i „ramę" dla ekranu. */
+.app-sidebar {
+  background: linear-gradient(180deg, #111c38 0%, #1b2550 42%, #3a2470 76%, #57297f 100%);
 }

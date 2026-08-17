@@ -49,23 +49,23 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
   return (
     <div className="space-y-6">
       {/* Pasek zapisu + postęp dokumentów */}
-      <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 backdrop-blur">
         <div className="min-w-0 flex-1">
-          <div className="mb-1 flex items-center justify-between text-xs text-zinc-400">
+          <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
             <span>Dokumenty załatwione</span>
-            <span className="font-mono text-zinc-300">{dp.done}/{dp.total} · {dp.pct}%</span>
+            <span className="font-mono text-slate-700">{dp.done}/{dp.total} · {dp.pct}%</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
             <div className={`h-full rounded-full ${dp.pct === 100 ? "bg-emerald-400" : "bg-amber-400"}`} style={{ width: `${dp.pct}%` }} />
           </div>
         </div>
         <span className="flex-shrink-0 text-xs">
-          {save === "saving" && <span className="text-zinc-400">Zapisywanie…</span>}
-          {save === "saved" && <span className="text-emerald-400">Zapisano ✓</span>}
-          {save === "error" && <span className="text-red-400">Błąd zapisu</span>}
+          {save === "saving" && <span className="text-slate-500">Zapisywanie…</span>}
+          {save === "saved" && <span className="text-emerald-600">Zapisano ✓</span>}
+          {save === "error" && <span className="text-red-600">Błąd zapisu</span>}
         </span>
       </div>
-      {save === "error" && errorMsg && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{errorMsg}</p>}
+      {save === "error" && errorMsg && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{errorMsg}</p>}
 
       {/* Nagłówek */}
       <Stage title="Dane transakcji">
@@ -88,7 +88,7 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
           ]}
         />
         {(card.podstawaNabycia === "spadek" || card.podstawaNabycia === "darowizna") && (
-          <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+          <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
             ⚠ Wymagane zaświadczenie z Urzędu Skarbowego o uregulowaniu podatku (nawet jeśli zwolniony).
           </p>
         )}
@@ -131,11 +131,11 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
 
       {/* ETAP 3 */}
       <Stage title="Etap 3 · Organizacja transakcji">
-        {!card.profilKupujacego && <p className="text-sm text-zinc-500">Wybierz sposób finansowania w Etapie 2, żeby zobaczyć właściwą ścieżkę.</p>}
+        {!card.profilKupujacego && <p className="text-sm text-slate-500">Wybierz sposób finansowania w Etapie 2, żeby zobaczyć właściwą ścieżkę.</p>}
 
         {isCredit && (
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-cyan-400">Wariant kredytowy</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-cyan-600">Wariant kredytowy</p>
             <div className="grid gap-3 sm:grid-cols-2">
               <Text label="Termin umowy przyrzeczonej (min. 2-3 mies.)" type="date" value={card.kredytTerminPrzyrzeczonej} onChange={(v) => set("kredytTerminPrzyrzeczonej", v)} />
               <Text label="Wpłacony zadatek (PLN)" inputMode="decimal" value={card.kredytZadatek} onChange={(v) => set("kredytZadatek", v)} />
@@ -150,7 +150,7 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
 
         {isCash && (
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Wariant gotówkowy</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Wariant gotówkowy</p>
             <Radio
               label="Umowa przedwstępna"
               value={card.gotowkaPrzedwstepna}
@@ -209,10 +209,10 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
       <Stage title="Kompletowanie dokumentów">
         <div className="space-y-2">
           {card.documents.map((doc, i) => (
-            <div key={doc.key} className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-950/40 p-3">
+            <div key={doc.key} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-white">{doc.label}</p>
-                {doc.hint && <p className="text-xs text-zinc-500">{doc.hint}</p>}
+                <p className="text-sm font-medium text-slate-900">{doc.label}</p>
+                {doc.hint && <p className="text-xs text-slate-500">{doc.hint}</p>}
               </div>
               <button
                 onClick={() => {
@@ -226,7 +226,7 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
               {doc.custom && (
                 <button
                   onClick={() => setCard((c) => ({ ...c, documents: c.documents.filter((_, n) => n !== i) }))}
-                  className="flex-shrink-0 text-zinc-600 hover:text-red-400"
+                  className="flex-shrink-0 text-slate-400 hover:text-red-600"
                   title="Usuń"
                 >
                   ✕
@@ -253,18 +253,18 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
 }
 
 const STATUS_STYLE: Record<DocStatus, string> = {
-  brak: "bg-zinc-800 text-zinc-400",
-  w_toku: "bg-amber-500/15 text-amber-300",
-  gotowe: "bg-emerald-500/15 text-emerald-300",
-  nd: "bg-zinc-800/60 text-zinc-500",
+  brak: "bg-slate-100 text-slate-500",
+  w_toku: "bg-amber-100 text-amber-700",
+  gotowe: "bg-emerald-100 text-emerald-700",
+  nd: "bg-slate-100 text-slate-500",
 };
 
 /* ---------- kontrolki ---------- */
 
 function Stage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-400">{title}</h2>
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">{title}</h2>
       <div className="space-y-4">{children}</div>
     </div>
   );
@@ -283,14 +283,14 @@ function Radio({
 }) {
   return (
     <div>
-      <p className="mb-2 text-sm text-zinc-300">{label}</p>
+      <p className="mb-2 text-sm text-slate-700">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((o) => (
           <button
             key={o.v}
             onClick={() => onChange(value === o.v ? "" : o.v)}
             className={`rounded-lg border px-3 py-2 text-sm transition ${
-              value === o.v ? "border-emerald-500/60 bg-emerald-500/10 text-white" : "border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-600"
+              value === o.v ? "border-emerald-500/60 bg-emerald-50 text-slate-900" : "border-slate-300 bg-white text-slate-700 hover:border-slate-300"
             }`}
           >
             {o.l}
@@ -306,7 +306,7 @@ function Check({ label, checked, onChange }: { label: string; checked: boolean; 
     <button onClick={() => onChange(!checked)} className="flex w-full items-center gap-3 text-left">
       <span
         className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border transition ${
-          checked ? "border-emerald-500 bg-emerald-500 text-zinc-950" : "border-zinc-600 bg-zinc-900"
+          checked ? "border-emerald-500 bg-emerald-500 text-white" : "border-slate-300 bg-white"
         }`}
       >
         {checked && (
@@ -315,7 +315,7 @@ function Check({ label, checked, onChange }: { label: string; checked: boolean; 
           </svg>
         )}
       </span>
-      <span className={`text-sm ${checked ? "text-white" : "text-zinc-300"}`}>{label}</span>
+      <span className={`text-sm ${checked ? "text-slate-900" : "text-slate-700"}`}>{label}</span>
     </button>
   );
 }
@@ -337,7 +337,7 @@ function Text({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-xs text-zinc-400">{label}</label>
+      <label className="mb-1 block text-xs text-slate-500">{label}</label>
       <input type={type} inputMode={inputMode} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />
     </div>
   );
@@ -361,7 +361,7 @@ function AddDoc({ onAdd }: { onAdd: (label: string) => void }) {
             setVal("");
           }
         }}
-        className="flex-shrink-0 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+        className="flex-shrink-0 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-400"
       >
         Dodaj
       </button>
@@ -370,4 +370,4 @@ function AddDoc({ onAdd }: { onAdd: (label: string) => void }) {
 }
 
 const inp =
-  "w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";

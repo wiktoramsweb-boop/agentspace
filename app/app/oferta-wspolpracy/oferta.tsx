@@ -93,11 +93,11 @@ export function OfertaWspolpracy({
   return (
     <div className="max-w-xl space-y-5">
       {/* Dyktowanie (opcjonalne) */}
-      <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-white">Podyktuj warunki (opcjonalnie)</p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-sm font-medium text-slate-900">Podyktuj warunki (opcjonalnie)</p>
+            <p className="text-xs text-slate-500">
               np. „adres Prądnicka 48, czas 3 miesiące, prowizja 2%"
             </p>
           </div>
@@ -105,7 +105,7 @@ export function OfertaWspolpracy({
             onClick={toggle}
             disabled={!supported}
             className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full transition disabled:opacity-40 ${
-              listening ? "bg-red-500 text-white" : "bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+              listening ? "bg-red-500 text-slate-900" : "bg-emerald-500 text-white hover:bg-emerald-400"
             }`}
             aria-label={listening ? "Zakończ dyktowanie" : "Dyktuj"}
           >
@@ -129,24 +129,24 @@ export function OfertaWspolpracy({
           className={inp}
         />
         {voiceError && (
-          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300">🎤 {voiceError}</p>
+          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-700">🎤 {voiceError}</p>
         )}
         {!supported && (
-          <p className="mt-2 text-xs text-amber-400">
+          <p className="mt-2 text-xs text-amber-600">
             Ta przeglądarka nie ma dyktowania. Na iPhone użyj ikony mikrofonu na klawiaturze iOS, na komputerze - Chrome. Możesz też po prostu wypełnić pola niżej ręcznie.
           </p>
         )}
         <button
           onClick={parseVoice}
           disabled={parsing || !transcript.trim()}
-          className="mt-3 w-full rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/20 disabled:opacity-50"
+          className="mt-3 w-full rounded-xl border border-emerald-500/40 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
         >
           {parsing ? "Przetwarzam…" : "✨ Wypełnij przez AI"}
         </button>
       </div>
 
       {/* Formularz */}
-      <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5 space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4">
         <Field label="Adres nieruchomości" value={values.adres} onChange={(v) => set("adres", v)} placeholder="Prądnicka 48" hint='Bez „ul." - dodamy automatycznie.' />
         <div className="grid grid-cols-2 gap-3">
           <Field label="Czas współpracy" value={values.czas} onChange={(v) => set("czas", v)} placeholder="3 miesiące" />
@@ -159,9 +159,9 @@ export function OfertaWspolpracy({
         </div>
       </div>
 
-      {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>}
       {done && !error && (
-        <p className="rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
+        <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
           ✅ PDF pobrany. Sprawdź folder „Pobrane" i wyślij klientowi.
         </p>
       )}
@@ -169,21 +169,21 @@ export function OfertaWspolpracy({
       <button
         onClick={generate}
         disabled={generating}
-        className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-60"
+        className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
       >
         {generating ? "Generuję PDF…" : "Pobierz ofertę (PDF)"}
       </button>
 
-      <p className="text-center text-xs text-zinc-600">
+      <p className="text-center text-xs text-slate-400">
         Automatyczna wysyłka mailem do klienta będzie dostępna po weryfikacji domeny. Na razie: pobierz i wyślij samodzielnie.
       </p>
     </div>
   );
 }
 
-const lbl = "mb-1.5 block text-sm text-zinc-400";
+const lbl = "mb-1.5 block text-sm text-slate-500";
 const inp =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 
 function Field({
   label,
@@ -202,7 +202,7 @@ function Field({
     <div>
       <label className={lbl}>{label}</label>
       <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />
-      {hint && <p className="mt-1 text-xs text-zinc-600">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-slate-400">{hint}</p>}
     </div>
   );
 }

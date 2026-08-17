@@ -33,11 +33,11 @@ function FunnelChips({ stages, hasGoal }: { stages: FunnelStageProgress[]; hasGo
   return (
     <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
       {stages.map((s) => (
-        <div key={s.key} className="rounded-lg bg-zinc-900/60 px-2.5 py-1.5">
-          <p className="text-[10px] uppercase tracking-wide text-zinc-500">{STAGE_SHORT[s.key]}</p>
-          <p className="font-mono text-sm font-semibold text-zinc-200">
+        <div key={s.key} className="rounded-lg bg-white px-2.5 py-1.5">
+          <p className="text-[10px] uppercase tracking-wide text-slate-500">{STAGE_SHORT[s.key]}</p>
+          <p className="font-mono text-sm font-semibold text-slate-800">
             {s.done}
-            {hasGoal && s.target > 0 && <span className="text-zinc-500">/{s.target}</span>}
+            {hasGoal && s.target > 0 && <span className="text-slate-500">/{s.target}</span>}
           </p>
         </div>
       ))}
@@ -47,9 +47,9 @@ function FunnelChips({ stages, hasGoal }: { stages: FunnelStageProgress[]; hasGo
 
 function TrendArrow({ trend }: { trend?: AgentTrend }) {
   if (!trend || trend.scoreTrend == null) return null;
-  if (trend.scoreTrend === "up") return <span title="wynik rośnie" className="text-sm text-emerald-400">↑</span>;
-  if (trend.scoreTrend === "down") return <span title="wynik spada" className="text-sm text-red-400">↓</span>;
-  return <span title="wynik stabilny" className="text-sm text-zinc-500">→</span>;
+  if (trend.scoreTrend === "up") return <span title="wynik rośnie" className="text-sm text-emerald-600">↑</span>;
+  if (trend.scoreTrend === "down") return <span title="wynik spada" className="text-sm text-red-600">↓</span>;
+  return <span title="wynik stabilny" className="text-sm text-slate-500">→</span>;
 }
 
 export default async function ZespolPage() {
@@ -136,7 +136,7 @@ export default async function ZespolPage() {
       {/* Alerty proaktywne - kto wymaga uwagi */}
       {insights.alerts.length > 0 ? (
         <Card className="mb-8 !border-amber-500/20 !bg-amber-500/[0.04]">
-          <h2 className="mb-4 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-amber-400">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-amber-600">
             ⚠️ Wymaga uwagi
           </h2>
           <div className="space-y-2">
@@ -144,15 +144,15 @@ export default async function ZespolPage() {
               <Link
                 key={i}
                 href={`/app/zespol/${a.agentId}`}
-                className="flex items-center justify-between gap-3 rounded-lg bg-zinc-900/50 px-3 py-2 text-sm transition hover:bg-zinc-900"
+                className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-3 py-2 text-sm transition hover:bg-white"
               >
                 <span className="min-w-0 truncate">
-                  <span className="font-medium text-white">{a.agentName}</span>
-                  <span className="text-zinc-400"> - {a.message}</span>
+                  <span className="font-medium text-slate-900">{a.agentName}</span>
+                  <span className="text-slate-500"> - {a.message}</span>
                 </span>
                 <span
                   className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${
-                    a.severity === "warn" ? "bg-amber-500/20 text-amber-300" : "bg-zinc-700/60 text-zinc-300"
+                    a.severity === "warn" ? "bg-amber-500/20 text-amber-700" : "bg-slate-200 text-slate-700"
                   }`}
                 >
                   {a.severity === "warn" ? "pilne" : "info"}
@@ -164,7 +164,7 @@ export default async function ZespolPage() {
       ) : (
         ranking.length > 0 && (
           <Card className="mb-8 !border-emerald-500/20 !bg-emerald-500/[0.04]">
-            <p className="text-sm text-emerald-300">✅ Wszystko gra - brak sygnałów wymagających uwagi.</p>
+            <p className="text-sm text-emerald-700">✅ Wszystko gra - brak sygnałów wymagających uwagi.</p>
           </Card>
         )
       )}
@@ -172,7 +172,7 @@ export default async function ZespolPage() {
       {/* Aktywność zespołu - cold calle w 4 tygodniach */}
       {insights.weeklyActivity.some((w) => w.total > 0) && (
         <Card className="mb-8">
-          <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+          <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
             Aktywność zespołu - telefony (4 tygodnie)
           </h2>
           <div className="flex items-end gap-3">
@@ -182,19 +182,19 @@ export default async function ZespolPage() {
               const isCurrent = i === insights.weeklyActivity.length - 1;
               return (
                 <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                  <span className="text-xs font-mono text-zinc-300">{w.total}</span>
+                  <span className="text-xs font-mono text-slate-700">{w.total}</span>
                   <div className="flex h-24 w-full items-end">
                     <div
-                      className={`w-full rounded-t-md ${isCurrent ? "bg-emerald-400/70" : "bg-zinc-600/60"}`}
+                      className={`w-full rounded-t-md ${isCurrent ? "bg-emerald-400/70" : "bg-slate-300"}`}
                       style={{ height: `${Math.max(4, h)}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-zinc-500">{w.label}</span>
+                  <span className="text-[10px] text-slate-500">{w.label}</span>
                 </div>
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-zinc-600">Ostatni słupek (zielony) = bieżący tydzień.</p>
+          <p className="mt-3 text-xs text-slate-400">Ostatni słupek (zielony) = bieżący tydzień.</p>
         </Card>
       )}
 
@@ -202,19 +202,19 @@ export default async function ZespolPage() {
       {isOwner && categories.length > 0 && (
         <div className="mb-8 grid gap-4 md:grid-cols-2">
           <Card className="!border-emerald-500/20 !bg-emerald-500/[0.04]">
-            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400">
+            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
               Najmocniejszy obszar zespołu
             </p>
-            <p className="text-xl font-semibold text-white">
-              {strongest.label} <span className="text-emerald-400">{strongest.avg}/10</span>
+            <p className="text-xl font-semibold text-slate-900">
+              {strongest.label} <span className="text-emerald-600">{strongest.avg}/10</span>
             </p>
           </Card>
           <Card className="!border-amber-500/20 !bg-amber-500/[0.04]">
-            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-amber-400">
+            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-amber-600">
               Do poprawy - najsłabszy obszar
             </p>
-            <p className="text-xl font-semibold text-white">
-              {weakest.label} <span className="text-amber-400">{weakest.avg}/10</span>
+            <p className="text-xl font-semibold text-slate-900">
+              {weakest.label} <span className="text-amber-600">{weakest.avg}/10</span>
             </p>
           </Card>
         </div>
@@ -224,27 +224,27 @@ export default async function ZespolPage() {
       {isOwner && (
         <>
           <div className="mb-8">
-            <h2 className="mb-3 text-lg font-semibold text-white">Zaproś do zespołu</h2>
+            <h2 className="mb-3 text-lg font-semibold text-slate-900">Zaproś do zespołu</h2>
             <Card>
               <InviteForm managers={managerOptions} />
               {invitations.length > 0 && (
                 <div className="mt-5 border-t border-zinc-900 pt-4">
-                  <p className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  <p className="mb-3 text-xs font-medium uppercase tracking-wider text-slate-500">
                     Oczekujące zaproszenia
                   </p>
                   <div className="space-y-2">
                     {invitations.map((inv) => (
                       <div key={inv.id} className="flex items-center justify-between gap-4 text-sm">
-                        <span className="min-w-0 truncate text-zinc-300">
+                        <span className="min-w-0 truncate text-slate-700">
                           {inv.email}
-                          <span className="ml-2 rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+                          <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
                             {ROLE_LABELS[(inv.role ?? "agent") as UserRole]}
                           </span>
                         </span>
                         <div className="flex flex-shrink-0 items-center gap-4">
                           <CopyLink link={`${APP_URL}/zaproszenie/${inv.token}`} label="Kopiuj link" compact />
                           <form action={cancelInvitation.bind(null, inv.id)}>
-                            <button className="text-xs text-zinc-500 transition hover:text-red-400">Anuluj</button>
+                            <button className="text-xs text-slate-500 transition hover:text-red-600">Anuluj</button>
                           </form>
                         </div>
                       </div>
@@ -256,16 +256,16 @@ export default async function ZespolPage() {
           </div>
 
           <div className="mb-8">
-            <h2 className="mb-1 text-lg font-semibold text-white">Role i limity</h2>
-            <p className="mb-3 text-sm text-zinc-400">
+            <h2 className="mb-1 text-lg font-semibold text-slate-900">Role i limity</h2>
+            <p className="mb-3 text-sm text-slate-500">
               Nadaj rolę (CEO / Menedżer / Agent) i ustaw tygodniowy limit rozmów z AI Coach.
             </p>
             <TeamRoles members={teamMembers} currentUserId={user.id} />
           </div>
 
           <div className="mb-8">
-            <h2 className="mb-1 text-lg font-semibold text-white">Zespoły menedżerów</h2>
-            <p className="mb-3 text-sm text-zinc-400">
+            <h2 className="mb-1 text-lg font-semibold text-slate-900">Zespoły menedżerów</h2>
+            <p className="mb-3 text-sm text-slate-500">
               Przypisz każdemu menedżerowi osoby, które ma widzieć (cele, telefony, wyniki AI - bez prowizji).
             </p>
             <ManagerTeams
@@ -280,12 +280,12 @@ export default async function ZespolPage() {
 
       {/* Ranking / lista agentów */}
       <div>
-        <h2 className="mb-3 text-lg font-semibold text-white">
+        <h2 className="mb-3 text-lg font-semibold text-slate-900">
           {isOwner ? "Ranking agentów" : "Twoi agenci"}
         </h2>
         {ranking.length === 0 ? (
           <Card>
-            <p className="text-center text-sm text-zinc-500">
+            <p className="text-center text-sm text-slate-500">
               {isOwner ? "Brak agentów. Zaproś kogoś powyżej." : "Nie masz jeszcze przypisanych agentów."}
             </p>
           </Card>
@@ -298,30 +298,30 @@ export default async function ZespolPage() {
                   <Link
                     key={agent.id}
                     href={`/app/zespol/${agent.id}`}
-                    className="block px-6 py-4 transition hover:bg-zinc-900/40"
+                    className="block px-6 py-4 transition hover:bg-slate-50"
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex min-w-0 items-center gap-4">
-                        <span className="w-6 flex-shrink-0 text-center font-mono text-sm font-bold text-zinc-500">
+                        <span className="w-6 flex-shrink-0 text-center font-mono text-sm font-bold text-slate-500">
                           {i + 1}
                         </span>
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-sm font-bold text-zinc-950">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-sm font-bold text-white">
                           {(agent.full_name ?? "?").charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate font-medium text-white">
+                          <p className="truncate font-medium text-slate-900">
                             {agent.full_name ?? agent.email}
                             {agent.role === "manager" && (
-                              <span className="ml-2 rounded bg-violet-500/15 px-1.5 py-0.5 text-[10px] font-medium text-violet-300">
+                              <span className="ml-2 rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700">
                                 Menedżer
                               </span>
                             )}
                           </p>
-                          <p className="text-sm text-zinc-500">
+                          <p className="text-sm text-slate-500">
                             {agent.sessionCount} sesji
                             {isOwner && ` · ${formatPln(commissions[agent.id] ?? 0)} prowizji (mc)`}
                             {agent.sessionsThisWeek === 0 && (
-                              <span className="ml-1 text-amber-400">· nie trenuje</span>
+                              <span className="ml-1 text-amber-600">· nie trenuje</span>
                             )}
                           </p>
                         </div>
@@ -332,7 +332,7 @@ export default async function ZespolPage() {
                             {agent.avgScore != null ? `${agent.avgScore}` : "-"}
                             <TrendArrow trend={insights.trends[agent.id]} />
                           </span>
-                          <span className="hidden text-xs text-zinc-500 sm:block">wynik AI</span>
+                          <span className="hidden text-xs text-slate-500 sm:block">wynik AI</span>
                         </div>
                         <span className="text-xs text-emerald-400/70">Szczegóły →</span>
                       </div>

@@ -109,8 +109,8 @@ export function SessionChat({
       {/* Header */}
       <div className="mb-4 flex flex-col gap-2 border-b border-zinc-900 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-white">{scenarioTitle}</h1>
-          <p className="text-sm text-zinc-500">Klient: {personality}</p>
+          <h1 className="text-lg font-semibold text-slate-900">{scenarioTitle}</h1>
+          <p className="text-sm text-slate-500">Klient: {personality}</p>
         </div>
         <EndSessionButton sessionId={sessionId} disabled={agentTurns === 0} />
       </div>
@@ -118,10 +118,10 @@ export function SessionChat({
       {/* Zadanie - WIDOCZNE cały czas, żeby nie zapomnieć adresu / celu */}
       {brief && (
         <div className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] px-4 py-3">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-emerald-600">
             Twoje zadanie
           </p>
-          <p className="text-sm leading-relaxed text-zinc-200">{brief}</p>
+          <p className="text-sm leading-relaxed text-slate-800">{brief}</p>
         </div>
       )}
 
@@ -136,7 +136,7 @@ export function SessionChat({
         {streaming && !streamText && (
           <div className="flex gap-3">
             <Avatar role="client" />
-            <div className="rounded-2xl rounded-tl-sm bg-zinc-800/60 px-4 py-3">
+            <div className="rounded-2xl rounded-tl-sm bg-slate-100 px-4 py-3">
               <TypingDots />
             </div>
           </div>
@@ -144,9 +144,9 @@ export function SessionChat({
       </div>
 
       {/* Input */}
-      <div className="mt-4 border-t border-zinc-800 pt-4">
+      <div className="mt-4 border-t border-slate-200 pt-4">
         {listening && (
-          <p className="mb-2 flex items-center gap-2 text-sm text-emerald-400">
+          <p className="mb-2 flex items-center gap-2 text-sm text-emerald-600">
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
               <span className="relative h-2.5 w-2.5 rounded-full bg-emerald-500" />
@@ -155,7 +155,7 @@ export function SessionChat({
           </p>
         )}
         {voiceError && (
-          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">🎤 {voiceError}</p>
+          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">🎤 {voiceError}</p>
         )}
         <form onSubmit={handleSend} className="flex gap-2">
           {voiceSupported && (
@@ -166,8 +166,8 @@ export function SessionChat({
               title={listening ? "Zakończ mówienie" : "Mów zamiast pisać"}
               className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border transition disabled:opacity-50 ${
                 listening
-                  ? "border-emerald-400 bg-emerald-500 text-zinc-950"
-                  : "border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-emerald-500/50 hover:text-white"
+                  ? "border-emerald-400 bg-emerald-500 text-white"
+                  : "border-slate-300 bg-slate-100 text-slate-700 hover:border-emerald-500/50 hover:text-slate-900"
               }`}
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -180,18 +180,18 @@ export function SessionChat({
             onChange={(e) => setInput(e.target.value)}
             placeholder={listening ? "Mów..." : "Napisz albo powiedz co mówisz do klienta..."}
             disabled={streaming}
-            className="flex-1 rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-60"
+            className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={streaming || !input.trim()}
-            className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Wyślij
           </button>
         </form>
         {voiceSupported && !listening && (
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-slate-500">
             🎤 Możesz mówić zamiast pisać - kliknij mikrofon. Działa najlepiej w Chrome.
           </p>
         )}
@@ -222,16 +222,16 @@ function EndButtonInner({ disabled }: { disabled: boolean }) {
       <button
         type="submit"
         disabled={disabled || pending}
-        className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-emerald-500/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition hover:border-emerald-500/50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? "Oceniam..." : "Zakończ i oceń"}
       </button>
       {pending && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-zinc-700 border-t-emerald-400" />
-            <p className="font-medium text-white">AI ocenia Twoją rozmowę...</p>
-            <p className="mt-1 text-sm text-zinc-500">To potrwa kilka sekund.</p>
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-400" />
+            <p className="font-medium text-slate-900">AI ocenia Twoją rozmowę...</p>
+            <p className="mt-1 text-sm text-slate-500">To potrwa kilka sekund.</p>
           </div>
         </div>
       )}
@@ -247,8 +247,8 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       <div
         className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
           isAgent
-            ? "rounded-tr-sm bg-emerald-500/15 text-emerald-50"
-            : "rounded-tl-sm bg-zinc-800/60 text-zinc-200"
+            ? "rounded-tr-sm bg-emerald-100 text-emerald-50"
+            : "rounded-tl-sm bg-slate-100 text-slate-800"
         }`}
       >
         {message.content}
@@ -262,8 +262,8 @@ function Avatar({ role }: { role: "agent" | "client" }) {
     <div
       className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold ${
         role === "agent"
-          ? "bg-emerald-500 text-zinc-950"
-          : "bg-zinc-700 text-zinc-200"
+          ? "bg-emerald-500 text-white"
+          : "bg-slate-200 text-slate-800"
       }`}
     >
       {role === "agent" ? "Ty" : "K"}
@@ -274,9 +274,9 @@ function Avatar({ role }: { role: "agent" | "client" }) {
 function TypingDots() {
   return (
     <span className="inline-flex gap-1">
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-500" style={{ animationDelay: "0ms" }} />
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-500" style={{ animationDelay: "150ms" }} />
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-500" style={{ animationDelay: "300ms" }} />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" style={{ animationDelay: "0ms" }} />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" style={{ animationDelay: "150ms" }} />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" style={{ animationDelay: "300ms" }} />
     </span>
   );
 }

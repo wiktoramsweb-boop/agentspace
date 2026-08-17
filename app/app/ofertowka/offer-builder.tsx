@@ -137,7 +137,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
         /* eslint-disable-next-line @next/next/no-img-element */
         <img src={hero.url} alt="" className="mb-2 h-60 w-full rounded-xl object-cover" />
       ) : (
-        <div className="mb-2 flex h-60 w-full items-center justify-center rounded-xl bg-zinc-100 text-sm text-zinc-400">
+        <div className="mb-2 flex h-60 w-full items-center justify-center rounded-xl bg-zinc-100 text-sm text-slate-500">
           Dodaj zdjęcia - pierwsze będzie główne
         </div>
       )}
@@ -155,8 +155,8 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{title || "Tytuł oferty"}</h1>
           {location && (
-            <p className="mt-0.5 flex items-center gap-1.5 text-zinc-500">
-              <Icon name="pin" className="h-4 w-4 text-zinc-400" /> {location}
+            <p className="mt-0.5 flex items-center gap-1.5 text-slate-500">
+              <Icon name="pin" className="h-4 w-4 text-slate-500" /> {location}
             </p>
           )}
         </div>
@@ -169,7 +169,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
             <div key={p.key} className="flex items-center gap-2.5 rounded-lg bg-zinc-50 px-3 py-2">
               <Icon name={p.icon} className="h-5 w-5 flex-shrink-0 text-emerald-600" />
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wide text-zinc-400">{p.label}</p>
+                <p className="text-[10px] uppercase tracking-wide text-slate-500">{p.label}</p>
                 <p className="truncate text-sm font-semibold text-zinc-900">
                   {paramDisplay(params[p.key], p.suffix)}
                 </p>
@@ -184,14 +184,14 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
         <img src="/logo.png" alt="" width={40} height={40} className="rounded-full" />
         <div className="min-w-0 text-sm">
           <p className="font-semibold text-zinc-900">{agent.name}</p>
-          <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-zinc-600">
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-slate-400">
             {agent.phone && (
               <span className="flex items-center gap-1.5 font-medium text-emerald-700">
                 <Icon name="phone" className="h-4 w-4" /> {agent.phone}
               </span>
             )}
             <span className="flex items-center gap-1.5">
-              <Icon name="mail" className="h-4 w-4 text-zinc-400" /> {agent.email}
+              <Icon name="mail" className="h-4 w-4 text-slate-500" /> {agent.email}
             </span>
           </div>
         </div>
@@ -206,13 +206,13 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
         <div className="print-hide mb-4 flex items-center justify-between gap-4">
           <button
             onClick={() => setPreview(false)}
-            className="inline-flex items-center gap-1 text-sm text-zinc-400 transition hover:text-white"
+            className="inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
           >
             ← Wróć do edycji
           </button>
           <button
             onClick={print}
-            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
           >
             Drukuj / Zapisz PDF
           </button>
@@ -226,7 +226,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
     <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
       <div className="print-hide space-y-5">
         <Section title="Zdjęcia (3-8)">
-          <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-zinc-700 py-4 text-sm text-zinc-400 transition hover:border-emerald-500 hover:text-emerald-400">
+          <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-slate-300 py-4 text-sm text-slate-500 transition hover:border-emerald-500 hover:text-emerald-600">
             + Dodaj zdjęcia z komputera
             <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
           </label>
@@ -238,7 +238,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
                   <img src={p.url} alt="" className="h-16 w-full rounded-lg object-cover" />
                   <button
                     onClick={() => removePhoto(p.id)}
-                    className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                    className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-slate-900 opacity-0 transition group-hover:opacity-100"
                   >
                     ✕
                   </button>
@@ -246,7 +246,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
               ))}
             </div>
           )}
-          <p className="mt-2 text-xs text-zinc-500">{photos.length}/{MAX_PHOTOS} zdjęć</p>
+          <p className="mt-2 text-xs text-slate-500">{photos.length}/{MAX_PHOTOS} zdjęć</p>
         </Section>
 
         <Section title="Podstawa">
@@ -283,7 +283,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
 
         <button
           onClick={() => setPreview(true)}
-          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400"
         >
           Podgląd i PDF →
         </button>
@@ -295,12 +295,12 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
 }
 
 const inp =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-4">
-      <h3 className="mb-3 text-sm font-semibold text-white">{title}</h3>
+    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <h3 className="mb-3 text-sm font-semibold text-slate-900">{title}</h3>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -319,7 +319,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
       <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />
     </div>
   );
@@ -338,7 +338,7 @@ function Select({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
       <select value={value} onChange={(e) => onChange(e.target.value)} className={inp}>
         <option value="">- wybierz -</option>
         {options.map((o) => (

@@ -37,18 +37,18 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
           name="title"
           required
           placeholder="Dodaj zadanie na dziś..."
-          className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+          className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
         />
         <button
           type="submit"
-          className="rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+          className="rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
         >
           +
         </button>
       </form>
 
       {sorted.length === 0 ? (
-        <p className="py-4 text-center text-sm text-zinc-600">
+        <p className="py-4 text-center text-sm text-slate-400">
           Brak zadań. Dodaj pierwsze - zaplanuj dzień.
         </p>
       ) : (
@@ -64,21 +64,21 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-                className="group flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-zinc-900/40"
+                className="group flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-slate-50"
               >
                 <button
                   onClick={() => toggle(task)}
                   className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition ${
-                    done ? "border-emerald-500 bg-emerald-500" : "border-zinc-700 hover:border-zinc-500"
+                    done ? "border-emerald-500 bg-emerald-500" : "border-slate-300 hover:border-slate-400"
                   }`}
                 >
                   {done && (
-                    <svg className="h-3 w-3 text-zinc-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   )}
                 </button>
-                <span className={`flex-1 text-sm ${done ? "text-zinc-600 line-through" : "text-zinc-200"}`}>
+                <span className={`flex-1 text-sm ${done ? "text-slate-400 line-through" : "text-slate-800"}`}>
                   {task.title}
                 </span>
                 <a
@@ -91,7 +91,7 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
                   rel="noopener noreferrer"
                   title="Dodaj do Google Calendar"
                   aria-label="Dodaj do Google Calendar"
-                  className="flex-shrink-0 text-zinc-700 opacity-0 transition group-hover:opacity-100 hover:text-emerald-400"
+                  className="flex-shrink-0 text-slate-400 opacity-0 transition group-hover:opacity-100 hover:text-emerald-600"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -99,7 +99,7 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
                 </a>
                 <button
                   onClick={() => deleteTask(task.id)}
-                  className="text-zinc-700 opacity-0 transition group-hover:opacity-100 hover:text-red-400"
+                  className="text-slate-400 opacity-0 transition group-hover:opacity-100 hover:text-red-600"
                 >
                   ✕
                 </button>

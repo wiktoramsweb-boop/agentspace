@@ -48,8 +48,8 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
         </div>
         <div className="text-right">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">FAKTURA</h1>
-          <p className="text-sm font-medium text-zinc-700">Nr {data.number || "-"}</p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="text-sm font-medium text-slate-400">Nr {data.number || "-"}</p>
+          <p className="mt-1 text-xs text-slate-500">
             {data.place || "Kraków"}, {data.issueDate || "-"}
           </p>
         </div>
@@ -58,7 +58,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
       {/* Sprzedawca / Nabywca */}
       <div className="grid grid-cols-2 gap-8 py-6">
         <div>
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
             Sprzedawca
           </p>
           <p className="font-semibold">{seller.name}</p>
@@ -67,12 +67,12 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
             {seller.postcode} {seller.city}
           </p>
           <p className="mt-1">NIP: {seller.nip}</p>
-          <p className="mt-2 text-xs text-zinc-600">
+          <p className="mt-2 text-xs text-slate-400">
             {seller.bank} · {seller.account}
           </p>
         </div>
         <div>
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
             Nabywca
           </p>
           <p className="font-semibold">{data.buyerName || "-"}</p>
@@ -98,7 +98,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
       {/* Pozycje */}
       <table className="mt-5 w-full border-collapse text-xs">
         <thead>
-          <tr className="border-b-2 border-zinc-300 text-left text-zinc-600">
+          <tr className="border-b-2 border-zinc-300 text-left text-slate-400">
             <th className="py-2 pr-2 font-medium">Lp.</th>
             <th className="py-2 pr-2 font-medium">Nazwa towaru / usługi</th>
             <th className="py-2 pr-2 text-right font-medium">Ilość</th>
@@ -127,11 +127,11 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
       {/* Podsumowanie */}
       <div className="mt-4 flex justify-end">
         <div className="w-full max-w-xs space-y-1 text-sm">
-          <div className="flex justify-between text-zinc-600">
+          <div className="flex justify-between text-slate-400">
             <span>Razem netto</span>
             <span>{formatMoney(total)} zł</span>
           </div>
-          <div className="flex justify-between text-zinc-600">
+          <div className="flex justify-between text-slate-400">
             <span>VAT (zw)</span>
             <span>0,00 zł</span>
           </div>
@@ -139,7 +139,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
             <span>Do zapłaty</span>
             <span>{formatMoney(total)} zł</span>
           </div>
-          <div className="flex justify-between text-zinc-600">
+          <div className="flex justify-between text-slate-400">
             <span>Zapłacono</span>
             <span>{formatMoney(data.paid || 0)} zł</span>
           </div>
@@ -150,19 +150,19 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-zinc-700">
-        <span className="text-zinc-500">Słownie: </span>
+      <p className="mt-3 text-xs text-slate-400">
+        <span className="text-slate-500">Słownie: </span>
         {amountToWordsPL(total)}
       </p>
 
       {/* Uwagi */}
-      <div className="mt-5 rounded-lg bg-zinc-50 p-3 text-xs text-zinc-600">
+      <div className="mt-5 rounded-lg bg-zinc-50 p-3 text-xs text-slate-400">
         <p>{VAT_NOTE}</p>
         {data.description && <p className="mt-1">{data.description}</p>}
       </div>
 
       {/* Podpisy */}
-      <div className="mt-10 grid grid-cols-2 gap-8 text-center text-[11px] text-zinc-500">
+      <div className="mt-10 grid grid-cols-2 gap-8 text-center text-[11px] text-slate-500">
         <div>
           <div className="mx-auto mb-1 w-4/5 border-t border-zinc-300" />
           Podpis osoby uprawnionej do odbioru faktury
@@ -180,7 +180,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
 function Meta({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-600">{label}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
       <p className="font-medium text-zinc-900">{value}</p>
     </div>
   );

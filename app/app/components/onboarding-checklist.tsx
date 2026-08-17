@@ -45,16 +45,16 @@ export function OnboardingChecklist({ state }: { state: OnboardingState }) {
   const pct = Math.round((done / STEPS.length) * 100);
 
   return (
-    <div className="mb-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/[0.08] to-zinc-800/40 p-6">
+    <div className="mb-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/[0.08] to-slate-50 p-6">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-white">Pierwsze kroki w AgentSpace</h2>
-          <p className="text-sm text-zinc-400">Zrób te 4 rzeczy, żeby ruszyć pełną parą.</p>
+          <h2 className="text-lg font-semibold text-slate-900">Pierwsze kroki w AgentSpace</h2>
+          <p className="text-sm text-slate-500">Zrób te 4 rzeczy, żeby ruszyć pełną parą.</p>
         </div>
-        <span className="text-sm font-medium text-emerald-400">{done}/{STEPS.length}</span>
+        <span className="text-sm font-medium text-emerald-600">{done}/{STEPS.length}</span>
       </div>
 
-      <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-zinc-800">
+      <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-slate-100">
         <div className="h-full rounded-full bg-emerald-400 transition-all" style={{ width: `${pct}%` }} />
       </div>
 
@@ -64,27 +64,27 @@ export function OnboardingChecklist({ state }: { state: OnboardingState }) {
           return (
             <div
               key={step.key}
-              className={`flex items-center gap-4 rounded-xl border p-3 ${complete ? "border-emerald-500/20 bg-emerald-500/5" : "border-zinc-700 bg-zinc-800/40"}`}
+              className={`flex items-center gap-4 rounded-xl border p-3 ${complete ? "border-emerald-500/20 bg-emerald-500/5" : "border-slate-300 bg-white"}`}
             >
               <div
-                className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border ${complete ? "border-emerald-500 bg-emerald-500" : "border-zinc-600"}`}
+                className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border ${complete ? "border-emerald-500 bg-emerald-500" : "border-slate-300"}`}
               >
                 {complete && (
-                  <svg className="h-4 w-4 text-zinc-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className={`text-sm font-medium ${complete ? "text-zinc-500 line-through" : "text-white"}`}>
+                <p className={`text-sm font-medium ${complete ? "text-slate-500 line-through" : "text-slate-900"}`}>
                   {step.title}
                 </p>
-                {!complete && <p className="text-xs text-zinc-400">{step.body}</p>}
+                {!complete && <p className="text-xs text-slate-500">{step.body}</p>}
               </div>
               {!complete && (
                 <Link
                   href={step.href}
-                  className="flex-shrink-0 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-zinc-950 transition hover:bg-emerald-400"
+                  className="flex-shrink-0 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-400"
                 >
                   {step.cta} →
                 </Link>

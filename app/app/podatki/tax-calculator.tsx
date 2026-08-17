@@ -42,21 +42,21 @@ export function TaxCalculator() {
     <div className="space-y-5">
       {/* Zastrzeżenie */}
       <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] p-4 text-sm text-amber-200/90">
-        <span className="font-semibold text-amber-300">To narzędzie do modelowania, nie porada podatkowa.</span>{" "}
+        <span className="font-semibold text-amber-700">To narzędzie do modelowania, nie porada podatkowa.</span>{" "}
         Kwoty ZUS i zdrowotnej na 2026 to szacunki (oficjalne kwoty ogłaszane są końcem roku) - możesz je
         poprawić w zakładce <span className="font-medium">Założenia</span>. Przed realną decyzją potwierdź u księgowej.
       </div>
 
       {/* Zakładki */}
-      <div className="flex flex-wrap gap-1.5 rounded-2xl border border-zinc-700/60 bg-zinc-900/60 p-1.5">
+      <div className="flex flex-wrap gap-1.5 rounded-2xl border border-slate-200 bg-white p-1.5">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`rounded-xl px-3.5 py-2 text-sm font-medium transition ${
               tab === t.id
-                ? "bg-emerald-500 text-zinc-950"
-                : "text-zinc-400 hover:bg-zinc-800/60 hover:text-white"
+                ? "bg-emerald-500 text-white"
+                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
             }`}
           >
             {t.label}
@@ -121,10 +121,10 @@ function FormaTab({ c }: { c: TaxConstants }) {
           />
         </Panel>
 
-        <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-4 text-sm text-zinc-400">
-          <p className="mb-1 font-medium text-zinc-300">Punkt przełamania skala ↔ liniowy</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
+          <p className="mb-1 font-medium text-slate-700">Punkt przełamania skala ↔ liniowy</p>
           <p>
-            Przy dochodzie ok. <span className="font-semibold text-white">{zl0(prog)}</span> na osobę liniowy
+            Przy dochodzie ok. <span className="font-semibold text-slate-900">{zl0(prog)}</span> na osobę liniowy
             zaczyna wygrywać. Poniżej - skala jest tańsza.
           </p>
         </div>
@@ -133,7 +133,7 @@ function FormaTab({ c }: { c: TaxConstants }) {
       {/* Wyniki - 3 karty */}
       <div className="space-y-4">
         {vatPayer && (
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-slate-500">
             Liczone od przychodu netto {zl0(przychodEfekt)} (po odliczeniu VAT od {zl0(przychod)}).
           </p>
         )}
@@ -143,7 +143,7 @@ function FormaTab({ c }: { c: TaxConstants }) {
           ))}
         </div>
         <BreakdownTable results={results} bestForm={best.form} />
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-slate-500">
           „Do kieszeni" = dochód − PIT/ryczałt − zdrowotna − ZUS społeczny − danina. Ryczałt liczony od
           przychodu (koszty NIE obniżają podatku) - opłaca się przy wysokiej marży, ale gdy masz realne
           koszty szybko przegrywa. Przy niskim dochodzie wygrywa skala (kwota wolna + 12%), przy wysokim -
@@ -160,18 +160,18 @@ function FormCard({ r, isBest }: { r: FormResult; isBest: boolean }) {
       className={`relative rounded-2xl border p-4 transition ${
         isBest
           ? "border-emerald-500/50 bg-emerald-500/[0.07] shadow-[0_0_30px_-12px] shadow-emerald-500/40"
-          : "border-zinc-700/60 bg-zinc-800/40"
+          : "border-slate-200 bg-white"
       }`}
     >
       {isBest && (
-        <span className="absolute -top-2.5 left-4 rounded-full bg-emerald-500 px-2.5 py-0.5 text-[11px] font-bold text-zinc-950">
+        <span className="absolute -top-2.5 left-4 rounded-full bg-emerald-500 px-2.5 py-0.5 text-[11px] font-bold text-white">
           NAJTANIEJ
         </span>
       )}
-      <p className="text-sm font-semibold text-zinc-200">{FORM_SHORT[r.form]}</p>
-      <p className="mt-3 text-2xl font-bold text-white">{zl0(r.netto)}</p>
-      <p className="text-xs text-zinc-500">do kieszeni / rok</p>
-      <div className="mt-3 space-y-1 border-t border-zinc-700/50 pt-3 text-xs text-zinc-400">
+      <p className="text-sm font-semibold text-slate-800">{FORM_SHORT[r.form]}</p>
+      <p className="mt-3 text-2xl font-bold text-slate-900">{zl0(r.netto)}</p>
+      <p className="text-xs text-slate-500">do kieszeni / rok</p>
+      <div className="mt-3 space-y-1 border-t border-slate-200 pt-3 text-xs text-slate-500">
         <Row label="Podatek" value={zl0(r.podatek)} />
         <Row label="Zdrowotna" value={zl0(r.zdrowotna)} />
         <Row label="ZUS społ." value={zl0(r.zusSpoleczny)} />
@@ -194,16 +194,16 @@ function BreakdownTable({ results, bestForm }: { results: FormResult[]; bestForm
     { label: "Efektywna stawka", get: (r) => pct1(r.efektywna) },
   ];
   return (
-    <div className="overflow-x-auto rounded-2xl border border-zinc-700/60">
+    <div className="overflow-x-auto rounded-2xl border border-slate-200">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-zinc-700/60 bg-zinc-900/60 text-left text-zinc-400">
+          <tr className="border-b border-slate-200 bg-white text-left text-slate-500">
             <th className="px-4 py-2.5 font-medium">Pozycja</th>
             {results.map((r) => (
               <th
                 key={r.form}
                 className={`px-4 py-2.5 text-right font-semibold ${
-                  r.form === bestForm ? "text-emerald-300" : "text-zinc-300"
+                  r.form === bestForm ? "text-emerald-700" : "text-slate-700"
                 }`}
               >
                 {FORM_SHORT[r.form]}
@@ -215,8 +215,8 @@ function BreakdownTable({ results, bestForm }: { results: FormResult[]; bestForm
           {rows.map((row, i) => (
             <tr
               key={row.label}
-              className={`border-b border-zinc-800/60 last:border-0 ${
-                row.label === "Do kieszeni" ? "bg-zinc-900/40 font-semibold text-white" : "text-zinc-400"
+              className={`border-b border-slate-200 last:border-0 ${
+                row.label === "Do kieszeni" ? "bg-slate-50 font-semibold text-slate-900" : "text-slate-500"
               }`}
             >
               <td className="px-4 py-2">{row.label}</td>
@@ -224,7 +224,7 @@ function BreakdownTable({ results, bestForm }: { results: FormResult[]; bestForm
                 <td
                   key={r.form}
                   className={`px-4 py-2 text-right tabular-nums ${
-                    r.form === bestForm && row.label === "Do kieszeni" ? "text-emerald-300" : ""
+                    r.form === bestForm && row.label === "Do kieszeni" ? "text-emerald-700" : ""
                   }`}
                 >
                   {row.get(r)}
@@ -281,23 +281,23 @@ function ZusTab({ c }: { c: TaxConstants }) {
         <div
           className={`rounded-2xl border p-5 ${
             skonczony
-              ? "border-zinc-700/60 bg-zinc-800/40"
+              ? "border-slate-200 bg-white"
               : t.monthsLeft <= 3
                 ? "border-red-500/40 bg-red-500/[0.07]"
                 : "border-emerald-500/40 bg-emerald-500/[0.06]"
           }`}
         >
           {skonczony ? (
-            <p className="text-lg font-semibold text-white">
+            <p className="text-lg font-semibold text-slate-900">
               Mały ZUS już się skończył ({datePL(t.preferencyjnyDo)}) - płacicie duży ZUS.
             </p>
           ) : (
             <>
-              <p className="text-sm text-zinc-400">Mały ZUS kończy się</p>
-              <p className="text-2xl font-bold text-white">{datePL(t.preferencyjnyDo)}</p>
-              <p className="mt-1 text-sm text-zinc-300">
-                Zostało <span className="font-semibold text-white">{t.monthsLeft} mies.</span>
-                {t.monthsLeft <= 3 && <span className="text-red-300"> - to już za chwilę!</span>}
+              <p className="text-sm text-slate-500">Mały ZUS kończy się</p>
+              <p className="text-2xl font-bold text-slate-900">{datePL(t.preferencyjnyDo)}</p>
+              <p className="mt-1 text-sm text-slate-700">
+                Zostało <span className="font-semibold text-slate-900">{t.monthsLeft} mies.</span>
+                {t.monthsLeft <= 3 && <span className="text-red-700"> - to już za chwilę!</span>}
               </p>
             </>
           )}
@@ -310,33 +310,33 @@ function ZusTab({ c }: { c: TaxConstants }) {
           <Stat label="Skok na osobę" value={`+${zl0(t.skokMies)}/mc`} tone="warn" />
         </div>
 
-        <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5">
-          <p className="text-sm text-zinc-400">Nowy stały koszt dla firmy ({osob} os.)</p>
-          <p className="text-2xl font-bold text-amber-300">+{zl0(t.skokRoczny * osob)} / rok</p>
-          <p className="mt-2 text-sm text-zinc-400">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <p className="text-sm text-slate-500">Nowy stały koszt dla firmy ({osob} os.)</p>
+          <p className="text-2xl font-bold text-amber-700">+{zl0(t.skokRoczny * osob)} / rok</p>
+          <p className="mt-2 text-sm text-slate-500">
             To o {zl0(t.skokMies * osob)} więcej miesięcznie. Wpisz to do budżetu (P&L), żeby nie pokazywał
             zawyżonego zysku. Zdrowotna się nie zmienia - leci od dochodu niezależnie od etapu ZUS.
           </p>
         </div>
 
         {/* Oś */}
-        <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5">
-          <p className="mb-3 text-sm font-medium text-zinc-300">Oś czasu składek</p>
-          <ol className="space-y-2 text-sm text-zinc-400">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <p className="mb-3 text-sm font-medium text-slate-700">Oś czasu składek</p>
+          <ol className="space-y-2 text-sm text-slate-500">
             {t.ulgaStartDo && (
               <li>
-                <span className="text-zinc-500">do {datePL(t.ulgaStartDo)}:</span> ulga na start - 0 zł
+                <span className="text-slate-500">do {datePL(t.ulgaStartDo)}:</span> ulga na start - 0 zł
                 społecznych (tylko zdrowotna)
               </li>
             )}
             <li>
-              <span className="text-zinc-500">
+              <span className="text-slate-500">
                 {datePL(t.preferencyjnyOd)} - {datePL(t.preferencyjnyDo)}:
               </span>{" "}
               mały ZUS ~{zl0(c.zusPreferencyjnyMies)}/mc
             </li>
             <li>
-              <span className="text-zinc-500">od {datePL(t.preferencyjnyDo)}:</span> duży ZUS ~
+              <span className="text-slate-500">od {datePL(t.preferencyjnyDo)}:</span> duży ZUS ~
               {zl0(c.zusDuzyMies)}/mc
             </li>
           </ol>
@@ -379,8 +379,8 @@ function VatTab({ c }: { c: TaxConstants }) {
 
       <div className="space-y-4">
         {/* Paski do limitu */}
-        <div className="space-y-3 rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5">
-          <p className="text-sm font-medium text-zinc-300">
+        <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
+          <p className="text-sm font-medium text-slate-700">
             Limit VAT: {zl0(c.limitVat)} na podmiot (od 2026)
           </p>
           {v.subjects.map((s) => {
@@ -388,12 +388,12 @@ function VatTab({ c }: { c: TaxConstants }) {
             return (
               <div key={s.name}>
                 <div className="mb-1 flex justify-between text-sm">
-                  <span className="text-zinc-300">{s.name}</span>
-                  <span className={s.nadLimit ? "font-semibold text-red-300" : "text-zinc-400"}>
+                  <span className="text-slate-700">{s.name}</span>
+                  <span className={s.nadLimit ? "font-semibold text-red-700" : "text-slate-500"}>
                     {zl0(s.przychod)} {s.nadLimit ? "· NAD LIMITEM" : `· do limitu ${zl0(s.doLimitu)}`}
                   </span>
                 </div>
-                <div className="h-2.5 overflow-hidden rounded-full bg-zinc-950">
+                <div className="h-2.5 overflow-hidden rounded-full bg-white">
                   <div
                     className={`h-full rounded-full transition-[width] duration-300 ease-[cubic-bezier(0.21,0.47,0.32,0.98)] ${
                       fill >= 100 ? "bg-red-500" : fill >= 85 ? "bg-amber-500" : "bg-emerald-500"
@@ -422,13 +422,13 @@ function VatTab({ c }: { c: TaxConstants }) {
           }`}
         >
           {nadLimit ? (
-            <p className="text-white">
-              <span className="font-semibold text-red-300">VAT nieunikniony.</span> Suma przychodów przebija
+            <p className="text-slate-900">
+              <span className="font-semibold text-red-700">VAT nieunikniony.</span> Suma przychodów przebija
               łączną pojemność o {zl0(v.nadPojemnosc)}. Nawet bez spółki wchodzicie w VAT w tym cyklu.
             </p>
           ) : (
-            <p className="text-white">
-              <span className="font-semibold text-emerald-300">Mieścicie się pod limitem</span> - zostało{" "}
+            <p className="text-slate-900">
+              <span className="font-semibold text-emerald-700">Mieścicie się pod limitem</span> - zostało{" "}
               {zl0(v.pojemnosc - v.sumaPrzychodow)} łącznej pojemności. Ale pamiętaj o ryzyku sztucznego
               podziału (niżej).
             </p>
@@ -436,10 +436,10 @@ function VatTab({ c }: { c: TaxConstants }) {
         </div>
 
         {/* Koszt utraty statusu */}
-        <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5">
-          <p className="text-sm text-zinc-400">Koszt wejścia w VAT (utrata statusu nie-VAT)</p>
-          <p className="text-2xl font-bold text-amber-300">−{zl0(v.kosztUtratyNetto)} / rok</p>
-          <p className="mt-2 text-sm text-zinc-400">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <p className="text-sm text-slate-500">Koszt wejścia w VAT (utrata statusu nie-VAT)</p>
+          <p className="text-2xl font-bold text-amber-700">−{zl0(v.kosztUtratyNetto)} / rok</p>
+          <p className="mt-2 text-sm text-slate-500">
             Sprzedajesz głównie osobom prywatnym (nie odliczą VAT), więc 23% od prowizji oddajesz fiskusowi
             (minus VAT z kosztów). To zwykle największa liczba w całej analizie - więcej niż oszczędność na
             ZUS czy spółce.
@@ -448,8 +448,8 @@ function VatTab({ c }: { c: TaxConstants }) {
 
         {/* Ostrzeżenie sztuczny podział */}
         <div className="rounded-2xl border border-red-500/25 bg-red-500/[0.05] p-5 text-sm text-red-200/90">
-          <p className="mb-1 font-semibold text-red-300">⚠ Ryzyko: sztuczne dzielenie działalności</p>
-          <p className="text-zinc-300">
+          <p className="mb-1 font-semibold text-red-700">⚠ Ryzyko: sztuczne dzielenie działalności</p>
+          <p className="text-slate-700">
             „Walenie na JDG, żeby zmieścić się pod limitem" fiskus może uznać za obejście limitu VAT - zsumować
             obroty 3 podmiotów, naliczyć VAT wstecz + odsetki + KKS. Obrona = realna odrębność (osobni klienci,
             umowy, koszty), nie samo przełączanie faktur.
@@ -527,14 +527,14 @@ function SpzooTab({ c }: { c: TaxConstants }) {
             <QuickBtn onClick={() => setPowolanie(Math.floor(zysk / 2))}>cały zysk</QuickBtn>
             <QuickBtn onClick={() => setPowolanie(0)}>0</QuickBtn>
           </div>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-slate-500">
             Powołanie uchwałą (art. 201 KSH): skala 12%/32% + zdrowotna 9%, <b>bez ZUS społecznego</b>. Jest
             kosztem spółki → obniża CIT. Trzymając ≤ 120k/os. płacisz tylko 12%.
           </p>
 
           <div className="pt-1">
             <Label>Reszta zysku (po powołaniu)</Label>
-            <div className="flex rounded-xl border border-zinc-700/60 bg-zinc-900/60 p-1">
+            <div className="flex rounded-xl border border-slate-200 bg-white p-1">
               <MiniTab active={wyplata === "zatrzymane"} onClick={() => setWyplata("zatrzymane")}>
                 Zostaje w spółce
               </MiniTab>
@@ -542,10 +542,10 @@ function SpzooTab({ c }: { c: TaxConstants }) {
                 Dywidenda
               </MiniTab>
             </div>
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 text-xs text-slate-500">
               {wyplata === "zatrzymane" ? (
                 <>
-                  <b className="text-emerald-400">Najkorzystniej.</b> Reszta zysku płaci tylko 9% CIT i zostaje w
+                  <b className="text-emerald-600">Najkorzystniej.</b> Reszta zysku płaci tylko 9% CIT i zostaje w
                   firmie (na rozwój / rezerwę). 19% dywidendy zapłacisz dopiero, jeśli kiedyś ją wypłacisz.
                 </>
               ) : (
@@ -586,9 +586,9 @@ function SpzooTab({ c }: { c: TaxConstants }) {
           />
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-zinc-700/60">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200">
           <table className="w-full text-sm">
-            <tbody className="text-zinc-400">
+            <tbody className="text-slate-500">
               <TR label="Zysk firmy (przed wypłatą zarządu)" value={zl0(zysk)} />
               <TR label={`Wynagrodzenie z powołania (2× ${zl0(pay.powolaniePerOsoba)})`} value={`−${zl0(pay.powolanieRazem)}`} />
               <TR label="PIT skala od powołania (2 os.)" value={`−${zl0(pay.pitPowolaniePerOsoba * 2)}`} />
@@ -612,13 +612,13 @@ function SpzooTab({ c }: { c: TaxConstants }) {
 
         <div
           className={`rounded-2xl border p-5 ${
-            spolkaLepsza ? "border-emerald-500/40 bg-emerald-500/[0.06]" : "border-zinc-700/60 bg-zinc-800/40"
+            spolkaLepsza ? "border-emerald-500/40 bg-emerald-500/[0.06]" : "border-slate-200 bg-white"
           }`}
         >
-          <p className="text-white">
+          <p className="text-slate-900">
             {spolkaLepsza ? (
               <>
-                <span className="font-semibold text-emerald-300">Spółka wygrywa o {zl0(roznica)}/rok</span>{" "}
+                <span className="font-semibold text-emerald-700">Spółka wygrywa o {zl0(roznica)}/rok</span>{" "}
                 (łączna wartość po podatku).
                 {wyplata === "zatrzymane" && (
                   <>
@@ -631,14 +631,14 @@ function SpzooTab({ c }: { c: TaxConstants }) {
               </>
             ) : (
               <>
-                <span className="font-semibold text-white">JDG wygrywa o {zl0(-roznica)}/rok</span> - przy tej
+                <span className="font-semibold text-slate-900">JDG wygrywa o {zl0(-roznica)}/rok</span> - przy tej
                 skali spółka się nie opłaca, zwłaszcza z kosztem VAT i księgowości. Zostań na JDG.
               </>
             )}
           </p>
         </div>
 
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-slate-500">
           Strategia „powołanie do 120k/os. + reszta w spółce" daje najniższy podatek dziś: 12% od powołania i
           tylko 9% CIT od reszty, bez ZUS i bez 19% dywidendy. Minus: część pieniędzy zostaje w firmie (nie w
           prywatnej kieszeni), dochodzi pełna księgowość (~800-1500 zł/mc) i brak ubezpieczenia ZUS wspólników
@@ -655,7 +655,7 @@ function MiniTab({ active, onClick, children }: { active: boolean; onClick: () =
     <button
       onClick={onClick}
       className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-        active ? "bg-emerald-500 text-zinc-950" : "text-zinc-400 hover:text-white"
+        active ? "bg-emerald-500 text-white" : "text-slate-500 hover:text-slate-900"
       }`}
     >
       {children}
@@ -667,7 +667,7 @@ function QuickBtn({ onClick, children }: { onClick: () => void; children: React.
   return (
     <button
       onClick={onClick}
-      className="rounded-full border border-zinc-700/60 bg-zinc-950 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:text-white"
+      className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-900"
     >
       {children}
     </button>
@@ -681,7 +681,7 @@ function ZalozeniaTab({ c, setC }: { c: TaxConstants; setC: (c: TaxConstants) =>
   const set = (k: keyof TaxConstants) => (v: number) => setC({ ...c, [k]: v });
   return (
     <div className="space-y-5">
-      <p className="text-sm text-zinc-400">
+      <p className="text-sm text-slate-500">
         Wszystkie kwoty i stawki w jednym miejscu - zmiana przelicza cały kalkulator na żywo. Domyślnie:
         reguły PIT (stabilne od 2022) + szacunki ZUS/zdrowotnej na 2026. Zaktualizuj, gdy ZUS ogłosi oficjalne
         kwoty.
@@ -718,7 +718,7 @@ function ZalozeniaTab({ c, setC }: { c: TaxConstants; setC: (c: TaxConstants) =>
       </div>
       <button
         onClick={() => setC(DEFAULT_CONSTANTS)}
-        className="rounded-xl border border-zinc-700 bg-zinc-800/60 px-4 py-2 text-sm text-zinc-300 transition hover:bg-zinc-700/60 hover:text-white"
+        className="rounded-xl border border-slate-300 bg-slate-100 px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-200 hover:text-slate-900"
       >
         Przywróć domyślne (2026)
       </button>
@@ -759,19 +759,19 @@ function usePersistedState<T>(key: string, initial: T) {
 // ═══════════════════════════════════════════════════════════════════════════
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-4">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500">{title}</p>
+    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</p>
       <div className="space-y-3">{children}</div>
     </div>
   );
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <label className="mb-1.5 block text-sm text-zinc-400">{children}</label>;
+  return <label className="mb-1.5 block text-sm text-slate-500">{children}</label>;
 }
 
 const inpCls =
-  "w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 
 function Num({
   label,
@@ -841,8 +841,8 @@ function Toggle({
         className="mt-0.5 h-4 w-4 shrink-0 accent-emerald-500"
       />
       <span>
-        <span className="text-sm text-zinc-200">{label}</span>
-        {hint && <span className="block text-xs text-zinc-500">{hint}</span>}
+        <span className="text-sm text-slate-800">{label}</span>
+        {hint && <span className="block text-xs text-slate-500">{hint}</span>}
       </span>
     </label>
   );
@@ -852,7 +852,7 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
   return (
     <div className="flex justify-between">
       <span>{label}</span>
-      <span className={strong ? "font-semibold text-zinc-200" : "text-zinc-300"}>{value}</span>
+      <span className={strong ? "font-semibold text-slate-800" : "text-slate-700"}>{value}</span>
     </div>
   );
 }
@@ -867,9 +867,9 @@ function Stat({
   tone?: "muted" | "warn";
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-4">
-      <p className="text-xs text-zinc-500">{label}</p>
-      <p className={`mt-1 text-lg font-bold ${tone === "warn" ? "text-amber-300" : "text-white"}`}>{value}</p>
+    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className={`mt-1 text-lg font-bold ${tone === "warn" ? "text-amber-700" : "text-slate-900"}`}>{value}</p>
     </div>
   );
 }
@@ -890,26 +890,26 @@ function BigCard({
       className={`relative rounded-2xl border p-5 ${
         best
           ? "border-emerald-500/50 bg-emerald-500/[0.07] shadow-[0_0_30px_-12px] shadow-emerald-500/40"
-          : "border-zinc-700/60 bg-zinc-800/40"
+          : "border-slate-200 bg-white"
       }`}
     >
       {best && (
-        <span className="absolute -top-2.5 left-4 rounded-full bg-emerald-500 px-2.5 py-0.5 text-[11px] font-bold text-zinc-950">
+        <span className="absolute -top-2.5 left-4 rounded-full bg-emerald-500 px-2.5 py-0.5 text-[11px] font-bold text-white">
           LEPSZE
         </span>
       )}
-      <p className="text-sm font-medium text-zinc-300">{title}</p>
-      <p className="mt-2 text-3xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-xs text-zinc-500">{sub}</p>
+      <p className="text-sm font-medium text-slate-700">{title}</p>
+      <p className="mt-2 text-3xl font-bold text-slate-900">{value}</p>
+      <p className="mt-1 text-xs text-slate-500">{sub}</p>
     </div>
   );
 }
 
 function TR({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
-    <tr className={`border-b border-zinc-800/60 last:border-0 ${strong ? "bg-zinc-900/40" : ""}`}>
-      <td className={`px-4 py-2.5 ${strong ? "font-semibold text-white" : ""}`}>{label}</td>
-      <td className={`px-4 py-2.5 text-right tabular-nums ${strong ? "font-semibold text-white" : "text-zinc-300"}`}>
+    <tr className={`border-b border-slate-200 last:border-0 ${strong ? "bg-slate-50" : ""}`}>
+      <td className={`px-4 py-2.5 ${strong ? "font-semibold text-slate-900" : ""}`}>{label}</td>
+      <td className={`px-4 py-2.5 text-right tabular-nums ${strong ? "font-semibold text-slate-900" : "text-slate-700"}`}>
         {value}
       </td>
     </tr>

@@ -44,7 +44,7 @@ const STYLES: Record<ToastType, { ring: string; icon: ReactNode }> = {
   success: {
     ring: "border-emerald-500/30",
     icon: (
-      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
+      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.4}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
@@ -54,7 +54,7 @@ const STYLES: Record<ToastType, { ring: string; icon: ReactNode }> = {
   error: {
     ring: "border-red-500/30",
     icon: (
-      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-400">
+      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.4}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>
@@ -64,7 +64,7 @@ const STYLES: Record<ToastType, { ring: string; icon: ReactNode }> = {
   info: {
     ring: "border-cyan-500/30",
     icon: (
-      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-400">
+      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-cyan-100 text-cyan-600">
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.4}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M12 3a9 9 0 100 18 9 9 0 000-18z" />
         </svg>
@@ -77,7 +77,7 @@ function ToastItem({ toast }: { toast: Toast }) {
   const s = STYLES[toast.type];
   return (
     <div
-      className={`animate-toast-in pointer-events-auto flex items-center gap-3 rounded-xl border ${s.ring} bg-zinc-900/95 px-4 py-3 text-sm text-zinc-100 shadow-xl shadow-black/40 backdrop-blur`}
+      className={`animate-toast-in pointer-events-auto flex items-center gap-3 rounded-xl border ${s.ring} bg-white px-4 py-3 text-sm text-slate-800 shadow-xl shadow-slate-900/10 backdrop-blur`}
     >
       {s.icon}
       <span className="min-w-0 flex-1">{toast.message}</span>

@@ -58,13 +58,13 @@ export function NearbyCard({ lat, lng }: { lat: number; lng: number }) {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-6 shadow-sm shadow-black/20">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">Co w okolicy</h2>
+        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Co w okolicy</h2>
         {cats && cats.length > 0 && (
           <button
             onClick={copyToDescription}
-            className="text-xs font-medium text-emerald-400 transition hover:text-emerald-300"
+            className="text-xs font-medium text-emerald-600 transition hover:text-emerald-700"
           >
             Kopiuj do opisu
           </button>
@@ -72,27 +72,27 @@ export function NearbyCard({ lat, lng }: { lat: number; lng: number }) {
       </div>
 
       {cats === null && !error && (
-        <p className="text-sm text-zinc-500">Sprawdzam okolicę…</p>
+        <p className="text-sm text-slate-500">Sprawdzam okolicę…</p>
       )}
-      {error && <p className="text-sm text-zinc-500">Nie udało się pobrać danych o okolicy.</p>}
+      {error && <p className="text-sm text-slate-500">Nie udało się pobrać danych o okolicy.</p>}
       {cats && cats.length === 0 && (
-        <p className="text-sm text-zinc-500">Brak znanych punktów w promieniu ~900 m.</p>
+        <p className="text-sm text-slate-500">Brak znanych punktów w promieniu ~900 m.</p>
       )}
 
       {cats && cats.length > 0 && (
         <motion.div className="space-y-3" initial="hidden" animate="show" variants={listVariants}>
           {cats.map((c) => (
             <motion.div key={c.key} variants={itemVariants}>
-              <p className="mb-1 text-xs font-medium text-zinc-400">
+              <p className="mb-1 text-xs font-medium text-slate-500">
                 {ICONS[c.key] ?? "•"} {c.label}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {c.items.map((i, n) => (
                   <span
                     key={n}
-                    className="rounded-lg bg-zinc-900/60 px-2 py-1 text-xs text-zinc-300"
+                    className="rounded-lg bg-white px-2 py-1 text-xs text-slate-700"
                   >
-                    {i.name} · <span className="text-zinc-500">{fmt(i.dist)}</span>
+                    {i.name} · <span className="text-slate-500">{fmt(i.dist)}</span>
                   </span>
                 ))}
               </div>

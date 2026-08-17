@@ -79,7 +79,7 @@ export function NewDealButton({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+        className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
       >
         + Dodaj transakcję
       </button>
@@ -95,7 +95,7 @@ export function NewDealButton({
               name="title"
               required
               placeholder="Sprzedaż mieszkania ul. Zbożowa"
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
             />
           </Labeled>
 
@@ -105,7 +105,7 @@ export function NewDealButton({
                 name="property_id"
                 value={propertyId}
                 onChange={(e) => onPickProperty(e.target.value)}
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
               >
                 <option value="">- brak -</option>
                 {properties.map((p) => (
@@ -123,20 +123,20 @@ export function NewDealButton({
               onChange={(e) => setTx(e.target.value)}
               inputMode="decimal"
               placeholder="650000"
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
             />
             <input type="hidden" name="transaction_value" value={txNum} />
           </Labeled>
 
           {/* Prowizje od stron */}
           <div className="space-y-2">
-            <p className="text-sm text-zinc-400">Prowizja od stron</p>
+            <p className="text-sm text-slate-500">Prowizja od stron</p>
             {PARTY_DEFS.map((d) => (
-              <div key={d.key} className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-3">
+              <div key={d.key} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-sm text-zinc-300">{d.label}</span>
+                  <span className="text-sm text-slate-700">{d.label}</span>
                   {resolved[d.key] > 0 && (
-                    <span className="text-sm font-semibold text-emerald-400">{formatPln(resolved[d.key])}</span>
+                    <span className="text-sm font-semibold text-emerald-600">{formatPln(resolved[d.key])}</span>
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -145,12 +145,12 @@ export function NewDealButton({
                     onChange={(e) => setParty(d.key, { val: e.target.value })}
                     inputMode="decimal"
                     placeholder="0"
-                    className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-base text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+                    className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
                   />
                   <select
                     value={parties[d.key].mode}
                     onChange={(e) => setParty(d.key, { mode: e.target.value as Mode })}
-                    className="flex-shrink-0 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-base text-white focus:border-emerald-500 focus:outline-none"
+                    className="flex-shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-900 focus:border-emerald-500 focus:outline-none"
                     aria-label={`Jednostka prowizji ${d.label}`}
                   >
                     <option value="pln">zł</option>
@@ -171,7 +171,7 @@ export function NewDealButton({
                 onChange={(e) => setSplit(e.target.value)}
                 inputMode="decimal"
                 placeholder="50"
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none"
               />
             </Labeled>
             <Labeled label="Dodatki (zł)">
@@ -181,7 +181,7 @@ export function NewDealButton({
                 onChange={(e) => setExtras(e.target.value)}
                 inputMode="decimal"
                 placeholder="np. 1000"
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
               />
             </Labeled>
           </div>
@@ -189,7 +189,7 @@ export function NewDealButton({
             <input
               name="extras_note"
               placeholder="Doradca kredytowy - Bartek"
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
             />
           </Labeled>
 
@@ -201,8 +201,8 @@ export function NewDealButton({
             <Row label={`Twój udział (${splitNum}% od netto)`} value={formatPln(agentBase)} muted />
             {extrasNum > 0 && <Row label="Dodatki (dla Ciebie)" value={formatPln(extrasNum)} muted />}
             <div className="mt-2 flex items-center justify-between border-t border-emerald-500/20 pt-2">
-              <span className="font-medium text-white">Twój zarobek (netto)</span>
-              <span className="text-xl font-semibold text-emerald-400">{formatPln(earnings)}</span>
+              <span className="font-medium text-slate-900">Twój zarobek (netto)</span>
+              <span className="text-xl font-semibold text-emerald-600">{formatPln(earnings)}</span>
             </div>
           </div>
 
@@ -210,22 +210,22 @@ export function NewDealButton({
             <input
               name="expectedClose"
               type="date"
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none"
             />
           </Labeled>
         </div>
 
-        <div className="flex flex-shrink-0 gap-3 border-t border-zinc-800 px-6 py-4">
+        <div className="flex flex-shrink-0 gap-3 border-t border-slate-200 px-6 py-4">
           <SubmitButton
             pendingText="Dodaję…"
-            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-zinc-950 hover:bg-emerald-400"
+            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-400"
           >
             Dodaj transakcję
           </SubmitButton>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-xl border border-zinc-700 px-5 py-3 text-zinc-300 transition hover:bg-zinc-800"
+            className="rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition hover:bg-slate-100"
           >
             Anuluj
           </button>
@@ -238,7 +238,7 @@ export function NewDealButton({
 function Labeled({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
       {children}
     </div>
   );
@@ -247,8 +247,8 @@ function Labeled({ label, children }: { label: string; children: React.ReactNode
 function Row({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
   return (
     <div className="flex items-center justify-between text-sm">
-      <span className={muted ? "text-zinc-400" : "text-zinc-300"}>{label}</span>
-      <span className={muted ? "text-zinc-300" : "font-medium text-white"}>{value}</span>
+      <span className={muted ? "text-slate-500" : "text-slate-700"}>{label}</span>
+      <span className={muted ? "text-slate-700" : "font-medium text-slate-900"}>{value}</span>
     </div>
   );
 }
@@ -264,7 +264,7 @@ export function DealActions({ dealId, status }: { dealId: string; status: DealSt
               setDealStatus(dealId, "zamkniety");
               toast("Transakcja zamknięta 🎉");
             }}
-            className="rounded-lg bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-300 transition hover:bg-emerald-500/25"
+            className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-500/25"
           >
             Zamknij ✓
           </button>
@@ -273,7 +273,7 @@ export function DealActions({ dealId, status }: { dealId: string; status: DealSt
               setDealStatus(dealId, "przepadl");
               toast("Oznaczono jako przepadła", "info");
             }}
-            className="rounded-lg bg-zinc-800/50 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-red-500/15 hover:text-red-300"
+            className="rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:bg-red-100 hover:text-red-700"
           >
             Przepadł
           </button>
@@ -285,7 +285,7 @@ export function DealActions({ dealId, status }: { dealId: string; status: DealSt
             setDealStatus(dealId, "w_toku");
             toast("Transakcja wznowiona", "info");
           }}
-          className="rounded-lg bg-zinc-800/50 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-zinc-800"
+          className="rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:bg-slate-100"
         >
           Wznów
         </button>
@@ -295,7 +295,7 @@ export function DealActions({ dealId, status }: { dealId: string; status: DealSt
           deleteDeal(dealId);
           toast("Usunięto transakcję", "info");
         }}
-        className="text-xs text-zinc-600 transition hover:text-red-400"
+        className="text-xs text-slate-400 transition hover:text-red-600"
         title="Usuń"
       >
         ✕

@@ -49,18 +49,18 @@ export default async function ClientDetailPage({ params }: Props) {
 
   return (
     <>
-      <Link href="/app/klienci" className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-emerald-400">
+      <Link href="/app/klienci" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Wszyscy klienci
       </Link>
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-xl font-bold text-zinc-950">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-xl font-bold text-white">
             {client.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-white">{client.name}</h1>
-            <p className="text-zinc-500">
+            <h1 className="text-2xl font-semibold text-slate-900">{client.name}</h1>
+            <p className="text-slate-500">
               {type?.label}
               {client.property && ` · ${client.property}`}
             </p>
@@ -68,8 +68,8 @@ export default async function ClientDetailPage({ params }: Props) {
               <span
                 className={`mt-1.5 inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-medium ${
                   reminder.due
-                    ? "bg-amber-500/15 text-amber-300"
-                    : "bg-zinc-800 text-zinc-400"
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-slate-100 text-slate-500"
                 }`}
               >
                 🔔 {reminder.label}
@@ -103,7 +103,7 @@ export default async function ClientDetailPage({ params }: Props) {
             })}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-emerald-500 hover:text-emerald-400"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition hover:border-emerald-500 hover:text-emerald-600"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -117,22 +117,22 @@ export default async function ClientDetailPage({ params }: Props) {
         {/* Lewa: dane + status */}
         <div className="space-y-6">
           <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
               Status
             </h2>
             <StatusChanger clientId={client.id} current={client.status} />
           </Card>
 
           <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
               Kontakt
             </h2>
             <dl className="space-y-3 text-sm">
               {client.phone && (
                 <div className="flex justify-between">
-                  <dt className="text-zinc-500">Telefon</dt>
+                  <dt className="text-slate-500">Telefon</dt>
                   <dd>
-                    <a href={`tel:${client.phone}`} className="text-emerald-400 hover:text-emerald-300">
+                    <a href={`tel:${client.phone}`} className="text-emerald-600 hover:text-emerald-700">
                       {client.phone}
                     </a>
                   </dd>
@@ -140,9 +140,9 @@ export default async function ClientDetailPage({ params }: Props) {
               )}
               {client.email && (
                 <div className="flex justify-between">
-                  <dt className="text-zinc-500">Email</dt>
+                  <dt className="text-slate-500">Email</dt>
                   <dd>
-                    <a href={`mailto:${client.email}`} className="text-emerald-400 hover:text-emerald-300">
+                    <a href={`mailto:${client.email}`} className="text-emerald-600 hover:text-emerald-700">
                       {client.email}
                     </a>
                   </dd>
@@ -150,19 +150,19 @@ export default async function ClientDetailPage({ params }: Props) {
               )}
               {client.budget_pln != null && (
                 <div className="flex justify-between">
-                  <dt className="text-zinc-500">Budżet</dt>
-                  <dd className="text-zinc-200">{formatPln(client.budget_pln)}</dd>
+                  <dt className="text-slate-500">Budżet</dt>
+                  <dd className="text-slate-800">{formatPln(client.budget_pln)}</dd>
                 </div>
               )}
               <div className="flex justify-between">
-                <dt className="text-zinc-500">Ostatni kontakt</dt>
-                <dd className="text-zinc-200">{daysAgo(client.last_contact_at)}</dd>
+                <dt className="text-slate-500">Ostatni kontakt</dt>
+                <dd className="text-slate-800">{daysAgo(client.last_contact_at)}</dd>
               </div>
             </dl>
           </Card>
 
           <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
               Następny kontakt
             </h2>
             <NextContactControl clientId={client.id} current={client.next_contact_at} />
@@ -170,10 +170,10 @@ export default async function ClientDetailPage({ params }: Props) {
 
           {client.address && (
             <Card>
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
                 Lokalizacja
               </h2>
-              <p className="mb-3 text-sm text-zinc-300">{client.address}</p>
+              <p className="mb-3 text-sm text-slate-700">{client.address}</p>
               {client.lat != null && client.lng != null && (
                 <MiniMap lat={client.lat} lng={client.lng} title={client.name} />
               )}
@@ -181,7 +181,7 @@ export default async function ClientDetailPage({ params }: Props) {
           )}
 
           <form action={deleteClient.bind(null, client.id)}>
-            <button className="text-xs text-zinc-600 transition hover:text-red-400">
+            <button className="text-xs text-slate-400 transition hover:text-red-600">
               Usuń klienta
             </button>
           </form>
@@ -191,7 +191,7 @@ export default async function ClientDetailPage({ params }: Props) {
         <div className="space-y-6">
           {(owned.length > 0 || interested.length > 0) && (
             <Card>
-              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
                 Powiązane nieruchomości
               </h2>
               <div className="space-y-4">
@@ -206,28 +206,28 @@ export default async function ClientDetailPage({ params }: Props) {
           )}
 
           <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
               Nowa notatka
             </h2>
             <NoteForm clientId={client.id} />
           </Card>
 
           <div>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
               Historia kontaktu ({notes.length})
             </h2>
             {notes.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/20 p-6 text-center text-sm text-zinc-500">
+              <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-500">
                 Brak notatek. Dodaj pierwszą po rozmowie z klientem.
               </p>
             ) : (
               <div className="space-y-3">
                 {notes.map((n) => (
-                  <div key={n.id} className="rounded-2xl border border-zinc-900 bg-zinc-900/40 p-4">
-                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-200">
+                  <div key={n.id} className="rounded-2xl border border-zinc-900 bg-slate-50 p-4">
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
                       {n.content}
                     </p>
-                    <p className="mt-2 text-xs text-zinc-600">
+                    <p className="mt-2 text-xs text-slate-400">
                       {new Intl.DateTimeFormat("pl-PL", {
                         dateStyle: "medium",
                         timeStyle: "short",
@@ -247,7 +247,7 @@ export default async function ClientDetailPage({ params }: Props) {
 function PropertyGroup({ label, items }: { label: string; items: Property[] }) {
   return (
     <div>
-      <p className="mb-2 text-xs uppercase tracking-wide text-zinc-600">{label}</p>
+      <p className="mb-2 text-xs uppercase tracking-wide text-slate-400">{label}</p>
       <ul className="space-y-2">
         {items.map((p) => {
           const st = PROPERTY_STATUSES.find((s) => s.value === p.status);
@@ -255,12 +255,12 @@ function PropertyGroup({ label, items }: { label: string; items: Property[] }) {
             <li key={p.id}>
               <Link
                 href={`/app/nieruchomosci/${p.id}`}
-                className="flex items-center justify-between gap-2 rounded-lg bg-zinc-900/50 px-3 py-2 transition hover:bg-zinc-900"
+                className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-2 transition hover:bg-white"
               >
-                <span className="min-w-0 truncate text-sm text-zinc-200">
+                <span className="min-w-0 truncate text-sm text-slate-800">
                   {p.title}
                   {p.price_pln != null && (
-                    <span className="text-zinc-500"> · {formatPln(p.price_pln)}</span>
+                    <span className="text-slate-500"> · {formatPln(p.price_pln)}</span>
                   )}
                 </span>
                 {st && (

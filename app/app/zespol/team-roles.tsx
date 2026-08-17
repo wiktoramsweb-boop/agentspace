@@ -33,16 +33,16 @@ export function TeamRoles({
 
   return (
     <div className="space-y-3">
-      {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
-      <div className="divide-y divide-zinc-900 rounded-2xl border border-zinc-800">
+      {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>}
+      <div className="divide-y divide-zinc-900 rounded-2xl border border-slate-200">
         {members.map((m) => (
           <div key={m.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-white">
+              <p className="truncate text-sm font-medium text-slate-900">
                 {m.label}
-                {m.id === currentUserId && <span className="ml-2 text-xs text-zinc-500">(Ty)</span>}
+                {m.id === currentUserId && <span className="ml-2 text-xs text-slate-500">(Ty)</span>}
               </p>
-              {m.email && <p className="truncate text-xs text-zinc-500">{m.email}</p>}
+              {m.email && <p className="truncate text-xs text-slate-500">{m.email}</p>}
             </div>
 
             <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
@@ -59,7 +59,7 @@ export function TeamRoles({
               </select>
 
               <div className="flex items-center gap-1.5" title="Tygodniowy limit rozmów z AI Coach (puste = bez limitu)">
-                <span className="text-xs text-zinc-500">Limit AI/tydz.</span>
+                <span className="text-xs text-slate-500">Limit AI/tydz.</span>
                 <input
                   type="number"
                   min={0}
@@ -73,7 +73,7 @@ export function TeamRoles({
                     const current = m.weekly_ai_limit;
                     if ((val ?? null) !== (current ?? null)) run(() => setWeeklyLimit(m.id, val));
                   }}
-                  className="w-16 rounded-lg border border-zinc-700 bg-zinc-900 px-2 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none disabled:opacity-60"
+                  className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none disabled:opacity-60"
                 />
               </div>
             </div>
@@ -85,4 +85,4 @@ export function TeamRoles({
 }
 
 const sel =
-  "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none disabled:opacity-60";
+  "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none disabled:opacity-60";
