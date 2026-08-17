@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ROLE_LABELS, type UserRole } from "@/lib/types";
+import { ThemeToggle } from "./theme-toggle";
 import { signOut } from "@/app/auth/actions";
 
 type NavColor = keyof typeof TILE;
@@ -145,22 +146,25 @@ export function Sidebar({
   );
 
   const account = (
-    <div className="border-t border-zinc-800 pt-4">
+    <div className="border-t border-white/10 pt-4">
       <div className="mb-3 flex items-center gap-3 px-3">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-sm font-bold text-zinc-950">
           {fullName.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-white">{fullName}</p>
-          <p className="truncate text-xs text-zinc-500">
+          <p className="truncate text-xs text-white/50">
             {ROLE_LABELS[role]} · {agencyName}
           </p>
         </div>
       </div>
+      <div className="mb-1">
+        <ThemeToggle />
+      </div>
       <form action={signOut}>
         <button
           type="submit"
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-white"
         >
           <LogoutIcon />
           Wyloguj się

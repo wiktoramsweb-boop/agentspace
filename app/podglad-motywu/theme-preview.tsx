@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Sidebar } from "../app/components/sidebar";
+import { ThemeToggle } from "../app/components/theme-toggle";
 import { PageHeader, StatCard, Card, Badge } from "../app/components/ui";
 import { Button, SegmentedToggle } from "../app/components/kit";
 import { PROPERTY_STATUSES, CLIENT_STATUSES } from "@/lib/types";
@@ -17,7 +18,14 @@ export function ThemePreview() {
           <PageHeader
             title="Nieruchomości"
             subtitle="12 aktywnych, 34 w biurze"
-            action={<Button accent="emerald">+ Dodaj nieruchomość</Button>}
+            action={
+              <div className="flex items-center gap-2">
+                <div className="w-44 rounded-xl bg-slate-800 p-1">
+                  <ThemeToggle />
+                </div>
+                <Button accent="emerald">+ Dodaj nieruchomość</Button>
+              </div>
+            }
           />
 
           <div className="grid gap-4 sm:grid-cols-3">

@@ -21,6 +21,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <ToastProvider>
+      {/* Motyw ustawiamy przed pierwszym malowaniem, żeby ciemny nie mrugał bielą. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{var t=localStorage.getItem("as_theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}`,
+        }}
+      />
       <div className="app-shell min-h-screen text-slate-900 md:flex">
         <Sidebar
           role={user.role}
