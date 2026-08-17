@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { getAgencyProperties, getAgencyClientsLite } from "@/lib/data-platform";
 import { PageHeader, EmptyState } from "../components/ui";
-import { NewPropertyForm } from "./new-property-form";
+import { PropertyWizard } from "./property-wizard";
 import { PropertiesBrowser } from "./properties-browser";
 
 export default async function NieruchomosciPage() {
@@ -19,7 +19,7 @@ export default async function NieruchomosciPage() {
       <PageHeader
         title="Nieruchomości"
         subtitle={`${active.length} aktywnych · ${properties.length} w biurze`}
-        action={<NewPropertyForm clients={clients} />}
+        action={<PropertyWizard clients={clients} />}
       />
 
       {properties.length === 0 ? (

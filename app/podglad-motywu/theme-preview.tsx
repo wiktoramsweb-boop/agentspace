@@ -6,6 +6,7 @@ import { ThemeToggle } from "../app/components/theme-toggle";
 import { PageHeader, StatCard, Card, Badge } from "../app/components/ui";
 import { Button, SegmentedToggle } from "../app/components/kit";
 import { PROPERTY_STATUSES, CLIENT_STATUSES } from "@/lib/types";
+import { PropertyWizard } from "../app/nieruchomosci/property-wizard";
 
 export function ThemePreview() {
   const [scope, setScope] = useState<"all" | "mine">("all");
@@ -23,7 +24,7 @@ export function ThemePreview() {
                 <div className="w-44 rounded-xl bg-slate-800 p-1">
                   <ThemeToggle />
                 </div>
-                <Button accent="emerald">+ Dodaj nieruchomość</Button>
+                <PropertyWizard clients={[{ id: "1", name: "Jan Kowalski" }, { id: "2", name: "Anna Nowak" }]} />
               </div>
             }
           />

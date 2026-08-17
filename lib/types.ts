@@ -197,7 +197,17 @@ export type Deal = {
 // ---------- NIERUCHOMOŚCI (oferty) ----------
 
 export type PropertyDealKind = "sprzedaz" | "wynajem";
-export type PropertyType = "mieszkanie" | "dom" | "dzialka" | "lokal" | "inne";
+export type PropertyType =
+  | "mieszkanie"
+  | "dom"
+  | "dzialka"
+  | "lokal"
+  | "magazyn"
+  | "obiekt"
+  | "pokoj"
+  | "inwestycja"
+  | "budynek"
+  | "inne";
 export type PropertyStatus = "aktywna" | "zarezerwowana" | "sfinalizowana" | "archiwum";
 
 export type Property = {
@@ -220,6 +230,27 @@ export type Property = {
   owner_client_id: string | null;
   created_at: string;
   updated_at: string;
+  // ── v17: pola pod ofertę i przyszły eksport na stronę www ──
+  offer_no?: string | null;
+  slug?: string | null;
+  headline?: string | null;
+  market?: string | null;
+  ownership?: string | null;
+  available_from?: string | null;
+  floors_total?: number | null;
+  year_built?: number | null;
+  building_type?: string | null;
+  condition_std?: string | null;
+  heating?: string | null;
+  plot_area_m2?: number | null;
+  admin_fee_pln?: number | null;
+  deposit_pln?: number | null;
+  features?: Record<string, boolean> | null;
+  photos?: { url: string; main?: boolean; export?: boolean; caption?: string }[] | null;
+  export_to_web?: boolean | null;
+  export_to_portals?: boolean | null;
+  web_published_at?: string | null;
+  export_address_mode?: string | null;
 };
 
 export type PropertyInterest = {
@@ -239,7 +270,93 @@ export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
   { value: "dom", label: "Dom" },
   { value: "dzialka", label: "Działka" },
   { value: "lokal", label: "Lokal / komercja" },
+  { value: "magazyn", label: "Magazyn" },
+  { value: "obiekt", label: "Obiekt" },
+  { value: "pokoj", label: "Pokój" },
+  { value: "inwestycja", label: "Inwestycja" },
+  { value: "budynek", label: "Budynek" },
   { value: "inne", label: "Inne" },
+];
+
+/** Kafelki wyboru typu w kreatorze: ikona + kolor (układ jak w ASARI). */
+export const PROPERTY_TYPE_TILES: {
+  value: PropertyType;
+  label: string;
+  emoji: string;
+  tile: string;
+  group: "podstawowe" | "wieksze";
+}[] = [
+  { value: "mieszkanie", label: "Mieszkanie", emoji: "🏢", tile: "bg-blue-500", group: "podstawowe" },
+  { value: "dom", label: "Dom", emoji: "🏠", tile: "bg-emerald-500", group: "podstawowe" },
+  { value: "dzialka", label: "Działka", emoji: "🌳", tile: "bg-teal-500", group: "podstawowe" },
+  { value: "lokal", label: "Lokal", emoji: "🏬", tile: "bg-violet-500", group: "podstawowe" },
+  { value: "magazyn", label: "Magazyn", emoji: "📦", tile: "bg-amber-500", group: "podstawowe" },
+  { value: "obiekt", label: "Obiekt", emoji: "🏛️", tile: "bg-slate-500", group: "podstawowe" },
+  { value: "pokoj", label: "Pokój", emoji: "🛏️", tile: "bg-rose-500", group: "podstawowe" },
+  { value: "inwestycja", label: "Inwestycja", emoji: "📈", tile: "bg-cyan-500", group: "wieksze" },
+  { value: "budynek", label: "Budynek", emoji: "🏘️", tile: "bg-indigo-500", group: "wieksze" },
+];
+
+// ── Słowniki pól oferty (v17). Wartości trzymamy jako tekst, żeby dodanie
+// nowej pozycji nie wymagało migracji bazy. ──
+export const MARKETS: { value: string; label: string }[] = [
+  { value: "wtorny", label: "Wtórny" },
+  { value: "pierwotny", label: "Pierwotny" },
+];
+
+export const OWNERSHIPS: { value: string; label: string }[] = [
+  { value: "wlasnosc", label: "Pełna własność (KW)" },
+  { value: "spoldzielcze", label: "Spółdzielcze własnościowe" },
+  { value: "udzial", label: "Udział w nieruchomości" },
+  { value: "uzytkowanie", label: "Użytkowanie wieczyste" },
+];
+
+export const BUILDING_TYPES: { value: string; label: string }[] = [
+  { value: "blok", label: "Blok" },
+  { value: "apartamentowiec", label: "Apartamentowiec" },
+  { value: "kamienica", label: "Kamienica" },
+  { value: "wolnostojacy", label: "Wolnostojący" },
+  { value: "blizniak", label: "Bliźniak" },
+  { value: "szeregowy", label: "Szeregowy" },
+];
+
+export const CONDITIONS: { value: string; label: string }[] = [
+  { value: "do_wprowadzenia", label: "Do wprowadzenia" },
+  { value: "do_odswiezenia", label: "Do odświeżenia" },
+  { value: "do_remontu", label: "Do remontu" },
+  { value: "deweloperski", label: "Stan deweloperski" },
+  { value: "w_budowie", label: "W budowie" },
+];
+
+export const HEATINGS: { value: string; label: string }[] = [
+  { value: "miejskie", label: "Miejskie (MPEC)" },
+  { value: "gazowe", label: "Gazowe" },
+  { value: "elektryczne", label: "Elektryczne" },
+  { value: "pompa", label: "Pompa ciepła" },
+  { value: "kominek", label: "Kominek / piec" },
+  { value: "inne", label: "Inne" },
+];
+
+/** Udogodnienia jako flagi w kolumnie features (jsonb). */
+export const PROPERTY_FEATURES: { key: string; label: string }[] = [
+  { key: "balkon", label: "Balkon" },
+  { key: "taras", label: "Taras" },
+  { key: "ogrodek", label: "Ogródek" },
+  { key: "winda", label: "Winda" },
+  { key: "garaz", label: "Garaż / miejsce postojowe" },
+  { key: "piwnica", label: "Piwnica / komórka" },
+  { key: "klimatyzacja", label: "Klimatyzacja" },
+  { key: "alarm", label: "System alarmowy" },
+  { key: "monitoring", label: "Monitoring" },
+  { key: "meble", label: "Umeblowane" },
+  { key: "zmywarka", label: "Zmywarka" },
+  { key: "pralka", label: "Pralka" },
+];
+
+export const EXPORT_ADDRESS_MODES: { value: string; label: string; hint: string }[] = [
+  { value: "pelny", label: "Pełny adres", hint: "z numerem budynku" },
+  { value: "ulica", label: "Tylko ulica", hint: "bez numeru (zalecane)" },
+  { value: "dzielnica", label: "Tylko dzielnica", hint: "najbardziej dyskretne" },
 ];
 
 export const PROPERTY_STATUSES: {
