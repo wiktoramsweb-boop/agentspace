@@ -71,7 +71,7 @@ export default async function AgentDetailPage({ params }: Props) {
       />
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Średni wynik AI" value={avgScore != null ? `${avgScore}/10` : "—"} sub={`${sessionCount} ocen`} accent />
+        <StatCard label="Średni wynik AI" value={avgScore != null ? `${avgScore}/10` : "-"} sub={`${sessionCount} ocen`} accent />
         <StatCard label="Sesje AI Coach" value={`${completedSessions}/${totalSessions}`} sub="ukończone / rozpoczęte" />
         <StatCard
           label="Dziś telefony"
@@ -81,7 +81,7 @@ export default async function AgentDetailPage({ params }: Props) {
         {isOwner ? (
           <StatCard label="Prowizja w tym mc" value={formatPln(monthCommission)} />
         ) : (
-          <StatCard label="Cel roczny" value={goal ? formatPln(goal.annual_income_pln) : "—"} />
+          <StatCard label="Cel roczny" value={goal ? formatPln(goal.annual_income_pln) : "-"} />
         )}
       </div>
 
@@ -125,12 +125,12 @@ export default async function AgentDetailPage({ params }: Props) {
 
         {!hasGoal && (
           <p className="mt-3 text-xs text-zinc-600">
-            Agent nie ustawił jeszcze celu w zakładce „Cele" — pokazujemy same wykonania.
+            Agent nie ustawił jeszcze celu w zakładce „Cele" - pokazujemy same wykonania.
           </p>
         )}
       </Card>
 
-      {/* Kalendarz miesiąca — które dni z celem telefonów */}
+      {/* Kalendarz miesiąca - które dni z celem telefonów */}
       <div className="mb-8">
         <MonthCalendarView calendar={calendar} hasTarget={dailyCallTarget > 0} title="Aktywność dzień po dniu" />
       </div>
@@ -209,7 +209,7 @@ export default async function AgentDetailPage({ params }: Props) {
                         <div key={sub.label} className="rounded-lg bg-zinc-900/60 px-2.5 py-1.5">
                           <p className="text-[10px] uppercase tracking-wide text-zinc-500">{sub.label}</p>
                           <p className={`font-mono text-sm font-semibold ${scoreColor(sub.v ?? null)}`}>
-                            {sub.v != null ? `${sub.v}/10` : "—"}
+                            {sub.v != null ? `${sub.v}/10` : "-"}
                           </p>
                         </div>
                       ))}

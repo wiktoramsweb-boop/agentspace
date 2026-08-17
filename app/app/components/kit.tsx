@@ -2,7 +2,7 @@
 
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-// Wspólne „klocki" UI z obsługą AKCENTU koloru — moduły mają różnić się kolorystycznie,
+// Wspólne „klocki" UI z obsługą AKCENTU koloru - moduły mają różnić się kolorystycznie,
 // więc każdy komponent przyjmuje `accent`. Pełne klasy Tailwind (żeby się zbudowały).
 
 export type Accent = "emerald" | "sky" | "violet" | "amber" | "rose" | "cyan";

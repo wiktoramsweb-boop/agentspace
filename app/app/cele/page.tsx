@@ -29,7 +29,7 @@ export default async function CelePage() {
   const user = await requireUser();
   const goal = await getGoal(user.id);
 
-  // Brak celu — pokaż setup
+  // Brak celu - pokaż setup
   if (!goal) {
     return (
       <>
@@ -41,7 +41,7 @@ export default async function CelePage() {
           <div className="mb-6">
             <h2 className="mb-2 text-lg font-semibold text-white">Zacznij od celu finansowego</h2>
             <p className="text-sm text-zinc-400">
-              Powiedz ile chcesz zarobić w rok. Policzymy ile cold calli, spotkań i umów potrzebujesz —
+              Powiedz ile chcesz zarobić w rok. Policzymy ile cold calli, spotkań i umów potrzebujesz -
               dziennie, tygodniowo, miesięcznie.
             </p>
           </div>
@@ -210,12 +210,12 @@ export default async function CelePage() {
         </div>
       </div>
 
-      {/* Kalendarz miesiąca — które dni z celem */}
+      {/* Kalendarz miesiąca - które dni z celem */}
       <div className="mt-6">
         <MonthCalendarView
           calendar={buildMonthCalendar(recentLogs, dailyTargets.cold_calls)}
           hasTarget={dailyTargets.cold_calls > 0}
-          title="Ten miesiąc — dzień po dniu"
+          title="Ten miesiąc - dzień po dniu"
         />
       </div>
 

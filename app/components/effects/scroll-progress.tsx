@@ -3,7 +3,7 @@
 import { motion, useScroll, useSpring } from "motion/react";
 
 /**
- * ScrollProgress — cienka belka u góry pokazująca postęp scrollowania.
+ * ScrollProgress - cienka belka u góry pokazująca postęp scrollowania.
  * Premium nav touch (Stripe / Medium style).
  */
 export function ScrollProgress() {

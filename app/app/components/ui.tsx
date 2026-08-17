@@ -81,7 +81,7 @@ export function ScoreBadge({ score }: { score: number | null }) {
     <span
       className={`inline-flex items-center rounded-lg px-2.5 py-1 font-mono text-sm font-semibold ${scoreBg(score)}`}
     >
-      {score != null ? `${score}/10` : "—"}
+      {score != null ? `${score}/10` : "-"}
     </span>
   );
 }

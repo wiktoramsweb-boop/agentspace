@@ -18,7 +18,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-  if (!post) return { title: "Nie znaleziono — AgentSpace" };
+  if (!post) return { title: "Nie znaleziono | AgentSpace" };
 
   return {
     title: `${post.title} | AgentSpace`,

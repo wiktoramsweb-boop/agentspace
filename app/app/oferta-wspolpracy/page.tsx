@@ -8,7 +8,7 @@ export default async function OfertaWspolpracyPage() {
     <>
       <PageHeader
         title="Oferta współpracy"
-        subtitle="Wypełnij warunki — wygenerujemy gotowy, firmowy PDF oferty dla klienta."
+        subtitle="Wypełnij warunki - wygenerujemy gotowy, firmowy PDF oferty dla klienta."
       />
       <OfertaWspolpracy
         defaultAgent={user.full_name ?? ""}

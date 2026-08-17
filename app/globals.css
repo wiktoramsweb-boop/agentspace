@@ -32,7 +32,7 @@ body {
    Scoped pod .mk, żeby NIE ruszyć interfejsu aplikacji /app.
    Nagłówki: duża skala, ujemny tracking, gradient fill.
    ───────────────────────────────────────────────────────────── */
-/* Tło marketingu — nigdy płaska czerń. Kilka miękkich poświat w kolorach
+/* Tło marketingu - nigdy płaska czerń. Kilka miękkich poświat w kolorach
    marki daje głębię; bez nich strona wygląda tanio i „sucho". */
 .mk {
   position: relative;
@@ -46,7 +46,7 @@ body {
   background-attachment: fixed;
 }
 
-/* Ziarno — cienka warstwa szumu. Zdejmuje z ciemnego tła „cyfrową płaskość". */
+/* Ziarno - cienka warstwa szumu. Zdejmuje z ciemnego tła „cyfrową płaskość". */
 .mk::before {
   content: "";
   position: fixed;
@@ -77,7 +77,7 @@ body {
   text-wrap: balance;
 }
 
-/* Fragment nagłówka w kolorach marki — używany na jedno–dwa słowa,
+/* Fragment nagłówka w kolorach marki - używany na jedno-dwa słowa,
    żeby nagłówek miał punkt zaczepienia dla oka. */
 .mk .grad {
   background: linear-gradient(
@@ -121,7 +121,7 @@ body {
   letter-spacing: -0.015em;
 }
 
-/* Akcent w nagłówku — musi nadpisać -webkit-text-fill-color z gradientu. */
+/* Akcent w nagłówku - musi nadpisać -webkit-text-fill-color z gradientu. */
 .mk .accent {
   -webkit-text-fill-color: var(--color-mk-accent);
   color: var(--color-mk-accent);
@@ -129,7 +129,7 @@ body {
 
 /* ─────────────────────────────────────────────────────────────
    WEJŚCIE TREŚCI (.mk-reveal)
-   Animacja jest tylko ozdobą — element ZAWSZE kończy widoczny,
+   Animacja jest tylko ozdobą - element ZAWSZE kończy widoczny,
    bo `both` domyka go na stanie `to`. Zero zależności od JS.
    ───────────────────────────────────────────────────────────── */
 @keyframes mk-reveal {
@@ -148,7 +148,7 @@ body {
   animation-delay: var(--mk-delay, 0s);
 }
 
-/* Gdzie przeglądarka wspiera osie przewijania — element wchodzi dokładnie
+/* Gdzie przeglądarka wspiera osie przewijania - element wchodzi dokładnie
    wtedy, gdy wjeżdża w widok, zamiast animować się od razu po załadowaniu.
    Tam, gdzie nie wspiera, animacja po prostu odpala się na starcie. */
 @supports (animation-timeline: view()) {
@@ -191,7 +191,7 @@ body {
     box-shadow 0.35s ease;
 }
 
-/* Cienka świetlna krecha na górnej krawędzi — detal, który czyta się jako jakość. */
+/* Cienka świetlna krecha na górnej krawędzi - detal, który czyta się jako jakość. */
 .mk-card::after {
   content: "";
   position: absolute;
@@ -235,7 +235,7 @@ body {
   opacity: 0.75;
 }
 
-/* Etykieta sekcji — pigułka z akcentem, nie szara plama. */
+/* Etykieta sekcji - pigułka z akcentem, nie szara plama. */
 .mk-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -255,7 +255,7 @@ body {
   color: #6ee7b7;
 }
 
-/* Kropka pulsująca w etykiecie — sygnał „to żyje”. */
+/* Kropka pulsująca w etykiecie - sygnał „to żyje”. */
 .mk-eyebrow::before {
   content: "";
   width: 6px;
@@ -390,7 +390,7 @@ body {
   color: #fff;
 }
 
-/* Tło panelu aplikacji — ciemny grafit (jaśniejszy niż sidebar) z poświatami marki.
+/* Tło panelu aplikacji - ciemny grafit (jaśniejszy niż sidebar) z poświatami marki.
    Sidebar jest ciemniejszy (zinc-950), więc treść ładnie się od niego odcina. */
 .app-shell {
   background-color: #101014;
@@ -416,7 +416,7 @@ body {
   animation: fade-in-up 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
 }
 
-/* Wejście strony — TYLKO opacity (bez transform), bo transform na kontenerze
+/* Wejście strony - TYLKO opacity (bez transform), bo transform na kontenerze
    psuje pozycjonowanie okien position:fixed (stają się względne do tego diva). */
 @keyframes page-in {
   from {
@@ -456,7 +456,7 @@ body {
   animation: toast-in 0.28s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
 }
 
-/* Druk faktur — chowamy interfejs, zostaje biała kartka.
+/* Druk faktur - chowamy interfejs, zostaje biała kartka.
    @page margin:0 usuwa nagłówki/stopki przeglądarki (URL, data, tytuł strony). */
 @media print {
   /* Żaden pierścień focusa/obrys nie może przebić do wydruku (zielona kreska). */
@@ -466,7 +466,7 @@ body {
     outline: none !important;
     box-shadow: none !important;
   }
-  /* Rozbij układ dwukolumnowy (formularz + podgląd) — po ukryciu formularza
+  /* Rozbij układ dwukolumnowy (formularz + podgląd) - po ukryciu formularza
      arkusz nie może zostać wciśnięty do wąskiej kolumny siatki. Ma zająć całą stronę. */
   .print-root {
     display: block !important;
@@ -503,7 +503,7 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* Umowa (tekst prawny) — margines robi PADDING arkusza (a @page{margin:0} zostaje,
+  /* Umowa (tekst prawny) - margines robi PADDING arkusza (a @page{margin:0} zostaje,
      dzięki czemu przeglądarka NIE wstawia własnego nagłówka/stopki: URL, data, nr strony).
      Czcionka zagęszczona, żeby całość zmieściła się na 2 stronach z podpisami. */
   .contract-sheet {
@@ -514,7 +514,7 @@ body {
     color: #18181b !important;
   }
 
-  /* Ofertówka — naturalna wysokość, ale całość trzyma się jednej strony
+  /* Ofertówka - naturalna wysokość, ale całość trzyma się jednej strony
      (bez dzielenia stopki/nazwy agenta między strony). */
   .sheet-a4 {
     min-height: 0 !important;
@@ -525,7 +525,7 @@ body {
   }
 }
 
-/* Głębia tła aplikacji — delikatne kolorowe poświaty, żeby nie było płasko. */
+/* Głębia tła aplikacji - delikatne kolorowe poświaty, żeby nie było płasko. */
 .app-shell {
   background:
     radial-gradient(1100px 550px at 100% -8%, rgba(16, 185, 129, 0.07), transparent 60%),
@@ -558,7 +558,7 @@ body {
   box-shadow: 0 18px 40px -18px var(--glow, rgba(16, 185, 129, 0.45));
 }
 
-/* Ciemne dymki Leafleta (mapa nieruchomości) — spójne z motywem. */
+/* Ciemne dymki Leafleta (mapa nieruchomości) - spójne z motywem. */
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   background: #18181b !important;
@@ -624,7 +624,7 @@ button:not(:disabled):active,
   background: #3f3f46;
 }
 
-/* Wejście modala — czysty CSS przez @starting-style.
+/* Wejście modala - czysty CSS przez @starting-style.
    Tło przygasa (fade), okno delikatnie skaluje się z 0.96 → 1. Tylko wejście. */
 .modal-overlay {
   transition: opacity 0.2s cubic-bezier(0.21, 0.47, 0.32, 0.98);
@@ -643,7 +643,7 @@ button:not(:disabled):active,
   }
 }
 
-/* Dostępność: uszanuj systemowe „ogranicz ruch" — animacje niemal natychmiastowe. */
+/* Dostępność: uszanuj systemowe „ogranicz ruch" - animacje niemal natychmiastowe. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

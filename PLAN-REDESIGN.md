@@ -5,7 +5,7 @@
 
 ---
 
-## DIAGNOZA — co jest nie tak dziś
+## DIAGNOZA - co jest nie tak dziś
 
 ### 1. Landing sprzedaje STARY produkt (najpilniejsze)
 
@@ -13,12 +13,12 @@
 |---|---|
 | „Szkolenie agentów z AI Coachem" | AI Coach + CRM + Cele + Prowizje + Nieruchomości + Zadania + Faktury + Rezerwacje + Maile + Oferta współpracy + Panel właściciela + Role CEO/Menedżer/Agent |
 | 3 moduły | ~14 modułów |
-| „Start Q1 2026" w meta description | Jest sierpień 2026 — **to zabija wiarygodność** |
+| „Start Q1 2026" w meta description | Jest sierpień 2026 - **to zabija wiarygodność** |
 | „Bądź wśród pierwszych 10 biur" | Produkt działa na produkcji |
 
 **To jest większy problem niż wygląd.** Sprzedajesz narzędzie do treningu, a zbudowałeś system operacyjny dla biura nieruchomości. Cena 299 zł/mc jest zaniżona względem tego, co faktycznie dostarczasz.
 
-### 2. Dlaczego receptionOS wygląda drożej — konkretnie
+### 2. Dlaczego receptionOS wygląda drożej - konkretnie
 
 | Element | receptionOS | AgentSpace dziś |
 |---|---|---|
@@ -32,25 +32,25 @@
 
 ---
 
-## FAZA 0 — Pilne (1 dzień)
+## FAZA 0 - Pilne (1 dzień)
 
 Zrób to nawet jeśli reszta poczeka.
 
 - [ ] Usuń „Start Q1 2026" z meta description i całej strony
-- [ ] Przepisz `<title>`: `AgentSpace — system operacyjny dla biura nieruchomości`
+- [ ] Przepisz `<title>`: `AgentSpace - system operacyjny dla biura nieruchomości`
 - [ ] Przepisz meta description pod PEŁNY produkt (CRM + cele + prowizje + AI Coach), nie sam trening
 - [ ] Zamień „Bądź wśród pierwszych 10 biur" → „Program Pierwszych 10 Biur" (rzadkość zamiast pre-launchu)
 - [ ] Podnieś cenę w komunikacji: 299 zł → **499 zł/mc** (patrz Faza 4)
 
 ---
 
-## FAZA 1 — Design system (3–4 dni)
+## FAZA 1 - Design system (3-4 dni)
 
-### 1.1 Tokeny — wklej do `app/globals.css`
+### 1.1 Tokeny - wklej do `app/globals.css`
 
 ```css
 @theme inline {
-  /* Paleta — ciepła czerń, jeden akcent */
+  /* Paleta - ciepła czerń, jeden akcent */
   --color-bg:        #0a0a0a;
   --color-surface:   #0f0c0a;
   --color-line:      #241f1c;   /* hairline między sekcjami */
@@ -61,7 +61,7 @@ Zrób to nawet jeśli reszta poczeka.
   --font-sans: "Inter Tight Variable", "Inter Tight", system-ui, sans-serif;
 }
 
-/* Nagłówki: gradient text — ich sygnaturowy trik */
+/* Nagłówki: gradient text - ich sygnaturowy trik */
 h1, h2, h3, h4 {
   background: linear-gradient(180deg, #fffaf7 0%, rgba(255,242,234,0.72) 100%);
   background-clip: text;
@@ -74,11 +74,11 @@ h2 { font-size: clamp(32px, 4vw, 56px); line-height: 1.12; font-weight: 400; }
 h3 { font-size: clamp(28px, 3vw, 44px); font-weight: 400; }
 ```
 
-**Font:** zamień Geist → **Inter Tight Variable** (`npm i @fontsource-variable/inter-tight`). To 60% różnicy wizualnej — Geist jest „techniczny", Inter Tight jest „produktowy".
+**Font:** zamień Geist → **Inter Tight Variable** (`npm i @fontsource-variable/inter-tight`). To 60% różnicy wizualnej - Geist jest „techniczny", Inter Tight jest „produktowy".
 
 **Kolor akcentu:** zostań przy niebieskim/granatowym. Kopiowanie ich pomarańczu = wyglądasz jak klon.
 
-### 1.2 Komponent `<Frame>` — najważniejszy element
+### 1.2 Komponent `<Frame>` - najważniejszy element
 
 Ich cała strona trzyma się na jednym komponencie: prostokąt z hairline'ową ramką, jasnymi znacznikami w narożnikach i „wcięciem" w górnej linii. Buduje wrażenie rysunku technicznego i spina wszystkie sekcje.
 
@@ -126,7 +126,7 @@ Plus z `globals.css`: `.grain`, `.shimmer`, `.card-glow`, `.animate-border-beam`
 
 **Zostaw tylko:** `fade-in.tsx` (delikatne wejście przy scrollu) + `<Frame>`. Tyle wystarczy.
 
-### 1.4 Nawigacja — frosted glass
+### 1.4 Nawigacja - frosted glass
 
 ```css
 .nav {
@@ -136,34 +136,34 @@ Plus z `globals.css`: `.grain`, `.shimmer`, `.card-glow`, `.animate-border-beam`
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 ```
-⚠️ Nie nakładaj `transform` na rodzica sekcji z `backdrop-filter` — psuje efekt (mają na to komentarz w kodzie).
+⚠️ Nie nakładaj `transform` na rodzica sekcji z `backdrop-filter` - psuje efekt (mają na to komentarz w kodzie).
 
 ---
 
-## FAZA 2 — Nowa struktura strony (3–4 dni)
+## FAZA 2 - Nowa struktura strony (3-4 dni)
 
 Kolejność sekcji przepisana z receptionOS (ta kolejność sprzedaje):
 
 | # | Sekcja | Treść dla AgentSpace |
 |---|---|---|
 | 1 | **Hero** | H1: „System operacyjny dla biura nieruchomości". Podtytuł jednym zdaniem. CTA: „Zobacz demo na żywo". Tło: subtelne wideo/gradient, bez aurory. |
-| 2 | **Partnerzy / zaufanie** | Logo Spectry + systemy, z którymi integrujesz. Jeśli brak — pomiń, nie wypełniaj śmieciem. |
+| 2 | **Partnerzy / zaufanie** | Logo Spectry + systemy, z którymi integrujesz. Jeśli brak - pomiń, nie wypełniaj śmieciem. |
 | 3 | **Wartości (3 kafle)** | Więcej transakcji / Mniej chaosu w biurze / Widzisz kto naprawdę pracuje |
 | 4 | **Funkcje (6 kafli w `<Frame>`)** | AI Coach · CRM klientów · Cele i lejek · Prowizje · Nieruchomości wspólne · Panel właściciela |
-| 5 | **Jak to działa — 3 kroki** | Audyt biura → Wdrożenie w 1 dzień → Pierwsze wnioski w 30 dni. **Dodaj schema `HowTo`.** |
+| 5 | **Jak to działa - 3 kroki** | Audyt biura → Wdrożenie w 1 dzień → Pierwsze wnioski w 30 dni. **Dodaj schema `HowTo`.** |
 | 6 | **Wyeliminuj problemy** | 3 kafle z bólem: chaos w Excelu / agenci odpadają / decydujesz przeczuciem |
-| 7 | **Porównanie (przełącznik)** | „Z AgentSpace" vs „Bez systemu" — dwa stany, ten sam layout |
+| 7 | **Porównanie (przełącznik)** | „Z AgentSpace" vs „Bez systemu" - dwa stany, ten sam layout |
 | 8 | **Opinie** | Karuzela. Start: Ty + zespół Spectry. Nie udawaj, że masz więcej. |
 | 9 | **Program Pierwszych 10 Biur** | Ekskluzywność: **jedno biuro na dzielnicę Krakowa / miasto** |
 | 10 | **Case study Spectra** | Twarde liczby przed/po. **Najważniejsza sekcja do zbudowania.** |
-| 11 | **O nas** | Twoja historia — biuro w Krakowie, budowałem to dla siebie. To działa, zostaw. |
+| 11 | **O nas** | Twoja historia - biuro w Krakowie, budowałem to dla siebie. To działa, zostaw. |
 | 12 | **Cennik** | Licznik agentów (jak ich licznik foteli) → cena skaluje się na żywo |
 | 13 | **CTA** | „Gotowy dołączyć do pierwszych 10 biur?" |
 | 14 | **Stopka** | 4 kolumny linków: Produkt / Moduły / O nas / Zasoby |
 
-### 2.1 Dowód produktu — zamień mockupy na wideo
+### 2.1 Dowód produktu - zamień mockupy na wideo
 
-Ich największa przewaga: **nagrania prawdziwego UI**, nie ilustracje. Nagraj 3 klipy po 15–20 s (QuickTime → screen recording):
+Ich największa przewaga: **nagrania prawdziwego UI**, nie ilustracje. Nagraj 3 klipy po 15-20 s (QuickTime → screen recording):
 1. Sesja AI Coach z głosem
 2. Pulpit poranny + cele
 3. Panel właściciela z rankingiem
@@ -172,32 +172,32 @@ Hostuj lokalnie (`/public/video/*.mp4`), `<video autoplay muted loop playsinline
 
 ---
 
-## FAZA 3 — SEO / GEO (2 dni)
+## FAZA 3 - SEO / GEO (2 dni)
 
 Masz już: `Organization`, `SoftwareApplication`, `FAQPage`. ✅
 
 Dołóż:
 
-- [ ] **`public/llms.txt` + `llms-full.txt`** — opis produktu dla crawlerów LLM (ChatGPT/Perplexity coraz częściej są źródłem leadów B2B). Prawie nikt w PL tego nie ma.
+- [ ] **`public/llms.txt` + `llms-full.txt`** - opis produktu dla crawlerów LLM (ChatGPT/Perplexity coraz częściej są źródłem leadów B2B). Prawie nikt w PL tego nie ma.
 - [ ] **Schema `HowTo`** na sekcji „Jak to działa"
 - [ ] **`ItemList` / `SiteNavigationElement`** dla nawigacji
-- [ ] **pSEO — strony integracji** (największy zysk SEO):
+- [ ] **pSEO - strony integracji** (największy zysk SEO):
   - `/integracje/asari`
   - `/integracje/galactica`
   - `/integracje/imo`
   - `/integracje/estiman`
   - `/integracje` (hub)
 
-  Każda: „AgentSpace + [System] — jak połączyć". Pośrednicy szukają dokładnie tak. Nawet jeśli integracja jest „w planach" — napisz uczciwie „w przygotowaniu, zgłoś zainteresowanie" i zbieraj leady.
+  Każda: „AgentSpace + [System] - jak połączyć". Pośrednicy szukają dokładnie tak. Nawet jeśli integracja jest „w planach" - napisz uczciwie „w przygotowaniu, zgłoś zainteresowanie" i zbieraj leady.
 - [ ] **Strony pod moduły** (jak ich `/produkt/*`): `/produkt/ai-coach`, `/produkt/crm`, `/produkt/prowizje`, `/produkt/cele`
 
 ---
 
-## FAZA 4 — Warstwa sprzedażowa (2–3 dni)
+## FAZA 4 - Warstwa sprzedażowa (2-3 dni)
 
 ### 4.1 Personalizowane oferty (ich najlepszy trik)
 
-Mają template `clinic-offer.js` → generuje dedykowaną stronę per klinika. Masz już `/oferta-wspolpracy` i generator PDF — połącz to:
+Mają template `clinic-offer.js` → generuje dedykowaną stronę per klinika. Masz już `/oferta-wspolpracy` i generator PDF - połącz to:
 
 ```
 app/oferta/[slug]/page.tsx
@@ -206,7 +206,7 @@ app/oferta/[slug]/page.tsx
 
 Strona wita po nazwie biura, pokazuje policzone ROI dla ICH liczby agentów, ma jeden przycisk. Wysyłasz link zamiast PDF-a. Konwertuje nieporównywalnie lepiej.
 
-### 4.2 Cennik — licznik agentów
+### 4.2 Cennik - licznik agentów
 
 Skopiuj mechanikę ich licznika foteli: `[−] 5 [+]` agentów → cena przelicza się na żywo. Uzasadnia cenę i pokazuje, że skaluje się z wielkością biura.
 
@@ -220,9 +220,9 @@ Skopiuj mechanikę ich licznika foteli: `[−] 5 [+]` agentów → cena przelicz
 
 299 zł/mc za 14 modułów to sygnał „to jest tanie narzędzie", nie „to jest system dla mojego biura".
 
-### 4.3 Case study Spectra — zbierz liczby
+### 4.3 Case study Spectra - zbierz liczby
 
-Potrzebujesz 3–4 twardych metryk przed/po. Nawet skromnych:
+Potrzebujesz 3-4 twardych metryk przed/po. Nawet skromnych:
 - liczba cold calli / tydzień
 - % leadów z follow-upem
 - czas na raportowanie
@@ -236,11 +236,11 @@ To jest jedyna rzecz z tej listy, której nie da się przyspieszyć kodem.
 
 | Faza | Czas | Priorytet |
 |---|---|---|
-| 0 — Naprawa treści | 1 dzień | 🔴 teraz |
-| 1 — Design system | 3–4 dni | 🔴 wysoki |
-| 2 — Struktura + wideo | 3–4 dni | 🟠 wysoki |
-| 3 — SEO/GEO + pSEO | 2 dni | 🟡 średni |
-| 4 — Sprzedaż | 2–3 dni | 🟠 wysoki |
+| 0 - Naprawa treści | 1 dzień | 🔴 teraz |
+| 1 - Design system | 3-4 dni | 🔴 wysoki |
+| 2 - Struktura + wideo | 3-4 dni | 🟠 wysoki |
+| 3 - SEO/GEO + pSEO | 2 dni | 🟡 średni |
+| 4 - Sprzedaż | 2-3 dni | 🟠 wysoki |
 
 **Razem: ~12 dni roboczych.**
 
@@ -248,9 +248,9 @@ To jest jedyna rzecz z tej listy, której nie da się przyspieszyć kodem.
 
 ## KOLEJNOŚĆ WYKONANIA (jeśli robisz sam)
 
-1. Faza 0 — dziś, to czysta korekta tekstu
-2. Font + tokeny + `<Frame>` — natychmiastowy skok wizualny
-3. Usunięcie efektów — paradoksalnie tu wygląd rośnie najbardziej
+1. Faza 0 - dziś, to czysta korekta tekstu
+2. Font + tokeny + `<Frame>` - natychmiastowy skok wizualny
+3. Usunięcie efektów - paradoksalnie tu wygląd rośnie najbardziej
 4. Nagranie 3 klipów UI
 5. Przestawienie sekcji wg tabeli z Fazy 2
 6. Cennik z licznikiem + nowe ceny
@@ -261,8 +261,8 @@ To jest jedyna rzecz z tej listy, której nie da się przyspieszyć kodem.
 
 ## CZEGO NIE KOPIOWAĆ
 
-- **Pomarańczowego akcentu** — zostań przy swoim kolorze
-- **Modelu 3D na sticky scroll** (ich „Apollo") — dużo pracy, mało konwersji
-- **Gatsby** — masz Next.js 16, jest lepszy
-- **Dwóch pakietów „Wkrótce dostępne"** — u Ciebie produkt działa, nie udawaj kolejki
-- **Dublowania treści mobile/desktop** (`.mobile` / `.desktop`) — mają to, ale to antywzorzec: podwaja DOM i szkodzi SEO. Rób responsywnie.
+- **Pomarańczowego akcentu** - zostań przy swoim kolorze
+- **Modelu 3D na sticky scroll** (ich „Apollo") - dużo pracy, mało konwersji
+- **Gatsby** - masz Next.js 16, jest lepszy
+- **Dwóch pakietów „Wkrótce dostępne"** - u Ciebie produkt działa, nie udawaj kolejki
+- **Dublowania treści mobile/desktop** (`.mobile` / `.desktop`) - mają to, ale to antywzorzec: podwaja DOM i szkodzi SEO. Rób responsywnie.

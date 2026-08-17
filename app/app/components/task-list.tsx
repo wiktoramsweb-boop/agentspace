@@ -49,7 +49,7 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
 
       {sorted.length === 0 ? (
         <p className="py-4 text-center text-sm text-zinc-600">
-          Brak zadań. Dodaj pierwsze — zaplanuj dzień.
+          Brak zadań. Dodaj pierwsze - zaplanuj dzień.
         </p>
       ) : (
         <ul className="space-y-1">

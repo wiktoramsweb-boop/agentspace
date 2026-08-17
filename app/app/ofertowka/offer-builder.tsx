@@ -38,7 +38,7 @@ const PARAMS: {
   { key: "available", label: "Dostępne od", placeholder: "od zaraz", icon: "key" },
 ];
 
-// Liniowe ikony (Heroicons outline) — spójne z panelem, profesjonalne.
+// Liniowe ikony (Heroicons outline) - spójne z panelem, profesjonalne.
 const ICON_PATHS: Record<string, string> = {
   area: "M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15",
   home: "m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25",
@@ -112,7 +112,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
   }
   function print() {
     const prev = document.title;
-    document.title = title ? `Oferta — ${title}` : "Oferta";
+    document.title = title ? `Oferta - ${title}` : "Oferta";
     window.print();
     setTimeout(() => (document.title = prev), 1000);
   }
@@ -138,7 +138,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
         <img src={hero.url} alt="" className="mb-2 h-60 w-full rounded-xl object-cover" />
       ) : (
         <div className="mb-2 flex h-60 w-full items-center justify-center rounded-xl bg-zinc-100 text-sm text-zinc-400">
-          Dodaj zdjęcia — pierwsze będzie główne
+          Dodaj zdjęcia - pierwsze będzie główne
         </div>
       )}
 
@@ -225,7 +225,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
       <div className="print-hide space-y-5">
-        <Section title="Zdjęcia (3–8)">
+        <Section title="Zdjęcia (3-8)">
           <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-zinc-700 py-4 text-sm text-zinc-400 transition hover:border-emerald-500 hover:text-emerald-400">
             + Dodaj zdjęcia z komputera
             <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
@@ -340,7 +340,7 @@ function Select({
     <div>
       <label className="mb-1.5 block text-sm text-zinc-400">{label}</label>
       <select value={value} onChange={(e) => onChange(e.target.value)} className={inp}>
-        <option value="">— wybierz —</option>
+        <option value="">- wybierz -</option>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}

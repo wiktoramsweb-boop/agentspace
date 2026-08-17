@@ -1,5 +1,5 @@
 -- ============================================================
--- AgentSpace — SETUP v10: poziom trudności sesji AI Coach
+-- AgentSpace - SETUP v10: poziom trudności sesji AI Coach
 -- ============================================================
 -- Uruchom w Supabase SQL Editor. Idempotentne.
 -- ============================================================

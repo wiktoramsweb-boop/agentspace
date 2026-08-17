@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL } from "./config";
 
 /**
- * Service-role client — omija RLS. TYLKO server-side (API routes, server
+ * Service-role client - omija RLS. TYLKO server-side (API routes, server
  * actions). Cały dostęp do danych aplikacji idzie przez ten klient, a
  * autoryzację (kto może co) egzekwujemy w kodzie na podstawie sesji usera.
  * Klucz service_role NIGDY nie trafia do przeglądarki.

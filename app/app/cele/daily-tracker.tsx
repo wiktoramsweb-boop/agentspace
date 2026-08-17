@@ -35,7 +35,7 @@ export function DailyTracker({
   const callPct = callTarget > 0 ? Math.min(100, Math.round((callsDone / callTarget) * 100)) : 0;
   const callGoalMet = callTarget > 0 && callsDone >= callTarget;
 
-  // Zapis debounced — klik jest natychmiastowy, zapis 900ms po ostatniej zmianie
+  // Zapis debounced - klik jest natychmiastowy, zapis 900ms po ostatniej zmianie
   function scheduleSave(next: Counts) {
     setSaved(false);
     if (timer.current) clearTimeout(timer.current);
@@ -153,8 +153,8 @@ export function DailyTracker({
           const val = counts[stage.key] ?? 0;
           const target = dailyTargets[stage.key] ?? 0;
           const cadence = cadences[stage.key] ?? "";
-          // Etapy codzienne (target>0) — cel spełniony gdy osiągnięty. Rzadkie etapy
-          // (target=0, np. sprzedaż) — każdy odhaczony to sukces, bez presji "na dziś".
+          // Etapy codzienne (target>0) - cel spełniony gdy osiągnięty. Rzadkie etapy
+          // (target=0, np. sprzedaż) - każdy odhaczony to sukces, bez presji "na dziś".
           const met = target > 0 ? val >= target : val > 0;
           const goalLabel = target > 0 ? `cel dziś: ${target}` : `rytm: ${cadence}`;
           return (

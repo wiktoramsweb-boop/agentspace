@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 type Category = string;
 
 /**
- * "Wizualne zdjęcie" dla karty bloga — animowany gradient + abstract elements
+ * "Wizualne zdjęcie" dla karty bloga - animowany gradient + abstract elements
  * dobrane do kategorii artykułu. Bez prawdziwych zdjęć, czyste motion-art.
  */
 export function BlogVisual({ category }: { category: Category }) {
@@ -21,7 +21,7 @@ export function BlogVisual({ category }: { category: Category }) {
         }}
       />
 
-      {/* Animowane bloby — różne pozycje per slug */}
+      {/* Animowane bloby - różne pozycje per slug */}
       <motion.div
         className="absolute h-32 w-32 rounded-full blur-2xl"
         style={{ background: variants.blob1, top: "10%", left: "20%" }}
@@ -58,7 +58,7 @@ export function BlogVisual({ category }: { category: Category }) {
         {variants.icon}
       </div>
 
-      {/* Dolna maska — fade do koloru karty */}
+      {/* Dolna maska - fade do koloru karty */}
       <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-zinc-900/30 to-transparent" />
     </div>
   );

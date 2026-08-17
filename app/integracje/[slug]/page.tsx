@@ -25,7 +25,7 @@ export async function generateMetadata({
   const integration = getIntegration(slug);
   if (!integration) return {};
 
-  const title = `AgentSpace + ${integration.name} — integracja dla biur nieruchomości`;
+  const title = `AgentSpace + ${integration.name} - integracja dla biur nieruchomości`;
   const description = `Jak połączyć ${integration.fullName} z AgentSpace: co się synchronizuje, dla kogo ma to sens i jak wygląda wdrożenie. Status: ${STATUS_LABEL[integration.status].toLowerCase()}.`;
 
   return {
@@ -62,7 +62,7 @@ export default async function IntegracjaPage({
         description={integration.about}
       />
 
-      {/* Uczciwy komunikat o statusie — nie udajemy gotowej integracji. */}
+      {/* Uczciwy komunikat o statusie - nie udajemy gotowej integracji. */}
       {!isLive && (
         <Section className="py-0">
           <Card accent className="p-6 md:p-8">
@@ -70,7 +70,7 @@ export default async function IntegracjaPage({
               <span className="font-medium text-[var(--color-mk-text)]">
                 Ta integracja jest {STATUS_LABEL[integration.status].toLowerCase()}.
               </span>{" "}
-              Kolejność prac ustalamy według zgłoszeń od biur — jeśli pracujesz
+              Kolejność prac ustalamy według zgłoszeń od biur - jeśli pracujesz
               na {integration.name}, daj znać. Biura, które zgłoszą się teraz,
               wdrażamy jako pierwsze i konsultujemy z nimi zakres synchronizacji.
             </p>
@@ -120,7 +120,7 @@ export default async function IntegracjaPage({
         <SectionHead
           eyebrow="Podział ról"
           title={`Co robi ${integration.name}, a co AgentSpace`}
-          lead="Systemy się nie dublują — każdy odpowiada za inny etap pracy biura."
+          lead="Systemy się nie dublują - każdy odpowiada za inny etap pracy biura."
         />
 
         <div className="mt-14 grid gap-5 md:grid-cols-2">

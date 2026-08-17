@@ -15,7 +15,7 @@ export default async function ScenarioSetupPage({ params }: Props) {
   const scenario = await getScenarioBySlug(slug);
   if (!scenario) notFound();
 
-  // Tygodniowy limit rozmów AI — jeśli wyczerpany, nie pozwól zacząć.
+  // Tygodniowy limit rozmów AI - jeśli wyczerpany, nie pozwól zacząć.
   const limitReached =
     user.weekly_ai_limit != null && (await getWeeklySessionCount(user.id)) >= user.weekly_ai_limit;
 
@@ -40,7 +40,7 @@ export default async function ScenarioSetupPage({ params }: Props) {
         <Card className="mb-8 !border-amber-500/30 !bg-amber-500/10">
           <p className="font-semibold text-amber-200">Wykorzystałeś limit rozmów AI na ten tydzień.</p>
           <p className="mt-1 text-sm text-amber-200/80">
-            Limit odnowi się w poniedziałek. Jeśli potrzebujesz więcej — poproś CEO o zwiększenie limitu.
+            Limit odnowi się w poniedziałek. Jeśli potrzebujesz więcej - poproś CEO o zwiększenie limitu.
           </p>
         </Card>
       )}
@@ -81,11 +81,11 @@ export default async function ScenarioSetupPage({ params }: Props) {
         </p>
         <h2 className="mb-1 text-lg font-semibold text-white">Jak trudny ma być klient?</h2>
         <p className="mb-4 text-sm text-zinc-500">
-          Zacznij od łatwego, żeby złapać pewność — potem podnoś poprzeczkę. Nie każdy klient jest trudny.
+          Zacznij od łatwego, żeby złapać pewność - potem podnoś poprzeczkę. Nie każdy klient jest trudny.
         </p>
         <div className="mb-8 grid gap-3 sm:grid-cols-3">
           {[
-            { value: "latwy", label: "Łatwy", desc: "Życzliwy, daje się przekonać — na rozgrzewkę" },
+            { value: "latwy", label: "Łatwy", desc: "Życzliwy, daje się przekonać - na rozgrzewkę" },
             { value: "sredni", label: "Średni", desc: "Realistyczny opór, ustępuje przy dobrych argumentach" },
             { value: "trudny", label: "Trudny", desc: "Wymagający, trzyma obiekcję twardo" },
           ].map((d) => (

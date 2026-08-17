@@ -22,7 +22,7 @@ export function ManagerTeams({ managers, agents }: { managers: MTManager[]; agen
     return (
       <p className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/30 p-4 text-sm text-zinc-500">
         Najpierw nadaj komuś rolę <span className="font-medium text-zinc-300">Menedżer</span> w „Role i przypisania"
-        powyżej — wtedy tutaj przypiszesz mu osoby, które ma widzieć.
+        powyżej - wtedy tutaj przypiszesz mu osoby, które ma widzieć.
       </p>
     );
   }

@@ -22,7 +22,7 @@ const EMAIL_TYPES: TypeDef[] = [
   { value: "propozycja", label: "Propozycja współpracy", desc: "Oferta + warunki + wycena", cat: "wlasciciel" },
   { value: "niezadowolenie", label: "Niezadowolony właściciel", desc: "Spokojna, dojrzała odpowiedź + plan", cat: "wlasciciel" },
   { value: "aktualizacja", label: "Aktualizacja statusu", desc: "Gdy mało nowości, a trzeba dać znać", cat: "wlasciciel" },
-  { value: "slaby_okres", label: "Trudny / słaby okres", desc: "Mało ruchu — uczciwie i z klasą", cat: "wlasciciel" },
+  { value: "slaby_okres", label: "Trudny / słaby okres", desc: "Mało ruchu - uczciwie i z klasą", cat: "wlasciciel" },
   { value: "zapytanie", label: "Odpowiedź na zapytanie", desc: "Do kupującego pytającego o ofertę", cat: "kupujacy" },
   { value: "prezentacja_zaproszenie", label: "Zaproszenie na prezentację", desc: "Umówienie oglądania", cat: "kupujacy" },
   { value: "followup", label: "Follow-up / odświeżenie", desc: "Delikatne przypomnienie się", cat: "kupujacy" },
@@ -51,7 +51,7 @@ const PLACEHOLDERS: Record<string, string> = {
     "Np.: 11 dni po publikacji, 320 wyświetleń na Otodom, 0 zapytań o prezentację. Uruchomiliśmy wyróżnienie oferty. Plan: reset oferty, outreach do 3 klientów z zeszłego miesiąca, kampania social.",
   podsumowanie: "Np.: piątkowe spotkanie, mieszkanie ul. Słońskiego, załączam podsumowanie i wzór umowy. Czas i prowizja do dogadania.",
   propozycja: "Np.: wyłączność 3 mies., prowizja 3% brutto, cena startowa 679 000 zł, wartość rynkowa ~533 tys. Pełna obsługa: zdjęcia, dron, kampanie, negocjacje.",
-  niezadowolenie: "Np.: właściciel grozi wypowiedzeniem. Fakty: kilkanaście prezentacji, 3 oferty 680–685 tys., jego cena min. 720 tys. Plan: reset oferty, outreach, cotygodniowy raport.",
+  niezadowolenie: "Np.: właściciel grozi wypowiedzeniem. Fakty: kilkanaście prezentacji, 3 oferty 680-685 tys., jego cena min. 720 tys. Plan: reset oferty, outreach, cotygodniowy raport.",
   slaby_okres:
     "Np.: 2 tyg. po publikacji, ~180 wyświetleń, brak zapytań o prezentację. Kontekst: górna półka cenowa, sezon urlopowy. Zrobione: wyróżnienie Otodom, dystrybucja MLS, mail do bazy inwestorów. Plan: reset oferty, materiał video, outreach do agentów.",
   oferta_cenowa: "Np.: kupujący złożył ofertę 685 tys. (gotówka, termin do końca września). Cena ofertowa 720 tys. Proszę o decyzję właściciela.",
@@ -118,7 +118,7 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      setError("Nie udało się skopiować — zaznacz i skopiuj ręcznie.");
+      setError("Nie udało się skopiować - zaznacz i skopiuj ręcznie.");
     }
   }
 
@@ -134,7 +134,7 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.05fr]">
-        {/* LEWO — formularz */}
+        {/* LEWO - formularz */}
         <div className="space-y-5">
           <TypePicker types={types} value={type} onChange={setType} />
 
@@ -151,7 +151,7 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
           <div>
             <label className={lbl}>
               {isSms ? "Szczegóły (godzina, adres, link…)" : "Co przekazać / fakty"}
-              <span className="ml-1 text-xs text-zinc-600">— AI użyje tylko tego, nie wymyśli liczb</span>
+              <span className="ml-1 text-xs text-zinc-600">- AI użyje tylko tego, nie wymyśli liczb</span>
             </label>
             <textarea
               value={facts}
@@ -189,7 +189,7 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
           </button>
         </div>
 
-        {/* PRAWO — wynik */}
+        {/* PRAWO - wynik */}
         <div>
           {!result ? (
             <EmptyState isSms={isSms} />
@@ -314,7 +314,7 @@ function MailResult({ result, onChange, onCopy, copied }: { result: Result; onCh
           {copied ? "✓ Skopiowano" : "Kopiuj treść"}
         </button>
         <p className="text-xs text-zinc-600">
-          Sprawdź maila przed wysłaniem — zwłaszcza liczby i miejsca w [nawiasach]. Wklej do Gmaila i wyślij.
+          Sprawdź maila przed wysłaniem - zwłaszcza liczby i miejsca w [nawiasach]. Wklej do Gmaila i wyślij.
         </p>
       </div>
     </div>

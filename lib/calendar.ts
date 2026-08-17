@@ -1,4 +1,4 @@
-// Budowanie linków "Dodaj do Google Calendar" — wariant bez API/OAuth.
+// Budowanie linków "Dodaj do Google Calendar" - wariant bez API/OAuth.
 // Klik w link otwiera Google Calendar z gotowym, wypełnionym wydarzeniem;
 // użytkownik tylko potwierdza "Zapisz". Zero konfiguracji po stronie Google.
 
@@ -12,7 +12,7 @@ function allDayStamp(d: Date): string {
 }
 
 // Parsuje "YYYY-MM-DD" jako datę lokalną (bez przesunięcia strefy),
-// a pełne ISO z czasem — normalnie. Brak daty => dziś.
+// a pełne ISO z czasem - normalnie. Brak daty => dziś.
 function toLocalDate(input?: string | null): Date {
   if (!input) return new Date();
   const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input);

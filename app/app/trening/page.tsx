@@ -4,7 +4,7 @@ import { getScenarios, getWeeklySessionCount } from "@/lib/data";
 import { SCENARIO_CATEGORIES, type ScenarioCategory } from "@/lib/types";
 import { PageHeader, EmptyState } from "../components/ui";
 
-// Kolory per kategoria — żeby karty się wyróżniały (pełne klasy dla Tailwind).
+// Kolory per kategoria - żeby karty się wyróżniały (pełne klasy dla Tailwind).
 const CAT_STYLE: Record<string, { tile: string; bar: string; hover: string; trenuj: string }> = {
   cold_calling: {
     tile: "bg-cyan-500/15 text-cyan-300",
@@ -80,12 +80,12 @@ export default async function TreningPage({
           {limitReached ? (
             <>
               <strong>Wykorzystałeś limit rozmów AI na ten tydzień</strong> ({usedThisWeek}/{weeklyLimit}).
-              Limit odnowi się w poniedziałek. Chcesz więcej — poproś CEO.
+              Limit odnowi się w poniedziałek. Chcesz więcej - poproś CEO.
             </>
           ) : (
             <>
               Rozmowy AI w tym tygodniu: <strong className="text-white">{usedThisWeek}/{weeklyLimit}</strong>{" "}
-              — zostało <strong className="text-emerald-400">{remaining}</strong>.
+              - zostało <strong className="text-emerald-400">{remaining}</strong>.
             </>
           )}
         </div>
@@ -96,7 +96,7 @@ export default async function TreningPage({
         </div>
       )}
 
-      {/* Instrukcja — jak to działa */}
+      {/* Instrukcja - jak to działa */}
       <div className="mb-8 grid gap-3 sm:grid-cols-3">
         {[
           { n: "1", t: "Wybierz scenariusz", d: "Z jednej z kategorii poniżej" },

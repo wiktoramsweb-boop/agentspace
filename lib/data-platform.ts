@@ -150,7 +150,7 @@ export async function getClientNotes(clientId: string): Promise<ClientNote[]> {
 }
 
 /**
- * Klienci "do kontaktu" — aktywni (nie zamknięci/straceni), bez kontaktu
+ * Klienci "do kontaktu" - aktywni (nie zamknięci/straceni), bez kontaktu
  * od 3+ dni. Do porannej odprawy.
  */
 export async function getClientsNeedingContact(

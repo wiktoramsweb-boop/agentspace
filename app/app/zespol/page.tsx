@@ -75,20 +75,20 @@ export default async function ZespolPage() {
       ])
     : [null, [], [], {} as Record<string, number>, []];
 
-  // Lista menedżerów/CEO (do przypisań) + członkowie (do zarządzania rolami) — tylko CEO.
+  // Lista menedżerów/CEO (do przypisań) + członkowie (do zarządzania rolami) - tylko CEO.
   const managerOptions: ManagerOption[] = members
     .filter((m) => m.role === "manager" || m.role === "owner")
-    .map((m) => ({ id: m.id, label: `${m.full_name ?? m.email ?? "—"} (${ROLE_LABELS[m.role]})` }));
+    .map((m) => ({ id: m.id, label: `${m.full_name ?? m.email ?? "-"} (${ROLE_LABELS[m.role]})` }));
   const teamMembers: TeamMember[] = members.map((m) => ({
     id: m.id,
-    label: m.full_name ?? m.email ?? "—",
+    label: m.full_name ?? m.email ?? "-",
     email: m.email,
     role: m.role,
     manager_id: m.manager_id,
     weekly_ai_limit: m.weekly_ai_limit,
   }));
 
-  // Statystyki nagłówka — dla menedżera liczone z jego zakresu.
+  // Statystyki nagłówka - dla menedżera liczone z jego zakresu.
   const scopedAvg = (() => {
     const vals = ranking.map((a) => a.avgScore).filter((n): n is number => n != null);
     return vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : null;
@@ -104,8 +104,8 @@ export default async function ZespolPage() {
         title="Zespół"
         subtitle={
           isOwner
-            ? `${user.agency?.name ?? "Twoje biuro"} — dane, nie przeczucia.`
-            : "Twoi agenci — cele i wyniki AI."
+            ? `${user.agency?.name ?? "Twoje biuro"} - dane, nie przeczucia.`
+            : "Twoi agenci - cele i wyniki AI."
         }
         action={isOwner ? <ReportButton /> : undefined}
       />
@@ -118,10 +118,10 @@ export default async function ZespolPage() {
             isOwner
               ? stats!.avgTeamScore != null
                 ? `${stats!.avgTeamScore}/10`
-                : "—"
+                : "-"
               : scopedAvg != null
                 ? `${scopedAvg}/10`
-                : "—"
+                : "-"
           }
         />
         <StatCard label="Sesje w tym tyg." value={isOwner ? stats!.sessionsThisWeek : scopedSessionsWeek} />
@@ -133,7 +133,7 @@ export default async function ZespolPage() {
         )}
       </div>
 
-      {/* Alerty proaktywne — kto wymaga uwagi */}
+      {/* Alerty proaktywne - kto wymaga uwagi */}
       {insights.alerts.length > 0 ? (
         <Card className="mb-8 !border-amber-500/20 !bg-amber-500/[0.04]">
           <h2 className="mb-4 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-amber-400">
@@ -148,7 +148,7 @@ export default async function ZespolPage() {
               >
                 <span className="min-w-0 truncate">
                   <span className="font-medium text-white">{a.agentName}</span>
-                  <span className="text-zinc-400"> — {a.message}</span>
+                  <span className="text-zinc-400"> - {a.message}</span>
                 </span>
                 <span
                   className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${
@@ -164,16 +164,16 @@ export default async function ZespolPage() {
       ) : (
         ranking.length > 0 && (
           <Card className="mb-8 !border-emerald-500/20 !bg-emerald-500/[0.04]">
-            <p className="text-sm text-emerald-300">✅ Wszystko gra — brak sygnałów wymagających uwagi.</p>
+            <p className="text-sm text-emerald-300">✅ Wszystko gra - brak sygnałów wymagających uwagi.</p>
           </Card>
         )
       )}
 
-      {/* Aktywność zespołu — cold calle w 4 tygodniach */}
+      {/* Aktywność zespołu - cold calle w 4 tygodniach */}
       {insights.weeklyActivity.some((w) => w.total > 0) && (
         <Card className="mb-8">
           <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
-            Aktywność zespołu — telefony (4 tygodnie)
+            Aktywność zespołu - telefony (4 tygodnie)
           </h2>
           <div className="flex items-end gap-3">
             {insights.weeklyActivity.map((w, i) => {
@@ -198,7 +198,7 @@ export default async function ZespolPage() {
         </Card>
       )}
 
-      {/* Mocne / słabe obszary — tylko CEO */}
+      {/* Mocne / słabe obszary - tylko CEO */}
       {isOwner && categories.length > 0 && (
         <div className="mb-8 grid gap-4 md:grid-cols-2">
           <Card className="!border-emerald-500/20 !bg-emerald-500/[0.04]">
@@ -211,7 +211,7 @@ export default async function ZespolPage() {
           </Card>
           <Card className="!border-amber-500/20 !bg-amber-500/[0.04]">
             <p className="mb-1 text-xs font-medium uppercase tracking-wider text-amber-400">
-              Do poprawy — najsłabszy obszar
+              Do poprawy - najsłabszy obszar
             </p>
             <p className="text-xl font-semibold text-white">
               {weakest.label} <span className="text-amber-400">{weakest.avg}/10</span>
@@ -220,7 +220,7 @@ export default async function ZespolPage() {
         </div>
       )}
 
-      {/* Zapraszanie + zarządzanie rolami — tylko CEO */}
+      {/* Zapraszanie + zarządzanie rolami - tylko CEO */}
       {isOwner && (
         <>
           <div className="mb-8">
@@ -266,7 +266,7 @@ export default async function ZespolPage() {
           <div className="mb-8">
             <h2 className="mb-1 text-lg font-semibold text-white">Zespoły menedżerów</h2>
             <p className="mb-3 text-sm text-zinc-400">
-              Przypisz każdemu menedżerowi osoby, które ma widzieć (cele, telefony, wyniki AI — bez prowizji).
+              Przypisz każdemu menedżerowi osoby, które ma widzieć (cele, telefony, wyniki AI - bez prowizji).
             </p>
             <ManagerTeams
               managers={teamMembers.filter((m) => m.role === "manager").map((m) => ({ id: m.id, name: m.label }))}
@@ -329,7 +329,7 @@ export default async function ZespolPage() {
                       <div className="flex items-center gap-3">
                         <div className="text-right">
                           <span className={`inline-flex items-center gap-1 font-mono text-lg font-semibold ${scoreColor(agent.avgScore)}`}>
-                            {agent.avgScore != null ? `${agent.avgScore}` : "—"}
+                            {agent.avgScore != null ? `${agent.avgScore}` : "-"}
                             <TrendArrow trend={insights.trends[agent.id]} />
                           </span>
                           <span className="hidden text-xs text-zinc-500 sm:block">wynik AI</span>

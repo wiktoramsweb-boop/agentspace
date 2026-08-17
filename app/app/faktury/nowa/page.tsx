@@ -24,7 +24,7 @@ export default async function NowaFakturaPage() {
       <div className="print-hide">
         <PageHeader
           title="Nowa faktura"
-          subtitle="Wypełnij dane — podgląd składa się na żywo. Zapisz albo od razu Drukuj/PDF."
+          subtitle="Wypełnij dane - podgląd składa się na żywo. Zapisz albo od razu Drukuj/PDF."
         />
       </div>
       <InvoiceCreator

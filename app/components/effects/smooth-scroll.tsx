@@ -4,7 +4,7 @@ import Lenis from "lenis";
 import { useEffect } from "react";
 
 /**
- * Inicjalizuje Lenis globalnie — daje "ślizgowy" scroll w stylu Apple / Linear.
+ * Inicjalizuje Lenis globalnie - daje "ślizgowy" scroll w stylu Apple / Linear.
  * Renderujemy raz w layoutcie, bez wpływu na DOM.
  */
 export function SmoothScroll() {

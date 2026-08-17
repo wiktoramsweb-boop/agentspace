@@ -15,7 +15,7 @@ export function RequestResetForm({ linkError }: { linkError?: boolean }) {
         <p className="font-medium text-emerald-300">Sprawdź skrzynkę 📧</p>
         <p className="mt-1 text-emerald-200/90">
           Jeśli konto z tym adresem istnieje, wysłaliśmy link do ustawienia nowego hasła. Otwórz go na tym
-          samym urządzeniu i w tej samej przeglądarce. Link może chwilę iść — sprawdź też spam.
+          samym urządzeniu i w tej samej przeglądarce. Link może chwilę iść - sprawdź też spam.
         </p>
       </div>
     );

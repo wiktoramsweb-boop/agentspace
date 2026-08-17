@@ -1,5 +1,5 @@
 -- ============================================================
--- AgentSpace — SETUP v8: Faktury (dla właściciela)
+-- AgentSpace - SETUP v8: Faktury (dla właściciela)
 -- ============================================================
 -- Uruchom w Supabase SQL Editor. Idempotentne.
 -- ============================================================

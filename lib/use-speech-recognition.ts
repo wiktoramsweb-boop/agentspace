@@ -40,7 +40,7 @@ const ERROR_MESSAGES: Record<string, string | null> = {
   "not-allowed": "Brak dostępu do mikrofonu. Zezwól na mikrofon w ustawieniach przeglądarki i spróbuj ponownie.",
   "service-not-allowed": "Mikrofon zablokowany w ustawieniach przeglądarki/systemu.",
   "audio-capture": "Nie wykryto mikrofonu w urządzeniu.",
-  "network": "Rozpoznawanie mowy wymaga internetu — sprawdź połączenie.",
+  "network": "Rozpoznawanie mowy wymaga internetu - sprawdź połączenie.",
   "no-speech": null, // nie traktujemy jako błąd
   "aborted": null,
 };
@@ -98,7 +98,7 @@ export function useSpeechRecognition(onText: (text: string, isFinal: boolean) =>
       recRef.current.start();
       setListening(true);
     } catch {
-      // start() rzuca, gdy wywołane zbyt szybko po poprzednim — spróbuj ponownie za chwilę
+      // start() rzuca, gdy wywołane zbyt szybko po poprzednim - spróbuj ponownie za chwilę
       setError("Nie udało się uruchomić mikrofonu. Kliknij jeszcze raz.");
     }
   }, [listening]);

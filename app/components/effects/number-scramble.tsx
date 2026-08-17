@@ -18,7 +18,7 @@ function randomChar() {
 }
 
 /**
- * NumberScramble — cyfry migoczą losowymi wartościami i progresywnie lokują się
+ * NumberScramble - cyfry migoczą losowymi wartościami i progresywnie lokują się
  * od lewej do prawej na docelową wartość. Stripe / Linear signature.
  */
 export function NumberScramble({
@@ -41,7 +41,7 @@ export function NumberScramble({
     if (!isInView) return;
 
     const totalMs = duration * 1000;
-    // Częste odświeżanie losowych cyfr (30ms = ~33fps) — flicker feel.
+    // Częste odświeżanie losowych cyfr (30ms = ~33fps) - flicker feel.
     const scrambleIntervalMs = 35;
     // Co ile ms lockujemy kolejną pozycję od lewej.
     const lockIntervalMs = totalMs / (targetLength + 1);

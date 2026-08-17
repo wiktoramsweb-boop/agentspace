@@ -25,7 +25,7 @@ export const getCurrentUser = cache(async (): Promise<ProfileWithAgency | null> 
     .single();
 
   if (!profile) {
-    // User w auth.users bez profilu (np. przerwana rejestracja) — dołóż email
+    // User w auth.users bez profilu (np. przerwana rejestracja) - dołóż email
     return {
       id: user.id,
       agency_id: null,

@@ -6,7 +6,7 @@ import { PageHero } from "../components/page-hero";
 import { FadeIn, StaggerContainer, StaggerItem } from "../components/fade-in";
 
 export const metadata: Metadata = {
-  title: "Dla agentów nieruchomości — co zyskasz z AgentSpace",
+  title: "Dla agentów nieruchomości | Co zyskasz z AgentSpace",
   description:
     "AgentSpace z perspektywy agenta nieruchomości. Trening cold calli z AI, plan dnia, tracking prowizji, ranking. Mniej stresu, więcej zamknięć, wyższa prowizja.",
   alternates: {
@@ -23,12 +23,12 @@ const BENEFITS = [
   {
     icon: ClockIcon,
     title: "15 min/dzień > 4-godzinne szkolenie raz na kwartał",
-    body: "Mózg uczy się przez powtarzanie. 15 min treningu codziennie przez miesiąc to 7.5 godziny wprawki — i każdą z nich pamiętasz. Warsztat raz na kwartał? Zapomnisz w 2 tygodnie.",
+    body: "Mózg uczy się przez powtarzanie. 15 min treningu codziennie przez miesiąc to 7.5 godziny wprawki - i każdą z nich pamiętasz. Warsztat raz na kwartał? Zapomnisz w 2 tygodnie.",
   },
   {
     icon: TargetIcon,
     title: "Konkretny feedback, nie 'ogólnie nieźle'",
-    body: "Po każdej sesji scoring 1–10 w 4 kategoriach (otwarcie, kwalifikacja, obsługa obiekcji, zamknięcie) plus 2-3 konkretne wskazówki: 'nie zapytałeś o timeline', 'za wcześnie zaproponowałeś prowizję'.",
+    body: "Po każdej sesji scoring 1-10 w 4 kategoriach (otwarcie, kwalifikacja, obsługa obiekcji, zamknięcie) plus 2-3 konkretne wskazówki: 'nie zapytałeś o timeline', 'za wcześnie zaproponowałeś prowizję'.",
   },
   {
     icon: ChartIcon,
@@ -38,14 +38,14 @@ const BENEFITS = [
   {
     icon: TrendingUpIcon,
     title: "Widzisz, że rośniesz",
-    body: "Po 30 dniach widzisz swoją krzywą: score sesji, zamknięcia, prowizja. Konkretne dane, nie 'czuję, że jest lepiej'. To dosłownie motywujące — i ułatwia rozmowy o awansie/podwyżce.",
+    body: "Po 30 dniach widzisz swoją krzywą: score sesji, zamknięcia, prowizja. Konkretne dane, nie 'czuję, że jest lepiej'. To dosłownie motywujące - i ułatwia rozmowy o awansie/podwyżce.",
   },
 ];
 
 const FAQ_AGENT = [
   {
     q: "Czy mój szef będzie widział, ile zarabiam i ile rozmów odbyłem?",
-    a: "Tak — w zakresie wyników biura. Ale to działa w obie strony: lepsze wyniki = silniejsza pozycja do negocjacji prowizji, awansu, lepszych leadów. Najlepsi agenci kochają widoczność — bo wygrywają z nią.",
+    a: "Tak - w zakresie wyników biura. Ale to działa w obie strony: lepsze wyniki = silniejsza pozycja do negocjacji prowizji, awansu, lepszych leadów. Najlepsi agenci kochają widoczność - bo wygrywają z nią.",
   },
   {
     q: "Czy muszę nagrywać prawdziwych klientów?",
@@ -57,7 +57,7 @@ const FAQ_AGENT = [
   },
   {
     q: "Co jeśli słabo idzie? Czy szef zobaczy moją porażkę?",
-    a: "Szef widzi Twoje wyniki w zespole — średni score, liczba sesji, trend. Nie widzi treści Twoich rozmów ani konkretnych pomyłek. Sesje są prywatne.",
+    a: "Szef widzi Twoje wyniki w zespole - średni score, liczba sesji, trend. Nie widzi treści Twoich rozmów ani konkretnych pomyłek. Sesje są prywatne.",
   },
 ];
 
@@ -69,10 +69,10 @@ export default function DlaAgentow() {
         <PageHero
           eyebrow="Dla agentów nieruchomości"
           title="Mniej stresu, więcej zamknięć, wyższa prowizja"
-          description="AgentSpace to nie kolejny system kontroli 'dla szefa'. To Twoje codzienne narzędzie — żeby ćwiczyć trudne rozmowy bez ryzyka, widzieć swój postęp, zarabiać więcej."
+          description="AgentSpace to nie kolejny system kontroli 'dla szefa'. To Twoje codzienne narzędzie - żeby ćwiczyć trudne rozmowy bez ryzyka, widzieć swój postęp, zarabiać więcej."
         />
 
-        {/* Benefits — grid z ikonami */}
+        {/* Benefits - grid z ikonami */}
         <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
@@ -147,7 +147,7 @@ export default function DlaAgentow() {
                 Powiedz szefowi o AgentSpace
               </h2>
               <p className="mb-8 text-zinc-400">
-                Jeśli prowadzisz/pracujesz w biurze, które chciałbyś, żeby wdrożyło AgentSpace —
+                Jeśli prowadzisz/pracujesz w biurze, które chciałbyś, żeby wdrożyło AgentSpace -
                 wyślij szefowi link do strony. Przyjmujemy jedno biuro na miasto.
               </p>
               <Link

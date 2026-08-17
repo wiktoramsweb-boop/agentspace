@@ -11,12 +11,12 @@ type Payload = {
   agencyName?: string;
   teamSize?: string;
   phone?: string;
-  // Honeypot — boty wypełniają wszystko, człowiek pomija ukryte pole
+  // Honeypot - boty wypełniają wszystko, człowiek pomija ukryte pole
   website?: string;
 };
 
 function hashIp(ip: string): string {
-  // SHA-256 hash IP — zachowujemy żeby móc wykryć spam, ale bez prawdziwego IP w bazie (RODO)
+  // SHA-256 hash IP - zachowujemy żeby móc wykryć spam, ale bez prawdziwego IP w bazie (RODO)
   return createHash("sha256")
     .update(ip + (process.env.IP_HASH_SALT ?? "default-salt"))
     .digest("hex")
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Niepoprawne dane" }, { status: 400 });
   }
 
-  // Honeypot — jeśli wypełnione, udajemy sukces bez zapisu
+  // Honeypot - jeśli wypełnione, udajemy sukces bez zapisu
   if (body.website && body.website.length > 0) {
     return NextResponse.json({ ok: true });
   }
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
         `,
       });
     } catch (emailError) {
-      // Email nie powiódł się, ale zapis już jest w bazie — nie blokujemy odpowiedzi
+      // Email nie powiódł się, ale zapis już jest w bazie - nie blokujemy odpowiedzi
       console.error("Resend error:", emailError);
     }
   }

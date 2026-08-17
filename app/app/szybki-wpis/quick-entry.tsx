@@ -168,7 +168,7 @@ export function QuickEntry() {
         {!supported && (
           <p className="mt-2 text-xs text-amber-400">
             Ta przeglądarka nie ma wbudowanego dyktowania. Na iPhone: dotknij pola tekstowego i użyj
-            <strong> ikony mikrofonu na klawiaturze iOS</strong> (dyktowanie), potem „Przetwórz". Na komputerze — Chrome.
+            <strong> ikony mikrofonu na klawiaturze iOS</strong> (dyktowanie), potem „Przetwórz". Na komputerze - Chrome.
           </p>
         )}
       </div>

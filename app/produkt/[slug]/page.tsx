@@ -103,7 +103,7 @@ export default async function ProduktPage({
         <SectionHead
           eyebrow="Reszta systemu"
           title="Pozostałe moduły"
-          lead="AgentSpace działa jako całość, ale wdrażasz go stopniowo — w tempie, które wytrzyma zespół."
+          lead="AgentSpace działa jako całość, ale wdrażasz go stopniowo - w tempie, które wytrzyma zespół."
         />
 
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -127,7 +127,7 @@ export default async function ProduktPage({
           <h2 className="max-w-[22ch]">Zobacz to na swoich danych</h2>
           <p className="mt-5 max-w-[50ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
             30 minut rozmowy. Pokażę, jak {mod.name.toLowerCase()} wyglądałby
-            w Twoim biurze — na Twoich klientach i Twoim modelu prowizji.
+            w Twoim biurze - na Twoich klientach i Twoim modelu prowizji.
           </p>
           <div className="mt-10">
             <Button href="/kontakt">Umów rozmowę</Button>

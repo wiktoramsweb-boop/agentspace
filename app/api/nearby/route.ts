@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export const maxDuration = 30;
 
-// Auto-research okolicy oferty — darmowe dane z OpenStreetMap (Overpass API).
+// Auto-research okolicy oferty - darmowe dane z OpenStreetMap (Overpass API).
 // Zwraca najbliższe POI w kategoriach: komunikacja, edukacja, sklepy, zdrowie, zieleń.
 
 const RADIUS = 900; // metrów

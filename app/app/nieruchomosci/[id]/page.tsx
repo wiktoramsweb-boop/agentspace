@@ -36,7 +36,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   const property = await getProperty(id);
   if (!property) notFound();
-  // Baza ofert jest wspólna dla biura — dostęp mają wszyscy z tej agencji.
+  // Baza ofert jest wspólna dla biura - dostęp mają wszyscy z tej agencji.
   if (property.agency_id !== user.agency_id) redirect("/app/nieruchomosci");
 
   const [owner, interested, deals, allClients] = await Promise.all([
@@ -56,12 +56,12 @@ export default async function PropertyDetailPage({ params }: Props) {
   );
 
   const specs = [
-    { label: "Cena", value: property.price_pln != null ? formatPln(property.price_pln) : "—" },
-    { label: "Powierzchnia", value: property.area_m2 != null ? `${property.area_m2} m²` : "—" },
-    { label: "Pokoje", value: property.rooms != null ? String(property.rooms) : "—" },
-    { label: "Piętro", value: property.floor != null ? String(property.floor) : "—" },
-    { label: "Typ", value: type?.label ?? "—" },
-    { label: "Rodzaj", value: kind?.label ?? "—" },
+    { label: "Cena", value: property.price_pln != null ? formatPln(property.price_pln) : "-" },
+    { label: "Powierzchnia", value: property.area_m2 != null ? `${property.area_m2} m²` : "-" },
+    { label: "Pokoje", value: property.rooms != null ? String(property.rooms) : "-" },
+    { label: "Piętro", value: property.floor != null ? String(property.floor) : "-" },
+    { label: "Typ", value: type?.label ?? "-" },
+    { label: "Rodzaj", value: kind?.label ?? "-" },
   ];
 
   return (

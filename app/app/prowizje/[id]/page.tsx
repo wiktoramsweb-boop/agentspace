@@ -29,7 +29,7 @@ export default async function DealDetailPage({ params }: Props) {
 
       <PageHeader
         title={deal.title}
-        subtitle="Karta transakcji — pilnuj etapów i dokumentów. Zmiany zapisują się same."
+        subtitle="Karta transakcji - pilnuj etapów i dokumentów. Zmiany zapisują się same."
         action={
           status && <span className={`rounded-md px-2.5 py-1 text-xs font-medium ${status.color}`}>{status.label}</span>
         }
@@ -38,9 +38,9 @@ export default async function DealDetailPage({ params }: Props) {
       {/* Skrót finansowy */}
       <Card className="mb-6 !border-emerald-500/20 !bg-emerald-500/[0.04]">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <Fin label="Wartość transakcji" value={deal.transaction_value_pln != null ? formatPln(deal.transaction_value_pln) : "—"} />
+          <Fin label="Wartość transakcji" value={deal.transaction_value_pln != null ? formatPln(deal.transaction_value_pln) : "-"} />
           <Fin label="Prowizja biura (brutto)" value={formatPln(deal.commission_pln)} />
-          <Fin label="Twój udział" value={deal.agent_split_pct ? `${deal.agent_split_pct}%` : "—"} />
+          <Fin label="Twój udział" value={deal.agent_split_pct ? `${deal.agent_split_pct}%` : "-"} />
           <Fin label="Twój zarobek" value={formatPln(deal.agent_earnings_pln)} accent />
         </div>
       </Card>

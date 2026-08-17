@@ -7,7 +7,7 @@
 export type ProductModule = {
   slug: string;
   name: string;
-  /** Nagłówek H1 — korzyść, nie nazwa modułu. */
+  /** Nagłówek H1 - korzyść, nie nazwa modułu. */
   headline: string;
   /** Lead pod H1. */
   lead: string;
@@ -27,8 +27,8 @@ export const MODULES: ProductModule[] = [
     slug: "crm",
     name: "CRM klientów",
     headline: "Baza klientów, która zostaje w biurze",
-    lead: "Karty klientów z historią, notatkami i pipeline. Osobno sprzedający, kupujący, wynajmujący i najemcy — bo każdy z nich wymaga innej rozmowy.",
-    seoTitle: "CRM dla biura nieruchomości — baza klientów | AgentSpace",
+    lead: "Karty klientów z historią, notatkami i pipeline. Osobno sprzedający, kupujący, wynajmujący i najemcy - bo każdy z nich wymaga innej rozmowy.",
+    seoTitle: "CRM i baza klientów dla biura nieruchomości | AgentSpace",
     seoDescription:
       "CRM zaprojektowany dla biur nieruchomości: typy klientów, pipeline, notatki, historia kontaktu. Baza zostaje w biurze, nie w telefonie agenta.",
     problem:
@@ -40,7 +40,7 @@ export const MODULES: ProductModule[] = [
       },
       {
         title: "Pipeline, który widać",
-        body: "Każdy klient ma etap. Widzisz, ilu klientów utknęło na tym samym etapie dłużej, niż powinno — zanim się wypalą.",
+        body: "Każdy klient ma etap. Widzisz, ilu klientów utknęło na tym samym etapie dłużej, niż powinno - zanim się wypalą.",
       },
       {
         title: "Notatki z każdego kontaktu",
@@ -63,7 +63,7 @@ export const MODULES: ProductModule[] = [
     seoDescription:
       "Lejek sprzedażowy dla biura nieruchomości: cel roczny przeliczony na dzienne działania. Tracker dnia, plan tygodnia, historia realizacji.",
     problem:
-      "„W tym roku robimy 40 transakcji” nie jest celem — to życzenie. Bez przeliczenia na liczbę telefonów i spotkań w tygodniu nikt nie wie, czy plan jest realizowany, dopóki nie jest za późno.",
+      "„W tym roku robimy 40 transakcji” nie jest celem - to życzenie. Bez przeliczenia na liczbę telefonów i spotkań w tygodniu nikt nie wie, czy plan jest realizowany, dopóki nie jest za późno.",
     capabilities: [
       {
         title: "Lejek liczony wstecz",
@@ -71,7 +71,7 @@ export const MODULES: ProductModule[] = [
       },
       {
         title: "Tracker dnia",
-        body: "Agent widzi jeden pierścień: ile z dzisiejszego celu już zrobił. Domknięcie dnia jest świętowane — to działa lepiej niż tabela.",
+        body: "Agent widzi jeden pierścień: ile z dzisiejszego celu już zrobił. Domknięcie dnia jest świętowane - to działa lepiej niż tabela.",
       },
       {
         title: "Plan tygodnia",
@@ -83,18 +83,18 @@ export const MODULES: ProductModule[] = [
       },
     ],
     forWhom:
-      "Dla agenta — jasność, co dziś robić. Dla właściciela — wczesny sygnał, że ktoś zaczyna odpadać.",
+      "Dla agenta: jasność, co dziś robić. Dla właściciela: wczesny sygnał, że ktoś zaczyna odpadać.",
   },
   {
     slug: "prowizje",
     name: "Prowizje i transakcje",
     headline: "Prowizje, które liczą się same",
-    lead: "Karta transakcji z pięcioma etapami i dokumentami. Cel miesięczny aktualizuje się przy każdym domknięciu — bez arkusza domykanego w niedzielę.",
+    lead: "Karta transakcji z pięcioma etapami i dokumentami. Cel miesięczny aktualizuje się przy każdym domknięciu - bez arkusza domykanego w niedzielę.",
     seoTitle: "Rozliczanie prowizji w biurze nieruchomości | AgentSpace",
     seoDescription:
       "Rozliczanie prowizji agentów nieruchomości: karta transakcji, etapy, dokumenty, automatyczne naliczanie i cel miesięczny biura.",
     problem:
-      "Rozliczenie prowizji to zwykle arkusz, który zna jedna osoba, aktualizuje się raz w miesiącu i zawsze zawiera dwa błędy — najczęściej na niekorzyść agenta, co niszczy zaufanie.",
+      "Rozliczenie prowizji to zwykle arkusz, który zna jedna osoba, aktualizuje się raz w miesiącu i zawsze zawiera dwa błędy - najczęściej na niekorzyść agenta, co niszczy zaufanie.",
     capabilities: [
       {
         title: "Karta transakcji",
@@ -114,18 +114,18 @@ export const MODULES: ProductModule[] = [
       },
     ],
     forWhom:
-      "Dla właściciela — kontrola nad rozliczeniami. Dla agenta — pewność, że prowizja jest policzona uczciwie.",
+      "Dla właściciela: kontrola nad rozliczeniami. Dla agenta: pewność, że prowizja jest policzona uczciwie.",
   },
   {
     slug: "ai-coach",
     name: "AI Coach",
     headline: "Agent trenuje trudne rozmowy na AI, nie na Twoich klientach",
     lead: "13 scenariuszy z polskiego rynku, 9 osobowości klienta, rozmowa głosem, scoring i feedback po polsku.",
-    seoTitle: "Szkolenie agentów nieruchomości z AI — AI Coach | AgentSpace",
+    seoTitle: "Szkolenie agentów nieruchomości z AI Coachem | AgentSpace",
     seoDescription:
       "Trening cold calli i spotkań pozyskowych z klientem AI. 13 scenariuszy, 9 osobowości, rozmowa głosem, scoring w czterech kategoriach i feedback po polsku.",
     problem:
-      "Nowy agent uczy się na prawdziwych leadach. Każda źle poprowadzona rozmowa to spalony kontakt, którego nikt już nie odzyska — a właściciel dowiaduje się o tym po fakcie.",
+      "Nowy agent uczy się na prawdziwych leadach. Każda źle poprowadzona rozmowa to spalony kontakt, którego nikt już nie odzyska - a właściciel dowiaduje się o tym po fakcie.",
     capabilities: [
       {
         title: "Trzy kategorie rozmów",
@@ -141,7 +141,7 @@ export const MODULES: ProductModule[] = [
       },
       {
         title: "Scoring i feedback",
-        body: "Ocena w czterech kategoriach plus konkretne wskazówki po polsku — co powiedzieć następnym razem, a czego unikać.",
+        body: "Ocena w czterech kategoriach plus konkretne wskazówki po polsku - co powiedzieć następnym razem, a czego unikać.",
       },
     ],
     forWhom:
@@ -164,7 +164,7 @@ export const MODULES: ProductModule[] = [
       },
       {
         title: "Mocne i słabe obszary",
-        body: "Gdzie zespół wypada dobrze, a gdzie systemowo traci — na pozyskaniu, na spotkaniu czy na domknięciu.",
+        body: "Gdzie zespół wypada dobrze, a gdzie systemowo traci - na pozyskaniu, na spotkaniu czy na domknięciu.",
       },
       {
         title: "Drill-down do agenta",
@@ -187,7 +187,7 @@ export const MODULES: ProductModule[] = [
     seoDescription:
       "Baza ofert dla całego biura nieruchomości: zdjęcia, statusy, przypisanie do agenta i widoczność dla zespołu. Koniec z ofertami w prywatnych folderach.",
     problem:
-      "Oferty leżą w prywatnych folderach agentów. Klient kupujący z jednego biurka nigdy nie spotka nieruchomości z drugiego — i transakcja wewnętrzna nie ma jak powstać.",
+      "Oferty leżą w prywatnych folderach agentów. Klient kupujący z jednego biurka nigdy nie spotka nieruchomości z drugiego - i transakcja wewnętrzna nie ma jak powstać.",
     capabilities: [
       {
         title: "Widoczność dla zespołu",
@@ -203,7 +203,7 @@ export const MODULES: ProductModule[] = [
       },
     ],
     forWhom:
-      "Dla całego zespołu — im większe biuro, tym więcej transakcji wewnętrznych ta baza generuje.",
+      "Dla całego zespołu: im większe biuro, tym więcej transakcji wewnętrznych ta baza generuje.",
   },
 ];
 

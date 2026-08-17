@@ -6,7 +6,7 @@ import { Button, Card, Tick } from "./ui";
 import { PLANS, planForAgents } from "@/lib/marketing/plans";
 
 /**
- * Cennik z licznikiem agentów — pakiet podświetla się sam w zależności
+ * Cennik z licznikiem agentów - pakiet podświetla się sam w zależności
  * od wielkości biura. Cel: właściciel od razu widzi „to jest mój pakiet”,
  * zamiast porównywać trzy kolumny.
  *
@@ -142,7 +142,7 @@ export function Pricing() {
       </div>
 
       <p className="mt-10 text-center text-sm text-[var(--color-mk-muted)]">
-        Ceny netto, rozliczenie miesięczne. Bez umowy na czas określony —
+        Ceny netto, rozliczenie miesięczne. Bez umowy na czas określony -
         rezygnujesz kiedy chcesz.
       </p>
     </div>

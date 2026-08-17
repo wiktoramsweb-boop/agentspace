@@ -62,7 +62,7 @@ export function OwnerPicker({
       }}
       className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
     >
-      <option value="">— brak właściciela —</option>
+      <option value="">- brak właściciela -</option>
       {clients.map((c) => (
         <option key={c.id} value={c.id}>
           {c.name}
@@ -97,7 +97,7 @@ export function InterestAdder({
         onChange={(e) => setValue(e.target.value)}
         className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
       >
-        <option value="">— wybierz klienta —</option>
+        <option value="">- wybierz klienta -</option>
         {clients.map((c) => (
           <option key={c.id} value={c.id}>
             {c.name}

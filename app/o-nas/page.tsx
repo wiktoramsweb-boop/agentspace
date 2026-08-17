@@ -8,7 +8,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from "../components/fade-in";
 import { TiltCard } from "../components/effects/tilt-card";
 
 export const metadata: Metadata = {
-  title: "O AgentSpace — polski system dla biur nieruchomości",
+  title: "O AgentSpace | Polski system dla biur nieruchomości",
   description:
     "Kto, dlaczego i po co buduje AgentSpace. Historia foundera, klient zero, filozofia produktu. Polska platforma dla biur nieruchomości.",
   alternates: {
@@ -20,7 +20,7 @@ const PRINCIPLES = [
   {
     number: "01",
     title: "Polski produkt, polski język",
-    body: "Nie tłumaczymy z angielskiego. Skrypty, scenariusze, obiekcje, feedback — wszystko po polsku, z polską specyfiką. Bo Twój klient nie mówi 'I'd like to make an offer'.",
+    body: "Nie tłumaczymy z angielskiego. Skrypty, scenariusze, obiekcje, feedback - wszystko po polsku, z polską specyfiką. Bo Twój klient nie mówi 'I'd like to make an offer'.",
   },
   {
     number: "02",
@@ -30,7 +30,7 @@ const PRINCIPLES = [
   {
     number: "03",
     title: "Dane > intuicja",
-    body: "Decyzje o rozwoju zespołu mają być oparte o liczby — kto rośnie, gdzie są luki. Nie o przeczucia, kto 'wygląda na obiecującego'.",
+    body: "Decyzje o rozwoju zespołu mają być oparte o liczby - kto rośnie, gdzie są luki. Nie o przeczucia, kto 'wygląda na obiecującego'.",
   },
   {
     number: "04",
@@ -69,7 +69,7 @@ export default function ONas() {
       <main className="bg-zinc-950 text-white">
         <PageHero
           eyebrow="O AgentSpace"
-          title="Polski produkt dla polskich biur — bez kompromisów"
+          title="Polski produkt dla polskich biur - bez kompromisów"
           description="AgentSpace nie jest kolejnym SaaS-em 'dla nieruchomości' tłumaczonym z angielskiego. Jest budowany w Krakowie, dla biur w Polsce, przez kogoś kto na co dzień prowadzi biuro nieruchomości i wie, co konkretnie boli."
         />
 
@@ -79,7 +79,7 @@ export default function ONas() {
             <FadeIn>
               <TiltCard className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
                 <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-12">
-                  {/* Avatar — duży, animowany glow */}
+                  {/* Avatar - duży, animowany glow */}
                   <div className="flex justify-center md:justify-start">
                     <div className="relative">
                       {/* Outer glow rings */}
@@ -119,14 +119,14 @@ export default function ONas() {
                         z klientem, gdzie pęka konwersja.
                       </p>
                       <p>
-                        Przez ostatnie lata próbowałem różnych rozwiązań — szkolenia stacjonarne,
+                        Przez ostatnie lata próbowałem różnych rozwiązań - szkolenia stacjonarne,
                         mentoring, książki, podcasty. Większość kosztuje, mało co rzeczywiście
                         zmienia codzienność agenta. Najlepsi w branży uczą się w bólu, przez
                         setki spalonych leadów. Najsłabsi odchodzą po sześciu miesiącach.
                       </p>
                       <p>
                         AgentSpace to system, którego sam potrzebowałem od dawna. Buduję go dla
-                        mojego biura — i otwieram go dla innych biur, które mają ten sam problem.
+                        mojego biura - i otwieram go dla innych biur, które mają ten sam problem.
                       </p>
                     </div>
                   </div>
@@ -172,7 +172,7 @@ export default function ONas() {
           </div>
         </section>
 
-        {/* Roadmap — animowany timeline */}
+        {/* Roadmap - animowany timeline */}
         <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
           <div className="mx-auto max-w-3xl">
             <FadeIn>

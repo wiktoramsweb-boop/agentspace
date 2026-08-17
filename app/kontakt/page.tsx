@@ -22,13 +22,13 @@ const QUICK_TOPICS = [
   },
   {
     title: "Demo",
-    body: "Pokażemy konkretnie jak AgentSpace zadziała u Was — 30 min.",
+    body: "Pokażemy konkretnie jak AgentSpace zadziała u Was - 30 min.",
     cta: "Wybierz w formularzu temat 'Demo'",
   },
   {
     title: "Inne",
-    body: "Współpraca, media, pomysł, krytyka — wszystko czytamy.",
-    cta: "Napisz po prostu — odpowiemy",
+    body: "Współpraca, media, pomysł, krytyka - wszystko czytamy.",
+    cta: "Napisz po prostu - odpowiemy",
   },
 ];
 
@@ -40,11 +40,11 @@ export default function Kontakt() {
         <PageHero
           eyebrow="Kontakt"
           title="Porozmawiajmy o Twoim biurze"
-          description="Pytanie o AgentSpace, propozycja pilotażu, współpraca? Napisz — odpowiadamy w 24h w dni robocze."
+          description="Pytanie o AgentSpace, propozycja pilotażu, współpraca? Napisz - odpowiadamy w 24h w dni robocze."
           compact
         />
 
-        {/* Quick topics — co możesz napisać */}
+        {/* Quick topics - co możesz napisać */}
         <section className="border-b border-zinc-900 px-6 py-16">
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-4 md:grid-cols-3">

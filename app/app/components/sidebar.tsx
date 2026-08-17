@@ -16,7 +16,7 @@ type NavItem = {
 };
 type NavSection = { title: string; items: NavItem[] };
 
-// Kolorowe kafelki ikon (jak w ASARI). Pełne klasy — żeby Tailwind je zbudował.
+// Kolorowe kafelki ikon (jak w ASARI). Pełne klasy - żeby Tailwind je zbudował.
 const TILE = {
   emerald: "bg-emerald-500/15 text-emerald-400",
   violet: "bg-violet-500/15 text-violet-400",

@@ -96,7 +96,7 @@ export async function inviteAgent(
   const link = `${APP_URL}/zaproszenie/${invitation.token}`;
 
   // Spróbuj wysłać email (jeśli Resend skonfigurowany). Bez zweryfikowanej domeny
-  // Resend dostarcza tylko na adres właściciela konta — dlatego zawsze zwracamy
+  // Resend dostarcza tylko na adres właściciela konta - dlatego zawsze zwracamy
   // też link do ręcznego wysłania.
   let emailSent = false;
   const resendKey = process.env.RESEND_API_KEY;
@@ -112,7 +112,7 @@ export async function inviteAgent(
             <h2 style="color:#10b981;">Zaproszenie do zespołu</h2>
             <p style="color:#3f3f46;font-size:15px;line-height:1.6;">
               <strong>${owner.full_name ?? "Właściciel biura"}</strong> zaprasza Cię do
-              <strong>${owner.agency?.name ?? "biura"}</strong> w AgentSpace — platformie do
+              <strong>${owner.agency?.name ?? "biura"}</strong> w AgentSpace - platformie do
               treningu sprzedaży nieruchomości z AI, w roli <strong>${ROLE_LABELS[role]}</strong>.
             </p>
             <p style="margin:28px 0;">
@@ -120,7 +120,7 @@ export async function inviteAgent(
                 Dołącz do zespołu →
               </a>
             </p>
-            <p style="color:#71717a;font-size:13px;">Link ważny 14 dni. Jeśli to pomyłka — zignoruj tę wiadomość.</p>
+            <p style="color:#71717a;font-size:13px;">Link ważny 14 dni. Jeśli to pomyłka - zignoruj tę wiadomość.</p>
           </div>
         `,
       });
@@ -135,7 +135,7 @@ export async function inviteAgent(
   return {
     success: emailSent
       ? `Zaproszenie wysłane mailem do ${email}. Link masz też poniżej.`
-      : `Zaproszenie utworzone. Mail nie wyszedł — skopiuj link poniżej i wyślij agentowi.`,
+      : `Zaproszenie utworzone. Mail nie wyszedł - skopiuj link poniżej i wyślij agentowi.`,
     link,
     emailSent,
   };
@@ -204,7 +204,7 @@ export async function setMemberRole(memberId: string, role: UserRole): Promise<R
       .select("id", { count: "exact", head: true })
       .eq("agency_id", owner.agency_id!)
       .eq("role", "owner");
-    if ((count ?? 0) <= 1) return { error: "To jedyny CEO — najpierw ustaw kogoś innego jako CEO." };
+    if ((count ?? 0) <= 1) return { error: "To jedyny CEO - najpierw ustaw kogoś innego jako CEO." };
   }
 
   await admin

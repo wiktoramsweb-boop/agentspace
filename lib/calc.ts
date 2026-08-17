@@ -1,4 +1,4 @@
-// Kalkulatory dla klienta (szacunki — nie stanowią oferty).
+// Kalkulatory dla klienta (szacunki - nie stanowią oferty).
 
 export function monthlyPayment(principal: number, annualRatePct: number, years: number): number {
   const n = Math.max(1, Math.round(years * 12));

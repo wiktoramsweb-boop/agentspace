@@ -7,14 +7,14 @@ import { PageTransition } from "./components/page-transition";
 import { PwaInstall } from "./components/pwa-install";
 
 export const metadata: Metadata = {
-  title: "AgentSpace — panel",
+  title: "Panel AgentSpace",
   robots: { index: false, follow: false },
 };
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
 
-  // User bez agencji (przerwana rejestracja) — obsłuż łagodnie
+  // User bez agencji (przerwana rejestracja) - obsłuż łagodnie
   if (!user.agency_id) {
     return <OnboardingRedirect />;
   }

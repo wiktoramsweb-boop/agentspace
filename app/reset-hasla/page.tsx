@@ -11,7 +11,7 @@ export default async function ResetHaslaPage({
   return (
     <AuthShell
       title="Nie pamiętasz hasła?"
-      subtitle="Podaj email, na który założone jest konto — wyślemy link do ustawienia nowego hasła."
+      subtitle="Podaj email, na który założone jest konto - wyślemy link do ustawienia nowego hasła."
       footer={
         <Link href="/login" className="text-emerald-400 hover:text-emerald-300">
           ← Wróć do logowania

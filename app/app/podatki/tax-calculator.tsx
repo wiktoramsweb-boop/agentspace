@@ -43,7 +43,7 @@ export function TaxCalculator() {
       {/* Zastrzeżenie */}
       <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] p-4 text-sm text-amber-200/90">
         <span className="font-semibold text-amber-300">To narzędzie do modelowania, nie porada podatkowa.</span>{" "}
-        Kwoty ZUS i zdrowotnej na 2026 to szacunki (oficjalne kwoty ogłaszane są końcem roku) — możesz je
+        Kwoty ZUS i zdrowotnej na 2026 to szacunki (oficjalne kwoty ogłaszane są końcem roku) - możesz je
         poprawić w zakładce <span className="font-medium">Założenia</span>. Przed realną decyzją potwierdź u księgowej.
       </div>
 
@@ -64,7 +64,7 @@ export function TaxCalculator() {
         ))}
       </div>
 
-      {/* Delikatny fade przy zmianie zakładki — treść „ustawia się", bez fajerwerków. */}
+      {/* Delikatny fade przy zmianie zakładki - treść „ustawia się", bez fajerwerków. */}
       <motion.div
         key={tab}
         initial={{ opacity: 0, y: 4 }}
@@ -82,7 +82,7 @@ export function TaxCalculator() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ZAKŁADKA 1 — FORMA OPODATKOWANIA (per wspólnik)
+// ZAKŁADKA 1 - FORMA OPODATKOWANIA (per wspólnik)
 // ═══════════════════════════════════════════════════════════════════════════
 function FormaTab({ c }: { c: TaxConstants }) {
   const [przychod, setPrzychod] = usePersistedState("as_tax_forma_przychod", 230000);
@@ -90,7 +90,7 @@ function FormaTab({ c }: { c: TaxConstants }) {
   const [zusStage, setZusStage] = usePersistedState<ZusStage>("as_tax_forma_zus", "duzy");
   const [vatPayer, setVatPayer] = usePersistedState("as_tax_forma_vat", false);
 
-  // Jako VATowiec Twoja prowizja brutto zawiera VAT — realny przychód firmy to netto.
+  // Jako VATowiec Twoja prowizja brutto zawiera VAT - realny przychód firmy to netto.
   const przychodEfekt = vatPayer ? przychod / (1 + c.stawkaVat) : przychod;
   const { results, best } = useMemo(
     () => compareForms({ przychod: przychodEfekt, koszty, zusStage }, c),
@@ -125,12 +125,12 @@ function FormaTab({ c }: { c: TaxConstants }) {
           <p className="mb-1 font-medium text-zinc-300">Punkt przełamania skala ↔ liniowy</p>
           <p>
             Przy dochodzie ok. <span className="font-semibold text-white">{zl0(prog)}</span> na osobę liniowy
-            zaczyna wygrywać. Poniżej — skala jest tańsza.
+            zaczyna wygrywać. Poniżej - skala jest tańsza.
           </p>
         </div>
       </div>
 
-      {/* Wyniki — 3 karty */}
+      {/* Wyniki - 3 karty */}
       <div className="space-y-4">
         {vatPayer && (
           <p className="text-xs text-zinc-500">
@@ -145,8 +145,8 @@ function FormaTab({ c }: { c: TaxConstants }) {
         <BreakdownTable results={results} bestForm={best.form} />
         <p className="text-xs text-zinc-500">
           „Do kieszeni" = dochód − PIT/ryczałt − zdrowotna − ZUS społeczny − danina. Ryczałt liczony od
-          przychodu (koszty NIE obniżają podatku) — opłaca się przy wysokiej marży, ale gdy masz realne
-          koszty szybko przegrywa. Przy niskim dochodzie wygrywa skala (kwota wolna + 12%), przy wysokim —
+          przychodu (koszty NIE obniżają podatku) - opłaca się przy wysokiej marży, ale gdy masz realne
+          koszty szybko przegrywa. Przy niskim dochodzie wygrywa skala (kwota wolna + 12%), przy wysokim -
           liniowy lub ryczałt.
         </p>
       </div>
@@ -239,7 +239,7 @@ function BreakdownTable({ results, bestForm }: { results: FormResult[]; bestForm
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ZAKŁADKA 2 — ZUS (oś czasu)
+// ZAKŁADKA 2 - ZUS (oś czasu)
 // ═══════════════════════════════════════════════════════════════════════════
 function ZusTab({ c }: { c: TaxConstants }) {
   const [rok, setRok] = usePersistedState("as_tax_zus_rok", 2024);
@@ -271,7 +271,7 @@ function ZusTab({ c }: { c: TaxConstants }) {
           checked={ulgaStart}
           onChange={setUlgaStart}
           label="Braliśmy ulgę na start (6 mies.)"
-          hint="kod 0570 przy rejestracji. Bez niej — od razu mały ZUS (kod 0540)"
+          hint="kod 0570 przy rejestracji. Bez niej - od razu mały ZUS (kod 0540)"
         />
         <Num label="Ilu wspólników" value={osob} onChange={setOsob} />
       </Panel>
@@ -289,7 +289,7 @@ function ZusTab({ c }: { c: TaxConstants }) {
         >
           {skonczony ? (
             <p className="text-lg font-semibold text-white">
-              Mały ZUS już się skończył ({datePL(t.preferencyjnyDo)}) — płacicie duży ZUS.
+              Mały ZUS już się skończył ({datePL(t.preferencyjnyDo)}) - płacicie duży ZUS.
             </p>
           ) : (
             <>
@@ -297,7 +297,7 @@ function ZusTab({ c }: { c: TaxConstants }) {
               <p className="text-2xl font-bold text-white">{datePL(t.preferencyjnyDo)}</p>
               <p className="mt-1 text-sm text-zinc-300">
                 Zostało <span className="font-semibold text-white">{t.monthsLeft} mies.</span>
-                {t.monthsLeft <= 3 && <span className="text-red-300"> — to już za chwilę!</span>}
+                {t.monthsLeft <= 3 && <span className="text-red-300"> - to już za chwilę!</span>}
               </p>
             </>
           )}
@@ -315,7 +315,7 @@ function ZusTab({ c }: { c: TaxConstants }) {
           <p className="text-2xl font-bold text-amber-300">+{zl0(t.skokRoczny * osob)} / rok</p>
           <p className="mt-2 text-sm text-zinc-400">
             To o {zl0(t.skokMies * osob)} więcej miesięcznie. Wpisz to do budżetu (P&L), żeby nie pokazywał
-            zawyżonego zysku. Zdrowotna się nie zmienia — leci od dochodu niezależnie od etapu ZUS.
+            zawyżonego zysku. Zdrowotna się nie zmienia - leci od dochodu niezależnie od etapu ZUS.
           </p>
         </div>
 
@@ -325,13 +325,13 @@ function ZusTab({ c }: { c: TaxConstants }) {
           <ol className="space-y-2 text-sm text-zinc-400">
             {t.ulgaStartDo && (
               <li>
-                <span className="text-zinc-500">do {datePL(t.ulgaStartDo)}:</span> ulga na start — 0 zł
+                <span className="text-zinc-500">do {datePL(t.ulgaStartDo)}:</span> ulga na start - 0 zł
                 społecznych (tylko zdrowotna)
               </li>
             )}
             <li>
               <span className="text-zinc-500">
-                {datePL(t.preferencyjnyOd)} – {datePL(t.preferencyjnyDo)}:
+                {datePL(t.preferencyjnyOd)} - {datePL(t.preferencyjnyDo)}:
               </span>{" "}
               mały ZUS ~{zl0(c.zusPreferencyjnyMies)}/mc
             </li>
@@ -352,7 +352,7 @@ const MIESIACE = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ZAKŁADKA 3 — VAT
+// ZAKŁADKA 3 - VAT
 // ═══════════════════════════════════════════════════════════════════════════
 function VatTab({ c }: { c: TaxConstants }) {
   const [sc, setSc] = usePersistedState("as_tax_vat_sc", 200000);
@@ -428,7 +428,7 @@ function VatTab({ c }: { c: TaxConstants }) {
             </p>
           ) : (
             <p className="text-white">
-              <span className="font-semibold text-emerald-300">Mieścicie się pod limitem</span> — zostało{" "}
+              <span className="font-semibold text-emerald-300">Mieścicie się pod limitem</span> - zostało{" "}
               {zl0(v.pojemnosc - v.sumaPrzychodow)} łącznej pojemności. Ale pamiętaj o ryzyku sztucznego
               podziału (niżej).
             </p>
@@ -441,7 +441,7 @@ function VatTab({ c }: { c: TaxConstants }) {
           <p className="text-2xl font-bold text-amber-300">−{zl0(v.kosztUtratyNetto)} / rok</p>
           <p className="mt-2 text-sm text-zinc-400">
             Sprzedajesz głównie osobom prywatnym (nie odliczą VAT), więc 23% od prowizji oddajesz fiskusowi
-            (minus VAT z kosztów). To zwykle największa liczba w całej analizie — więcej niż oszczędność na
+            (minus VAT z kosztów). To zwykle największa liczba w całej analizie - więcej niż oszczędność na
             ZUS czy spółce.
           </p>
         </div>
@@ -450,7 +450,7 @@ function VatTab({ c }: { c: TaxConstants }) {
         <div className="rounded-2xl border border-red-500/25 bg-red-500/[0.05] p-5 text-sm text-red-200/90">
           <p className="mb-1 font-semibold text-red-300">⚠ Ryzyko: sztuczne dzielenie działalności</p>
           <p className="text-zinc-300">
-            „Walenie na JDG, żeby zmieścić się pod limitem" fiskus może uznać za obejście limitu VAT — zsumować
+            „Walenie na JDG, żeby zmieścić się pod limitem" fiskus może uznać za obejście limitu VAT - zsumować
             obroty 3 podmiotów, naliczyć VAT wstecz + odsetki + KKS. Obrona = realna odrębność (osobni klienci,
             umowy, koszty), nie samo przełączanie faktur.
           </p>
@@ -461,10 +461,10 @@ function VatTab({ c }: { c: TaxConstants }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ZAKŁADKA 4 — JDG vs SP. Z O.O.
+// ZAKŁADKA 4 - JDG vs SP. Z O.O.
 // ═══════════════════════════════════════════════════════════════════════════
 // Co zrobić z zyskiem, który zostaje po wynagrodzeniu z powołania:
-// „zatrzymane" = zostaje w spółce (tylko CIT, bez dywidendy) — najkorzystniej.
+// „zatrzymane" = zostaje w spółce (tylko CIT, bez dywidendy) - najkorzystniej.
 // „dywidenda"  = wypłacić wspólnikom (dochodzi 19% podatku od dywidendy).
 type Wyplata = "zatrzymane" | "dywidenda";
 
@@ -474,7 +474,7 @@ function SpzooTab({ c }: { c: TaxConstants }) {
   const [zusStage, setZusStage] = usePersistedState<ZusStage>("as_tax_spzoo_zus", "duzy");
   const [malyPodatnik, setMalyPodatnik] = usePersistedState("as_tax_spzoo_maly", true);
   const [wyplata, setWyplata] = usePersistedState<Wyplata>("as_tax_spzoo_wyplata2", "zatrzymane");
-  const [powolanie, setPowolanie] = usePersistedState("as_tax_spzoo_powolanie", 120000); // per osoba — domyślnie do progu 12%
+  const [powolanie, setPowolanie] = usePersistedState("as_tax_spzoo_powolanie", 120000); // per osoba - domyślnie do progu 12%
 
   const s = useMemo(
     () => compareSpzoo(zysk, forma, zusStage, malyPodatnik, c),
@@ -549,7 +549,7 @@ function SpzooTab({ c }: { c: TaxConstants }) {
                   firmie (na rozwój / rezerwę). 19% dywidendy zapłacisz dopiero, jeśli kiedyś ją wypłacisz.
                 </>
               ) : (
-                <>Reszta wypłacona wspólnikom — dochodzi 19% podatku od dywidendy (podwójne opodatkowanie).</>
+                <>Reszta wypłacona wspólnikom - dochodzi 19% podatku od dywidendy (podwójne opodatkowanie).</>
               )}
             </p>
           </div>
@@ -569,13 +569,13 @@ function SpzooTab({ c }: { c: TaxConstants }) {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <BigCard
-            title={`JDG — 2× ${FORM_SHORT[forma]}`}
+            title={`JDG - 2× ${FORM_SHORT[forma]}`}
             value={zl0(s.jdgNetto)}
             sub={`efektywnie ${pct1(s.jdgEfektywna)} · wszystko w kieszeni, z ubezpieczeniem ZUS`}
             best={!spolkaLepsza}
           />
           <BigCard
-            title="Sp. z o.o. — wartość po podatku"
+            title="Sp. z o.o. - wartość po podatku"
             value={zl0(spolkaWartosc)}
             sub={
               wyplata === "zatrzymane"
@@ -605,7 +605,7 @@ function SpzooTab({ c }: { c: TaxConstants }) {
                 <TR label="= Zostaje w spółce (po CIT, bez dywidendy)" value={zl0(pay.zatrzymaneWSpolce)} strong />
               )}
               <TR label="Łączna wartość po opodatkowaniu" value={zl0(pay.wartoscPoOpodatkowaniu)} strong />
-              <TR label={`JDG — do kieszeni (2× ${FORM_SHORT[forma]})`} value={zl0(s.jdgNetto)} strong />
+              <TR label={`JDG - do kieszeni (2× ${FORM_SHORT[forma]})`} value={zl0(s.jdgNetto)} strong />
             </tbody>
           </table>
         </div>
@@ -623,7 +623,7 @@ function SpzooTab({ c }: { c: TaxConstants }) {
                 {wyplata === "zatrzymane" && (
                   <>
                     {" "}
-                    Pamiętaj: {zl0(pay.zatrzymaneWSpolce)} jest w spółce, nie na Twoim koncie — 19% dywidendy
+                    Pamiętaj: {zl0(pay.zatrzymaneWSpolce)} jest w spółce, nie na Twoim koncie - 19% dywidendy
                     zapłacisz przy ewentualnej wypłacie.
                   </>
                 )}{" "}
@@ -631,7 +631,7 @@ function SpzooTab({ c }: { c: TaxConstants }) {
               </>
             ) : (
               <>
-                <span className="font-semibold text-white">JDG wygrywa o {zl0(-roznica)}/rok</span> — przy tej
+                <span className="font-semibold text-white">JDG wygrywa o {zl0(-roznica)}/rok</span> - przy tej
                 skali spółka się nie opłaca, zwłaszcza z kosztem VAT i księgowości. Zostań na JDG.
               </>
             )}
@@ -641,8 +641,8 @@ function SpzooTab({ c }: { c: TaxConstants }) {
         <p className="text-xs text-zinc-500">
           Strategia „powołanie do 120k/os. + reszta w spółce" daje najniższy podatek dziś: 12% od powołania i
           tylko 9% CIT od reszty, bez ZUS i bez 19% dywidendy. Minus: część pieniędzy zostaje w firmie (nie w
-          prywatnej kieszeni), dochodzi pełna księgowość (~800–1500 zł/mc) i brak ubezpieczenia ZUS wspólników
-          (dokupujesz prywatnie). Estoński CIT pominięto (wymaga min. 3 osób na UoP — agenci na B2B się nie
+          prywatnej kieszeni), dochodzi pełna księgowość (~800-1500 zł/mc) i brak ubezpieczenia ZUS wspólników
+          (dokupujesz prywatnie). Estoński CIT pominięto (wymaga min. 3 osób na UoP - agenci na B2B się nie
           liczą).
         </p>
       </div>
@@ -675,14 +675,14 @@ function QuickBtn({ onClick, children }: { onClick: () => void; children: React.
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ZAKŁADKA 5 — ZAŁOŻENIA (edytowalne stałe)
+// ZAKŁADKA 5 - ZAŁOŻENIA (edytowalne stałe)
 // ═══════════════════════════════════════════════════════════════════════════
 function ZalozeniaTab({ c, setC }: { c: TaxConstants; setC: (c: TaxConstants) => void }) {
   const set = (k: keyof TaxConstants) => (v: number) => setC({ ...c, [k]: v });
   return (
     <div className="space-y-5">
       <p className="text-sm text-zinc-400">
-        Wszystkie kwoty i stawki w jednym miejscu — zmiana przelicza cały kalkulator na żywo. Domyślnie:
+        Wszystkie kwoty i stawki w jednym miejscu - zmiana przelicza cały kalkulator na żywo. Domyślnie:
         reguły PIT (stabilne od 2022) + szacunki ZUS/zdrowotnej na 2026. Zaktualizuj, gdy ZUS ogłosi oficjalne
         kwoty.
       </p>
@@ -692,8 +692,8 @@ function ZalozeniaTab({ c, setC }: { c: TaxConstants; setC: (c: TaxConstants) =>
           <Num label="Duży ZUS (z Funduszem Pracy)" value={c.zusDuzyMies} onChange={set("zusDuzyMies")} />
         </Panel>
         <Panel title="Składka zdrowotna">
-          <Num label="Skala — % od dochodu" value={c.zdrowotnaSkalaStawka * 100} onChange={(v) => set("zdrowotnaSkalaStawka")(v / 100)} />
-          <Num label="Liniowy — % od dochodu" value={c.zdrowotnaLiniowyStawka * 100} onChange={(v) => set("zdrowotnaLiniowyStawka")(v / 100)} />
+          <Num label="Skala - % od dochodu" value={c.zdrowotnaSkalaStawka * 100} onChange={(v) => set("zdrowotnaSkalaStawka")(v / 100)} />
+          <Num label="Liniowy - % od dochodu" value={c.zdrowotnaLiniowyStawka * 100} onChange={(v) => set("zdrowotnaLiniowyStawka")(v / 100)} />
           <Num label="Minimalna miesięczna (skala/liniowy)" value={c.zdrowotnaMinMies} onChange={set("zdrowotnaMinMies")} />
         </Panel>
         <Panel title="Zdrowotna ryczałt (miesięcznie, wg progów)">
@@ -703,7 +703,7 @@ function ZalozeniaTab({ c, setC }: { c: TaxConstants; setC: (c: TaxConstants) =>
         </Panel>
         <Panel title="Stawki podatku">
           <Num label="Liniowy (%)" value={c.stawkaLiniowy * 100} onChange={(v) => set("stawkaLiniowy")(v / 100)} />
-          <Num label="Ryczałt — pośrednictwo nieruchomości (%)" value={c.stawkaRyczalt * 100} onChange={(v) => set("stawkaRyczalt")(v / 100)} />
+          <Num label="Ryczałt - pośrednictwo nieruchomości (%)" value={c.stawkaRyczalt * 100} onChange={(v) => set("stawkaRyczalt")(v / 100)} />
           <Num label="Próg skali 12%/32% (zł)" value={c.progSkali} onChange={set("progSkali")} />
         </Panel>
         <Panel title="VAT">
@@ -727,7 +727,7 @@ function ZalozeniaTab({ c, setC }: { c: TaxConstants; setC: (c: TaxConstants) =>
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Trwały stan — zapis do localStorage (zostaje po odświeżeniu, per przeglądarka)
+// Trwały stan - zapis do localStorage (zostaje po odświeżeniu, per przeglądarka)
 // ═══════════════════════════════════════════════════════════════════════════
 function usePersistedState<T>(key: string, initial: T) {
   const [state, setState] = useState<T>(initial);

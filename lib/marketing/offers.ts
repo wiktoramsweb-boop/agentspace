@@ -6,29 +6,29 @@
  *
  * JAK DODAĆ NOWĄ OFERTĘ:
  * 1. Dopisz obiekt do tablicy OFFERS poniżej.
- * 2. Zacommituj i wypchnij — Vercel zbuduje stronę automatycznie.
+ * 2. Zacommituj i wypchnij - Vercel zbuduje stronę automatycznie.
  * 3. Wyślij link: https://agentspace.pl/oferta/[slug]
  *
- * Strony są `noindex` — nie trafiają do Google ani do sitemapy.
+ * Strony są `noindex` - nie trafiają do Google ani do sitemapy.
  */
 
 import { PLANS, type Plan } from "./plans";
 
 export type Offer = {
   slug: string;
-  /** Nazwa biura — pojawia się w nagłówku. */
+  /** Nazwa biura - pojawia się w nagłówku. */
   officeName: string;
   city: string;
-  /** Imię osoby decyzyjnej — użyte w powitaniu. */
+  /** Imię osoby decyzyjnej - użyte w powitaniu. */
   contactFirstName: string;
   agents: number;
   /** Pakiet, który proponujesz (id z PLANS). */
   planId: string;
-  /** Cena po negocjacji; jeśli pusta — cena z cennika. */
+  /** Cena po negocjacji; jeśli pusta - cena z cennika. */
   customPrice?: number;
-  /** 2–3 zdania nawiązujące do rozmowy. Tu robisz personalizację. */
+  /** 2-3 zdania nawiązujące do rozmowy. Tu robisz personalizację. */
   intro: string;
-  /** Konkretne rzeczy, o których rozmawialiście — ich problemy. */
+  /** Konkretne rzeczy, o których rozmawialiście - ich problemy. */
   painPoints: string[];
   /** Do kiedy oferta obowiązuje (format: "31 sierpnia 2026"). */
   validUntil: string;
@@ -43,7 +43,7 @@ export const OFFERS: Offer[] = [
     agents: 8,
     planId: "pro",
     intro:
-      "Dziękuję za rozmowę. Zebrałem to, o czym mówiliśmy, w jedno miejsce — żebyś nie musiała szukać tego w mailach. Poniżej konkretna propozycja dla ośmiu agentów.",
+      "Dziękuję za rozmowę. Zebrałem to, o czym mówiliśmy, w jedno miejsce - żebyś nie musiała szukać tego w mailach. Poniżej konkretna propozycja dla ośmiu agentów.",
     painPoints: [
       "Baza klientów rozrzucona między Excelem a telefonami agentów",
       "Brak wglądu w to, ile realnie dzieje się między odprawami",

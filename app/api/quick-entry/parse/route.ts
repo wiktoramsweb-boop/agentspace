@@ -13,7 +13,8 @@ Zasady:
 - city: miasto jeśli wynika z kontekstu, inaczej null (domyślnie okolica to Kraków, ale nie zgaduj jeśli nie ma).
 - create_property: true jeśli podano adres nieruchomości (wtedy warto dodać ją do bazy), inaczej false.
 - property_title: krótka nazwa oferty na podstawie adresu/kontekstu (np. "Mieszkanie ul. Prądnicka 34/23"), inaczej null.
-- note: notatka ze spotkania — zachowaj sens i szczegóły tego, co powiedział agent, lekko uporządkowane, po polsku. Nie skracaj drastycznie, nie dodawaj rzeczy, których nie było.
+- note: notatka ze spotkania - zachowaj sens i szczegóły tego, co powiedział agent, lekko uporządkowane, po polsku. Nie skracaj drastycznie, nie dodawaj rzeczy, których nie było.
+INTERPUNKCJA: w polu note nie używaj myślnika ani półpauzy (znaki — i –); stosuj przecinek, dwukropek lub kropkę.
 Zawsze wywołaj narzędzie zapisz_wpis z wszystkimi polami.`;
 
 export async function POST(request: Request) {

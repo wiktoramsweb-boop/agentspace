@@ -6,7 +6,7 @@ import { PageHero } from "../components/page-hero";
 export const metadata: Metadata = {
   title: "Polityka prywatności | AgentSpace",
   description:
-    "Polityka prywatności AgentSpace — administrator danych, podstawy prawne przetwarzania, prawa użytkowników, ciasteczka, RODO.",
+    "Polityka prywatności AgentSpace - administrator danych, podstawy prawne przetwarzania, prawa użytkowników, ciasteczka, RODO.",
   alternates: {
     canonical: "https://agentspace.pl/polityka-prywatnosci",
   },
@@ -71,21 +71,21 @@ export default function PolitykaPrywatnosci() {
             <p>Dane osobowe są przetwarzane w następujących celach:</p>
             <ul>
               <li>
-                <strong>Lista oczekujących</strong> — kontakt w sprawie wczesnego dostępu do
+                <strong>Lista oczekujących</strong> - kontakt w sprawie wczesnego dostępu do
                 AgentSpace, podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda osoby, której dane
                 dotyczą).
               </li>
               <li>
-                <strong>Marketing własny</strong> — informacje o starcie produktu, nowych
+                <strong>Marketing własny</strong> - informacje o starcie produktu, nowych
                 funkcjach, ofertach specjalnych dla biur nieruchomości, podstawa prawna: art. 6
                 ust. 1 lit. f) RODO (prawnie uzasadniony interes administratora).
               </li>
               <li>
-                <strong>Cele analityczne</strong> — pomiar ruchu, optymalizacja strony, podstawa
+                <strong>Cele analityczne</strong> - pomiar ruchu, optymalizacja strony, podstawa
                 prawna: art. 6 ust. 1 lit. f) RODO.
               </li>
               <li>
-                <strong>Wypełnienie obowiązków prawnych</strong> — np. rozliczenia podatkowe po
+                <strong>Wypełnienie obowiązków prawnych</strong> - np. rozliczenia podatkowe po
                 zawarciu umowy, podstawa prawna: art. 6 ust. 1 lit. c) RODO.
               </li>
             </ul>
@@ -110,7 +110,7 @@ export default function PolitykaPrywatnosci() {
             <ul>
               <li>prawo dostępu do swoich danych osobowych (art. 15 RODO),</li>
               <li>prawo do sprostowania danych (art. 16 RODO),</li>
-              <li>prawo do usunięcia danych — &quot;prawo do bycia zapomnianym&quot; (art. 17 RODO),</li>
+              <li>prawo do usunięcia danych - &quot;prawo do bycia zapomnianym&quot; (art. 17 RODO),</li>
               <li>prawo do ograniczenia przetwarzania (art. 18 RODO),</li>
               <li>prawo do przenoszenia danych (art. 20 RODO),</li>
               <li>prawo do sprzeciwu wobec przetwarzania (art. 21 RODO),</li>
@@ -154,16 +154,16 @@ export default function PolitykaPrywatnosci() {
             <p>Stosujemy następujące kategorie cookies:</p>
             <ul>
               <li>
-                <strong>Niezbędne</strong> — konieczne do działania strony (np. zapamiętanie
+                <strong>Niezbędne</strong> - konieczne do działania strony (np. zapamiętanie
                 wyboru języka, sesje), nie wymagają zgody.
               </li>
               <li>
-                <strong>Analityczne</strong> — pomiar ruchu (np. Google Analytics, Vercel
-                Analytics) — wymagają zgody.
+                <strong>Analityczne</strong> - pomiar ruchu (np. Google Analytics, Vercel
+                Analytics) - wymagają zgody.
               </li>
               <li>
-                <strong>Marketingowe</strong> — śledzenie konwersji reklam (np. Google Ads
-                Conversion Tag, Meta Pixel) — wymagają zgody.
+                <strong>Marketingowe</strong> - śledzenie konwersji reklam (np. Google Ads
+                Conversion Tag, Meta Pixel) - wymagają zgody.
               </li>
             </ul>
             <p>

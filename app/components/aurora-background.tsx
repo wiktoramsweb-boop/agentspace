@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 export function AuroraBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Główna aurora — emerald */}
+      {/* Główna aurora - emerald */}
       <motion.div
         className="absolute -top-1/2 left-1/2 h-[620px] w-[620px] -translate-x-1/2 rounded-full bg-emerald-500/[0.11] blur-3xl"
         animate={{
@@ -20,7 +20,7 @@ export function AuroraBackground() {
         }}
       />
 
-      {/* Drugi blob — cyan, po przeciwnej stronie */}
+      {/* Drugi blob - cyan, po przeciwnej stronie */}
       <motion.div
         className="absolute -top-1/4 right-0 h-[480px] w-[480px] rounded-full bg-cyan-500/[0.08] blur-3xl"
         animate={{
@@ -35,7 +35,7 @@ export function AuroraBackground() {
         }}
       />
 
-      {/* Trzeci blob — subtle violet */}
+      {/* Trzeci blob - subtle violet */}
       <motion.div
         className="absolute top-1/4 left-0 h-[420px] w-[420px] rounded-full bg-violet-500/[0.06] blur-3xl"
         animate={{
@@ -60,7 +60,7 @@ export function AuroraBackground() {
         }}
       />
 
-      {/* Dolna maska — fade do czerni */}
+      {/* Dolna maska - fade do czerni */}
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#08090b] via-[#08090b]/70 to-transparent" />
     </div>
   );

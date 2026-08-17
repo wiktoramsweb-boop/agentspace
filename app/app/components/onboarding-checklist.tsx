@@ -11,7 +11,7 @@ const STEPS = [
   {
     key: "hasGoal" as const,
     title: "Ustaw swój cel",
-    body: "Powiedz ile chcesz zarobić — rozbijemy to na codzienne działania.",
+    body: "Powiedz ile chcesz zarobić - rozbijemy to na codzienne działania.",
     href: "/app/cele",
     cta: "Ustaw cel",
   },

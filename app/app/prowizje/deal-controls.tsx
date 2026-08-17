@@ -100,14 +100,14 @@ export function NewDealButton({
           </Labeled>
 
           {properties.length > 0 && (
-            <Labeled label="Nieruchomość (opcjonalnie — podstawi cenę)">
+            <Labeled label="Nieruchomość (opcjonalnie - podstawi cenę)">
               <select
                 name="property_id"
                 value={propertyId}
                 onChange={(e) => onPickProperty(e.target.value)}
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
               >
-                <option value="">— brak —</option>
+                <option value="">- brak -</option>
                 {properties.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.title}
@@ -188,7 +188,7 @@ export function NewDealButton({
           <Labeled label="Opis dodatków (np. prowizja od doradcy kredytowego)">
             <input
               name="extras_note"
-              placeholder="Doradca kredytowy — Bartek"
+              placeholder="Doradca kredytowy - Bartek"
               className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
             />
           </Labeled>

@@ -1,4 +1,4 @@
-// Karta transakcji sprzedaży nieruchomości — etapy 1–5 + checklista dokumentów.
+// Karta transakcji sprzedaży nieruchomości - etapy 1-5 + checklista dokumentów.
 // Cała karta zapisywana jako JSON w deals.transaction_card (SETUP v15).
 
 export type DocStatus = "brak" | "w_toku" | "gotowe" | "nd";
@@ -9,16 +9,16 @@ export type TransactionCard = {
   propertyAddress: string;
   reservationDate: string;
 
-  // Etap 1 — weryfikacja prawna i podatkowa
+  // Etap 1 - weryfikacja prawna i podatkowa
   podstawaNabycia: "" | "kupno" | "spadek" | "darowizna";
   dataNabycia: string;
   pit5lat: "" | "tak" | "nie";
   hipoteka: "" | "nie" | "tak";
 
-  // Etap 2 — profil kupującego
+  // Etap 2 - profil kupującego
   profilKupujacego: "" | "gotowka" | "kredyt" | "kredyt_nasz";
 
-  // Etap 3A — wariant kredytowy
+  // Etap 3A - wariant kredytowy
   kredytTerminPrzyrzeczonej: string;
   kredytZadatek: string;
   kredytDokDoradca: boolean;
@@ -27,16 +27,16 @@ export type TransactionCard = {
   kredytUmowaPodpisana: boolean;
   kredytNotariuszTermin: boolean;
 
-  // Etap 3B — wariant gotówkowy
+  // Etap 3B - wariant gotówkowy
   gotowkaPrzedwstepna: "" | "podpisano" | "pominieto";
   gotowkaPrzedwstepnaData: string;
   gotowkaZaplata: "" | "natychmiast" | "depozyt" | "zwykly";
 
-  // Etap 4 — umowa końcowa
+  // Etap 4 - umowa końcowa
   pcc: "" | "kupujacy" | "zwolniony";
   dowodyWazne: boolean;
 
-  // Etap 5 — po akcie
+  // Etap 5 - po akcie
   przelewWykonany: boolean;
   kredytUruchomiony: boolean;
   liczniki: boolean;

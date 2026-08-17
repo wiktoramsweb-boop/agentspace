@@ -38,7 +38,7 @@ const child: Variants = {
 };
 
 /**
- * Reveal tekstu litera po literze — z blur + slide up.
+ * Reveal tekstu litera po literze - z blur + slide up.
  * Premium hero entrance.
  */
 export function TextReveal({ children, className, delay = 0 }: TextRevealProps) {
@@ -82,7 +82,7 @@ type WordRevealProps = {
 };
 
 /**
- * Reveal całego bloku (word-level zamiast char-level) — szybsze dla długich tekstów.
+ * Reveal całego bloku (word-level zamiast char-level) - szybsze dla długich tekstów.
  */
 export function WordReveal({ children, className, delay = 0 }: WordRevealProps) {
   return (
@@ -102,7 +102,7 @@ export function WordReveal({ children, className, delay = 0 }: WordRevealProps) 
 }
 
 /**
- * Inline (span) wersja WordReveal — działa wewnątrz h1, p, itd. bez łamania layoutu.
+ * Inline (span) wersja WordReveal - działa wewnątrz h1, p, itd. bez łamania layoutu.
  */
 export function InlineReveal({ children, className, delay = 0 }: WordRevealProps) {
   return (

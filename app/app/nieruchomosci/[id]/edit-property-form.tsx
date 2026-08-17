@@ -82,7 +82,7 @@ export function EditPropertyForm({
           <div>
             <label className="mb-1.5 block text-sm text-zinc-400">Właściciel</label>
             <select name="owner_client_id" defaultValue={property.owner_client_id ?? ""} className={selectCls}>
-              <option value="">— brak —</option>
+              <option value="">- brak -</option>
               {clients.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}

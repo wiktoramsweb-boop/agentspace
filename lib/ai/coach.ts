@@ -7,11 +7,11 @@ import { PERSONALITIES, type ChatMessage } from "../types";
  */
 const DIFFICULTY_BLOCK: Record<string, string> = {
   latwy:
-    "\n\nPOZIOM TRUDNOŚCI: ŁATWY. To najważniejsza instrukcja — jesteś życzliwym, otwartym klientem. Obiekcje zgłaszasz miękko i szybko dajesz się przekonać każdemu sensownemu argumentowi. Nagradzaj nawet niedoskonałe próby agenta, bądź wyrozumiały. Celem jest zbudowanie pewności początkującego agenta, więc doprowadź rozmowę do pozytywnego zakończenia, jeśli agent w ogóle się stara.",
+    "\n\nPOZIOM TRUDNOŚCI: ŁATWY. To najważniejsza instrukcja - jesteś życzliwym, otwartym klientem. Obiekcje zgłaszasz miękko i szybko dajesz się przekonać każdemu sensownemu argumentowi. Nagradzaj nawet niedoskonałe próby agenta, bądź wyrozumiały. Celem jest zbudowanie pewności początkującego agenta, więc doprowadź rozmowę do pozytywnego zakończenia, jeśli agent w ogóle się stara.",
   sredni:
-    "\n\nPOZIOM TRUDNOŚCI: ŚREDNI. Standardowy, realistyczny opór — trzymasz swoją obiekcję, ale ustępujesz przy dobrych, konkretnych argumentach. Nie oddawaj za łatwo, ale też nie bądź nadmiernie trudny.",
+    "\n\nPOZIOM TRUDNOŚCI: ŚREDNI. Standardowy, realistyczny opór - trzymasz swoją obiekcję, ale ustępujesz przy dobrych, konkretnych argumentach. Nie oddawaj za łatwo, ale też nie bądź nadmiernie trudny.",
   trudny:
-    "\n\nPOZIOM TRUDNOŚCI: TRUDNY. Jesteś wymagającym klientem — trzymasz obiekcję twardo i ustępujesz tylko przy naprawdę mocnych, konkretnych i dobrze poprowadzonych argumentach. Testuj agenta.",
+    "\n\nPOZIOM TRUDNOŚCI: TRUDNY. Jesteś wymagającym klientem - trzymasz obiekcję twardo i ustępujesz tylko przy naprawdę mocnych, konkretnych i dobrze poprowadzonych argumentach. Testuj agenta.",
 };
 
 export function buildClientSystemPrompt(
@@ -21,10 +21,13 @@ export function buildClientSystemPrompt(
 ): string {
   const p = PERSONALITIES.find((x) => x.value === personality);
   const desc = p
-    ? `${p.label} — ${p.description}. Graj konsekwentnie tę postawę przez całą rozmowę.`
+    ? `${p.label} - ${p.description}. Graj konsekwentnie tę postawę przez całą rozmowę.`
     : "Neutralny, przeciętny klient.";
   const diff = DIFFICULTY_BLOCK[difficulty] ?? DIFFICULTY_BLOCK.sredni;
-  return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc) + diff;
+  // Klient AI ma mówić jak człowiek, a myślnik w wypowiedzi zdradza tekst z AI.
+  const style =
+    "\n\nINTERPUNKCJA: nie używaj myślnika ani półpauzy (znaki — i –). Zamiast nich przecinek, dwukropek lub kropka.";
+  return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc) + diff + style;
 }
 
 /**
@@ -52,7 +55,7 @@ export async function streamClientReply(
   const system = buildClientSystemPrompt(scenarioSystemPrompt, personality, difficulty);
   const messages = toAnthropicMessages(transcript);
 
-  // Jeśli transkrypt pusty lub ostatni był od klienta — zaczynamy rozmowę
+  // Jeśli transkrypt pusty lub ostatni był od klienta - zaczynamy rozmowę
   // (AI wypowiada pierwsze zdanie). Wtedy dokładamy "user" trigger.
   const needsOpener =
     messages.length === 0 || messages[messages.length - 1].role === "assistant";
@@ -70,7 +73,7 @@ export async function streamClientReply(
       {
         type: "text",
         text: system,
-        // Prompt caching — system prompt jest długi i powtarza się co turę.
+        // Prompt caching - system prompt jest długi i powtarza się co turę.
         cache_control: { type: "ephemeral" },
       },
     ],
@@ -122,16 +125,18 @@ Oceniasz w 4 kategoriach, każda w skali 1-10:
 - objection_handling (obsługa obiekcji): jak agent reagował na opór, wątpliwości, "nie"
 - closing (zamknięcie): czy agent zaproponował konkretny następny krok, umówił spotkanie/działanie
 
-overall: ogólna ocena 1-10 (nie musi być średnią — uwzględnij całościowe wrażenie).
+overall: ogólna ocena 1-10 (nie musi być średnią - uwzględnij całościowe wrażenie).
 
-summary: 2-3 zdania podsumowania po polsku — co poszło dobrze, co najważniejsze do poprawy.
+summary: 2-3 zdania podsumowania po polsku - co poszło dobrze, co najważniejsze do poprawy.
 
 suggestions: 2-4 KONKRETNE wskazówki po polsku. Każda odnosi się do tego co agent FAKTYCZNIE powiedział (lub czego nie powiedział). Cytuj/parafrazuj realne momenty. Dawaj gotowe sformułowania których agent może użyć następnym razem. NIE ogólniki.
 
-Bądź sprawiedliwy ale wymagający. Jeśli rozmowa była krótka lub agent zrobił mało — niższe oceny. Odpowiadasz TYLKO w formacie JSON, bez dodatkowego tekstu.`;
+Bądź sprawiedliwy ale wymagający. Jeśli rozmowa była krótka lub agent zrobił mało - niższe oceny. Odpowiadasz TYLKO w formacie JSON, bez dodatkowego tekstu.
+
+INTERPUNKCJA (ważne): w summary i suggestions nie używaj myślnika ani półpauzy (znaki — i –). Zamiast nich stosuj przecinek, dwukropek albo kropkę.`;
 
 /**
- * Ocenia zakończoną sesję. Używa tool use — gwarantuje poprawny format
+ * Ocenia zakończoną sesję. Używa tool use - gwarantuje poprawny format
  * (zero parsowania JSON z tekstu, brak ryzyka błędu składni).
  */
 export async function scoreSession(

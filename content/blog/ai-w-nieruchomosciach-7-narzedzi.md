@@ -1,6 +1,6 @@
 ---
 title: "AI w nieruchomościach: 7 narzędzi, które warto znać w 2026"
-description: "Praktyczny przegląd narzędzi AI dla biur RE — od wyceny po marketing. Co działa w Polsce, co warto testować, czego unikać. Z konkretnymi cenami."
+description: "Praktyczny przegląd narzędzi AI dla biur RE - od wyceny po marketing. Co działa w Polsce, co warto testować, czego unikać. Z konkretnymi cenami."
 date: "2026-04-15"
 author: "Wiktor Szostek"
 category: "Trendy i narzędzia"
@@ -12,13 +12,13 @@ keywords:
   - "automatyzacja sprzedaży RE"
 ---
 
-W 2026 nie ma już sensu pytać "czy używać AI". Pytanie brzmi: **które narzędzia rzeczywiście oszczędzają czas, a które są marketingowym puchem**. Przejrzałem kilkanaście rozwiązań — w polskim i międzynarodowym rynku — i wybrałem siedem, które realnie zmieniają codzienną pracę biura nieruchomości.
+W 2026 nie ma już sensu pytać "czy używać AI". Pytanie brzmi: **które narzędzia rzeczywiście oszczędzają czas, a które są marketingowym puchem**. Przejrzałem kilkanaście rozwiązań - w polskim i międzynarodowym rynku - i wybrałem siedem, które realnie zmieniają codzienną pracę biura nieruchomości.
 
-Nie ma rankingu "najlepsze". Każde z nich rozwiązuje inny problem. Pokazuję, **co robi, ile kosztuje, dla kogo to jest** — i co się dzieje, gdy spróbujesz tego dziś.
+Nie ma rankingu "najlepsze". Każde z nich rozwiązuje inny problem. Pokazuję, **co robi, ile kosztuje, dla kogo to jest** - i co się dzieje, gdy spróbujesz tego dziś.
 
 ## 1. AI Coach do treningu agentów (AgentSpace)
 
-**Co robi:** symuluje rozmowę z klientem przez głos — agent ćwiczy cold calling, obiekcje, negocjację prowizji w prywatnej sesji. Po sesji dostaje scoring w 4 kategoriach i konkretny feedback po polsku.
+**Co robi:** symuluje rozmowę z klientem przez głos - agent ćwiczy cold calling, obiekcje, negocjację prowizji w prywatnej sesji. Po sesji dostaje scoring w 4 kategoriach i konkretny feedback po polsku.
 
 **Cena:** 299 zł/mc/biuro do 10 agentów (premiera Q1 2026).
 
@@ -28,7 +28,7 @@ Nie ma rankingu "najlepsze". Każde z nich rozwiązuje inny problem. Pokazuję, 
 
 ## 2. AI do automatycznych opisów ofert (różne)
 
-**Co robi:** wrzucasz zdjęcia mieszkania + podstawowe dane (metraż, dzielnica, pokoje) — AI generuje opis sprzedażowy w stylu Otodom / Domiporta.
+**Co robi:** wrzucasz zdjęcia mieszkania + podstawowe dane (metraż, dzielnica, pokoje) - AI generuje opis sprzedażowy w stylu Otodom / Domiporta.
 
 **Narzędzia:** ChatGPT (bezpłatne), Copy.ai, Jasper, polskie wtyczki do CRM-ów.
 
@@ -48,7 +48,7 @@ Nie ma rankingu "najlepsze". Każde z nich rozwiązuje inny problem. Pokazuję, 
 
 **Dla kogo:** biura z wysokim wolumenem zapytań, które tracą leady poza godzinami pracy.
 
-**Czego unikać:** zbyt sztucznych głosów — klient od razu wyczuje, że to bot, i się rozłączy. Inwestuj w jakość TTS (text-to-speech).
+**Czego unikać:** zbyt sztucznych głosów - klient od razu wyczuje, że to bot, i się rozłączy. Inwestuj w jakość TTS (text-to-speech).
 
 ## 4. AI do wyceny mieszkań (Evaluer, Propertly)
 
@@ -94,7 +94,7 @@ Nie ma rankingu "najlepsze". Każde z nich rozwiązuje inny problem. Pokazuję, 
 
 **Dla kogo:** średnie i duże biura, które chcą decydować na bazie danych, nie intuicji.
 
-**Czego unikać:** zbyt skomplikowanych dashboardów. Jeśli nie zaglądasz tam codziennie — to dla Ciebie strata pieniędzy.
+**Czego unikać:** zbyt skomplikowanych dashboardów. Jeśli nie zaglądasz tam codziennie - to dla Ciebie strata pieniędzy.
 
 ---
 
@@ -108,4 +108,4 @@ Po roku testów u nas (i u zaprzyjaźnionych biur w Krakowie) wyciągnąłem trz
 
 ---
 
-Jeśli interesuje Cię konkretnie **AI Coach do treningu agentów** — premiera AgentSpace w Q1 2026. [Dołącz do listy oczekujących](/#waitlist) — pierwsze 10 biur dostaje 3 miesiące za darmo i 30% rabatu na pierwszy rok.
+Jeśli interesuje Cię konkretnie **AI Coach do treningu agentów** - premiera AgentSpace w Q1 2026. [Dołącz do listy oczekujących](/#waitlist) - pierwsze 10 biur dostaje 3 miesiące za darmo i 30% rabatu na pierwszy rok.

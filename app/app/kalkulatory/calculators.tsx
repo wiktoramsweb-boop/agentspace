@@ -87,15 +87,15 @@ export function Calculators({ agent }: { agent: Agent }) {
         extra > 0 && m.savedInterest > 0
           ? `Nadpłacając ${zl0(extra)}/mc oszczędzasz ${zl0(m.savedInterest)} odsetek`
           : undefined,
-      note: "Wartości szacunkowe — nie stanowią oferty. Rzeczywiste warunki zależą od banku i zdolności kredytowej.",
+      note: "Wartości szacunkowe - nie stanowią oferty. Rzeczywiste warunki zależą od banku i zdolności kredytowej.",
     };
   } else if (tab === "koszty") {
     const pccLabel =
       rynek === "wtorny"
         ? "PCC (2%)"
         : rynek === "wtorny_bez_pcc"
-          ? "PCC — zwolnienie (1. mieszkanie)"
-          : "PCC — rynek pierwotny";
+          ? "PCC - zwolnienie (1. mieszkanie)"
+          : "PCC - rynek pierwotny";
     sheet = {
       title: "Koszty zakupu",
       subtitle: `${zl0(price)} · rynek ${rynek === "pierwotny" ? "pierwotny" : "wtórny"}`,
@@ -135,18 +135,18 @@ export function Calculators({ agent }: { agent: Agent }) {
         { label: "Roczny dochód netto", value: zl0(y.annualNet), muted: true },
         {
           label: "Zwrot inwestycji",
-          value: y.paybackYears > 0 ? `~${y.paybackYears.toFixed(1).replace(".", ",")} lat` : "—",
+          value: y.paybackYears > 0 ? `~${y.paybackYears.toFixed(1).replace(".", ",")} lat` : "-",
           muted: true,
         },
       ],
       emphasis: { label: "ROI brutto (rocznie)", value: pct(y.gross) },
-      note: "Wartości szacunkowe — bez podatku od najmu i pustostanów.",
+      note: "Wartości szacunkowe - bez podatku od najmu i pustostanów.",
     };
   }
 
   function print() {
     const prev = document.title;
-    document.title = `${sheet.title} — Spectra`;
+    document.title = `${sheet.title} - Spectra`;
     window.print();
     setTimeout(() => (document.title = prev), 1000);
   }
@@ -163,7 +163,7 @@ export function Calculators({ agent }: { agent: Agent }) {
     />
   );
 
-  // Widok pełnoekranowego podglądu (jak faktura) — czysty druk na całą stronę A4.
+  // Widok pełnoekranowego podglądu (jak faktura) - czysty druk na całą stronę A4.
   if (preview) {
     return (
       <div>
@@ -201,7 +201,7 @@ export function Calculators({ agent }: { agent: Agent }) {
               <Num label="Kwota kredytu (zł)" value={amount} onChange={setAmount} />
               <Num label="Oprocentowanie (%)" value={rate} onChange={setRate} />
               <Num label="Okres (lata)" value={years} onChange={setYears} />
-              <Num label="Nadpłata miesięczna (zł) — opcjonalnie" value={extra} onChange={setExtra} />
+              <Num label="Nadpłata miesięczna (zł) - opcjonalnie" value={extra} onChange={setExtra} />
             </div>
           )}
 
@@ -212,7 +212,7 @@ export function Calculators({ agent }: { agent: Agent }) {
                 <label className={lbl}>Rynek / PCC</label>
                 <div className="flex flex-wrap gap-1.5">
                   <Pill active={rynek === "wtorny"} onClick={() => setRynek("wtorny")}>Wtórny (2%)</Pill>
-                  <Pill active={rynek === "wtorny_bez_pcc"} onClick={() => setRynek("wtorny_bez_pcc")}>Wtórny — bez PCC</Pill>
+                  <Pill active={rynek === "wtorny_bez_pcc"} onClick={() => setRynek("wtorny_bez_pcc")}>Wtórny - bez PCC</Pill>
                   <Pill active={rynek === "pierwotny"} onClick={() => setRynek("pierwotny")}>Pierwotny</Pill>
                 </div>
               </div>
@@ -233,7 +233,7 @@ export function Calculators({ agent }: { agent: Agent }) {
                     type="number"
                     value={taksaInput}
                     onChange={(e) => setTaksaInput(e.target.value)}
-                    placeholder={`maks. ${zl0(c.taksaMaksBrutto)} — zostaw puste jeśli bez rabatu`}
+                    placeholder={`maks. ${zl0(c.taksaMaksBrutto)} - zostaw puste jeśli bez rabatu`}
                     className={inp}
                   />
                 </div>

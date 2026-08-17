@@ -1,5 +1,5 @@
 -- ============================================================
--- AgentSpace — SETUP v9: telefony w profilach
+-- AgentSpace - SETUP v9: telefony w profilach
 -- ============================================================
 -- Uruchom w Supabase SQL Editor. Idempotentne.
 -- ============================================================

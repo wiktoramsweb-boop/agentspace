@@ -11,7 +11,7 @@ const NAV_LINKS = [
 /**
  * Górna nawigacja marketingu.
  *
- * UWAGA: żaden rodzic tego elementu nie może mieć `transform` —
+ * UWAGA: żaden rodzic tego elementu nie może mieć `transform` -
  * transform tworzy nowy kontekst kompozycji i zabija backdrop-filter
  * (pasek przestaje być matowy, robi się płaski).
  */

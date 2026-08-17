@@ -1,5 +1,5 @@
 /**
- * Pakiety cenowe — jedno źródło prawdy.
+ * Pakiety cenowe - jedno źródło prawdy.
  *
  * Trzymane poza komponentem, bo używa ich zarówno cennik (client component),
  * jak i strony ofertowe renderowane po stronie serwera.
@@ -28,7 +28,7 @@ export const PLANS: Plan[] = [
     tagline: "Dla biur, które porządkują podstawy",
     features: [
       "Do 5 agentów",
-      "CRM klientów — karty, notatki, pipeline",
+      "CRM klientów - karty, notatki, pipeline",
       "Wspólna baza nieruchomości",
       "Zadania i pulpit dnia",
       "Cele i lejek sprzedażowy",
@@ -44,8 +44,8 @@ export const PLANS: Plan[] = [
     features: [
       "Do 15 agentów",
       "Wszystko ze Start",
-      "AI Coach — 13+ scenariuszy, 9 osobowości klienta",
-      "Panel właściciela — ranking, mocne i słabe obszary",
+      "AI Coach - 13+ scenariuszy, 9 osobowości klienta",
+      "Panel właściciela - ranking, mocne i słabe obszary",
       "AI Asystent Dnia i pisanie follow-upów",
       "Raporty miesięczne na e-mail",
       "Karta transakcji i umowy rezerwacyjne (PDF)",

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useToast } from "../../components/toast";
 
-// Wejście kategorii, gdy dane o okolicy doskoczą (fetch async) — delikatny stagger.
+// Wejście kategorii, gdy dane o okolicy doskoczą (fetch async) - delikatny stagger.
 const listVariants = { show: { transition: { staggerChildren: 0.05 } } };
 const itemVariants = {
   hidden: { opacity: 0, y: 6 },
@@ -53,7 +53,7 @@ export function NearbyCard({ lat, lng }: { lat: number; lng: number }) {
     );
     navigator.clipboard
       .writeText(lines.join("\n"))
-      .then(() => toast("Skopiowano — wklej do opisu oferty"))
+      .then(() => toast("Skopiowano - wklej do opisu oferty"))
       .catch(() => toast("Nie udało się skopiować", "error"));
   }
 

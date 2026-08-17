@@ -20,9 +20,9 @@ export async function generateMetadata({
   if (!offer) return { robots: { index: false, follow: false } };
 
   return {
-    title: `Oferta dla ${offer.officeName} — AgentSpace`,
+    title: `Oferta dla ${offer.officeName} | AgentSpace`,
     description: `Propozycja wdrożenia AgentSpace dla ${offer.officeName} (${offer.city}).`,
-    // Strony ofertowe są prywatne — nie chcemy ich w wynikach wyszukiwania.
+    // Strony ofertowe są prywatne - nie chcemy ich w wynikach wyszukiwania.
     robots: { index: false, follow: false },
   };
 }
@@ -36,12 +36,12 @@ const STEPS = [
   {
     n: "02",
     title: "Pierwsze dwa tygodnie",
-    body: "Zespół pracuje w systemie, ja jestem dostępny na bieżąco. Poprawiamy konfigurację pod to, jak realnie pracujecie — nie pod to, jak zakładaliśmy.",
+    body: "Zespół pracuje w systemie, ja jestem dostępny na bieżąco. Poprawiamy konfigurację pod to, jak realnie pracujecie - nie pod to, jak zakładaliśmy.",
   },
   {
     n: "03",
     title: "Po 30 dniach",
-    body: "Siadamy do danych: kto realizuje cele, gdzie giną leady, jak wyglądają rozmowy. Decydujecie, czy zostajemy — bez umowy na czas określony.",
+    body: "Siadamy do danych: kto realizuje cele, gdzie giną leady, jak wyglądają rozmowy. Decydujecie, czy zostajemy - bez umowy na czas określony.",
   },
 ];
 
@@ -60,7 +60,7 @@ export default async function OfertaPage({
 
   return (
     <div className="mk relative min-h-screen">
-      {/* Bez nawigacji — to strona jednego celu, nie miejsce do przeglądania. */}
+      {/* Bez nawigacji - to strona jednego celu, nie miejsce do przeglądania. */}
       <section className="relative overflow-hidden px-6 pt-24 pb-16 md:pt-32">
         <div
           aria-hidden="true"
@@ -115,7 +115,7 @@ export default async function OfertaPage({
             ))}
           </ul>
           <p className="mt-8 max-w-[58ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-            Każdy z tych punktów AgentSpace zamyka w ramach jednego systemu —
+            Każdy z tych punktów AgentSpace zamyka w ramach jednego systemu -
             bez dokładania kolejnego narzędzia obok.
           </p>
         </div>
@@ -145,7 +145,7 @@ export default async function OfertaPage({
                 <span className="text-[var(--color-mk-text)]">
                   {yearly} zł
                 </span>{" "}
-                — dwa miesiące gratis.
+                - dwa miesiące gratis.
               </p>
 
               <div className="h-px bg-[var(--color-mk-line)]" />
@@ -166,7 +166,7 @@ export default async function OfertaPage({
 
               <ul className="flex flex-col gap-3">
                 {[
-                  "Wdrożenie i import bazy — bez opłaty",
+                  "Wdrożenie i import bazy - bez opłaty",
                   "Wyłączność na Wasze miasto w ramach Programu Pierwszych 10 Biur",
                   "Cena zamrożona na 24 miesiące",
                   "Bez umowy na czas określony",
@@ -214,7 +214,7 @@ export default async function OfertaPage({
         <div className="flex flex-col items-center text-center">
           <h2 className="max-w-[22ch]">Zaczynamy?</h2>
           <p className="mt-5 max-w-[48ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-            Odpisz na maila albo zadzwoń — ustalimy termin wdrożenia. Jeśli coś
+            Odpisz na maila albo zadzwoń - ustalimy termin wdrożenia. Jeśli coś
             wymaga doprecyzowania, też daj znać.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">

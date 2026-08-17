@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 
 /**
  * Server-side klient z service_role key.
- * Tylko w API routes — NIGDY w client components.
+ * Tylko w API routes - NIGDY w client components.
  * Service role omija RLS, więc możemy zapisywać dane od użytkowników
  * bez konieczności rzutu autoryzacji.
  */

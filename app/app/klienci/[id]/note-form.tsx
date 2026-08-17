@@ -21,7 +21,7 @@ export function NoteForm({ clientId }: { clientId: string }) {
         name="content"
         required
         rows={3}
-        placeholder="Dodaj notatkę z kontaktu — o czym rozmawialiście, co dalej..."
+        placeholder="Dodaj notatkę z kontaktu - o czym rozmawialiście, co dalej..."
         className="w-full resize-y rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
       />
       <SubmitButton />

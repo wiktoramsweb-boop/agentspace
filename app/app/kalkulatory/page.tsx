@@ -9,7 +9,7 @@ export default async function KalkulatoryPage() {
       <div className="print-hide">
         <PageHeader
           title="Kalkulatory"
-          subtitle="Policz przy kliencie ratę, koszty zakupu i rentowność najmu — i wyślij mu ładny PDF."
+          subtitle="Policz przy kliencie ratę, koszty zakupu i rentowność najmu - i wyślij mu ładny PDF."
         />
       </div>
       <Calculators

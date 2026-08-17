@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgentSpace — system operacyjny dla biura nieruchomości",
+  title: "AgentSpace | System operacyjny dla biura nieruchomości",
   description:
     "Jedno miejsce pracy całego biura: CRM klientów, wspólna baza nieruchomości, cele i lejek sprzedaży, rozliczanie prowizji, AI Coach do treningu rozmów i panel właściciela. Polski produkt, działa od pierwszego dnia.",
   keywords: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     canonical: "https://agentspace.pl",
   },
   openGraph: {
-    title: "AgentSpace — system operacyjny dla biura nieruchomości",
+    title: "AgentSpace | System operacyjny dla biura nieruchomości",
     description:
       "CRM, wspólna baza nieruchomości, cele, prowizje, AI Coach i panel właściciela w jednym miejscu. Dla biur nieruchomości w Polsce.",
     url: "https://agentspace.pl",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AgentSpace — system operacyjny dla biura nieruchomości",
+    title: "AgentSpace | System operacyjny dla biura nieruchomości",
     description:
       "CRM, wspólna baza nieruchomości, cele, prowizje, AI Coach i panel właściciela w jednym miejscu. Dla biur nieruchomości w Polsce.",
   },

@@ -23,6 +23,7 @@ Zasady:
 - Ton: rzeczowy, motywujący, po polsku, jak dobry menedżer sprzedaży.
 - Każda sugestia: krótki tytuł (co zrobić) + jedno zdanie dlaczego.
 - Kategorie: klient (kontakt/follow-up), trening (AI Coach), prowizja (pipeline), zadanie.
+- INTERPUNKCJA: nie używaj myślnika ani półpauzy (— –); stosuj przecinek, dwukropek lub kropkę.
 - Zawsze wywołaj narzędzie zaproponuj_priorytety z dokładnie 3 sugestiami.`;
 
 export async function getDailySuggestions(
@@ -63,8 +64,8 @@ Najsłabszy obszar treningowy: ${ctx.weakestTrainingArea ?? "brak danych"}
               items: {
                 type: "object",
                 properties: {
-                  title: { type: "string", description: "Co zrobić — krótko" },
-                  reason: { type: "string", description: "Dlaczego — jedno zdanie" },
+                  title: { type: "string", description: "Co zrobić (krótko)" },
+                  reason: { type: "string", description: "Dlaczego - jedno zdanie" },
                   category: {
                     type: "string",
                     enum: ["klient", "trening", "prowizja", "zadanie"],

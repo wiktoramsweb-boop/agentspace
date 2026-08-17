@@ -23,7 +23,7 @@ export function Section({
   );
 }
 
-/** Nagłówek sekcji — z etykietą i opcjonalnym podtytułem. */
+/** Nagłówek sekcji - z etykietą i opcjonalnym podtytułem. */
 export function SectionHead({
   eyebrow,
   title,
@@ -55,7 +55,7 @@ export function SectionHead({
 
 /**
  * Karta treści. Gradient + obramowanie ożywające pod kursorem (`.mk-card`).
- * `accent` podświetla ją na stałe — dla polecanego pakietu albo głównego CTA.
+ * `accent` podświetla ją na stałe - dla polecanego pakietu albo głównego CTA.
  */
 export function Card({
   children,
@@ -83,7 +83,7 @@ type ButtonProps = {
 /**
  * Przycisk.
  * `primary` ma gradient marki + poświatę, która rośnie przy najechaniu,
- * oraz przesuwający się połysk (`.mk-sheen`) — to jedyne miejsce, gdzie
+ * oraz przesuwający się połysk (`.mk-sheen`) - to jedyne miejsce, gdzie
  * pozwalamy sobie na tak wyraźny efekt, bo to najważniejszy element strony.
  */
 export function Button({

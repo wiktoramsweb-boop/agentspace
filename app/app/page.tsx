@@ -89,7 +89,7 @@ export default async function DashboardPage() {
           icon={<IconWallet />}
         />
         <StatCard label="Pipeline" value={formatPln(commission.pipelineValue)} sub={`${commission.dealsInProgress} w toku`} icon={<IconTrend />} />
-        <StatCard label="Średni wynik AI" value={stats.avgScore != null ? `${stats.avgScore}/10` : "—"} icon={<IconSpark />} />
+        <StatCard label="Średni wynik AI" value={stats.avgScore != null ? `${stats.avgScore}/10` : "-"} icon={<IconSpark />} />
         <StatCard label="Sesje w tym tyg." value={stats.sessionsThisWeek} icon={<IconBolt />} />
       </div>
 
@@ -280,7 +280,7 @@ export default async function DashboardPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard label="Agenci" value={ownerStats.agentCount} />
-            <StatCard label="Średni wynik zespołu" value={ownerStats.avgTeamScore != null ? `${ownerStats.avgTeamScore}/10` : "—"} />
+            <StatCard label="Średni wynik zespołu" value={ownerStats.avgTeamScore != null ? `${ownerStats.avgTeamScore}/10` : "-"} />
             <StatCard label="Sesje zespołu w tyg." value={ownerStats.sessionsThisWeek} />
           </div>
         </div>

@@ -72,7 +72,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Strony modułów — długi ogon fraz produktowych.
+  // Strony modułów - długi ogon fraz produktowych.
   const modulePages: MetadataRoute.Sitemap = MODULES.map((mod) => ({
     url: `${BASE_URL}/produkt/${mod.slug}`,
     lastModified: now,
@@ -80,7 +80,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  // Strony integracji — łapią wyszukiwania „[system] + integracja".
+  // Strony integracji - łapią wyszukiwania „[system] + integracja".
   const integrationPages: MetadataRoute.Sitemap = INTEGRATIONS.map((item) => ({
     url: `${BASE_URL}/integracje/${item.slug}`,
     lastModified: now,

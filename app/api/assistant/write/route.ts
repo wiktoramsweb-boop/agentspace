@@ -3,9 +3,13 @@ import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 
 export const maxDuration = 45;
 
+// Doklejane do każdego promptu: myślnik/półpauza od razu zdradzają tekst z AI.
+const NO_DASH_RULE =
+  " INTERPUNKCJA (ważne): nie używaj myślnika ani półpauzy (znaki — i –). Zamiast nich stosuj przecinek, dwukropek, kropkę albo nawias.";
+
 const SYSTEMS: Record<string, string> = {
   followup:
-    "Jesteś asystentem agenta nieruchomości w Polsce. Piszesz krótkie, naturalne wiadomości follow-up do klienta (SMS/WhatsApp). Ton: uprzejmy, konkretny, ludzki — nie sztuczny, nie nachalny. Po polsku. Zwróć samą treść wiadomości, bez komentarzy. Max 3-4 zdania.",
+    "Jesteś asystentem agenta nieruchomości w Polsce. Piszesz krótkie, naturalne wiadomości follow-up do klienta (SMS/WhatsApp). Ton: uprzejmy, konkretny, ludzki - nie sztuczny, nie nachalny. Po polsku. Zwróć samą treść wiadomości, bez komentarzy. Max 3-4 zdania.",
   objection:
     "Jesteś trenerem sprzedaży nieruchomości w Polsce. Agent podaje obiekcję klienta. Podajesz 2-3 konkretne, gotowe do użycia odpowiedzi po polsku (każda w 1-2 zdaniach), które agent może powiedzieć. Praktyczne, oparte na wartości, nie ogólnikowe. Zwróć same odpowiedzi jako listę.",
   summary:
@@ -27,7 +31,7 @@ export async function POST(request: Request) {
 
   const kind = body.kind ?? "custom";
   const context = (body.context ?? "").trim();
-  const system = SYSTEMS[kind] ?? SYSTEMS.custom;
+  const system = (SYSTEMS[kind] ?? SYSTEMS.custom) + NO_DASH_RULE;
 
   if (!context && kind !== "followup") {
     return new Response(JSON.stringify({ error: "Podaj kontekst" }), { status: 400 });

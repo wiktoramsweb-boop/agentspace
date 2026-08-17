@@ -36,7 +36,7 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
 
-  // Ochrona /app — bez zalogowania → /login
+  // Ochrona /app - bez zalogowania → /login
   if (path.startsWith("/app") && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

@@ -10,7 +10,7 @@ type MagneticProps = {
 };
 
 /**
- * MagneticButton — przycisk lekko przyciąga się do kursora.
+ * MagneticButton - przycisk lekko przyciąga się do kursora.
  * Subtelnie premium (~0.3 strength = idealny dla CTA).
  */
 export function Magnetic({ children, className, strength = 0.3 }: MagneticProps) {

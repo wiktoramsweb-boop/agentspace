@@ -1,7 +1,7 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
-// Generator „Oferty współpracy" — nadrukowuje pola na gotowy 6-stronicowy wzór z Canvy
+// Generator „Oferty współpracy" - nadrukowuje pola na gotowy 6-stronicowy wzór z Canvy
 // (public/oferta/wzor.pdf). Współrzędne zweryfikowane offline (PyMuPDF), układ pdf-lib:
 // origin dół-lewo, wysokość strony 2384.25 pt. Szczegóły: lib/OFERTA-WSPOLPRACY-HANDOFF.md.
 
@@ -64,7 +64,7 @@ export async function generateOfertaPdf(values: OfertaValues): Promise<Uint8Arra
 
   const pdf = await PDFDocument.load(baseBytes);
   pdf.registerFontkit(fontkit);
-  // KRYTYCZNE: subset:false — subset gubi glify polskich znaków (adres wychodził „ul ądn a").
+  // KRYTYCZNE: subset:false - subset gubi glify polskich znaków (adres wychodził „ul ądn a").
   const emb = (b: Uint8Array) => pdf.embedFont(b, { subset: false });
   const fonts: Record<FontKey, Awaited<ReturnType<typeof emb>>> = {
     cgReg: await emb(cgRegB),

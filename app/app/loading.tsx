@@ -1,4 +1,4 @@
-// Szkielet ładowania panelu — pokazuje się podczas renderowania strony po stronie
+// Szkielet ładowania panelu - pokazuje się podczas renderowania strony po stronie
 // serwera, dając wrażenie natychmiastowej reakcji przy nawigacji.
 export default function AppLoading() {
   return (

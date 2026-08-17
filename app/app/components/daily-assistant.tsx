@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import type { DailySuggestion } from "@/lib/ai/assistant";
 
-// Wejście priorytetów, gdy AI je zwróci — delikatny stagger (raz dziennie, warto).
+// Wejście priorytetów, gdy AI je zwróci - delikatny stagger (raz dziennie, warto).
 const listVariants = { show: { transition: { staggerChildren: 0.06 } } };
 const itemVariants = {
   hidden: { opacity: 0, y: 8 },
@@ -101,7 +101,7 @@ export function DailyAssistant() {
 
       {state === "done" && suggestions.length === 0 && (
         <p className="py-2 text-sm text-zinc-500">
-          Brak pilnych priorytetów — dodaj klientów i transakcje, żeby asystent miał z czego korzystać.
+          Brak pilnych priorytetów - dodaj klientów i transakcje, żeby asystent miał z czego korzystać.
         </p>
       )}
     </div>

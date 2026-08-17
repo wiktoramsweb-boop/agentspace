@@ -9,7 +9,7 @@ type BorderBeamProps = {
 };
 
 /**
- * BorderBeam — animowana świetlna linia okrążająca obwód karty.
+ * BorderBeam - animowana świetlna linia okrążająca obwód karty.
  * Magic UI / Aceternity inspired.
  *
  * Wymaga rodzica z `position: relative` i `overflow: hidden`.

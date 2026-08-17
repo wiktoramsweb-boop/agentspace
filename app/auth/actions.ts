@@ -27,7 +27,7 @@ export async function signUpOwner(
 
   const admin = createSupabaseAdmin();
 
-  // 1. Utwórz usera (bez maila potwierdzającego — od razu aktywny)
+  // 1. Utwórz usera (bez maila potwierdzającego - od razu aktywny)
   const { data: created, error: createErr } = await admin.auth.admin.createUser({
     email,
     password,

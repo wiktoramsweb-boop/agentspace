@@ -1,5 +1,5 @@
 -- ============================================================
--- AgentSpace — schema APLIKACJI (produkt, nie landing)
+-- AgentSpace - schema APLIKACJI (produkt, nie landing)
 -- ============================================================
 -- Wklej w Supabase SQL Editor → New query → Run.
 -- Bezpieczne do wielokrotnego uruchomienia (idempotentne).
@@ -98,7 +98,7 @@ create index if not exists scenarios_order_idx on public.scenarios(order_index);
 -- Cały dostęp do danych aplikacji idzie przez server-side kod
 -- z kluczem service_role (który omija RLS). Klucz service_role
 -- NIGDY nie trafia do przeglądarki. Włączamy RLS bez polityk dla
--- anon/authenticated — to backstop: nawet gdyby anon key wyciekł,
+-- anon/authenticated - to backstop: nawet gdyby anon key wyciekł,
 -- nie ma dostępu do danych.
 -- Wyjątek: scenariusze mogą być czytane publicznie (nic wrażliwego).
 -- ============================================================
@@ -110,7 +110,7 @@ alter table public.training_sessions enable row level security;
 alter table public.session_scores enable row level security;
 alter table public.scenarios enable row level security;
 
--- Scenariusze — publiczny odczyt aktywnych
+-- Scenariusze - publiczny odczyt aktywnych
 drop policy if exists "scenarios_public_read" on public.scenarios;
 create policy "scenarios_public_read" on public.scenarios
   for select using (is_active = true);

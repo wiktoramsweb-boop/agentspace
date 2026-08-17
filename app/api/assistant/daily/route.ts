@@ -31,7 +31,7 @@ export async function POST() {
       getAgentStats(user.id),
     ]);
 
-    // Najsłabszy obszar treningowy z ostatnich scoringów — uproszczenie:
+    // Najsłabszy obszar treningowy z ostatnich scoringów - uproszczenie:
     // bierzemy średni wynik; szczegół per kategoria dorobi się w panelu.
     const weakest =
       agentStats.avgScore != null && agentStats.avgScore < 7

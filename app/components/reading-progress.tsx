@@ -3,7 +3,7 @@
 import { motion, useScroll, useSpring } from "motion/react";
 
 /**
- * Pasek postępu czytania artykułu — pokazuje jak daleko jest user w artykule.
+ * Pasek postępu czytania artykułu - pokazuje jak daleko jest user w artykule.
  * Renderuj pod nav, nad treścią.
  */
 export function ReadingProgress() {

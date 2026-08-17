@@ -1,10 +1,10 @@
 /**
  * Publiczne wartości Supabase (URL + publishable/anon key).
- * Te wartości SĄ jawne z definicji — trafiają do bundla przeglądarki,
+ * Te wartości SĄ jawne z definicji - trafiają do bundla przeglądarki,
  * więc bezpiecznie trzymać je jako domyślne w kodzie. Env var (jeśli
- * ustawiony) ma pierwszeństwo — ułatwia zmianę projektu bez ruszania kodu.
+ * ustawiony) ma pierwszeństwo - ułatwia zmianę projektu bez ruszania kodu.
  *
- * UWAGA: to NIE jest service_role (sekret) — ten zawsze z env.
+ * UWAGA: to NIE jest service_role (sekret) - ten zawsze z env.
  */
 export const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://puowqbebsbmrcvoivkxb.supabase.co";

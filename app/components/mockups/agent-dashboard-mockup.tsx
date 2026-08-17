@@ -4,9 +4,9 @@ import { motion } from "motion/react";
 
 const TASKS = [
   { label: "Oddzwoń do Pana Kowalskiego (Mieszko 12)", done: true },
-  { label: "Oględziny ul. Wielicka 134 — 15:00", done: true },
+  { label: "Oględziny ul. Wielicka 134 - 15:00", done: true },
   { label: "Follow-up: rodzina Nowak (3 propozycje)", done: false },
-  { label: "Trening AI Coach — scenariusz Obiekcje", done: false },
+  { label: "Trening AI Coach - scenariusz Obiekcje", done: false },
 ];
 
 const STATS = [

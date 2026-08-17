@@ -93,7 +93,7 @@ export function SessionChat({
     void runTurn(text);
   }
 
-  // Głos — rozpoznawanie mowy PL (darmowe, w przeglądarce)
+  // Głos - rozpoznawanie mowy PL (darmowe, w przeglądarce)
   const { supported: voiceSupported, listening, error: voiceError, toggle, stop } = useSpeechRecognition(
     (text, isFinal) => {
       if (isFinal) {
@@ -115,7 +115,7 @@ export function SessionChat({
         <EndSessionButton sessionId={sessionId} disabled={agentTurns === 0} />
       </div>
 
-      {/* Zadanie — WIDOCZNE cały czas, żeby nie zapomnieć adresu / celu */}
+      {/* Zadanie - WIDOCZNE cały czas, żeby nie zapomnieć adresu / celu */}
       {brief && (
         <div className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] px-4 py-3">
           <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-emerald-400">
@@ -192,7 +192,7 @@ export function SessionChat({
         </form>
         {voiceSupported && !listening && (
           <p className="mt-2 text-xs text-zinc-500">
-            🎤 Możesz mówić zamiast pisać — kliknij mikrofon. Działa najlepiej w Chrome.
+            🎤 Możesz mówić zamiast pisać - kliknij mikrofon. Działa najlepiej w Chrome.
           </p>
         )}
         {!voiceSupported && (

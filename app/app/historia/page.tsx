@@ -17,8 +17,8 @@ export default async function HistoriaPage() {
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <StatCard label="Sesje łącznie" value={stats.totalSessions} accent />
-        <StatCard label="Średni wynik" value={stats.avgScore != null ? `${stats.avgScore}/10` : "—"} />
-        <StatCard label="Najlepszy wynik" value={stats.bestScore != null ? `${stats.bestScore}/10` : "—"} />
+        <StatCard label="Średni wynik" value={stats.avgScore != null ? `${stats.avgScore}/10` : "-"} />
+        <StatCard label="Najlepszy wynik" value={stats.bestScore != null ? `${stats.bestScore}/10` : "-"} />
       </div>
 
       {sessions.length === 0 ? (

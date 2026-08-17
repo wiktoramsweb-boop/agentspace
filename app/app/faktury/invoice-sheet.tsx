@@ -48,9 +48,9 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
         </div>
         <div className="text-right">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">FAKTURA</h1>
-          <p className="text-sm font-medium text-zinc-700">Nr {data.number || "—"}</p>
+          <p className="text-sm font-medium text-zinc-700">Nr {data.number || "-"}</p>
           <p className="mt-1 text-xs text-zinc-500">
-            {data.place || "Kraków"}, {data.issueDate || "—"}
+            {data.place || "Kraków"}, {data.issueDate || "-"}
           </p>
         </div>
       </div>
@@ -75,7 +75,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
             Nabywca
           </p>
-          <p className="font-semibold">{data.buyerName || "—"}</p>
+          <p className="font-semibold">{data.buyerName || "-"}</p>
           {data.buyerAddress && <p>{data.buyerAddress}</p>}
           {(data.buyerPostcode || data.buyerCity) && (
             <p>
@@ -90,9 +90,9 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
       {/* Meta */}
       <div className="grid grid-cols-2 gap-x-8 gap-y-1 border-y border-zinc-200 py-3 text-xs sm:grid-cols-4">
         <Meta label="Forma płatności" value={data.paymentMethod || "Przelew"} />
-        <Meta label="Termin płatności" value={data.paymentDate || "—"} />
-        <Meta label="Data sprzedaży" value={data.saleDate || "—"} />
-        <Meta label="Data wystawienia" value={data.issueDate || "—"} />
+        <Meta label="Termin płatności" value={data.paymentDate || "-"} />
+        <Meta label="Data sprzedaży" value={data.saleDate || "-"} />
+        <Meta label="Data wystawienia" value={data.issueDate || "-"} />
       </div>
 
       {/* Pozycje */}
@@ -113,7 +113,7 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
             return (
               <tr key={i} className="border-b border-zinc-100 align-top">
                 <td className="py-2 pr-2">{i + 1}</td>
-                <td className="py-2 pr-2">{it.name || "—"}</td>
+                <td className="py-2 pr-2">{it.name || "-"}</td>
                 <td className="py-2 pr-2 text-right">{it.qty || 0}</td>
                 <td className="py-2 pr-2 text-right">{formatMoney(Number(it.unitPrice) || 0)} zł</td>
                 <td className="py-2 pr-2 text-right">zw</td>

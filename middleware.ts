@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Auth-check tylko na ścieżkach które go wymagają — strony marketingowe
+  // Auth-check tylko na ścieżkach które go wymagają - strony marketingowe
   // (landing, blog, cennik itd.) NIE wywołują Supabase, więc są szybkie.
   matcher: ["/app/:path*", "/login", "/signup"],
 };

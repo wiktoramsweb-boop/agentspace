@@ -1,9 +1,9 @@
 -- ============================================================
--- AgentSpace — SETUP v2: platforma codziennej pracy
+-- AgentSpace - SETUP v2: platforma codziennej pracy
 -- ============================================================
 -- Uruchom w Supabase SQL Editor PO pierwszym SETUP.
 -- Dodaje: zadania, klienci (CRM), notatki, prowizje (deals).
--- Idempotentne — bezpieczne do ponownego uruchomienia.
+-- Idempotentne - bezpieczne do ponownego uruchomienia.
 -- ============================================================
 
 -- ---------- TASKS (plan dnia / lista zadań) ----------
@@ -67,7 +67,7 @@ create index if not exists client_notes_client_idx on public.client_notes(client
 create index if not exists deals_agent_idx on public.deals(agent_id, created_at desc);
 create index if not exists deals_agency_idx on public.deals(agency_id, status);
 
--- ---------- RLS (backstop — dostęp przez service_role) ----------
+-- ---------- RLS (backstop - dostęp przez service_role) ----------
 alter table public.tasks enable row level security;
 alter table public.clients enable row level security;
 alter table public.client_notes enable row level security;

@@ -1,4 +1,4 @@
-// Generator opisów ogłoszeń nieruchomości — w pełni szablonowy (bez AI, za darmo).
+// Generator opisów ogłoszeń nieruchomości - w pełni szablonowy (bez AI, za darmo).
 // Składa profesjonalny opis w stylu Spectra z parametrów wpisanych przez agenta.
 // Sekcje bez treści są pomijane, więc można wypełnić tyle, ile się chce.
 

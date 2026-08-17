@@ -8,12 +8,12 @@ import { Card, Button, Section, SectionHead } from "../components/mk/ui";
 import { INTEGRATIONS, STATUS_LABEL } from "@/lib/marketing/integrations";
 
 export const metadata: Metadata = {
-  title: "Integracje z systemami dla biur nieruchomości — AgentSpace",
+  title: "Integracje z systemami dla biur nieruchomości | AgentSpace",
   description:
     "AgentSpace łączy się z systemami, których biura nieruchomości używają na co dzień: Asari, Galactica, IMO, Estiman. Zachowujesz obieg ofert, zyskujesz zarządzanie zespołem.",
   alternates: { canonical: "https://agentspace.pl/integracje" },
   openGraph: {
-    title: "Integracje — AgentSpace dla biur nieruchomości",
+    title: "Integracje | AgentSpace dla biur nieruchomości",
     description:
       "Asari, Galactica, IMO, Estiman. Zachowaj obieg ofert, dołóż zarządzanie zespołem.",
     url: "https://agentspace.pl/integracje",
@@ -34,7 +34,7 @@ export default function IntegracjePage() {
       <PageHero
         eyebrow="Integracje"
         title="Nie musisz porzucać systemu, który działa"
-        description="Większość biur ma już gdzieś swoje oferty. AgentSpace nie każe migrować wszystkiego na start — łączymy się z systemami ofertowymi, żeby nie wpisywać tych samych danych dwa razy."
+        description="Większość biur ma już gdzieś swoje oferty. AgentSpace nie każe migrować wszystkiego na start - łączymy się z systemami ofertowymi, żeby nie wpisywać tych samych danych dwa razy."
       />
 
       <FrameRule />
@@ -43,7 +43,7 @@ export default function IntegracjePage() {
         <SectionHead
           eyebrow="Systemy"
           title="Z czym łączymy AgentSpace"
-          lead="Status aktualizujemy na bieżąco. Jeśli Twojego systemu nie ma na liście — napisz, sprawdzimy możliwość połączenia."
+          lead="Status aktualizujemy na bieżąco. Jeśli Twojego systemu nie ma na liście - napisz, sprawdzimy możliwość połączenia."
         />
 
         <div className="mt-14 grid gap-5 md:grid-cols-2">
@@ -95,7 +95,7 @@ export default function IntegracjePage() {
           <h2 className="max-w-[22ch]">Pracujesz na innym systemie?</h2>
           <p className="mt-5 max-w-[50ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
             Napisz, z czego korzysta Twoje biuro. Sprawdzimy, czy da się je
-            połączyć z AgentSpace — a jeśli nie, powiem wprost.
+            połączyć z AgentSpace - a jeśli nie, powiem wprost.
           </p>
           <div className="mt-10">
             <Button href="/kontakt">Zapytaj o swój system</Button>

@@ -3,7 +3,7 @@
  *
  * UCZCIWOŚĆ: `status` mówi wprost, co działa, a co jest w przygotowaniu.
  * Strona "w przygotowaniu" ma sens SEO i zbiera zainteresowanie, ale NIE
- * może sugerować, że integracja jest gotowa. Gdy integracja ruszy —
+ * może sugerować, że integracja jest gotowa. Gdy integracja ruszy -
  * zmień status na "live" i uzupełnij `syncs`.
  */
 
@@ -15,7 +15,7 @@ export type Integration = {
   /** Pełna nazwa używana w tytułach i tekście. */
   fullName: string;
   status: IntegrationStatus;
-  /** Krótki opis systemu — kim jest, dla kogo. */
+  /** Krótki opis systemu - kim jest, dla kogo. */
   about: string;
   /** Co realnie przepływa (lub przepłynie) między systemami. */
   syncs: string[];
@@ -38,7 +38,7 @@ export const INTEGRATIONS: Integration[] = [
     about:
       "Jeden z najpopularniejszych systemów CRM dla biur nieruchomości w Polsce. Biura używają go głównie do zarządzania ofertami i eksportu na portale.",
     syncs: [
-      "Baza nieruchomości — oferty i statusy",
+      "Baza nieruchomości - oferty i statusy",
       "Kontakty klientów wraz z przypisaniem do agenta",
       "Historia zmian statusu oferty",
     ],
@@ -56,12 +56,12 @@ export const INTEGRATIONS: Integration[] = [
       "Dane kontaktowe właścicieli i klientów",
       "Przypisanie oferty do agenta prowadzącego",
     ],
-    why: "Galactica dobrze obsługuje wystawianie ofert, ale nie odpowiada na pytanie „jak pracuje mój zespół”. AgentSpace dokłada cele, lejek, prowizje i trening — bez wymiany systemu ofertowego.",
+    why: "Galactica dobrze obsługuje wystawianie ofert, ale nie odpowiada na pytanie „jak pracuje mój zespół”. AgentSpace dokłada cele, lejek, prowizje i trening - bez wymiany systemu ofertowego.",
   },
   {
     slug: "imo",
     name: "IMO",
-    fullName: "IMO — system dla biur nieruchomości",
+    fullName: "IMO - system dla biur nieruchomości",
     status: "planned",
     about:
       "System obsługujący oferty, klientów i eksport na portale, używany przez biura o różnej wielkości.",
@@ -83,7 +83,7 @@ export const INTEGRATIONS: Integration[] = [
       "Oferty nieruchomości",
       "Kontakty i historia współpracy z klientem",
     ],
-    why: "Połączenie pozwala zachować dotychczasowy obieg ofert i dołożyć warstwę zarządzania zespołem — bez migracji całej bazy na start.",
+    why: "Połączenie pozwala zachować dotychczasowy obieg ofert i dołożyć warstwę zarządzania zespołem - bez migracji całej bazy na start.",
   },
 ];
 

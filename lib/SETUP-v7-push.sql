@@ -1,5 +1,5 @@
 -- ============================================================
--- AgentSpace — SETUP v7: powiadomienia push (Web Push)
+-- AgentSpace - SETUP v7: powiadomienia push (Web Push)
 -- ============================================================
 -- Uruchom w Supabase SQL Editor. Idempotentne.
 -- Przechowuje subskrypcje push agentów (jedno urządzenie = jeden wpis).

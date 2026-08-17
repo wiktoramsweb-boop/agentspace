@@ -6,7 +6,7 @@ import { PageHero } from "../components/page-hero";
 import { FadeIn, StaggerContainer, StaggerItem } from "../components/fade-in";
 
 export const metadata: Metadata = {
-  title: "Dla właścicieli biur nieruchomości — AgentSpace",
+  title: "Dla właścicieli biur nieruchomości | AgentSpace",
   description:
     "AgentSpace dla właścicieli biur nieruchomości. Niższa rotacja agentów, szybszy onboarding, decyzje oparte o dane. Pakiety od 499 zł/mc.",
   alternates: {
@@ -18,12 +18,12 @@ const PROBLEMS_OWNER = [
   {
     stat: "60%",
     title: "agentów odpada w 6 mc",
-    body: "Bez systemu szkolenia: chaotyczny start, brak feedbacku. Najlepsi odchodzą, słabi nie wiedzą czego im brakuje. Koszt: 15–30 tys. zł na nieudanego agenta.",
+    body: "Bez systemu szkolenia: chaotyczny start, brak feedbacku. Najlepsi odchodzą, słabi nie wiedzą czego im brakuje. Koszt: 15-30 tys. zł na nieudanego agenta.",
   },
   {
     stat: "8h",
     title: "tygodniowo na mentoring 1-na-1",
-    body: "Mentorowanie kosztuje czas. Senior agenci nie chcą tego robić — chcą sprzedawać. Wewnętrzne szkolenia raz na kwartał = za rzadko żeby zmienić nawyk.",
+    body: "Mentorowanie kosztuje czas. Senior agenci nie chcą tego robić - chcą sprzedawać. Wewnętrzne szkolenia raz na kwartał = za rzadko żeby zmienić nawyk.",
   },
   {
     stat: "0",
@@ -59,7 +59,7 @@ const ROI_MATH = [
   { label: "Koszt AgentSpace", value: "od 499 zł", suffix: "/ mc", color: "text-zinc-300" },
   { label: "Średnia prowizja z transakcji", value: "~8 000 zł", suffix: "", color: "text-zinc-300" },
   { label: "Próg break-even", value: "+1 transakcja", suffix: "/ mc", color: "text-emerald-400" },
-  { label: "Średnio zespół 8-osobowy daje (po 30 dniach)", value: "+3–5 transakcji", suffix: "/ mc", color: "text-emerald-400" },
+  { label: "Średnio zespół 8-osobowy daje (po 30 dniach)", value: "+3-5 transakcji", suffix: "/ mc", color: "text-emerald-400" },
 ];
 
 export default function DlaWlascicieli() {
@@ -70,7 +70,7 @@ export default function DlaWlascicieli() {
         <PageHero
           eyebrow="Dla właścicieli biur nieruchomości"
           title="Zespół który rośnie. Niższa rotacja. Decyzje oparte o dane."
-          description="AgentSpace nie jest kolejnym CRM. To system rozwoju zespołu — codzienny dryl, tracking, ranking. Robione przez właściciela biura w Krakowie, dla właścicieli biur w Polsce."
+          description="AgentSpace nie jest kolejnym CRM. To system rozwoju zespołu - codzienny dryl, tracking, ranking. Robione przez właściciela biura w Krakowie, dla właścicieli biur w Polsce."
         />
 
         {/* Problemy z liczbami */}

@@ -6,7 +6,7 @@ import { PageHero } from "../components/page-hero";
 export const metadata: Metadata = {
   title: "Regulamin | AgentSpace",
   description:
-    "Regulamin świadczenia usług AgentSpace — zasady korzystania z platformy do szkolenia agentów nieruchomości.",
+    "Regulamin świadczenia usług AgentSpace - zasady korzystania z platformy do szkolenia agentów nieruchomości.",
   alternates: {
     canonical: "https://agentspace.pl/regulamin",
   },
@@ -46,22 +46,22 @@ export default function Regulamin() {
             <h2>§2. Definicje</h2>
             <ul>
               <li>
-                <strong>Użytkownik</strong> — osoba fizyczna lub prawna korzystająca z Serwisu.
+                <strong>Użytkownik</strong> - osoba fizyczna lub prawna korzystająca z Serwisu.
               </li>
               <li>
-                <strong>Klient</strong> — Użytkownik biznesowy (biuro nieruchomości lub
+                <strong>Klient</strong> - Użytkownik biznesowy (biuro nieruchomości lub
                 pośrednik), który zawarł umowę z Operatorem na korzystanie z AgentSpace.
               </li>
               <li>
-                <strong>Usługa</strong> — platforma SaaS AgentSpace umożliwiająca szkolenie
+                <strong>Usługa</strong> - platforma SaaS AgentSpace umożliwiająca szkolenie
                 agentów nieruchomości, dostęp do AI Coacha, dashboard dla agentów i panel dla
                 właściciela biura.
               </li>
               <li>
-                <strong>Konto</strong> — indywidualny dostęp Klienta do Usługi po rejestracji.
+                <strong>Konto</strong> - indywidualny dostęp Klienta do Usługi po rejestracji.
               </li>
               <li>
-                <strong>Lista oczekujących</strong> — formularz na stronie głównej umożliwiający
+                <strong>Lista oczekujących</strong> - formularz na stronie głównej umożliwiający
                 rejestrację zainteresowania wczesnym dostępem do AgentSpace.
               </li>
             </ul>
@@ -69,7 +69,7 @@ export default function Regulamin() {
             <h2>§3. Status Serwisu (faza pre-launch)</h2>
             <p>
               Na dzień publikacji Regulaminu AgentSpace znajduje się w fazie pre-launch
-              — Usługa nie jest jeszcze dostępna w pełnej formie. Serwis umożliwia obecnie:
+              - Usługa nie jest jeszcze dostępna w pełnej formie. Serwis umożliwia obecnie:
             </p>
             <ul>
               <li>zapoznanie się z planowanymi funkcjami Usługi,</li>
@@ -91,7 +91,7 @@ export default function Regulamin() {
               <li>adresu e-mail (wymagane),</li>
               <li>nazwy biura nieruchomości (wymagane),</li>
               <li>liczby agentów w zespole (wymagane),</li>
-              <li>numeru telefonu (opcjonalne — dla szybszego kontaktu).</li>
+              <li>numeru telefonu (opcjonalne - dla szybszego kontaktu).</li>
             </ul>
             <p>
               Zapis oznacza zgodę na przetwarzanie danych osobowych w celu informowania
@@ -105,7 +105,7 @@ export default function Regulamin() {
             </p>
             <ul>
               <li>
-                wyłączność terytorialną — w okresie obowiązywania umowy Operator nie
+                wyłączność terytorialną - w okresie obowiązywania umowy Operator nie
                 zawrze umowy z innym biurem nieruchomości z tego samego miasta
                 (w Warszawie i Krakowie: z tej samej dzielnicy),
               </li>
@@ -132,7 +132,7 @@ export default function Regulamin() {
               </li>
               <li>dostęp do Internetu o stabilnej prędkości min. 5 Mbps,</li>
               <li>
-                w przypadku korzystania z AI Coacha — mikrofon i głośniki / słuchawki,
+                w przypadku korzystania z AI Coacha - mikrofon i głośniki / słuchawki,
               </li>
               <li>włączona obsługa JavaScript i plików cookies.</li>
             </ul>

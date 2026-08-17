@@ -7,7 +7,7 @@ import { APP_URL } from "@/lib/supabase/config";
 export type ResetResult = { error: string } | { ok: true } | undefined;
 
 /**
- * Krok 1 — wysyła maila z linkiem do ustawienia nowego hasła.
+ * Krok 1 - wysyła maila z linkiem do ustawienia nowego hasła.
  * Ze względów bezpieczeństwa NIE zdradzamy, czy dany email istnieje w bazie:
  * zawsze zwracamy „ok" (Supabase i tak nie zgłasza błędu dla nieznanego maila).
  */
@@ -27,7 +27,7 @@ export async function requestPasswordReset(
 }
 
 /**
- * Krok 3 — ustawia nowe hasło. Wymaga aktywnej sesji odzyskiwania
+ * Krok 3 - ustawia nowe hasło. Wymaga aktywnej sesji odzyskiwania
  * (ustawionej przez /reset-hasla/callback po kliknięciu w link z maila).
  */
 export async function updatePassword(

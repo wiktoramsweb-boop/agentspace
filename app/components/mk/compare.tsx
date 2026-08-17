@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card } from "./ui";
 
 /**
- * Przełącznik „z systemem / bez systemu” — ten sam layout, dwa stany.
+ * Przełącznik „z systemem / bez systemu” - ten sam layout, dwa stany.
  * Kontrast robi robotę lepiej niż lista zalet.
  */
 
@@ -24,7 +24,7 @@ const STATES = {
     label: "Bez systemu",
     rows: [
       ["Baza klientów", "Excel, notes, WhatsApp i głowa agenta"],
-      ["Kontakt do właściciela", "W telefonie agenta — odchodzi razem z nim"],
+      ["Kontakt do właściciela", "W telefonie agenta - odchodzi razem z nim"],
       ["Wiesz co robi zespół", "Tyle, ile powie na porannej odprawie"],
       ["Rozliczenie prowizji", "Arkusz, który ktoś musi domknąć ręcznie"],
       ["Nowy agent", "Uczy się na prawdziwych klientach"],

@@ -1,5 +1,5 @@
 -- ============================================================
--- AgentSpace — schema bazy Supabase
+-- AgentSpace - schema bazy Supabase
 -- ============================================================
 -- Wklej w Supabase SQL Editor (lewy pasek → SQL Editor → New query)
 -- i kliknij Run.

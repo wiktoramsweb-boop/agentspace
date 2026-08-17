@@ -24,7 +24,7 @@ export function PwaInstall() {
     // Już zainstalowana? (tryb standalone / iOS)
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
-      // @ts-expect-error — iOS Safari
+      // @ts-expect-error - iOS Safari
       window.navigator.standalone === true;
     if (standalone) return;
 
@@ -34,7 +34,7 @@ export function PwaInstall() {
     const ios = /iphone|ipad|ipod/i.test(ua);
     setIsIOS(ios);
 
-    // Android/desktop — przechwyć natywny prompt instalacji
+    // Android/desktop - przechwyć natywny prompt instalacji
     const onBIP = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
@@ -42,7 +42,7 @@ export function PwaInstall() {
     };
     window.addEventListener("beforeinstallprompt", onBIP);
 
-    // iOS nie emituje beforeinstallprompt — pokaż baner z instrukcją
+    // iOS nie emituje beforeinstallprompt - pokaż baner z instrukcją
     if (ios) {
       const t = setTimeout(() => setVisible(true), 1500);
       return () => {
@@ -89,7 +89,7 @@ export function PwaInstall() {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-white">Zainstaluj AgentSpace</p>
               <p className="text-xs text-zinc-400">
-                Miej apkę na telefonie — szybki dostęp i powiadomienia.
+                Miej apkę na telefonie - szybki dostęp i powiadomienia.
               </p>
             </div>
             <button
@@ -122,7 +122,7 @@ export function PwaInstall() {
                 <Step n={2} /> Wybierz <strong className="text-white">„Do ekranu początkowego"</strong>
               </li>
               <li className="flex items-center gap-2">
-                <Step n={3} /> Potwierdź <strong className="text-white">„Dodaj"</strong> — gotowe ✅
+                <Step n={3} /> Potwierdź <strong className="text-white">„Dodaj"</strong> - gotowe ✅
               </li>
             </ol>
             <p className="mt-3 text-xs text-zinc-500">

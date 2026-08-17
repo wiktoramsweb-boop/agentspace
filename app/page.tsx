@@ -11,7 +11,7 @@ import { Compare } from "./components/mk/compare";
 
 /* ── Treść ─────────────────────────────────────────────────── */
 
-/** Liczby prawdziwe z konstrukcji produktu — nie z cudzych badań. */
+/** Liczby prawdziwe z konstrukcji produktu - nie z cudzych badań. */
 const FACTS = [
   { value: 6, suffix: "", label: "modułów w jednym systemie" },
   { value: 1, suffix: " dzień", label: "wdrożenia razem z importem bazy" },
@@ -57,7 +57,7 @@ const MODULES = [
   {
     name: "AI Coach",
     slug: "ai-coach",
-    body: "Agent trenuje rozmowy z klientem AI — cold call, spotkanie pozyskowe, najem. 13 scenariuszy, 9 osobowości klienta, głos, scoring i feedback po polsku.",
+    body: "Agent trenuje rozmowy z klientem AI: cold call, spotkanie pozyskowe, najem. 13 scenariuszy, 9 osobowości klienta, głos, scoring i feedback po polsku.",
   },
   {
     name: "Panel właściciela",
@@ -91,7 +91,7 @@ const PROBLEMS = [
   },
   {
     title: "Nie wiesz, co się dzieje między odprawami",
-    body: "Wiesz, ile było transakcji. Nie wiesz, ile było telefonów, ile spotkań i który agent utknął dwa tygodnie temu — dopóki nie jest za późno.",
+    body: "Wiesz, ile było transakcji. Nie wiesz, ile było telefonów, ile spotkań i który agent utknął dwa tygodnie temu - dopóki nie jest za późno.",
   },
   {
     title: "Nowy agent uczy się na Twoich klientach",
@@ -106,7 +106,7 @@ const NOT_FOR = [
   },
   {
     title: "Nie chcesz prowadzić zespołu",
-    body: "AgentSpace pokazuje dane i daje narzędzia, ale nie zarządza za Ciebie. Jeśli nikt nie spojrzy w panel raz w tygodniu i nie porozmawia z agentem, który słabnie — żaden system tego nie naprawi.",
+    body: "AgentSpace pokazuje dane i daje narzędzia, ale nie zarządza za Ciebie. Jeśli nikt nie spojrzy w panel raz w tygodniu i nie porozmawia z agentem, który słabnie - żaden system tego nie naprawi.",
   },
   {
     title: "Szukasz portalu z eksportem ofert",
@@ -118,17 +118,17 @@ const FAQ = [
   {
     question: "Czy AgentSpace działa już dziś?",
     answer:
-      "Tak. Platforma działa na produkcji i jest codziennie używana w biurze Spectra Nieruchomości w Krakowie — to biuro założyciela i pierwszy klient produktu. Przyjmujemy kolejne biura w ramach Programu Pierwszych 10 Biur.",
+      "Tak. Platforma działa na produkcji i jest codziennie używana w biurze Spectra Nieruchomości w Krakowie - to biuro założyciela i pierwszy klient produktu. Przyjmujemy kolejne biura w ramach Programu Pierwszych 10 Biur.",
   },
   {
     question: "Czy AgentSpace zastąpi mój obecny system?",
     answer:
-      "W większości biur tak — AgentSpace obejmuje CRM klientów, wspólną bazę nieruchomości, cele, prowizje, zadania i dokumenty. Jeśli korzystasz z systemu do masowego eksportu ofert na portale, na razie warto zostawić go obok. Na rozmowie sprawdzamy to konkretnie na Twoim przypadku.",
+      "W większości biur tak - AgentSpace obejmuje CRM klientów, wspólną bazę nieruchomości, cele, prowizje, zadania i dokumenty. Jeśli korzystasz z systemu do masowego eksportu ofert na portale, na razie warto zostawić go obok. Na rozmowie sprawdzamy to konkretnie na Twoim przypadku.",
   },
   {
     question: "Ile trwa wdrożenie i kto je robi?",
     answer:
-      "Jeden dzień roboczy. Zakładamy konto, wgrywamy bazę klientów i nieruchomości, zapraszamy agentów i konfigurujemy cele pod Twój model pracy. Robimy to razem z Tobą — nie zostawiamy Cię z pustym systemem.",
+      "Jeden dzień roboczy. Zakładamy konto, wgrywamy bazę klientów i nieruchomości, zapraszamy agentów i konfigurujemy cele pod Twój model pracy. Robimy to razem z Tobą - nie zostawiamy Cię z pustym systemem.",
   },
   {
     question: "Czy agenci to zaakceptują?",
@@ -138,7 +138,7 @@ const FAQ = [
   {
     question: "Czy musimy nagrywać rozmowy z prawdziwymi klientami?",
     answer:
-      "Nie. AI Coach to symulacje — agent ćwiczy z klientem AI, nie z prawdziwym. Zero ryzyka RODO po stronie Twoich klientów. Analiza prawdziwych nagrań jest na mapie drogowej i będzie opcjonalna.",
+      "Nie. AI Coach to symulacje - agent ćwiczy z klientem AI, nie z prawdziwym. Zero ryzyka RODO po stronie Twoich klientów. Analiza prawdziwych nagrań jest na mapie drogowej i będzie opcjonalna.",
   },
   {
     question: "Gdzie są przechowywane dane biura?",
@@ -148,7 +148,7 @@ const FAQ = [
   {
     question: "Czy jest umowa na czas określony?",
     answer:
-      "Nie. Rozliczenie miesięczne, rezygnujesz kiedy chcesz. Nie chcemy trzymać biura umową — jeśli system nie daje wartości, powinieneś móc odejść.",
+      "Nie. Rozliczenie miesięczne, rezygnujesz kiedy chcesz. Nie chcemy trzymać biura umową - jeśli system nie daje wartości, powinieneś móc odejść.",
   },
 ];
 
@@ -207,7 +207,7 @@ export default function Home() {
             </p>
           </FadeIn>
 
-          {/* Pasek liczb — ożywia hero i od razu daje konkret */}
+          {/* Pasek liczb - ożywia hero i od razu daje konkret */}
           <FadeIn delay={0.4} className="mt-14 w-full">
             <div className="mx-auto grid max-w-3xl gap-0 sm:grid-cols-3">
               {FACTS.map((fact, i) => (
@@ -310,7 +310,7 @@ export default function Home() {
           eyebrow="Krok po kroku"
           title={
             <>
-              Od rozmowy do pierwszych wniosków —{" "}
+              Od rozmowy do pierwszych wniosków -{" "}
               <span className="grad">30 dni</span>
             </>
           }
@@ -394,7 +394,7 @@ export default function Home() {
         <div className="mx-auto max-w-3xl">
           <FadeIn>
             <Card accent className="overflow-hidden p-8 md:p-14">
-              {/* Poświaty w rogach — karta ma być najjaśniejszym punktem strony */}
+              {/* Poświaty w rogach - karta ma być najjaśniejszym punktem strony */}
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-emerald-500/20 blur-3xl"
@@ -410,7 +410,7 @@ export default function Home() {
                   Przyjmujemy <span className="grad">jedno biuro na miasto</span>
                 </h3>
                 <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                  Wdrażamy powoli i z każdym biurem pracujemy indywidualnie —
+                  Wdrażamy powoli i z każdym biurem pracujemy indywidualnie -
                   dlatego przyjmujemy ograniczoną liczbę biur, po jednym na
                   miasto (w Warszawie i Krakowie po jednym na dzielnicę).
                 </p>
@@ -419,7 +419,7 @@ export default function Home() {
                   {[
                     "Wyłączność na Twoje miasto na czas trwania umowy",
                     "Wdrożenie 1:1 z założycielem, nie z działem supportu",
-                    "Wpływ na mapę drogową — budujemy pod realne potrzeby biur",
+                    "Wpływ na mapę drogową - budujemy pod realne potrzeby biur",
                     "Cena zamrożona na 24 miesiące",
                   ].map((item) => (
                     <li
@@ -479,7 +479,7 @@ export default function Home() {
                     Prowadzę biuro nieruchomości{" "}
                     <span className="font-medium">Spectra</span> w Krakowie. Znam
                     ten moment, w którym dobry agent odchodzi i zabiera ze sobą
-                    pół bazy — i wiem, ile to kosztuje biuro.{" "}
+                    pół bazy - i wiem, ile to kosztuje biuro.{" "}
                     <span className="grad font-medium">
                       AgentSpace to system, którego sam potrzebowałem od lat.
                     </span>{" "}
@@ -614,7 +614,7 @@ export default function Home() {
               </h2>
               <p className="mx-auto mt-6 max-w-[48ch] text-[1.0625rem] leading-relaxed text-[var(--color-mk-muted)]">
                 30 minut rozmowy. Sprawdzimy, gdzie Twoje biuro traci transakcje
-                — wnioski dostajesz niezależnie od tego, czy zaczniemy
+                - wnioski dostajesz niezależnie od tego, czy zaczniemy
                 współpracę.
               </p>
               <div className="mt-11 flex justify-center">

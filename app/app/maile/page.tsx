@@ -8,7 +8,7 @@ export default async function MailePage() {
     <>
       <PageHeader
         title="Asystent wiadomości"
-        subtitle="Maile i SMS-y do klientów. Wybierz temat, wpisz fakty — AI napisze w tonie Spectry. Sprawdź, skopiuj, wyślij."
+        subtitle="Maile i SMS-y do klientów. Wybierz temat, wpisz fakty - AI napisze w tonie Spectry. Sprawdź, skopiuj, wyślij."
       />
       <MailGenerator defaultSignature={user.full_name ?? ""} />
     </>

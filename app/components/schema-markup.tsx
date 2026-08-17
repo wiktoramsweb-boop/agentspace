@@ -1,7 +1,7 @@
 /**
  * JSON-LD structured data dla Google rich snippets i crawlerów LLM.
  * Schemy: SoftwareApplication, Organization, FAQPage, HowTo, ItemList (nawigacja).
- * Bez "use client" — to czysty HTML w SSR.
+ * Bez "use client" - to czysty HTML w SSR.
  *
  * FAQ_ENTRIES musi odpowiadać treści widocznej na stronie (app/page.tsx).
  * Google karze za schema, która nie zgadza się z widoczną treścią.
@@ -10,11 +10,11 @@
 const FAQ_ENTRIES = [
   {
     q: "Czy AgentSpace działa już dziś?",
-    a: "Tak. Platforma działa na produkcji i jest codziennie używana w biurze Spectra Nieruchomości w Krakowie — to biuro założyciela i pierwszy klient produktu. Przyjmujemy kolejne biura w ramach Programu Pierwszych 10 Biur.",
+    a: "Tak. Platforma działa na produkcji i jest codziennie używana w biurze Spectra Nieruchomości w Krakowie - to biuro założyciela i pierwszy klient produktu. Przyjmujemy kolejne biura w ramach Programu Pierwszych 10 Biur.",
   },
   {
     q: "Czy AgentSpace zastąpi mój obecny system?",
-    a: "W większości biur tak — AgentSpace obejmuje CRM klientów, wspólną bazę nieruchomości, cele, prowizje, zadania i dokumenty. Jeśli korzystasz z systemu do masowego eksportu ofert na portale, na razie warto zostawić go obok.",
+    a: "W większości biur tak - AgentSpace obejmuje CRM klientów, wspólną bazę nieruchomości, cele, prowizje, zadania i dokumenty. Jeśli korzystasz z systemu do masowego eksportu ofert na portale, na razie warto zostawić go obok.",
   },
   {
     q: "Ile trwa wdrożenie i kto je robi?",
@@ -26,7 +26,7 @@ const FAQ_ENTRIES = [
   },
   {
     q: "Czy musimy nagrywać rozmowy z prawdziwymi klientami?",
-    a: "Nie. AI Coach to symulacje — agent ćwiczy z klientem AI, nie z prawdziwym. Zero ryzyka RODO po stronie klientów biura.",
+    a: "Nie. AI Coach to symulacje - agent ćwiczy z klientem AI, nie z prawdziwym. Zero ryzyka RODO po stronie klientów biura.",
   },
   {
     q: "Gdzie są przechowywane dane biura?",
@@ -102,10 +102,10 @@ const softwareApplicationSchema = {
   featureList: [
     "CRM klientów z pipeline i notatkami",
     "Wspólna baza nieruchomości dla biura",
-    "Cele i lejek sprzedażowy — roczny do dziennego",
+    "Cele i lejek sprzedażowy - roczny do dziennego",
     "Rozliczanie prowizji i karta transakcji",
     "Umowy rezerwacyjne generowane do PDF",
-    "AI Coach — trening rozmów z klientem AI",
+    "AI Coach - trening rozmów z klientem AI",
     "Panel właściciela z rankingiem i raportami",
     "Role: CEO, menedżer, agent",
   ],
@@ -171,7 +171,7 @@ const howToSchema = {
   "@type": "HowTo",
   name: "Jak wdrożyć AgentSpace w biurze nieruchomości",
   description:
-    "Wdrożenie systemu operacyjnego AgentSpace w biurze nieruchomości w trzech krokach — od rozmowy do pierwszych wniosków z danych.",
+    "Wdrożenie systemu operacyjnego AgentSpace w biurze nieruchomości w trzech krokach - od rozmowy do pierwszych wniosków z danych.",
   totalTime: "P30D",
   step: [
     {
@@ -225,7 +225,7 @@ export function SchemaMarkup() {
   return (
     <script
       type="application/ld+json"
-      // JSON-LD wymaga dangerouslySetInnerHTML — oficjalnie rekomendowany
+      // JSON-LD wymaga dangerouslySetInnerHTML - oficjalnie rekomendowany
       // sposób przez React i Google. Treść statyczna, zero ryzyka XSS.
       dangerouslySetInnerHTML={{ __html: JSON.stringify(combined) }}
     />

@@ -5,9 +5,9 @@ import { useState } from "react";
 type Status = "idle" | "submitting" | "success" | "error";
 
 const TEAM_SIZE_OPTIONS = [
-  { value: "1-3", label: "1–3 agentów" },
-  { value: "4-10", label: "4–10 agentów" },
-  { value: "11-25", label: "11–25 agentów" },
+  { value: "1-3", label: "1-3 agentów" },
+  { value: "4-10", label: "4-10 agentów" },
+  { value: "11-25", label: "11-25 agentów" },
   { value: "25+", label: "Powyżej 25 agentów" },
 ];
 
@@ -84,7 +84,7 @@ export function WaitlistForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      {/* Honeypot — ukryte pole dla botów */}
+      {/* Honeypot - ukryte pole dla botów */}
       <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
         <label htmlFor="website">Zostaw puste</label>
         <input

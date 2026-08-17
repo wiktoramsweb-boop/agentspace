@@ -8,7 +8,7 @@ import { BlogVisual } from "../components/blog-visual";
 import { StaggerContainer, StaggerItem } from "../components/fade-in";
 
 export const metadata: Metadata = {
-  title: "Blog — Szkolenie agentów nieruchomości | AgentSpace",
+  title: "Szkolenie agentów nieruchomości | Blog AgentSpace",
   description:
     "Praktyczne artykuły o szkoleniu agentów RE, technikach sprzedaży, AI w nieruchomościach. Dla właścicieli biur i agentów w Polsce.",
   alternates: {
@@ -25,7 +25,7 @@ export default function BlogIndex() {
       <main className="bg-zinc-950 text-white">
         <PageHero
           eyebrow="Blog AgentSpace"
-          title="Szkolenie, sprzedaż, AI — dla biur nieruchomości"
+          title="Szkolenie, sprzedaż, AI - dla biur nieruchomości"
           description="Praktyczne artykuły dla właścicieli biur i agentów. Konkretne techniki, prawdziwe liczby, polski rynek."
           compact
         />

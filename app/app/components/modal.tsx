@@ -10,7 +10,7 @@ import { useEffect, useRef, type ReactNode } from "react";
  * kliknięte pole samo przewija się do widoku nad klawiaturą.
  *
  * Wewnątrz umieść <form className="flex min-h-0 flex-1 flex-col"> z przewijaną
- * częścią (flex-1 overflow-y-auto) i przyklejoną stopką — patrz przykłady.
+ * częścią (flex-1 overflow-y-auto) i przyklejoną stopką - patrz przykłady.
  */
 export function Modal({
   title,
@@ -38,7 +38,7 @@ export function Modal({
     };
   }, [onClose]);
 
-  // Gdy użytkownik kliknie pole (telefon) — przewiń je do widoku nad klawiaturą.
+  // Gdy użytkownik kliknie pole (telefon) - przewiń je do widoku nad klawiaturą.
   useEffect(() => {
     const el = boxRef.current;
     if (!el) return;

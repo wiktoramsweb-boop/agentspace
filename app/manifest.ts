@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "AgentSpace",
     short_name: "AgentSpace",
     description:
-      "System operacyjny agenta nieruchomości — trening AI, klienci, oferty, cele, prowizje.",
+      "System operacyjny agenta nieruchomości - trening AI, klienci, oferty, cele, prowizje.",
     start_url: "/app",
     scope: "/",
     display: "standalone",

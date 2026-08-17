@@ -94,7 +94,7 @@ export function CoachFlow() {
         <StepCard
           number="02"
           title="Wybierz osobowość klienta"
-          body="AI gra klienta z konkretną postawą — od agresywnego po biznesowego."
+          body="AI gra klienta z konkretną postawą - od agresywnego po biznesowego."
         >
           <div className="flex h-full flex-col justify-center gap-1">
             {PERSONALITIES.slice(0, 3).map((p, i) => (
@@ -120,7 +120,7 @@ export function CoachFlow() {
         <StepCard
           number="03"
           title="Rozmawiasz głosem"
-          body="Mikrofon w przeglądarce. Mówisz jak do prawdziwego klienta — naturalne tempo."
+          body="Mikrofon w przeglądarce. Mówisz jak do prawdziwego klienta - naturalne tempo."
         >
           <div className="flex h-full items-center justify-center gap-1">
             {Array.from({ length: 22 }).map((_, i) => (
@@ -148,7 +148,7 @@ export function CoachFlow() {
         <StepCard
           number="04"
           title="AI odpowiada głosem"
-          body="Polski głos, naturalny ton, kontruje argumenty. To nie ChatGPT — to symulacja klienta."
+          body="Polski głos, naturalny ton, kontruje argumenty. To nie ChatGPT - to symulacja klienta."
         >
           <div className="flex h-full flex-col justify-center gap-2">
             <motion.div
@@ -182,7 +182,7 @@ export function CoachFlow() {
         <StepCard
           number="05"
           title="Scoring + feedback PL"
-          body="Po sesji: wynik 1–10 w 4 kategoriach + konkretne sugestie poprawy."
+          body="Po sesji: wynik 1-10 w 4 kategoriach + konkretne sugestie poprawy."
         >
           <div className="flex h-full flex-col justify-center gap-1.5">
             {SCORES.map((score, i) => (

@@ -133,7 +133,7 @@ export function OfertaWspolpracy({
         )}
         {!supported && (
           <p className="mt-2 text-xs text-amber-400">
-            Ta przeglądarka nie ma dyktowania. Na iPhone użyj ikony mikrofonu na klawiaturze iOS, na komputerze — Chrome. Możesz też po prostu wypełnić pola niżej ręcznie.
+            Ta przeglądarka nie ma dyktowania. Na iPhone użyj ikony mikrofonu na klawiaturze iOS, na komputerze - Chrome. Możesz też po prostu wypełnić pola niżej ręcznie.
           </p>
         )}
         <button
@@ -147,7 +147,7 @@ export function OfertaWspolpracy({
 
       {/* Formularz */}
       <div className="rounded-2xl border border-zinc-700/60 bg-zinc-800/40 p-5 space-y-4">
-        <Field label="Adres nieruchomości" value={values.adres} onChange={(v) => set("adres", v)} placeholder="Prądnicka 48" hint='Bez „ul." — dodamy automatycznie.' />
+        <Field label="Adres nieruchomości" value={values.adres} onChange={(v) => set("adres", v)} placeholder="Prądnicka 48" hint='Bez „ul." - dodamy automatycznie.' />
         <div className="grid grid-cols-2 gap-3">
           <Field label="Czas współpracy" value={values.czas} onChange={(v) => set("czas", v)} placeholder="3 miesiące" />
           <Field label="Prowizja" value={values.prowizja} onChange={(v) => set("prowizja", v)} placeholder="2% brutto" />

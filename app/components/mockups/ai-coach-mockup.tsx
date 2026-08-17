@@ -13,7 +13,7 @@ export function AiCoachMockup() {
           </div>
           <div>
             <p className="font-semibold text-white">Sesja treningowa</p>
-            <p className="text-[10px] text-zinc-500">Zimny telefon — agresywny klient</p>
+            <p className="text-[10px] text-zinc-500">Zimny telefon - agresywny klient</p>
           </div>
         </div>
         <div className="rounded-md bg-zinc-800/50 px-2 py-1 font-mono text-[10px] tabular-nums text-zinc-300">

@@ -8,7 +8,7 @@ export default async function SzybkiWpisPage() {
     <>
       <PageHeader
         title="Szybki wpis głosem"
-        subtitle="Po spotkaniu powiedz relację — AI doda klienta, notatkę i nieruchomość do CRM."
+        subtitle="Po spotkaniu powiedz relację - AI doda klienta, notatkę i nieruchomość do CRM."
       />
       <QuickEntry />
     </>

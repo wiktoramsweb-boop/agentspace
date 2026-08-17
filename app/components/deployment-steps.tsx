@@ -13,7 +13,7 @@ const STEPS = [
   {
     number: "02",
     title: "Agenci trenują codziennie",
-    body: "15 minut dziennie ćwiczenia z AI Coach. Praktyka czyni mistrza — różnica między początkującym a doświadczonym to dziesiątki rozmów.",
+    body: "15 minut dziennie ćwiczenia z AI Coach. Praktyka czyni mistrza - różnica między początkującym a doświadczonym to dziesiątki rozmów.",
     Icon: MicIcon,
   },
   {
@@ -51,7 +51,7 @@ function ChartIcon() {
 export function DeploymentSteps() {
   return (
     <div className="relative">
-      {/* Połącznik między krokami — tylko desktop */}
+      {/* Połącznik między krokami - tylko desktop */}
       <div className="absolute left-0 right-0 top-[44px] hidden h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent md:block" />
 
       <StaggerContainer className="relative grid gap-8 md:grid-cols-3 md:gap-6" staggerDelay={0.15}>

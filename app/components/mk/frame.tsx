@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /**
- * Ramka „rysunku technicznego” — hairline + jasne znaczniki w narożnikach.
+ * Ramka „rysunku technicznego” - hairline + jasne znaczniki w narożnikach.
  * To jest jedyny powtarzalny motyw wizualny marketingu. Używany wszędzie:
  * karty modułów, cennik, case study, sekcje.
  *
@@ -59,7 +59,7 @@ export function Frame({ children, className = "", interactive = false }: FramePr
 }
 
 /**
- * Pozioma linia rozdzielająca sekcje, z „wcięciem” — sygnaturowy detal.
+ * Pozioma linia rozdzielająca sekcje, z „wcięciem” - sygnaturowy detal.
  * Rysowana jako SVG rozciągnięty na całą szerokość.
  */
 export function FrameRule({ className = "" }: { className?: string }) {

@@ -9,7 +9,7 @@ type GlowCardProps = {
 };
 
 /**
- * GlowCard — karta z gradientem podążającym za kursorem.
+ * GlowCard - karta z gradientem podążającym za kursorem.
  * Aceternity / Vercel "spotlight cards" inspired.
  */
 export function GlowCard({ children, className }: GlowCardProps) {

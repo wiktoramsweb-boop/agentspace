@@ -1,9 +1,9 @@
 -- ============================================================
--- AgentSpace — SETUP v5: Nieruchomości (hub) + kalkulator prowizji
+-- AgentSpace - SETUP v5: Nieruchomości (hub) + kalkulator prowizji
 --                        + adres/mapa i przypomnienia u klientów
 -- ============================================================
 -- Uruchom w Supabase SQL Editor PO SETUP v2 (i v3/v4).
--- Idempotentne — bezpieczne do ponownego uruchomienia.
+-- Idempotentne - bezpieczne do ponownego uruchomienia.
 -- ============================================================
 
 -- ---------- PROPERTIES (nieruchomości / oferty) ----------
@@ -80,6 +80,6 @@ create index if not exists property_interests_client_idx on public.property_inte
 create index if not exists clients_next_contact_idx on public.clients(agent_id, next_contact_at);
 create index if not exists deals_property_idx on public.deals(property_id);
 
--- ---------- RLS (backstop — dostęp przez service_role) ----------
+-- ---------- RLS (backstop - dostęp przez service_role) ----------
 alter table public.properties enable row level security;
 alter table public.property_interests enable row level security;

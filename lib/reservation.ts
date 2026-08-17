@@ -1,7 +1,7 @@
 import { amountToWordsPL } from "./invoice";
 
 // Generator umowy rezerwacyjnej (sprzedaż / najem). Treść parametryzowana, prawnie kompletna.
-// Definicje stron w formie standardowej (Sprzedający/Kupujący, Wynajmujący/Najemca) —
+// Definicje stron w formie standardowej (Sprzedający/Kupujący, Wynajmujący/Najemca) -
 // to terminy zdefiniowane w umowie, poprawne niezależnie od płci/liczby stron.
 
 export type DocType = "dowod" | "paszport";
@@ -119,7 +119,7 @@ export function buildReservation(d: ReservationData): ResDoc {
     d.propDetails.trim() ? `, ${d.propDetails.trim()}` : ""
   }** (dalej: „${term}”).`;
 
-  // § 2 — wspólny dla sprzedaży i najmu (płatnik zależny od roli)
+  // § 2 - wspólny dla sprzedaży i najmu (płatnik zależny od roli)
   const payer = isSale ? "Kupujący" : "Najemca";
   const payTo = isSale ? "Sprzedającego" : "Wynajmującego";
   const przyszlaUmowa = isSale ? "umowy sprzedaży" : "umowy najmu";
@@ -136,7 +136,7 @@ export function buildReservation(d: ReservationData): ResDoc {
     ],
   };
 
-  // § 5 — skutki niedojścia (zależne od typu wpłaty)
+  // § 5 - skutki niedojścia (zależne od typu wpłaty)
   const forfeit = `${fLow} przepada w całości na rzecz ${payTo}${isZad ? " (charakter bezzwrotny)" : ""} tytułem rekompensaty za wyłączenie ${gen} z oferty${isSale ? "" : " najmu"}.`;
   const sellerBack = isZad
     ? `${payer} może żądać zwrotu wpłaconego zadatku w wysokości nominalnej w terminie 7 dni od dnia złożenia oświadczenia o rezygnacji; Strony zgodnie wyłączają obowiązek zapłaty sumy dwukrotnie wyższej, o którym mowa w art. 394 § 1 Kodeksu cywilnego.`
@@ -174,8 +174,8 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push({
       h: "§ 5. Skutki niedojścia do zawarcia umowy",
       items: [
-        `W przypadku rezygnacji Kupującego z zawarcia umowy sprzedaży albo niedopełnienia przez niego formalności niezbędnych do jej zawarcia w terminie wskazanym w § 4 ust. 1 — ${forfeit}`,
-        `W przypadku rezygnacji Sprzedającego ze sprzedaży ${gen} przed upływem terminu, o którym mowa w § 4 ust. 1 — ${sellerBack}`,
+        `W przypadku rezygnacji Kupującego z zawarcia umowy sprzedaży albo niedopełnienia przez niego formalności niezbędnych do jej zawarcia w terminie wskazanym w § 4 ust. 1 - ${forfeit}`,
+        `W przypadku rezygnacji Sprzedającego ze sprzedaży ${gen} przed upływem terminu, o którym mowa w § 4 ust. 1 - ${sellerBack}`,
       ],
     });
 
@@ -217,8 +217,8 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push({
       h: "§ 5. Skutki niedojścia do zawarcia umowy najmu",
       items: [
-        `W przypadku rezygnacji Najemcy z podpisania umowy najmu albo niedopełnienia przez niego formalności wymaganych do jej zawarcia w terminie wskazanym w § 4 ust. 1 — ${forfeit}`,
-        `W przypadku rezygnacji Wynajmującego z oddania ${gen} w najem przed upływem terminu, o którym mowa w § 4 ust. 1 — ${sellerBack}`,
+        `W przypadku rezygnacji Najemcy z podpisania umowy najmu albo niedopełnienia przez niego formalności wymaganych do jej zawarcia w terminie wskazanym w § 4 ust. 1 - ${forfeit}`,
+        `W przypadku rezygnacji Wynajmującego z oddania ${gen} w najem przed upływem terminu, o którym mowa w § 4 ust. 1 - ${sellerBack}`,
       ],
     });
 
@@ -237,8 +237,8 @@ export function buildReservation(d: ReservationData): ResDoc {
     sections.push({ h: "§ 6. Postanowienia dotyczące przyszłej umowy najmu", items: przyszla });
   }
 
-  // Dodatkowe zapisy (np. dopisane przez AI) — przed postanowieniami końcowymi,
-  // żeby nie ruszać numeracji §1–§6 (do których odwołują się inne paragrafy).
+  // Dodatkowe zapisy (np. dopisane przez AI) - przed postanowieniami końcowymi,
+  // żeby nie ruszać numeracji §1-§6 (do których odwołują się inne paragrafy).
   const custom = (d.customClauses ?? []).map((c) => c.trim()).filter(Boolean);
   if (custom.length) {
     sections.push({ h: "§ 7. Postanowienia dodatkowe", items: custom });

@@ -5,7 +5,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { SessionChat } from "./chat";
 import { SessionResults } from "./results";
 
-// Scoring (endSession) potrafi trwać kilka-kilkanaście sekund — daj mu czas.
+// Scoring (endSession) potrafi trwać kilka-kilkanaście sekund - daj mu czas.
 export const maxDuration = 60;
 
 type Props = { params: Promise<{ id: string }> };

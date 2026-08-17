@@ -68,7 +68,7 @@ export default async function ProwizjePage() {
         />
         <StatCard
           label="Cel miesięczny"
-          value={goal > 0 ? formatPln(goal) : "—"}
+          value={goal > 0 ? formatPln(goal) : "-"}
           sub={goal > 0 ? undefined : "ustaw w ustawieniach"}
         />
       </div>

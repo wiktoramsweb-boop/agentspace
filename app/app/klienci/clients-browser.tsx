@@ -8,7 +8,7 @@ import { formatPln, daysAgo } from "@/lib/format";
 
 const digits = (s: string | null) => (s ?? "").replace(/\D/g, "");
 
-// Kolor awatara na podstawie nazwy — stabilny, żywy, w klimacie marki.
+// Kolor awatara na podstawie nazwy - stabilny, żywy, w klimacie marki.
 const AVATARS = [
   "from-emerald-400 to-cyan-500",
   "from-violet-400 to-fuchsia-500",
@@ -166,15 +166,15 @@ export function ClientsBrowser({
                     </p>
                   </div>
                   <div className="min-w-0 text-sm">
-                    <p className="truncate text-zinc-300">{c.phone ?? "—"}</p>
+                    <p className="truncate text-zinc-300">{c.phone ?? "-"}</p>
                     <p className="truncate text-xs text-zinc-500">
-                      {c.budget_pln != null ? formatPln(c.budget_pln) : "—"}
+                      {c.budget_pln != null ? formatPln(c.budget_pln) : "-"}
                     </p>
                   </div>
                   <div className="hidden min-w-0 text-sm sm:block">
                     <p className="truncate text-zinc-400">
                       <span className="text-zinc-600">Opiekun: </span>
-                      {c.opiekunName ?? "—"}
+                      {c.opiekunName ?? "-"}
                     </p>
                     <p className="truncate text-xs text-zinc-500">{daysAgo(c.last_contact_at)}</p>
                   </div>

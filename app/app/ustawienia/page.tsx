@@ -37,7 +37,7 @@ export default async function UstawieniaPage() {
             </div>
             <div>
               <dt className="text-zinc-500">Biuro</dt>
-              <dd className="text-zinc-200">{user.agency?.name ?? "—"}</dd>
+              <dd className="text-zinc-200">{user.agency?.name ?? "-"}</dd>
             </div>
             {user.agency?.trial_ends_at && user.agency.plan === "trial" && (
               <div>

@@ -1,10 +1,10 @@
 -- ============================================================
--- AgentSpace — SETUP v13: role CEO / Menedżer / Agent + przypisania
+-- AgentSpace - SETUP v13: role CEO / Menedżer / Agent + przypisania
 -- ============================================================
 -- Uruchom w Supabase SQL Editor. Idempotentne (można puścić wielokrotnie).
 --
 -- Model ról: kolumna profiles.role (text) przyjmuje:
---   'owner'   = CEO (pełny dostęp) — wartość NIE zmieniana, cała autoryzacja o nią oparta
+--   'owner'   = CEO (pełny dostęp) - wartość NIE zmieniana, cała autoryzacja o nią oparta
 --   'manager' = Menedżer (widzi tylko swoich przypisanych agentów: Cele + wyniki AI)
 --   'agent'   = Agent
 -- ============================================================

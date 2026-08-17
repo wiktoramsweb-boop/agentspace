@@ -22,7 +22,7 @@ export default async function OpisyPage() {
     <>
       <PageHeader
         title="Opisy ogłoszeń"
-        subtitle="Wpisz parametry i kliknij ✨ — AI napisze pełny opis w stylu Spectra."
+        subtitle="Wpisz parametry i kliknij ✨ - AI napisze pełny opis w stylu Spectra."
       />
       <OpisGenerator properties={prefill} />
     </>

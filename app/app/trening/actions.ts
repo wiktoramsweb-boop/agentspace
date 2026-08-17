@@ -90,7 +90,7 @@ export async function endSession(sessionId: string, _formData?: FormData): Promi
       });
     } catch (err) {
       console.error("Scoring error:", err);
-      // Brak scoringu — sesja i tak zakończona, user zobaczy transkrypt
+      // Brak scoringu - sesja i tak zakończona, user zobaczy transkrypt
     }
   }
 

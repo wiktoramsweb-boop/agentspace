@@ -7,14 +7,14 @@ type PageHeroProps = {
   title: ReactNode;
   description?: ReactNode;
   children?: ReactNode;
-  /** Wersja kompaktowa — mniejsze paddingi, dla stron statycznych/prawnych. */
+  /** Wersja kompaktowa - mniejsze paddingi, dla stron statycznych/prawnych. */
   compact?: boolean;
 };
 
 /**
  * Nagłówek podstrony marketingowej: aurora + spotlight w tle.
  *
- * Wejścia robi CSS (`.mk-reveal`), nie motion — treść nagłówka nie może
+ * Wejścia robi CSS (`.mk-reveal`), nie motion - treść nagłówka nie może
  * zależeć od tego, czy JS zdążył się zhydratować. To komponent serwerowy.
  */
 export function PageHero({

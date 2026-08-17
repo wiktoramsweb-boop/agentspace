@@ -14,6 +14,6 @@ export function createAnthropic() {
 }
 
 // Model konfigurowalny przez env (gdyby ID modelu się zmieniło).
-// Domyślnie Sonnet — dobry balans jakości polskiego dialogu i kosztu.
+// Domyślnie Sonnet - dobry balans jakości polskiego dialogu i kosztu.
 export const COACH_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5-20250929";
 export const SCORING_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5-20250929";

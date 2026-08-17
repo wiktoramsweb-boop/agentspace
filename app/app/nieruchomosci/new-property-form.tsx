@@ -63,7 +63,7 @@ export function NewPropertyForm({ clients }: { clients: ClientLite[] }) {
               name="owner_client_id"
               className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-white focus:border-emerald-500 focus:outline-none"
             >
-              <option value="">— brak / dodaj później —</option>
+              <option value="">- brak / dodaj później -</option>
               {clients.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}

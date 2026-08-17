@@ -10,7 +10,7 @@ type TiltCardProps = {
 };
 
 /**
- * 3D card tilt — kursor pochyla kartę w 3D z perspektywą.
+ * 3D card tilt - kursor pochyla kartę w 3D z perspektywą.
  * Apple/Stripe vibe. Idealne pod mockupy ekranów.
  */
 export function TiltCard({ children, className, maxTilt = 8 }: TiltCardProps) {

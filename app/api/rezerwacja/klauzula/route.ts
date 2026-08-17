@@ -7,9 +7,10 @@ const SYSTEM = `Jesteś prawnikiem redagującym umowy rezerwacyjne nieruchomośc
 
 Zasady:
 - Język formalny, precyzyjny, spójny z resztą umowy. Strony to zdefiniowane terminy: przy sprzedaży „Sprzedający" i „Kupujący", przy najmie „Wynajmujący" i „Najemca". Wpłata to „zadatek" albo „opłata rezerwacyjna" (użyj tego, co podano).
-- JEDNO zwięzłe postanowienie (1–4 zdania). BEZ numeru paragrafu i BEZ nagłówka — sama treść ustępu.
+- JEDNO zwięzłe postanowienie (1-4 zdania). BEZ numeru paragrafu i BEZ nagłówka - sama treść ustępu.
 - Nie wymyślaj kwot, dat, nazwisk, numerów. Jeśli potrzebne dane, których agent nie podał, wstaw [placeholder w nawiasach kwadratowych].
 - Jeśli prośba jest niejasna, zredaguj najbardziej sensowny, bezpieczny prawnie zapis.
+- INTERPUNKCJA: nie używaj myślnika ani półpauzy (— –); stosuj przecinek, dwukropek lub nawias.
 Zawsze wywołaj narzędzie dodaj_zapis.`;
 
 export async function POST(request: Request) {

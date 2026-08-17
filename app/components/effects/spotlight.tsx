@@ -4,7 +4,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef } from "react";
 
 /**
- * Spotlight — świetlna plama która śledzi kursor.
+ * Spotlight - świetlna plama która śledzi kursor.
  * Działa relative w kontenerze rodzica. Premium hero effect (Linear/Vercel style).
  */
 export function Spotlight() {

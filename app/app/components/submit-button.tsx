@@ -3,7 +3,7 @@
 import { useFormStatus } from "react-dom";
 
 /**
- * Przycisk „submit" ze stanem ładowania — sam czyta pending z rodzica <form>.
+ * Przycisk „submit" ze stanem ładowania - sam czyta pending z rodzica <form>.
  * Dzięki temu użytkownik od razu widzi, że klik zadziałał (spinner + blokada),
  * a opcjonalny overlay przykrywa dłuższe akcje (np. start sesji z przekierowaniem).
  */

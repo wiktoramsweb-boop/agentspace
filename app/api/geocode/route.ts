@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 // Proxy do darmowego geokodera OpenStreetMap (Nominatim).
 // Dzięki temu z frontu wołamy własny endpoint (Nominatim wymaga nagłówka
-// User-Agent i limitu ~1 zapytanie/s — obsługujemy to tutaj + cache 24h).
+// User-Agent i limitu ~1 zapytanie/s - obsługujemy to tutaj + cache 24h).
 
 type NominatimItem = {
   display_name: string;

@@ -119,7 +119,7 @@ export async function POST(request: Request) {
 
             <div style="background: #f4f4f5; border-radius: 8px; padding: 16px; white-space: pre-wrap; color: #18181b; font-size: 14px; line-height: 1.6;">${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
 
-            <p style="color: #71717a; font-size: 12px; margin-top: 24px;">Możesz odpowiedzieć bezpośrednio na ten email — pójdzie do ${email}.</p>
+            <p style="color: #71717a; font-size: 12px; margin-top: 24px;">Możesz odpowiedzieć bezpośrednio na ten email - pójdzie do ${email}.</p>
           </div>
         `,
       });

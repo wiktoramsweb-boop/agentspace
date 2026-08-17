@@ -23,7 +23,7 @@ export default async function NowePasswordPage() {
       >
         <p className="text-sm text-zinc-400">
           Otwórz najświeższy link z maila na tym samym urządzeniu i w tej samej przeglądarce, w której
-          prosiłaś/prosiłeś o reset. Jeśli nie działa — wygeneruj nowy.
+          prosiłaś/prosiłeś o reset. Jeśli nie działa - wygeneruj nowy.
         </p>
       </AuthShell>
     );

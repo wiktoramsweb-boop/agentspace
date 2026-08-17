@@ -7,12 +7,12 @@ import { Pricing } from "../components/mk/pricing";
 import { FadeIn } from "../components/fade-in";
 
 export const metadata: Metadata = {
-  title: "Cennik — AgentSpace dla biur nieruchomości",
+  title: "Cennik | AgentSpace dla biur nieruchomości",
   description:
     "Trzy pakiety: Start 499 zł, Pro 899 zł, Biuro od 1490 zł miesięcznie. Cena zależy od liczby agentów, nie od liczby modułów. Bez umowy na czas określony.",
   alternates: { canonical: "https://agentspace.pl/cennik" },
   openGraph: {
-    title: "Cennik — AgentSpace dla biur nieruchomości",
+    title: "Cennik | AgentSpace dla biur nieruchomości",
     description:
       "Start 499 zł, Pro 899 zł, Biuro od 1490 zł miesięcznie. Płacisz za wielkość biura, nie za moduły.",
     url: "https://agentspace.pl/cennik",
@@ -22,11 +22,11 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Co się dzieje, gdy zatrudnię kolejnego agenta?",
-    a: "Nic w trakcie miesiąca — nie doliczamy opłat za użytkownika. Jeśli zespół przekroczy limit pakietu na stałe, przy kolejnym rozliczeniu przechodzimy na wyższy pakiet. Odzywamy się wcześniej, nie robimy tego po cichu.",
+    a: "Nic w trakcie miesiąca - nie doliczamy opłat za użytkownika. Jeśli zespół przekroczy limit pakietu na stałe, przy kolejnym rozliczeniu przechodzimy na wyższy pakiet. Odzywamy się wcześniej, nie robimy tego po cichu.",
   },
   {
     q: "Czy jest okres próbny?",
-    a: "Zamiast klasycznego triala robimy wdrożenie pilotażowe: pierwszy miesiąc pracujemy razem na Twoich danych. Jeśli po nim uznasz, że system nie daje wartości — kończymy bez faktury za kolejny okres.",
+    a: "Zamiast klasycznego triala robimy wdrożenie pilotażowe: pierwszy miesiąc pracujemy razem na Twoich danych. Jeśli po nim uznasz, że system nie daje wartości - kończymy bez faktury za kolejny okres.",
   },
   {
     q: "Czy mogę zapłacić za rok z góry?",
@@ -38,7 +38,7 @@ const FAQ = [
   },
   {
     q: "Co z danymi, jeśli zrezygnuję?",
-    a: "Eksportujemy całą bazę klientów, nieruchomości i transakcji do plików, które otworzysz w Excelu. Dane są Twoje — nie trzymamy biura zakładnikiem bazy.",
+    a: "Eksportujemy całą bazę klientów, nieruchomości i transakcji do plików, które otworzysz w Excelu. Dane są Twoje - nie trzymamy biura zakładnikiem bazy.",
   },
 ];
 

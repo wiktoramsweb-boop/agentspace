@@ -1,5 +1,5 @@
 -- ============================================================
--- AgentSpace — SETUP v16: RLS (Row Level Security) — izolacja biur
+-- AgentSpace - SETUP v16: RLS (Row Level Security) - izolacja biur
 -- ============================================================
 -- Uruchom w Supabase SQL Editor. Idempotentne.
 --
@@ -7,7 +7,7 @@
 -- OMIJA RLS. Te polityki są DRUGĄ WARSTWĄ (backstop): chronią, gdyby kiedyś
 -- jakiś kod użył klucza anon/uwierzytelnionego użytkownika (np. publiczny
 -- endpoint) lub gdyby ktoś uderzył w API bezpośrednio. Nie zastępują kontroli
--- agency_id w kodzie stron — one zostają. Włączenie RLS nie psuje działającej
+-- agency_id w kodzie stron - one zostają. Włączenie RLS nie psuje działającej
 -- apki (service_role i tak je pomija).
 -- ============================================================
 
@@ -22,7 +22,7 @@ as $$
   select agency_id from public.profiles where id = auth.uid()
 $$;
 
--- Tabele z kolumną agency_id — polityka „tylko moja agencja".
+-- Tabele z kolumną agency_id - polityka „tylko moja agencja".
 do $$
 declare t text;
 begin

@@ -1,20 +1,20 @@
-# Handoff: „Oferta współpracy" (Droga A — nadruk na wzór z Canvy)
+# Handoff: „Oferta współpracy" (Droga A - nadruk na wzór z Canvy)
 
 Stan na moment przerwania. Feature 1 (Szybki wpis głosem) JEST GOTOWE i wdrożone.
-Ten dokument dotyczy Feature 2 — generatora oferty współpracy z PDF-a z Canvy.
+Ten dokument dotyczy Feature 2 - generatora oferty współpracy z PDF-a z Canvy.
 
 ## Co już zrobione (gotowe assety w repo)
-- **Czysta baza:** `public/oferta/wzor.pdf` — wygenerowana z `~/Downloads/wzor-oferta.pdf`
+- **Czysta baza:** `public/oferta/wzor.pdf` - wygenerowana z `~/Downloads/wzor-oferta.pdf`
   przez PyMuPDF: usunięte znaczniki (tekst + wektorowy `MIESIAC_X`), zdjęcia/design NIETKNIĘTE
   (redakcja z `images=PDF_REDACT_IMAGE_NONE`, bez fill → bez łaty na zdjęciu). `MIESIAC_X`
-  usunięty z OKŁADKI (str.0) I OSTATNIEJ STRONY (str.5) — obie mają nagłówek "OFERTA WSPÓŁPRACY / MIESIĄC".
+  usunięty z OKŁADKI (str.0) I OSTATNIEJ STRONY (str.5) - obie mają nagłówek "OFERTA WSPÓŁPRACY / MIESIĄC".
 - **Czcionki (statyczne, z variable przez fonttools instancer wght=400/700):**
   `public/oferta/fonts/` → `CormorantGaramond-Regular.ttf`, `CormorantGaramond-Bold.ttf`,
   `Arimo-Regular.ttf`, `Arimo-Bold.ttf`.
 - **Zależności zainstalowane:** `pdf-lib`, `@pdf-lib/fontkit`.
 
 ## KRYTYCZNE
-- `embedFont(bytes, { subset: false })` — z `subset: true` GUBI GLIFY (adres wychodził „ul ądn a").
+- `embedFont(bytes, { subset: false })` - z `subset: true` GUBI GLIFY (adres wychodził „ul ądn a").
   Musi być `subset: false`.
 - Kolory RGB 0-1 z hexów poniżej. Współrzędne w układzie pdf-lib (origin dół-lewo), już przeliczone.
 - Wysokość strony: 2384.25 pt.
@@ -26,14 +26,14 @@ Wartości wejściowe: `adres`, `miesiac`, `agent`, `telefon`, `czas`, `prowizja`
 |---|---|---|---|---|---|---|---|
 | adres | 0 | 132.3 | 1190.7 | 150 | CormorantGaramond-Regular | #f8f5ef | tekst = "ul. " + adres |
 | miesiac | 0 | 841.9 | 2101.2 | 38 | Arimo-Regular | #e8e3de | WYŚRODKOWANY (x = 841.9 - szer/2) |
-| miesiac | 5 | 841.9 | 2101.2 | 38 | Arimo-Regular | #e8e3de | WYŚRODKOWANY — TE SAME współrzędne co str.0 |
+| miesiac | 5 | 841.9 | 2101.2 | 38 | Arimo-Regular | #e8e3de | WYŚRODKOWANY - TE SAME współrzędne co str.0 |
 | agent | 0 | 130.3 | 118.8 | 38 | Arimo-Bold | #f8f5ef | |
 | agent | 5 | 109.2 | 157.9 | 38 | Arimo-Bold | #f8f5ef | |
 | telefon | 5 | 1321.2 | 119.7 | 30 | Arimo-Regular | #dcd6d1 | WYŚRODKOWANY pod mailem (środek maila x=1321.2) |
 | czas | 4 | 132.3 | 1760.7 | 55.1 | CormorantGaramond-Bold | #150e0a | np. "3 miesiące" |
 | prowizja | 4 | 975.1 | 1760.7 | 55.1 | CormorantGaramond-Bold | #150e0a | np. "2% brutto" |
 
-E-mail `biuro@spectranieruchomosci.pl` jest NA STAŁE w PDF (brak tokenu) — nie ruszać.
+E-mail `biuro@spectranieruchomosci.pl` jest NA STAŁE w PDF (brak tokenu) - nie ruszać.
 
 ## Sprawdzona logika generowania (Node/przeglądarka pdf-lib)
 ```js
@@ -61,10 +61,10 @@ for (const f of FIELDS) {
    → wypełnia pola głosem („czas 3 miesiące, prowizja 2%, adres Prądnicka 48…").
 3. Generowanie **po stronie klienta** (pdf-lib): `fetch('/oferta/wzor.pdf')` + 4 czcionki z
    `/oferta/fonts/…`, rysowanie pól, `download` jako `Oferta wspolpracy - {adres}.pdf`.
-4. Wpis w sidebarze (sekcja Sprzedaż lub Finanse), rola: wszyscy albo owner — do ustalenia.
+4. Wpis w sidebarze (sekcja Sprzedaż lub Finanse), rola: wszyscy albo owner - do ustalenia.
 5. Wysyłka mailem do klienta = wymaga zweryfikowanej domeny Resend (wciąż niezrobione).
    Na teraz: pobranie pliku, agent wysyła sam.
 
 ## Uwaga techniczna
 Generowanie client-side (public/ assety) jest najpewniejsze na Vercel (public/ zawsze serwowane).
-Renderowanie/weryfikację robiłem PyMuPDF (fitz) offline — nie jest dostępne w runtime Vercela.
+Renderowanie/weryfikację robiłem PyMuPDF (fitz) offline - nie jest dostępne w runtime Vercela.

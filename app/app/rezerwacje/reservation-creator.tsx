@@ -149,7 +149,7 @@ export function ReservationCreator({ city }: { city: string }) {
         </div>
       ))}
 
-      {/* Podpisy — linia kropkowana + „Podpis …" + imię */}
+      {/* Podpisy - linia kropkowana + „Podpis …" + imię */}
       <div className="mt-10 grid grid-cols-2 gap-12 break-inside-avoid">
         <SignBlock roleGen={doc.ownerRoleGen} names={doc.ownerNames} />
         <SignBlock roleGen={doc.buyerRoleGen} names={doc.buyerNames} />
@@ -157,7 +157,7 @@ export function ReservationCreator({ city }: { city: string }) {
     </div>
   );
 
-  // Tryb podglądu (jak w kalkulatorze) — arkusz poza siatką, na całą stronę.
+  // Tryb podglądu (jak w kalkulatorze) - arkusz poza siatką, na całą stronę.
   // Wstrzyknięty @page{margin} daje równe marginesy na KAŻDEJ stronie (zwykły @page działa).
   if (preview) {
     return (
@@ -228,7 +228,7 @@ export function ReservationCreator({ city }: { city: string }) {
           <div>
             <label className={lbl}>Rodzaj wpłaty</label>
             <select value={d.depositType} onChange={(e) => set("depositType", e.target.value as DepositType)} className={inp}>
-              <option value="zadatek">Zadatek (bezzwrotny — art. 394 KC)</option>
+              <option value="zadatek">Zadatek (bezzwrotny - art. 394 KC)</option>
               <option value="oplata">Opłata rezerwacyjna</option>
             </select>
           </div>
@@ -284,7 +284,7 @@ export function ReservationCreator({ city }: { city: string }) {
 
         <Section title="Dodatkowe zapisy (opcjonalnie)">
           <p className="text-xs text-zinc-500">
-            Napisz własnymi słowami, co dopisać do umowy — AI ujmie to formalnie i doda przed postanowieniami końcowymi.
+            Napisz własnymi słowami, co dopisać do umowy - AI ujmie to formalnie i doda przed postanowieniami końcowymi.
           </p>
           <textarea
             value={aiReq}

@@ -45,7 +45,7 @@ export function InviteForm({ managers }: { managers: ManagerOption[] }) {
             <div className="flex-1">
               <label className={lbl}>Menedżer (opcjonalnie)</label>
               <select name="managerId" className={inp} defaultValue="">
-                <option value="">— bez menedżera —</option>
+                <option value="">- bez menedżera -</option>
                 {managers.map((m) => (
                   <option key={m.id} value={m.id}>{m.label}</option>
                 ))}

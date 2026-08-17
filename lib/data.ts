@@ -109,7 +109,7 @@ export async function getSessionWithScore(
   } as SessionWithScore;
 }
 
-/** Poniedziałek bieżącego tygodnia (lokalnie, 00:00) — początek okna limitu. */
+/** Poniedziałek bieżącego tygodnia (lokalnie, 00:00) - początek okna limitu. */
 export function mondayOfThisWeek(ref = new Date()): Date {
   const d = new Date(ref);
   const day = (d.getDay() + 6) % 7; // 0 = poniedziałek
@@ -118,7 +118,7 @@ export function mondayOfThisWeek(ref = new Date()): Date {
   return d;
 }
 
-/** Liczba sesji treningowych rozpoczętych w tym tygodniu (Pn–Nd) przez agenta. */
+/** Liczba sesji treningowych rozpoczętych w tym tygodniu (Pn-Nd) przez agenta. */
 export async function getWeeklySessionCount(agentId: string): Promise<number> {
   const admin = createSupabaseAdmin();
   const { count } = await admin
@@ -194,7 +194,7 @@ export async function getTeamRanking(
   return ranked;
 }
 
-// ---- Postęp lejka (Cele) per agent — dla widoku zespołu/menedżera ----
+// ---- Postęp lejka (Cele) per agent - dla widoku zespołu/menedżera ----
 
 export type FunnelStageKeyDb = "cold_calls" | "meetings" | "listings" | "buyers" | "sales";
 
@@ -220,7 +220,7 @@ const FUNNEL_STAGE_KEYS: FunnelStageKeyDb[] = [
 
 /**
  * Postęp lejka (telefony, spotkania, umowy, kupujący, sprzedaże) w bieżącym miesiącu
- * vs cel miesięczny — dla podanej listy agentów. Zwraca mapę agentId → postęp.
+ * vs cel miesięczny - dla podanej listy agentów. Zwraca mapę agentId → postęp.
  */
 export async function getTeamFunnelProgress(
   agentIds: string[],
@@ -344,7 +344,7 @@ export async function getTeamInsights(
     }
   }
 
-  // Aktywność zespołu — cold calle w 4 kolejnych tygodniach.
+  // Aktywność zespołu - cold calle w 4 kolejnych tygodniach.
   const weeklyActivity: WeeklyActivity[] = [];
   for (let w = 3; w >= 0; w--) {
     const start = new Date(monday);
@@ -491,7 +491,7 @@ export async function getAgentDetail(
     .select("overall, opening, qualification, objection_handling, closing")
     .eq("agent_id", agentId);
 
-  // Wszystkie sesje agenta (nie tylko 10) — CEO/menedżer chce widzieć każdą.
+  // Wszystkie sesje agenta (nie tylko 10) - CEO/menedżer chce widzieć każdą.
   const sessions = await getRecentSessions(agentId, 500);
   const totalSessions = sessions.length;
   const completedSessions = sessions.filter((s) => s.status === "completed").length;

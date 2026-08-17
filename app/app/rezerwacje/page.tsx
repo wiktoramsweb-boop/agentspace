@@ -9,7 +9,7 @@ export default async function RezerwacjePage() {
       <div className="print-hide">
         <PageHeader
           title="Umowa rezerwacyjna"
-          subtitle="Sprzedaż lub najem. Wpisz dane stron i kwotę — reszta gotowa. Drukuj lub zapisz PDF."
+          subtitle="Sprzedaż lub najem. Wpisz dane stron i kwotę - reszta gotowa. Drukuj lub zapisz PDF."
         />
       </div>
       <ReservationCreator city="Kraków" />

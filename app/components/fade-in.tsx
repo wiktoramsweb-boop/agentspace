@@ -1,19 +1,19 @@
 import { Children, isValidElement, type CSSProperties, type ReactNode } from "react";
 
 /**
- * Wejście treści przy przewijaniu — CZYSTY CSS, bez JavaScriptu.
+ * Wejście treści przy przewijaniu - CZYSTY CSS, bez JavaScriptu.
  *
  * DLACZEGO NIE motion/react:
  * `whileInView` ukrywa treść (opacity: 0) i odsłania ją dopiero, gdy JS się
  * zhydratuje i odpali animację. Jeśli JS nie wystartuje, karta jest wolno
- * ładowana albo przeglądarka wstrzyma rAF (np. karta w tle) — cała strona
+ * ładowana albo przeglądarka wstrzyma rAF (np. karta w tle) - cała strona
  * poniżej hero zostaje niewidoczna. Dla strony marketingowej to niedopuszczalne.
  *
  * Tutaj animacja jest wyłącznie warstwą ozdobną: element ZAWSZE kończy
  * widoczny, bo `animation-fill-mode: both` domyka go na stanie `to`.
  * Definicja animacji: `.mk-reveal` w globals.css.
  *
- * To są komponenty serwerowe — nie dokładają ani bajta JS do przeglądarki.
+ * To są komponenty serwerowe - nie dokładają ani bajta JS do przeglądarki.
  */
 
 type FadeInProps = {
@@ -46,7 +46,7 @@ type StaggerProps = {
 };
 
 /**
- * Kontener kaskady. Sam nie animuje — rozdaje opóźnienia dzieciom,
+ * Kontener kaskady. Sam nie animuje - rozdaje opóźnienia dzieciom,
  * żeby wchodziły jedno po drugim.
  */
 export function StaggerContainer({
@@ -60,7 +60,7 @@ export function StaggerContainer({
     <div className={className}>
       {items.map((child, i) => {
         if (!isValidElement(child)) return child;
-        // Opóźnienie wstrzykujemy zmienną CSS na opakowaniu — StaggerItem
+        // Opóźnienie wstrzykujemy zmienną CSS na opakowaniu - StaggerItem
         // nie musi wiedzieć, którym jest z kolei.
         return (
           <div

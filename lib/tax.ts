@@ -2,7 +2,7 @@
 //
 // UWAGA: To narzędzie do modelowania i porównań, NIE porada podatkowa.
 // Stawki i kwoty ZUS na 2026 to szacunki (oficjalne kwoty ZUS 2026 ogłaszane są
-// pod koniec roku) — dlatego wszystkie stałe są edytowalne w panelu „Założenia".
+// pod koniec roku) - dlatego wszystkie stałe są edytowalne w panelu „Założenia".
 // Przed realną decyzją (zmiana formy, VAT, spółka) potwierdź u księgowej/doradcy.
 
 export type TaxForm = "skala" | "liniowy" | "ryczalt";
@@ -30,16 +30,16 @@ export const ZUS_STAGE_LABELS: Record<ZusStage, string> = {
 // Domyślne wartości: reguły PIT są stabilne (2022→), kwoty ZUS/zdrowotnej to
 // szacunki na 2026 na bazie prognozowanego wzrostu wynagrodzeń.
 export type TaxConstants = {
-  // PIT — skala
+  // PIT - skala
   kwotaWolna: number; // 30 000
-  progSkali: number; // 120 000 — granica 12%/32%
+  progSkali: number; // 120 000 - granica 12%/32%
   stawkaSkala1: number; // 0.12
   stawkaSkala2: number; // 0.32
   kwotaZmniejszajaca: number; // 3 600 (12% z kwoty wolnej)
-  // PIT — liniowy
+  // PIT - liniowy
   stawkaLiniowy: number; // 0.19
   liniowyZdrowotnaOdliczenieLimit: number; // roczny limit odliczenia zdrowotnej od dochodu
-  // PIT — ryczałt (pośrednictwo w obrocie nieruchomościami = 15%)
+  // PIT - ryczałt (pośrednictwo w obrocie nieruchomościami = 15%)
   stawkaRyczalt: number; // 0.15
   // Danina solidarnościowa (4% od dochodu > 1 mln)
   daninaProg: number; // 1 000 000
@@ -47,8 +47,8 @@ export type TaxConstants = {
   // Składka zdrowotna
   zdrowotnaSkalaStawka: number; // 0.09 od dochodu (skala)
   zdrowotnaLiniowyStawka: number; // 0.049 od dochodu (liniowy)
-  zdrowotnaMinMies: number; // minimalna miesięczna (9% płacy min.) — dla skali/liniowego
-  // Ryczałt — składka zdrowotna wg progów rocznego przychodu (miesięcznie)
+  zdrowotnaMinMies: number; // minimalna miesięczna (9% płacy min.) - dla skali/liniowego
+  // Ryczałt - składka zdrowotna wg progów rocznego przychodu (miesięcznie)
   ryczaltProg1: number; // 60 000 przychodu
   ryczaltProg2: number; // 300 000 przychodu
   zdrowotnaRyczalt1Mies: number; // przychód ≤ prog1
@@ -164,14 +164,14 @@ export function computeForm(form: TaxForm, input: FormInput, c: TaxConstants): F
     podstawaOpodatkowania = Math.max(0, dochod - zusSpoleczny - zdrowotnaOdliczenie);
     podatek = podstawaOpodatkowania * c.stawkaLiniowy;
   } else {
-    // Ryczałt — podatek od przychodu (koszty nie obniżają podatku).
+    // Ryczałt - podatek od przychodu (koszty nie obniżają podatku).
     zdrowotna = zdrowotnaRyczaltRoczna(przychod, c);
     // Podstawę (przychód) pomniejsza się o składki społeczne i 50% zdrowotnej.
     podstawaOpodatkowania = Math.max(0, przychod - zusSpoleczny - 0.5 * zdrowotna);
     podatek = podstawaOpodatkowania * c.stawkaRyczalt;
   }
 
-  // Danina solidarnościowa — od dochodu (skala/liniowy) ponad próg.
+  // Danina solidarnościowa - od dochodu (skala/liniowy) ponad próg.
   if (form !== "ryczalt" && dochod > c.daninaProg) {
     danina = (dochod - c.daninaProg) * c.daninaStawka;
   }
@@ -219,7 +219,7 @@ export function progSkalaLiniowy(zusStage: ZusStage, c: TaxConstants): number {
   return Math.round((lo + hi) / 2);
 }
 
-// ── ZUS — oś czasu (kiedy kończy się mały ZUS) ──────────────────────────────
+// ── ZUS - oś czasu (kiedy kończy się mały ZUS) ──────────────────────────────
 export type ZusTimeline = {
   ulgaStartDo: Date | null;
   preferencyjnyOd: Date;
@@ -273,7 +273,7 @@ function monthsBetween(from: Date, to: Date): number {
   );
 }
 
-// ── VAT — pojemność 3 podmiotów + koszt utraty statusu ──────────────────────
+// ── VAT - pojemność 3 podmiotów + koszt utraty statusu ──────────────────────
 export type VatSubject = { name: string; przychod: number };
 export type VatResult = {
   subjects: { name: string; przychod: number; doLimitu: number; nadLimit: boolean }[];
@@ -298,7 +298,7 @@ export function computeVat(
   }));
   const sumaPrzychodow = subjects.reduce((a, s) => a + s.przychod, 0);
   const pojemnosc = c.limitVat * subjects.length;
-  // VAT należny (metoda „w stu" — prowizja brutto zawiera VAT po wejściu w VAT):
+  // VAT należny (metoda „w stu" - prowizja brutto zawiera VAT po wejściu w VAT):
   const vatNalezny = (sumaPrzychodow * c.stawkaVat) / (1 + c.stawkaVat);
   const vatOdliczony = (kosztyZVat * c.stawkaVat) / (1 + c.stawkaVat);
   return {
@@ -321,7 +321,7 @@ export type SpzooResult = {
   spzooNetto: number; // do podziału między wspólników po CIT i dywidendzie
   spzooEfektywna: number;
   citStawka: number;
-  // JDG — 2 wspólników na wybranej formie
+  // JDG - 2 wspólników na wybranej formie
   jdgNetto: number;
   jdgDaniny: number;
   jdgEfektywna: number;
@@ -411,7 +411,7 @@ export function compareSpzoo(
   malyPodatnikCit: boolean,
   c: TaxConstants,
 ): SpzooResult {
-  // Sp. z o.o. — zysk → CIT → dywidenda (19%). 2-osobowa: brak ZUS wspólników.
+  // Sp. z o.o. - zysk → CIT → dywidenda (19%). 2-osobowa: brak ZUS wspólników.
   const citStawka = malyPodatnikCit ? c.citMaly : c.citStandard;
   const cit = Math.max(0, zyskFirmy) * citStawka;
   const poCit = zyskFirmy - cit;
@@ -419,7 +419,7 @@ export function compareSpzoo(
   const spzooNetto = poCit - dywidenda;
   const spzooEfektywna = zyskFirmy > 0 ? (cit + dywidenda) / zyskFirmy : 0;
 
-  // JDG — zysk dzielony 50/50 na 2 wspólników, każdy rozlicza wybraną formą.
+  // JDG - zysk dzielony 50/50 na 2 wspólników, każdy rozlicza wybraną formą.
   const perOsoba = zyskFirmy / 2;
   const r = computeForm(jdgForma, { przychod: perOsoba, koszty: 0, zusStage }, c);
   const jdgNetto = r.netto * 2;

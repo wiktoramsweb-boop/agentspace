@@ -1,5 +1,5 @@
 export function formatPln(amount: number | null | undefined): string {
-  if (amount == null) return "—";
+  if (amount == null) return "-";
   return new Intl.NumberFormat("pl-PL", {
     style: "currency",
     currency: "PLN",
@@ -8,7 +8,7 @@ export function formatPln(amount: number | null | undefined): string {
 }
 
 export function formatDateShort(iso: string | null): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   return new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "short" }).format(
     new Date(iso),
   );

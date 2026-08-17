@@ -55,7 +55,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
 
   const html = `
     <div style="font-family:-apple-system,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#18181b;">
-      <h1 style="color:#10b981;font-size:22px;margin:0 0 4px;">Raport miesięczny — ${agency.name}</h1>
+      <h1 style="color:#10b981;font-size:22px;margin:0 0 4px;">Raport miesięczny - ${agency.name}</h1>
       <p style="color:#71717a;margin:0 0 24px;">${monthName}</p>
 
       <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
@@ -67,7 +67,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
           <td style="width:12px;"></td>
           <td style="padding:12px;background:#f4f4f5;border-radius:8px;">
             <div style="font-size:12px;color:#71717a;">Średni wynik AI</div>
-            <div style="font-size:22px;font-weight:600;">${stats.avgTeamScore ?? "—"}/10</div>
+            <div style="font-size:22px;font-weight:600;">${stats.avgTeamScore ?? "-"}/10</div>
           </td>
           <td style="width:12px;"></td>
           <td style="padding:12px;background:#f4f4f5;border-radius:8px;">
@@ -80,7 +80,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
       ${strongest && weakest ? `
       <p style="font-size:15px;line-height:1.6;">
         Najmocniejszy obszar zespołu: <strong>${strongest.label}</strong> (${strongest.avg}/10).<br/>
-        Do poprawy: <strong>${weakest.label}</strong> (${weakest.avg}/10) — rozważ wspólne szkolenie.
+        Do poprawy: <strong>${weakest.label}</strong> (${weakest.avg}/10) - rozważ wspólne szkolenie.
       </p>` : ""}
 
       ${topAgent ? `<p style="font-size:15px;">🏆 Najlepszy agent: <strong>${topAgent.full_name ?? topAgent.email}</strong> (${topAgent.avgScore}/10)</p>` : ""}
@@ -105,7 +105,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
     await resend.emails.send({
       from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
       to: ownerEmail,
-      subject: `📊 Raport miesięczny — ${agency.name} (${monthName})`,
+      subject: `📊 Raport miesięczny - ${agency.name} (${monthName})`,
       html,
     });
     return true;

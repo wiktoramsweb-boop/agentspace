@@ -24,7 +24,7 @@ export function computeFunnel(goal: Goal): FunnelTargets {
   const annualListings = annualSales * goal.listings_per_sale;
   const annualMeetings = annualListings * goal.meetings_per_listing;
   const annualCalls = annualMeetings * goal.calls_per_meeting;
-  // kupujący: zakładamy ~1 kupujący na sprzedaż (uproszczenie) — do lejka informacyjnie
+  // kupujący: zakładamy ~1 kupujący na sprzedaż (uproszczenie) - do lejka informacyjnie
   const annualBuyers = annualSales;
 
   const workdaysPerYear = Math.max(1, goal.workdays_per_week) * 52;
@@ -38,7 +38,7 @@ export function computeFunnel(goal: Goal): FunnelTargets {
     // (żeby nie pokazywać "1 sprzedaż dziś" codziennie).
     const dailyTarget = dailyRaw >= 0.8 ? Math.max(1, Math.round(dailyRaw)) : 0;
 
-    // Czytelny rytm — najmniejszy sensowny okres, w którym wychodzi ≥1.
+    // Czytelny rytm - najmniejszy sensowny okres, w którym wychodzi ≥1.
     let cadence: string;
     if (dailyRaw >= 1) cadence = `${Math.round(dailyRaw)}/dzień`;
     else if (weekly >= 1) cadence = `~${Math.round(weekly)}/tydz.`;

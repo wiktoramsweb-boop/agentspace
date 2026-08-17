@@ -58,19 +58,19 @@ export const SCENARIO_CATEGORIES: {
   {
     value: "cold_calling",
     label: "Cold Calling",
-    description: "Zimne telefony — pozyskiwanie kontaktu przez telefon",
+    description: "Zimne telefony - pozyskiwanie kontaktu przez telefon",
     icon: "phone",
   },
   {
     value: "spotkanie",
     label: "Spotkania pozyskowe",
-    description: "Spotkania u klienta — pozyskanie oferty i podpisanie umowy",
+    description: "Spotkania u klienta - pozyskanie oferty i podpisanie umowy",
     icon: "handshake",
   },
   {
     value: "najem",
     label: "Najem (bezpieczny)",
-    description: "Wynajem — weryfikacja najemcy, dochody, bezpieczeństwo",
+    description: "Wynajem - weryfikacja najemcy, dochody, bezpieczeństwo",
     icon: "shield",
   },
 ];
@@ -284,7 +284,7 @@ export const PERSONALITIES = [
   {
     value: "zyczliwy",
     label: "Życzliwy (łatwy)",
-    description: "Otwarty, sympatyczny, chętnie współpracuje — dobry na start",
+    description: "Otwarty, sympatyczny, chętnie współpracuje - dobry na start",
     color: "emerald",
   },
   {

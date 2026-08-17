@@ -65,7 +65,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
   const toast = useToast();
 
   const templateOutput = useMemo(() => generateListing(i), [i]);
-  // Gdy AI (lub ręczna edycja) nadpisze tekst — pokazujemy jego wersję,
+  // Gdy AI (lub ręczna edycja) nadpisze tekst - pokazujemy jego wersję,
   // inaczej podgląd składany na żywo z pól.
   const output = aiText !== null ? aiText : templateOutput;
 
@@ -84,7 +84,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
         toast(data.error ?? "Nie udało się wygenerować.", "error");
       } else {
         setAiText(data.text);
-        toast("Gotowe — opis napisany przez AI ✨");
+        toast("Gotowe - opis napisany przez AI ✨");
       }
     } catch {
       setError("Błąd połączenia. Spróbuj ponownie.");
@@ -177,7 +177,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
                 defaultValue=""
                 className={selectCls}
               >
-                <option value="">— wybierz ofertę —</option>
+                <option value="">- wybierz ofertę -</option>
                 {properties.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.title}
@@ -207,7 +207,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
             placeholder="Z 20 m² TARASEM, GARAŻEM I KOMÓRKĄ"
           />
           <Field
-            label="Własny tytuł (opcjonalnie — nadpisuje powyższe)"
+            label="Własny tytuł (opcjonalnie - nadpisuje powyższe)"
             value={i.customTitle}
             onChange={(v) => set("customTitle", v)}
           />
@@ -222,7 +222,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
             placeholder="Prezentujemy przestronne, w pełni rozkładowe mieszkanie..."
             rows={4}
           />
-          <Toggle label="Dopisz zdanie 'Mamy klucze — prezentacja także wieczorami i w weekendy'" checked={i.klucze} onChange={(v) => set("klucze", v)} />
+          <Toggle label="Dopisz zdanie 'Mamy klucze - prezentacja także wieczorami i w weekendy'" checked={i.klucze} onChange={(v) => set("klucze", v)} />
         </Section>
 
         {/* Podstawowe informacje */}
@@ -279,7 +279,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
                 <input
                   value={a}
                   onChange={(e) => setAtut(idx, e.target.value)}
-                  placeholder="Ogrzewanie miejskie — niższe koszty, brak przeglądów gazowych"
+                  placeholder="Ogrzewanie miejskie - niższe koszty, brak przeglądów gazowych"
                   className={inputCls + " flex-1"}
                 />
                 <button onClick={() => removeAtut(idx)} className="px-2 text-zinc-600 hover:text-red-400" title="Usuń">

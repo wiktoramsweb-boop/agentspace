@@ -99,8 +99,8 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
             value={card.pit5lat}
             onChange={(v) => set("pit5lat", v as TransactionCard["pit5lat"])}
             options={[
-              { v: "tak", l: "TAK — bez PIT" },
-              { v: "nie", l: "NIE — 19% PIT / ulga" },
+              { v: "tak", l: "TAK - bez PIT" },
+              { v: "nie", l: "NIE - 19% PIT / ulga" },
             ]}
           />
         </div>
@@ -109,8 +109,8 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
           value={card.hipoteka}
           onChange={(v) => set("hipoteka", v as TransactionCard["hipoteka"])}
           options={[
-            { v: "nie", l: "NIE — czysta KW" },
-            { v: "tak", l: "TAK — konieczna promesa" },
+            { v: "nie", l: "NIE - czysta KW" },
+            { v: "tak", l: "TAK - konieczna promesa" },
           ]}
         />
       </Stage>
@@ -137,7 +137,7 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-cyan-400">Wariant kredytowy</p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Text label="Termin umowy przyrzeczonej (min. 2–3 mies.)" type="date" value={card.kredytTerminPrzyrzeczonej} onChange={(v) => set("kredytTerminPrzyrzeczonej", v)} />
+              <Text label="Termin umowy przyrzeczonej (min. 2-3 mies.)" type="date" value={card.kredytTerminPrzyrzeczonej} onChange={(v) => set("kredytTerminPrzyrzeczonej", v)} />
               <Text label="Wpłacony zadatek (PLN)" inputMode="decimal" value={card.kredytZadatek} onChange={(v) => set("kredytZadatek", v)} />
             </div>
             <Check label="Przekazano komplet dokumentów do doradcy kredytowego" checked={card.kredytDokDoradca} onChange={(v) => set("kredytDokDoradca", v)} />

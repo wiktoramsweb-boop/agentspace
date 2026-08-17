@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
- * Krok 2 — użytkownik klika link z maila i ląduje tutaj. Zamieniamy token na
+ * Krok 2 - użytkownik klika link z maila i ląduje tutaj. Zamieniamy token na
  * sesję odzyskiwania (cookies), potem przekierowujemy na formularz nowego hasła.
  *
  * Obsługujemy oba warianty szablonu maila Supabase:

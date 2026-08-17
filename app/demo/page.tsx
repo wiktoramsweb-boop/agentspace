@@ -11,7 +11,7 @@ import { FadeIn } from "../components/fade-in";
 import { TiltCard } from "../components/effects/tilt-card";
 
 export const metadata: Metadata = {
-  title: "Demo AgentSpace — zobacz jak działa AI Coach",
+  title: "Demo AgentSpace | Zobacz jak działa AI Coach",
   description:
     "Demo platformy AgentSpace: AI Coach do treningu cold calli, dashboard agenta, panel właściciela biura. Interaktywne mockupy + pełen flow sesji treningowej.",
   alternates: {
@@ -23,7 +23,7 @@ const MOCKUPS_LIST = [
   {
     eyebrow: "Ekran 1",
     title: "AI Coach w działaniu",
-    body: "Agent wybiera scenariusz, wybiera osobowość klienta, klika start. Mikrofon się aktywuje, AI mówi pierwsze zdanie po polsku. Rozmowa toczy się jak prawdziwa — z przerwami, obiekcjami, zaskakującymi pytaniami.",
+    body: "Agent wybiera scenariusz, wybiera osobowość klienta, klika start. Mikrofon się aktywuje, AI mówi pierwsze zdanie po polsku. Rozmowa toczy się jak prawdziwa - z przerwami, obiekcjami, zaskakującymi pytaniami.",
     Mockup: AiCoachMockup,
   },
   {
@@ -34,7 +34,7 @@ const MOCKUPS_LIST = [
   },
   {
     eyebrow: "Ekran 3",
-    title: "Panel właściciela — pełen obraz zespołu",
+    title: "Panel właściciela: pełen obraz zespołu",
     body: "Średni score sesji, ranking agentów, najsłabsze obszary zespołu, alerty (np. agent który nie trenuje). Decyzje oparte o dane, nie przeczucia.",
     Mockup: OwnerPanelMockup,
   },
@@ -48,7 +48,7 @@ export default function Demo() {
         <PageHero
           eyebrow="Demo"
           title="Zobacz, jak wygląda AgentSpace od środka"
-          description="Główne ekrany systemu. Chcesz zobaczyć go na żywo, na danych swojego biura — umów rozmowę."
+          description="Główne ekrany systemu. Chcesz zobaczyć go na żywo, na danych swojego biura - umów rozmowę."
         />
 
         {/* Mockupy */}

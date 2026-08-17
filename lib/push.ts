@@ -68,7 +68,7 @@ export async function sendPushToAgent(
       sent += 1;
     } catch (err) {
       const code = (err as { statusCode?: number })?.statusCode;
-      // 404/410 — subskrypcja wygasła, usuń ją
+      // 404/410 - subskrypcja wygasła, usuń ją
       if (code === 404 || code === 410) {
         await admin.from("push_subscriptions").delete().eq("id", s.id);
       } else {

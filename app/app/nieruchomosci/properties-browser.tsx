@@ -136,7 +136,7 @@ export function PropertiesBrowser({
                     )}
 
                     <p className="text-2xl font-bold text-white">
-                      {p.price_pln != null ? formatPln(p.price_pln) : "—"}
+                      {p.price_pln != null ? formatPln(p.price_pln) : "-"}
                       {p.deal_kind === "wynajem" && p.price_pln != null && (
                         <span className="text-sm font-medium text-zinc-500"> /mc</span>
                       )}
@@ -148,7 +148,7 @@ export function PropertiesBrowser({
                         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-[10px] font-bold text-zinc-950">
                           {(p.opiekunName ?? "?").charAt(0).toUpperCase()}
                         </span>
-                        {mine ? "Ty" : p.opiekunName ?? "—"}
+                        {mine ? "Ty" : p.opiekunName ?? "-"}
                       </span>
                       <span className="text-xs font-medium text-emerald-400/80 opacity-0 transition group-hover:opacity-100">Otwórz →</span>
                     </div>

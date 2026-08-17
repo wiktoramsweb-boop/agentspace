@@ -1,4 +1,4 @@
-// Dane i logika faktur (VAT zw — art. 113 ust. 1).
+// Dane i logika faktur (VAT zw - art. 113 ust. 1).
 
 export type Seller = {
   key: string;

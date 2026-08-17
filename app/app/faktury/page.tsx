@@ -27,7 +27,7 @@ export default async function FakturyPage() {
       {invoices.length === 0 ? (
         <EmptyState
           title="Brak faktur"
-          body="Wystaw pierwszą fakturę — wybierz sprzedawcę, wpisz nabywcę i kwotę, a resztę (konto, słownie, VAT zw) zrobimy za Ciebie."
+          body="Wystaw pierwszą fakturę - wybierz sprzedawcę, wpisz nabywcę i kwotę, a resztę (konto, słownie, VAT zw) zrobimy za Ciebie."
           ctaHref="/app/faktury/nowa"
           ctaLabel="Nowa faktura"
           icon={
@@ -54,7 +54,7 @@ export default async function FakturyPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-white">Faktura {inv.number}</p>
                   <p className="truncate text-sm text-zinc-400">
-                    {inv.buyer_name || "—"} · {seller.name.split(" ").slice(0, 2).join(" ")}…
+                    {inv.buyer_name || "-"} · {seller.name.split(" ").slice(0, 2).join(" ")}…
                     {inv.issue_date && ` · ${formatDateShort(inv.issue_date)}`}
                   </p>
                 </div>

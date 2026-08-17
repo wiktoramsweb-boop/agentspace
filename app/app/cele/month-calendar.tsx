@@ -4,7 +4,7 @@ import type { MonthCalendar } from "@/lib/goal-calendar";
 const WEEKDAYS = ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"];
 
 /**
- * Miesięczny kalendarz wykonania celu telefonów — który dzień był „na zielono" (cel zrobiony),
+ * Miesięczny kalendarz wykonania celu telefonów - który dzień był „na zielono" (cel zrobiony),
  * a który nie. Czysto prezentacyjny (dane z buildMonthCalendar).
  */
 export function MonthCalendarView({
@@ -65,7 +65,7 @@ export function MonthCalendarView({
         <Legend cls="bg-emerald-500/20 border-emerald-500/40" label="cel wykonany" />
         <Legend cls="bg-amber-500/15 border-amber-500/30" label="częściowo" />
         <Legend cls="bg-zinc-900/40 border-zinc-800" label="brak / 0" />
-        {!hasTarget && <span className="text-zinc-600">· agent bez ustawionego celu — liczby to same wykonania</span>}
+        {!hasTarget && <span className="text-zinc-600">· agent bez ustawionego celu - liczby to same wykonania</span>}
       </div>
     </Card>
   );
