@@ -500,3 +500,83 @@ export const FUNNEL_STAGES = [
 export type FunnelStageKey = (typeof FUNNEL_STAGES)[number]["key"];
 
 export type PersonalityValue = (typeof PERSONALITIES)[number]["value"];
+
+// ---------- DZIAŁANIA (CRM: połączenia, zadania, wydarzenia, spotkania) ----------
+
+export type ActivityKind = "polaczenie" | "zadanie" | "wydarzenie" | "spotkanie";
+export type ActivityStatus = "zaplanowane" | "wykonane" | "anulowane";
+export type ActivityPriority = "niski" | "normalny" | "wysoki";
+
+export type Activity = {
+  id: string;
+  agency_id: string;
+  created_by: string | null;
+  kind: ActivityKind;
+  purpose: string | null;
+  subject: string;
+  description: string | null;
+  status: ActivityStatus;
+  priority: ActivityPriority;
+  call_direction: string | null;
+  duration_s: number | null;
+  due_at: string | null;
+  started_at: string | null;
+  ended_at: string | null;
+  completed_at: string | null;
+  client_id: string | null;
+  property_id: string | null;
+  assignee_ids: string[];
+  include_in_report: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Kafelki wyboru rodzaju działania (modal „Wybierz rodzaj działania"). */
+export const ACTIVITY_KINDS: {
+  value: ActivityKind;
+  label: string;
+  emoji: string;
+  tile: string;   // kolor kafelka z ikoną
+  badge: string;  // kolor plakietki na liście
+}[] = [
+  { value: "polaczenie", label: "Połączenie telefoniczne", emoji: "📞", tile: "bg-blue-500", badge: "bg-orange-100 text-orange-700" },
+  { value: "zadanie", label: "Zadanie", emoji: "✅", tile: "bg-violet-500", badge: "bg-violet-100 text-violet-700" },
+  { value: "wydarzenie", label: "Wydarzenie", emoji: "📅", tile: "bg-amber-500", badge: "bg-amber-100 text-amber-700" },
+  { value: "spotkanie", label: "Spotkanie", emoji: "🤝", tile: "bg-rose-500", badge: "bg-blue-100 text-blue-700" },
+];
+
+export const ACTIVITY_STATUSES: { value: ActivityStatus; label: string; color: string; bar: string }[] = [
+  { value: "zaplanowane", label: "Zaplanowane", color: "bg-emerald-100 text-emerald-700", bar: "bg-emerald-400" },
+  { value: "wykonane", label: "Wykonane", color: "bg-blue-100 text-blue-700", bar: "bg-blue-400" },
+  { value: "anulowane", label: "Anulowane", color: "bg-slate-200 text-slate-600", bar: "bg-slate-300" },
+];
+
+export const ACTIVITY_PRIORITIES: { value: ActivityPriority; label: string; color: string }[] = [
+  { value: "niski", label: "Niski", color: "bg-slate-200 text-slate-600" },
+  { value: "normalny", label: "Normalny", color: "bg-emerald-100 text-emerald-700" },
+  { value: "wysoki", label: "Wysoki", color: "bg-red-100 text-red-700" },
+];
+
+/** Cel działania - lista wzorowana na ASARI. */
+export const ACTIVITY_PURPOSES: { value: string; label: string; kinds: ActivityKind[] }[] = [
+  { value: "rozmowa_pozyskowa", label: "Rozmowa pozyskowa", kinds: ["polaczenie"] },
+  { value: "rozmowa_aktualizacyjna", label: "Rozmowa aktualizacyjna", kinds: ["polaczenie"] },
+  { value: "rozmowa_niesklasyfikowana", label: "Rozmowa niesklasyfikowana", kinds: ["polaczenie"] },
+  { value: "spotkanie_pozyskowe", label: "Spotkanie pozyskowe", kinds: ["spotkanie", "wydarzenie"] },
+  { value: "prezentacja", label: "Prezentacja nieruchomości", kinds: ["spotkanie", "wydarzenie"] },
+  { value: "obnizka_ceny", label: "Spotkanie w celu obniżki ceny", kinds: ["spotkanie"] },
+  { value: "przedluzenie_umowy", label: "Spotkanie w celu przedłużenia umowy", kinds: ["spotkanie"] },
+  { value: "home_staging", label: "Home staging", kinds: ["zadanie", "wydarzenie", "spotkanie"] },
+  { value: "sesja_foto", label: "Sesja fotograficzna", kinds: ["zadanie", "wydarzenie", "spotkanie"] },
+  { value: "szkolenie", label: "Szkolenie", kinds: ["wydarzenie", "zadanie", "spotkanie"] },
+  { value: "inne", label: "Inne", kinds: ["polaczenie", "zadanie", "wydarzenie", "spotkanie"] },
+];
+
+export const CALL_DIRECTIONS: { value: string; label: string }[] = [
+  { value: "wychodzaca", label: "Rozmowa wychodząca" },
+  { value: "przychodzaca", label: "Rozmowa przychodząca" },
+];
+
+export const ACTIVITY_KIND_MAP = Object.fromEntries(
+  ACTIVITY_KINDS.map((k) => [k.value, k]),
+) as Record<ActivityKind, (typeof ACTIVITY_KINDS)[number]>;

@@ -37,6 +37,7 @@ const SECTIONS: NavSection[] = [
     title: "Główne",
     items: [
       { href: "/app", label: "Pulpit", icon: <HomeIcon />, color: "emerald" },
+      { href: "/app/dzialania", label: "Działania", icon: <BoltIcon />, color: "amber" },
       { href: "/app/szybki-wpis", label: "Szybki wpis", icon: <VoiceIcon />, color: "teal" },
       { href: "/app/cele", label: "Cele", icon: <TargetIcon />, color: "violet" },
       { href: "/app/trening", label: "AI Coach", icon: <MicIcon />, color: "cyan" },
@@ -219,6 +220,9 @@ function UserCircleIcon() {
 }
 function PhotoIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>;
+}
+function BoltIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" /></svg>;
 }
 function VoiceIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>;

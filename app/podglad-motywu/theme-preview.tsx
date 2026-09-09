@@ -7,6 +7,43 @@ import { PageHeader, StatCard, Card, Badge } from "../app/components/ui";
 import { Button, SegmentedToggle } from "../app/components/kit";
 import { PROPERTY_STATUSES, CLIENT_STATUSES } from "@/lib/types";
 import { PropertyWizard } from "../app/nieruchomosci/property-wizard";
+import { ActivityModal } from "../app/dzialania/activity-modal";
+import { ActivitiesBrowser } from "../app/dzialania/activities-browser";
+import type { ActivityRich } from "@/lib/data-activities";
+
+
+const MOCK_AGENTS = [
+  { id: "u1", name: "Wiktor Szostek" },
+  { id: "u2", name: "Patrycja Gdowska" },
+  { id: "u3", name: "Natalia Grygiel" },
+];
+const MOCK_CLIENTS = [
+  { id: "c1", name: "Małgorzata Zielińska" },
+  { id: "c2", name: "Roman Kalinowski" },
+];
+const MOCK_PROPS = [{ id: "p1", name: "Kraków, ul. Wielicka" }];
+
+const base = {
+  agency_id: "a1", created_by: "u1", description: null as string | null,
+  call_direction: null as string | null, duration_s: null as number | null,
+  started_at: null, ended_at: null, completed_at: null,
+  property_id: null as string | null, propertyTitle: null as string | null,
+  include_in_report: false, created_at: "", updated_at: "",
+};
+const MOCK_ACTIVITIES: ActivityRich[] = [
+  { ...base, id: "1", kind: "polaczenie", purpose: "rozmowa_pozyskowa", subject: "Pozysk ul. Warmijska",
+    status: "wykonane", priority: "normalny", due_at: "2026-09-09T14:30:00Z", client_id: "c1",
+    clientName: "Małgorzata Zielińska", assignee_ids: ["u1"], assigneeNames: ["Wiktor Szostek"],
+    call_direction: "wychodzaca", duration_s: 245,
+    description: "Klientka rozważa sprzedaż w I kwartale. Umówiony telefon za 2 tygodnie." },
+  { ...base, id: "2", kind: "spotkanie", purpose: "prezentacja", subject: "Prezentacja Sołtysowska",
+    status: "zaplanowane", priority: "wysoki", due_at: "2026-09-15T17:00:00Z", client_id: "c2",
+    clientName: "Roman Kalinowski", property_id: "p1", propertyTitle: "Kraków, ul. Wielicka",
+    assignee_ids: ["u1", "u2"], assigneeNames: ["Wiktor Szostek", "Patrycja Gdowska"] },
+  { ...base, id: "3", kind: "zadanie", purpose: "sesja_foto", subject: "Zamówić sesję zdjęciową",
+    status: "zaplanowane", priority: "normalny", due_at: "2026-09-01T10:30:00Z", client_id: null,
+    clientName: null, assignee_ids: ["u3"], assigneeNames: ["Natalia Grygiel"] },
+];
 
 export function ThemePreview() {
   const [scope, setScope] = useState<"all" | "mine">("all");
@@ -120,6 +157,14 @@ export function ThemePreview() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-slate-900">Działania (moduł CRM)</h2>
+              <ActivityModal agents={MOCK_AGENTS} clients={MOCK_CLIENTS} properties={MOCK_PROPS} />
+            </div>
+            <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" />
           </div>
 
           <Card>

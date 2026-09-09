@@ -1,0 +1,296 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState, useTransition } from "react";
+import type { ActivityRich } from "@/lib/data-activities";
+import { setActivityStatus, deleteActivity } from "./actions";
+import {
+  ACTIVITY_KINDS,
+  ACTIVITY_KIND_MAP,
+  ACTIVITY_PRIORITIES,
+  ACTIVITY_PURPOSES,
+  ACTIVITY_STATUSES,
+  type ActivityKind,
+  type ActivityStatus,
+} from "@/lib/types";
+
+const STATUS_MAP = Object.fromEntries(ACTIVITY_STATUSES.map((s) => [s.value, s]));
+const PRIORITY_MAP = Object.fromEntries(ACTIVITY_PRIORITIES.map((p) => [p.value, p]));
+const PURPOSE_MAP = Object.fromEntries(ACTIVITY_PURPOSES.map((p) => [p.value, p.label]));
+
+function fmtWhen(iso: string | null): string {
+  if (!iso) return "-";
+  const d = new Date(iso);
+  return d.toLocaleString("pl-PL", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function fmtDuration(s: number | null): string | null {
+  if (!s) return null;
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m > 0 ? `${m} min ${sec} s` : `${sec} s`;
+}
+
+export function ActivitiesBrowser({
+  activities,
+  currentUserId,
+}: {
+  activities: ActivityRich[];
+  currentUserId: string;
+}) {
+  const [query, setQuery] = useState("");
+  const [scope, setScope] = useState<"all" | "mine">("all");
+  const [status, setStatus] = useState<ActivityStatus | "">("");
+  const [kind, setKind] = useState<ActivityKind | "">("");
+  const [pending, start] = useTransition();
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return activities.filter((a) => {
+      if (scope === "mine" && !(a.assignee_ids ?? []).includes(currentUserId)) return false;
+      if (status && a.status !== status) return false;
+      if (kind && a.kind !== kind) return false;
+      if (!q) return true;
+      return (
+        a.subject.toLowerCase().includes(q) ||
+        (a.clientName ?? "").toLowerCase().includes(q) ||
+        (a.propertyTitle ?? "").toLowerCase().includes(q) ||
+        (a.description ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [activities, query, scope, status, kind, currentUserId]);
+
+  const mineCount = activities.filter((a) => (a.assignee_ids ?? []).includes(currentUserId)).length;
+
+  return (
+    <div>
+      {/* Pasek filtrów */}
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Szukaj po temacie, kliencie, ofercie…"
+          className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
+        />
+        <div className="flex rounded-xl border border-slate-300 bg-white p-1">
+          <Scope active={scope === "all"} onClick={() => setScope("all")}>
+            Wszystko ({activities.length})
+          </Scope>
+          <Scope active={scope === "mine"} onClick={() => setScope("mine")}>
+            Moje ({mineCount})
+          </Scope>
+        </div>
+      </div>
+
+      {/* Chipsy rodzaju */}
+      <div className="mb-2.5 flex flex-wrap gap-2">
+        <Chip active={kind === ""} onClick={() => setKind("")}>
+          Wszystkie rodzaje
+        </Chip>
+        {ACTIVITY_KINDS.map((k) => (
+          <Chip key={k.value} active={kind === k.value} onClick={() => setKind(kind === k.value ? "" : k.value)}>
+            {k.emoji} {k.label}
+          </Chip>
+        ))}
+      </div>
+
+      {/* Chipsy statusu */}
+      <div className="mb-5 flex flex-wrap gap-2">
+        <Chip active={status === ""} onClick={() => setStatus("")}>
+          Wszystkie statusy
+        </Chip>
+        {ACTIVITY_STATUSES.map((s) => (
+          <Chip
+            key={s.value}
+            active={status === s.value}
+            onClick={() => setStatus(status === s.value ? "" : s.value)}
+          >
+            {s.label}
+          </Chip>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-10 text-center text-sm text-slate-500">
+          {activities.length === 0
+            ? "Brak działań. Dodaj pierwsze - telefon, zadanie albo spotkanie."
+            : "Brak działań dla tego filtra."}
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {filtered.map((a) => {
+            const km = ACTIVITY_KIND_MAP[a.kind] ?? ACTIVITY_KIND_MAP.polaczenie;
+            const sm = STATUS_MAP[a.status] ?? STATUS_MAP.zaplanowane;
+            const pm = PRIORITY_MAP[a.priority] ?? PRIORITY_MAP.normalny;
+            const overdue =
+              a.status === "zaplanowane" && a.due_at && new Date(a.due_at) < new Date();
+            const dur = fmtDuration(a.duration_s);
+
+            return (
+              <div
+                key={a.id}
+                className="group flex items-stretch gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white pl-0 transition hover:border-slate-300 hover:shadow-sm"
+              >
+                <span className={`w-1.5 flex-shrink-0 ${sm.bar}`} />
+
+                <div className="min-w-0 flex-1 py-4 pr-4">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <span className={`flex h-7 w-7 items-center justify-center rounded-lg text-sm text-white ${km.tile}`}>
+                      {km.emoji}
+                    </span>
+                    <p className="font-semibold text-slate-900">{a.subject}</p>
+                    {overdue && (
+                      <span className="rounded-md bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                        zaległe
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid gap-x-6 gap-y-1.5 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                    <Row label="Typ">
+                      <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${km.badge}`}>
+                        {km.label}
+                      </span>
+                    </Row>
+                    <Row label="Priorytet">
+                      <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${pm.color}`}>
+                        {pm.label}
+                      </span>
+                    </Row>
+                    <Row label="Status">
+                      <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${sm.color}`}>
+                        {sm.label}
+                      </span>
+                    </Row>
+                    <Row label="Termin">
+                      <span className={overdue ? "font-medium text-red-600" : "text-slate-700"}>
+                        {fmtWhen(a.due_at)}
+                      </span>
+                    </Row>
+
+                    {a.purpose && <Row label="Cel">{PURPOSE_MAP[a.purpose] ?? a.purpose}</Row>}
+                    <Row label="Agent">{a.assigneeNames.join(", ") || "-"}</Row>
+                    <Row label="Klient">
+                      {a.client_id && a.clientName ? (
+                        <Link href={`/app/klienci/${a.client_id}`} className="text-blue-600 hover:underline">
+                          {a.clientName}
+                        </Link>
+                      ) : (
+                        "-"
+                      )}
+                    </Row>
+                    <Row label="Nieruchomość">
+                      {a.property_id && a.propertyTitle ? (
+                        <Link
+                          href={`/app/nieruchomosci/${a.property_id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {a.propertyTitle}
+                        </Link>
+                      ) : (
+                        "-"
+                      )}
+                    </Row>
+                    {dur && <Row label="Czas rozmowy">{dur}</Row>}
+                  </div>
+
+                  {a.description && (
+                    <p className="mt-2.5 line-clamp-2 text-sm text-slate-500">{a.description}</p>
+                  )}
+                </div>
+
+                <div className="flex flex-shrink-0 flex-col items-end justify-center gap-2 pr-4">
+                  {a.status !== "wykonane" && (
+                    <button
+                      onClick={() => start(() => setActivityStatus(a.id, "wykonane"))}
+                      disabled={pending}
+                      className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-200 disabled:opacity-50"
+                    >
+                      ✓ Wykonane
+                    </button>
+                  )}
+                  {a.status === "wykonane" && (
+                    <button
+                      onClick={() => start(() => setActivityStatus(a.id, "zaplanowane"))}
+                      disabled={pending}
+                      className="rounded-lg px-3 py-1.5 text-xs text-slate-400 transition hover:text-slate-700 disabled:opacity-50"
+                    >
+                      Cofnij
+                    </button>
+                  )}
+                  <button
+                    onClick={() => start(() => deleteActivity(a.id))}
+                    disabled={pending}
+                    aria-label="Usuń działanie"
+                    className="rounded-lg px-3 py-1.5 text-xs text-slate-300 opacity-0 transition group-hover:opacity-100 hover:text-red-600 disabled:opacity-50"
+                  >
+                    Usuń
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <p className="flex items-center gap-1.5 truncate">
+      <span className="text-slate-400">{label}:</span>
+      <span className="truncate text-slate-700">{children}</span>
+    </p>
+  );
+}
+
+function Scope({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+        active ? "bg-emerald-500 text-white" : "text-slate-500 hover:text-slate-900"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Chip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+        active
+          ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+          : "border-slate-200 bg-white text-slate-500 hover:text-slate-900"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
