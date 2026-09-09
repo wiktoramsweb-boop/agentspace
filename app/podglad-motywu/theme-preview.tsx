@@ -170,7 +170,7 @@ export function ThemePreview() {
               <SearchWizard clients={MOCK_CLIENTS} />
               <ActivityModal agents={MOCK_AGENTS} clients={MOCK_CLIENTS} properties={MOCK_PROPS} />
             </div>
-            <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" />
+            <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" agents={MOCK_AGENTS} />
           </div>
 
           <Card>

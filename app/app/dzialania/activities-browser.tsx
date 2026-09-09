@@ -41,15 +41,22 @@ function fmtDuration(s: number | null): string | null {
 export function ActivitiesBrowser({
   activities,
   currentUserId,
+  agents = [],
 }: {
   activities: ActivityRich[];
   currentUserId: string;
+  agents?: { id: string; name: string }[];
 }) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<"all" | "mine">("all");
   const [status, setStatus] = useState<ActivityStatus | "">("");
   const [kind, setKind] = useState<ActivityKind | "">("");
   const [pending, start] = useTransition();
+  const [advanced, setAdvanced] = useState(false);
+  const [agentId, setAgentId] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -60,6 +67,10 @@ export function ActivitiesBrowser({
       if (scope === "mine" && !(a.assignee_ids ?? []).includes(currentUserId)) return false;
       if (status && a.status !== status) return false;
       if (kind && a.kind !== kind) return false;
+      if (agentId && !(a.assignee_ids ?? []).includes(agentId)) return false;
+      if (purpose && a.purpose !== purpose) return false;
+      if (from && (a.due_at ?? "") < `${from}T00:00:00`) return false;
+      if (to && (a.due_at ?? "") > `${to}T23:59:59`) return false;
       if (!q) return true;
       const phoneDigits = (a.contact_phone ?? "").replace(/\D/g, "");
       if (qDigits.length >= 3 && phoneDigits.includes(qDigits)) return true;
@@ -72,7 +83,7 @@ export function ActivitiesBrowser({
         (a.description ?? "").toLowerCase().includes(q)
       );
     });
-  }, [activities, query, scope, status, kind, currentUserId]);
+  }, [activities, query, scope, status, kind, currentUserId, agentId, purpose, from, to]);
 
   const mineCount = activities.filter((a) => (a.assignee_ids ?? []).includes(currentUserId)).length;
 
@@ -126,6 +137,65 @@ export function ActivitiesBrowser({
             {s.label}
           </Chip>
         ))}
+      </div>
+
+      {/* Filtry zaawansowane - zwinięte, żeby nie zaśmiecać widoku codziennego */}
+      <div className="mb-5">
+        <button
+          onClick={() => setAdvanced((v) => !v)}
+          className="text-sm font-medium text-emerald-600 transition hover:text-emerald-700"
+        >
+          {advanced ? "Ukryj filtry zaawansowane" : "Filtry zaawansowane"}
+          {(agentId || purpose || from || to) && !advanced ? " (aktywne)" : ""}
+        </button>
+
+        {advanced && (
+          <div className="mt-3 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <label className="mb-1 block text-xs text-slate-500">Agent</label>
+              <select value={agentId} onChange={(e) => setAgentId(e.target.value)} className={advInp}>
+                <option value="">wszyscy</option>
+                {agents.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-500">Cel</label>
+              <select value={purpose} onChange={(e) => setPurpose(e.target.value)} className={advInp}>
+                <option value="">wszystkie</option>
+                {ACTIVITY_PURPOSES.map((p) => (
+                  <option key={p.value} value={p.value}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-500">Termin od</label>
+              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className={advInp} />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-slate-500">Termin do</label>
+              <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className={advInp} />
+            </div>
+            {(agentId || purpose || from || to) && (
+              <button
+                onClick={() => {
+                  setAgentId("");
+                  setPurpose("");
+                  setFrom("");
+                  setTo("");
+                }}
+                className="justify-self-start rounded-lg px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-900"
+              >
+                Wyczyść filtry zaawansowane
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {filtered.length === 0 ? (
@@ -275,6 +345,9 @@ export function ActivitiesBrowser({
     </div>
   );
 }
+
+const advInp =
+  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none";
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (

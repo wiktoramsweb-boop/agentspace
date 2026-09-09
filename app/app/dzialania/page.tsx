@@ -5,6 +5,7 @@ import { computeFunnel } from "@/lib/funnel";
 import { PageHeader, StatCard } from "../components/ui";
 import { ActivitiesBrowser } from "./activities-browser";
 import { ActivityModal } from "./activity-modal";
+import Link from "next/link";
 
 export default async function DzialaniaPage() {
   const user = await requireUser();
@@ -35,7 +36,17 @@ export default async function DzialaniaPage() {
         title="Działania"
         subtitle="Telefony, zadania, spotkania i wydarzenia całego biura w jednym miejscu."
         action={
-          <ActivityModal agents={agents} clients={clientsLite} properties={propsLite} />
+          <div className="flex flex-wrap items-center gap-2">
+            {user.role === "owner" && (
+              <Link
+                href="/app/dzialania/raport"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                Raport zespołu
+              </Link>
+            )}
+            <ActivityModal agents={agents} clients={clientsLite} properties={propsLite} />
+          </div>
         }
       />
 
@@ -58,7 +69,7 @@ export default async function DzialaniaPage() {
         <StatCard label="Wykonane" value={stats.doneWeek} sub="w ostatnich 7 dniach" />
       </div>
 
-      <ActivitiesBrowser activities={activities} currentUserId={user.id} />
+      <ActivitiesBrowser activities={activities} currentUserId={user.id} agents={agents} />
     </>
   );
 }

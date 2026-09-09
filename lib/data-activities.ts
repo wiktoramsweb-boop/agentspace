@@ -223,3 +223,132 @@ export async function getClientsByPhone(
     .limit(10);
   return (data ?? []) as { id: string; name: string; phone: string | null }[];
 }
+
+// ---------- RAPORT DZIAŁAŃ (panel CEO) ----------
+
+export type ReportFilters = {
+  agentId?: string;      // konkretny agent albo pusto = wszyscy
+  kind?: string;
+  status?: string;
+  purpose?: string;
+  priority?: string;
+  from?: string;         // data od (YYYY-MM-DD)
+  to?: string;           // data do (YYYY-MM-DD)
+  q?: string;
+};
+
+export type AgentStat = {
+  id: string;
+  name: string;
+  polaczenie: number;
+  spotkanie: number;
+  zadanie: number;
+  wydarzenie: number;
+  wykonane: number;
+  zaplanowane: number;
+  total: number;
+};
+
+export type ActivitiesReport = {
+  rows: ActivityRich[];
+  total: number;
+  byKind: Record<string, number>;
+  byStatus: Record<string, number>;
+  agents: AgentStat[];
+  truncated: boolean;
+};
+
+const REPORT_LIMIT = 5000;
+
+/**
+ * Raport działań dla właściciela: kto ile zrobił w danym okresie.
+ *
+ * Filtrujemy po stronie bazy (daty, rodzaj, status), a zliczamy w kodzie -
+ * przy jednym biurze to kilka tysięcy wierszy, więc różnica jest nieodczuwalna,
+ * a unikamy budowania zapytań agregujących pod każdy wariant filtra.
+ */
+export async function getActivitiesReport(
+  agencyId: string,
+  f: ReportFilters,
+  agents: { id: string; name: string }[],
+): Promise<ActivitiesReport> {
+  const admin = createSupabaseAdmin();
+  let q = admin
+    .from("activities")
+    .select("*")
+    .eq("agency_id", agencyId)
+    .order("due_at", { ascending: false, nullsFirst: false })
+    .limit(REPORT_LIMIT);
+
+  if (f.kind) q = q.eq("kind", f.kind);
+  if (f.status) q = q.eq("status", f.status);
+  if (f.purpose) q = q.eq("purpose", f.purpose);
+  if (f.priority) q = q.eq("priority", f.priority);
+  if (f.agentId) q = q.contains("assignee_ids", [f.agentId]);
+  if (f.from) q = q.gte("due_at", `${f.from}T00:00:00`);
+  if (f.to) q = q.lte("due_at", `${f.to}T23:59:59`);
+  if (f.q) {
+    const like = `%${f.q}%`;
+    q = q.or(`subject.ilike.${like},contact_name.ilike.${like},description.ilike.${like}`);
+  }
+
+  const { data, error } = await q;
+  const rows = error ? [] : ((data ?? []) as Activity[]);
+
+  const byKind: Record<string, number> = {};
+  const byStatus: Record<string, number> = {};
+  const perAgent = new Map<string, AgentStat>();
+  for (const a of agents) {
+    perAgent.set(a.id, {
+      id: a.id,
+      name: a.name,
+      polaczenie: 0,
+      spotkanie: 0,
+      zadanie: 0,
+      wydarzenie: 0,
+      wykonane: 0,
+      zaplanowane: 0,
+      total: 0,
+    });
+  }
+
+  for (const r of rows) {
+    byKind[r.kind] = (byKind[r.kind] ?? 0) + 1;
+    byStatus[r.status] = (byStatus[r.status] ?? 0) + 1;
+    // Działanie prowadzone przez dwóch agentów liczy się obu - tak jak w ASARI,
+    // gdzie spotkanie z dwoma opiekunami widnieje u każdego z nich.
+    for (const id of r.assignee_ids ?? []) {
+      const s = perAgent.get(id);
+      if (!s) continue;
+      s.total++;
+      if (r.kind in s) (s as unknown as Record<string, number>)[r.kind]++;
+      if (r.status === "wykonane") s.wykonane++;
+      if (r.status === "zaplanowane") s.zaplanowane++;
+    }
+  }
+
+  // Nazwy powiązań tylko dla widocznej części listy - reszta i tak nie jest wyświetlana.
+  const visible = rows.slice(0, 200);
+  const clientIds = [...new Set(visible.map((r) => r.client_id).filter(Boolean))] as string[];
+  const { data: clients } = clientIds.length
+    ? await admin.from("clients").select("id, name").in("id", clientIds)
+    : { data: [] };
+  const cMap = new Map(((clients ?? []) as { id: string; name: string }[]).map((c) => [c.id, c.name]));
+  const uMap = new Map(agents.map((a) => [a.id, a.name]));
+
+  const rich: ActivityRich[] = visible.map((r) => ({
+    ...r,
+    clientName: r.client_id ? (cMap.get(r.client_id) ?? null) : null,
+    propertyTitle: null,
+    assigneeNames: (r.assignee_ids ?? []).map((id) => uMap.get(id) ?? "Agent"),
+  }));
+
+  return {
+    rows: rich,
+    total: rows.length,
+    byKind,
+    byStatus,
+    agents: [...perAgent.values()].filter((a) => a.total > 0).sort((a, b) => b.total - a.total),
+    truncated: rows.length >= REPORT_LIMIT,
+  };
+}
