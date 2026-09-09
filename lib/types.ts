@@ -282,6 +282,10 @@ export type Property = {
   export_to_portals?: boolean | null;
   web_published_at?: string | null;
   export_address_mode?: string | null;
+  // ── v21: proces obsługi i rola powiązanego klienta ──
+  process_stage?: string | null;
+  process_changed_at?: string | null;
+  owner_role?: string | null;
 };
 
 export type PropertyInterest = {
@@ -614,3 +618,77 @@ export const CALL_DIRECTIONS: { value: string; label: string }[] = [
 export const ACTIVITY_KIND_MAP = Object.fromEntries(
   ACTIVITY_KINDS.map((k) => [k.value, k]),
 ) as Record<ActivityKind, (typeof ACTIVITY_KINDS)[number]>;
+
+// ---------- POSZUKIWANIA (czego szuka kupujący/najemca) ----------
+
+export type SearchStatus = "aktualne" | "wstrzymane" | "zamkniete";
+
+export type Search = {
+  id: string;
+  agency_id: string;
+  agent_id: string | null;
+  client_id: string | null;
+  search_no: string | null;
+  title: string | null;
+  deal_kind: PropertyDealKind;
+  property_types: PropertyType[];
+  price_min: number | null;
+  price_max: number | null;
+  area_min: number | null;
+  area_max: number | null;
+  rooms_min: number | null;
+  rooms_max: number | null;
+  floor_min: number | null;
+  floor_max: number | null;
+  year_built_min: number | null;
+  locations: string[];
+  must_have: Record<string, boolean>;
+  status: SearchStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const SEARCH_STATUSES: { value: SearchStatus; label: string; color: string; bar: string }[] = [
+  { value: "aktualne", label: "Aktualne", color: "bg-emerald-100 text-emerald-700", bar: "bg-emerald-400" },
+  { value: "wstrzymane", label: "Wstrzymane", color: "bg-amber-100 text-amber-700", bar: "bg-amber-400" },
+  { value: "zamkniete", label: "Zamknięte", color: "bg-slate-200 text-slate-600", bar: "bg-slate-300" },
+];
+
+export type MatchStatus = "nowe" | "wyslane" | "odrzucone" | "zainteresowany";
+
+export const MATCH_STATUSES: { value: MatchStatus; label: string; color: string }[] = [
+  { value: "nowe", label: "Nowe", color: "bg-blue-100 text-blue-700" },
+  { value: "wyslane", label: "Wysłane", color: "bg-violet-100 text-violet-700" },
+  { value: "zainteresowany", label: "Zainteresowany", color: "bg-emerald-100 text-emerald-700" },
+  { value: "odrzucone", label: "Odrzucone", color: "bg-slate-200 text-slate-600" },
+];
+
+// ---------- PROCES OBSŁUGI NIERUCHOMOŚCI (pasek etapów) ----------
+
+export type ProcessStage =
+  | "przyjeta"
+  | "male_zainteresowanie"
+  | "liczne_prezentacje"
+  | "zlozona_oferta"
+  | "oplata_rezerwacyjna"
+  | "umowa_przedwstepna"
+  | "wygrana";
+
+export const PROCESS_STAGES: { value: ProcessStage; label: string; short: string }[] = [
+  { value: "przyjeta", label: "Przyjęta nieruchomość", short: "Przyjęta" },
+  { value: "male_zainteresowanie", label: "Małe zainteresowanie", short: "Małe zainter." },
+  { value: "liczne_prezentacje", label: "Liczne prezentacje", short: "Prezentacje" },
+  { value: "zlozona_oferta", label: "Złożona oferta", short: "Oferta" },
+  { value: "oplata_rezerwacyjna", label: "Opłata rezerwacyjna", short: "Rezerwacja" },
+  { value: "umowa_przedwstepna", label: "Umowa przedwstępna", short: "Przedwstępna" },
+  { value: "wygrana", label: "Transakcja wygrana", short: "Wygrana" },
+];
+
+/** Rola klienta powiązanego z nieruchomością. */
+export const OWNER_ROLES: { value: string; label: string; forKind?: PropertyDealKind }[] = [
+  { value: "wlasciciel", label: "Właściciel", forKind: "sprzedaz" },
+  { value: "wynajmujacy", label: "Wynajmujący", forKind: "wynajem" },
+  { value: "wspolwlasciciel", label: "Współwłaściciel" },
+  { value: "pelnomocnik", label: "Pełnomocnik" },
+];
