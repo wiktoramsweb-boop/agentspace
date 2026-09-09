@@ -823,3 +823,19 @@ html[data-theme="dark"] .app-shell :is(.invoice-sheet, .print-sheet, .sheet-a4, 
   border-color: #e2e8f0 !important;
   color-scheme: light;
 }
+
+/* Domknięcie ciemnej skórki: warianty, które wcześniej uciekły.
+   bg-white/60 to puste stany („Brak działań") - bez tego świeciły jasnym
+   prostokątem na ciemnym tle. */
+html[data-theme="dark"] .app-shell .bg-white\/60 { background-color: rgba(24, 24, 27, 0.6) !important; }
+html[data-theme="dark"] .app-shell .hover\:bg-white:hover { background-color: #18181b !important; }
+html[data-theme="dark"] .app-shell .hover\:text-slate-700:hover { color: #d4d4d8 !important; }
+html[data-theme="dark"] .app-shell .placeholder\:text-slate-500::placeholder { color: #71717a !important; }
+html[data-theme="dark"] .app-shell .text-slate-300 { color: #d4d4d8 !important; }
+html[data-theme="dark"] .app-shell .bg-slate-500 { background-color: #52525b !important; }
+html[data-theme="dark"] .app-shell .border-dashed { border-color: #3f3f46 !important; }
+
+/* Dokumenty do druku nadal zostaja biale. */
+html[data-theme="dark"] .app-shell :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) .bg-white\/60 {
+  background-color: #ffffff !important;
+}

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ROLE_LABELS, type UserRole } from "@/lib/types";
 import { ThemeToggle } from "./theme-toggle";
+import { GlobalSearch } from "./global-search";
 import { signOut } from "@/app/auth/actions";
 
 type NavColor = keyof typeof TILE;
@@ -91,7 +92,9 @@ export function Sidebar({
     href === "/app" ? pathname === "/app" : pathname.startsWith(href);
 
   const nav = (
-    <nav className="flex flex-1 flex-col gap-5 overflow-y-auto">
+    <nav className="flex flex-1 flex-col overflow-y-auto">
+      <GlobalSearch />
+      <div className="flex flex-col gap-5">
       {SECTIONS.map((section) => {
         const items = section.items.filter((i) => !i.roles || i.roles.includes(role));
         if (items.length === 0) return null;
@@ -134,6 +137,7 @@ export function Sidebar({
           </div>
         );
       })}
+      </div>
     </nav>
   );
 
