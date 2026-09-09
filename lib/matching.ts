@@ -185,10 +185,10 @@ export function findMatches(search: Search, properties: Property[]): Match[] {
 }
 
 /** Odwrotnie: które poszukiwania pasują do danej oferty (karta nieruchomości). */
-export function findSearchesForProperty(
+export function findSearchesForProperty<T extends Search>(
   property: Property,
-  searches: Search[],
-): { search: Search; match: Match }[] {
+  searches: T[],
+): { search: T; match: Match }[] {
   return searches
     .filter((s) => s.status === "aktualne")
     .map((s) => ({ search: s, match: matchPropertyToSearch(property, s) }))

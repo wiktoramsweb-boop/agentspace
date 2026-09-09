@@ -230,3 +230,72 @@ export async function removePropertyInterest(
     .eq("client_id", clientId);
   revalidatePath(`/app/nieruchomosci/${propertyId}`);
 }
+
+/** Rola powiązanego klienta: właściciel przy sprzedaży, wynajmujący przy najmie. */
+export async function setPropertyOwnerRole(propertyId: string, role: string): Promise<void> {
+  const user = await requireUser();
+  const admin = createSupabaseAdmin();
+  await admin
+    .from("properties")
+    .update({ owner_role: role, updated_at: new Date().toISOString() })
+    .eq("id", propertyId)
+    .eq("agency_id", user.agency_id);
+  revalidatePath(`/app/nieruchomosci/${propertyId}`);
+}
+
+/**
+ * Zakłada klienta i od razu przypina go do oferty. Agent stojący u klienta
+ * nie musi przełączać się do modułu Klienci, żeby dopisać właściciela.
+ */
+export async function attachNewOwner(
+  propertyId: string,
+  formData: FormData,
+): Promise<void> {
+  const user = await requireUser();
+  const name = String(formData.get("owner_name") ?? "").trim();
+  if (!name) return;
+  const phone = String(formData.get("owner_phone") ?? "").trim() || null;
+  const role = String(formData.get("owner_role") ?? "wlasciciel");
+
+  const admin = createSupabaseAdmin();
+  const { data: client } = await admin
+    .from("clients")
+    .insert({
+      agent_id: user.id,
+      agency_id: user.agency_id,
+      name,
+      phone,
+      type: role === "wynajmujacy" ? "wynajmujacy" : "sprzedajacy",
+      status: "w_kontakcie",
+      last_contact_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
+
+  if (client) {
+    await admin
+      .from("properties")
+      .update({ owner_client_id: client.id, owner_role: role, updated_at: new Date().toISOString() })
+      .eq("id", propertyId)
+      .eq("agency_id", user.agency_id);
+  }
+
+  revalidatePath(`/app/nieruchomosci/${propertyId}`);
+  revalidatePath("/app/klienci");
+}
+
+/** Etap procesu obsługi oferty (pasek na karcie). */
+export async function setProcessStage(propertyId: string, stage: string): Promise<void> {
+  const user = await requireUser();
+  const admin = createSupabaseAdmin();
+  await admin
+    .from("properties")
+    .update({
+      process_stage: stage,
+      process_changed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", propertyId)
+    .eq("agency_id", user.agency_id);
+  revalidatePath(`/app/nieruchomosci/${propertyId}`);
+}

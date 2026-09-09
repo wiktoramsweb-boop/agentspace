@@ -119,9 +119,19 @@ export function PropertiesBrowser({
                         </span>
                         <span className={`text-xs font-semibold uppercase tracking-wide ${kv.chip}`}>{kind?.label}</span>
                       </div>
-                      {status && (
-                        <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${status.color}`}>{status.label}</span>
-                      )}
+                      <div className="flex flex-col items-end gap-1">
+                        {status && (
+                          <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${status.color}`}>{status.label}</span>
+                        )}
+                        {p.export_to_web ? (
+                          <span
+                            title="Oznaczona do publikacji na stronie"
+                            className="rounded-md bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700"
+                          >
+                            na stronę
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
 
                     <h3 className="mb-1 truncate font-semibold text-slate-900">{p.title}</h3>

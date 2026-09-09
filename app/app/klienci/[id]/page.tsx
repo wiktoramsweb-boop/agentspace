@@ -22,6 +22,10 @@ import { getAgencyProperties } from "@/lib/data-platform";
 import { ActivityModal } from "../../dzialania/activity-modal";
 import { ClientActivities } from "./client-activities";
 import { ClientDetails } from "./client-details";
+import { SearchWizard } from "../../poszukiwania/search-wizard";
+import { ClientSearches } from "./client-searches";
+import { getSearches, getActiveProperties } from "@/lib/data-searches";
+import { findMatches } from "@/lib/matching";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -54,11 +58,20 @@ export default async function ClientDetailPage({ params }: Props) {
 
   // Działania tego klienta - historia telefonów i spotkań w jednym miejscu.
   const agencyId = user.agency_id;
-  const [clientActivities, agents, agencyProps] = await Promise.all([
+  const [clientActivities, agents, agencyProps, clientSearches, activeProps] = await Promise.all([
     agencyId ? getActivities(agencyId, { clientId: client.id, limit: 50 }) : Promise.resolve([]),
     agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
     agencyId ? getAgencyProperties(agencyId) : Promise.resolve([]),
+    agencyId ? getSearches(agencyId, { clientId: client.id, limit: 20 }) : Promise.resolve([]),
+    agencyId ? getActiveProperties(agencyId) : Promise.resolve([]),
   ]);
+
+  // Ile ofert pasuje do każdego poszukiwania tego klienta - agent widzi od razu,
+  // czy ma o czym z nim rozmawiać.
+  const searchMatchCounts: Record<string, number> = {};
+  for (const s of clientSearches) {
+    searchMatchCounts[s.id] = findMatches(s, activeProps).filter((m) => m.fits).length;
+  }
 
   return (
     <>
@@ -219,6 +232,20 @@ export default async function ClientDetailPage({ params }: Props) {
               </div>
             </Card>
           )}
+
+          <Card>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+                Poszukiwania ({clientSearches.length})
+              </h2>
+              <SearchWizard
+                clients={[{ id: client.id, name: client.name, phone: client.phone }]}
+                presetClientId={client.id}
+                trigger="plus"
+              />
+            </div>
+            <ClientSearches searches={clientSearches} matchCounts={searchMatchCounts} />
+          </Card>
 
           <Card>
             <div className="mb-4 flex items-center justify-between gap-3">

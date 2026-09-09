@@ -6,10 +6,13 @@ import { createClient } from "./actions";
 import { CLIENT_STATUSES, CLIENT_SOURCES, PHONE_LABELS, type ClientType } from "@/lib/types";
 import { AddressInput } from "../components/address-input";
 import { Modal } from "../components/modal";
+import { CLIENT_TYPE_ICONS } from "../components/icons";
 
 type ExistingPhone = { phone: string | null; owner: string | null };
 
 const digits = (s: string) => s.replace(/\D/g, "");
+
+const STEPS = ["Typ klienta", "Dane kontaktowe", "Czego dotyczy", "Adres i zgody"] as const;
 
 type TypeMeta = {
   value: ClientType;
@@ -24,6 +27,8 @@ type TypeMeta = {
   showAmount: boolean;
   /** Forma biernika do przycisku (Dodaj sprzedajacego, nie: sprzedajacy). */
   addLabel: string;
+  /** Kolor kafelka z ikona w kroku 1. */
+  tile: string;
 };
 
 const TYPES: TypeMeta[] = [
@@ -39,6 +44,7 @@ const TYPES: TypeMeta[] = [
     addressLabel: "Adres nieruchomości",
     showAmount: true,
     addLabel: "sprzedającego",
+    tile: "bg-emerald-500",
   },
   {
     value: "kupujacy",
@@ -52,6 +58,7 @@ const TYPES: TypeMeta[] = [
     addressLabel: "Preferowana lokalizacja",
     showAmount: true,
     addLabel: "kupującego",
+    tile: "bg-sky-500",
   },
   {
     value: "wynajmujacy",
@@ -65,6 +72,7 @@ const TYPES: TypeMeta[] = [
     addressLabel: "Adres nieruchomości",
     showAmount: true,
     addLabel: "wynajmującego",
+    tile: "bg-violet-500",
   },
   {
     value: "najemca",
@@ -78,6 +86,7 @@ const TYPES: TypeMeta[] = [
     addressLabel: "Preferowana lokalizacja",
     showAmount: true,
     addLabel: "najemcę",
+    tile: "bg-amber-500",
   },
   {
     value: "inny",
@@ -91,6 +100,7 @@ const TYPES: TypeMeta[] = [
     addressLabel: "Lokalizacja (opcjonalnie)",
     showAmount: false,
     addLabel: "kontakt",
+    tile: "bg-slate-500",
   },
 ];
 
@@ -100,8 +110,14 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
   const [extraPhones, setExtraPhones] = useState<number[]>([]);
   const [extraEmails, setExtraEmails] = useState<number[]>([]);
   const [type, setType] = useState<ClientType>("sprzedajacy");
+  const [step, setStep] = useState(0);
 
   const meta = TYPES.find((t) => t.value === type) ?? TYPES[0];
+
+  function close() {
+    setOpen(false);
+    setStep(0);
+  }
   const pd = digits(phone);
   const dup = pd.length >= 7 ? existingPhones.find((e) => e.phone && digits(e.phone) === pd) : undefined;
 
@@ -117,30 +133,64 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
   }
 
   return (
-    <Modal title="Dodawanie kontaktu" onClose={() => setOpen(false)} maxWidth="max-w-3xl">
+    <Modal title="Dodawanie kontaktu" onClose={close} maxWidth="max-w-3xl">
       <form action={createClient} className="flex min-h-0 flex-1 flex-col">
         <input type="hidden" name="type" value={type} />
+
+        <div className="flex flex-shrink-0 gap-1 overflow-x-auto border-b border-slate-200 px-4">
+          {STEPS.map((s, i) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setStep(i)}
+              className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition ${
+                step === i
+                  ? "border-emerald-500 text-emerald-600"
+                  : "border-transparent text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
         <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
-          {/* Krok 1: typ klienta */}
-          <div>
-            <label className={lbl}>Typ klienta</label>
-            <div className="grid grid-cols-2 gap-2">
-              {TYPES.map((t) => (
-                <button
-                  key={t.value}
-                  type="button"
-                  onClick={() => setType(t.value)}
-                  className={`rounded-xl border p-2.5 text-left transition ${
-                    type === t.value ? t.color : "border-slate-200 bg-slate-50 hover:border-slate-300"
-                  }`}
-                >
-                  <p className="text-sm font-medium text-slate-900">{t.label}</p>
-                  <p className="mt-0.5 text-xs text-slate-500">{t.desc}</p>
-                </button>
-              ))}
+          {/* KROK 1 - typ klienta (kafelki z ikonami) */}
+          <div hidden={step !== 0}>
+            <p className="mb-4 text-center text-sm text-slate-500">
+              Od tego zależą dalsze pola - sprzedający ma oczekiwaną cenę, kupujący budżet.
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+              {TYPES.map((t) => {
+                const active = type === t.value;
+                const Icon = CLIENT_TYPE_ICONS[t.value] ?? CLIENT_TYPE_ICONS.inny;
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => {
+                      setType(t.value);
+                      setStep(1);
+                    }}
+                    className={`flex flex-col items-center gap-2.5 rounded-2xl border p-4 text-center transition ${
+                      active
+                        ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                        : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"
+                    }`}
+                  >
+                    <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-white ${t.tile}`}>
+                      <Icon className="h-6 w-6" />
+                    </span>
+                    <span className={`text-sm font-medium ${active ? "text-emerald-700" : "text-slate-800"}`}>
+                      {t.label}
+                    </span>
+                    <span className="text-xs leading-tight text-slate-500">{t.desc}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
+          <div hidden={step !== 1} className="space-y-4">
           {/* ── Informacje podstawowe ─────────────────────────── */}
           <Section title="Informacje podstawowe">
             <div className="grid gap-3 sm:grid-cols-2">
@@ -245,6 +295,9 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
             </div>
           </Section>
 
+          </div>
+
+          <div hidden={step !== 2} className="space-y-4">
           {/* ── Czego dotyczy ─────────────────────────────────── */}
           <Section title="Czego dotyczy">
             <Field label={meta.propertyLabel} name="property" placeholder={meta.propertyPh} />
@@ -255,6 +308,9 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
             )}
           </Section>
 
+          </div>
+
+          <div hidden={step !== 3} className="space-y-4">
           {/* ── Dane adresowe ─────────────────────────────────── */}
           <Section title="Dane adresowe">
             <AddressInput label={meta.addressLabel} />
@@ -286,22 +342,57 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
           </Section>
 
           <Field label="Następny kontakt (przypomnienie)" name="next_contact_at" type="date" />
+          </div>
         </div>
 
-        <div className="flex flex-shrink-0 gap-3 border-t border-slate-200 px-6 py-4">
-          <SubmitButton
-            pendingText="Dodaję…"
-            className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-400"
-          >
-            Dodaj {meta.addLabel}
-          </SubmitButton>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition hover:bg-slate-100"
-          >
-            Anuluj
-          </button>
+        <div className="flex flex-shrink-0 flex-wrap items-center gap-3 border-t border-slate-200 px-6 py-4">
+          <div className="flex items-center gap-1.5">
+            {STEPS.map((s, i) => (
+              <span
+                key={s}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === step ? "w-6 bg-emerald-500" : i < step ? "w-1.5 bg-emerald-400" : "w-1.5 bg-slate-300"
+                }`}
+              />
+            ))}
+          </div>
+          <span className="text-xs text-slate-500">
+            Krok {step + 1} z {STEPS.length}
+          </span>
+
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={close}
+              className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-100"
+            >
+              Anuluj
+            </button>
+            {step > 0 && (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s - 1)}
+                className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-100"
+              >
+                Poprzedni
+              </button>
+            )}
+            {step < STEPS.length - 1 && (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s + 1)}
+                className="rounded-xl bg-blue-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-400"
+              >
+                Dalej
+              </button>
+            )}
+            <SubmitButton
+              pendingText="Dodaję…"
+              className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-400"
+            >
+              Dodaj {meta.addLabel}
+            </SubmitButton>
+          </div>
         </div>
       </form>
     </Modal>

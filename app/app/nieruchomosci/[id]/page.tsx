@@ -20,12 +20,14 @@ import { MiniMap } from "../../components/mini-map";
 import { formatPln } from "@/lib/format";
 import {
   StatusBar,
-  OwnerPicker,
   InterestAdder,
   RemoveInterestButton,
   DeletePropertyButton,
 } from "./property-controls";
 import { EditPropertyForm } from "./edit-property-form";
+import { ProcessBar, OwnerCard } from "./property-extras";
+import { MatchingSearches } from "./matching-searches";
+import { getActiveSearches } from "@/lib/data-searches";
 import { NearbyCard } from "./nearby-card";
 
 type Props = { params: Promise<{ id: string }> };
@@ -39,11 +41,12 @@ export default async function PropertyDetailPage({ params }: Props) {
   // Baza ofert jest wspólna dla biura - dostęp mają wszyscy z tej agencji.
   if (property.agency_id !== user.agency_id) redirect("/app/nieruchomosci");
 
-  const [owner, interested, deals, allClients] = await Promise.all([
+  const [owner, interested, deals, allClients, activeSearches] = await Promise.all([
     property.owner_client_id ? getClient(property.owner_client_id) : Promise.resolve(null),
     getPropertyInterestedClients(id),
     getDealsForProperty(id),
     getClientsLite(user.id),
+    user.agency_id ? getActiveSearches(user.agency_id) : Promise.resolve([]),
   ]);
 
   const status = PROPERTY_STATUSES.find((s) => s.value === property.status);
@@ -94,6 +97,7 @@ export default async function PropertyDetailPage({ params }: Props) {
       </div>
 
       <div className="mb-6">
+        <ProcessBar propertyId={property.id} stage={property.process_stage ?? null} />
         <StatusBar propertyId={property.id} status={property.status} />
       </div>
 
@@ -146,21 +150,27 @@ export default async function PropertyDetailPage({ params }: Props) {
         <div className="space-y-6">
           <Card>
             <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Właściciel
+              {property.deal_kind === "wynajem" ? "Wynajmujący" : "Właściciel"}
             </h2>
-            <OwnerPicker
+            <OwnerCard
               propertyId={property.id}
               ownerId={property.owner_client_id}
+              ownerRole={property.owner_role ?? null}
+              ownerName={owner?.name ?? null}
+              ownerPhone={owner?.phone ?? null}
+              dealKind={property.deal_kind}
               clients={allClients}
             />
-            {owner && (
-              <Link
-                href={`/app/klienci/${owner.id}`}
-                className="mt-2 inline-block text-sm text-emerald-600 hover:text-emerald-700"
-              >
-                Otwórz kartę: {owner.name} →
-              </Link>
-            )}
+          </Card>
+
+          <Card>
+            <h2 className="mb-1 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Pasujące poszukiwania
+            </h2>
+            <p className="mb-3 text-xs text-slate-400">
+              Klienci, którzy szukają czegoś takiego. Zadzwoń, zanim zobaczą ofertę gdzie indziej.
+            </p>
+            <MatchingSearches property={property} searches={activeSearches} />
           </Card>
 
           <Card>
