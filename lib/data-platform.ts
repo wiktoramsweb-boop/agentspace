@@ -361,14 +361,14 @@ export async function getClientsLite(
 /** Lekka lista klientów CAŁEGO biura (do selectów, np. wybór właściciela oferty). */
 export async function getAgencyClientsLite(
   agencyId: string,
-): Promise<{ id: string; name: string; type: string }[]> {
+): Promise<{ id: string; name: string; type: string; phone: string | null }[]> {
   const admin = createSupabaseAdmin();
   const { data } = await admin
     .from("clients")
-    .select("id, name, type")
+    .select("id, name, type, phone")
     .eq("agency_id", agencyId)
     .order("name", { ascending: true });
-  return (data ?? []) as { id: string; name: string; type: string }[];
+  return (data ?? []) as { id: string; name: string; type: string; phone: string | null }[];
 }
 
 /** Lekka lista ofert do selectów (np. w kalkulatorze prowizji). */

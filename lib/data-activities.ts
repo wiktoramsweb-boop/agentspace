@@ -118,3 +118,97 @@ export async function getAgencyAgents(
     name: p.full_name ?? "Agent",
   }));
 }
+
+/** Pojedyncze działanie z nazwami powiązań. */
+export async function getActivity(id: string, agencyId: string): Promise<ActivityRich | null> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("activities")
+    .select("*")
+    .eq("id", id)
+    .eq("agency_id", agencyId)
+    .maybeSingle();
+  if (!data) return null;
+
+  const a = data as Activity;
+  const [client, property, profiles] = await Promise.all([
+    a.client_id
+      ? admin.from("clients").select("name").eq("id", a.client_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    a.property_id
+      ? admin.from("properties").select("title").eq("id", a.property_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    (a.assignee_ids ?? []).length
+      ? admin.from("profiles").select("id, full_name").in("id", a.assignee_ids)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  return {
+    ...a,
+    clientName: (client.data as { name?: string } | null)?.name ?? null,
+    propertyTitle: (property.data as { title?: string } | null)?.title ?? null,
+    assigneeNames: ((profiles.data ?? []) as { full_name: string | null }[]).map(
+      (u) => u.full_name ?? "Agent",
+    ),
+  };
+}
+
+/**
+ * Historia kontaktu z danym numerem: wszystkie wcześniejsze działania pod ten
+ * sam telefon. To odpowiedź na pytanie „czy ktoś już tu dzwonił i o czym?".
+ */
+export async function getActivitiesByPhone(
+  agencyId: string,
+  phone: string,
+  excludeId?: string,
+): Promise<ActivityRich[]> {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 6) return [];
+
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("activities")
+    .select("*")
+    .eq("agency_id", agencyId)
+    .eq("contact_phone_digits", digits)
+    .order("due_at", { ascending: false })
+    .limit(50);
+
+  const rows = ((data ?? []) as Activity[]).filter((r) => r.id !== excludeId);
+  if (rows.length === 0) return [];
+
+  const userIds = [...new Set(rows.flatMap((r) => r.assignee_ids ?? []))];
+  const { data: profiles } = userIds.length
+    ? await admin.from("profiles").select("id, full_name").in("id", userIds)
+    : { data: [] };
+  const uMap = new Map(
+    ((profiles ?? []) as { id: string; full_name: string | null }[]).map((u) => [
+      u.id,
+      u.full_name ?? "Agent",
+    ]),
+  );
+
+  return rows.map((r) => ({
+    ...r,
+    clientName: null,
+    propertyTitle: null,
+    assigneeNames: (r.assignee_ids ?? []).map((id) => uMap.get(id) ?? "Agent"),
+  }));
+}
+
+/** Klienci pasujący do numeru (do podpowiedzi „ten numer jest już w bazie"). */
+export async function getClientsByPhone(
+  agencyId: string,
+  phone: string,
+): Promise<{ id: string; name: string; phone: string | null }[]> {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 6) return [];
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("clients")
+    .select("id, name, phone")
+    .eq("agency_id", agencyId)
+    .eq("phone_digits", digits)
+    .limit(10);
+  return (data ?? []) as { id: string; name: string; phone: string | null }[];
+}

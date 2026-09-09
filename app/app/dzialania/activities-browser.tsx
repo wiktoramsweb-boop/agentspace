@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import type { ActivityRich } from "@/lib/data-activities";
 import { setActivityStatus, deleteActivity } from "./actions";
+import { ACTIVITY_ICONS } from "../components/icons";
 import {
   ACTIVITY_KINDS,
   ACTIVITY_KIND_MAP,
@@ -52,13 +53,20 @@ export function ActivitiesBrowser({
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    // Gdy wpisano co najmniej 3 cyfry, traktujemy zapytanie takze jako numer
+    // telefonu: "+48 600 100 200", "600-100-200" i "600100200" to ten sam numer.
+    const qDigits = query.replace(/\D/g, "");
     return activities.filter((a) => {
       if (scope === "mine" && !(a.assignee_ids ?? []).includes(currentUserId)) return false;
       if (status && a.status !== status) return false;
       if (kind && a.kind !== kind) return false;
       if (!q) return true;
+      const phoneDigits = (a.contact_phone ?? "").replace(/\D/g, "");
+      if (qDigits.length >= 3 && phoneDigits.includes(qDigits)) return true;
       return (
         a.subject.toLowerCase().includes(q) ||
+        (a.contact_name ?? "").toLowerCase().includes(q) ||
+        (a.contact_phone ?? "").toLowerCase().includes(q) ||
         (a.clientName ?? "").toLowerCase().includes(q) ||
         (a.propertyTitle ?? "").toLowerCase().includes(q) ||
         (a.description ?? "").toLowerCase().includes(q)
@@ -75,7 +83,7 @@ export function ActivitiesBrowser({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Szukaj po temacie, kliencie, ofercie…"
+          placeholder="Szukaj po numerze telefonu, nazwisku, temacie…"
           className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
         />
         <div className="flex rounded-xl border border-slate-300 bg-white p-1">
@@ -93,11 +101,15 @@ export function ActivitiesBrowser({
         <Chip active={kind === ""} onClick={() => setKind("")}>
           Wszystkie rodzaje
         </Chip>
-        {ACTIVITY_KINDS.map((k) => (
-          <Chip key={k.value} active={kind === k.value} onClick={() => setKind(kind === k.value ? "" : k.value)}>
-            {k.emoji} {k.label}
-          </Chip>
-        ))}
+        {ACTIVITY_KINDS.map((k) => {
+          const KIcon = ACTIVITY_ICONS[k.value];
+          return (
+            <Chip key={k.value} active={kind === k.value} onClick={() => setKind(kind === k.value ? "" : k.value)}>
+              <KIcon className="h-3.5 w-3.5" />
+              {k.label}
+            </Chip>
+          );
+        })}
       </div>
 
       {/* Chipsy statusu */}
@@ -132,6 +144,7 @@ export function ActivitiesBrowser({
               a.status === "zaplanowane" && a.due_at && new Date(a.due_at) < new Date();
             const dur = fmtDuration(a.duration_s);
 
+            const KindIcon = ACTIVITY_ICONS[a.kind] ?? ACTIVITY_ICONS.polaczenie;
             return (
               <div
                 key={a.id}
@@ -141,10 +154,15 @@ export function ActivitiesBrowser({
 
                 <div className="min-w-0 flex-1 py-4 pr-4">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className={`flex h-7 w-7 items-center justify-center rounded-lg text-sm text-white ${km.tile}`}>
-                      {km.emoji}
+                    <span className={`flex h-7 w-7 items-center justify-center rounded-lg text-white ${km.tile}`}>
+                      <KindIcon className="h-4 w-4" />
                     </span>
-                    <p className="font-semibold text-slate-900">{a.subject}</p>
+                    <Link
+                      href={`/app/dzialania/${a.id}`}
+                      className="font-semibold text-slate-900 hover:text-emerald-600 hover:underline"
+                    >
+                      {a.subject}
+                    </Link>
                     {overdue && (
                       <span className="rounded-md bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                         zaległe
@@ -176,6 +194,16 @@ export function ActivitiesBrowser({
 
                     {a.purpose && <Row label="Cel">{PURPOSE_MAP[a.purpose] ?? a.purpose}</Row>}
                     <Row label="Agent">{a.assigneeNames.join(", ") || "-"}</Row>
+                    <Row label="Telefon">
+                      {a.contact_phone ? (
+                        <a href={`tel:${a.contact_phone}`} className="text-blue-600 hover:underline">
+                          {a.contact_phone}
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </Row>
+                    <Row label="Kontakt">{a.contact_name ?? "-"}</Row>
                     <Row label="Klient">
                       {a.client_id && a.clientName ? (
                         <Link href={`/app/klienci/${a.client_id}`} className="text-blue-600 hover:underline">
@@ -206,6 +234,12 @@ export function ActivitiesBrowser({
                 </div>
 
                 <div className="flex flex-shrink-0 flex-col items-end justify-center gap-2 pr-4">
+                  <Link
+                    href={`/app/dzialania/${a.id}`}
+                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:text-emerald-600"
+                  >
+                    Szczegóły →
+                  </Link>
                   {a.status !== "wykonane" && (
                     <button
                       onClick={() => start(() => setActivityStatus(a.id, "wykonane"))}
@@ -284,7 +318,7 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${
         active
           ? "border-emerald-500 bg-emerald-50 text-emerald-700"
           : "border-slate-200 bg-white text-slate-500 hover:text-slate-900"

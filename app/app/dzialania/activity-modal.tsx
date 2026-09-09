@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Modal } from "../components/modal";
 import { SubmitButton } from "../components/submit-button";
+import { ACTIVITY_ICONS } from "../components/icons";
 import { createActivity } from "./actions";
 import {
   ACTIVITY_KINDS,
@@ -14,15 +15,8 @@ import {
   type ActivityKind,
 } from "@/lib/types";
 
+type ClientLite = { id: string; name: string; phone?: string | null };
 type Lite = { id: string; name: string };
-
-/** Formatuje sekundy jako 00:00:00 (licznik rozmowy jak w ASARI). */
-function hhmmss(total: number): string {
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  return [h, m, s].map((n) => String(n).padStart(2, "0")).join(":");
-}
 
 export function ActivityModal({
   agents,
@@ -33,7 +27,7 @@ export function ActivityModal({
   trigger = "button",
 }: {
   agents: Lite[];
-  clients: Lite[];
+  clients: ClientLite[];
   properties: Lite[];
   presetClientId?: string;
   presetPropertyId?: string;
@@ -69,20 +63,23 @@ export function ActivityModal({
       {open && !kind && (
         <Modal title="Wybierz rodzaj działania" onClose={close} maxWidth="max-w-xl">
           <div className="grid grid-cols-2 gap-4 px-6 py-8">
-            {ACTIVITY_KINDS.map((k) => (
-              <button
-                key={k.value}
-                onClick={() => setKind(k.value)}
-                className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-7 transition hover:border-slate-300 hover:shadow-md"
-              >
-                <span
-                  className={`flex h-14 w-14 items-center justify-center rounded-2xl text-2xl text-white ${k.tile}`}
+            {ACTIVITY_KINDS.map((k) => {
+              const Icon = ACTIVITY_ICONS[k.value];
+              return (
+                <button
+                  key={k.value}
+                  onClick={() => setKind(k.value)}
+                  className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-7 transition hover:border-slate-300 hover:shadow-md"
                 >
-                  {k.emoji}
-                </span>
-                <span className="text-center text-sm font-medium text-slate-800">{k.label}</span>
-              </button>
-            ))}
+                  <span
+                    className={`flex h-14 w-14 items-center justify-center rounded-2xl text-white ${k.tile}`}
+                  >
+                    <Icon className="h-7 w-7" />
+                  </span>
+                  <span className="text-center text-sm font-medium text-slate-800">{k.label}</span>
+                </button>
+              );
+            })}
           </div>
         </Modal>
       )}
@@ -115,7 +112,7 @@ function ActivityForm({
 }: {
   kind: ActivityKind;
   agents: Lite[];
-  clients: Lite[];
+  clients: ClientLite[];
   properties: Lite[];
   presetClientId?: string;
   presetPropertyId?: string;
@@ -123,40 +120,52 @@ function ActivityForm({
   onClose: () => void;
 }) {
   const meta = ACTIVITY_KIND_MAP[kind];
+  const Icon = ACTIVITY_ICONS[kind];
   const isCall = kind === "polaczenie";
   const purposes = ACTIVITY_PURPOSES.filter((p) => p.kinds.includes(kind));
 
   const [assignees, setAssignees] = useState<string[]>([]);
-  const [seconds, setSeconds] = useState(0);
-  const [running, setRunning] = useState(false);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [clientId, setClientId] = useState(presetClientId ?? "");
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
 
-  // Licznik rozmowy: agent klika Start przy odebraniu i Stop po zakończeniu.
-  useEffect(() => {
-    if (running) {
-      timer.current = setInterval(() => setSeconds((s) => s + 1), 1000);
-    } else if (timer.current) {
-      clearInterval(timer.current);
-      timer.current = null;
+  // Wybór klienta z bazy uzupełnia dane kontaktowe - agent nie przepisuje ręcznie.
+  function pickClient(id: string) {
+    setClientId(id);
+    const c = clients.find((x) => x.id === id);
+    if (c) {
+      setContactName(c.name);
+      if (c.phone) setContactPhone(c.phone);
     }
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [running]);
+  }
 
   const today = new Date().toISOString().slice(0, 10);
   const nowTime = new Date().toTimeString().slice(0, 5);
 
   return (
-    <Modal title={`Dodawanie: ${meta.label.toLowerCase()}`} onClose={onClose} maxWidth="max-w-3xl">
+    <Modal title={`Nowe: ${meta.label.toLowerCase()}`} onClose={onClose} maxWidth="max-w-3xl">
       <form action={createActivity} className="flex min-h-0 flex-1 flex-col">
         <input type="hidden" name="kind" value={kind} />
         {assignees.map((id) => (
           <input key={id} type="hidden" name="assignee_ids" value={id} />
         ))}
-        <input type="hidden" name="duration_s" value={seconds} />
 
         <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
+          {/* Nagłówek rodzaju */}
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <span className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${meta.tile}`}>
+              <Icon className="h-5 w-5" />
+            </span>
+            <p className="text-sm font-medium text-slate-700">{meta.label}</p>
+            <button
+              type="button"
+              onClick={onBack}
+              className="ml-auto text-xs text-slate-500 underline-offset-2 hover:text-slate-900 hover:underline"
+            >
+              zmień rodzaj
+            </button>
+          </div>
+
           {/* Cel + temat */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
@@ -183,53 +192,62 @@ function ActivityForm({
             </div>
           </div>
 
-          {/* Przypisani agenci */}
-          <Section icon="👤" title="Przypisane do">
-            <div className="flex flex-wrap gap-2">
-              {assignees.map((id) => {
-                const a = agents.find((x) => x.id === id);
-                return (
-                  <span
-                    key={id}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-100 px-2.5 py-1 text-sm text-blue-700"
-                  >
-                    {a?.name ?? "Agent"}
-                    <button
-                      type="button"
-                      onClick={() => setAssignees((p) => p.filter((x) => x !== id))}
-                      aria-label="Usuń"
-                      className="text-blue-500 hover:text-blue-800"
-                    >
-                      ✕
-                    </button>
-                  </span>
-                );
-              })}
+          {/* Dane kontaktowe - sedno wyszukiwania po numerze */}
+          <Section title="Z kim">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <Label>Imię i nazwisko</Label>
+                <input
+                  name="contact_name"
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  placeholder="np. Marcin Nowak"
+                  className={inp}
+                />
+              </div>
+              <div>
+                <Label>Telefon</Label>
+                <input
+                  name="contact_phone"
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
+                  placeholder="600 100 200"
+                  inputMode="tel"
+                  className={inp}
+                />
+              </div>
+              <div>
+                <Label>E-mail</Label>
+                <input name="contact_email" type="email" placeholder="marcin@example.pl" className={inp} />
+              </div>
             </div>
-            <select
-              value=""
-              onChange={(e) => {
-                const v = e.target.value;
-                if (v && !assignees.includes(v)) setAssignees((p) => [...p, v]);
-              }}
-              className={inp}
-            >
-              <option value="">Dodaj agenta…</option>
-              {agents
-                .filter((a) => !assignees.includes(a.id))
-                .map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
+            <div>
+              <Label>Klient z bazy (opcjonalnie)</Label>
+              <select
+                name="client_id"
+                value={clientId}
+                onChange={(e) => pickClient(e.target.value)}
+                className={inp}
+              >
+                <option value="">nie wybrano</option>
+                {clients.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                    {c.phone ? ` (${c.phone})` : ""}
                   </option>
                 ))}
-            </select>
-            <p className="text-xs text-slate-400">Puste = działanie przypisane do Ciebie.</p>
+              </select>
+              <p className="mt-1.5 text-xs text-slate-400">
+                Wybór klienta uzupełni imię i telefon. Numer zapisujemy zawsze, żeby dało się później
+                wyszukać, czy ktoś już pod niego dzwonił.
+              </p>
+            </div>
           </Section>
 
-          {/* Rozmowa (tylko połączenie) */}
-          {isCall && (
-            <Section icon="📞" title="Rozmowa">
-              <div className="grid gap-3 sm:grid-cols-2">
+          {/* Szczegóły */}
+          <Section title="Szczegóły">
+            <div className="grid gap-3 sm:grid-cols-3">
+              {isCall && (
                 <div>
                   <Label>Rodzaj rozmowy</Label>
                   <select name="call_direction" className={inp} defaultValue="wychodzaca">
@@ -240,122 +258,111 @@ function ActivityForm({
                     ))}
                   </select>
                 </div>
-                <div>
-                  <Label>Priorytet</Label>
-                  <select name="priority" className={inp} defaultValue="normalny">
-                    {ACTIVITY_PRIORITIES.map((p) => (
-                      <option key={p.value} value={p.value}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <div className="flex-1">
-                  <Label>Początek rozmowy</Label>
-                  <div className="flex gap-2">
-                    <input type="date" name="due_date" defaultValue={today} className={inp} />
-                    <input type="time" name="due_time" defaultValue={nowTime} className={inp} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-2xl font-bold tabular-nums text-slate-900">
-                    {hhmmss(seconds)}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setRunning((r) => !r)}
-                    className={`rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition ${
-                      running ? "bg-red-500 hover:bg-red-400" : "bg-blue-500 hover:bg-blue-400"
-                    }`}
-                  >
-                    {running ? "■ Stop" : "▶ Start"}
-                  </button>
-                </div>
-              </div>
-            </Section>
-          )}
-
-          {/* Harmonogram (dla nie-rozmów) */}
-          {!isCall && (
-            <Section icon="📅" title="Harmonogram">
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div>
-                  <Label>Data</Label>
-                  <input type="date" name="due_date" defaultValue={today} className={inp} />
-                </div>
-                <div>
-                  <Label>Godzina</Label>
-                  <input type="time" name="due_time" defaultValue="09:00" className={inp} />
-                </div>
-                <div>
-                  <Label>Priorytet</Label>
-                  <select name="priority" className={inp} defaultValue="normalny">
-                    {ACTIVITY_PRIORITIES.map((p) => (
-                      <option key={p.value} value={p.value}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </Section>
-          )}
-
-          {/* Opis */}
-          <Section icon="📝" title="Opis">
-            <textarea
-              name="description"
-              rows={4}
-              placeholder="Co ustalono, co dalej…"
-              className={inp}
-            />
-          </Section>
-
-          {/* Powiązania */}
-          <Section icon="🔗" title="Powiązane z">
-            <div className="grid gap-3 sm:grid-cols-2">
+              )}
               <div>
-                <Label>Klient</Label>
-                <select name="client_id" className={inp} defaultValue={presetClientId ?? ""}>
-                  <option value="">brak</option>
-                  {clients.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
+                <Label>Status</Label>
+                <select name="status" className={inp} defaultValue="wykonane">
+                  {ACTIVITY_STATUSES.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <Label>Nieruchomość</Label>
-                <select name="property_id" className={inp} defaultValue={presetPropertyId ?? ""}>
-                  <option value="">brak</option>
-                  {properties.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
+                <Label>Priorytet</Label>
+                <select name="priority" className={inp} defaultValue="normalny">
+                  {ACTIVITY_PRIORITIES.map((p) => (
+                    <option key={p.value} value={p.value}>
+                      {p.label}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>Data</Label>
+                <input type="date" name="due_date" defaultValue={today} className={inp} />
+              </div>
+              <div>
+                <Label>Godzina</Label>
+                <input type="time" name="due_time" defaultValue={nowTime} className={inp} />
+              </div>
+            </div>
           </Section>
 
-          {/* Status */}
-          <div className="sm:w-1/2">
-            <Label>Status</Label>
-            <select name="status" className={inp} defaultValue="zaplanowane">
-              {ACTIVITY_STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Opis */}
+          <Section title="Co ustalono">
+            <textarea
+              name="description"
+              rows={5}
+              placeholder="O czym rozmawialiście, co dalej, kiedy kolejny kontakt…"
+              className={inp}
+            />
+            <p className="text-xs text-slate-400">
+              To pole czyta agent, który za kilka miesięcy zadzwoni pod ten sam numer. Warto opisać konkret.
+            </p>
+          </Section>
+
+          {/* Powiązania i przypisanie */}
+          <Section title="Powiązania">
+            <div>
+              <Label>Nieruchomość (opcjonalnie)</Label>
+              <select name="property_id" className={inp} defaultValue={presetPropertyId ?? ""}>
+                <option value="">brak</option>
+                {properties.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label>Przypisane do</Label>
+              <div className="mb-2 flex flex-wrap gap-2">
+                {assignees.map((id) => {
+                  const a = agents.find((x) => x.id === id);
+                  return (
+                    <span
+                      key={id}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-blue-100 px-2.5 py-1 text-sm text-blue-700"
+                    >
+                      {a?.name ?? "Agent"}
+                      <button
+                        type="button"
+                        onClick={() => setAssignees((p) => p.filter((x) => x !== id))}
+                        aria-label="Usuń"
+                        className="text-blue-500 hover:text-blue-800"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+              <select
+                value=""
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v && !assignees.includes(v)) setAssignees((p) => [...p, v]);
+                }}
+                className={inp}
+              >
+                <option value="">Dodaj agenta…</option>
+                {agents
+                  .filter((a) => !assignees.includes(a.id))
+                  .map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name}
+                    </option>
+                  ))}
+              </select>
+              <p className="mt-1.5 text-xs text-slate-400">Puste = działanie przypisane do Ciebie.</p>
+            </div>
+          </Section>
         </div>
 
-        {/* Stopka jak w ASARI */}
         <div className="flex flex-shrink-0 flex-wrap items-center gap-3 border-t border-slate-200 px-6 py-4">
           <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
             <input
@@ -369,13 +376,6 @@ function ActivityForm({
           <div className="ml-auto flex items-center gap-2">
             <button
               type="button"
-              onClick={onBack}
-              className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-100"
-            >
-              Zmień rodzaj
-            </button>
-            <button
-              type="button"
               onClick={onClose}
               className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-100"
             >
@@ -385,7 +385,7 @@ function ActivityForm({
               pendingText="Zapisuję…"
               className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-400"
             >
-              Zapisz i zamknij
+              Zapisz działanie
             </SubmitButton>
           </div>
         </div>
@@ -401,21 +401,10 @@ function Label({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-sm text-slate-500">{children}</label>;
 }
 
-function Section({
-  icon,
-  title,
-  children,
-}: {
-  icon: string;
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-2.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-        <span>{icon}</span>
-        {title}
-      </p>
+      <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">{title}</p>
       <div className="space-y-3">{children}</div>
     </div>
   );

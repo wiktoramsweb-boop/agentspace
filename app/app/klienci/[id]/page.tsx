@@ -17,6 +17,10 @@ import { NextContactControl } from "./next-contact-control";
 import { deleteClient } from "../actions";
 import { AiWriter } from "../../components/ai-writer";
 import { googleCalendarUrl } from "@/lib/calendar";
+import { getActivities, getAgencyAgents } from "@/lib/data-activities";
+import { getAgencyProperties } from "@/lib/data-platform";
+import { ActivityModal } from "../../dzialania/activity-modal";
+import { ClientActivities } from "./client-activities";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -46,6 +50,14 @@ export default async function ClientDetailPage({ params }: Props) {
   ]);
   const type = { label: CLIENT_TYPE_LABELS[client.type] ?? client.type };
   const reminder = reminderState(client.next_contact_at);
+
+  // Działania tego klienta - historia telefonów i spotkań w jednym miejscu.
+  const agencyId = user.agency_id;
+  const [clientActivities, agents, agencyProps] = await Promise.all([
+    agencyId ? getActivities(agencyId, { clientId: client.id, limit: 50 }) : Promise.resolve([]),
+    agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
+    agencyId ? getAgencyProperties(agencyId) : Promise.resolve([]),
+  ]);
 
   return (
     <>
@@ -206,6 +218,22 @@ export default async function ClientDetailPage({ params }: Props) {
           )}
 
           <Card>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+                Działania ({clientActivities.length})
+              </h2>
+              <ActivityModal
+                agents={agents}
+                clients={[{ id: client.id, name: client.name, phone: client.phone }]}
+                properties={agencyProps.map((p) => ({ id: p.id, name: p.title }))}
+                presetClientId={client.id}
+                trigger="plus"
+              />
+            </div>
+            <ClientActivities activities={clientActivities} />
+          </Card>
+
+          <Card>
             <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
               Nowa notatka
             </h2>
@@ -223,7 +251,7 @@ export default async function ClientDetailPage({ params }: Props) {
             ) : (
               <div className="space-y-3">
                 {notes.map((n) => (
-                  <div key={n.id} className="rounded-2xl border border-zinc-900 bg-slate-50 p-4">
+                  <div key={n.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
                       {n.content}
                     </p>

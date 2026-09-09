@@ -791,3 +791,35 @@ html[data-theme="dark"] .app-shell :is(.invoice-sheet, .print-sheet, .sheet-a4, 
 html[data-theme="dark"] .app-shell :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) .text-slate-600,
 html[data-theme="dark"] .app-shell :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) .text-slate-500 { color: #64748b !important; }
 html[data-theme="dark"] .app-shell :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) .border-slate-200 { border-color: #e2e8f0 !important; }
+
+/* Pola formularzy w ciemnym motywie. Bez tego natywne kontrolki (select, date,
+   time) renderują się jasnym tekstem na jasnym tle systemu i nic nie widać. */
+html[data-theme="dark"] .app-shell input,
+html[data-theme="dark"] .app-shell select,
+html[data-theme="dark"] .app-shell textarea {
+  background-color: #18181b !important;
+  color: #fafafa !important;
+  border-color: #3f3f46 !important;
+}
+html[data-theme="dark"] .app-shell option {
+  background-color: #18181b;
+  color: #fafafa;
+}
+html[data-theme="dark"] .app-shell input::placeholder,
+html[data-theme="dark"] .app-shell textarea::placeholder {
+  color: #71717a !important;
+}
+/* Natywne okienka kalendarza i zegara mają iść w ciemny wariant systemowy. */
+html[data-theme="dark"] .app-shell input[type="date"],
+html[data-theme="dark"] .app-shell input[type="time"],
+html[data-theme="dark"] .app-shell input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+/* Dokumenty do druku zostają białe także w polach. */
+html[data-theme="dark"] .app-shell :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) :is(input, select, textarea) {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+  color-scheme: light;
+}

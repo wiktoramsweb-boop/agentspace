@@ -282,19 +282,18 @@ export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
 export const PROPERTY_TYPE_TILES: {
   value: PropertyType;
   label: string;
-  emoji: string;
   tile: string;
   group: "podstawowe" | "wieksze";
 }[] = [
-  { value: "mieszkanie", label: "Mieszkanie", emoji: "🏢", tile: "bg-blue-500", group: "podstawowe" },
-  { value: "dom", label: "Dom", emoji: "🏠", tile: "bg-emerald-500", group: "podstawowe" },
-  { value: "dzialka", label: "Działka", emoji: "🌳", tile: "bg-teal-500", group: "podstawowe" },
-  { value: "lokal", label: "Lokal", emoji: "🏬", tile: "bg-violet-500", group: "podstawowe" },
-  { value: "magazyn", label: "Magazyn", emoji: "📦", tile: "bg-amber-500", group: "podstawowe" },
-  { value: "obiekt", label: "Obiekt", emoji: "🏛️", tile: "bg-slate-500", group: "podstawowe" },
-  { value: "pokoj", label: "Pokój", emoji: "🛏️", tile: "bg-rose-500", group: "podstawowe" },
-  { value: "inwestycja", label: "Inwestycja", emoji: "📈", tile: "bg-cyan-500", group: "wieksze" },
-  { value: "budynek", label: "Budynek", emoji: "🏘️", tile: "bg-indigo-500", group: "wieksze" },
+  { value: "mieszkanie", label: "Mieszkanie", tile: "bg-blue-500", group: "podstawowe" },
+  { value: "dom", label: "Dom", tile: "bg-emerald-500", group: "podstawowe" },
+  { value: "dzialka", label: "Działka", tile: "bg-teal-500", group: "podstawowe" },
+  { value: "lokal", label: "Lokal", tile: "bg-violet-500", group: "podstawowe" },
+  { value: "magazyn", label: "Magazyn", tile: "bg-amber-500", group: "podstawowe" },
+  { value: "obiekt", label: "Obiekt", tile: "bg-slate-500", group: "podstawowe" },
+  { value: "pokoj", label: "Pokój", tile: "bg-rose-500", group: "podstawowe" },
+  { value: "inwestycja", label: "Inwestycja", tile: "bg-cyan-500", group: "wieksze" },
+  { value: "budynek", label: "Budynek", tile: "bg-indigo-500", group: "wieksze" },
 ];
 
 // ── Słowniki pól oferty (v17). Wartości trzymamy jako tekst, żeby dodanie
@@ -527,6 +526,11 @@ export type Activity = {
   property_id: string | null;
   assignee_ids: string[];
   include_in_report: boolean;
+  // v19: dane kontaktowe wpisane wprost (gdy numeru nie ma jeszcze w bazie klientów)
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
+  contact_phone_digits?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -535,14 +539,13 @@ export type Activity = {
 export const ACTIVITY_KINDS: {
   value: ActivityKind;
   label: string;
-  emoji: string;
   tile: string;   // kolor kafelka z ikoną
   badge: string;  // kolor plakietki na liście
 }[] = [
-  { value: "polaczenie", label: "Połączenie telefoniczne", emoji: "📞", tile: "bg-blue-500", badge: "bg-orange-100 text-orange-700" },
-  { value: "zadanie", label: "Zadanie", emoji: "✅", tile: "bg-violet-500", badge: "bg-violet-100 text-violet-700" },
-  { value: "wydarzenie", label: "Wydarzenie", emoji: "📅", tile: "bg-amber-500", badge: "bg-amber-100 text-amber-700" },
-  { value: "spotkanie", label: "Spotkanie", emoji: "🤝", tile: "bg-rose-500", badge: "bg-blue-100 text-blue-700" },
+  { value: "polaczenie", label: "Połączenie telefoniczne", tile: "bg-blue-500", badge: "bg-blue-100 text-blue-700" },
+  { value: "zadanie", label: "Zadanie", tile: "bg-violet-500", badge: "bg-violet-100 text-violet-700" },
+  { value: "wydarzenie", label: "Wydarzenie", tile: "bg-amber-500", badge: "bg-amber-100 text-amber-700" },
+  { value: "spotkanie", label: "Spotkanie", tile: "bg-rose-500", badge: "bg-rose-100 text-rose-700" },
 ];
 
 export const ACTIVITY_STATUSES: { value: ActivityStatus; label: string; color: string; bar: string }[] = [

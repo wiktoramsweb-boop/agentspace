@@ -8,14 +8,7 @@ import { formatPln } from "@/lib/format";
 import { Card } from "../components/ui";
 import { SegmentedToggle } from "../components/kit";
 import { PropertiesMap } from "./properties-map";
-
-const TYPE_EMOJI: Record<string, string> = {
-  mieszkanie: "🏢",
-  dom: "🏠",
-  dzialka: "🌳",
-  lokal: "🏬",
-  inne: "📍",
-};
+import { PROPERTY_ICONS, PinIcon } from "../components/icons";
 
 function kindVisual(kind: string) {
   return kind === "wynajem"
@@ -79,7 +72,7 @@ export function PropertiesBrowser({
         <Card className="mb-6 !overflow-hidden !p-0">
           <div className="flex items-center justify-between border-b border-slate-200 bg-gradient-to-r from-emerald-500/10 via-sky-500/5 to-transparent px-5 py-3">
             <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-slate-700">
-              🗺️ Mapa ofert
+              Mapa ofert
             </h2>
             <span className="text-xs text-slate-500">{mapPoints.length} na mapie</span>
           </div>
@@ -110,6 +103,7 @@ export function PropertiesBrowser({
               .join(" · ");
             const mine = p.agent_id === currentUserId;
             const kv = kindVisual(p.deal_kind);
+            const TypeIcon = PROPERTY_ICONS[p.property_type] ?? PinIcon;
             return (
               <Link key={p.id} href={`/app/nieruchomosci/${p.id}`} className="block">
                 <div
@@ -120,8 +114,8 @@ export function PropertiesBrowser({
                   <div className="p-5">
                     <div className="mb-3 flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2.5">
-                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-xl">
-                          {TYPE_EMOJI[p.property_type] ?? "📍"}
+                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600">
+                          <TypeIcon className="h-5 w-5" />
                         </span>
                         <span className={`text-xs font-semibold uppercase tracking-wide ${kv.chip}`}>{kind?.label}</span>
                       </div>
@@ -132,7 +126,10 @@ export function PropertiesBrowser({
 
                     <h3 className="mb-1 truncate font-semibold text-slate-900">{p.title}</h3>
                     {(p.city || p.address) && (
-                      <p className="mb-3 truncate text-sm text-slate-500">📍 {p.city ?? p.address}</p>
+                      <p className="mb-3 flex items-center gap-1 truncate text-sm text-slate-500">
+                        <PinIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                        {p.city ?? p.address}
+                      </p>
                     )}
 
                     <p className="text-2xl font-bold text-slate-900">

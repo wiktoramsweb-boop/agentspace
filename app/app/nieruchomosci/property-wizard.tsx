@@ -5,6 +5,7 @@ import { createProperty } from "./actions";
 import { AddressInput } from "../components/address-input";
 import { Modal } from "../components/modal";
 import { SubmitButton } from "../components/submit-button";
+import { PROPERTY_ICONS } from "../components/icons";
 import {
   PROPERTY_DEAL_KINDS,
   PROPERTY_TYPE_TILES,
@@ -354,6 +355,7 @@ function TileGrid({
     <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-7">
       {tiles.map((t) => {
         const active = value === t.value;
+        const TileIcon = PROPERTY_ICONS[t.value] ?? PROPERTY_ICONS.inne;
         return (
           <button
             key={t.value}
@@ -366,9 +368,9 @@ function TileGrid({
             }`}
           >
             <span
-              className={`flex h-11 w-11 items-center justify-center rounded-xl text-xl text-white ${t.tile}`}
+              className={`flex h-11 w-11 items-center justify-center rounded-xl text-white ${t.tile}`}
             >
-              {t.emoji}
+              <TileIcon className="h-6 w-6" />
             </span>
             <span className={`text-xs font-medium ${active ? "text-emerald-700" : "text-slate-700"}`}>
               {t.label}

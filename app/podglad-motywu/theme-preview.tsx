@@ -29,11 +29,13 @@ const base = {
   started_at: null, ended_at: null, completed_at: null,
   property_id: null as string | null, propertyTitle: null as string | null,
   include_in_report: false, created_at: "", updated_at: "",
+  contact_name: null as string | null, contact_phone: null as string | null, contact_email: null as string | null,
 };
 const MOCK_ACTIVITIES: ActivityRich[] = [
   { ...base, id: "1", kind: "polaczenie", purpose: "rozmowa_pozyskowa", subject: "Pozysk ul. Warmijska",
     status: "wykonane", priority: "normalny", due_at: "2026-09-09T14:30:00Z", client_id: "c1",
     clientName: "Małgorzata Zielińska", assignee_ids: ["u1"], assigneeNames: ["Wiktor Szostek"],
+    contact_name: "Małgorzata Zielińska", contact_phone: "600 100 200",
     call_direction: "wychodzaca", duration_s: 245,
     description: "Klientka rozważa sprzedaż w I kwartale. Umówiony telefon za 2 tygodnie." },
   { ...base, id: "2", kind: "spotkanie", purpose: "prezentacja", subject: "Prezentacja Sołtysowska",
