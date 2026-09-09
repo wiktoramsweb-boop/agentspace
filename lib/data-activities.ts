@@ -82,18 +82,29 @@ export async function getActivityStats(agencyId: string, userId: string) {
   const admin = createSupabaseAdmin();
   const { data } = await admin
     .from("activities")
-    .select("status, due_at, assignee_ids, completed_at")
+    .select("status, kind, due_at, assignee_ids, completed_at")
     .eq("agency_id", agencyId)
     .limit(2000);
 
-  const rows = (data ?? []) as Pick<Activity, "status" | "due_at" | "assignee_ids" | "completed_at">[];
+  const rows = (data ?? []) as Pick<
+    Activity,
+    "status" | "kind" | "due_at" | "assignee_ids" | "completed_at"
+  >[];
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
   const weekAgo = new Date(now.getTime() - 7 * 864e5).toISOString();
 
   const mine = rows.filter((r) => (r.assignee_ids ?? []).includes(userId));
+
+  // Telefony wykonane dzisiaj - to je porównujemy z celem dziennym z Celów.
+  const isToday = (r: { due_at: string | null; completed_at: string | null }) =>
+    (r.completed_at ?? r.due_at ?? "").slice(0, 10) === todayStr;
+
   return {
     planned: mine.filter((r) => r.status === "zaplanowane").length,
+    callsToday: mine.filter((r) => r.kind === "polaczenie" && r.status === "wykonane" && isToday(r))
+      .length,
+    doneToday: mine.filter((r) => r.status === "wykonane" && isToday(r)).length,
     today: mine.filter((r) => r.status === "zaplanowane" && (r.due_at ?? "").slice(0, 10) === todayStr)
       .length,
     overdue: mine.filter(

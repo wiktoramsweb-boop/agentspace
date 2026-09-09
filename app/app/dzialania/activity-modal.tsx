@@ -242,6 +242,23 @@ function ActivityForm({
                 wyszukać, czy ktoś już pod niego dzwonił.
               </p>
             </div>
+
+            <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <input
+                type="checkbox"
+                name="create_client"
+                value="1"
+                defaultChecked
+                className="mt-0.5 h-4 w-4 accent-emerald-500"
+              />
+              <span>
+                <span className="text-sm font-medium text-slate-800">Dodaj do bazy klientów</span>
+                <span className="block text-xs text-slate-500">
+                  Jeśli tego numeru jeszcze nie ma w Klientach, założymy kartę automatycznie. Gdy numer
+                  już istnieje, działanie podepniemy pod istniejącego klienta.
+                </span>
+              </span>
+            </label>
           </Section>
 
           {/* Szczegóły */}

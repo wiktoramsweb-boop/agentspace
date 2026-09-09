@@ -47,6 +47,36 @@ export async function createActivity(formData: FormData): Promise<void> {
     }
   }
 
+  // Jeśli agent wpisał numer, a nie wskazał klienta z bazy: szukamy po numerze,
+  // a gdy takiego nie ma - zakładamy klienta. Dzięki temu baza buduje się sama
+  // przy zwykłym zapisywaniu telefonów, zamiast wymagać osobnego kroku.
+  let linkedClientId = clientId;
+  const wantsClient = formData.get("create_client") === "1";
+  const digits = (contactPhone ?? "").replace(/\D/g, "");
+
+  if (!linkedClientId && digits.length >= 6) {
+    const existing = await findClientByPhone(admin, user.agency_id, digits, contactPhone!);
+    if (existing) {
+      linkedClientId = existing;
+    } else if (wantsClient) {
+      const { data: created } = await admin
+        .from("clients")
+        .insert({
+          agent_id: user.id,
+          agency_id: user.agency_id,
+          name: contactName || contactPhone || "Kontakt bez nazwy",
+          phone: contactPhone,
+          email: txt(formData, "contact_email"),
+          type: "inny",
+          status: "nowy",
+          last_contact_at: status === "wykonane" ? new Date().toISOString() : null,
+        })
+        .select("id")
+        .single();
+      if (created) linkedClientId = created.id;
+    }
+  }
+
   await admin.from("activities").insert({
     agency_id: user.agency_id,
     created_by: user.id,
@@ -59,7 +89,7 @@ export async function createActivity(formData: FormData): Promise<void> {
     call_direction: txt(formData, "call_direction"),
     due_at: whenFrom(formData, "due_date", "due_time"),
     completed_at: status === "wykonane" ? new Date().toISOString() : null,
-    client_id: clientId,
+    client_id: linkedClientId,
     contact_name: contactName,
     contact_phone: contactPhone,
     contact_email: txt(formData, "contact_email"),
@@ -68,8 +98,51 @@ export async function createActivity(formData: FormData): Promise<void> {
     include_in_report: formData.get("include_in_report") === "1",
   });
 
+  // Wykonane działanie = był kontakt. Aktualizujemy datę u klienta, żeby
+  // przypomnienia „dawno nie dzwoniłeś" liczyły się od realnej rozmowy.
+  if (linkedClientId && status === "wykonane") {
+    await admin
+      .from("clients")
+      .update({ last_contact_at: new Date().toISOString() })
+      .eq("id", linkedClientId)
+      .eq("agency_id", user.agency_id);
+  }
+
   revalidatePath("/app/dzialania");
+  revalidatePath("/app/klienci");
   revalidatePath("/app");
+}
+
+/**
+ * Szuka klienta po numerze telefonu. Najpierw po kolumnie ze samymi cyframi
+ * (v19), a gdy migracji jeszcze nie ma - po surowym numerze.
+ */
+async function findClientByPhone(
+  admin: ReturnType<typeof createSupabaseAdmin>,
+  agencyId: string | null,
+  digits: string,
+  raw: string,
+): Promise<string | null> {
+  const byDigits = await admin
+    .from("clients")
+    .select("id")
+    .eq("agency_id", agencyId)
+    .eq("phone_digits", digits)
+    .limit(1)
+    .maybeSingle();
+  if (!byDigits.error && byDigits.data) return byDigits.data.id;
+
+  if (byDigits.error) {
+    const byRaw = await admin
+      .from("clients")
+      .select("id")
+      .eq("agency_id", agencyId)
+      .eq("phone", raw)
+      .limit(1)
+      .maybeSingle();
+    if (byRaw.data) return byRaw.data.id;
+  }
+  return null;
 }
 
 /** Szybka zmiana statusu z listy (odhaczenie „wykonane"). */
