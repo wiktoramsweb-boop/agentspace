@@ -25,6 +25,7 @@ export function PropertiesBrowser({
 }) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<"all" | "mine">("all");
+  const [sort, setSort] = useState<"nowe" | "cena_rosnaco" | "cena_malejaco" | "cena_m2">("nowe");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -39,6 +40,19 @@ export function PropertiesBrowser({
       );
     });
   }, [properties, query, scope, currentUserId]);
+
+  // Sortowanie liczone po filtrach - agenci najczęściej szukają „najtańsze w tej
+  // dzielnicy", a nie „najtańsze w całej bazie".
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    const perM2 = (p: PropertyWithOwner) =>
+      p.price_pln != null && p.area_m2 ? p.price_pln / p.area_m2 : Number.POSITIVE_INFINITY;
+    if (sort === "cena_rosnaco") arr.sort((a, b) => (a.price_pln ?? Infinity) - (b.price_pln ?? Infinity));
+    else if (sort === "cena_malejaco") arr.sort((a, b) => (b.price_pln ?? -1) - (a.price_pln ?? -1));
+    else if (sort === "cena_m2") arr.sort((a, b) => perM2(a) - perM2(b));
+    else arr.sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+    return arr;
+  }, [filtered, sort]);
 
   const mineCount = properties.filter((p) => p.agent_id === currentUserId).length;
   const active = filtered.filter((p) => p.status === "aktywna");
@@ -56,6 +70,17 @@ export function PropertiesBrowser({
           placeholder="Szukaj po nazwie, adresie, mieście lub agencie…"
           className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
         />
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as typeof sort)}
+          className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
+          aria-label="Sortowanie"
+        >
+          <option value="nowe">Najnowsze</option>
+          <option value="cena_rosnaco">Cena rosnąco</option>
+          <option value="cena_malejaco">Cena malejąco</option>
+          <option value="cena_m2">Cena za m² rosnąco</option>
+        </select>
         <SegmentedToggle
           value={scope}
           onChange={setScope}
@@ -68,7 +93,7 @@ export function PropertiesBrowser({
       </div>
 
       {/* Mapa */}
-      {filtered.length > 0 && (
+      {sorted.length > 0 && (
         <Card className="mb-6 !overflow-hidden !p-0">
           <div className="flex items-center justify-between border-b border-slate-200 bg-gradient-to-r from-emerald-500/10 via-sky-500/5 to-transparent px-5 py-3">
             <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-slate-700">
@@ -86,13 +111,13 @@ export function PropertiesBrowser({
         </Card>
       )}
 
-      {filtered.length === 0 ? (
+      {sorted.length === 0 ? (
         <Card>
           <p className="text-center text-sm text-slate-500">Brak ofert dla tego filtra.</p>
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((p) => {
+          {sorted.map((p) => {
             const status = PROPERTY_STATUSES.find((s) => s.value === p.status);
             const kind = PROPERTY_DEAL_KINDS.find((k) => k.value === p.deal_kind);
             const params = [

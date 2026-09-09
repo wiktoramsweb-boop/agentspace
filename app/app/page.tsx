@@ -21,6 +21,8 @@ import { formatPln, daysAgo } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
 import { TaskList } from "./components/task-list";
 import { DailyAssistant } from "./components/daily-assistant";
+import { TodayActivities } from "./components/today-activities";
+import { getActivities } from "@/lib/data-activities";
 import { GameStrip, BadgesCard } from "./components/game-strip";
 import { OnboardingChecklist } from "./components/onboarding-checklist";
 
@@ -48,6 +50,9 @@ export default async function DashboardPage() {
   // Cel dzienny telefonów (z lejka) → gamifikacja
   const dailyCallTarget = goalRow ? computeFunnel(goalRow).byStage.cold_calls.daily : 0;
   const game = await getGameData(user.id, dailyCallTarget);
+  const myActivities = user.agency_id
+    ? await getActivities(user.agency_id, { scope: "mine", userId: user.id, limit: 100 })
+    : [];
 
   const goal = user.monthly_goal_pln ?? 0;
   const goalProgress = goal > 0 ? Math.min(100, Math.round((commission.monthClosed / goal) * 100)) : 0;
@@ -118,6 +123,16 @@ export default async function DashboardPage() {
 
       {/* Plan dnia + Klienci do kontaktu */}
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-slate-900">Działania na dziś</h2>
+            <Link href="/app/dzialania" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+              Wszystkie →
+            </Link>
+          </div>
+          <TodayActivities activities={myActivities} />
+        </Card>
+
         <Card>
           <h2 className="mb-4 text-lg font-semibold text-slate-900">Plan dnia</h2>
           <TaskList tasks={tasks} />
