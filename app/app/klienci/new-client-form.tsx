@@ -22,6 +22,8 @@ type TypeMeta = {
   amountPh: string;
   addressLabel: string;
   showAmount: boolean;
+  /** Forma biernika do przycisku (Dodaj sprzedajacego, nie: sprzedajacy). */
+  addLabel: string;
 };
 
 const TYPES: TypeMeta[] = [
@@ -36,6 +38,7 @@ const TYPES: TypeMeta[] = [
     amountPh: "650000",
     addressLabel: "Adres nieruchomości",
     showAmount: true,
+    addLabel: "sprzedającego",
   },
   {
     value: "kupujacy",
@@ -48,6 +51,7 @@ const TYPES: TypeMeta[] = [
     amountPh: "700000",
     addressLabel: "Preferowana lokalizacja",
     showAmount: true,
+    addLabel: "kupującego",
   },
   {
     value: "wynajmujacy",
@@ -60,6 +64,7 @@ const TYPES: TypeMeta[] = [
     amountPh: "2500",
     addressLabel: "Adres nieruchomości",
     showAmount: true,
+    addLabel: "wynajmującego",
   },
   {
     value: "najemca",
@@ -72,6 +77,7 @@ const TYPES: TypeMeta[] = [
     amountPh: "3000",
     addressLabel: "Preferowana lokalizacja",
     showAmount: true,
+    addLabel: "najemcę",
   },
   {
     value: "inny",
@@ -84,6 +90,7 @@ const TYPES: TypeMeta[] = [
     amountPh: "",
     addressLabel: "Lokalizacja (opcjonalnie)",
     showAmount: false,
+    addLabel: "kontakt",
   },
 ];
 
@@ -286,7 +293,7 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
             pendingText="Dodaję…"
             className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-400"
           >
-            Dodaj {meta.label.toLowerCase()}
+            Dodaj {meta.addLabel}
           </SubmitButton>
           <button
             type="button"

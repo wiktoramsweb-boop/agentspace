@@ -9,6 +9,7 @@ import { PROPERTY_STATUSES, CLIENT_STATUSES } from "@/lib/types";
 import { PropertyWizard } from "../app/nieruchomosci/property-wizard";
 import { ActivityModal } from "../app/dzialania/activity-modal";
 import { ActivitiesBrowser } from "../app/dzialania/activities-browser";
+import { NewClientForm } from "../app/klienci/new-client-form";
 import type { ActivityRich } from "@/lib/data-activities";
 
 
@@ -162,8 +163,9 @@ export function ThemePreview() {
           </div>
 
           <div>
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-lg font-semibold text-slate-900">Działania (moduł CRM)</h2>
+              <NewClientForm existingPhones={[{ phone: "600100200", owner: "Wiktor" }]} />
               <ActivityModal agents={MOCK_AGENTS} clients={MOCK_CLIENTS} properties={MOCK_PROPS} />
             </div>
             <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" />
