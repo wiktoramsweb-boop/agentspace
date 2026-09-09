@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { SearchHit } from "@/app/api/szukaj/route";
 import { ApartmentIcon, PersonIcon, PhoneIcon, SearchIcon2 } from "./icons";
 
@@ -30,6 +31,9 @@ export function GlobalSearch() {
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   // Skrót klawiszowy działa z każdego miejsca aplikacji.
   useEffect(() => {
@@ -112,11 +116,15 @@ export function GlobalSearch() {
         <kbd className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] font-medium">⌘K</kbd>
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-[60] flex items-start justify-center bg-slate-900/60 p-4 pt-[12vh] backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        >
+      {/* Portal do <body>: sidebar ma position:sticky, co tworzy własny kontekst
+          nakładania. Modal renderowany w środku byłby przykrywany przez treść
+          strony mimo wysokiego z-index. */}
+      {open && mounted &&
+        createPortal(
+          <div
+            className="portal-dark fixed inset-0 z-[60] flex items-start justify-center bg-slate-900/60 p-4 pt-[12vh] backdrop-blur-sm"
+            onClick={() => setOpen(false)}
+          >
           <div
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
@@ -195,9 +203,10 @@ export function GlobalSearch() {
               <span>Enter otwiera</span>
               <span>Esc zamyka</span>
             </div>
-          </div>
-        </div>
-      )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
