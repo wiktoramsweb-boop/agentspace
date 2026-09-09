@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { SubmitButton } from "../components/submit-button";
 import { createClient } from "./actions";
-import { CLIENT_STATUSES, type ClientType } from "@/lib/types";
+import { CLIENT_STATUSES, CLIENT_SOURCES, PHONE_LABELS, type ClientType } from "@/lib/types";
 import { AddressInput } from "../components/address-input";
 import { Modal } from "../components/modal";
 
@@ -90,6 +90,8 @@ const TYPES: TypeMeta[] = [
 export function NewClientForm({ existingPhones = [] }: { existingPhones?: ExistingPhone[] }) {
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState("");
+  const [extraPhones, setExtraPhones] = useState<number[]>([]);
+  const [extraEmails, setExtraEmails] = useState<number[]>([]);
   const [type, setType] = useState<ClientType>("sprzedajacy");
 
   const meta = TYPES.find((t) => t.value === type) ?? TYPES[0];
@@ -108,7 +110,7 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
   }
 
   return (
-    <Modal title="Nowy klient" onClose={() => setOpen(false)}>
+    <Modal title="Dodawanie kontaktu" onClose={() => setOpen(false)} maxWidth="max-w-3xl">
       <form action={createClient} className="flex min-h-0 flex-1 flex-col">
         <input type="hidden" name="type" value={type} />
         <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
@@ -132,42 +134,149 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
             </div>
           </div>
 
-          {/* Dane kontaktowe */}
-          <Field label="Imię i nazwisko" name="name" required placeholder="Jan Kowalski" />
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={lbl}>Telefon</label>
-              <input
-                name="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+48 600 000 000"
-                inputMode="tel"
-                className={`w-full rounded-xl border bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:outline-none ${
-                  dup ? "border-amber-500/60 focus:border-amber-500" : "border-slate-200 focus:border-emerald-500"
-                }`}
-              />
+          {/* ── Informacje podstawowe ─────────────────────────── */}
+          <Section title="Informacje podstawowe">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Imię *" name="first_name" required placeholder="Jan" />
+              <Field label="Nazwisko" name="last_name" placeholder="Kowalski" />
             </div>
-            <Field label="Email" name="email" type="email" placeholder="jan@email.pl" />
-          </div>
-          {dup && (
-            <p className="-mt-2 text-xs text-amber-600">
-              ⚠️ Ten numer jest już w bazie{dup.owner ? ` (opiekun: ${dup.owner})` : ""}. Możesz dodać mimo to.
-            </p>
-          )}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Firma" name="company" placeholder="np. Nowak Development" />
+              <Field label="Stanowisko" name="position" placeholder="np. Prezes" />
+            </div>
 
-          {/* Pola zależne od typu */}
-          <Field label={meta.propertyLabel} name="property" placeholder={meta.propertyPh} />
-          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className={lbl}>Telefon główny</label>
+                <input
+                  name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+48 600 000 000"
+                  inputMode="tel"
+                  className={`w-full rounded-xl border bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:outline-none ${
+                    dup ? "border-amber-500/60 focus:border-amber-500" : "border-slate-200 focus:border-emerald-500"
+                  }`}
+                />
+              </div>
+              <Field label="E-mail główny" name="email" type="email" placeholder="jan@email.pl" />
+            </div>
+            {dup && (
+              <p className="-mt-1 text-xs text-amber-600">
+                Ten numer jest już w bazie{dup.owner ? ` (opiekun: ${dup.owner})` : ""}. Możesz dodać mimo to.
+              </p>
+            )}
+
+            {/* Dodatkowe telefony */}
+            {extraPhones.map((_, i) => (
+              <div key={`ph${i}`} className="flex items-end gap-2">
+                <div className="flex-1">
+                  <label className={lbl}>Dodatkowy telefon</label>
+                  <input name="extra_phone_value" placeholder="600 000 000" inputMode="tel" className={inp} />
+                </div>
+                <div className="w-40">
+                  <label className={lbl}>Opis</label>
+                  <select name="extra_phone_label" className={inp} defaultValue="komórka">
+                    {PHONE_LABELS.map((l) => (
+                      <option key={l} value={l}>
+                        {l}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setExtraPhones((p) => p.filter((_, j) => j !== i))}
+                  className="mb-1 rounded-lg px-2 py-2 text-slate-400 transition hover:text-red-600"
+                  aria-label="Usuń telefon"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setExtraPhones((p) => [...p, 1])}
+              className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+            >
+              + Dodaj telefon
+            </button>
+
+            {/* Dodatkowe maile */}
+            {extraEmails.map((_, i) => (
+              <div key={`em${i}`} className="flex items-end gap-2">
+                <div className="flex-1">
+                  <label className={lbl}>Dodatkowy e-mail</label>
+                  <input name="extra_email_value" type="email" placeholder="jan.prywatny@email.pl" className={inp} />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setExtraEmails((p) => p.filter((_, j) => j !== i))}
+                  className="mb-1 rounded-lg px-2 py-2 text-slate-400 transition hover:text-red-600"
+                  aria-label="Usuń e-mail"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setExtraEmails((p) => [...p, 1])}
+              className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+            >
+              + Dodaj e-mail
+            </button>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Field label="Nr dokumentu tożsamości" name="id_document" placeholder="ABC 123456" />
+              <Field label="PESEL" name="pesel" placeholder="90010112345" />
+              <Field label="NIP" name="nip" placeholder="6772516327" />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Select label="Źródło" name="source" options={CLIENT_SOURCES} empty />
+              <Select label="Status" name="status" options={CLIENT_STATUSES} />
+            </div>
+          </Section>
+
+          {/* ── Czego dotyczy ─────────────────────────────────── */}
+          <Section title="Czego dotyczy">
+            <Field label={meta.propertyLabel} name="property" placeholder={meta.propertyPh} />
             {meta.showAmount ? (
               <Field label={meta.amountLabel} name="budget" type="text" inputMode="decimal" placeholder={meta.amountPh} />
             ) : (
               <input type="hidden" name="budget" value="" />
             )}
-            <Select label="Status" name="status" options={CLIENT_STATUSES} />
-          </div>
+          </Section>
 
-          <AddressInput label={meta.addressLabel} />
+          {/* ── Dane adresowe ─────────────────────────────────── */}
+          <Section title="Dane adresowe">
+            <AddressInput label={meta.addressLabel} />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Field label="Kod pocztowy" name="postal_code" placeholder="30-002" />
+              <Field label="Województwo" name="voivodeship" placeholder="małopolskie" />
+              <Field label="Państwo" name="country" placeholder="Polska" />
+            </div>
+          </Section>
+
+          {/* ── Zgody marketingowe ────────────────────────────── */}
+          <Section title="Zgody marketingowe">
+            <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <input
+                type="checkbox"
+                name="marketing_consent"
+                value="1"
+                className="mt-0.5 h-4 w-4 accent-emerald-500"
+              />
+              <span>
+                <span className="text-sm font-medium text-slate-800">
+                  Zgoda na przesyłanie informacji handlowych
+                </span>
+                <span className="block text-xs text-slate-500">
+                  Zapisujemy datę wyrażenia zgody - to dowód przy ewentualnej kontroli RODO.
+                </span>
+              </span>
+            </label>
+          </Section>
 
           <Field label="Następny kontakt (przypomnienie)" name="next_contact_at" type="date" />
         </div>
@@ -189,6 +298,15 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
         </div>
       </form>
     </Modal>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">{title}</p>
+      <div className="space-y-3">{children}</div>
+    </div>
   );
 }
 
@@ -223,15 +341,18 @@ function Select({
   label,
   name,
   options,
+  empty,
 }: {
   label: string;
   name: string;
   options: readonly { value: string; label: string }[];
+  empty?: boolean;
 }) {
   return (
     <div>
       <label className={lbl}>{label}</label>
-      <select name={name} className={inp}>
+      <select name={name} className={inp} defaultValue={empty ? "" : undefined}>
+        {empty && <option value="">nie podano</option>}
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}

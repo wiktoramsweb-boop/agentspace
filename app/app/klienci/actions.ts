@@ -11,35 +11,77 @@ function floatOrNull(v: FormDataEntryValue | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/** Zbiera dodatkowe telefony/maile z pól o powtarzalnych nazwach. */
+function listFrom(formData: FormData, key: string): { value: string; label?: string }[] {
+  const values = formData.getAll(`${key}_value`).map(String);
+  const labels = formData.getAll(`${key}_label`).map(String);
+  return values
+    .map((v, i) => ({ value: v.trim(), label: labels[i]?.trim() || undefined }))
+    .filter((x) => x.value);
+}
+
 export async function createClient(formData: FormData): Promise<void> {
   const user = await requireUser();
-  const name = String(formData.get("name") ?? "").trim();
+  const txt = (k: string) => String(formData.get(k) ?? "").trim() || null;
+
+  // Nazwa wyświetlana: z imienia i nazwiska, a gdy ich brak - z pola „name".
+  const first = txt("first_name");
+  const last = txt("last_name");
+  const name = [first, last].filter(Boolean).join(" ") || String(formData.get("name") ?? "").trim();
   if (!name) return;
 
   const admin = createSupabaseAdmin();
   const budget = parseInt(String(formData.get("budget") ?? "").replace(/\s/g, ""), 10);
 
-  const { data } = await admin
+  // Rdzeń zapisujemy zawsze; pola z v20 dokładamy osobno, żeby brak migracji
+  // nie zablokował dodania klienta.
+  const core = {
+    agent_id: user.id,
+    agency_id: user.agency_id,
+    name,
+    phone: txt("phone"),
+    email: txt("email"),
+    type: (String(formData.get("type") ?? "kupujacy") as ClientType),
+    status: (String(formData.get("status") ?? "nowy") as ClientStatus),
+    budget_pln: Number.isFinite(budget) ? budget : null,
+    property: txt("property"),
+    city: txt("city"),
+    address: txt("address"),
+    lat: floatOrNull(formData.get("lat")),
+    lng: floatOrNull(formData.get("lng")),
+    next_contact_at: String(formData.get("next_contact_at") ?? "") || null,
+    last_contact_at: new Date().toISOString(),
+  };
+
+  const consent = formData.get("marketing_consent") === "1";
+  const extra = {
+    first_name: first,
+    last_name: last,
+    phones: listFrom(formData, "extra_phone"),
+    emails: listFrom(formData, "extra_email"),
+    pesel: txt("pesel"),
+    nip: txt("nip"),
+    id_document: txt("id_document"),
+    company: txt("company"),
+    position: txt("position"),
+    source: txt("source"),
+    country: txt("country") ?? "Polska",
+    postal_code: txt("postal_code"),
+    voivodeship: txt("voivodeship"),
+    marketing_consent: consent,
+    marketing_consent_at: consent ? new Date().toISOString() : null,
+  };
+
+  let { data, error } = await admin
     .from("clients")
-    .insert({
-      agent_id: user.id,
-      agency_id: user.agency_id,
-      name,
-      phone: String(formData.get("phone") ?? "").trim() || null,
-      email: String(formData.get("email") ?? "").trim() || null,
-      type: (String(formData.get("type") ?? "kupujacy") as ClientType),
-      status: (String(formData.get("status") ?? "nowy") as ClientStatus),
-      budget_pln: Number.isFinite(budget) ? budget : null,
-      property: String(formData.get("property") ?? "").trim() || null,
-      city: String(formData.get("city") ?? "").trim() || null,
-      address: String(formData.get("address") ?? "").trim() || null,
-      lat: floatOrNull(formData.get("lat")),
-      lng: floatOrNull(formData.get("lng")),
-      next_contact_at: String(formData.get("next_contact_at") ?? "") || null,
-      last_contact_at: new Date().toISOString(),
-    })
+    .insert({ ...core, ...extra })
     .select("id")
     .single();
+
+  if (error) {
+    const retry = await admin.from("clients").insert(core).select("id").single();
+    data = retry.data;
+  }
 
   revalidatePath("/app/klienci");
   if (data) redirect(`/app/klienci/${data.id}`);

@@ -159,7 +159,38 @@ export type Client = {
   last_contact_at: string | null;
   created_at: string;
   updated_at: string;
+  // ── v20: pełna kartoteka kontaktu (jak w ASARI) ──
+  first_name?: string | null;
+  last_name?: string | null;
+  phones?: { value: string; label?: string }[] | null;
+  emails?: { value: string; label?: string }[] | null;
+  pesel?: string | null;
+  nip?: string | null;
+  id_document?: string | null;
+  company?: string | null;
+  position?: string | null;
+  source?: string | null;
+  country?: string | null;
+  postal_code?: string | null;
+  voivodeship?: string | null;
+  marketing_consent?: boolean | null;
+  marketing_consent_at?: string | null;
 };
+
+/** Skąd mamy klienta - lista wzorowana na polu „Źródło" z ASARI. */
+export const CLIENT_SOURCES: { value: string; label: string }[] = [
+  { value: "polecenie", label: "Polecenie" },
+  { value: "portal", label: "Portal ogłoszeniowy" },
+  { value: "strona", label: "Strona www" },
+  { value: "telefon", label: "Telefon przychodzący" },
+  { value: "social", label: "Social media" },
+  { value: "banner", label: "Baner / tablica" },
+  { value: "cold_call", label: "Cold call" },
+  { value: "klient_powracajacy", label: "Klient powracający" },
+  { value: "inne", label: "Inne" },
+];
+
+export const PHONE_LABELS = ["komórka", "domowy", "służbowy", "inny"] as const;
 
 export type ClientNote = {
   id: string;

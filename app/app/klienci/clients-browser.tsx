@@ -58,7 +58,8 @@ export function ClientsBrowser({
       const byName = c.name.toLowerCase().includes(q);
       const byEmail = (c.email ?? "").toLowerCase().includes(q);
       const byPhone = qd.length >= 3 && digits(c.phone).includes(qd);
-      return byName || byEmail || byPhone;
+      const byCompany = (c.company ?? "").toLowerCase().includes(q);
+      return byName || byEmail || byPhone || byCompany;
     });
   }, [clients, query, scope, statusFilter, typeFilter, currentUserId]);
 
@@ -87,7 +88,7 @@ export function ClientsBrowser({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Szukaj po nazwisku lub numerze telefonu…"
+            placeholder="Szukaj po nazwisku, numerze telefonu, firmie…"
             className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-slate-900 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none"
           />
         </div>

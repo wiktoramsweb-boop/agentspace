@@ -21,6 +21,7 @@ import { getActivities, getAgencyAgents } from "@/lib/data-activities";
 import { getAgencyProperties } from "@/lib/data-platform";
 import { ActivityModal } from "../../dzialania/activity-modal";
 import { ClientActivities } from "./client-activities";
+import { ClientDetails } from "./client-details";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -134,6 +135,8 @@ export default async function ClientDetailPage({ params }: Props) {
             </h2>
             <StatusChanger clientId={client.id} current={client.status} />
           </Card>
+
+          <ClientDetails client={client} />
 
           <Card>
             <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
