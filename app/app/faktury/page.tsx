@@ -2,8 +2,7 @@ import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
 import { getInvoices } from "@/lib/data-invoices";
 import { PageHeader, EmptyState } from "../components/ui";
-import { formatMoney, getSeller } from "@/lib/invoice";
-import { formatDateShort } from "@/lib/format";
+import { InvoicesBrowser } from "./invoices-browser";
 
 export default async function FakturyPage() {
   const owner = await requireOwner();
@@ -37,32 +36,7 @@ export default async function FakturyPage() {
           }
         />
       ) : (
-        <div className="space-y-2.5">
-          {invoices.map((inv) => {
-            const seller = getSeller(inv.seller_key);
-            return (
-              <Link
-                key={inv.id}
-                href={`/app/faktury/${inv.id}`}
-                className="hover-lift flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-slate-300 hover:bg-slate-100"
-              >
-                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                  </svg>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-slate-900">Faktura {inv.number}</p>
-                  <p className="truncate text-sm text-slate-500">
-                    {inv.buyer_name || "-"} · {seller.name.split(" ").slice(0, 2).join(" ")}…
-                    {inv.issue_date && ` · ${formatDateShort(inv.issue_date)}`}
-                  </p>
-                </div>
-                <span className="flex-shrink-0 font-semibold text-slate-900">{formatMoney(inv.total_pln)} zł</span>
-              </Link>
-            );
-          })}
-        </div>
+        <InvoicesBrowser invoices={invoices} />
       )}
     </>
   );
