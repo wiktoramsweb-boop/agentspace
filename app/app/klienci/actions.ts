@@ -178,3 +178,31 @@ export async function deleteClient(clientId: string): Promise<void> {
   revalidatePath("/app/klienci");
   redirect("/app/klienci");
 }
+
+/**
+ * Czy ten numer jest już w bazie biura i kto jest opiekunem. Zwraca tylko
+ * nazwisko opiekuna, nigdy dane klienta - działa więc także wtedy, gdy biuro
+ * ukrywa agentom kontakty cudzych klientów.
+ */
+export async function lookupPhoneOwner(phone: string): Promise<{ owner: string | null } | null> {
+  const user = await requireUser();
+  const digits = String(phone ?? "").replace(/\D/g, "");
+  if (!user.agency_id || digits.length < 7) return null;
+
+  const admin = createSupabaseAdmin();
+  const { data, error } = await admin
+    .from("clients")
+    .select("agent_id")
+    .eq("agency_id", user.agency_id)
+    .eq("phone_digits", digits)
+    .limit(1)
+    .maybeSingle();
+  if (error || !data) return null;
+
+  const { data: agent } = await admin
+    .from("profiles")
+    .select("full_name, email")
+    .eq("id", data.agent_id)
+    .maybeSingle();
+  return { owner: agent?.full_name ?? agent?.email ?? null };
+}

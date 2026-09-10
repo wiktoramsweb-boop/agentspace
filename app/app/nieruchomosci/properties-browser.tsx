@@ -195,6 +195,17 @@ export function PropertiesBrowser({
                   style={{ ["--glow"]: kv.glow } as CSSProperties}
                 >
                   <div className={`h-1.5 w-full bg-gradient-to-r ${kv.bar}`} />
+                  {p.photos?.[0]?.url && (
+                    <div className="aspect-[16/10] overflow-hidden bg-slate-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={p.photos[0].url}
+                        alt={p.title}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                      />
+                    </div>
+                  )}
                   <div className="p-5">
                     <div className="mb-3 flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2.5">

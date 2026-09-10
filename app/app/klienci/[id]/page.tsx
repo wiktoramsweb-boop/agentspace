@@ -27,6 +27,7 @@ import { SearchWizard } from "../../poszukiwania/search-wizard";
 import { ClientSearches } from "./client-searches";
 import { getSearches, getActiveProperties } from "@/lib/data-searches";
 import { findMatches } from "@/lib/matching";
+import { getAgencySettings } from "@/lib/agency-settings";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -59,12 +60,13 @@ export default async function ClientDetailPage({ params }: Props) {
 
   // Działania tego klienta - historia telefonów i spotkań w jednym miejscu.
   const agencyId = user.agency_id;
-  const [clientActivities, agents, agencyProps, clientSearches, activeProps] = await Promise.all([
+  const [clientActivities, agents, agencyProps, clientSearches, activeProps, settings] = await Promise.all([
     agencyId ? getActivities(agencyId, { clientId: client.id, limit: 50 }) : Promise.resolve([]),
     agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
     agencyId ? getAgencyProperties(agencyId) : Promise.resolve([]),
     agencyId ? getSearches(agencyId, { clientId: client.id, limit: 20 }) : Promise.resolve([]),
     agencyId ? getActiveProperties(agencyId) : Promise.resolve([]),
+    getAgencySettings(agencyId, user.agency?.name),
   ]);
 
   // Ile ofert pasuje do każdego poszukiwania tego klienta - agent widzi od razu,
@@ -259,6 +261,7 @@ export default async function ClientDetailPage({ params }: Props) {
                 properties={agencyProps.map((p) => ({ id: p.id, name: p.title }))}
                 presetClientId={client.id}
                 trigger="plus"
+                reportDefault={settings.options.report_default}
               />
             </div>
             <ClientActivities activities={clientActivities} />

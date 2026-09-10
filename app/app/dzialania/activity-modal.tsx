@@ -27,6 +27,7 @@ export function ActivityModal({
   presetClientId,
   presetPropertyId,
   trigger = "button",
+  reportDefault = false,
 }: {
   agents: Lite[];
   clients: ClientLite[];
@@ -34,6 +35,8 @@ export function ActivityModal({
   presetClientId?: string;
   presetPropertyId?: string;
   trigger?: "button" | "plus";
+  /** Ustawienie biura: nowe działanie od razu zaznaczone do raportu aktywności. */
+  reportDefault?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<ActivityKind | null>(null);
@@ -94,6 +97,7 @@ export function ActivityModal({
           properties={properties}
           presetClientId={presetClientId}
           presetPropertyId={presetPropertyId}
+          reportDefault={reportDefault}
           onBack={() => setKind(null)}
           onClose={close}
         />
@@ -109,6 +113,7 @@ function ActivityForm({
   properties,
   presetClientId,
   presetPropertyId,
+  reportDefault,
   onBack,
   onClose,
 }: {
@@ -118,6 +123,7 @@ function ActivityForm({
   properties: Lite[];
   presetClientId?: string;
   presetPropertyId?: string;
+  reportDefault: boolean;
   onBack: () => void;
   onClose: () => void;
 }) {
@@ -405,6 +411,7 @@ function ActivityForm({
               type="checkbox"
               name="include_in_report"
               value="1"
+              defaultChecked={reportDefault}
               className="h-4 w-4 accent-emerald-500"
             />
             Uwzględnij w raporcie aktywności

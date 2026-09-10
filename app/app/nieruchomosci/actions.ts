@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PROPERTY_TYPES, type PropertyDealKind, type PropertyStatus, type PropertyType } from "@/lib/types";
+import { sanitizePhotos } from "@/lib/property-photos";
+import { getAgencySettings } from "@/lib/agency-settings";
+import { PHOTO_BUCKET } from "@/lib/storage";
+import { removeFiles } from "@/lib/storage-server";
 
 function intOrNull(v: FormDataEntryValue | null): number | null {
   const n = parseInt(String(v ?? "").replace(/\s/g, ""), 10);
@@ -111,16 +115,30 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
   const admin = createSupabaseAdmin();
   const extra = extraFromForm(formData);
 
-  // Numer oferty per biuro i rok (SP/2026/001). Gdy brak funkcji z v17,
-  // po prostu pomijamy numer, żeby zapis się nie wywalił.
+  // Numer oferty per biuro i rok, np. SP/2026/001. Prefiks z ustawień biura,
+  // żeby inne biura nie dostawały numerów „SP". Gdy brak funkcji z v17,
+  // pomijamy numer, żeby zapis się nie wywalił.
+  const settings = await getAgencySettings(user.agency_id, user.agency?.name);
   const year = new Date().getFullYear();
   let offerNo: string | null = null;
-  const { data: noData } = await admin.rpc("next_offer_no", {
-    p_agency: user.agency_id,
-    p_year: year,
-  });
-  if (typeof noData === "number") {
-    offerNo = `SP/${year}/${String(noData).padStart(3, "0")}`;
+  if (settings.options.auto_numbering) {
+    const { data: noData } = await admin.rpc("next_offer_no", {
+      p_agency: user.agency_id,
+      p_year: year,
+    });
+    if (typeof noData === "number") {
+      offerNo = `${settings.options.offer_prefix}/${year}/${String(noData).padStart(3, "0")}`;
+    }
+  }
+
+  // Zdjęcia wgrane w kreatorze. Przepuszczamy tylko pliki z folderu biura.
+  let photos: ReturnType<typeof sanitizePhotos> = [];
+  try {
+    photos = user.agency_id
+      ? sanitizePhotos(JSON.parse(String(formData.get("photos") ?? "[]")), user.agency_id)
+      : [];
+  } catch {
+    photos = [];
   }
 
   const full = {
@@ -128,6 +146,7 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
     agency_id: user.agency_id,
     ...fields,
     ...extra,
+    photos,
     offer_no: offerNo,
     slug: buildSlug(fields, offerNo),
     web_published_at: extra.export_to_web ? new Date().toISOString() : null,
@@ -192,7 +211,22 @@ export async function setPropertyStatus(
 export async function deleteProperty(id: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  await admin.from("properties").delete().eq("id", id).eq("agency_id", user.agency_id);
+
+  // Zdjęcia oferty kasujemy razem z nią, inaczej zostałyby w magazynie na zawsze.
+  const { data: prop } = await admin
+    .from("properties")
+    .select("photos")
+    .eq("id", id)
+    .eq("agency_id", user.agency_id)
+    .maybeSingle();
+
+  const { error } = await admin.from("properties").delete().eq("id", id).eq("agency_id", user.agency_id);
+  if (!error && prop && user.agency_id) {
+    const files = ((prop.photos ?? []) as { path?: string; original_path?: string }[])
+      .flatMap((p) => [p.path, p.original_path])
+      .filter((p): p is string => !!p && p.startsWith(`${user.agency_id}/`));
+    await removeFiles(PHOTO_BUCKET, [...new Set(files)]);
+  }
   revalidatePath("/app/nieruchomosci");
   redirect("/app/nieruchomosci");
 }

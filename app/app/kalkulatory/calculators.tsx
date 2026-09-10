@@ -4,7 +4,7 @@ import { useState } from "react";
 import { mortgage, purchaseCosts, rentalYield, type Rynek } from "@/lib/calc";
 import { CalcSheet, type SheetRow } from "./calc-sheet";
 
-type Agent = { name: string; email: string; phone?: string; agency: string };
+type Agent = { name: string; email: string; phone?: string; agency: string; logoUrl?: string | null };
 
 const zl0 = (n: number) =>
   new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(Math.round(n)) + " zł";
@@ -146,7 +146,7 @@ export function Calculators({ agent }: { agent: Agent }) {
 
   function print() {
     const prev = document.title;
-    document.title = `${sheet.title} - Spectra`;
+    document.title = `${sheet.title} - ${agent.agency}`;
     window.print();
     setTimeout(() => (document.title = prev), 1000);
   }

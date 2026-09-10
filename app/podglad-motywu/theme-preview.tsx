@@ -67,7 +67,10 @@ export function ThemePreview() {
                 <div className="w-44 rounded-xl bg-slate-800 p-1">
                   <ThemeToggle />
                 </div>
-                <PropertyWizard clients={[{ id: "1", name: "Jan Kowalski" }, { id: "2", name: "Anna Nowak" }]} />
+                <PropertyWizard
+                  clients={[{ id: "1", name: "Jan Kowalski" }, { id: "2", name: "Anna Nowak" }]}
+                  photoConfig={{ maxWidth: 1600, maxHeight: 1200, watermark: null, stamp: null }}
+                />
               </div>
             }
           />

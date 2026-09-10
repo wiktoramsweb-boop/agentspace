@@ -259,7 +259,10 @@ export function ActivitiesBrowser({
                     {a.purpose && <Row label="Cel">{PURPOSE_MAP[a.purpose] ?? a.purpose}</Row>}
                     <Row label="Agent">{a.assigneeNames.join(", ") || "-"}</Row>
                     <Row label="Telefon">
-                      {a.contact_phone ? (
+                      {a.contact_phone?.includes("•") ? (
+                        // Numer ukryty ustawieniem biura - bez linku do dzwonienia.
+                        <span className="text-slate-500">{a.contact_phone}</span>
+                      ) : a.contact_phone ? (
                         <a href={`tel:${a.contact_phone}`} className="text-blue-600 hover:underline">
                           {formatPhone(a.contact_phone)}
                         </a>

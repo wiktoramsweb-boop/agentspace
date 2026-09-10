@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Agent = { name: string; email: string; phone?: string; agency: string };
+type Agent = { name: string; email: string; phone?: string; agency: string; logoUrl?: string | null };
 type Photo = { id: string; url: string };
 
 const MAX_PHOTOS = 8;
@@ -127,7 +127,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
       <div className="mb-4 flex items-center justify-between gap-4 border-b border-zinc-200 pb-4">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Logo" width={44} height={44} className="rounded-full" />
+          <img src={agent.logoUrl ?? "/logo.png"} alt="Logo" width={44} height={44} className={agent.logoUrl ? "h-11 w-auto max-w-[120px] object-contain" : "rounded-full"} />
           <p className="text-sm font-semibold">{agent.agency}</p>
         </div>
         <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">Oferta</span>
@@ -181,7 +181,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
 
       <div className="mt-6 flex items-center gap-3 border-t border-zinc-200 pt-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="" width={40} height={40} className="rounded-full" />
+        <img src={agent.logoUrl ?? "/logo.png"} alt="" width={40} height={40} className={agent.logoUrl ? "h-10 w-auto max-w-[110px] object-contain" : "rounded-full"} />
         <div className="min-w-0 text-sm">
           <p className="font-semibold text-zinc-900">{agent.name}</p>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-slate-400">

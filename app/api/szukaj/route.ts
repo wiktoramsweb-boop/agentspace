@@ -1,5 +1,7 @@
 import { getCurrentUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { getAgencySettings } from "@/lib/agency-settings";
+import { maskPhone } from "@/lib/format";
 
 export type SearchHit = {
   kind: "klient" | "nieruchomosc" | "dzialanie" | "poszukiwanie";
@@ -31,10 +33,10 @@ export async function GET(request: Request) {
   const digits = q.replace(/\D/g, "");
   const isPhone = digits.length >= 3;
 
-  const [clients, properties, activities, searches] = await Promise.all([
+  const [clients, properties, activities, searches, settings] = await Promise.all([
     admin
       .from("clients")
-      .select("id, name, phone, email, company, type")
+      .select("id, name, phone, phone_digits, email, company, type, agent_id")
       .eq("agency_id", agency)
       .or(
         isPhone
@@ -50,7 +52,7 @@ export async function GET(request: Request) {
       .limit(6),
     admin
       .from("activities")
-      .select("id, subject, contact_name, contact_phone, due_at")
+      .select("id, subject, contact_name, contact_phone, contact_phone_digits, due_at, created_by, assignee_ids")
       .eq("agency_id", agency)
       .or(
         isPhone
@@ -65,13 +67,45 @@ export async function GET(request: Request) {
       .eq("agency_id", agency)
       .or(`title.ilike.${like},search_no.ilike.${like}`)
       .limit(4),
+    getAgencySettings(agency, user.agency?.name),
   ]);
+
+  // Ukrywanie kontaktów (Ustawienia → Pozostałe): agent nie widzi pełnych
+  // numerów cudzych klientów. Dodatkowo cudzy klient pokazuje się po numerze
+  // tylko przy pełnym numerze - inaczej dałoby się go odtworzyć cyfra po cyfrze,
+  // wpisując coraz dłuższe fragmenty.
+  const mask = settings.options.hide_contacts && user.role === "agent";
+  const exactPhone = (d: string | null | undefined) =>
+    !!d && digits.length >= 9 && (d === digits || d.endsWith(digits.slice(-9)));
+  const textHit = (...vals: (string | null | undefined)[]) =>
+    vals.some((v) => (v ?? "").toLowerCase().includes(q.toLowerCase()));
+
+  type ClientRow = Record<string, string | null>;
+  type ActivityRow = Record<string, unknown>;
+  const clientRows = ((clients.data ?? []) as ClientRow[])
+    .filter((c) => !mask || c.agent_id === user.id || !isPhone || exactPhone(c.phone_digits) || textHit(c.name, c.company))
+    .map((c) =>
+      mask && c.agent_id !== user.id ? { ...c, phone: maskPhone(c.phone) } : c,
+    );
+  const activityRows = ((activities.data ?? []) as ActivityRow[])
+    .map((a) => {
+      const own = a.created_by === user.id || ((a.assignee_ids as string[] | null) ?? []).includes(user.id);
+      return { a, own };
+    })
+    .filter(
+      ({ a, own }) =>
+        !mask || own || !isPhone || exactPhone(a.contact_phone_digits as string | null) ||
+        textHit(a.subject as string | null, a.contact_name as string | null),
+    )
+    .map(({ a, own }) =>
+      mask && !own ? { ...a, contact_phone: maskPhone(a.contact_phone as string | null) } : a,
+    ) as Record<string, string | null>[];
 
   const zl = (n: number | null) =>
     n == null ? null : new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(n) + " zł";
 
   const hits: SearchHit[] = [
-    ...((clients.data ?? []) as Record<string, string | null>[]).map((c) => ({
+    ...clientRows.map((c) => ({
       kind: "klient" as const,
       id: c.id!,
       title: c.name ?? "Klient",
@@ -88,7 +122,7 @@ export async function GET(request: Request) {
           .join(" · ") || null,
       href: `/app/nieruchomosci/${p.id}`,
     })),
-    ...((activities.data ?? []) as Record<string, string | null>[]).map((a) => ({
+    ...activityRows.map((a) => ({
       kind: "dzialanie" as const,
       id: a.id!,
       title: a.subject ?? "Działanie",

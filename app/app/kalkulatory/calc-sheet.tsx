@@ -23,7 +23,7 @@ export function CalcSheet({
   emphasis?: { label: string; value: string };
   savings?: string;
   note?: string;
-  agent: { name: string; email: string; phone?: string; agency: string };
+  agent: { name: string; email: string; phone?: string; agency: string; logoUrl?: string | null };
 }) {
   const today = new Date().toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
   return (
@@ -31,7 +31,7 @@ export function CalcSheet({
       <div className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-5">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Logo" width={48} height={48} className="rounded-full" />
+          <img src={agent.logoUrl ?? "/logo.png"} alt="Logo" width={48} height={48} className={agent.logoUrl ? "h-12 w-auto max-w-[130px] object-contain" : "rounded-full"} />
           <div>
             <p className="text-sm font-semibold">{agent.agency}</p>
             <p className="text-xs text-slate-500">Symulacja dla klienta · {today}</p>

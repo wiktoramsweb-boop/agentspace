@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getSearch, getActiveProperties, getMatchStatuses } from "@/lib/data-searches";
 import { findMatches } from "@/lib/matching";
+import { getAgencySettings, matchTolerance } from "@/lib/agency-settings";
 import { Card } from "../../components/ui";
 import { PROPERTY_ICONS } from "../../components/icons";
 import { MatchList } from "./match-list";
@@ -34,12 +35,18 @@ export default async function SearchDetailPage({ params }: Props) {
   const search = await getSearch(id, agencyId);
   if (!search) notFound();
 
-  const [properties, statusMap] = await Promise.all([
+  const [properties, statusMap, settings] = await Promise.all([
     getActiveProperties(agencyId),
     getMatchStatuses(agencyId, id),
+    getAgencySettings(agencyId, user.agency?.name),
   ]);
 
-  const allMatches = findMatches(search, properties);
+  const allMatches = findMatches(search, properties, matchTolerance(settings));
+  const o = settings.options;
+  const rangeText =
+    o.match_price_minus === o.match_price_plus && o.match_area_minus === o.match_area_plus && o.match_price_plus === o.match_area_plus
+      ? `o mniej niż ${o.match_price_plus}%`
+      : `(cena −${o.match_price_minus}/+${o.match_price_plus}%, metraż −${o.match_area_minus}/+${o.match_area_plus}%)`;
   const fits = allMatches.filter((m) => m.fits);
   const near = allMatches.filter((m) => !m.fits);
 
@@ -165,7 +172,7 @@ export default async function SearchDetailPage({ params }: Props) {
                 </span>
               </h2>
               <p className="mb-3 text-xs text-slate-400">
-                Oferty poza zakresem o mniej niż 10% albo bez jednego udogodnienia. Warto pokazać, bo
+                Oferty poza zakresem {rangeText} albo bez jednego udogodnienia. Warto pokazać, bo
                 klienci często je akceptują.
               </p>
               <MatchList searchId={search.id} matches={near} statuses={statuses} />

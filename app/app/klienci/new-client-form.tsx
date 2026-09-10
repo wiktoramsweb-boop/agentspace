@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitButton } from "../components/submit-button";
-import { createClient } from "./actions";
+import { createClient, lookupPhoneOwner } from "./actions";
 import { CLIENT_STATUSES, CLIENT_SOURCES, PHONE_LABELS, type ClientType } from "@/lib/types";
 import { AddressInput } from "../components/address-input";
 import { Modal } from "../components/modal";
@@ -120,7 +120,26 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
     setStep(0);
   }
   const pd = digits(phone);
-  const dup = pd.length >= 7 ? existingPhones.find((e) => e.phone && digits(e.phone) === pd) : undefined;
+  const localDup = pd.length >= 7 ? existingPhones.find((e) => e.phone && digits(e.phone) === pd) : undefined;
+
+  // Gdy numeru nie ma na liście (np. to klient innego agenta z ukrytym
+  // telefonem), pytamy serwer. Wraca tylko nazwisko opiekuna.
+  const [remoteDup, setRemoteDup] = useState<{ owner: string | null } | null>(null);
+  const hasLocalDup = !!localDup;
+  useEffect(() => {
+    setRemoteDup(null);
+    if (pd.length < 7 || hasLocalDup) return;
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      const res = await lookupPhoneOwner(pd);
+      if (!cancelled) setRemoteDup(res);
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [pd, hasLocalDup]);
+  const dup = localDup ?? remoteDup ?? undefined;
 
   if (!open) {
     return (

@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth";
 import { getSearches, getActiveProperties } from "@/lib/data-searches";
 import { getAgencyClientsLite } from "@/lib/data-platform";
 import { findMatches } from "@/lib/matching";
+import { getAgencySettings, matchTolerance } from "@/lib/agency-settings";
 import { PageHeader, StatCard } from "../components/ui";
 import { SearchesBrowser } from "./searches-browser";
 import { SearchWizard } from "./search-wizard";
@@ -9,6 +10,7 @@ import { SearchWizard } from "./search-wizard";
 export default async function PoszukiwaniaPage() {
   const user = await requireUser();
   const agencyId = user.agency_id;
+  const tol = matchTolerance(await getAgencySettings(agencyId, user.agency?.name));
 
   const [searches, properties, clients] = await Promise.all([
     agencyId ? getSearches(agencyId, { limit: 300 }) : Promise.resolve([]),
@@ -21,7 +23,7 @@ export default async function PoszukiwaniaPage() {
   const matchCounts: Record<string, { fits: number; near: number }> = {};
   let totalFits = 0;
   for (const s of searches) {
-    const matches = findMatches(s, properties);
+    const matches = findMatches(s, properties, tol);
     const fits = matches.filter((m) => m.fits).length;
     const near = matches.length - fits;
     matchCounts[s.id] = { fits, near };

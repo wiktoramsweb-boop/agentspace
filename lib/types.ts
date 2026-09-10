@@ -277,7 +277,7 @@ export type Property = {
   admin_fee_pln?: number | null;
   deposit_pln?: number | null;
   features?: Record<string, boolean> | null;
-  photos?: { url: string; main?: boolean; export?: boolean; caption?: string }[] | null;
+  photos?: PropertyPhoto[] | null;
   export_to_web?: boolean | null;
   export_to_portals?: boolean | null;
   web_published_at?: string | null;
@@ -534,6 +534,34 @@ export const FUNNEL_STAGES = [
 export type FunnelStageKey = (typeof FUNNEL_STAGES)[number]["key"];
 
 export type PersonalityValue = (typeof PERSONALITIES)[number]["value"];
+
+// ---------- ZDJĘCIA OFERT ----------
+
+/**
+ * Zdjęcie oferty. Pierwsze w tablicy to zdjęcie główne.
+ * Trzymamy dwie wersje: ze znakiem wodnym (pokazywaną wszędzie) i czystą,
+ * żeby po zmianie znaku wodnego albo stempla dało się zdjęcie przerobić
+ * bez ponownego wgrywania.
+ */
+export type PropertyPhoto = {
+  url: string;
+  path?: string;
+  original_url?: string;
+  original_path?: string;
+  caption?: string;
+  /** Eksport na stronę i portale. */
+  export?: boolean;
+  /** Wydruki i maile (ofertówka, PDF dla klienta). */
+  print?: boolean;
+  /** Rzut / plan mieszkania. */
+  plan?: boolean;
+  /** Wizualizacja, nie zdjęcie (ważne przy rynku pierwotnym). */
+  visualization?: boolean;
+  /** Na zdjęciu jest stempel promocyjny. */
+  stamp?: boolean;
+  width?: number;
+  height?: number;
+};
 
 // ---------- DZIAŁANIA (CRM: połączenia, zadania, wydarzenia, spotkania) ----------
 

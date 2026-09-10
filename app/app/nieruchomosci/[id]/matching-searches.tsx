@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Property } from "@/lib/types";
 import type { SearchRich } from "@/lib/data-searches";
-import { findSearchesForProperty } from "@/lib/matching";
+import { findSearchesForProperty, type MatchTolerance } from "@/lib/matching";
 
 const zl = (n: number | null) =>
   n == null ? "-" : new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(n) + " zł";
@@ -21,11 +21,13 @@ function range(min: number | null, max: number | null, money = false): string {
 export function MatchingSearches({
   property,
   searches,
+  tolerance,
 }: {
   property: Property;
   searches: SearchRich[];
+  tolerance?: MatchTolerance;
 }) {
-  const results = findSearchesForProperty(property, searches);
+  const results = findSearchesForProperty(property, searches, tolerance);
 
   if (results.length === 0) {
     return (

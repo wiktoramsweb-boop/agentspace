@@ -29,6 +29,8 @@ import { ProcessBar, OwnerCard } from "./property-extras";
 import { MatchingSearches } from "./matching-searches";
 import { getActiveSearches } from "@/lib/data-searches";
 import { NearbyCard } from "./nearby-card";
+import { PhotoManager } from "../photo-manager";
+import { getAgencySettings, matchTolerance, photoConfigFrom } from "@/lib/agency-settings";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -41,12 +43,13 @@ export default async function PropertyDetailPage({ params }: Props) {
   // Baza ofert jest wspólna dla biura - dostęp mają wszyscy z tej agencji.
   if (property.agency_id !== user.agency_id) redirect("/app/nieruchomosci");
 
-  const [owner, interested, deals, allClients, activeSearches] = await Promise.all([
+  const [owner, interested, deals, allClients, activeSearches, settings] = await Promise.all([
     property.owner_client_id ? getClient(property.owner_client_id) : Promise.resolve(null),
     getPropertyInterestedClients(id),
     getDealsForProperty(id),
     getClientsLite(user.id),
     user.agency_id ? getActiveSearches(user.agency_id) : Promise.resolve([]),
+    getAgencySettings(user.agency_id, user.agency?.name),
   ]);
 
   const status = PROPERTY_STATUSES.find((s) => s.value === property.status);
@@ -102,8 +105,20 @@ export default async function PropertyDetailPage({ params }: Props) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        {/* Lewa: parametry, opis, mapa */}
+        {/* Lewa: zdjęcia, parametry, opis, mapa */}
         <div className="space-y-6">
+          <Card>
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Zdjęcia ({property.photos?.length ?? 0})
+            </h2>
+            <PhotoManager
+              propertyId={property.id}
+              initial={property.photos ?? []}
+              config={photoConfigFrom(settings)}
+              canEditSettings={user.role === "owner"}
+            />
+          </Card>
+
           <Card>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {specs.map((s) => (
@@ -170,7 +185,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             <p className="mb-3 text-xs text-slate-400">
               Klienci, którzy szukają czegoś takiego. Zadzwoń, zanim zobaczą ofertę gdzie indziej.
             </p>
-            <MatchingSearches property={property} searches={activeSearches} />
+            <MatchingSearches property={property} searches={activeSearches} tolerance={matchTolerance(settings)} />
           </Card>
 
           <Card>

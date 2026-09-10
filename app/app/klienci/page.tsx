@@ -3,10 +3,31 @@ import { getAgencyClients } from "@/lib/data-platform";
 import { PageHeader, EmptyState } from "../components/ui";
 import { NewClientForm } from "./new-client-form";
 import { ClientsBrowser } from "./clients-browser";
+import { getAgencySettings } from "@/lib/agency-settings";
+import { maskPhone } from "@/lib/format";
 
 export default async function KlienciPage() {
   const user = await requireUser();
-  const clients = user.agency_id ? await getAgencyClients(user.agency_id) : [];
+  const [clients, settings] = await Promise.all([
+    user.agency_id ? getAgencyClients(user.agency_id) : Promise.resolve([]),
+    getAgencySettings(user.agency_id, user.agency?.name),
+  ]);
+
+  // Ukrywanie kontaktów (Ustawienia → Pozostałe) dotyczy tylko agentów.
+  // Maskujemy na serwerze: do przeglądarki nie trafia pełny numer ani e-mail,
+  // więc nie da się ich wyciągnąć z kodu strony.
+  const mask = settings.options.hide_contacts && user.role === "agent";
+  const listClients = mask
+    ? clients.map((c) =>
+        c.agent_id === user.id
+          ? c
+          : { ...c, phone: maskPhone(c.phone), email: c.email ? "ukryty" : null, phones: [], emails: [] },
+      )
+    : clients;
+  const knownPhones = (mask ? clients.filter((c) => c.agent_id === user.id) : clients).map((c) => ({
+    phone: c.phone,
+    owner: c.opiekunName,
+  }));
 
   const active = clients.filter((c) => !["zamkniety", "stracony"].includes(c.status));
   const today = new Date().toISOString().slice(0, 10);
@@ -21,7 +42,7 @@ export default async function KlienciPage() {
         subtitle={`${active.length} aktywnych · ${clients.length} w biurze${
           dueCount > 0 ? ` · ${dueCount} do kontaktu` : ""
         }`}
-        action={<NewClientForm existingPhones={clients.map((c) => ({ phone: c.phone, owner: c.opiekunName }))} />}
+        action={<NewClientForm existingPhones={knownPhones} />}
       />
 
       {clients.length === 0 ? (
@@ -35,7 +56,7 @@ export default async function KlienciPage() {
           }
         />
       ) : (
-        <ClientsBrowser clients={clients} currentUserId={user.id} />
+        <ClientsBrowser clients={listClients} currentUserId={user.id} />
       )}
     </>
   );

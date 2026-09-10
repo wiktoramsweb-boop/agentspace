@@ -10,20 +10,37 @@ export type Match = {
   reasons: MatchReason[];
 };
 
-/** Ile procent poza zakres jeszcze traktujemy jako „prawie pasuje". */
-const TOLERANCE = 0.1;
+/**
+ * Ile poza zakres (jako ułamek) jeszcze traktujemy jako „prawie pasuje".
+ * Biuro ustawia to w Ustawieniach → Pozostałe; domyślnie 10% w obie strony.
+ */
+export type MatchTolerance = {
+  priceMinus: number;
+  pricePlus: number;
+  areaMinus: number;
+  areaPlus: number;
+};
+
+export const DEFAULT_TOLERANCE: MatchTolerance = {
+  priceMinus: 0.1,
+  pricePlus: 0.1,
+  areaMinus: 0.1,
+  areaPlus: 0.1,
+};
 
 function inRange(
   value: number | null | undefined,
   min: number | null,
   max: number | null,
+  below: number,
+  above: number,
 ): "ok" | "near" | "no" | "unknown" {
   if (value == null) return "unknown";
   if (min != null && value < min) {
-    return value >= min * (1 - TOLERANCE) ? "near" : "no";
+    return value >= min * (1 - below) ? "near" : "no";
   }
   if (max != null && value > max) {
-    return value <= max * (1 + TOLERANCE) ? "near" : "no";
+    return value <= max * (1 + above) ? "near" : "no";
   }
   return "ok";
 }
@@ -39,7 +56,11 @@ function fmtPln(n: number): string {
  * 700 tys., obejrzy mieszkanie za 730 tys. Odrzucanie takich ofert po cichu
  * jest gorsze niż pokazanie ich z adnotacją.
  */
-export function matchPropertyToSearch(property: Property, search: Search): Match {
+export function matchPropertyToSearch(
+  property: Property,
+  search: Search,
+  tol: MatchTolerance = DEFAULT_TOLERANCE,
+): Match {
   const reasons: MatchReason[] = [];
   let hardFail = false;
   let nearCount = 0;
@@ -67,7 +88,7 @@ export function matchPropertyToSearch(property: Property, search: Search): Match
   // Cena.
   if (search.price_min != null || search.price_max != null) {
     maxPoints += 30;
-    const r = inRange(property.price_pln, search.price_min, search.price_max);
+    const r = inRange(property.price_pln, search.price_min, search.price_max, tol.priceMinus, tol.pricePlus);
     const detail = property.price_pln != null ? fmtPln(property.price_pln) : "brak ceny";
     reasons.push({ label: "Cena", ok: r === "ok", detail });
     if (r === "ok") points += 30;
@@ -80,7 +101,7 @@ export function matchPropertyToSearch(property: Property, search: Search): Match
   // Powierzchnia.
   if (search.area_min != null || search.area_max != null) {
     maxPoints += 25;
-    const r = inRange(property.area_m2, search.area_min, search.area_max);
+    const r = inRange(property.area_m2, search.area_min, search.area_max, tol.areaMinus, tol.areaPlus);
     const detail = property.area_m2 != null ? `${property.area_m2} m2` : "brak metrażu";
     reasons.push({ label: "Powierzchnia", ok: r === "ok", detail });
     if (r === "ok") points += 25;
@@ -173,10 +194,14 @@ export function matchPropertyToSearch(property: Property, search: Search): Match
  * Dopasowania dla jednego poszukiwania. Zwraca posortowane: najpierw pełne
  * trafienia, potem „prawie", a w środku po trafności malejąco.
  */
-export function findMatches(search: Search, properties: Property[]): Match[] {
+export function findMatches(
+  search: Search,
+  properties: Property[],
+  tol: MatchTolerance = DEFAULT_TOLERANCE,
+): Match[] {
   return properties
     .filter((p) => p.status === "aktywna")
-    .map((p) => matchPropertyToSearch(p, search))
+    .map((p) => matchPropertyToSearch(p, search, tol))
     .filter((m) => m.fits || m.nearMiss)
     .sort((a, b) => {
       if (a.fits !== b.fits) return a.fits ? -1 : 1;
@@ -188,10 +213,11 @@ export function findMatches(search: Search, properties: Property[]): Match[] {
 export function findSearchesForProperty<T extends Search>(
   property: Property,
   searches: T[],
+  tol: MatchTolerance = DEFAULT_TOLERANCE,
 ): { search: T; match: Match }[] {
   return searches
     .filter((s) => s.status === "aktualne")
-    .map((s) => ({ search: s, match: matchPropertyToSearch(property, s) }))
+    .map((s) => ({ search: s, match: matchPropertyToSearch(property, s, tol) }))
     .filter(({ match }) => match.fits || match.nearMiss)
     .sort((a, b) => {
       if (a.match.fits !== b.match.fits) return a.match.fits ? -1 : 1;

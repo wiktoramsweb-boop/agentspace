@@ -3,13 +3,15 @@ import { getAgencyProperties, getAgencyClientsLite } from "@/lib/data-platform";
 import { PageHeader, EmptyState } from "../components/ui";
 import { PropertyWizard } from "./property-wizard";
 import { PropertiesBrowser } from "./properties-browser";
+import { getAgencySettings, photoConfigFrom } from "@/lib/agency-settings";
 
 export default async function NieruchomosciPage() {
   const user = await requireUser();
   const agencyId = user.agency_id;
-  const [properties, clients] = await Promise.all([
+  const [properties, clients, settings] = await Promise.all([
     agencyId ? getAgencyProperties(agencyId) : Promise.resolve([]),
     agencyId ? getAgencyClientsLite(agencyId) : Promise.resolve([]),
+    getAgencySettings(agencyId, user.agency?.name),
   ]);
 
   const active = properties.filter((p) => p.status === "aktywna");
@@ -19,7 +21,14 @@ export default async function NieruchomosciPage() {
       <PageHeader
         title="Nieruchomości"
         subtitle={`${active.length} aktywnych · ${properties.length} w biurze`}
-        action={<PropertyWizard clients={clients} />}
+        action={
+          <PropertyWizard
+            clients={clients}
+            photoConfig={photoConfigFrom(settings)}
+            offerPrefix={settings.options.offer_prefix}
+            canEditSettings={user.role === "owner"}
+          />
+        }
       />
 
       {properties.length === 0 ? (

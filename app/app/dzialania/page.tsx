@@ -1,4 +1,6 @@
 import { requireUser } from "@/lib/auth";
+import { getAgencySettings } from "@/lib/agency-settings";
+import { maskPhone } from "@/lib/format";
 import { getActivities, getActivityStats, getAgencyAgents } from "@/lib/data-activities";
 import { getAgencyClientsLite, getAgencyProperties, getGoal } from "@/lib/data-platform";
 import { computeFunnel } from "@/lib/funnel";
@@ -11,7 +13,7 @@ export default async function DzialaniaPage() {
   const user = await requireUser();
   const agencyId = user.agency_id;
 
-  const [activities, stats, agents, clients, properties, goalRow] = await Promise.all([
+  const [activities, stats, agents, clients, properties, goalRow, settings] = await Promise.all([
     agencyId ? getActivities(agencyId, { limit: 300 }) : Promise.resolve([]),
     agencyId
       ? getActivityStats(agencyId, user.id)
@@ -20,6 +22,7 @@ export default async function DzialaniaPage() {
     agencyId ? getAgencyClientsLite(agencyId) : Promise.resolve([]),
     agencyId ? getAgencyProperties(agencyId) : Promise.resolve([]),
     getGoal(user.id),
+    getAgencySettings(agencyId, user.agency?.name),
   ]);
 
   // Cel dzienny telefonów pochodzi z lejka w module Cele - dzięki temu
@@ -28,6 +31,17 @@ export default async function DzialaniaPage() {
   const callsLeft = Math.max(0, callTarget - stats.callsToday);
 
   const propsLite = properties.map((p) => ({ id: p.id, name: p.title }));
+
+  // Ukrywanie kontaktów (Ustawienia → Pozostałe): agent widzi pełny numer
+  // tylko przy swoich działaniach. Maskujemy przed wysłaniem do przeglądarki.
+  const mask = settings.options.hide_contacts && user.role === "agent";
+  const listActivities = mask
+    ? activities.map((a) =>
+        a.created_by === user.id || a.assignee_ids.includes(user.id)
+          ? a
+          : { ...a, contact_phone: maskPhone(a.contact_phone), contact_email: a.contact_email ? "ukryty" : null },
+      )
+    : activities;
   const clientsLite = clients.map((c) => ({ id: c.id, name: c.name }));
 
   return (
@@ -45,7 +59,12 @@ export default async function DzialaniaPage() {
                 Raport zespołu
               </Link>
             )}
-            <ActivityModal agents={agents} clients={clientsLite} properties={propsLite} />
+            <ActivityModal
+              agents={agents}
+              clients={clientsLite}
+              properties={propsLite}
+              reportDefault={settings.options.report_default}
+            />
           </div>
         }
       />
@@ -69,7 +88,7 @@ export default async function DzialaniaPage() {
         <StatCard label="Wykonane" value={stats.doneWeek} sub="w ostatnich 7 dniach" />
       </div>
 
-      <ActivitiesBrowser activities={activities} currentUserId={user.id} agents={agents} />
+      <ActivitiesBrowser activities={listActivities} currentUserId={user.id} agents={agents} />
     </>
   );
 }

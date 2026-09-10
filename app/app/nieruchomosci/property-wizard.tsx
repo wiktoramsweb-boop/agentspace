@@ -6,6 +6,10 @@ import { AddressInput } from "../components/address-input";
 import { Modal } from "../components/modal";
 import { SubmitButton } from "../components/submit-button";
 import { PROPERTY_ICONS } from "../components/icons";
+import { PhotoManager } from "./photo-manager";
+import { discardPhotoUploads } from "./photo-actions";
+import type { PhotoConfig } from "@/lib/agency-settings";
+import type { PropertyPhoto } from "@/lib/types";
 import {
   PROPERTY_DEAL_KINDS,
   PROPERTY_TYPE_TILES,
@@ -23,7 +27,7 @@ import {
 
 type ClientLite = { id: string; name: string };
 
-const STEPS = ["Nieruchomość", "Adres", "Parametry", "Opis", "Publikacja"] as const;
+const STEPS = ["Nieruchomość", "Adres", "Parametry", "Opis", "Zdjęcia", "Publikacja"] as const;
 
 /**
  * Kreator dodawania nieruchomości wzorowany na ASARI: krok 1 to rodzaj transakcji
@@ -32,7 +36,17 @@ const STEPS = ["Nieruchomość", "Adres", "Parametry", "Opis", "Publikacja"] as 
  * Wszystkie kroki są w JEDNYM formularzu, a nieaktywne tylko ukrywamy. Dzięki temu
  * zapis wysyła komplet danych bez przepisywania stanu między krokami.
  */
-export function PropertyWizard({ clients }: { clients: ClientLite[] }) {
+export function PropertyWizard({
+  clients,
+  photoConfig,
+  offerPrefix = "SP",
+  canEditSettings = false,
+}: {
+  clients: ClientLite[];
+  photoConfig: PhotoConfig;
+  offerPrefix?: string;
+  canEditSettings?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [dealKind, setDealKind] = useState<PropertyDealKind>("sprzedaz");
@@ -40,11 +54,18 @@ export function PropertyWizard({ clients }: { clients: ClientLite[] }) {
   const [features, setFeatures] = useState<Record<string, boolean>>({});
   const [exportWeb, setExportWeb] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<PropertyPhoto[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const isRent = dealKind === "wynajem";
   const isLand = type === "dzialka";
 
   function close() {
+    // Zdjęcia wgrane w kreatorze, który zamknięto bez zapisu, nie należą do
+    // żadnej oferty. Kasujemy je, żeby nie zalegały w magazynie.
+    const leftovers = photos.flatMap((p) => [p.path, p.original_path]).filter(Boolean) as string[];
+    if (leftovers.length) void discardPhotoUploads([...new Set(leftovers)]);
+    setPhotos([]);
     setOpen(false);
     setStep(0);
   }
@@ -250,8 +271,19 @@ export function PropertyWizard({ clients }: { clients: ClientLite[] }) {
             </div>
           </div>
 
-          {/* ── KROK 5: publikacja ────────────────────────────────── */}
-          <div hidden={step !== 4} className="space-y-4">
+          {/* ── KROK 5: zdjęcia ───────────────────────────────────── */}
+          <div hidden={step !== 4}>
+            <PhotoManager
+              config={photoConfig}
+              onChange={setPhotos}
+              onBusyChange={setUploading}
+              canEditSettings={canEditSettings}
+            />
+            <input type="hidden" name="photos" value={JSON.stringify(photos)} />
+          </div>
+
+          {/* ── KROK 6: publikacja ────────────────────────────────── */}
+          <div hidden={step !== 5} className="space-y-4">
             <div className="rounded-2xl border border-amber-500/30 bg-amber-50 p-4 text-sm text-amber-800">
               <p className="font-semibold">Eksport jeszcze nie wysyła ofert na zewnątrz.</p>
               <p className="mt-1">
@@ -289,7 +321,7 @@ export function PropertyWizard({ clients }: { clients: ClientLite[] }) {
             </label>
 
             <p className="text-xs text-slate-400">
-              Numer oferty nadamy automatycznie przy zapisie (format SP/{new Date().getFullYear()}/001).
+              Numer oferty nadamy automatycznie przy zapisie (format {offerPrefix}/{new Date().getFullYear()}/001).
             </p>
           </div>
         </div>
@@ -344,9 +376,10 @@ export function PropertyWizard({ clients }: { clients: ClientLite[] }) {
             )}
             <SubmitButton
               pendingText="Zapisuję…"
+              disabled={uploading}
               className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-400"
             >
-              Zapisz ofertę
+              {uploading ? "Czekam na zdjęcia…" : "Zapisz ofertę"}
             </SubmitButton>
           </div>
         </div>

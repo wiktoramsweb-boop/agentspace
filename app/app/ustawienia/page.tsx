@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { APP_TZ } from "@/lib/datetime";
 import { ROLE_LABELS } from "@/lib/types";
-import { PageHeader, Card } from "../components/ui";
+import { Card } from "../components/ui";
 import { SettingsForm } from "./settings-form";
 import { PushToggle } from "./push-toggle";
 import { ChangeEmail } from "./change-email";
@@ -13,8 +13,6 @@ export default async function UstawieniaPage() {
 
   return (
     <>
-      <PageHeader title="Ustawienia" subtitle="Twój profil i preferencje." />
-
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <h2 className="mb-5 text-lg font-semibold text-slate-900">Profil</h2>

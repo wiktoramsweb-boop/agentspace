@@ -56,3 +56,15 @@ export function formatPhone(raw: string | null | undefined): string {
   if (trimmed.startsWith("+") && digits.length > 9) return trimmed;
   return trimmed;
 }
+
+/**
+ * Numer z ukrytymi cyframi, np. „••• ••• 783". Używane, gdy biuro włączy
+ * ukrywanie kontaktów: agent widzi, że numer jest, ale nie może go spisać.
+ * Ostatnie trzy cyfry zostają, żeby dało się rozróżnić dwa kontakty.
+ */
+export function maskPhone(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const d = raw.replace(/\D/g, "");
+  if (d.length < 3) return "•••";
+  return `••• ••• ${d.slice(-3)}`;
+}
