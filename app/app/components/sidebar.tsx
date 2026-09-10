@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ROLE_LABELS, type UserRole } from "@/lib/types";
 import { ThemeToggle } from "./theme-toggle";
 import { GlobalSearch } from "./global-search";
 import { signOut } from "@/app/auth/actions";
+
+const COLLAPSE_KEY = "as_nav_collapsed";
 
 type NavColor = keyof typeof TILE;
 type NavItem = {
@@ -87,23 +89,56 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Menu ma 19 pozycji - na niższych ekranach nie mieści się w całości.
+  // Agent może zwinąć sekcje, z których nie korzysta; wybór zostaje na stałe.
+  const [collapsed, setCollapsed] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(COLLAPSE_KEY);
+      if (raw) setCollapsed(JSON.parse(raw));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  function toggleSection(title: string) {
+    setCollapsed((prev) => {
+      const next = prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title];
+      try {
+        localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
 
   const isActive = (href: string) =>
     href === "/app" ? pathname === "/app" : pathname.startsWith(href);
 
   const nav = (
-    <nav className="flex flex-1 flex-col overflow-y-auto">
+    <nav className="sidebar-nav flex min-h-0 flex-1 flex-col overflow-y-auto">
       <GlobalSearch />
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4 pb-2">
       {SECTIONS.map((section) => {
         const items = section.items.filter((i) => !i.roles || i.roles.includes(role));
         if (items.length === 0) return null;
+        // Sekcja z aktywną pozycją zostaje otwarta, żeby agent widział, gdzie jest.
+        const hasActive = items.some((i) => isActive(i.href));
+        const isCollapsed = collapsed.includes(section.title) && !hasActive;
         return (
           <div key={section.title}>
-            <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+            <button
+              type="button"
+              onClick={() => toggleSection(section.title)}
+              aria-expanded={!isCollapsed}
+              className="mb-1.5 flex w-full items-center gap-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-600 transition hover:text-zinc-400"
+            >
+              <ChevronIcon open={!isCollapsed} />
               {section.title}
-            </p>
-            <div className="flex flex-col gap-0.5">
+            </button>
+            <div className={`flex flex-col gap-0.5 ${isCollapsed ? "hidden" : ""}`}>
               {items.map((item) => {
                 const active = isActive(item.href);
                 return (
@@ -211,6 +246,19 @@ export function Sidebar({
   );
 }
 
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      className={`h-3 w-3 transition-transform ${open ? "" : "-rotate-90"}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={3}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+    </svg>
+  );
+}
 function HomeIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>;
 }

@@ -676,6 +676,23 @@ button:not(:disabled):active,
   background: linear-gradient(180deg, #111c38 0%, #1b2550 42%, #3a2470 76%, #57297f 100%);
 }
 
+/* Pasek przewijania menu: cienki i stonowany, żeby nie rozbijał ciemnego panelu.
+   Bez tego na niższych ekranach nie widać, że lista jeszcze się przewija. */
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 /* ─────────────────────────────────────────────────────────────
    CIEMNY MOTYW APLIKACJI (przełącznik słońce/księżyc)
    Jasny motyw jest źródłem prawdy (klasy w komponentach), a ciemny

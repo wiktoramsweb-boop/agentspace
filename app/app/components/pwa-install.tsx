@@ -8,6 +8,11 @@ type BeforeInstallPromptEvent = Event & {
 };
 
 const DISMISS_KEY = "pwa-install-dismissed";
+const VISITS_KEY = "pwa-install-visits";
+/** Odłożenie na miesiąc. Agent, który raz odrzucił, nie chce tego widzieć co dzień. */
+const SNOOZE_DAYS = 30;
+/** Baner pokazujemy dopiero przy trzeciej wizycie - pierwsze wejście ma być czyste. */
+const MIN_VISITS = 3;
 
 export function PwaInstall() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
@@ -28,7 +33,22 @@ export function PwaInstall() {
       window.navigator.standalone === true;
     if (standalone) return;
 
-    if (localStorage.getItem(DISMISS_KEY)) return;
+    // Odłożone? Wracamy do tematu dopiero po SNOOZE_DAYS.
+    const snoozedUntil = Number(localStorage.getItem(DISMISS_KEY) ?? 0);
+    if (snoozedUntil > Date.now()) return;
+
+    // Instalacja ma sens na telefonie. Na dużym ekranie agent i tak pracuje
+    // w przeglądarce, więc baner byłby tylko zasłaniającą reklamą.
+    if (window.innerWidth >= 900) return;
+
+    // Nie zaczepiamy na pierwszym wejściu - najpierw niech apka się przyda.
+    const visits = Number(localStorage.getItem(VISITS_KEY) ?? 0) + 1;
+    try {
+      localStorage.setItem(VISITS_KEY, String(visits));
+    } catch {
+      /* ignore */
+    }
+    if (visits < MIN_VISITS) return;
 
     const ua = window.navigator.userAgent;
     const ios = /iphone|ipad|ipod/i.test(ua);
@@ -44,7 +64,7 @@ export function PwaInstall() {
 
     // iOS nie emituje beforeinstallprompt - pokaż baner z instrukcją
     if (ios) {
-      const t = setTimeout(() => setVisible(true), 1500);
+      const t = setTimeout(() => setVisible(true), 8000);
       return () => {
         clearTimeout(t);
         window.removeEventListener("beforeinstallprompt", onBIP);
@@ -58,7 +78,7 @@ export function PwaInstall() {
     setVisible(false);
     setShowIOSHelp(false);
     try {
-      localStorage.setItem(DISMISS_KEY, "1");
+      localStorage.setItem(DISMISS_KEY, String(Date.now() + SNOOZE_DAYS * 86400000));
     } catch {
       /* ignore */
     }
