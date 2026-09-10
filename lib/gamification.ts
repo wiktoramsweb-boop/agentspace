@@ -164,16 +164,16 @@ function computeBadges(t: GameData["totals"]): Badge[] {
   });
 
   return [
-    mk("first-session", "Pierwszy krok", "Ukończ 1 sesję AI Coach", "🎯", t.sessions, 1),
-    mk("caller-50", "Rozmówca", "50 cold calli łącznie", "📞", t.coldCalls, 50),
-    mk("caller-250", "Maszyna do dzwonienia", "250 cold calli łącznie", "🔥", t.coldCalls, 250),
-    mk("streak-5", "Passa tygodnia", "5 dni z rzędu z celem telefonów", "⚡", t.streak, 5),
-    mk("streak-14", "Żelazna passa", "14 dni z rzędu z celem telefonów", "💎", t.streak, 14),
-    mk("high-score", "Mistrz rozmowy", "Sesja Coach z wynikiem 9+", "🏅", t.bestScore, 9),
-    mk("first-listing", "Pierwsza umowa", "Podpisz pierwszą umowę", "📄", t.listings, 1),
-    mk("closer", "Zamykacz", "Pierwsza sprzedaż", "🏆", t.sales, 1),
-    mk("closer-10", "Rekin", "10 sprzedaży łącznie", "🦈", t.sales, 10),
-    mk("meetings-20", "Człowiek spotkań", "20 spotkań pozyskowych", "🤝", t.meetings, 20),
+    mk("first-session", "Pierwszy krok", "Ukończ 1 sesję AI Coach", "target", t.sessions, 1),
+    mk("caller-50", "Rozmówca", "50 cold calli łącznie", "phone", t.coldCalls, 50),
+    mk("caller-250", "Maszyna do dzwonienia", "250 cold calli łącznie", "flame", t.coldCalls, 250),
+    mk("streak-5", "Passa tygodnia", "5 dni z rzędu z celem telefonów", "bolt", t.streak, 5),
+    mk("streak-14", "Żelazna passa", "14 dni z rzędu z celem telefonów", "gem", t.streak, 14),
+    mk("high-score", "Mistrz rozmowy", "Sesja Coach z wynikiem 9+", "medal", t.bestScore, 9),
+    mk("first-listing", "Pierwsza umowa", "Podpisz pierwszą umowę", "doc", t.listings, 1),
+    mk("closer", "Zamykacz", "Pierwsza sprzedaż", "trophy", t.sales, 1),
+    mk("closer-10", "Rekin", "10 sprzedaży łącznie", "star", t.sales, 10),
+    mk("meetings-20", "Człowiek spotkań", "20 spotkań pozyskowych", "handshake", t.meetings, 20),
   ];
 }
 

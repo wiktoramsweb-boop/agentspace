@@ -336,3 +336,57 @@ export function HandWaveIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function BoltIcon2({ className }: IconProps) {
+  return (
+    <svg className={className ?? "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+    </svg>
+  );
+}
+
+export function GemIcon({ className }: IconProps) {
+  return (
+    <svg className={className ?? "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h12l4 6-10 12L2 9l4-6Zm-4 6h20M8 3l-2 6 6 12 6-12-2-6" />
+    </svg>
+  );
+}
+
+export function DocIcon2({ className }: IconProps) {
+  return (
+    <svg className={className ?? "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+    </svg>
+  );
+}
+
+export function HandshakeIcon2({ className }: IconProps) {
+  return (
+    <svg className={className ?? "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 11.5 5 8.5m0 0L2.5 11l4 4.5 2-1.5 2.5 2.5 2-1 2 2 2-2 2.5-2.5-1.5-6-4-1.5-3 1-3-1L5 8.5Z" />
+    </svg>
+  );
+}
+
+export function StarIcon({ className }: IconProps) {
+  return (
+    <svg className={className ?? "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.5a.56.56 0 0 1 1.04 0l2.13 4.32 4.77.7c.46.06.64.63.31.95l-3.45 3.36.81 4.75c.08.46-.4.81-.81.6L12 15.93l-4.27 2.25c-.41.21-.89-.14-.81-.6l.81-4.75-3.45-3.36a.56.56 0 0 1 .31-.95l4.77-.7L11.48 3.5Z" />
+    </svg>
+  );
+}
+
+/** Ikony odznak. Klucz zapisany w lib/gamification.ts, obrazek dobierany tutaj. */
+export const BADGE_ICONS: Record<string, (p: IconProps) => React.ReactElement> = {
+  target: TargetIcon2,
+  phone: PhoneIcon,
+  flame: FlameIcon,
+  bolt: BoltIcon2,
+  gem: GemIcon,
+  medal: MedalIcon,
+  doc: DocIcon2,
+  trophy: TrophyIcon,
+  star: StarIcon,
+  handshake: HandshakeIcon2,
+};

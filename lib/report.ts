@@ -83,7 +83,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
         Do poprawy: <strong>${weakest.label}</strong> (${weakest.avg}/10) - rozważ wspólne szkolenie.
       </p>` : ""}
 
-      ${topAgent ? `<p style="font-size:15px;">🏆 Najlepszy agent: <strong>${topAgent.full_name ?? topAgent.email}</strong> (${topAgent.avgScore}/10)</p>` : ""}
+      ${topAgent ? `<p style="font-size:15px;">Najlepszy agent: <strong>${topAgent.full_name ?? topAgent.email}</strong> (${topAgent.avgScore}/10)</p>` : ""}
 
       ${notTraining.length > 0 ? `
       <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin:16px 0;">
@@ -105,7 +105,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
     await resend.emails.send({
       from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
       to: ownerEmail,
-      subject: `📊 Raport miesięczny - ${agency.name} (${monthName})`,
+      subject: `Raport miesięczny - ${agency.name} (${monthName})`,
       html,
     });
     return true;

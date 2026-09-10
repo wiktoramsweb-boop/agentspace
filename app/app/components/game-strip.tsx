@@ -1,4 +1,4 @@
-import { FlameIcon, TrophyIcon } from "./icons";
+import { BADGE_ICONS, FlameIcon, StarIcon, TrophyIcon } from "./icons";
 import type { GameData } from "@/lib/gamification";
 
 export function GameStrip({ game }: { game: GameData }) {
@@ -44,7 +44,10 @@ export function GameStrip({ game }: { game: GameData }) {
       <div className="flex items-center gap-4 rounded-2xl border border-slate-300 bg-white p-5">
         {nextBadge ? (
           <>
-            <span className="text-4xl opacity-40 grayscale">{nextBadge.icon}</span>
+            {(() => {
+              const BadgeIcon = BADGE_ICONS[nextBadge.icon] ?? StarIcon;
+              return <BadgeIcon className="h-9 w-9 text-slate-400" />;
+            })()}
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-slate-900">{nextBadge.label}</p>
               <p className="text-xs text-slate-500">{nextBadge.description}</p>
@@ -88,7 +91,12 @@ export function BadgesCard({ game }: { game: GameData }) {
             }`}
             title={b.description}
           >
-            <div className={`mb-1 text-3xl ${b.unlocked ? "" : "opacity-30 grayscale"}`}>{b.icon}</div>
+            <div className={`mb-1 flex justify-center ${b.unlocked ? "text-emerald-600" : "text-slate-300"}`}>
+                {(() => {
+                  const BadgeIcon = BADGE_ICONS[b.icon] ?? StarIcon;
+                  return <BadgeIcon className="h-7 w-7" />;
+                })()}
+              </div>
             <p className={`text-xs font-medium ${b.unlocked ? "text-slate-900" : "text-slate-500"}`}>{b.label}</p>
             {!b.unlocked && b.progress && (
               <p className="mt-1 text-[10px] text-slate-400">{b.progress.current}/{b.progress.target}</p>
