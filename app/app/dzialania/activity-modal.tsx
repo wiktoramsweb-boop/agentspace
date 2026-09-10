@@ -5,6 +5,7 @@ import { Modal } from "../components/modal";
 import { SubmitButton } from "../components/submit-button";
 import { ACTIVITY_ICONS } from "../components/icons";
 import { createActivity } from "./actions";
+import { nowTimePL, todayPL } from "@/lib/datetime";
 import {
   ACTIVITY_KINDS,
   ACTIVITY_KIND_MAP,
@@ -139,12 +140,20 @@ function ActivityForm({
     }
   }
 
-  const today = new Date().toISOString().slice(0, 10);
-  const nowTime = new Date().toTimeString().slice(0, 5);
+  const today = todayPL();
+  const nowTime = nowTimePL();
 
   return (
     <Modal title={`Nowe: ${meta.label.toLowerCase()}`} onClose={onClose} maxWidth="max-w-3xl">
-      <form action={createActivity} className="flex min-h-0 flex-1 flex-col">
+      <form
+        action={async (fd) => {
+          // Zamykamy dopiero po zapisie - inaczej agent nie wie, czy się udało,
+          // i zdarza się zapis drugi raz.
+          await createActivity(fd);
+          onClose();
+        }}
+        className="flex min-h-0 flex-1 flex-col"
+      >
         <input type="hidden" name="kind" value={kind} />
         {assignees.map((id) => (
           <input key={id} type="hidden" name="assignee_ids" value={id} />

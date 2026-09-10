@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { SearchRich } from "@/lib/data-searches";
@@ -163,7 +164,7 @@ export function SearchesBrowser({
                       )}
                     </Row>
                     <Row label="Dodano">
-                      {new Date(s.created_at).toLocaleDateString("pl-PL")}
+                      {formatDatePL(s.created_at)}
                     </Row>
                   </div>
                 </div>

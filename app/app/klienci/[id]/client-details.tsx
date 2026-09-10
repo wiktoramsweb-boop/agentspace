@@ -1,3 +1,4 @@
+import { formatDatePL } from "@/lib/datetime";
 import { Card } from "../../components/ui";
 import { CLIENT_SOURCES, type Client } from "@/lib/types";
 
@@ -82,7 +83,7 @@ export function ClientDetails({ client }: { client: Client }) {
             </span>
             {client.marketing_consent_at && (
               <span className="text-slate-500">
-                {new Date(client.marketing_consent_at).toLocaleDateString("pl-PL")}
+                {formatDatePL(client.marketing_consent_at)}
               </span>
             )}
           </p>

@@ -1,3 +1,4 @@
+import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
 import { getActivitiesReport, getAgencyAgents, type ReportFilters } from "@/lib/data-activities";
@@ -16,9 +17,7 @@ const PURPOSE_MAP = Object.fromEntries(ACTIVITY_PURPOSES.map((p) => [p.value, p.
 
 function fmt(iso: string | null): string {
   if (!iso) return "-";
-  return new Date(iso).toLocaleString("pl-PL", {
-    day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
-  });
+  return formatDateTimePL(iso);
 }
 
 /** Zakresy dat dla szybkich skrótów („ten miesiąc" itd.). */

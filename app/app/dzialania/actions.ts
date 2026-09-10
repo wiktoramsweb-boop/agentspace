@@ -4,19 +4,20 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { warsawToIso } from "@/lib/datetime";
 
 function txt(fd: FormData, k: string): string | null {
   const v = String(fd.get(k) ?? "").trim();
   return v || null;
 }
 
-/** Łączy datę i godzinę z formularza w znacznik czasu. */
+/**
+ * Łączy datę i godzinę z formularza w znacznik czasu.
+ * Wartości z formularza to czas polski - serwer działa w UTC, więc bez jawnej
+ * strefy godzina zapisywałaby się przesunięta o 1-2 h.
+ */
 function whenFrom(fd: FormData, dateKey: string, timeKey: string): string | null {
-  const d = String(fd.get(dateKey) ?? "").trim();
-  if (!d) return null;
-  const t = String(fd.get(timeKey) ?? "").trim() || "09:00";
-  const dt = new Date(`${d}T${t}`);
-  return Number.isNaN(dt.getTime()) ? null : dt.toISOString();
+  return warsawToIso(String(fd.get(dateKey) ?? ""), String(fd.get(timeKey) ?? ""));
 }
 
 export async function createActivity(formData: FormData): Promise<void> {

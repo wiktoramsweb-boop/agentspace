@@ -88,7 +88,13 @@ export function NewDealButton({
 
   return (
     <Modal title="Nowa transakcja" onClose={() => setOpen(false)}>
-      <form action={createDeal} className="flex min-h-0 flex-1 flex-col">
+      <form
+        action={async (fd) => {
+          await createDeal(fd);
+          setOpen(false);
+        }}
+        className="flex min-h-0 flex-1 flex-col"
+      >
         <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
           <Labeled label="Opis">
             <input

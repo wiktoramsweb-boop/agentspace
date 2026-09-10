@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import type { ActivityRich } from "@/lib/data-activities";
+import { formatDateTimePL } from "@/lib/datetime";
 import { setActivityStatus, deleteActivity } from "./actions";
 import { ACTIVITY_ICONS } from "../components/icons";
 import {
@@ -20,15 +21,7 @@ const PRIORITY_MAP = Object.fromEntries(ACTIVITY_PRIORITIES.map((p) => [p.value,
 const PURPOSE_MAP = Object.fromEntries(ACTIVITY_PURPOSES.map((p) => [p.value, p.label]));
 
 function fmtWhen(iso: string | null): string {
-  if (!iso) return "-";
-  const d = new Date(iso);
-  return d.toLocaleString("pl-PL", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return formatDateTimePL(iso);
 }
 
 function fmtDuration(s: number | null): string | null {

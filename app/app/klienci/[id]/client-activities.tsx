@@ -1,3 +1,4 @@
+import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
 import Link from "next/link";
 import type { ActivityRich } from "@/lib/data-activities";
 import { ACTIVITY_ICONS } from "../../components/icons";
@@ -38,9 +39,7 @@ export function ClientActivities({ activities }: { activities: ActivityRich[] })
             </div>
             <p className="text-xs text-slate-500">
               {a.due_at
-                ? new Date(a.due_at).toLocaleString("pl-PL", {
-                    day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
-                  })
+                ? formatDateTimePL(a.due_at)
                 : "-"}
               {a.assigneeNames.length > 0 && ` · ${a.assigneeNames.join(", ")}`}
             </p>

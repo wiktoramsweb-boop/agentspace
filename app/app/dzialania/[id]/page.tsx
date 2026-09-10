@@ -1,3 +1,4 @@
+import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -20,9 +21,7 @@ const DIRECTION_MAP = Object.fromEntries(CALL_DIRECTIONS.map((c) => [c.value, c.
 
 function fmt(iso: string | null): string {
   if (!iso) return "-";
-  return new Date(iso).toLocaleString("pl-PL", {
-    year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
-  });
+  return formatDateTimePL(iso);
 }
 
 type Props = { params: Promise<{ id: string }> };

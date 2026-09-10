@@ -79,11 +79,11 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
       if (cancelled || !ref.current || mapRef.current) return;
       const map = L.map(ref.current, { scrollWheelZoom: false }).setView([50.0647, 19.945], 11);
       mapRef.current = map;
-      // Jasne kafelki (CARTO light) - spójne z jasnym motywem aplikacji.
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        attribution: "© OpenStreetMap © CARTO",
-        subdomains: "abcd",
-        maxZoom: 20,
+      // Kafelki OpenStreetMap - darmowe i bez klucza API. CARTO wymaga teraz
+      // klucza i bez niego zwraca mapę z napisami "API KEY REQUIRED".
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap",
+        maxZoom: 19,
       }).addTo(map);
 
       const markers: any[] = [];
