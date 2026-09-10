@@ -27,7 +27,7 @@ export default async function ProwizjePage() {
 
       {/* Cel miesięczny */}
       {goal > 0 && (
-        <Card className="mb-6 !border-emerald-500/30 !bg-gradient-to-br !from-emerald-500/10 !to-slate-50">
+        <Card className="hero-goal mb-6">
           <div className="mb-2 flex items-end justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
@@ -49,7 +49,7 @@ export default async function ProwizjePage() {
         </Card>
       )}
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           label="Twój zarobek (mc)"
           value={formatPln(stats.monthClosed)}

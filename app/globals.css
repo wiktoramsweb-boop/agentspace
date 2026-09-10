@@ -676,6 +676,18 @@ button:not(:disabled):active,
   background: linear-gradient(180deg, #111c38 0%, #1b2550 42%, #3a2470 76%, #57297f 100%);
 }
 
+/* Wyróżniony kafel celu (Cele, Prowizje). Wcześniej był to gradient
+   z klasami !important, których ciemny motyw nie potrafił nadpisać, przez co
+   po zmianie na ciemny kafel zostawał jasny, a tekst na nim znikał. */
+.hero-goal {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(248, 250, 252, 1)) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hero-goal {
+  border-color: rgba(16, 185, 129, 0.28) !important;
+  background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(24, 24, 27, 1)) !important;
+}
+
 /* Pasek przewijania menu: cienki i stonowany, żeby nie rozbijał ciemnego panelu.
    Bez tego na niższych ekranach nie widać, że lista jeszcze się przewija. */
 .sidebar-nav {

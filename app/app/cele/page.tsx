@@ -137,7 +137,7 @@ export default async function CelePage() {
       />
 
       {/* Roczny cel + postęp */}
-      <Card className="mb-6 !border-emerald-500/30 !bg-gradient-to-br !from-emerald-500/10 !to-slate-50">
+      <Card className="hero-goal mb-6">
         <div className="mb-3 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Roczny cel</p>

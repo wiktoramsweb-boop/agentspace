@@ -38,7 +38,7 @@ export function StatCard({
 }) {
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border p-5 shadow-sm shadow-slate-900/5 transition ${
+      className={`group relative overflow-hidden rounded-2xl border p-4 shadow-sm shadow-slate-900/5 transition sm:p-5 ${
         accent
           ? "border-emerald-500/40 bg-gradient-to-br from-emerald-500/20 to-slate-50"
           : "border-slate-200 bg-white hover:border-slate-300"

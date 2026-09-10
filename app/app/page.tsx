@@ -86,7 +86,7 @@ export default async function DashboardPage() {
       <GameStrip game={game} />
 
       {/* Górne statystyki */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           label="Twój zarobek (mc)"
           value={formatPln(commission.monthClosed)}
