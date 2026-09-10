@@ -32,10 +32,14 @@ export function AssetUploader({
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
+  // SVG tylko dla logo. Znak wodny i stempel rysujemy na zdjęciu w canvasie,
+  // a SVG bez zapisanych wymiarów wychodzi tam w złych proporcjach.
+  const allowed = kind === "logo" ? /^image\/(png|jpeg|webp|svg\+xml)$/ : /^image\/(png|jpeg|webp)$/;
+
   async function upload(file: File) {
     setError(null);
-    if (!/^image\/(png|jpeg|webp|svg\+xml)$/.test(file.type)) {
-      setError("Wybierz plik PNG, JPG, WEBP albo SVG.");
+    if (!allowed.test(file.type)) {
+      setError(kind === "logo" ? "Wybierz plik PNG, JPG, WEBP albo SVG." : "Wybierz plik PNG, JPG albo WEBP.");
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -94,7 +98,7 @@ export function AssetUploader({
         <input
           ref={inputRef}
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+          accept={kind === "logo" ? "image/png,image/jpeg,image/webp,image/svg+xml" : "image/png,image/jpeg,image/webp"}
           hidden
           onChange={(e) => {
             const f = e.target.files?.[0];

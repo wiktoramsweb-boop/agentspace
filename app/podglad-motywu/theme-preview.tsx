@@ -13,6 +13,7 @@ import { NewClientForm } from "../app/klienci/new-client-form";
 import { SearchWizard } from "../app/poszukiwania/search-wizard";
 import type { ActivityRich } from "@/lib/data-activities";
 import { Pagination } from "../app/components/pagination";
+import { PhotoPipelineTest } from "./photo-pipeline-test";
 
 
 const MOCK_AGENTS = [
@@ -177,6 +178,11 @@ export function ThemePreview() {
             </div>
             <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" agents={MOCK_AGENTS} />
           </div>
+
+          <Card>
+            <h2 className="mb-2 font-semibold text-slate-900">Obróbka zdjęć: znak wodny</h2>
+            <PhotoPipelineTest />
+          </Card>
 
           <Card>
             <h2 className="mb-2 font-semibold text-slate-900">Stronicowanie</h2>
