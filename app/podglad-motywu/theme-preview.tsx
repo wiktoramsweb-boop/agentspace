@@ -12,6 +12,7 @@ import { ActivitiesBrowser } from "../app/dzialania/activities-browser";
 import { NewClientForm } from "../app/klienci/new-client-form";
 import { SearchWizard } from "../app/poszukiwania/search-wizard";
 import type { ActivityRich } from "@/lib/data-activities";
+import { Pagination } from "../app/components/pagination";
 
 
 const MOCK_AGENTS = [
@@ -51,6 +52,7 @@ const MOCK_ACTIVITIES: ActivityRich[] = [
 
 export function ThemePreview() {
   const [scope, setScope] = useState<"all" | "mine">("all");
+  const [demoPage, setDemoPage] = useState(0);
 
   return (
     <div className="app-shell min-h-screen text-slate-900 md:flex">
@@ -172,6 +174,11 @@ export function ThemePreview() {
             </div>
             <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" agents={MOCK_AGENTS} />
           </div>
+
+          <Card>
+            <h2 className="mb-2 font-semibold text-slate-900">Stronicowanie</h2>
+            <Pagination page={demoPage} total={137} onPage={setDemoPage} label="kontaktów" />
+          </Card>
 
           <Card>
             <table className="w-full text-sm">
