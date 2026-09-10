@@ -22,10 +22,10 @@ Odbiorca decyzyjny: właściciel lub menedżer biura nieruchomości. Użytkownic
 ## Integracje
 
 - [Integracje](https://agentspace.pl/integracje): przegląd systemów, z którymi łączy się AgentSpace
-- [Asari](https://agentspace.pl/integracje/asari): status — w przygotowaniu
-- [Galactica](https://agentspace.pl/integracje/galactica): status — w przygotowaniu
-- [IMO](https://agentspace.pl/integracje/imo): status — planowana
-- [Estiman](https://agentspace.pl/integracje/estiman): status — planowana
+- [Asari](https://agentspace.pl/integracje/asari): status: w przygotowaniu
+- [Galactica](https://agentspace.pl/integracje/galactica): status: w przygotowaniu
+- [IMO](https://agentspace.pl/integracje/imo): status: planowana
+- [Estiman](https://agentspace.pl/integracje/estiman): status: planowana
 
 ## Firma
 

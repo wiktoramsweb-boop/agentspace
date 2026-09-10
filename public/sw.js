@@ -1,4 +1,4 @@
-// AgentSpace — service worker.
+// AgentSpace, service worker.
 // Etap 1: umożliwia instalację PWA. Handlery push są gotowe pod Etap 2.
 
 self.addEventListener("install", () => {
@@ -9,7 +9,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// Passthrough — wymagane, by przeglądarka uznała aplikację za instalowalną.
+// Passthrough, wymagane, by przeglądarka uznała aplikację za instalowalną.
 self.addEventListener("fetch", () => {});
 
 // --- Push (Etap 2) ---
