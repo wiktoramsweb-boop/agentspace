@@ -44,7 +44,7 @@ export function ResultForm({
         <button
           type="submit"
           disabled={pending || disabled}
-          className="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:opacity-60"
+          className="rounded-xl bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-emerald-500/25 transition hover:bg-emerald-400 disabled:opacity-60"
         >
           {pending ? "Zapisuję…" : "Zapisz"}
         </button>
@@ -53,18 +53,21 @@ export function ResultForm({
   );
 }
 
-/** Sekcja z tytułem na krawędzi ramki, jak w ASARI („Dane firmy", „Adres korespondencyjny"). */
+/** Sekcja ustawień: karta z nagłówkiem i opcjonalną akcją po prawej. */
 export function Fieldset({ title, children, aside }: { title: string; children: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <fieldset className="rounded-2xl border border-slate-200 bg-white px-5 pb-5 pt-2">
-      <legend className="flex items-center gap-2 px-2 text-base font-semibold text-slate-900">{title}{aside}</legend>
-      <div className="mt-3 space-y-4">{children}</div>
-    </fieldset>
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/[0.03]">
+      <header className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-5 py-3.5">
+        <h2 className="text-[15px] font-semibold text-slate-900">{title}</h2>
+        {aside}
+      </header>
+      <div className="space-y-4 px-5 py-5">{children}</div>
+    </section>
   );
 }
 
 export const inputCls =
-  "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/15";
+  "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/15";
 
 export function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (

@@ -670,10 +670,14 @@ button:not(:disabled):active,
   background: #94a3b8;
 }
 
-/* Sidebar aplikacji: granat przechodzący w purpurę (układ i klimat jak w ASARI).
-   Ciemny pasek obok jasnej treści daje czytelny kontrast i „ramę" dla ekranu. */
+/* Sidebar aplikacji: głęboki grafit z turkusowym podtonem i zieloną poświatą
+   u dołu - kolory marki AgentSpace (zieleń i turkus), a nie granat z fioletem
+   kojarzony z innymi CRM-ami. Ciemny pasek obok jasnej treści daje „ramę". */
 .app-sidebar {
-  background: linear-gradient(180deg, #111c38 0%, #1b2550 42%, #3a2470 76%, #57297f 100%);
+  background:
+    radial-gradient(120% 45% at 0% 100%, rgba(16, 185, 129, 0.22), transparent 62%),
+    radial-gradient(90% 35% at 100% 0%, rgba(45, 212, 191, 0.1), transparent 60%),
+    linear-gradient(180deg, #0b151d 0%, #0d1d26 48%, #0c2527 100%);
 }
 
 /* Wyróżniony kafel celu (Cele, Prowizje). Wcześniej był to gradient
@@ -686,6 +690,35 @@ button:not(:disabled):active,
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hero-goal {
   border-color: rgba(16, 185, 129, 0.28) !important;
   background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(24, 24, 27, 1)) !important;
+}
+
+/* Przycisk „atramentowy": grafit w jasnym motywie, jasny w ciemnym.
+   Drugorzędne akcje (Dalej, Wybierz zdjęcia, aktywna pozycja menu) muszą się
+   odróżniać od zielonego „Zapisz", a w ciemnym motywie nie zlewać z tłem. */
+.btn-ink {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+.btn-ink:hover {
+  background-color: #1e293b;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .btn-ink {
+  background-color: #e4e4e7 !important;
+  color: #09090b !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .btn-ink:hover {
+  background-color: #ffffff !important;
+}
+
+/* Połysk przesuwający się po pasku postępu wgrywania zdjęć. Samo przesuwanie
+   paska przy wolnym łączu wygląda jak zawieszenie; połysk pokazuje, że praca trwa. */
+.shimmer-bar {
+  background-size: 200% 100%;
+  animation: shimmer-move 1.6s linear infinite;
+}
+@keyframes shimmer-move {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
 }
 
 /* Szachownica pod podglądem logo i znaku wodnego (jak w edytorach grafiki).

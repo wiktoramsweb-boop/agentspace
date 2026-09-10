@@ -47,7 +47,7 @@ export function OptionsForm({ options, disabled }: { options: AgencyOptions; dis
               value="1"
               checked={auto}
               onChange={(e) => setAuto(e.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-blue-600"
+              className="mt-0.5 h-4 w-4 accent-emerald-500"
             />
             <span className="text-sm text-slate-800">Automatyczne numerowanie według maski</span>
           </label>
@@ -112,7 +112,7 @@ function Check({
 }) {
   return (
     <label className="flex cursor-pointer items-start gap-3">
-      <input type="checkbox" name={name} value="1" defaultChecked={defaultChecked} className="mt-0.5 h-4 w-4 accent-blue-600" />
+      <input type="checkbox" name={name} value="1" defaultChecked={defaultChecked} className="mt-0.5 h-4 w-4 accent-emerald-500" />
       <span>
         <span className="block text-sm text-slate-800">{label}</span>
         {hint && <span className="mt-0.5 block text-xs text-slate-500">{hint}</span>}

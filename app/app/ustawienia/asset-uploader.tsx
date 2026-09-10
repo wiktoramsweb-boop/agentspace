@@ -73,7 +73,7 @@ export function AssetUploader({
   return (
     <div className="space-y-3">
       <div
-        className={`flex h-36 items-center justify-center overflow-hidden rounded-xl border border-slate-200 p-3 ${
+        className={`flex h-36 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-slate-300 p-3 ${
           checker ? "checker-bg" : "bg-slate-50"
         }`}
       >
@@ -88,7 +88,7 @@ export function AssetUploader({
       {busy && (
         <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
           <div
-            className="h-full rounded-full bg-blue-500 transition-[width]"
+            className="shimmer-bar h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300 transition-[width]"
             style={{ width: `${Math.max(8, Math.round(progress * 100))}%` }}
           />
         </div>
@@ -110,7 +110,7 @@ export function AssetUploader({
           type="button"
           disabled={busy || disabled}
           onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
+          className="btn-ink inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold transition disabled:opacity-50"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V4m0 0-4 4m4-4 4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
@@ -122,7 +122,7 @@ export function AssetUploader({
             type="button"
             disabled={busy || disabled}
             onClick={() => void remove()}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
           >
             Usuń
           </button>

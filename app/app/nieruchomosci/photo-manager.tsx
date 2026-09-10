@@ -1,30 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import type { PhotoConfig } from "@/lib/agency-settings";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import type { PhotoConfig } from "@/lib/agency-settings-shared";
 import type { PropertyPhoto } from "@/lib/types";
 import { MAX_PHOTOS } from "@/lib/property-photos";
 import { downloadFile, preparePhoto, renderPhoto, uploadToSignedUrl } from "@/lib/photo-process";
 import { discardPhotoUploads, savePropertyPhotos, signPhotoUploads } from "./photo-actions";
 
-type Progress = { label: string; done: number; total: number; fraction: number };
+/** Zdjęcie w trakcie wgrywania: podgląd z dysku i postęp. */
+type Pending = {
+  id: string;
+  name: string;
+  preview: string | null;
+  progress: number;
+  stage: "kolejka" | "obrobka" | "wysylka" | "blad";
+};
 
-const FLAGS: { key: "export" | "print" | "plan" | "visualization"; label: string }[] = [
-  { key: "export", label: "Eksport" },
-  { key: "print", label: "Wydruki i maile" },
-  { key: "plan", label: "Plan" },
-  { key: "visualization", label: "Wizualizacja" },
+/** Krótszy stan na potrzeby paska u góry, np. przy nakładaniu stempla. */
+type Task = { label: string; done: number; total: number };
+
+const FLAGS: { key: "export" | "print" | "plan" | "visualization"; label: string; hint: string }[] = [
+  { key: "export", label: "Eksport", hint: "Na stronę i portale" },
+  { key: "print", label: "Wydruki", hint: "Ofertówka, PDF i maile" },
+  { key: "plan", label: "Rzut", hint: "To plan mieszkania" },
+  { key: "visualization", label: "Wizualizacja", hint: "Grafika, nie zdjęcie" },
 ];
 
+const STAGE_LABEL: Record<Pending["stage"], string> = {
+  kolejka: "w kolejce",
+  obrobka: "obróbka",
+  wysylka: "wysyłka",
+  blad: "błąd",
+};
+
 /**
- * Zdjęcia oferty: wgrywanie (ze znakiem wodnym biura), kolejność, zdjęcie
- * główne, opisy i oznaczenia jak w ASARI.
+ * Zdjęcia oferty: wgrywanie ze znakiem wodnym biura, kolejność, zdjęcie główne,
+ * opisy i oznaczenia.
  *
  * Dwa tryby:
  * - propertyId podany: każda zmiana od razu zapisuje się w ofercie (karta oferty),
  * - bez propertyId: lista trzymana w pamięci i oddawana przez onChange
- *   (kreator dodawania, zapis razem z całą ofertą).
+ *   (kreator dodawania i edycji, zapis razem z całą ofertą).
  */
 export function PhotoManager({
   initial = [],
@@ -42,8 +60,10 @@ export function PhotoManager({
   onBusyChange?: (busy: boolean) => void;
   canEditSettings?: boolean;
 }) {
+  const reduceMotion = useReducedMotion();
   const [photos, setPhotos] = useState<PropertyPhoto[]>(initial);
-  const [progress, setProgress] = useState<Progress | null>(null);
+  const [pending, setPending] = useState<Pending[]>([]);
+  const [task, setTask] = useState<Task | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [dragFrom, setDragFrom] = useState<number | null>(null);
@@ -52,9 +72,21 @@ export function PhotoManager({
 
   const photosRef = useRef(photos);
   const saving = useRef(false);
-  const pending = useRef<PropertyPhoto[] | null>(null);
+  const queued = useRef<PropertyPhoto[] | null>(null);
   const live = !!propertyId;
-  const busy = progress !== null;
+  // Kafelek z błędem czeka chwilę na ekranie, ale nie blokuje zapisu oferty.
+  const busy = pending.some((p) => p.stage !== "blad") || task !== null;
+
+  // Pliki, które oferta miała przed otwarciem. W kreatorze nie wolno ich
+  // kasować od razu - jeśli agent anuluje edycję, zdjęcia muszą zostać.
+  const initialFiles = useMemo(
+    () => new Set(initial.flatMap((p) => [p.path, p.original_path]).filter(Boolean) as string[]),
+    [initial],
+  );
+  const discardNew = (paths: (string | undefined)[]) => {
+    const fresh = paths.filter((p): p is string => !!p && !initialFiles.has(p));
+    if (fresh.length) void discardPhotoUploads(fresh);
+  };
 
   useEffect(() => {
     photosRef.current = photos;
@@ -68,7 +100,7 @@ export function PhotoManager({
   async function persist(list: PropertyPhoto[]) {
     if (!propertyId) return;
     if (saving.current) {
-      pending.current = list;
+      queued.current = list;
       return;
     }
     saving.current = true;
@@ -81,8 +113,8 @@ export function PhotoManager({
     } else {
       setSaveState("saved");
     }
-    const next = pending.current;
-    pending.current = null;
+    const next = queued.current;
+    queued.current = null;
     if (next) void persist(next);
   }
 
@@ -93,10 +125,12 @@ export function PhotoManager({
     if (save) void persist(list);
   }
 
+  const patchPending = (id: string, patch: Partial<Pending>) =>
+    setPending((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+
   async function addFiles(fileList: FileList | File[]) {
     setError(null);
-    const all = Array.from(fileList);
-    const images = all.filter(
+    const images = Array.from(fileList).filter(
       (f) => f.type.startsWith("image/") || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name),
     );
     const room = MAX_PHOTOS - photosRef.current.length;
@@ -110,11 +144,21 @@ export function PhotoManager({
       return;
     }
 
+    // Kafelki pojawiają się od razu, z podglądem prosto z dysku.
+    const batch: Pending[] = files.map((f, i) => ({
+      id: `${Date.now()}-${i}`,
+      name: f.name,
+      preview: /heic|heif/i.test(f.type) ? null : URL.createObjectURL(f),
+      progress: 0,
+      stage: "kolejka",
+    }));
+    setPending((prev) => [...prev, ...batch]);
+
     const perPhoto = config.watermark ? 2 : 1;
-    setProgress({ label: "Przygotowuję wgrywanie…", done: 0, total: files.length, fraction: 0 });
     const signed = await signPhotoUploads(files.length * perPhoto);
     if (signed.error) {
-      setProgress(null);
+      batch.forEach((b) => b.preview && URL.revokeObjectURL(b.preview));
+      setPending((prev) => prev.filter((p) => !batch.some((b) => b.id === p.id)));
       setError(signed.error);
       return;
     }
@@ -124,48 +168,53 @@ export function PhotoManager({
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const step = (f: number) =>
-        setProgress({
-          label: config.watermark ? "Znak wodny i wysyłka…" : "Wysyłka…",
-          done: i,
-          total: files.length,
-          fraction: (i + f) / files.length,
-        });
+      const slot = batch[i];
       try {
-        step(0);
+        patchPending(slot.id, { stage: "obrobka", progress: 0.05 });
         const { original, marked } = await preparePhoto(file, config);
         const upOriginal = signed.uploads[i * perPhoto];
         const upMarked = marked ? signed.uploads[i * perPhoto + 1] : null;
 
-        await uploadToSignedUrl(upOriginal.signedUrl, original.blob, (f) => step(marked ? f * 0.5 : f));
+        patchPending(slot.id, { stage: "wysylka", progress: 0.1 });
+        await uploadToSignedUrl(upOriginal.signedUrl, original.blob, (f) =>
+          patchPending(slot.id, { progress: 0.1 + f * (marked ? 0.45 : 0.9) }),
+        );
         if (marked && upMarked) {
-          await uploadToSignedUrl(upMarked.signedUrl, marked.blob, (f) => step(0.5 + f * 0.5));
+          await uploadToSignedUrl(upMarked.signedUrl, marked.blob, (f) =>
+            patchPending(slot.id, { progress: 0.55 + f * 0.45 }),
+          );
         }
 
         const shown = upMarked ?? upOriginal;
-        const photo: PropertyPhoto = {
-          path: shown.path,
-          url: shown.publicUrl,
-          original_path: upOriginal.path,
-          original_url: upOriginal.publicUrl,
-          export: true,
-          print: true,
-          width: original.width,
-          height: original.height,
-        };
-        list = [...list, photo];
+        list = [
+          ...list,
+          {
+            path: shown.path,
+            url: shown.publicUrl,
+            original_path: upOriginal.path,
+            original_url: upOriginal.publicUrl,
+            export: true,
+            print: true,
+            width: original.width,
+            height: original.height,
+          },
+        ];
         commit(list, false); // pokazujemy od razu, zapis na końcu paczki
+        setPending((prev) => prev.filter((p) => p.id !== slot.id));
+        if (slot.preview) URL.revokeObjectURL(slot.preview);
       } catch {
         failed.push(file.name);
+        patchPending(slot.id, { stage: "blad" });
       }
     }
 
-    setProgress(null);
     void persist(list);
     if (failed.length) {
       setError(
         `Nie udało się dodać: ${failed.join(", ")}. Zdjęcia HEIC z iPhone'a otwórz i zapisz jako JPG albo wgraj z Safari.`,
       );
+      // Kafelki z błędem znikają po chwili, żeby nie wisiały w siatce.
+      setTimeout(() => setPending((prev) => prev.filter((p) => p.stage !== "blad")), 4000);
     }
   }
 
@@ -184,18 +233,17 @@ export function PhotoManager({
     );
   }
 
-  async function remove(i: number) {
+  function remove(i: number) {
     const p = photos[i];
-    const list = photos.filter((_, j) => j !== i);
-    commit(list);
-    // W kreatorze oferta jeszcze nie istnieje, więc plik nigdzie nie jest
-    // zapisany i od razu go kasujemy. Na karcie robi to zapis oferty.
-    if (!live) void discardPhotoUploads([p.path, p.original_path].filter(Boolean) as string[]);
+    commit(photos.filter((_, j) => j !== i));
+    // W kreatorze kasujemy od razu tylko świeżo wgrane pliki. Zdjęcia, które
+    // oferta już miała, usuwa zapis oferty - albo zostają, gdy agent anuluje.
+    if (!live) discardNew([p.path, p.original_path]);
   }
 
   /**
    * Przerabia zdjęcie od nowa z czystego oryginału: z aktualnym znakiem wodnym
-   * i opcjonalnie stemplem. Stary plik ze znakiem przestaje być potrzebny.
+   * i opcjonalnie stemplem.
    */
   async function rerender(i: number, withStamp: boolean): Promise<PropertyPhoto | null> {
     const p = photosRef.current[i];
@@ -225,34 +273,33 @@ export function PhotoManager({
   async function toggleStamp(i: number) {
     setError(null);
     const p = photos[i];
-    setProgress({ label: "Nakładam stempel…", done: 0, total: 1, fraction: 0.4 });
+    setTask({ label: p.stamp ? "Zdejmuję stempel…" : "Nakładam stempel…", done: 0, total: 1 });
     try {
       const next = await rerender(i, !p.stamp);
       if (next) {
         const oldPath = p.path !== p.original_path ? p.path : undefined;
         commit(photosRef.current.map((x, j) => (j === i ? next : x)));
-        if (!live && oldPath && oldPath !== next.path) void discardPhotoUploads([oldPath]);
+        if (!live && oldPath !== next.path) discardNew([oldPath]);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Nie udało się nałożyć stempla.");
     }
-    setProgress(null);
+    setTask(null);
   }
 
   /** Po zmianie znaku wodnego w ustawieniach: przerób wszystkie zdjęcia oferty. */
   async function refreshWatermark() {
     setError(null);
     const total = photosRef.current.length;
-    const oldPaths: string[] = [];
+    const old: string[] = [];
     let list = photosRef.current;
     for (let i = 0; i < total; i++) {
-      setProgress({ label: "Nakładam aktualny znak wodny…", done: i, total, fraction: i / total });
+      setTask({ label: "Nakładam aktualny znak wodny…", done: i, total });
       try {
         const next = await rerender(i, !!list[i].stamp);
         if (next) {
-          if (list[i].path && list[i].path !== list[i].original_path && list[i].path !== next.path) {
-            oldPaths.push(list[i].path!);
-          }
+          const prev = list[i];
+          if (prev.path && prev.path !== prev.original_path && prev.path !== next.path) old.push(prev.path);
           list = list.map((x, j) => (j === i ? next : x));
           commit(list, false);
         }
@@ -260,113 +307,116 @@ export function PhotoManager({
         /* zostaje stara wersja tego zdjęcia */
       }
     }
-    setProgress(null);
+    setTask(null);
     void persist(list);
-    if (!live && oldPaths.length) void discardPhotoUploads(oldPaths);
+    if (!live) discardNew(old);
   }
 
   async function downloadAll(clean: boolean) {
     setError(null);
     for (let i = 0; i < photos.length; i++) {
       const p = photos[i];
-      const url = clean ? p.original_url ?? p.url : p.url;
-      setProgress({ label: "Pobieram zdjęcia…", done: i, total: photos.length, fraction: i / photos.length });
+      setTask({ label: "Pobieram zdjęcia…", done: i, total: photos.length });
       try {
-        await downloadFile(url, `zdjecie-${String(i + 1).padStart(2, "0")}${clean ? "-bez-znaku" : ""}.jpg`);
+        await downloadFile(
+          clean ? p.original_url ?? p.url : p.url,
+          `zdjecie-${String(i + 1).padStart(2, "0")}${clean ? "-bez-znaku" : ""}.jpg`,
+        );
       } catch {
         setError("Część zdjęć nie pobrała się. Spróbuj ponownie.");
       }
     }
-    setProgress(null);
+    setTask(null);
   }
 
   const canRefresh = photos.some((p) => p.original_url) && !!config.watermark;
+  const doneCount = pending.filter((p) => p.stage !== "kolejka" && p.stage !== "blad").length;
+  const overall = pending.length
+    ? pending.reduce((a, p) => a + (p.stage === "blad" ? 1 : p.progress), 0) / pending.length
+    : 0;
+  const spring = reduceMotion ? { duration: 0 } : { type: "spring" as const, stiffness: 420, damping: 34 };
 
   return (
     // @container: liczba kolumn zależy od miejsca, a nie od ekranu. W kreatorze
     // mieszczą się 4 zdjęcia w rzędzie, w węższej kolumnie karty oferty 3.
     <div className="@container space-y-4">
-      {/* Strefa wgrywania */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => !busy && inputRef.current?.click()}
-        onKeyDown={(e) => {
-          if ((e.key === "Enter" || e.key === " ") && !busy) {
-            e.preventDefault();
-            inputRef.current?.click();
-          }
-        }}
-        onDragOver={(e) => {
-          if (e.dataTransfer.types.includes("Files")) {
-            e.preventDefault();
-            setDropActive(true);
-          }
-        }}
-        onDragLeave={() => setDropActive(false)}
-        onDrop={(e) => {
-          if (!e.dataTransfer.types.includes("Files")) return;
-          e.preventDefault();
-          setDropActive(false);
-          if (!busy) void addFiles(e.dataTransfer.files);
-        }}
-        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
+      {/* ── Strefa wgrywania ─────────────────────────────── */}
+      <motion.div
+        animate={dropActive && !reduceMotion ? { scale: 1.01 } : { scale: 1 }}
+        transition={{ type: "spring", stiffness: 380, damping: 26 }}
+        className={`rounded-3xl bg-gradient-to-br p-[1.5px] transition-shadow ${
           dropActive
-            ? "border-blue-500 bg-blue-50"
-            : "border-slate-300 bg-slate-50 hover:border-blue-400 hover:bg-blue-50/60"
-        } ${busy ? "pointer-events-none opacity-70" : ""}`}
+            ? "from-emerald-400 via-teal-400 to-cyan-400 shadow-xl shadow-emerald-500/20"
+            : "from-emerald-200 via-slate-200 to-teal-200"
+        }`}
       >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
-          multiple
-          hidden
-          onChange={(e) => {
-            if (e.target.files) void addFiles(e.target.files);
-            e.target.value = "";
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label="Dodaj zdjęcia"
+          onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
           }}
-        />
-        {busy ? (
-          <>
-            <Spinner />
-            <p className="text-sm font-medium text-blue-600">{progress.label}</p>
-          </>
-        ) : (
-          <>
-            <CloudIcon />
-            <p className="text-sm font-medium text-slate-800">
-              Przeciągnij zdjęcia tutaj lub kliknij, aby wybrać
-            </p>
-            <p className="text-xs text-slate-500">
-              JPEG, PNG, WEBP · zmniejszamy do {config.maxWidth} × {config.maxHeight}
-            </p>
-          </>
-        )}
-      </div>
-
-      {busy && (
-        <div className="relative h-7 overflow-hidden rounded-full bg-slate-200">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400 transition-[width] duration-200"
-            style={{ width: `${Math.max(4, Math.round(progress.fraction * 100))}%` }}
+          onDragOver={(e) => {
+            if (e.dataTransfer.types.includes("Files")) {
+              e.preventDefault();
+              setDropActive(true);
+            }
+          }}
+          onDragLeave={() => setDropActive(false)}
+          onDrop={(e) => {
+            if (!e.dataTransfer.types.includes("Files")) return;
+            e.preventDefault();
+            setDropActive(false);
+            void addFiles(e.dataTransfer.files);
+          }}
+          className={`group relative flex cursor-pointer items-center gap-5 overflow-hidden rounded-[calc(1.5rem-1.5px)] px-6 py-6 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 sm:py-7 ${
+            dropActive ? "bg-emerald-50" : "bg-white hover:bg-emerald-50/40"
+          }`}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+            multiple
+            hidden
+            onChange={(e) => {
+              if (e.target.files) void addFiles(e.target.files);
+              e.target.value = "";
+            }}
           />
-          <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-slate-800">
-            {Math.min(progress.done + 1, progress.total)}/{progress.total} · {Math.round(progress.fraction * 100)} %
+          <PhotoStackIcon active={dropActive} />
+          <div className="min-w-0">
+            <p className="font-semibold text-slate-900">
+              {dropActive ? "Puść, a zajmiemy się resztą" : "Upuść zdjęcia albo wybierz z dysku"}
+            </p>
+            <p className="mt-0.5 text-sm text-slate-500">
+              Zmniejszymy je do {config.maxWidth} × {config.maxHeight}
+              {config.watermark ? " i nałożymy znak wodny biura" : ""}. Możesz dodać kilka naraz.
+            </p>
+          </div>
+          <span className="btn-ink ml-auto hidden flex-shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition sm:inline-block">
+            Wybierz zdjęcia
           </span>
         </div>
-      )}
+      </motion.div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+      {/* ── Pasek stanu ──────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
         {config.watermark ? (
-          <span className="rounded-md bg-emerald-50 px-2 py-1 font-medium text-emerald-700">
-            Znak wodny biura nakładany automatycznie
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Znak wodny włączony
           </span>
         ) : (
           <span className="text-slate-500">
-            Znak wodny: nie ustawiony.{" "}
+            Znak wodny nie jest ustawiony.{" "}
             {canEditSettings ? (
-              <Link href="/app/ustawienia/znak-wodny" className="font-medium text-blue-600 hover:underline">
+              <Link href="/app/ustawienia/znak-wodny" className="font-medium text-emerald-700 hover:underline">
                 Wgraj go w ustawieniach
               </Link>
             ) : (
@@ -378,175 +428,271 @@ export function PhotoManager({
           <span className="text-slate-400">{saveState === "saving" ? "Zapisuję…" : "Zapisano"}</span>
         )}
         {photos.length > 0 && (
-          <span className="ml-auto flex flex-wrap items-center gap-2">
+          <span className="ml-auto flex flex-wrap items-center gap-1.5">
             {canRefresh && (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => void refreshWatermark()}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
-              >
-                Nałóż aktualny znak wodny
-              </button>
+              <GhostBtn disabled={busy} onClick={() => void refreshWatermark()}>
+                Nałóż aktualny znak
+              </GhostBtn>
             )}
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => void downloadAll(false)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
-            >
-              <DownloadIcon /> Pobierz zdjęcia
-            </button>
+            <GhostBtn disabled={busy} onClick={() => void downloadAll(false)}>
+              <DownloadIcon /> Pobierz wszystkie
+            </GhostBtn>
             {photos.some((p) => p.original_url && p.original_url !== p.url) && (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => void downloadAll(true)}
-                className="rounded-lg px-2 py-1.5 font-medium text-slate-500 transition hover:text-slate-900 disabled:opacity-50"
-              >
-                bez znaku wodnego
-              </button>
+              <GhostBtn disabled={busy} onClick={() => void downloadAll(true)} subtle>
+                bez znaku
+              </GhostBtn>
             )}
           </span>
         )}
       </div>
 
+      <AnimatePresence>
+        {(pending.length > 0 || task) && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="rounded-2xl bg-slate-900 px-4 py-3 text-white"
+          >
+            <div className="mb-2 flex items-center justify-between text-xs">
+              <span className="font-medium">
+                {task ? task.label : `Wgrywam zdjęcia: ${Math.min(doneCount + 1, pending.length)} z ${pending.length}`}
+              </span>
+              <span className="tabular-nums text-white/60">
+                {task
+                  ? `${Math.min(task.done + 1, task.total)}/${task.total}`
+                  : `${Math.round(overall * 100)}%`}
+              </span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+              <motion.div
+                className="shimmer-bar h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300"
+                initial={false}
+                animate={{ width: `${Math.max(6, (task ? (task.done + 0.5) / task.total : overall) * 100)}%` }}
+                transition={{ ease: "easeOut", duration: 0.3 }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {error && (
         <p className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       )}
 
-      {photos.length === 0 ? (
-        !busy && <p className="py-2 text-center text-sm text-slate-400">Brak zdjęć</p>
+      {/* ── Siatka zdjęć ─────────────────────────────────── */}
+      {photos.length === 0 && pending.length === 0 ? (
+        <p className="py-2 text-center text-sm text-slate-400">
+          Oferta nie ma jeszcze zdjęć. Pierwsze dodane będzie zdjęciem głównym.
+        </p>
       ) : (
-        <ul className="grid grid-cols-2 gap-3 @lg:grid-cols-3 @3xl:grid-cols-4">
-          {photos.map((p, i) => (
-            <li
-              key={p.path ?? p.url}
-              draggable={!busy}
-              onDragStart={(e) => {
-                setDragFrom(i);
-                e.dataTransfer.effectAllowed = "move";
-              }}
-              onDragOver={(e) => {
-                if (dragFrom !== null) e.preventDefault();
-              }}
-              onDrop={(e) => {
-                if (dragFrom === null) return;
-                e.preventDefault();
-                move(dragFrom, i);
-                setDragFrom(null);
-              }}
-              onDragEnd={() => setDragFrom(null)}
-              className={`flex flex-col overflow-hidden rounded-xl border bg-white transition ${
-                dragFrom === i ? "border-blue-400 opacity-50" : "border-slate-200"
-              }`}
-            >
-              <div className="relative aspect-[4/3] bg-slate-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={p.url}
-                  alt={p.caption || `Zdjęcie ${i + 1}`}
-                  loading="lazy"
-                  className="h-full w-full cursor-grab object-cover active:cursor-grabbing"
-                />
-                {i === 0 && (
-                  <span className="absolute left-2 top-2 rounded-md bg-blue-600 px-2 py-0.5 text-[11px] font-semibold text-white shadow">
-                    Główne
-                  </span>
-                )}
-                {p.stamp && (
-                  <span className="absolute right-2 top-2 rounded-md bg-amber-400 px-2 py-0.5 text-[11px] font-semibold text-amber-950 shadow">
-                    stempel
-                  </span>
-                )}
-              </div>
+        <motion.ul layout={!reduceMotion} className="grid grid-cols-2 gap-3 @lg:grid-cols-3 @3xl:grid-cols-4">
+          <AnimatePresence initial={false}>
+            {photos.map((p, i) => (
+              <motion.li
+                key={p.path ?? p.url}
+                layout={!reduceMotion}
+                initial={reduceMotion ? false : { opacity: 0, scale: 0.92, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
+                transition={spring}
+                // Natywne przeciąganie HTML5 (warianty Capture), bo onDragStart
+                // w motion oznacza własny gest przesuwania, a nie drag and drop.
+                draggable={!busy}
+                onDragStartCapture={(e: React.DragEvent) => {
+                  setDragFrom(i);
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                onDragOverCapture={(e: React.DragEvent) => {
+                  if (dragFrom !== null) e.preventDefault();
+                }}
+                onDropCapture={(e: React.DragEvent) => {
+                  if (dragFrom === null) return;
+                  e.preventDefault();
+                  move(dragFrom, i);
+                  setDragFrom(null);
+                }}
+                onDragEndCapture={() => setDragFrom(null)}
+                className={`group flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md ${
+                  i === 0 ? "border-emerald-300 ring-1 ring-emerald-200" : "border-slate-200"
+                } ${dragFrom === i ? "opacity-40" : ""}`}
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.url}
+                    alt={p.caption || `Zdjęcie ${i + 1}`}
+                    loading="lazy"
+                    draggable={false}
+                    className="h-full w-full cursor-grab object-cover transition duration-500 group-hover:scale-[1.04] active:cursor-grabbing"
+                  />
+                  <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/45 to-transparent" />
 
-              {/* Pasek akcji zawsze widoczny: na telefonie nie ma najechania myszką. */}
-              <div className="flex items-center gap-0.5 border-b border-slate-100 px-1.5 py-1">
-                <IconBtn label="Przesuń w lewo" disabled={busy || i === 0} onClick={() => move(i, i - 1)}>
-                  <ChevronIcon dir="left" />
-                </IconBtn>
-                <IconBtn
-                  label="Przesuń w prawo"
-                  disabled={busy || i === photos.length - 1}
-                  onClick={() => move(i, i + 1)}
-                >
-                  <ChevronIcon dir="right" />
-                </IconBtn>
-                {i !== 0 && (
-                  <IconBtn label="Ustaw jako główne" disabled={busy} onClick={() => move(i, 0)}>
-                    <StarIcon />
-                  </IconBtn>
-                )}
-                {i === 0 && config.stamp && p.original_url && (
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void toggleStamp(i)}
-                    className={`rounded-md px-1.5 py-1 text-[11px] font-semibold transition disabled:opacity-40 ${
-                      p.stamp ? "bg-amber-100 text-amber-800" : "text-slate-500 hover:bg-slate-100"
-                    }`}
-                  >
-                    {p.stamp ? "Zdejmij stempel" : "Stempel"}
-                  </button>
-                )}
-                <span className="ml-auto flex">
-                  <IconBtn
-                    label="Pobierz"
-                    disabled={busy}
-                    onClick={() => void downloadFile(p.url, `zdjecie-${i + 1}.jpg`).catch(() => setError("Nie udało się pobrać zdjęcia."))}
-                  >
-                    <DownloadIcon />
-                  </IconBtn>
-                  <IconBtn label="Usuń zdjęcie" disabled={busy} danger onClick={() => void remove(i)}>
-                    <TrashIcon />
-                  </IconBtn>
-                </span>
-              </div>
+                  {i === 0 ? (
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-semibold text-white shadow">
+                      <StarIcon filled /> Główne
+                    </span>
+                  ) : (
+                    <span className="absolute left-2 top-2 rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-medium tabular-nums text-white backdrop-blur">
+                      {i + 1}
+                    </span>
+                  )}
+                  {p.stamp && (
+                    <span className="absolute right-2 top-2 rounded-full bg-amber-400 px-2 py-0.5 text-[11px] font-semibold text-amber-950 shadow">
+                      stempel
+                    </span>
+                  )}
 
-              <div className="space-y-2 p-2.5">
-                <input
-                  value={p.caption ?? ""}
-                  onChange={(e) => update(i, { caption: e.target.value }, false)}
-                  onBlur={() => void persist(photosRef.current)}
-                  placeholder="Opis zdjęcia…"
-                  maxLength={200}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-900 placeholder:italic placeholder:text-slate-400 focus:border-blue-400 focus:outline-none"
-                />
-                <div className="flex flex-wrap gap-x-3 gap-y-1.5">
-                  {FLAGS.map((f) => {
-                    // Eksport i wydruki są domyślnie włączone, reszta wyłączona.
-                    const on = f.key === "export" || f.key === "print" ? p[f.key] !== false : !!p[f.key];
-                    return (
-                      <label key={f.key} className="flex cursor-pointer items-center gap-1.5 text-xs text-slate-700">
-                        <input
-                          type="checkbox"
-                          checked={on}
-                          disabled={busy}
-                          onChange={(e) => update(i, { [f.key]: e.target.checked })}
-                          className="h-3.5 w-3.5 accent-blue-600"
-                        />
-                        {f.label}
-                      </label>
-                    );
-                  })}
+                  {/* Akcje na szklanym pasku. Na dotyku widoczne zawsze, na myszy po najechaniu. */}
+                  <div className="absolute inset-x-2 bottom-2 flex items-center gap-0.5 rounded-full bg-white/15 p-0.5 backdrop-blur-md transition sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+                    <GlassBtn label="Przesuń w lewo" disabled={busy || i === 0} onClick={() => move(i, i - 1)}>
+                      <ChevronIcon dir="left" />
+                    </GlassBtn>
+                    <GlassBtn label="Przesuń w prawo" disabled={busy || i === photos.length - 1} onClick={() => move(i, i + 1)}>
+                      <ChevronIcon dir="right" />
+                    </GlassBtn>
+                    {i !== 0 && (
+                      <GlassBtn label="Ustaw jako główne" disabled={busy} onClick={() => move(i, 0)}>
+                        <StarIcon />
+                      </GlassBtn>
+                    )}
+                    <span className="ml-auto flex">
+                      <GlassBtn
+                        label="Pobierz"
+                        disabled={busy}
+                        onClick={() =>
+                          void downloadFile(p.url, `zdjecie-${i + 1}.jpg`).catch(() =>
+                            setError("Nie udało się pobrać zdjęcia."),
+                          )
+                        }
+                      >
+                        <DownloadIcon />
+                      </GlassBtn>
+                      <GlassBtn label="Usuń zdjęcie" disabled={busy} danger onClick={() => remove(i)}>
+                        <TrashIcon />
+                      </GlassBtn>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+
+                <div className="space-y-2.5 p-3">
+                  <input
+                    value={p.caption ?? ""}
+                    onChange={(e) => update(i, { caption: e.target.value }, false)}
+                    onBlur={() => void persist(photosRef.current)}
+                    placeholder="Dodaj opis, np. salon z aneksem"
+                    maxLength={200}
+                    className="w-full border-0 border-b border-transparent bg-transparent px-0 py-1 text-sm text-slate-900 placeholder:text-slate-400 hover:border-slate-200 focus:border-emerald-400 focus:outline-none focus:ring-0"
+                  />
+                  <div className="flex flex-wrap gap-1.5">
+                    {FLAGS.map((f) => {
+                      // Eksport i wydruki są domyślnie włączone, reszta wyłączona.
+                      const on = f.key === "export" || f.key === "print" ? p[f.key] !== false : !!p[f.key];
+                      return (
+                        <button
+                          key={f.key}
+                          type="button"
+                          title={f.hint}
+                          aria-pressed={on}
+                          disabled={busy}
+                          onClick={() => update(i, { [f.key]: !on })}
+                          className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition disabled:opacity-50 ${
+                            on
+                              ? "bg-emerald-100 text-emerald-800 ring-1 ring-inset ring-emerald-300"
+                              : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                          }`}
+                        >
+                          {f.label}
+                        </button>
+                      );
+                    })}
+                    {i === 0 && config.stamp && p.original_url && (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void toggleStamp(i)}
+                        aria-pressed={!!p.stamp}
+                        className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition disabled:opacity-50 ${
+                          p.stamp
+                            ? "bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-300"
+                            : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                        }`}
+                      >
+                        {p.stamp ? "Stempel ✓" : "+ Stempel"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </motion.li>
+            ))}
+
+            {pending.map((u) => (
+              <motion.li
+                key={u.id}
+                layout={!reduceMotion}
+                initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={spring}
+                className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
+                  {u.preview && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={u.preview} alt="" className="h-full w-full scale-105 object-cover blur-[2px] brightness-75" />
+                  )}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                    <ProgressRing value={u.progress} error={u.stage === "blad"} waiting={u.stage === "kolejka"} />
+                    <span className="rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur">
+                      {STAGE_LABEL[u.stage]}
+                    </span>
+                  </div>
+                </div>
+                <p className="truncate px-3 py-2.5 text-xs text-slate-500">{u.name}</p>
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </motion.ul>
       )}
 
       {photos.length > 1 && (
         <p className="text-xs text-slate-400">
-          Pierwsze zdjęcie jest główne. Kolejność zmienisz strzałkami albo przeciągając zdjęcie.
+          Pierwsze zdjęcie jest główne. Kolejność zmienisz strzałkami, gwiazdką albo przeciągając zdjęcie.
         </p>
       )}
     </div>
   );
 }
 
-function IconBtn({
+/** Okrągły licznik postępu jednego zdjęcia. */
+function ProgressRing({ value, error, waiting }: { value: number; error: boolean; waiting: boolean }) {
+  const r = 18;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="relative flex h-12 w-12 items-center justify-center">
+      <svg className={`absolute inset-0 -rotate-90 ${waiting ? "animate-spin [animation-duration:2.4s]" : ""}`} viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r={r} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="4" />
+        <circle
+          cx="22"
+          cy="22"
+          r={r}
+          fill="none"
+          stroke={error ? "#f87171" : "#34d399"}
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={waiting ? c * 0.75 : c * (1 - Math.min(1, value))}
+          style={{ transition: "stroke-dashoffset 250ms ease-out" }}
+        />
+      </svg>
+      <span className="text-[11px] font-semibold tabular-nums text-white">
+        {error ? "!" : waiting ? "" : `${Math.round(value * 100)}%`}
+      </span>
+    </div>
+  );
+}
+
+function GlassBtn({
   label,
   onClick,
   disabled,
@@ -566,8 +712,8 @@ function IconBtn({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className={`flex h-7 w-7 items-center justify-center rounded-md transition disabled:opacity-30 ${
-        danger ? "text-slate-400 hover:bg-red-50 hover:text-red-600" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+      className={`flex h-7 w-7 items-center justify-center rounded-full text-white transition disabled:opacity-30 ${
+        danger ? "hover:bg-red-500/80" : "hover:bg-white/25"
       }`}
     >
       {children}
@@ -575,20 +721,55 @@ function IconBtn({
   );
 }
 
-function Spinner() {
+function GhostBtn({
+  onClick,
+  disabled,
+  subtle,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  subtle?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <svg className="h-6 w-6 animate-spin text-blue-500" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="3" />
-      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-    </svg>
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium transition disabled:opacity-50 ${
+        subtle ? "text-slate-500 hover:text-slate-900" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
-function CloudIcon() {
+/** Stos zdjęć z lekkim „oddechem" - rozchyla się, gdy agent przeciąga pliki. */
+function PhotoStackIcon({ active }: { active: boolean }) {
   return (
-    <svg className="h-9 w-9 text-blue-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M6.5 19a4.5 4.5 0 0 1-.42-8.98A6 6 0 0 1 17.66 8.5 5 5 0 0 1 17.5 19h-11Zm5.5-9.4-3.7 3.7 1.4 1.4 1.3-1.29V17h2v-3.59l1.3 1.3 1.4-1.42L12 9.6Z" />
-    </svg>
+    <span className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center" aria-hidden="true">
+      <motion.span
+        className="absolute h-11 w-11 rounded-xl bg-teal-200"
+        animate={{ rotate: active ? -16 : -9, x: active ? -5 : -2 }}
+        transition={{ type: "spring", stiffness: 300, damping: 18 }}
+      />
+      <motion.span
+        className="absolute h-11 w-11 rounded-xl bg-emerald-300"
+        animate={{ rotate: active ? 12 : 6, x: active ? 5 : 2 }}
+        transition={{ type: "spring", stiffness: 300, damping: 18 }}
+      />
+      <motion.span
+        className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
+        animate={{ y: active ? -3 : 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 18 }}
+      >
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V6m0 0-4 4m4-4 4 4M5 19h14" />
+        </svg>
+      </motion.span>
+    </span>
   );
 }
 
@@ -608,9 +789,9 @@ function TrashIcon() {
   );
 }
 
-function StarIcon() {
+function StarIcon({ filled = false }: { filled?: boolean }) {
   return (
-    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+    <svg className="h-3.5 w-3.5" fill={filled ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7L12 3Z" />
     </svg>
   );

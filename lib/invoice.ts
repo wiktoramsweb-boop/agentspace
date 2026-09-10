@@ -9,6 +9,12 @@ export type Seller = {
   nip: string;
   bank: string;
   account: string;
+  /**
+   * Czy faktura nosi markę Spectra (logo i nazwę w nagłówku). Tylko s.c.
+   * działa pod tą marką; faktury z jednoosobowych działalności wystawiamy
+   * bez logo, żeby nie sugerowały, że sprzedawcą jest spółka.
+   */
+  brand: boolean;
 };
 
 export const SELLERS: Seller[] = [
@@ -21,6 +27,7 @@ export const SELLERS: Seller[] = [
     nip: "6772516327",
     bank: "mBank",
     account: "61 1140 2004 0000 3802 8526 2390",
+    brand: true,
   },
   {
     key: "slaweta",
@@ -31,6 +38,7 @@ export const SELLERS: Seller[] = [
     nip: "6832140513",
     bank: "mBank",
     account: "21 1140 2004 0000 3202 8525 9912",
+    brand: false,
   },
   {
     key: "szostek",
@@ -41,6 +49,7 @@ export const SELLERS: Seller[] = [
     nip: "9442290347",
     bank: "mBank",
     account: "54 1140 2004 0000 3502 8526 0044",
+    brand: false,
   },
 ];
 

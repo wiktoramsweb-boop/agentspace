@@ -40,12 +40,17 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
     <div className="invoice-sheet mx-auto w-full max-w-[820px] bg-white p-8 text-[13px] leading-relaxed text-zinc-900 shadow-xl md:p-10">
       {/* Nagłówek */}
       <div className="flex items-start justify-between gap-6 border-b border-zinc-200 pb-5">
-        <div className="flex items-center gap-3">
-          <Logo />
-          <div>
-            <p className="text-sm font-semibold text-zinc-900">Agencja Nieruchomości Spectra</p>
+        {seller.brand ? (
+          <div className="flex items-center gap-3">
+            <Logo />
+            <div>
+              <p className="text-sm font-semibold text-zinc-900">Agencja Nieruchomości Spectra</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          // Jednoosobowa działalność: bez logo i marki Spectra, sama nazwa sprzedawcy.
+          <p className="max-w-[60%] text-sm font-semibold text-zinc-900">{seller.name}</p>
+        )}
         <div className="text-right">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">FAKTURA</h1>
           <p className="text-sm font-medium text-slate-400">Nr {data.number || "-"}</p>

@@ -27,12 +27,16 @@ export function SettingsNav({ isOwner }: { isOwner: boolean }) {
         key={item.href}
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm transition lg:border-l-2 lg:rounded-l-none ${
+        className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm transition ${
           active
-            ? "bg-blue-50 font-medium text-blue-700 lg:border-blue-600"
-            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 lg:border-transparent"
+            ? "btn-ink font-medium shadow-sm"
+            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
         }`}
       >
+        <span
+          aria-hidden="true"
+          className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${active ? "bg-emerald-400" : "bg-slate-300"}`}
+        />
         {item.label}
       </Link>
     );

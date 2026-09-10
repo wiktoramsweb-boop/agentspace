@@ -6,6 +6,7 @@ import { createClient, lookupPhoneOwner } from "./actions";
 import { CLIENT_STATUSES, CLIENT_SOURCES, PHONE_LABELS, type ClientType } from "@/lib/types";
 import { AddressInput } from "../components/address-input";
 import { Modal } from "../components/modal";
+import { WizardNav, WizardSteps } from "../components/wizard-steps";
 import { CLIENT_TYPE_ICONS } from "../components/icons";
 
 type ExistingPhone = { phone: string | null; owner: string | null };
@@ -165,22 +166,7 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
       >
         <input type="hidden" name="type" value={type} />
 
-        <div className="flex flex-shrink-0 gap-1 overflow-x-auto border-b border-slate-200 px-4">
-          {STEPS.map((s, i) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setStep(i)}
-              className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition ${
-                step === i
-                  ? "border-emerald-500 text-emerald-600"
-                  : "border-transparent text-slate-500 hover:text-slate-900"
-              }`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+        <WizardSteps steps={STEPS} step={step} onStep={setStep} />
         <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
           {/* KROK 1 - typ klienta (kafelki z ikonami) */}
           <div hidden={step !== 0}>
@@ -379,55 +365,20 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
           </p>
         )}
 
-        <div className="flex flex-shrink-0 flex-wrap items-center gap-3 border-t border-slate-200 px-6 py-4">
-          <div className="flex items-center gap-1.5">
-            {STEPS.map((s, i) => (
-              <span
-                key={s}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === step ? "w-6 bg-emerald-500" : i < step ? "w-1.5 bg-emerald-400" : "w-1.5 bg-slate-300"
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-xs text-slate-500">
-            Krok {step + 1} z {STEPS.length}
-          </span>
-
-          <div className="ml-auto flex items-center gap-2">
-            <button
-              type="button"
-              onClick={close}
-              className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-100"
-            >
-              Anuluj
-            </button>
-            {step > 0 && (
-              <button
-                type="button"
-                onClick={() => setStep((s) => s - 1)}
-                className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-100"
-              >
-                Poprzedni
-              </button>
-            )}
-            {step < STEPS.length - 1 && (
-              <button
-                type="button"
-                onClick={() => setStep((s) => s + 1)}
-                className="rounded-xl bg-blue-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-400"
-              >
-                Dalej
-              </button>
-            )}
-            <SubmitButton
-              pendingText="Dodaję…"
-              className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-400"
-            >
-              Dodaj {meta.addLabel}
-            </SubmitButton>
-          </div>
-        </div>
+        <WizardNav
+          step={step}
+          total={STEPS.length}
+          onBack={() => setStep((s) => s - 1)}
+          onNext={() => setStep((s) => s + 1)}
+          onCancel={close}
+        >
+          <SubmitButton
+            pendingText="Dodaję…"
+            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-emerald-500/25 hover:bg-emerald-400"
+          >
+            Dodaj {meta.addLabel}
+          </SubmitButton>
+        </WizardNav>
       </form>
     </Modal>
   );

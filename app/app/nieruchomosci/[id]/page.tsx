@@ -24,7 +24,7 @@ import {
   RemoveInterestButton,
   DeletePropertyButton,
 } from "./property-controls";
-import { EditPropertyForm } from "./edit-property-form";
+import { PropertyWizard } from "../property-wizard";
 import { ProcessBar, OwnerCard } from "./property-extras";
 import { MatchingSearches } from "./matching-searches";
 import { getActiveSearches } from "@/lib/data-searches";
@@ -96,7 +96,12 @@ export default async function PropertyDetailPage({ params }: Props) {
             <p className="text-slate-500">{property.address ?? property.city}</p>
           )}
         </div>
-        <EditPropertyForm property={property} clients={allClients} />
+        <PropertyWizard
+          property={property}
+          clients={allClients}
+          photoConfig={photoConfigFrom(settings)}
+          canEditSettings={user.role === "owner"}
+        />
       </div>
 
       <div className="mb-6">

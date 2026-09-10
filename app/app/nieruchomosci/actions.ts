@@ -177,20 +177,67 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
   redirect(`/app/nieruchomosci/${data.id}`);
 }
 
-export async function updateProperty(id: string, formData: FormData): Promise<void> {
+/**
+ * Edycja oferty z kreatora: wszystkie pola, udogodnienia, publikacja i zdjęcia.
+ * Pliki zdjęć usunięte w edycji kasujemy z magazynu dopiero po udanym zapisie.
+ */
+export async function updateProperty(id: string, formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
+  if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
   const fields = propertyFromForm(formData);
-  if (!fields.title) return;
+  if (!fields.title) fields.title = buildTitle(fields);
+  if (!fields.title) {
+    return { ok: false, error: "Uzupełnij nazwę oferty albo typ, miasto i metraż." };
+  }
 
   const admin = createSupabaseAdmin();
-  await admin
+  const { data: before } = await admin
     .from("properties")
-    .update({ ...fields, updated_at: new Date().toISOString() })
+    .select("photos, export_to_web, web_published_at")
     .eq("id", id)
-    .eq("agency_id", user.agency_id);
+    .eq("agency_id", user.agency_id)
+    .maybeSingle();
+  if (!before) return { ok: false, error: "Nie znaleziono oferty." };
+
+  let photos: ReturnType<typeof sanitizePhotos> = [];
+  try {
+    photos = sanitizePhotos(JSON.parse(String(formData.get("photos") ?? "[]")), user.agency_id);
+  } catch {
+    photos = (before.photos ?? []) as ReturnType<typeof sanitizePhotos>;
+  }
+
+  const extra = extraFromForm(formData);
+  const now = new Date().toISOString();
+  const full = {
+    ...fields,
+    ...extra,
+    photos,
+    // Data publikacji na stronie ustawiana przy pierwszym włączeniu eksportu.
+    web_published_at: extra.export_to_web ? before.web_published_at ?? now : null,
+    updated_at: now,
+  };
+
+  let { error } = await admin.from("properties").update(full).eq("id", id).eq("agency_id", user.agency_id);
+  if (error) {
+    // Brak kolumn z v17: zapisujemy przynajmniej rdzeń oferty.
+    const retry = await admin
+      .from("properties")
+      .update({ ...fields, updated_at: now })
+      .eq("id", id)
+      .eq("agency_id", user.agency_id);
+    error = retry.error;
+    if (error) return { ok: false, error: `Nie udało się zapisać zmian: ${error.message}` };
+  } else {
+    const keep = new Set(photos.flatMap((p) => [p.path, p.original_path]).filter(Boolean));
+    const dropped = ((before.photos ?? []) as { path?: string; original_path?: string }[])
+      .flatMap((p) => [p.path, p.original_path])
+      .filter((p): p is string => !!p && !keep.has(p) && p.startsWith(`${user.agency_id}/`));
+    await removeFiles(PHOTO_BUCKET, [...new Set(dropped)]);
+  }
 
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");
+  return { ok: true };
 }
 
 export async function setPropertyStatus(

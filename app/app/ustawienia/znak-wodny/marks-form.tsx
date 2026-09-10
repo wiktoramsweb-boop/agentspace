@@ -55,7 +55,7 @@ export function MarksForm({
         <section className="rounded-2xl border border-slate-200 bg-white">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
                 <DropIcon />
               </span>
               <h2 className="text-base font-semibold text-slate-900">Znak wodny</h2>
@@ -65,7 +65,7 @@ export function MarksForm({
                 type="checkbox"
                 checked={wmEnabled}
                 onChange={(e) => setWmEnabled(e.target.checked)}
-                className="h-4 w-4 accent-blue-600"
+                className="h-4 w-4 accent-emerald-500"
               />
               Nakładaj na nowe zdjęcia
             </label>
@@ -208,7 +208,7 @@ function Preview({
           <span className="flex gap-1.5">
             {Array.from({ length: count }, (_, i) => (
               <button key={i} type="button" aria-label={`Zdjęcie ${i + 1}`} onClick={() => onIndex(i)}
-                className={`h-2 w-2 rounded-full ${i === index ? "bg-blue-600" : "bg-slate-300"}`} />
+                className={`h-2 w-2 rounded-full ${i === index ? "bg-emerald-500" : "bg-slate-300"}`} />
             ))}
           </span>
           <button type="button" aria-label="Następne zdjęcie" onClick={() => onIndex((index + 1) % count)}
@@ -254,7 +254,7 @@ function Slider({
         max={max}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full accent-blue-600"
+        className="w-full accent-emerald-500"
       />
     </label>
   );
