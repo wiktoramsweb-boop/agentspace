@@ -7,7 +7,9 @@ export async function getInvoices(agencyId: string): Promise<Invoice[]> {
     .from("invoices")
     .select("*")
     .eq("agency_id", agencyId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    // Jawny limit: Supabase i tak ucina listę po cichu.
+    .limit(1000);
   return (data ?? []) as Invoice[];
 }
 

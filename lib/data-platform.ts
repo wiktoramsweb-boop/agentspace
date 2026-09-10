@@ -1,4 +1,11 @@
 import { createSupabaseAdmin } from "./supabase/admin";
+
+/**
+ * Górny limit list. Bez niego Supabase i tak ucina wynik (domyślnie 1000),
+ * tylko po cichu - lepiej mieć to jawnie w kodzie. Przy większych bazach
+ * trzeba tu wejść i dołożyć stronicowanie.
+ */
+const LIST_LIMIT = 1000;
 import type {
   Task,
   Client,
@@ -107,7 +114,8 @@ export async function getClients(agentId: string): Promise<Client[]> {
     .from("clients")
     .select("*")
     .eq("agent_id", agentId)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(LIST_LIMIT);
   return (data ?? []) as Client[];
 }
 
@@ -121,7 +129,7 @@ export async function getAgencyClients(agencyId: string): Promise<ClientWithOwne
       .from("clients")
       .select("*")
       .eq("agency_id", agencyId)
-      .order("updated_at", { ascending: false }),
+      .order("updated_at", { ascending: false }).limit(LIST_LIMIT),
     admin.from("profiles").select("id, full_name").eq("agency_id", agencyId),
   ]);
   const nameById = new Map(
@@ -275,7 +283,8 @@ export async function getProperties(agentId: string): Promise<Property[]> {
     .from("properties")
     .select("*")
     .eq("agent_id", agentId)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(LIST_LIMIT);
   return (data ?? []) as Property[];
 }
 
@@ -291,7 +300,7 @@ export type PropertyWithOwner = Property & { opiekunName: string | null };
 export async function getAgencyProperties(agencyId: string): Promise<PropertyWithOwner[]> {
   const admin = createSupabaseAdmin();
   const [propsRes, profilesRes] = await Promise.all([
-    admin.from("properties").select("*").eq("agency_id", agencyId).order("updated_at", { ascending: false }),
+    admin.from("properties").select("*").eq("agency_id", agencyId).order("updated_at", { ascending: false }).limit(LIST_LIMIT),
     admin.from("profiles").select("id, full_name").eq("agency_id", agencyId),
   ]);
   const nameById = new Map(
@@ -320,7 +329,8 @@ export async function getPropertiesOwnedByClient(clientId: string): Promise<Prop
     .from("properties")
     .select("*")
     .eq("owner_client_id", clientId)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(LIST_LIMIT);
   return (data ?? []) as Property[];
 }
 
@@ -354,7 +364,8 @@ export async function getClientsLite(
     .from("clients")
     .select("id, name, type")
     .eq("agent_id", agentId)
-    .order("name", { ascending: true });
+    .order("name", { ascending: true })
+    .limit(LIST_LIMIT);
   return (data ?? []) as { id: string; name: string; type: string }[];
 }
 
@@ -367,7 +378,8 @@ export async function getAgencyClientsLite(
     .from("clients")
     .select("id, name, type, phone")
     .eq("agency_id", agencyId)
-    .order("name", { ascending: true });
+    .order("name", { ascending: true })
+    .limit(LIST_LIMIT);
   return (data ?? []) as { id: string; name: string; type: string; phone: string | null }[];
 }
 
@@ -380,7 +392,8 @@ export async function getPropertiesLite(
     .from("properties")
     .select("id, title, price_pln")
     .eq("agent_id", agentId)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(LIST_LIMIT);
   return (data ?? []) as { id: string; title: string; price_pln: number | null }[];
 }
 
