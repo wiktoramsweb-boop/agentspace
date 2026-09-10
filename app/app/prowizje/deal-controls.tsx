@@ -31,6 +31,7 @@ export function NewDealButton({
   defaultSplit?: number;
 }) {
   const [open, setOpen] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [propertyId, setPropertyId] = useState("");
   const [tx, setTx] = useState("");
   const [split, setSplit] = useState(String(defaultSplit));
@@ -90,8 +91,10 @@ export function NewDealButton({
     <Modal title="Nowa transakcja" onClose={() => setOpen(false)}>
       <form
         action={async (fd) => {
-          await createDeal(fd);
-          setOpen(false);
+          setSaveError(null);
+          const res = await createDeal(fd);
+          if (res.ok) setOpen(false);
+          else setSaveError(res.error);
         }}
         className="flex min-h-0 flex-1 flex-col"
       >
@@ -220,6 +223,12 @@ export function NewDealButton({
             />
           </Labeled>
         </div>
+
+        {saveError && (
+          <p className="mx-6 mb-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {saveError}
+          </p>
+        )}
 
         <div className="flex flex-shrink-0 gap-3 border-t border-slate-200 px-6 py-4">
           <SubmitButton

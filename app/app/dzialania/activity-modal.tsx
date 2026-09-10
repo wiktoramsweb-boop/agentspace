@@ -129,6 +129,7 @@ function ActivityForm({
   const [clientId, setClientId] = useState(presetClientId ?? "");
   const [contactName, setContactName] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Wybór klienta z bazy uzupełnia dane kontaktowe - agent nie przepisuje ręcznie.
   function pickClient(id: string) {
@@ -147,10 +148,12 @@ function ActivityForm({
     <Modal title={`Nowe: ${meta.label.toLowerCase()}`} onClose={onClose} maxWidth="max-w-3xl">
       <form
         action={async (fd) => {
-          // Zamykamy dopiero po zapisie - inaczej agent nie wie, czy się udało,
-          // i zdarza się zapis drugi raz.
-          await createActivity(fd);
-          onClose();
+          // Zamykamy dopiero po udanym zapisie. Inaczej agent nie wie, czy się
+          // udało: zamknięty modal przy błędzie wyglądał jak zapisane działanie.
+          setSaveError(null);
+          const res = await createActivity(fd);
+          if (res.ok) onClose();
+          else setSaveError(res.error);
         }}
         className="flex min-h-0 flex-1 flex-col"
       >
@@ -388,6 +391,12 @@ function ActivityForm({
             </div>
           </Section>
         </div>
+
+        {saveError && (
+          <p className="mx-6 mb-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {saveError}
+          </p>
+        )}
 
         <div className="flex flex-shrink-0 flex-wrap items-center gap-3 border-t border-slate-200 px-6 py-4">
           <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">

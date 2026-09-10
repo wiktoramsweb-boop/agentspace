@@ -96,12 +96,17 @@ function buildSlug(f: ReturnType<typeof propertyFromForm>, offerNo: string | nul
     .slice(0, 120);
 }
 
-export async function createProperty(formData: FormData): Promise<void> {
+/** Wynik zapisu. Kreator zamyka się tylko przy powodzeniu. */
+export type SaveResult = { ok: true } | { ok: false; error: string };
+
+export async function createProperty(formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
   const fields = propertyFromForm(formData);
   // Kreator nie wymaga nazwy: jeśli agent jej nie wpisał, układamy ją z danych.
   if (!fields.title) fields.title = buildTitle(fields);
-  if (!fields.title) return;
+  if (!fields.title) {
+    return { ok: false, error: "Uzupełnij nazwę oferty albo typ, miasto i metraż." };
+  }
 
   const admin = createSupabaseAdmin();
   const extra = extraFromForm(formData);
@@ -142,8 +147,15 @@ export async function createProperty(formData: FormData): Promise<void> {
     error = retry.error;
   }
 
+  if (!data) {
+    return {
+      ok: false,
+      error: `Nie udało się zapisać oferty: ${error?.message ?? "nieznany błąd"}`,
+    };
+  }
+
   revalidatePath("/app/nieruchomosci");
-  if (data) redirect(`/app/nieruchomosci/${data.id}`);
+  redirect(`/app/nieruchomosci/${data.id}`);
 }
 
 export async function updateProperty(id: string, formData: FormData): Promise<void> {

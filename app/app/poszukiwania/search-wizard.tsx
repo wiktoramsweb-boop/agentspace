@@ -28,6 +28,7 @@ export function SearchWizard({
 }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [dealKind, setDealKind] = useState<PropertyDealKind>("sprzedaz");
   const [types, setTypes] = useState<PropertyType[]>(["mieszkanie"]);
   const [mustHave, setMustHave] = useState<Record<string, boolean>>({});
@@ -64,7 +65,14 @@ export function SearchWizard({
 
   return (
     <Modal title="Dodawanie poszukiwania" onClose={close} maxWidth="max-w-4xl">
-      <form action={createSearch} className="flex min-h-0 flex-1 flex-col">
+      <form
+        action={async (fd) => {
+          setSaveError(null);
+          const res = await createSearch(fd);
+          if (!res.ok) setSaveError(res.error);
+        }}
+        className="flex min-h-0 flex-1 flex-col"
+      >
         <input type="hidden" name="deal_kind" value={dealKind} />
         {types.map((t) => (
           <input key={t} type="hidden" name="property_types" value={t} />
@@ -247,6 +255,12 @@ export function SearchWizard({
             </div>
           </div>
         </div>
+
+        {saveError && (
+          <p className="mx-6 mb-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {saveError}
+          </p>
+        )}
 
         <div className="flex flex-shrink-0 flex-wrap items-center gap-3 border-t border-slate-200 px-6 py-4">
           <div className="flex items-center gap-1.5">

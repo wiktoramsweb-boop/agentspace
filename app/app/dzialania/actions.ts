@@ -20,10 +20,13 @@ function whenFrom(fd: FormData, dateKey: string, timeKey: string): string | null
   return warsawToIso(String(fd.get(dateKey) ?? ""), String(fd.get(timeKey) ?? ""));
 }
 
-export async function createActivity(formData: FormData): Promise<void> {
+/** Wynik zapisu. Modal zamyka się tylko przy ok, inaczej pokazuje powód. */
+export type SaveResult = { ok: true } | { ok: false; error: string };
+
+export async function createActivity(formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
   const subject = String(formData.get("subject") ?? "").trim();
-  if (!subject) return;
+  if (!subject) return { ok: false, error: "Podaj temat działania." };
 
   // Przypisani agenci: gdy nikogo nie wskazano, działanie jest moje.
   const assignees = formData.getAll("assignee_ids").map(String).filter(Boolean);
@@ -78,7 +81,7 @@ export async function createActivity(formData: FormData): Promise<void> {
     }
   }
 
-  await admin.from("activities").insert({
+  const { error: insertError } = await admin.from("activities").insert({
     agency_id: user.agency_id,
     created_by: user.id,
     kind: txt(formData, "kind") ?? "polaczenie",
@@ -99,6 +102,15 @@ export async function createActivity(formData: FormData): Promise<void> {
     include_in_report: formData.get("include_in_report") === "1",
   });
 
+  // Bez tego nieudany zapis wyglądał jak udany: modal się zamykał, a działania
+  // nie było. Agent musi zobaczyć powód i mieć wpisane dane nadal w formularzu.
+  if (insertError) {
+    return {
+      ok: false,
+      error: `Nie udało się zapisać działania: ${insertError.message}`,
+    };
+  }
+
   // Wykonane działanie = był kontakt. Aktualizujemy datę u klienta, żeby
   // przypomnienia „dawno nie dzwoniłeś" liczyły się od realnej rozmowy.
   if (linkedClientId && status === "wykonane") {
@@ -112,6 +124,7 @@ export async function createActivity(formData: FormData): Promise<void> {
   revalidatePath("/app/dzialania");
   revalidatePath("/app/klienci");
   revalidatePath("/app");
+  return { ok: true };
 }
 
 /**

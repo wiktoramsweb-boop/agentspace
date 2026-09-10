@@ -110,6 +110,7 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
   const [extraPhones, setExtraPhones] = useState<number[]>([]);
   const [extraEmails, setExtraEmails] = useState<number[]>([]);
   const [type, setType] = useState<ClientType>("sprzedajacy");
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [step, setStep] = useState(0);
 
   const meta = TYPES.find((t) => t.value === type) ?? TYPES[0];
@@ -134,7 +135,15 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
 
   return (
     <Modal title="Dodawanie kontaktu" onClose={close} maxWidth="max-w-3xl">
-      <form action={createClient} className="flex min-h-0 flex-1 flex-col">
+      <form
+        action={async (fd) => {
+          // Przy błędzie zostawiamy formularz otwarty z danymi i pokazujemy powód.
+          setSaveError(null);
+          const res = await createClient(fd);
+          if (!res.ok) setSaveError(res.error);
+        }}
+        className="flex min-h-0 flex-1 flex-col"
+      >
         <input type="hidden" name="type" value={type} />
 
         <div className="flex flex-shrink-0 gap-1 overflow-x-auto border-b border-slate-200 px-4">
@@ -344,6 +353,12 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
           <Field label="Następny kontakt (przypomnienie)" name="next_contact_at" type="date" />
           </div>
         </div>
+
+        {saveError && (
+          <p className="mx-6 mb-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {saveError}
+          </p>
+        )}
 
         <div className="flex flex-shrink-0 flex-wrap items-center gap-3 border-t border-slate-200 px-6 py-4">
           <div className="flex items-center gap-1.5">

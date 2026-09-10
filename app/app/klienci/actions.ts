@@ -20,7 +20,10 @@ function listFrom(formData: FormData, key: string): { value: string; label?: str
     .filter((x) => x.value);
 }
 
-export async function createClient(formData: FormData): Promise<void> {
+/** Wynik zapisu. Formularz zamyka się tylko przy powodzeniu. */
+export type SaveResult = { ok: true } | { ok: false; error: string };
+
+export async function createClient(formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
   const txt = (k: string) => String(formData.get(k) ?? "").trim() || null;
 
@@ -28,7 +31,7 @@ export async function createClient(formData: FormData): Promise<void> {
   const first = txt("first_name");
   const last = txt("last_name");
   const name = [first, last].filter(Boolean).join(" ") || String(formData.get("name") ?? "").trim();
-  if (!name) return;
+  if (!name) return { ok: false, error: "Podaj imię i nazwisko albo nazwę kontaktu." };
 
   const admin = createSupabaseAdmin();
   const budget = parseInt(String(formData.get("budget") ?? "").replace(/\s/g, ""), 10);
@@ -78,13 +81,24 @@ export async function createClient(formData: FormData): Promise<void> {
     .select("id")
     .single();
 
+  let lastError = error;
   if (error) {
+    // Brak kolumn z migracji v20: zapisujemy sam rdzeń kontaktu, żeby agent
+    // nie stracił wpisanych danych.
     const retry = await admin.from("clients").insert(core).select("id").single();
     data = retry.data;
+    lastError = retry.error;
+  }
+
+  if (!data) {
+    return {
+      ok: false,
+      error: `Nie udało się zapisać kontaktu: ${lastError?.message ?? "nieznany błąd"}`,
+    };
   }
 
   revalidatePath("/app/klienci");
-  if (data) redirect(`/app/klienci/${data.id}`);
+  redirect(`/app/klienci/${data.id}`);
 }
 
 /** Ustawia (lub czyści) datę następnego zaplanowanego kontaktu. */

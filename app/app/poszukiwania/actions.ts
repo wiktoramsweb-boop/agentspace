@@ -15,7 +15,10 @@ function int(v: FormDataEntryValue | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-export async function createSearch(formData: FormData): Promise<void> {
+/** Wynik zapisu. Formularz zamyka się tylko przy powodzeniu. */
+export type SaveResult = { ok: true } | { ok: false; error: string };
+
+export async function createSearch(formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
   const txt = (k: string) => String(formData.get(k) ?? "").trim() || null;
@@ -67,10 +70,16 @@ export async function createSearch(formData: FormData): Promise<void> {
     notes: txt("notes"),
   };
 
-  const { data } = await admin.from("searches").insert(row).select("id").single();
+  const { data, error } = await admin.from("searches").insert(row).select("id").single();
+  if (!data) {
+    return {
+      ok: false,
+      error: `Nie udało się zapisać poszukiwania: ${error?.message ?? "nieznany błąd"}`,
+    };
+  }
 
   revalidatePath("/app/poszukiwania");
-  if (data) redirect(`/app/poszukiwania/${data.id}`);
+  redirect(`/app/poszukiwania/${data.id}`);
 }
 
 export async function setSearchStatus(id: string, status: string): Promise<void> {

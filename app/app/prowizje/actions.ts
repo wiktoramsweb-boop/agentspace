@@ -10,10 +10,13 @@ function num(v: FormDataEntryValue | null): number {
   return Number.isFinite(n) ? Math.max(0, n) : 0;
 }
 
-export async function createDeal(formData: FormData): Promise<void> {
+/** Wynik zapisu. Modal zamyka się tylko przy ok, inaczej pokazuje powód. */
+export type SaveResult = { ok: true } | { ok: false; error: string };
+
+export async function createDeal(formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
   const title = String(formData.get("title") ?? "").trim();
-  if (!title) return;
+  if (!title) return { ok: false, error: "Podaj opis transakcji." };
 
   // Prowizje od stron (już przeliczone na zł po stronie kalkulatora)
   const seller = num(formData.get("commission_seller"));
@@ -32,7 +35,7 @@ export async function createDeal(formData: FormData): Promise<void> {
   const agentEarnings = Math.round((netto * split) / 100) + extras;
 
   const admin = createSupabaseAdmin();
-  await admin.from("deals").insert({
+  const { error: insertError } = await admin.from("deals").insert({
     agent_id: user.id,
     agency_id: user.agency_id,
     title,
@@ -52,8 +55,14 @@ export async function createDeal(formData: FormData): Promise<void> {
     expected_close: String(formData.get("expectedClose") ?? "") || null,
   });
 
+  // Bez tego nieudany zapis zamykał modal tak samo jak udany.
+  if (insertError) {
+    return { ok: false, error: `Nie udało się zapisać transakcji: ${insertError.message}` };
+  }
+
   revalidatePath("/app/prowizje");
   revalidatePath("/app");
+  return { ok: true };
 }
 
 export async function setDealStatus(dealId: string, status: DealStatus): Promise<void> {

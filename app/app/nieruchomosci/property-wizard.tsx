@@ -39,6 +39,7 @@ export function PropertyWizard({ clients }: { clients: ClientLite[] }) {
   const [type, setType] = useState<PropertyType>("mieszkanie");
   const [features, setFeatures] = useState<Record<string, boolean>>({});
   const [exportWeb, setExportWeb] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const isRent = dealKind === "wynajem";
   const isLand = type === "dzialka";
@@ -61,7 +62,14 @@ export function PropertyWizard({ clients }: { clients: ClientLite[] }) {
 
   return (
     <Modal title="Dodawanie nieruchomości" onClose={close} maxWidth="max-w-4xl">
-      <form action={createProperty} className="flex min-h-0 flex-1 flex-col">
+      <form
+        action={async (fd) => {
+          setSaveError(null);
+          const res = await createProperty(fd);
+          if (!res.ok) setSaveError(res.error);
+        }}
+        className="flex min-h-0 flex-1 flex-col"
+      >
         {/* Zakładki kroków (klikalne, jak w ASARI) */}
         <div className="flex flex-shrink-0 gap-1 overflow-x-auto border-b border-slate-200 px-4">
           {STEPS.map((s, i) => (
@@ -287,6 +295,12 @@ export function PropertyWizard({ clients }: { clients: ClientLite[] }) {
         </div>
 
         {/* Stopka: postęp + akcje (jak w ASARI) */}
+        {saveError && (
+          <p className="mx-6 mb-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {saveError}
+          </p>
+        )}
+
         <div className="flex flex-shrink-0 flex-wrap items-center gap-3 border-t border-slate-200 px-6 py-4">
           <div className="flex items-center gap-1.5">
             {STEPS.map((s, i) => (
