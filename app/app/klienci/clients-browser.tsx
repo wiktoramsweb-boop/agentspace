@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { BellIcon } from "../components/icons";
-import { useMemo, useState } from "react";
+import { PAGE_SIZE, Pagination } from "../components/pagination";
+import { todayPL } from "@/lib/datetime";
+import { useEffect, useMemo, useState } from "react";
 import { CLIENT_STATUSES, CLIENT_TYPES, CLIENT_TYPE_LABELS, type ClientStatus, type ClientType } from "@/lib/types";
 import type { ClientWithOwner } from "@/lib/data-platform";
 import { formatPln, daysAgo, formatPhone } from "@/lib/format";
@@ -45,8 +47,9 @@ export function ClientsBrowser({
   const [scope, setScope] = useState<"all" | "mine">("all");
   const [statusFilter, setStatusFilter] = useState<ClientStatus | "">("");
   const [typeFilter, setTypeFilter] = useState<ClientType | "">("");
+  const [page, setPage] = useState(0);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayPL();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -64,11 +67,21 @@ export function ClientsBrowser({
     });
   }, [clients, query, scope, statusFilter, typeFilter, currentUserId]);
 
+  // Zmiana filtra ma wracać na pierwszą stronę, inaczej po zawężeniu listy
+  // agent trafiał na pustą stronę 4.
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const visible = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
   const typeCounts = useMemo(() => {
     const m: Record<string, number> = {};
     for (const c of clients) m[c.type] = (m[c.type] ?? 0) + 1;
     return m;
   }, [clients]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [query, scope, statusFilter, typeFilter]);
 
   const mineCount = clients.filter((c) => c.agent_id === currentUserId).length;
 
@@ -142,7 +155,7 @@ export function ClientsBrowser({
         </div>
       ) : (
         <div className="space-y-2.5">
-          {filtered.map((c) => {
+          {visible.map((c) => {
             const status = CLIENT_STATUSES.find((s) => s.value === c.status);
             const typeLabel = CLIENT_TYPE_LABELS[c.type] ?? c.type;
             const due = c.next_contact_at && c.next_contact_at <= today;
@@ -199,6 +212,13 @@ export function ClientsBrowser({
           })}
         </div>
       )}
+
+      <Pagination
+        page={safePage}
+        total={filtered.length}
+        onPage={setPage}
+        label="kontaktów"
+      />
     </div>
   );
 }

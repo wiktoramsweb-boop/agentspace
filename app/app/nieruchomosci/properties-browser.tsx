@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { PROPERTY_STATUSES, PROPERTY_DEAL_KINDS } from "@/lib/types";
 import type { PropertyWithOwner } from "@/lib/data-platform";
 import { formatPln } from "@/lib/format";
@@ -9,6 +9,7 @@ import { Card } from "../components/ui";
 import { SegmentedToggle } from "../components/kit";
 import { PropertiesMap } from "./properties-map";
 import { PROPERTY_ICONS, PinIcon } from "../components/icons";
+import { PAGE_SIZE, Pagination } from "../components/pagination";
 
 function kindVisual(kind: string) {
   return kind === "wynajem"
@@ -41,6 +42,7 @@ export function PropertiesBrowser({
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<"all" | "mine">("all");
   const [sort, setSort] = useState<"nowe" | "cena_rosnaco" | "cena_malejaco" | "cena_m2">("nowe");
+  const [page, setPage] = useState(0);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -68,6 +70,15 @@ export function PropertiesBrowser({
     else arr.sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
     return arr;
   }, [filtered, sort]);
+
+  // Zmiana filtra wraca na pierwszą stronę, żeby nie wylądować na pustej.
+  useEffect(() => {
+    setPage(0);
+  }, [query, scope, sort]);
+
+  const pageCount = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const visible = sorted.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   const mineCount = properties.filter((p) => p.agent_id === currentUserId).length;
   const active = filtered.filter((p) => p.status === "aktywna");
@@ -165,7 +176,7 @@ export function PropertiesBrowser({
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {sorted.map((p) => {
+          {visible.map((p) => {
             const status = PROPERTY_STATUSES.find((s) => s.value === p.status);
             const kind = PROPERTY_DEAL_KINDS.find((k) => k.value === p.deal_kind);
             const params = [
@@ -239,6 +250,8 @@ export function PropertiesBrowser({
           })}
         </div>
       )}
+
+      <Pagination page={safePage} total={sorted.length} onPage={setPage} label="ofert" />
     </div>
   );
 }
