@@ -99,7 +99,13 @@ export function PropertiesBrowser({
             <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-slate-700">
               Mapa ofert
             </h2>
-            <span className="text-xs text-slate-500">{mapPoints.length} na mapie</span>
+            {/* Agent od razu widzi, ile ofert wypada z mapy przez brak adresu. */}
+            <span className="text-xs text-slate-500">
+              {mapPoints.length} z {sorted.length} na mapie
+              {sorted.length - mapPoints.length > 0
+                ? ` · ${sorted.length - mapPoints.length} bez lokalizacji`
+                : ""}
+            </span>
           </div>
           {mapPoints.length > 0 ? (
             <PropertiesMap points={mapPoints} />
