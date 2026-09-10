@@ -107,7 +107,9 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
       }
       if (markers.length) {
         const group = L.featureGroup(markers);
-        map.fitBounds(group.getBounds().pad(0.25));
+        // maxZoom: przy jednej ofercie mapa skakała na poziom ulicy i agent
+        // tracił kontekst miasta.
+        map.fitBounds(group.getBounds().pad(0.25), { maxZoom: 14 });
       }
       setTimeout(() => map.invalidateSize(), 200);
     });

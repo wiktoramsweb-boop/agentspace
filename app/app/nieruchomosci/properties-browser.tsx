@@ -16,6 +16,21 @@ function kindVisual(kind: string) {
     : { bar: "from-emerald-400 to-cyan-400", glow: "rgba(16,185,129,0.4)", chip: "text-emerald-700" };
 }
 
+/** Środek Krakowa (Rynek Główny) i promień, w jakim trzymamy mapę ofert. */
+const KRAKOW = { lat: 50.0619, lng: 19.9369 };
+const MAP_RADIUS_KM = 45;
+
+/** Odległość od centrum Krakowa w km (wzór haversine). */
+function distanceKm(lat: number, lng: number): number {
+  const toRad = (v: number) => (v * Math.PI) / 180;
+  const dLat = toRad(lat - KRAKOW.lat);
+  const dLng = toRad(lng - KRAKOW.lng);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(KRAKOW.lat)) * Math.cos(toRad(lat)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
 export function PropertiesBrowser({
   properties,
   currentUserId,
@@ -56,9 +71,18 @@ export function PropertiesBrowser({
 
   const mineCount = properties.filter((p) => p.agent_id === currentUserId).length;
   const active = filtered.filter((p) => p.status === "aktywna");
-  const mapPoints = active
+  const located = active
     .filter((p) => p.lat != null && p.lng != null)
     .map((p) => ({ id: p.id, title: p.title, price: p.price_pln, lat: p.lat!, lng: p.lng!, kind: p.deal_kind }));
+
+  // Pracujemy w Krakowie i okolicach. Pojedyncza oferta spod Oświęcimia
+  // rozciągała mapę na pół Małopolski i krakowskie pinezki zlewały się w kupkę,
+  // więc trzymamy na mapie tylko okolicę, a dalekie oferty wypisujemy pod nią.
+  const near = located.filter((p) => distanceKm(p.lat, p.lng) <= MAP_RADIUS_KM);
+  const far = located.filter((p) => distanceKm(p.lat, p.lng) > MAP_RADIUS_KM);
+  // Gdy akurat nic nie ma w okolicy, lepiej pokazać cokolwiek niż pustą mapę.
+  const mapPoints = near.length > 0 ? near : located;
+  const farShown = near.length > 0 ? far : [];
 
   return (
     <div>
@@ -99,11 +123,11 @@ export function PropertiesBrowser({
             <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-slate-700">
               Mapa ofert
             </h2>
-            {/* Agent od razu widzi, ile ofert wypada z mapy przez brak adresu. */}
+            {/* Agent od razu widzi, ile ofert wypada z mapy i dlaczego. */}
             <span className="text-xs text-slate-500">
-              {mapPoints.length} z {sorted.length} na mapie
-              {sorted.length - mapPoints.length > 0
-                ? ` · ${sorted.length - mapPoints.length} bez lokalizacji`
+              {mapPoints.length} z {active.length} na mapie
+              {active.length - located.length > 0
+                ? ` · ${active.length - located.length} bez lokalizacji`
                 : ""}
             </span>
           </div>
@@ -113,6 +137,24 @@ export function PropertiesBrowser({
             <p className="p-6 text-sm text-slate-500">
               Żadna oferta w tym widoku nie ma lokalizacji. Przy dodawaniu/edycji wybierz adres z podpowiedzi.
             </p>
+          )}
+          {farShown.length > 0 && (
+            <div className="border-t border-slate-200 px-5 py-3">
+              <p className="mb-1.5 text-xs text-slate-500">
+                Poza okolicami Krakowa (nie na mapie, żeby jej nie rozciągać):
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {farShown.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/app/nieruchomosci/${p.id}`}
+                    className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+                  >
+                    {p.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
           )}
         </Card>
       )}
