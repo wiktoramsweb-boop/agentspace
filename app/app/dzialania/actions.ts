@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { warsawToIso } from "@/lib/datetime";
+import { applyActivityToGoals } from "@/lib/goal-sync";
 
 function txt(fd: FormData, k: string): string | null {
   const v = String(fd.get(k) ?? "").trim();
@@ -81,6 +82,9 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
     }
   }
 
+  const assigneeIds = assignees.length ? assignees : [user.id];
+  const completedAt = status === "wykonane" ? new Date().toISOString() : null;
+
   const { error: insertError } = await admin.from("activities").insert({
     agency_id: user.agency_id,
     created_by: user.id,
@@ -92,13 +96,13 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
     priority: txt(formData, "priority") ?? "normalny",
     call_direction: txt(formData, "call_direction"),
     due_at: whenFrom(formData, "due_date", "due_time"),
-    completed_at: status === "wykonane" ? new Date().toISOString() : null,
+    completed_at: completedAt,
     client_id: linkedClientId,
     contact_name: contactName,
     contact_phone: contactPhone,
     contact_email: txt(formData, "contact_email"),
     property_id: txt(formData, "property_id"),
-    assignee_ids: assignees.length ? assignees : [user.id],
+    assignee_ids: assigneeIds,
     include_in_report: formData.get("include_in_report") === "1",
   });
 
@@ -110,6 +114,22 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
       error: `Nie udało się zapisać działania: ${insertError.message}`,
     };
   }
+
+  // Wykonany telefon albo spotkanie od razu podbija licznik w Celach,
+  // żeby agent nie odhaczał tego samego drugi raz.
+  await applyActivityToGoals(
+    admin,
+    {
+      kind: txt(formData, "kind") ?? "polaczenie",
+      purpose: txt(formData, "purpose"),
+      status,
+      completed_at: completedAt,
+      assignee_ids: assigneeIds,
+      created_by: user.id,
+      agency_id: user.agency_id,
+    },
+    1,
+  );
 
   // Wykonane działanie = był kontakt. Aktualizujemy datę u klienta, żeby
   // przypomnienia „dawno nie dzwoniłeś" liczyły się od realnej rozmowy.
@@ -123,6 +143,7 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
 
   revalidatePath("/app/dzialania");
   revalidatePath("/app/klienci");
+  revalidatePath("/app/cele");
   revalidatePath("/app");
   return { ok: true };
 }
@@ -159,27 +180,55 @@ async function findClientByPhone(
   return null;
 }
 
+/** Pola potrzebne do przeliczenia celów. */
+const GOAL_FIELDS = "kind, purpose, status, completed_at, assignee_ids, created_by, agency_id";
+
 /** Szybka zmiana statusu z listy (odhaczenie „wykonane"). */
 export async function setActivityStatus(id: string, status: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
+
+  // Stan sprzed zmiany, żeby cofnąć wcześniejsze zaliczenie do celów.
+  const { data: before } = await admin
+    .from("activities")
+    .select(GOAL_FIELDS)
+    .eq("id", id)
+    .eq("agency_id", user.agency_id)
+    .maybeSingle();
+  if (!before) return;
+
+  const completedAt = status === "wykonane" ? new Date().toISOString() : null;
   await admin
     .from("activities")
-    .update({
-      status,
-      completed_at: status === "wykonane" ? new Date().toISOString() : null,
-    })
+    .update({ status, completed_at: completedAt })
     .eq("id", id)
     .eq("agency_id", user.agency_id);
 
+  await applyActivityToGoals(admin, before, -1);
+  await applyActivityToGoals(admin, { ...before, status, completed_at: completedAt }, 1);
+
   revalidatePath("/app/dzialania");
+  revalidatePath("/app/cele");
+  revalidatePath("/app");
 }
 
 export async function deleteActivity(id: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
+
+  const { data: before } = await admin
+    .from("activities")
+    .select(GOAL_FIELDS)
+    .eq("id", id)
+    .eq("agency_id", user.agency_id)
+    .maybeSingle();
+
   await admin.from("activities").delete().eq("id", id).eq("agency_id", user.agency_id);
+  if (before) await applyActivityToGoals(admin, before, -1);
+
   revalidatePath("/app/dzialania");
+  revalidatePath("/app/cele");
+  revalidatePath("/app");
 }
 
 /** Usunięcie z poziomu karty działania - wraca na listę. */

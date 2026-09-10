@@ -4,6 +4,7 @@ import { computeFunnel } from "@/lib/funnel";
 import { FUNNEL_STAGES } from "@/lib/types";
 import { PageHeader, Card } from "../components/ui";
 import { formatPln, plDays } from "@/lib/format";
+import { todayDatePL } from "@/lib/datetime";
 import { buildMonthCalendar } from "@/lib/goal-calendar";
 import { GoalSetup } from "./goal-setup";
 import { DailyTracker } from "./daily-tracker";
@@ -18,10 +19,11 @@ function ymd(d: Date): string {
 
 /** Poniedziałek tygodnia zawierającego datę d. */
 function mondayOf(d: Date): Date {
+  // Liczymy w UTC, bo todayDatePL() to północ UTC polskiej daty. Mieszanie
+  // ze strefą lokalną przesuwało tydzień o jeden dzień.
   const x = new Date(d);
-  const day = (x.getDay() + 6) % 7; // 0 = poniedziałek
-  x.setDate(x.getDate() - day);
-  x.setHours(0, 0, 0, 0);
+  const day = (x.getUTCDay() + 6) % 7; // 0 = poniedziałek
+  x.setUTCDate(x.getUTCDate() - day);
   return x;
 }
 
@@ -83,15 +85,15 @@ export default async function CelePage() {
   const daysHitCallGoal = recentLogs.filter((l) => l.cold_calls >= dailyTargets.cold_calls).length;
 
   // Bieżący tydzień (Pn-Nd)
-  const todayStr = ymd(new Date());
-  const monday = mondayOf(new Date());
+  const todayStr = ymd(todayDatePL());
+  const monday = mondayOf(todayDatePL());
   const weekDays: WeekDay[] = DAY_LABELS.map((label, i) => {
     const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
+    d.setUTCDate(monday.getUTCDate() + i);
     const ds = ymd(d);
     return {
       label,
-      dayNum: String(d.getDate()),
+      dayNum: String(d.getUTCDate()),
       calls: callsByDate.get(ds) ?? 0,
       target: dailyTargets.cold_calls,
       isToday: ds === todayStr,
@@ -105,17 +107,17 @@ export default async function CelePage() {
   const history: WeekSummary[] = [];
   for (let w = 1; w <= 6; w++) {
     const wkMonday = new Date(monday);
-    wkMonday.setDate(monday.getDate() - w * 7);
+    wkMonday.setUTCDate(monday.getUTCDate() - w * 7);
     let total = 0;
     for (let i = 0; i < 7; i++) {
       const d = new Date(wkMonday);
-      d.setDate(wkMonday.getDate() + i);
+      d.setUTCDate(wkMonday.getUTCDate() + i);
       total += callsByDate.get(ymd(d)) ?? 0;
     }
     const wkEnd = new Date(wkMonday);
-    wkEnd.setDate(wkMonday.getDate() + 6);
+    wkEnd.setUTCDate(wkMonday.getUTCDate() + 6);
     history.push({
-      label: `${wkMonday.getDate()}.${wkMonday.getMonth() + 1}`,
+      label: `${wkMonday.getUTCDate()}.${wkMonday.getUTCMonth() + 1}`,
       total,
       target: weekTarget,
     });
@@ -164,6 +166,10 @@ export default async function CelePage() {
           <h2 className="mb-1 text-lg font-semibold text-slate-900">Dziś</h2>
           <p className="mb-5 text-sm text-slate-500">
             Odhacz co zrobiłeś. Passa: <span className="text-emerald-600">{plDays(daysHitCallGoal)}</span> z celem telefonów (ost. 30 dni).
+          </p>
+          <p className="mb-5 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] px-3 py-2 text-xs text-emerald-700">
+            Telefony i spotkania zapisane w Działaniach liczą się tutaj same. Ręcznie
+            dobijasz tylko to, czego nie wpisałeś w CRM.
           </p>
           <DailyTracker log={todayLog} dailyTargets={dailyTargets} cadences={cadences} valuePerCall={valuePerCall} />
         </Card>

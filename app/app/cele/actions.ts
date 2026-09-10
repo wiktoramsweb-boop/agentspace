@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { todayPL } from "@/lib/datetime";
 
 function num(v: FormDataEntryValue | null, fallback = 0): number {
   const n = parseFloat(String(v ?? "").replace(/\s/g, "").replace(",", "."));
@@ -36,7 +37,8 @@ export async function saveGoal(formData: FormData): Promise<void> {
 export async function saveTodayLog(formData: FormData): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  const today = new Date().toISOString().slice(0, 10);
+  // Dzień liczony po polsku: po 22:00 UTC wskazywałby już jutro.
+  const today = todayPL();
 
   await admin.from("daily_logs").upsert(
     {

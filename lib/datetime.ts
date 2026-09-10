@@ -143,3 +143,13 @@ export function nowTimePL(): string {
     hour12: false,
   }).format(new Date());
 }
+
+/**
+ * „Dzisiaj" jako obiekt Date ustawiony na północ UTC polskiej daty.
+ * Dzięki temu arytmetyka dni (tydzień, miesiąc) i klucze YYYY-MM-DD zgadzają
+ * się z tym, co zapisujemy w dziennikach celów.
+ */
+export function todayDatePL(): Date {
+  const [y, m, d] = todayPL().split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}

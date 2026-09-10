@@ -1,3 +1,4 @@
+import { todayDatePL } from "./datetime";
 import { createSupabaseAdmin } from "./supabase/admin";
 
 // XP za akcje
@@ -88,15 +89,15 @@ function computeStreak(
 ): number {
   if (dailyCallTarget <= 0) return 0;
   let streak = 0;
-  const d = new Date();
+  const d = todayDatePL();
   // Pozwól zacząć passę od dziś LUB wczoraj (jeszcze dziś nie dzwonił)
   const todayHit = (logsByDate.get(d.toISOString().slice(0, 10)) ?? 0) >= dailyCallTarget;
-  if (!todayHit) d.setDate(d.getDate() - 1);
+  if (!todayHit) d.setUTCDate(d.getUTCDate() - 1);
   for (let i = 0; i < 400; i++) {
     const ds = d.toISOString().slice(0, 10);
     if ((logsByDate.get(ds) ?? 0) >= dailyCallTarget) {
       streak++;
-      d.setDate(d.getDate() - 1);
+      d.setUTCDate(d.getUTCDate() - 1);
     } else break;
   }
   return streak;
@@ -182,10 +183,10 @@ export async function getWeeklyChallenge(
   agencyId: string,
 ): Promise<{ agentId: string; name: string; calls: number }[]> {
   const admin = createSupabaseAdmin();
-  const monday = new Date();
-  const day = (monday.getDay() + 6) % 7;
-  monday.setDate(monday.getDate() - day);
-  monday.setHours(0, 0, 0, 0);
+  // Wszystko w UTC, bo todayDatePL() zwraca północ UTC polskiej daty.
+  const monday = todayDatePL();
+  const day = (monday.getUTCDay() + 6) % 7;
+  monday.setUTCDate(monday.getUTCDate() - day);
 
   const [{ data: logs }, { data: profiles }] = await Promise.all([
     admin
