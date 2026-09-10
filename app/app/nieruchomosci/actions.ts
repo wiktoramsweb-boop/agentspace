@@ -200,14 +200,35 @@ export async function setPropertyOwner(
   revalidatePath(`/app/nieruchomosci/${propertyId}`);
 }
 
+/**
+ * Sprawdza, że oferta należy do biura zalogowanego użytkownika.
+ * Tabela property_interests nie ma kolumny agency_id, więc bez tego ktoś
+ * z innego biura mógłby modyfikować powiązania, znając identyfikator oferty.
+ */
+async function ownsProperty(
+  admin: ReturnType<typeof createSupabaseAdmin>,
+  propertyId: string,
+  agencyId: string | null,
+): Promise<boolean> {
+  if (!agencyId) return false;
+  const { data } = await admin
+    .from("properties")
+    .select("id")
+    .eq("id", propertyId)
+    .eq("agency_id", agencyId)
+    .maybeSingle();
+  return !!data;
+}
+
 /** Dodaj klienta jako zainteresowanego ofertą (kupujący/najemca). */
 export async function addPropertyInterest(
   propertyId: string,
   clientId: string,
 ): Promise<void> {
-  await requireUser();
+  const user = await requireUser();
   if (!clientId) return;
   const admin = createSupabaseAdmin();
+  if (!(await ownsProperty(admin, propertyId, user.agency_id))) return;
   await admin
     .from("property_interests")
     .upsert(
@@ -221,8 +242,9 @@ export async function removePropertyInterest(
   propertyId: string,
   clientId: string,
 ): Promise<void> {
-  await requireUser();
+  const user = await requireUser();
   const admin = createSupabaseAdmin();
+  if (!(await ownsProperty(admin, propertyId, user.agency_id))) return;
   await admin
     .from("property_interests")
     .delete()
