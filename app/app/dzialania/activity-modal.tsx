@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatPhone } from "@/lib/format";
 import { Modal } from "../components/modal";
 import { SubmitButton } from "../components/submit-button";
 import { ACTIVITY_ICONS } from "../components/icons";
@@ -245,7 +246,7 @@ function ActivityForm({
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
-                    {c.phone ? ` (${c.phone})` : ""}
+                    {c.phone ? ` (${formatPhone(c.phone)})` : ""}
                   </option>
                 ))}
               </select>

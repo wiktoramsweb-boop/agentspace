@@ -11,7 +11,7 @@ import {
 import { CLIENT_TYPE_LABELS, PROPERTY_STATUSES, type Property } from "@/lib/types";
 import { Card } from "../../components/ui";
 import { MiniMap } from "../../components/mini-map";
-import { formatPln, daysAgo, formatDateShort } from "@/lib/format";
+import { formatPln, daysAgo, formatDateShort, formatPhone } from "@/lib/format";
 import { StatusChanger } from "./status-changer";
 import { NoteForm } from "./note-form";
 import { NextContactControl } from "./next-contact-control";
@@ -126,7 +126,7 @@ export default async function ClientDetailPage({ params }: Props) {
               title: `Spotkanie: ${client.name}`,
               details: `Klient: ${client.name}${type?.label ? ` (${type.label})` : ""}${
                 client.property ? ` · ${client.property}` : ""
-              }${client.phone ? ` · tel. ${client.phone}` : ""}`,
+              }${client.phone ? ` · tel. ${formatPhone(client.phone)}` : ""}`,
             })}
             target="_blank"
             rel="noopener noreferrer"
@@ -162,7 +162,7 @@ export default async function ClientDetailPage({ params }: Props) {
                   <dt className="text-slate-500">Telefon</dt>
                   <dd>
                     <a href={`tel:${client.phone}`} className="text-emerald-600 hover:text-emerald-700">
-                      {client.phone}
+                      {formatPhone(client.phone)}
                     </a>
                   </dd>
                 </div>

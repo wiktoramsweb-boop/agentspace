@@ -39,3 +39,20 @@ export function daysAgo(iso: string | null): string {
   if (diff === 1) return "wczoraj";
   return `${diff} dni temu`;
 }
+
+/**
+ * Numer telefonu w czytelnej postaci: 600 000 002, +48 600 000 002.
+ * Agenci odczytują numery z ekranu, więc ciąg „600000002" łatwo pomylić.
+ * Numer w nieznanym formacie zostawiamy bez zmian.
+ */
+export function formatPhone(raw: string | null | undefined): string {
+  if (!raw) return "-";
+  const trimmed = raw.trim();
+  const digits = trimmed.replace(/\D/g, "");
+  const group = (d: string) => d.replace(/(\d{3})(?=\d)/g, "$1 ");
+
+  if (digits.length === 9) return group(digits);
+  if (digits.length === 11 && digits.startsWith("48")) return `+48 ${group(digits.slice(2))}`;
+  if (trimmed.startsWith("+") && digits.length > 9) return trimmed;
+  return trimmed;
+}

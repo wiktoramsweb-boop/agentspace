@@ -1,4 +1,5 @@
 import { dateKeyPL, formatTimePL, todayPL } from "@/lib/datetime";
+import { formatPhone } from "@/lib/format";
 import Link from "next/link";
 import type { ActivityRich } from "@/lib/data-activities";
 import { ACTIVITY_ICONS } from "./icons";
@@ -45,7 +46,7 @@ export function TodayActivities({ activities }: { activities: ActivityRich[] }) 
               <span className="block truncate text-xs text-slate-500">
                 {formatTimePL(a.due_at)}
                 {a.contact_name ? ` · ${a.contact_name}` : ""}
-                {a.contact_phone ? ` · ${a.contact_phone}` : ""}
+                {a.contact_phone ? ` · ${formatPhone(a.contact_phone)}` : ""}
               </span>
             </span>
             {overdue && (

@@ -1,4 +1,5 @@
 import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
+import { formatPhone } from "@/lib/format";
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
 import { getActivitiesReport, getAgencyAgents, type ReportFilters } from "@/lib/data-activities";
@@ -266,7 +267,7 @@ export default async function RaportDzialanPage({ searchParams }: Props) {
                           {fmt(a.due_at)} · {a.assigneeNames.join(", ") || "-"}
                           {a.purpose ? ` · ${PURPOSE_MAP[a.purpose] ?? a.purpose}` : ""}
                           {a.contact_name ? ` · ${a.contact_name}` : ""}
-                          {a.contact_phone ? ` · ${a.contact_phone}` : ""}
+                          {a.contact_phone ? ` · ${formatPhone(a.contact_phone)}` : ""}
                         </span>
                       </span>
                       <span className={`flex-shrink-0 rounded-md px-2 py-0.5 text-xs font-medium ${sm.color}`}>

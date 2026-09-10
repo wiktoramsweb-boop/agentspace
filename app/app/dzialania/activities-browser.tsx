@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatPhone } from "@/lib/format";
 import { useMemo, useState, useTransition } from "react";
 import type { ActivityRich } from "@/lib/data-activities";
 import { formatDateTimePL } from "@/lib/datetime";
@@ -260,7 +261,7 @@ export function ActivitiesBrowser({
                     <Row label="Telefon">
                       {a.contact_phone ? (
                         <a href={`tel:${a.contact_phone}`} className="text-blue-600 hover:underline">
-                          {a.contact_phone}
+                          {formatPhone(a.contact_phone)}
                         </a>
                       ) : (
                         "-"

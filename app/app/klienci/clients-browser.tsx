@@ -5,7 +5,7 @@ import { BellIcon } from "../components/icons";
 import { useMemo, useState } from "react";
 import { CLIENT_STATUSES, CLIENT_TYPES, CLIENT_TYPE_LABELS, type ClientStatus, type ClientType } from "@/lib/types";
 import type { ClientWithOwner } from "@/lib/data-platform";
-import { formatPln, daysAgo } from "@/lib/format";
+import { formatPln, daysAgo, formatPhone } from "@/lib/format";
 
 const digits = (s: string | null) => (s ?? "").replace(/\D/g, "");
 
@@ -168,7 +168,7 @@ export function ClientsBrowser({
                     </p>
                   </div>
                   <div className="min-w-0 text-sm">
-                    <p className="truncate text-slate-700">{c.phone ?? "-"}</p>
+                    <p className="truncate text-slate-700">{formatPhone(c.phone)}</p>
                     <p className="truncate text-xs text-slate-500">
                       {c.budget_pln != null ? formatPln(c.budget_pln) : "-"}
                     </p>

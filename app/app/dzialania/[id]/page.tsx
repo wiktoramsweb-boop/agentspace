@@ -1,4 +1,5 @@
 import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
+import { formatPhone } from "@/lib/format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -95,7 +96,7 @@ export default async function ActivityDetailPage({ params }: Props) {
               <Field label="Telefon">
                 {activity.contact_phone ? (
                   <a href={`tel:${activity.contact_phone}`} className="text-blue-600 hover:underline">
-                    {activity.contact_phone}
+                    {formatPhone(activity.contact_phone)}
                   </a>
                 ) : (
                   "-"
@@ -159,7 +160,7 @@ export default async function ActivityDetailPage({ params }: Props) {
                     className="block rounded-xl border border-slate-200 p-3 transition hover:border-emerald-500 hover:bg-emerald-50"
                   >
                     <p className="font-medium text-slate-900">{c.name}</p>
-                    <p className="text-sm text-slate-500">{c.phone}</p>
+                    <p className="text-sm text-slate-500">{formatPhone(c.phone)}</p>
                   </Link>
                 ))}
               </div>
@@ -172,7 +173,7 @@ export default async function ActivityDetailPage({ params }: Props) {
             </h2>
             <p className="mb-3 text-xs text-slate-400">
               {activity.contact_phone
-                ? `Wcześniejsze kontakty pod ${activity.contact_phone}`
+                ? `Wcześniejsze kontakty pod ${formatPhone(activity.contact_phone)}`
                 : "Brak numeru w tym działaniu."}
             </p>
 
