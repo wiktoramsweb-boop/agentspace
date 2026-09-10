@@ -40,9 +40,9 @@ export function MonthCalendarView({
           } else if (d.isFuture) {
             cls = "border-slate-200 bg-slate-50 text-slate-400";
           } else if (d.met) {
-            cls = "border-emerald-500/40 bg-emerald-100 text-emerald-200";
+            cls = "border-emerald-500/40 bg-emerald-100 text-emerald-700";
           } else if (d.partial) {
-            cls = "border-amber-500/30 bg-amber-100 text-amber-200";
+            cls = "border-amber-500/30 bg-amber-100 text-amber-700";
           } else {
             cls = "border-slate-200 bg-slate-50 text-slate-500";
           }

@@ -1,5 +1,7 @@
 "use client";
 
+import { BusIcon, CartIcon, HealthIcon, SchoolIcon, TreeIcon } from "../../components/icons";
+
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useToast } from "../../components/toast";
@@ -13,12 +15,12 @@ const itemVariants = {
 
 type Cat = { key: string; label: string; items: { name: string; dist: number }[] };
 
-const ICONS: Record<string, string> = {
-  komunikacja: "🚌",
-  edukacja: "🎓",
-  sklepy: "🛒",
-  zdrowie: "➕",
-  zielen: "🌳",
+const ICONS: Record<string, (p: { className?: string }) => React.ReactElement> = {
+  komunikacja: BusIcon,
+  edukacja: SchoolIcon,
+  sklepy: CartIcon,
+  zdrowie: HealthIcon,
+  zielen: TreeIcon,
 };
 
 function fmt(dist: number): string {
@@ -83,8 +85,12 @@ export function NearbyCard({ lat, lng }: { lat: number; lng: number }) {
         <motion.div className="space-y-3" initial="hidden" animate="show" variants={listVariants}>
           {cats.map((c) => (
             <motion.div key={c.key} variants={itemVariants}>
-              <p className="mb-1 text-xs font-medium text-slate-500">
-                {ICONS[c.key] ?? "•"} {c.label}
+              <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                {(() => {
+                  const CatIcon = ICONS[c.key];
+                  return CatIcon ? <CatIcon className="h-4 w-4" /> : null;
+                })()}
+                {c.label}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {c.items.map((i, n) => (

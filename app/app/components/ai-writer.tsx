@@ -1,5 +1,6 @@
 "use client";
 
+import { SparkIcon } from "./icons";
 import { useState } from "react";
 
 type Kind = "followup" | "objection" | "summary" | "custom";
@@ -59,9 +60,9 @@ export function AiWriter({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-xl border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-200 transition hover:bg-violet-100"
+        className="inline-flex items-center gap-2 rounded-xl border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-700 transition hover:bg-violet-100"
       >
-        ✨ {buttonLabel}
+        <SparkIcon className="h-4 w-4" /> {buttonLabel}
       </button>
     );
   }
@@ -71,7 +72,7 @@ export function AiWriter({
       <div className="w-full max-w-lg rounded-3xl border border-slate-300 bg-white p-6 md:p-8">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-            <span className="text-violet-600">✨</span> {title}
+            <SparkIcon className="h-4 w-4 text-violet-600" /> {title}
           </h2>
           <button onClick={() => setOpen(false)} className="text-slate-500 hover:text-slate-900">✕</button>
         </div>

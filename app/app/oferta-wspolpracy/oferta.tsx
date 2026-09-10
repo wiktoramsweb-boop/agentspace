@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SparkIcon } from "../components/icons";
 import { useSpeechRecognition } from "@/lib/use-speech-recognition";
 import { generateOfertaPdf, currentMiesiac, type OfertaValues } from "@/lib/oferta-pdf";
 
@@ -129,7 +130,7 @@ export function OfertaWspolpracy({
           className={inp}
         />
         {voiceError && (
-          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-700">🎤 {voiceError}</p>
+          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-700">{voiceError}</p>
         )}
         {!supported && (
           <p className="mt-2 text-xs text-amber-600">
@@ -141,7 +142,7 @@ export function OfertaWspolpracy({
           disabled={parsing || !transcript.trim()}
           className="mt-3 w-full rounded-xl border border-emerald-500/40 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
         >
-          {parsing ? "Przetwarzam…" : "✨ Wypełnij przez AI"}
+          {parsing ? "Przetwarzam…" : <><SparkIcon className="h-4 w-4" /> Wypełnij przez AI</>}
         </button>
       </div>
 
@@ -162,7 +163,7 @@ export function OfertaWspolpracy({
       {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>}
       {done && !error && (
         <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-          ✅ PDF pobrany. Sprawdź folder „Pobrane" i wyślij klientowi.
+          PDF pobrany. Sprawdź folder „Pobrane" i wyślij klientowi.
         </p>
       )}
 

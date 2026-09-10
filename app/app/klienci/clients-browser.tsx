@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BellIcon } from "../components/icons";
 import { useMemo, useState } from "react";
 import { CLIENT_STATUSES, CLIENT_TYPES, CLIENT_TYPE_LABELS, type ClientStatus, type ClientType } from "@/lib/types";
 import type { ClientWithOwner } from "@/lib/data-platform";
@@ -184,7 +185,7 @@ export function ClientsBrowser({
                 <div className="flex flex-shrink-0 items-center gap-3 pr-4">
                   {due && (
                     <span className="rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
-                      🔔
+                      <BellIcon className="h-3.5 w-3.5" />
                     </span>
                   )}
                   {status && (

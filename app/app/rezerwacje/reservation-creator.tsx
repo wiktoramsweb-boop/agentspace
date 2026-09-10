@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SparkIcon } from "../components/icons";
 import { buildReservation, type Party, type ReservationData, type ResMode, type PropType, type DepositType, type DocType } from "@/lib/reservation";
 import { generateReservationPdf } from "@/lib/reservation-pdf";
 
@@ -299,7 +300,7 @@ export function ReservationCreator({ city }: { city: string }) {
             disabled={aiLoading || !aiReq.trim()}
             className="w-full rounded-lg border border-emerald-500/40 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
           >
-            {aiLoading ? "Redaguję…" : "✨ Dopisz zapis przez AI"}
+            {aiLoading ? "Redaguję…" : <><SparkIcon className="h-4 w-4" /> Dopisz zapis przez AI</>}
           </button>
           {d.customClauses.length > 0 && (
             <div className="space-y-2 pt-1">

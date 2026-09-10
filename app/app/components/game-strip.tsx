@@ -1,3 +1,4 @@
+import { FlameIcon, TrophyIcon } from "./icons";
 import type { GameData } from "@/lib/gamification";
 
 export function GameStrip({ game }: { game: GameData }) {
@@ -32,7 +33,7 @@ export function GameStrip({ game }: { game: GameData }) {
 
       {/* Passa */}
       <div className="flex items-center gap-4 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-slate-50 p-5">
-        <span className="text-4xl">{totals.streak > 0 ? "🔥" : "💤"}</span>
+        <FlameIcon className={`h-9 w-9 ${totals.streak > 0 ? "text-amber-500" : "text-slate-300"}`} />
         <div>
           <p className="text-2xl font-bold text-slate-900">{totals.streak} {totals.streak === 1 ? "dzień" : "dni"}</p>
           <p className="text-xs text-slate-500">passa z celem telefonów</p>
@@ -56,7 +57,7 @@ export function GameStrip({ game }: { game: GameData }) {
           </>
         ) : (
           <>
-            <span className="text-4xl">👑</span>
+            <TrophyIcon className="h-9 w-9 text-amber-500" />
             <div>
               <p className="text-sm font-semibold text-slate-900">Wszystkie odznaki!</p>
               <p className="text-xs text-slate-500">Jesteś legendą</p>

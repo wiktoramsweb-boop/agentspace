@@ -69,7 +69,7 @@ export function PushToggle() {
       });
       if (!res.ok) throw new Error();
       setStatus("on");
-      toast("Powiadomienia włączone ✅");
+      toast("Powiadomienia włączone.");
       // Wyślij testowe powiadomienie potwierdzające
       fetch("/api/push/test", { method: "POST" }).catch(() => {});
     } catch {
@@ -116,7 +116,7 @@ export function PushToggle() {
 
   if (status === "ios-not-installed") {
     return (
-      <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] p-3 text-sm text-amber-200">
+      <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] p-3 text-sm text-amber-700">
         Aby włączyć powiadomienia na iPhone, najpierw <strong>zainstaluj apkę</strong>:
         Udostępnij → „Do ekranu początkowego". Potem otwórz apkę z ekranu głównego i wróć tutaj.
       </div>

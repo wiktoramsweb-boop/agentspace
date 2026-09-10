@@ -142,7 +142,7 @@ export function PwaInstall() {
                 <Step n={2} /> Wybierz <strong className="text-slate-900">„Do ekranu początkowego"</strong>
               </li>
               <li className="flex items-center gap-2">
-                <Step n={3} /> Potwierdź <strong className="text-slate-900">„Dodaj"</strong> - gotowe ✅
+                <Step n={3} /> Potwierdź <strong className="text-slate-900">„Dodaj"</strong> - gotowe
               </li>
             </ol>
             <p className="mt-3 text-xs text-slate-500">

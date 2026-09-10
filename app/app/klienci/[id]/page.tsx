@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BellIcon } from "../../components/icons";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import {
@@ -98,7 +99,7 @@ export default async function ClientDetailPage({ params }: Props) {
                     : "bg-slate-100 text-slate-500"
                 }`}
               >
-                🔔 {reminder.label}
+                <BellIcon className="h-4 w-4" /> {reminder.label}
               </span>
             )}
           </div>

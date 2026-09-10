@@ -19,7 +19,7 @@ export default async function KlienciPage() {
       <PageHeader
         title="Klienci"
         subtitle={`${active.length} aktywnych · ${clients.length} w biurze${
-          dueCount > 0 ? ` · 🔔 ${dueCount} do kontaktu` : ""
+          dueCount > 0 ? ` · ${dueCount} do kontaktu` : ""
         }`}
         action={<NewClientForm existingPhones={clients.map((c) => ({ phone: c.phone, owner: c.opiekunName }))} />}
       />

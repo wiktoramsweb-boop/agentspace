@@ -1,3 +1,5 @@
+import { CoinsIcon } from "../components/icons";
+
 export type SheetRow = {
   label: string;
   value: string;
@@ -67,7 +69,7 @@ export function CalcSheet({
 
       {savings && (
         <div className="mt-3 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-          <span className="text-lg">💰</span> {savings}
+          <CoinsIcon className="h-4 w-4" /> {savings}
         </div>
       )}
 

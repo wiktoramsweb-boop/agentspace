@@ -38,8 +38,8 @@ export default async function ScenarioSetupPage({ params }: Props) {
 
       {limitReached && (
         <Card className="mb-8 !border-amber-500/30 !bg-amber-500/10">
-          <p className="font-semibold text-amber-200">Wykorzystałeś limit rozmów AI na ten tydzień.</p>
-          <p className="mt-1 text-sm text-amber-200/80">
+          <p className="font-semibold text-amber-700">Wykorzystałeś limit rozmów AI na ten tydzień.</p>
+          <p className="mt-1 text-sm text-amber-700">
             Limit odnowi się w poniedziałek. Jeśli potrzebujesz więcej - poproś CEO o zwiększenie limitu.
           </p>
         </Card>

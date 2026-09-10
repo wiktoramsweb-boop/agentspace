@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/auth";
+import { APP_TZ } from "@/lib/datetime";
 import { ROLE_LABELS } from "@/lib/types";
 import { PageHeader, Card } from "../components/ui";
 import { SettingsForm } from "./settings-form";
@@ -7,6 +8,8 @@ import { ChangeEmail } from "./change-email";
 
 export default async function UstawieniaPage() {
   const user = await requireUser();
+  const trialOver =
+    !!user.agency?.trial_ends_at && new Date(user.agency.trial_ends_at) < new Date();
 
   return (
     <>
@@ -41,11 +44,16 @@ export default async function UstawieniaPage() {
             </div>
             {user.agency?.trial_ends_at && user.agency.plan === "trial" && (
               <div>
-                <dt className="text-slate-500">Okres próbny do</dt>
-                <dd className="text-slate-800">
-                  {new Intl.DateTimeFormat("pl-PL", { dateStyle: "long" }).format(
-                    new Date(user.agency.trial_ends_at),
-                  )}
+                {/* Po terminie zmieniamy etykietę, żeby data z przeszłości
+                    nie wyglądała jak błąd aplikacji. */}
+                <dt className="text-slate-500">
+                  {trialOver ? "Okres próbny zakończony" : "Okres próbny do"}
+                </dt>
+                <dd className={trialOver ? "font-medium text-amber-600" : "text-slate-800"}>
+                  {new Intl.DateTimeFormat("pl-PL", {
+                    timeZone: APP_TZ,
+                    dateStyle: "long",
+                  }).format(new Date(user.agency.trial_ends_at))}
                 </dd>
               </div>
             )}

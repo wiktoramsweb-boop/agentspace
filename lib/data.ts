@@ -1,6 +1,7 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import type { Scenario, TrainingSession, SessionScore, Profile, Goal, DailyLog } from "./types";
 import { computeFunnel } from "./funnel";
+import { plDays } from "./format";
 
 export async function getScenarios(): Promise<Scenario[]> {
   const admin = createSupabaseAdmin();
@@ -333,7 +334,7 @@ export async function getTeamInsights(
       const last = callDays.sort()[callDays.length - 1];
       const days = Math.round((Date.parse(todayStr) - Date.parse(last)) / 86400000);
       if (days >= 3) {
-        alerts.push({ agentId: a.id, agentName: a.name, severity: "warn", message: `Nie logował telefonów od ${days} dni.` });
+        alerts.push({ agentId: a.id, agentName: a.name, severity: "warn", message: `Nie logował telefonów od ${plDays(days)}.` });
       }
     }
 

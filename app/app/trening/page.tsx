@@ -73,7 +73,7 @@ export default async function TreningPage({
         <div
           className={`mb-6 rounded-xl border px-4 py-3 text-sm ${
             limitReached
-              ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
+              ? "border-amber-500/30 bg-amber-500/10 text-amber-700"
               : "border-slate-300 bg-white text-slate-700"
           }`}
         >
@@ -91,7 +91,7 @@ export default async function TreningPage({
         </div>
       )}
       {limitParam === "reached" && !limitReached && (
-        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
           Ta rozmowa przekroczyłaby Twój tygodniowy limit.
         </div>
       )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatIcon, MailIcon2, SparkIcon } from "../components/icons";
 import { useMemo, useState } from "react";
 
 type Cat = "wlasciciel" | "kupujacy" | "negocjacje" | "formalnosci" | "relacja" | "inne";
@@ -129,8 +130,8 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
     <div className="space-y-6">
       {/* Przełącznik Mail / SMS */}
       <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1">
-        <ModeBtn active={!isSms} onClick={() => switchMode("mail")} color="emerald" icon="✉️" label="Maile" />
-        <ModeBtn active={isSms} onClick={() => switchMode("sms")} color="sky" icon="💬" label="SMS-y" />
+        <ModeBtn active={!isSms} onClick={() => switchMode("mail")} color="emerald" icon={<MailIcon2 className="h-4 w-4" />} label="Maile" />
+        <ModeBtn active={isSms} onClick={() => switchMode("sms")} color="sky" icon={<ChatIcon className="h-4 w-4" />} label="SMS-y" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.05fr]">
@@ -185,7 +186,15 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
               accent === "sky" ? "bg-sky-400 hover:bg-sky-300" : "bg-emerald-500 hover:bg-emerald-400"
             }`}
           >
-            {loading ? "Piszę…" : result ? `✨ Napisz ${isSms ? "SMS" : "mail"} od nowa` : `✨ Napisz ${isSms ? "SMS" : "mail"}`}
+            {loading ? (
+              "Piszę…"
+            ) : (
+              <span className="inline-flex items-center justify-center gap-2">
+                <SparkIcon className="h-4 w-4" />
+                Napisz {isSms ? "SMS" : "mail"}
+                {result ? " od nowa" : ""}
+              </span>
+            )}
           </button>
         </div>
 
@@ -211,7 +220,7 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
 
 /* ---------- podkomponenty ---------- */
 
-function ModeBtn({ active, onClick, color, icon, label }: { active: boolean; onClick: () => void; color: "emerald" | "sky"; icon: string; label: string }) {
+function ModeBtn({ active, onClick, color, icon, label }: { active: boolean; onClick: () => void; color: "emerald" | "sky"; icon: React.ReactNode; label: string }) {
   const on = color === "sky" ? "bg-sky-400 text-white" : "bg-emerald-500 text-white";
   return (
     <button
@@ -274,8 +283,8 @@ function EmptyState({ isSms }: { isSms: boolean }) {
         isSms ? "border-sky-500/20 bg-sky-500/[0.03]" : "border-emerald-500/20 bg-emerald-500/[0.03]"
       }`}
     >
-      <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl ${isSms ? "bg-sky-100" : "bg-emerald-100"}`}>
-        {isSms ? "💬" : "✉️"}
+      <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${isSms ? "bg-sky-100 text-sky-600" : "bg-emerald-100 text-emerald-600"}`}>
+        {isSms ? <ChatIcon className="h-7 w-7" /> : <MailIcon2 className="h-7 w-7" />}
       </div>
       <p className="text-sm font-medium text-slate-900">
         Twój {isSms ? "SMS" : "mail"} pojawi się tutaj
@@ -298,8 +307,8 @@ function MailResult({ result, onChange, onCopy, copied }: { result: Result; onCh
   return (
     <div className="overflow-hidden rounded-2xl border border-emerald-500/20 bg-slate-50">
       <div className="flex items-center gap-2 border-b border-emerald-500/20 bg-emerald-500/[0.06] px-5 py-3">
-        <span>✉️</span>
-        <span className="text-sm font-semibold text-emerald-200">Mail gotowy</span>
+        <MailIcon2 className="h-4 w-4 text-emerald-600" />
+        <span className="text-sm font-semibold text-emerald-700">Mail gotowy</span>
       </div>
       <div className="space-y-3 p-5">
         <div>
@@ -332,8 +341,8 @@ function SmsResult({ text, onChange, onCopy, copied }: { text: string; onChange:
   return (
     <div className="overflow-hidden rounded-2xl border border-sky-500/20 bg-slate-50">
       <div className="flex items-center gap-2 border-b border-sky-500/20 bg-sky-500/[0.06] px-5 py-3">
-        <span>💬</span>
-        <span className="text-sm font-semibold text-sky-200">SMS gotowy</span>
+        <ChatIcon className="h-4 w-4 text-sky-600" />
+        <span className="text-sm font-semibold text-sky-700">SMS gotowy</span>
       </div>
       <div className="space-y-3 p-5">
         {/* Podgląd „dymek" */}

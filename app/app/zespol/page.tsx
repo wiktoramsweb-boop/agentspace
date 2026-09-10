@@ -137,7 +137,7 @@ export default async function ZespolPage() {
       {insights.alerts.length > 0 ? (
         <Card className="mb-8 !border-amber-500/20 !bg-amber-500/[0.04]">
           <h2 className="mb-4 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-amber-600">
-            ⚠️ Wymaga uwagi
+            Wymaga uwagi
           </h2>
           <div className="space-y-2">
             {insights.alerts.map((a, i) => (
@@ -164,7 +164,7 @@ export default async function ZespolPage() {
       ) : (
         ranking.length > 0 && (
           <Card className="mb-8 !border-emerald-500/20 !bg-emerald-500/[0.04]">
-            <p className="text-sm text-emerald-700">✅ Wszystko gra - brak sygnałów wymagających uwagi.</p>
+            <p className="text-sm text-emerald-700">Wszystko gra - brak sygnałów wymagających uwagi.</p>
           </Card>
         )
       )}

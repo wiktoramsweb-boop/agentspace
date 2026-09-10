@@ -1,5 +1,6 @@
 "use client";
 
+import { TargetIcon2 } from "../components/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import { saveTodayLog } from "./actions";
@@ -81,22 +82,28 @@ export function DailyTracker({
             className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center"
           >
             <div className="rounded-3xl bg-emerald-500 px-8 py-6 text-center shadow-[0_0_80px_rgba(16,185,129,0.7)]">
-              <motion.p animate={{ scale: [1, 1.25, 1], rotate: [0, 8, -8, 0] }} transition={{ duration: 0.6, repeat: 2 }} className="text-5xl">
-                🎯
-              </motion.p>
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.6, repeat: 2 }}
+                className="flex justify-center"
+              >
+                <TargetIcon2 className="h-14 w-14 text-white" />
+              </motion.div>
               <p className="mt-2 text-lg font-bold text-white">Cel dnia wykonany!</p>
-              <p className="text-sm text-zinc-900">Bliżej rocznego celu 💪</p>
+              <p className="text-sm text-zinc-900">Bliżej rocznego celu.</p>
             </div>
             {[...Array(16)].map((_, i) => (
+              // Konfetti z kolorowych krążków zamiast emotek: ten sam efekt,
+              // a wygląda spójnie z resztą CRM-u.
               <motion.span
                 key={i}
-                className="absolute text-2xl"
+                className={`absolute h-2.5 w-2.5 rounded-full ${
+                  ["bg-emerald-400", "bg-cyan-400", "bg-amber-400", "bg-violet-400", "bg-rose-400"][i % 5]
+                }`}
                 initial={{ opacity: 1, y: 0, x: 0 }}
                 animate={{ opacity: 0, y: -140 - Math.random() * 100, x: (Math.random() - 0.5) * 360 }}
                 transition={{ duration: 1.8, delay: Math.random() * 0.4 }}
-              >
-                {["💰", "🎉", "✨", "🏆", "🔥"][i % 5]}
-              </motion.span>
+              />
             ))}
           </motion.div>
         )}

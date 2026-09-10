@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { SparkIcon } from "../components/icons";
 import {
   generateListing,
   type OpisInput,
@@ -84,7 +85,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
         toast(data.error ?? "Nie udało się wygenerować.", "error");
       } else {
         setAiText(data.text);
-        toast("Gotowe - opis napisany przez AI ✨");
+        toast("Gotowe. Opis napisany przez AI.");
       }
     } catch {
       setError("Błąd połączenia. Spróbuj ponownie.");
@@ -350,7 +351,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
             disabled={loading}
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:opacity-90 disabled:opacity-60"
           >
-            {loading ? "AI pisze opis…" : "✨ Napisz przez AI"}
+            {loading ? "AI pisze opis…" : <><SparkIcon className="h-4 w-4" /> Napisz przez AI</>}
           </button>
           {aiText !== null && (
             <button
@@ -372,7 +373,7 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
           className="h-[70vh] w-full resize-none rounded-2xl border border-slate-200 bg-white p-4 font-mono text-xs leading-relaxed text-slate-800 focus:border-emerald-500 focus:outline-none"
         />
         <p className="mt-2 text-xs text-slate-500">
-          ✨ AI napisze układ, atuty, lokalizację, potencjał i rekomendację z podanych danych.
+          AI napisze układ, atuty, lokalizację, potencjał i rekomendację z podanych danych.
           Tekst możesz dowolnie edytować. <span className="text-amber-400/80">Zweryfikuj szczegóły
           (linie, odległości, ceny) przed publikacją.</span>
         </p>

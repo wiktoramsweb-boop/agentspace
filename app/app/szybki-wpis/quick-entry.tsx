@@ -68,8 +68,8 @@ export function QuickEntry() {
   if (form) {
     return (
       <div className="max-w-xl space-y-4">
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-4 text-sm text-emerald-200">
-          ✅ Rozpoznane. Sprawdź i popraw, potem zapisz do CRM.
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-4 text-sm text-emerald-700">
+          Rozpoznane. Sprawdź i popraw, potem zapisz do CRM.
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4">
@@ -163,7 +163,7 @@ export function QuickEntry() {
           className={inp}
         />
         {voiceError && (
-          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-700">🎤 {voiceError}</p>
+          <p className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-700">{voiceError}</p>
         )}
         {!supported && (
           <p className="mt-2 text-xs text-amber-600">

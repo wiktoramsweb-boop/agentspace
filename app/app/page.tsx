@@ -16,6 +16,7 @@ import {
 import { getGameData, getWeeklyChallenge } from "@/lib/gamification";
 import { computeFunnel } from "@/lib/funnel";
 import { CLIENT_STATUSES } from "@/lib/types";
+import { BellIcon } from "./components/icons";
 import { PageHeader, StatCard, ScoreBadge, Card } from "./components/ui";
 import { formatPln, daysAgo } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
@@ -66,7 +67,7 @@ export default async function DashboardPage() {
   return (
     <>
       <PageHeader
-        title={`Cześć, ${firstName} 👋`}
+        title={`Cześć, ${firstName}`}
         subtitle={new Intl.DateTimeFormat("pl-PL", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}
         action={
           <Link
@@ -147,7 +148,7 @@ export default async function DashboardPage() {
           </div>
           {reminders.length === 0 && hotClients.length === 0 ? (
             <p className="py-4 text-center text-sm text-slate-400">
-              Wszyscy klienci na bieżąco. 👌
+              Wszyscy klienci na bieżąco.
             </p>
           ) : (
             <ul className="space-y-1">
@@ -163,7 +164,9 @@ export default async function DashboardPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-slate-900">{c.name}</p>
-                        <p className="text-xs text-amber-600">🔔 zaplanowany kontakt</p>
+                        <p className="flex items-center gap-1 text-xs text-amber-600">
+                          <BellIcon className="h-3.5 w-3.5" /> zaplanowany kontakt
+                        </p>
                       </div>
                     </div>
                   </Link>
@@ -219,8 +222,19 @@ export default async function DashboardPage() {
                     className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 ${a.agentId === user.id ? "bg-emerald-50" : ""}`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="w-5 text-center font-mono text-sm font-bold text-slate-500">
-                        {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                      {/* Podium bez emotek: kolorowy krążek z numerem. */}
+                      <span
+                        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold ${
+                          i === 0
+                            ? "bg-amber-100 text-amber-700"
+                            : i === 1
+                              ? "bg-slate-200 text-slate-700"
+                              : i === 2
+                                ? "bg-orange-100 text-orange-700"
+                                : "text-slate-500"
+                        }`}
+                      >
+                        {i + 1}
                       </span>
                       <span className={`text-sm ${a.agentId === user.id ? "font-semibold text-slate-900" : "text-slate-700"}`}>
                         {a.agentId === user.id ? "Ty" : a.name}

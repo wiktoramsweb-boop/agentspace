@@ -268,7 +268,7 @@ export function DealActions({ dealId, status }: { dealId: string; status: DealSt
           <button
             onClick={() => {
               setDealStatus(dealId, "zamkniety");
-              toast("Transakcja zamknięta 🎉");
+              toast("Transakcja zamknięta.");
             }}
             className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-500/25"
           >

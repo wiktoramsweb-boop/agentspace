@@ -155,7 +155,7 @@ export function SessionChat({
           </p>
         )}
         {voiceError && (
-          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">🎤 {voiceError}</p>
+          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{voiceError}</p>
         )}
         <form onSubmit={handleSend} className="flex gap-2">
           {voiceSupported && (
@@ -192,12 +192,12 @@ export function SessionChat({
         </form>
         {voiceSupported && !listening && (
           <p className="mt-2 text-xs text-slate-500">
-            🎤 Możesz mówić zamiast pisać - kliknij mikrofon. Działa najlepiej w Chrome.
+            Możesz mówić zamiast pisać - kliknij mikrofon. Działa najlepiej w Chrome.
           </p>
         )}
         {!voiceSupported && (
           <p className="mt-2 text-xs text-amber-400/80">
-            🎤 Ta przeglądarka nie ma wbudowanego dyktowania. Na iPhone dotknij pola tekstowego i użyj
+            Ta przeglądarka nie ma wbudowanego dyktowania. Na iPhone dotknij pola tekstowego i użyj
             ikony mikrofonu na klawiaturze iOS. Na komputerze użyj Chrome.
           </p>
         )}

@@ -3,7 +3,7 @@ import { getGoal, getTodayLog, getRecentLogs, getYearClosedCommission } from "@/
 import { computeFunnel } from "@/lib/funnel";
 import { FUNNEL_STAGES } from "@/lib/types";
 import { PageHeader, Card } from "../components/ui";
-import { formatPln } from "@/lib/format";
+import { formatPln, plDays } from "@/lib/format";
 import { buildMonthCalendar } from "@/lib/goal-calendar";
 import { GoalSetup } from "./goal-setup";
 import { DailyTracker } from "./daily-tracker";
@@ -163,7 +163,7 @@ export default async function CelePage() {
         <Card>
           <h2 className="mb-1 text-lg font-semibold text-slate-900">Dziś</h2>
           <p className="mb-5 text-sm text-slate-500">
-            Odhacz co zrobiłeś. Passa: <span className="text-emerald-600">{daysHitCallGoal} dni</span> z celem telefonów (ost. 30 dni).
+            Odhacz co zrobiłeś. Passa: <span className="text-emerald-600">{plDays(daysHitCallGoal)}</span> z celem telefonów (ost. 30 dni).
           </p>
           <DailyTracker log={todayLog} dailyTargets={dailyTargets} cadences={cadences} valuePerCall={valuePerCall} />
         </Card>

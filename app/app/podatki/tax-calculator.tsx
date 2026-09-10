@@ -41,7 +41,7 @@ export function TaxCalculator() {
   return (
     <div className="space-y-5">
       {/* Zastrzeżenie */}
-      <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] p-4 text-sm text-amber-200/90">
+      <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] p-4 text-sm text-amber-700">
         <span className="font-semibold text-amber-700">To narzędzie do modelowania, nie porada podatkowa.</span>{" "}
         Kwoty ZUS i zdrowotnej na 2026 to szacunki (oficjalne kwoty ogłaszane są końcem roku) - możesz je
         poprawić w zakładce <span className="font-medium">Założenia</span>. Przed realną decyzją potwierdź u księgowej.
@@ -447,7 +447,7 @@ function VatTab({ c }: { c: TaxConstants }) {
         </div>
 
         {/* Ostrzeżenie sztuczny podział */}
-        <div className="rounded-2xl border border-red-500/25 bg-red-500/[0.05] p-5 text-sm text-red-200/90">
+        <div className="rounded-2xl border border-red-500/25 bg-red-500/[0.05] p-5 text-sm text-red-700">
           <p className="mb-1 font-semibold text-red-700">⚠ Ryzyko: sztuczne dzielenie działalności</p>
           <p className="text-slate-700">
             „Walenie na JDG, żeby zmieścić się pod limitem" fiskus może uznać za obejście limitu VAT - zsumować
