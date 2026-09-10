@@ -107,7 +107,7 @@ export function SessionChat({
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col md:h-[calc(100vh-9rem)]">
       {/* Header */}
-      <div className="mb-4 flex flex-col gap-2 border-b border-zinc-900 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-lg font-semibold text-slate-900">{scenarioTitle}</h1>
           <p className="text-sm text-slate-500">Klient: {personality}</p>

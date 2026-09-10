@@ -30,11 +30,11 @@ export default async function HistoriaPage() {
         />
       ) : (
         <Card className="!p-0">
-          <div className="divide-y divide-zinc-900">
+          <div className="divide-y divide-slate-200">
             {sessions.map((s) => (
               <Link
                 key={s.id}
-                href={s.status === "completed" ? `/app/sesja/${s.id}` : `/app/sesja/${s.id}`}
+                href={`/app/sesja/${s.id}`}
                 className="flex items-center justify-between gap-4 px-6 py-4 transition hover:bg-slate-50"
               >
                 <div className="min-w-0">
@@ -44,10 +44,18 @@ export default async function HistoriaPage() {
                   <p className="text-sm text-slate-500">
                     {formatDate(s.started_at)}
                     {s.personality && ` · klient ${s.personality}`}
-                    {s.status === "in_progress" && " · w trakcie"}
                   </p>
                 </div>
-                <ScoreBadge score={s.score?.overall ?? null} />
+                <div className="flex flex-shrink-0 items-center gap-2">
+                  {/* Nieskończona sesja nie ma wyniku, więc bez tej etykiety
+                      wyglądała jak zwykły trening ocenionego na „-". */}
+                  {s.status === "in_progress" && (
+                    <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                      niedokończona
+                    </span>
+                  )}
+                  <ScoreBadge score={s.score?.overall ?? null} />
+                </div>
               </Link>
             ))}
           </div>

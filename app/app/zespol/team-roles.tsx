@@ -34,7 +34,7 @@ export function TeamRoles({
   return (
     <div className="space-y-3">
       {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>}
-      <div className="divide-y divide-zinc-900 rounded-2xl border border-slate-200">
+      <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200">
         {members.map((m) => (
           <div key={m.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">

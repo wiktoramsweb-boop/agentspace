@@ -228,7 +228,7 @@ export default async function ZespolPage() {
             <Card>
               <InviteForm managers={managerOptions} />
               {invitations.length > 0 && (
-                <div className="mt-5 border-t border-zinc-900 pt-4">
+                <div className="mt-5 border-t border-slate-200 pt-4">
                   <p className="mb-3 text-xs font-medium uppercase tracking-wider text-slate-500">
                     Oczekujące zaproszenia
                   </p>
@@ -291,7 +291,7 @@ export default async function ZespolPage() {
           </Card>
         ) : (
           <Card className="!p-0">
-            <div className="divide-y divide-zinc-900">
+            <div className="divide-y divide-slate-200">
               {ranking.map((agent, i) => {
                 const fp = funnelByAgent[agent.id];
                 return (

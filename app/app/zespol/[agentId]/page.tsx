@@ -171,7 +171,7 @@ export default async function AgentDetailPage({ params }: Props) {
         </Card>
       ) : (
         <Card className="!p-0">
-          <div className="divide-y divide-zinc-900">
+          <div className="divide-y divide-slate-200">
             {sessions.map((s) => {
               const sc = s.score;
               const inProgress = s.status !== "completed";

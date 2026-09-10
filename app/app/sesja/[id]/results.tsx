@@ -74,7 +74,7 @@ export function SessionResults({
                 </p>
               </div>
             </div>
-            <div className="rounded-2xl border border-zinc-900 bg-slate-50 p-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <p className="mb-1 text-xs font-medium uppercase tracking-wider text-slate-500">
                 Podsumowanie
               </p>
@@ -83,7 +83,7 @@ export function SessionResults({
           </div>
 
           {/* Kategorie */}
-          <div className="mb-6 rounded-2xl border border-zinc-900 bg-slate-50 p-6">
+          <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <h2 className="mb-5 text-sm font-medium uppercase tracking-wider text-slate-500">
               Rozbicie na kategorie
             </h2>
@@ -132,7 +132,7 @@ export function SessionResults({
       )}
 
       {/* Transkrypt */}
-      <details className="rounded-2xl border border-zinc-900 bg-slate-50 p-6">
+      <details className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
         <summary className="cursor-pointer text-sm font-medium uppercase tracking-wider text-slate-500">
           Transkrypt rozmowy ({session.transcript.length} wiadomości)
         </summary>

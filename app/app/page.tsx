@@ -273,7 +273,7 @@ export default async function DashboardPage() {
           </Card>
         ) : (
           <Card className="!p-0">
-            <div className="divide-y divide-zinc-900">
+            <div className="divide-y divide-slate-200">
               {recent.map((s) => (
                 <Link
                   key={s.id}
