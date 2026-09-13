@@ -28,17 +28,32 @@ export function ActivityModal({
   presetPropertyId,
   trigger = "button",
   reportDefault = false,
+  presetDate,
+  presetTime,
+  open: openProp,
+  onOpenChange,
 }: {
   agents: Lite[];
   clients: ClientLite[];
   properties: Lite[];
   presetClientId?: string;
   presetPropertyId?: string;
-  trigger?: "button" | "plus";
+  /** "none" = bez własnego przycisku, otwierane z zewnątrz (np. klik w kalendarzu). */
+  trigger?: "button" | "plus" | "none";
   /** Ustawienie biura: nowe działanie od razu zaznaczone do raportu aktywności. */
   reportDefault?: boolean;
+  /** Data i godzina z klikniętego miejsca w kalendarzu. */
+  presetDate?: string;
+  presetTime?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (v: boolean) => {
+    setOpenState(v);
+    onOpenChange?.(v);
+  };
   const [kind, setKind] = useState<ActivityKind | null>(null);
 
   function close() {
@@ -48,7 +63,7 @@ export function ActivityModal({
 
   return (
     <>
-      {trigger === "plus" ? (
+      {trigger === "none" ? null : trigger === "plus" ? (
         <button
           onClick={() => setOpen(true)}
           aria-label="Dodaj działanie"
@@ -98,6 +113,8 @@ export function ActivityModal({
           presetClientId={presetClientId}
           presetPropertyId={presetPropertyId}
           reportDefault={reportDefault}
+          presetDate={presetDate}
+          presetTime={presetTime}
           onBack={() => setKind(null)}
           onClose={close}
         />
@@ -114,6 +131,8 @@ function ActivityForm({
   presetClientId,
   presetPropertyId,
   reportDefault,
+  presetDate,
+  presetTime,
   onBack,
   onClose,
 }: {
@@ -124,6 +143,8 @@ function ActivityForm({
   presetClientId?: string;
   presetPropertyId?: string;
   reportDefault: boolean;
+  presetDate?: string;
+  presetTime?: string;
   onBack: () => void;
   onClose: () => void;
 }) {
@@ -148,8 +169,10 @@ function ActivityForm({
     }
   }
 
-  const today = todayPL();
-  const nowTime = nowTimePL();
+  const today = presetDate ?? todayPL();
+  const nowTime = presetTime ?? nowTimePL();
+  // Termin z przyszłości (klik w kalendarzu) to plan, a nie coś już zrobionego.
+  const isFuture = `${today}T${nowTime}` > `${todayPL()}T${nowTimePL()}`;
 
   return (
     <Modal title={`Nowe: ${meta.label.toLowerCase()}`} onClose={onClose} maxWidth="max-w-3xl">
@@ -297,7 +320,7 @@ function ActivityForm({
               )}
               <div>
                 <Label>Status</Label>
-                <select name="status" className={inp} defaultValue="wykonane">
+                <select name="status" className={inp} defaultValue={isFuture ? "zaplanowane" : "wykonane"}>
                   {ACTIVITY_STATUSES.map((s) => (
                     <option key={s.value} value={s.value}>
                       {s.label}

@@ -142,6 +142,8 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
   }
 
   revalidatePath("/app/dzialania");
+
+  revalidatePath("/app/kalendarz");
   revalidatePath("/app/klienci");
   revalidatePath("/app/cele");
   revalidatePath("/app");
@@ -208,6 +210,8 @@ export async function setActivityStatus(id: string, status: string): Promise<voi
   await applyActivityToGoals(admin, { ...before, status, completed_at: completedAt }, 1);
 
   revalidatePath("/app/dzialania");
+
+  revalidatePath("/app/kalendarz");
   revalidatePath("/app/cele");
   revalidatePath("/app");
 }
@@ -227,6 +231,8 @@ export async function deleteActivity(id: string): Promise<void> {
   if (before) await applyActivityToGoals(admin, before, -1);
 
   revalidatePath("/app/dzialania");
+
+  revalidatePath("/app/kalendarz");
   revalidatePath("/app/cele");
   revalidatePath("/app");
 }
@@ -241,4 +247,34 @@ export async function deleteActivityAndBack(id: string): Promise<void> {
 export async function toggleActivityDone(id: string, done: boolean): Promise<void> {
   await setActivityStatus(id, done ? "wykonane" : "zaplanowane");
   revalidatePath(`/app/dzialania/${id}`);
+}
+
+/**
+ * Nowy termin działania po przeciągnięciu w kalendarzu. Data i godzina w czasie
+ * polskim; odrzucamy wszystko, co nie wygląda na datę, zamiast zgadywać.
+ */
+export async function rescheduleActivity(
+  id: string,
+  dateKey: string,
+  time: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const user = await requireUser();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey) || !/^\d{2}:\d{2}$/.test(time)) {
+    return { ok: false, error: "Nieprawidłowy termin." };
+  }
+  const dueAt = warsawToIso(dateKey, time);
+  if (!dueAt) return { ok: false, error: "Nieprawidłowy termin." };
+
+  const admin = createSupabaseAdmin();
+  const { error } = await admin
+    .from("activities")
+    .update({ due_at: dueAt, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("agency_id", user.agency_id);
+  if (error) return { ok: false, error: `Nie udało się przesunąć: ${error.message}` };
+
+  revalidatePath("/app/kalendarz");
+  revalidatePath("/app/dzialania");
+  revalidatePath("/app");
+  return { ok: true };
 }

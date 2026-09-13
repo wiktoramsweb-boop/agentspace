@@ -14,6 +14,7 @@ import { SearchWizard } from "../app/poszukiwania/search-wizard";
 import type { ActivityRich } from "@/lib/data-activities";
 import { Pagination } from "../app/components/pagination";
 import { PhotoPipelineTest } from "./photo-pipeline-test";
+import { CalendarDemo } from "./calendar-demo";
 
 
 const MOCK_AGENTS = [
@@ -177,6 +178,11 @@ export function ThemePreview() {
               <ActivityModal agents={MOCK_AGENTS} clients={MOCK_CLIENTS} properties={MOCK_PROPS} />
             </div>
             <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" agents={MOCK_AGENTS} />
+          </div>
+
+          <div id="demo-kalendarz" className="space-y-10">
+            <CalendarDemo />
+            <CalendarDemo view="miesiac" />
           </div>
 
           <Card>

@@ -153,3 +153,65 @@ export function todayDatePL(): Date {
   const [y, m, d] = todayPL().split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d));
 }
+
+/**
+ * Części daty i godziny w polskiej strefie: klucz dnia, godzina, minuta
+ * i dzień tygodnia (0 = poniedziałek). Podstawa siatki kalendarza.
+ */
+export function partsPL(iso: string | null | undefined): {
+  dateKey: string;
+  hour: number;
+  minute: number;
+  weekday: number;
+} | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: APP_TZ,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      weekday: "short",
+      hour12: false,
+    })
+      .formatToParts(d)
+      .map((x) => [x.type, x.value]),
+  );
+  const order = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  return {
+    dateKey: `${p.year}-${p.month}-${p.day}`,
+    hour: Number(p.hour) % 24,
+    minute: Number(p.minute),
+    weekday: Math.max(0, order.indexOf(p.weekday)),
+  };
+}
+
+/** Przesunięcie klucza dnia (YYYY-MM-DD) o n dni. Liczone w UTC, więc bez pułapek zmiany czasu. */
+export function addDaysKey(key: string, n: number): string {
+  const [y, m, d] = key.split("-").map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d + n));
+  return t.toISOString().slice(0, 10);
+}
+
+/** Dzień tygodnia klucza dnia (0 = poniedziałek). */
+export function weekdayOfKey(key: string): number {
+  const [y, m, d] = key.split("-").map(Number);
+  return (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;
+}
+
+/** Poniedziałek tygodnia, w którym leży dany dzień. */
+export function mondayOfKey(key: string): string {
+  return addDaysKey(key, -weekdayOfKey(key));
+}
+
+/** Czy tekst to poprawny klucz dnia YYYY-MM-DD. */
+export function isDateKey(v: unknown): v is string {
+  if (typeof v !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+  const [y, m, d] = v.split("-").map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d));
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d;
+}
