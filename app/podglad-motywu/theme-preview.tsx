@@ -15,6 +15,7 @@ import type { ActivityRich } from "@/lib/data-activities";
 import { Pagination } from "../app/components/pagination";
 import { PhotoPipelineTest } from "./photo-pipeline-test";
 import { CalendarDemo } from "./calendar-demo";
+import { DocsDemo } from "./docs-demo";
 
 
 const MOCK_AGENTS = [
@@ -179,6 +180,8 @@ export function ThemePreview() {
             </div>
             <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" agents={MOCK_AGENTS} />
           </div>
+
+          <DocsDemo />
 
           <div id="demo-kalendarz" className="space-y-10">
             <CalendarDemo />

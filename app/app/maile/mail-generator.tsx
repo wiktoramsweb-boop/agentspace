@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatIcon, MailIcon2, SparkIcon } from "../components/icons";
+import { SaveToClient, type ClientContact } from "../components/save-to-client";
 import { useMemo, useState } from "react";
 
 type Cat = "wlasciciel" | "kupujacy" | "negocjacje" | "formalnosci" | "relacja" | "inne";
@@ -70,7 +71,7 @@ const PLACEHOLDERS: Record<string, string> = {
 
 type Result = { subject: string; body: string };
 
-export function MailGenerator({ defaultSignature }: { defaultSignature: string }) {
+export function MailGenerator({ defaultSignature, clients = [] }: { defaultSignature: string; clients?: ClientContact[] }) {
   const [mode, setMode] = useState<"mail" | "sms">("mail");
   const types = mode === "mail" ? EMAIL_TYPES : SMS_TYPES;
   const [type, setType] = useState<string>("raport");
@@ -202,15 +203,20 @@ export function MailGenerator({ defaultSignature }: { defaultSignature: string }
         <div>
           {!result ? (
             <EmptyState isSms={isSms} />
-          ) : isSms ? (
-            <SmsResult text={result.body} onChange={(t) => setResult({ subject: "", body: t })} onCopy={() => copyText(result.body)} copied={copied} />
           ) : (
-            <MailResult
-              result={result}
-              onChange={setResult}
-              onCopy={() => copyText(result.body)}
-              copied={copied}
-            />
+            <div className="space-y-3">
+              {isSms ? (
+                <SmsResult text={result.body} onChange={(t) => setResult({ subject: "", body: t })} onCopy={() => copyText(result.body)} copied={copied} />
+              ) : (
+                <MailResult
+                  result={result}
+                  onChange={setResult}
+                  onCopy={() => copyText(result.body)}
+                  copied={copied}
+                />
+              )}
+              <SaveToClient channel={isSms ? "sms" : "mail"} subject={result.subject} body={result.body} clients={clients} />
+            </div>
           )}
         </div>
       </div>
@@ -323,7 +329,7 @@ function MailResult({ result, onChange, onCopy, copied }: { result: Result; onCh
           {copied ? "✓ Skopiowano" : "Kopiuj treść"}
         </button>
         <p className="text-xs text-slate-400">
-          Sprawdź maila przed wysłaniem - zwłaszcza liczby i miejsca w [nawiasach]. Wklej do Gmaila i wyślij.
+          Sprawdź maila przed wysłaniem, zwłaszcza liczby i miejsca w [nawiasach]. Potem otwórz go w poczcie poniżej albo skopiuj.
         </p>
       </div>
     </div>

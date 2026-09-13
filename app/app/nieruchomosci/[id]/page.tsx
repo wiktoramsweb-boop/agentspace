@@ -29,6 +29,8 @@ import { ProcessBar, OwnerCard } from "./property-extras";
 import { MatchingSearches } from "./matching-searches";
 import { getActiveSearches } from "@/lib/data-searches";
 import { NearbyCard } from "./nearby-card";
+import { getDocuments } from "@/lib/data-documents";
+import { DocumentsCard } from "../../dokumenty/documents-card";
 import { PhotoManager } from "../photo-manager";
 import { getAgencySettings, matchTolerance, photoConfigFrom } from "@/lib/agency-settings";
 
@@ -43,13 +45,14 @@ export default async function PropertyDetailPage({ params }: Props) {
   // Baza ofert jest wspólna dla biura - dostęp mają wszyscy z tej agencji.
   if (property.agency_id !== user.agency_id) redirect("/app/nieruchomosci");
 
-  const [owner, interested, deals, allClients, activeSearches, settings] = await Promise.all([
+  const [owner, interested, deals, allClients, activeSearches, settings, documents] = await Promise.all([
     property.owner_client_id ? getClient(property.owner_client_id) : Promise.resolve(null),
     getPropertyInterestedClients(id),
     getDealsForProperty(id),
     getClientsLite(user.id),
     user.agency_id ? getActiveSearches(user.agency_id) : Promise.resolve([]),
     getAgencySettings(user.agency_id, user.agency?.name),
+    getDocuments(user.agency_id, "property", id),
   ]);
 
   const status = PROPERTY_STATUSES.find((s) => s.value === property.status);
@@ -65,10 +68,28 @@ export default async function PropertyDetailPage({ params }: Props) {
     { label: "Cena", value: property.price_pln != null ? formatPln(property.price_pln) : "-" },
     { label: "Powierzchnia", value: property.area_m2 != null ? `${property.area_m2} m²` : "-" },
     { label: "Pokoje", value: property.rooms != null ? String(property.rooms) : "-" },
-    { label: "Piętro", value: property.floor != null ? String(property.floor) : "-" },
+    { label: "Piętro", value: property.floor == null ? "-" : property.floor === 0 ? "parter" : String(property.floor) },
     { label: "Typ", value: type?.label ?? "-" },
     { label: "Rodzaj", value: kind?.label ?? "-" },
+    {
+      label: "Świadectwo energ.",
+      value:
+        property.energy_cert_status === "posiada"
+          ? property.energy_ep != null
+            ? `EP ${property.energy_ep} kWh/m²`
+            : "posiada"
+          : property.energy_cert_status === "w_przygotowaniu"
+            ? "w przygotowaniu"
+            : property.energy_cert_status === "zwolniona"
+              ? "zwolniona"
+              : "brak danych",
+    },
   ];
+  // Aktywna oferta bez świadectwa i bez zwolnienia nie powinna iść do ogłoszenia.
+  const energyMissing =
+    property.status === "aktywna" &&
+    property.energy_cert_status !== "posiada" &&
+    property.energy_cert_status !== "zwolniona";
 
   return (
     <>
@@ -125,6 +146,12 @@ export default async function PropertyDetailPage({ params }: Props) {
           </Card>
 
           <Card>
+            {energyMissing && (
+              <p className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                Brak świadectwa energetycznego. Ogłoszenie musi podawać wskaźnik EP: uzupełnij go w edycji
+                oferty albo wgraj skan w Dokumentach.
+              </p>
+            )}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {specs.map((s) => (
                 <div key={s.label}>
@@ -166,8 +193,15 @@ export default async function PropertyDetailPage({ params }: Props) {
           )}
         </div>
 
-        {/* Prawa: właściciel, zainteresowani, transakcje */}
+        {/* Prawa: dokumenty, właściciel, zainteresowani, transakcje */}
         <div className="space-y-6">
+          <Card>
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Dokumenty ({documents.docs.length})
+            </h2>
+            <DocumentsCard entity="property" entityId={property.id} initial={documents.docs} ready={documents.ready} />
+          </Card>
+
           <Card>
             <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
               {property.deal_kind === "wynajem" ? "Wynajmujący" : "Właściciel"}

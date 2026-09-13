@@ -22,6 +22,7 @@ import {
   HEATINGS,
   PROPERTY_FEATURES,
   EXPORT_ADDRESS_MODES,
+  ENERGY_CERT_STATUSES,
   type Property,
   type PropertyDealKind,
   type PropertyPhoto,
@@ -258,6 +259,18 @@ export function PropertyWizard({
                 {isRent && <Field label="Kaucja (zł)" name="deposit_pln" type="number" value={p?.deposit_pln} placeholder="3000" />}
                 <Field label="Dostępne od" name="available_from" type="date" value={p?.available_from} />
               </div>
+            </Group>
+
+            <Group title="Świadectwo energetyczne">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <Select label="Stan świadectwa" name="energy_cert_status" options={ENERGY_CERT_STATUSES} value={p?.energy_cert_status} empty />
+                <Field label="Wskaźnik EP (kWh/m²·rok)" name="energy_ep" type="number" value={p?.energy_ep} placeholder="95" />
+                <Field label="Ważne do" name="energy_cert_valid_until" type="date" value={p?.energy_cert_valid_until} />
+              </div>
+              <p className="text-xs text-slate-400">
+                Od 2023 roku ogłoszenie sprzedaży i najmu musi podawać wskaźnik EP. Skan świadectwa
+                dodasz na karcie oferty w sekcji Dokumenty.
+              </p>
             </Group>
 
             {!isLand && (

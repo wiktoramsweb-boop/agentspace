@@ -28,6 +28,10 @@ import { ClientSearches } from "./client-searches";
 import { getSearches, getActiveProperties } from "@/lib/data-searches";
 import { findMatches } from "@/lib/matching";
 import { getAgencySettings } from "@/lib/agency-settings";
+import { getDocuments } from "@/lib/data-documents";
+import { getClientMessages } from "@/lib/data-messages";
+import { DocumentsCard } from "../../dokumenty/documents-card";
+import { ClientCorrespondence } from "./client-correspondence";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -60,13 +64,15 @@ export default async function ClientDetailPage({ params }: Props) {
 
   // Działania tego klienta - historia telefonów i spotkań w jednym miejscu.
   const agencyId = user.agency_id;
-  const [clientActivities, agents, agencyProps, clientSearches, activeProps, settings] = await Promise.all([
+  const [clientActivities, agents, agencyProps, clientSearches, activeProps, settings, documents, correspondence] = await Promise.all([
     agencyId ? getActivities(agencyId, { clientId: client.id, limit: 50 }) : Promise.resolve([]),
     agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
     agencyId ? getAgencyProperties(agencyId) : Promise.resolve([]),
     agencyId ? getSearches(agencyId, { clientId: client.id, limit: 20 }) : Promise.resolve([]),
     agencyId ? getActiveProperties(agencyId) : Promise.resolve([]),
     getAgencySettings(agencyId, user.agency?.name),
+    getDocuments(agencyId, "client", client.id),
+    getClientMessages(agencyId, client.id),
   ]);
 
   // Ile ofert pasuje do każdego poszukiwania tego klienta - agent widzi od razu,
@@ -115,6 +121,7 @@ export default async function ClientDetailPage({ params }: Props) {
             presetContext={`Klient: ${client.name}, ${type?.label ?? ""}${client.property ? `, szuka/sprzedaje: ${client.property}` : ""}${client.budget_pln ? `, budżet ${client.budget_pln} zł` : ""}. Status: ${client.status}.${client.notes ? ` Notatka: ${client.notes}` : ""}`}
             buttonLabel="Napisz follow-up"
             title="Wiadomość follow-up do klienta"
+            client={{ id: client.id, name: client.name, email: client.email ?? null, phone: client.phone ?? null }}
             placeholder="O czym była ostatnia rozmowa? Co chcesz przekazać?"
           />
           <AiWriter
@@ -265,6 +272,26 @@ export default async function ClientDetailPage({ params }: Props) {
               />
             </div>
             <ClientActivities activities={clientActivities} />
+          </Card>
+
+          <Card>
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Korespondencja ({correspondence.messages.length})
+            </h2>
+            <ClientCorrespondence
+              clientId={client.id}
+              clientEmail={client.email ?? null}
+              clientPhone={client.phone ?? null}
+              initial={correspondence.messages}
+              ready={correspondence.ready}
+            />
+          </Card>
+
+          <Card>
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Dokumenty ({documents.docs.length})
+            </h2>
+            <DocumentsCard entity="client" entityId={client.id} initial={documents.docs} ready={documents.ready} />
           </Card>
 
           <Card>

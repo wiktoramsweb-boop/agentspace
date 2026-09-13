@@ -11,7 +11,9 @@ import { SUPABASE_URL } from "./supabase/config";
 
 export const PHOTO_BUCKET = "property-photos";
 export const ASSET_BUCKET = "agency-assets";
-export type BucketId = typeof PHOTO_BUCKET | typeof ASSET_BUCKET;
+/** Dokumenty (umowy, KW, skany dowodów) - bucket PRYWATNY, bez publicznych adresów. */
+export const DOC_BUCKET = "documents";
+export type BucketId = typeof PHOTO_BUCKET | typeof ASSET_BUCKET | typeof DOC_BUCKET;
 
 export function publicAssetUrl(bucket: BucketId, path: string): string {
   const base = (process.env.SUPABASE_URL ?? SUPABASE_URL).replace(/\/$/, "");

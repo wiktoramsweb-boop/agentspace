@@ -103,6 +103,30 @@ function buildSlug(f: ReturnType<typeof propertyFromForm>, offerNo: string | nul
 /** Wynik zapisu. Kreator zamyka się tylko przy powodzeniu. */
 export type SaveResult = { ok: true } | { ok: false; error: string };
 
+/**
+ * Świadectwo energetyczne (kolumny z v23). Zapisujemy je osobnym, opcjonalnym
+ * zapytaniem: bez migracji v23 błąd tutaj nie może zablokować zapisu oferty.
+ */
+async function saveEnergyCert(
+  admin: ReturnType<typeof createSupabaseAdmin>,
+  id: string,
+  agencyId: string | null,
+  formData: FormData,
+): Promise<void> {
+  if (!formData.has("energy_cert_status")) return;
+  const status = String(formData.get("energy_cert_status") ?? "");
+  const until = String(formData.get("energy_cert_valid_until") ?? "");
+  await admin
+    .from("properties")
+    .update({
+      energy_cert_status: ["posiada", "w_przygotowaniu", "zwolniona"].includes(status) ? status : null,
+      energy_ep: floatOrNull(formData.get("energy_ep")),
+      energy_cert_valid_until: /^\d{4}-\d{2}-\d{2}$/.test(until) ? until : null,
+    })
+    .eq("id", id)
+    .eq("agency_id", agencyId);
+}
+
 export async function createProperty(formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
   const fields = propertyFromForm(formData);
@@ -172,6 +196,7 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
       error: `Nie udało się zapisać oferty: ${error?.message ?? "nieznany błąd"}`,
     };
   }
+  await saveEnergyCert(admin, data.id, user.agency_id, formData);
 
   revalidatePath("/app/nieruchomosci");
   redirect(`/app/nieruchomosci/${data.id}`);
@@ -234,6 +259,8 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
       .filter((p): p is string => !!p && !keep.has(p) && p.startsWith(`${user.agency_id}/`));
     await removeFiles(PHOTO_BUCKET, [...new Set(dropped)]);
   }
+
+  await saveEnergyCert(admin, id, user.agency_id, formData);
 
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");

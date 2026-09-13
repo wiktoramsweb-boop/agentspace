@@ -2,6 +2,7 @@
 
 import { SparkIcon } from "./icons";
 import { useState } from "react";
+import { SaveToClient, type ClientContact } from "./save-to-client";
 
 type Kind = "followup" | "objection" | "summary" | "custom";
 
@@ -12,6 +13,7 @@ export function AiWriter({
   buttonLabel,
   title,
   placeholder,
+  client,
 }: {
   kind: Kind;
   clientName?: string;
@@ -19,6 +21,8 @@ export function AiWriter({
   buttonLabel: string;
   title: string;
   placeholder?: string;
+  /** Gdy podany: gotową wiadomość można wysłać i zapisać w korespondencji klienta. */
+  client?: ClientContact;
 }) {
   const [open, setOpen] = useState(false);
   const [context, setContext] = useState(presetContext ?? "");
@@ -104,6 +108,12 @@ export function AiWriter({
             >
               {copied ? "✓ Skopiowano" : "Kopiuj"}
             </button>
+          </div>
+        )}
+
+        {result && client && (
+          <div className="mt-3">
+            <SaveToClient channel="mail" subject={title} body={result} clients={[client]} presetClientId={client.id} />
           </div>
         )}
       </div>

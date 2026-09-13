@@ -286,7 +286,18 @@ export type Property = {
   process_stage?: string | null;
   process_changed_at?: string | null;
   owner_role?: string | null;
+  // ── v23: świadectwo charakterystyki energetycznej ──
+  energy_cert_status?: string | null;
+  energy_ep?: number | null;
+  energy_cert_valid_until?: string | null;
 };
+
+/** Stan świadectwa energetycznego oferty (od 2023 wymagane w ogłoszeniu). */
+export const ENERGY_CERT_STATUSES: { value: string; label: string }[] = [
+  { value: "posiada", label: "Posiada świadectwo" },
+  { value: "w_przygotowaniu", label: "W przygotowaniu" },
+  { value: "zwolniona", label: "Zwolniona z obowiązku" },
+];
 
 export type PropertyInterest = {
   id: string;
