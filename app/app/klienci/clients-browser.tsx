@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
 import { BellIcon } from "../components/icons";
-import { PAGE_SIZE, Pagination } from "../components/pagination";
+import { ListToolbar, ServerPagination } from "../components/list-controls";
+import { BulkBar, SelectBox, useSelection } from "../components/bulk-bar";
 import { todayPL } from "@/lib/datetime";
-import { useEffect, useMemo, useState } from "react";
-import { CLIENT_STATUSES, CLIENT_TYPES, CLIENT_TYPE_LABELS, type ClientStatus, type ClientType } from "@/lib/types";
-import type { ClientWithOwner } from "@/lib/data-platform";
+import { CLIENT_STATUSES, CLIENT_TYPES, CLIENT_TYPE_LABELS, type ClientStatus } from "@/lib/types";
+import type { ClientRow } from "@/lib/data-lists";
+import type { ListQuery } from "@/lib/list-params";
 import { formatPln, daysAgo, formatPhone } from "@/lib/format";
-
-const digits = (s: string | null) => (s ?? "").replace(/\D/g, "");
 
 // Kolor awatara na podstawie nazwy - stabilny, żywy, w klimacie marki.
 const AVATARS = [
@@ -36,233 +36,162 @@ const ACCENT: Record<ClientStatus, string> = {
   stracony: "bg-red-400",
 };
 
+const SORTS = [
+  { value: "zmiana", label: "Ostatnio zmienione" },
+  { value: "nowe", label: "Najnowsze" },
+  { value: "nazwa", label: "Nazwisko A-Z" },
+  { value: "kontakt", label: "Najdawniej kontaktowani" },
+  { value: "budzet", label: "Budżet malejąco" },
+];
+
+/**
+ * Lista klientów. Filtrowanie, sortowanie i strony liczy baza, a przeglądarka
+ * dostaje tylko jedną stronę wyników - to jedyna wersja, która zniesie bazę
+ * z importu z innego systemu.
+ */
 export function ClientsBrowser({
-  clients,
-  currentUserId,
+  rows,
+  query,
+  total,
+  pages,
+  agents,
+  canDelete,
 }: {
-  clients: ClientWithOwner[];
-  currentUserId: string;
+  rows: ClientRow[];
+  query: ListQuery;
+  total: number;
+  pages: number;
+  agents: { id: string; name: string }[];
+  canDelete: boolean;
 }) {
-  const [query, setQuery] = useState("");
-  const [scope, setScope] = useState<"all" | "mine">("all");
-  const [statusFilter, setStatusFilter] = useState<ClientStatus | "">("");
-  const [typeFilter, setTypeFilter] = useState<ClientType | "">("");
-  const [page, setPage] = useState(0);
-
+  const reduce = useReducedMotion();
+  const selection = useSelection();
   const today = todayPL();
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const qd = digits(query);
-    return clients.filter((c) => {
-      if (scope === "mine" && c.agent_id !== currentUserId) return false;
-      if (statusFilter && c.status !== statusFilter) return false;
-      if (typeFilter && c.type !== typeFilter) return false;
-      if (!q) return true;
-      const byName = c.name.toLowerCase().includes(q);
-      const byEmail = (c.email ?? "").toLowerCase().includes(q);
-      const byPhone = qd.length >= 3 && digits(c.phone).includes(qd);
-      const byCompany = (c.company ?? "").toLowerCase().includes(q);
-      return byName || byEmail || byPhone || byCompany;
-    });
-  }, [clients, query, scope, statusFilter, typeFilter, currentUserId]);
-
-  // Zmiana filtra ma wracać na pierwszą stronę, inaczej po zawężeniu listy
-  // agent trafiał na pustą stronę 4.
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, pageCount - 1);
-  const visible = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
-
-  const typeCounts = useMemo(() => {
-    const m: Record<string, number> = {};
-    for (const c of clients) m[c.type] = (m[c.type] ?? 0) + 1;
-    return m;
-  }, [clients]);
-
-  useEffect(() => {
-    setPage(0);
-  }, [query, scope, statusFilter, typeFilter]);
-
-  const mineCount = clients.filter((c) => c.agent_id === currentUserId).length;
+  const pageIds = rows.map((r) => r.id);
+  const allOnPage = pageIds.length > 0 && pageIds.every((id) => selection.has(id));
 
   return (
     <div>
-      {/* Pasek wyszukiwania + zakres */}
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <svg
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.3-4.3M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z" />
-          </svg>
+      <ListToolbar
+        base="/app/klienci"
+        query={query}
+        total={total}
+        sorts={SORTS}
+        agents={agents}
+        placeholder="Szukaj po nazwisku, numerze telefonu, e-mailu, firmie…"
+        filters={{
+          statuses: CLIENT_STATUSES.map((s) => ({ value: s.value, label: s.label })),
+          types: { label: "Typ klienta", options: CLIENT_TYPES.map((t) => ({ value: t.value, label: t.label })) },
+          dateFields: [
+            { value: "zmiana", label: "ostatniej zmiany" },
+            { value: "nowe", label: "dodania" },
+            { value: "kontakt", label: "ostatniego kontaktu" },
+          ],
+          city: true,
+          range: { label: "Budżet", unit: "zł" },
+          extra: {
+            label: "Dodatkowo",
+            options: [
+              { value: "do_kontaktu", label: "Do kontaktu (termin minął)" },
+              { value: "bez_kontaktu", label: "Nigdy nie kontaktowani" },
+            ],
+          },
+        }}
+      />
+
+      {rows.length > 0 && (
+        <label className="mb-2 flex w-fit cursor-pointer items-center gap-2 text-xs font-medium text-slate-500">
           <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Szukaj po nazwisku, numerze telefonu, firmie…"
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-slate-900 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none"
+            type="checkbox"
+            checked={allOnPage}
+            onChange={() => selection.setMany(pageIds, !allOnPage)}
+            className="h-4 w-4 accent-emerald-500"
           />
-        </div>
-        <div className="flex rounded-xl border border-slate-200 bg-white p-1">
-          <ScopeBtn active={scope === "all"} onClick={() => setScope("all")}>
-            Całe biuro ({clients.length})
-          </ScopeBtn>
-          <ScopeBtn active={scope === "mine"} onClick={() => setScope("mine")}>
-            Moi ({mineCount})
-          </ScopeBtn>
-        </div>
-      </div>
+          Zaznacz wszystkich na stronie ({rows.length})
+        </label>
+      )}
 
-      {/* Filtr typu klienta */}
-      <div className="mb-3 flex flex-wrap gap-2">
-        <Chip active={typeFilter === ""} onClick={() => setTypeFilter("")}>
-          Wszyscy
-        </Chip>
-        {CLIENT_TYPES.map((t) => (
-          <Chip
-            key={t.value}
-            active={typeFilter === t.value}
-            onClick={() => setTypeFilter(typeFilter === t.value ? "" : t.value)}
-          >
-            {t.label}
-            {typeCounts[t.value] ? ` (${typeCounts[t.value]})` : ""}
-          </Chip>
-        ))}
-      </div>
-
-      {/* Filtr statusu */}
-      <div className="mb-5 flex flex-wrap gap-2">
-        <Chip active={statusFilter === ""} onClick={() => setStatusFilter("")}>
-          Wszystkie
-        </Chip>
-        {CLIENT_STATUSES.map((s) => (
-          <Chip
-            key={s.value}
-            active={statusFilter === s.value}
-            onClick={() => setStatusFilter(statusFilter === s.value ? "" : s.value)}
-          >
-            {s.label}
-          </Chip>
-        ))}
-      </div>
-
-      {filtered.length === 0 ? (
+      {rows.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center text-sm text-slate-500">
-          {query ? "Brak wyników dla tego wyszukiwania." : "Brak klientów w tym widoku."}
+          Nic nie pasuje do tych filtrów. Zmień je albo wyczyść, żeby zobaczyć całą bazę.
         </div>
       ) : (
         <div className="space-y-2.5">
-          {visible.map((c) => {
+          {rows.map((c, i) => {
             const status = CLIENT_STATUSES.find((s) => s.value === c.status);
             const typeLabel = CLIENT_TYPE_LABELS[c.type] ?? c.type;
             const due = c.next_contact_at && c.next_contact_at <= today;
+            const picked = selection.has(c.id);
             return (
-              <Link
+              <motion.div
                 key={c.id}
-                href={`/app/klienci/${c.id}`}
-                className="hover-lift group flex items-center gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 pl-0 transition hover:border-slate-300 hover:bg-slate-100"
+                initial={reduce ? false : { opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: reduce ? 0 : Math.min(0.2, i * 0.015), duration: 0.25 }}
+                className={`hover-lift group relative flex items-center gap-2 overflow-hidden rounded-2xl border bg-white transition ${
+                  picked ? "border-emerald-400 ring-1 ring-emerald-300" : "border-slate-200 hover:border-slate-300"
+                }`}
               >
                 <span className={`h-14 w-1.5 flex-shrink-0 rounded-r-full ${ACCENT[c.status]}`} />
-                <div
-                  className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(c.name)} text-sm font-bold text-white`}
-                >
-                  {c.name.charAt(0).toUpperCase()}
-                </div>
+                <SelectBox checked={picked} onChange={() => selection.toggle(c.id)} label={`Zaznacz ${c.name}`} />
 
-                <div className="grid min-w-0 flex-1 grid-cols-1 gap-x-6 gap-y-0.5 sm:grid-cols-[1.4fr_1fr_1fr]">
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-slate-900">{c.name}</p>
-                    <p className="truncate text-sm text-slate-500">
-                      {typeLabel}
-                      {c.property && ` · ${c.property}`}
-                    </p>
+                <Link href={`/app/klienci/${c.id}`} className="flex min-w-0 flex-1 items-center gap-4 py-4 pr-4">
+                  <div
+                    className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(c.name)} text-sm font-bold text-white`}
+                  >
+                    {c.name.charAt(0).toUpperCase()}
                   </div>
-                  <div className="min-w-0 text-sm">
-                    <p className="truncate text-slate-700">{formatPhone(c.phone)}</p>
-                    <p className="truncate text-xs text-slate-500">
-                      {c.budget_pln != null ? formatPln(c.budget_pln) : "-"}
-                    </p>
-                  </div>
-                  <div className="hidden min-w-0 text-sm sm:block">
-                    <p className="truncate text-slate-500">
-                      <span className="text-slate-400">Opiekun: </span>
-                      {c.opiekunName ?? "-"}
-                    </p>
-                    <p className="truncate text-xs text-slate-500">{daysAgo(c.last_contact_at)}</p>
-                  </div>
-                </div>
 
-                <div className="flex flex-shrink-0 items-center gap-3 pr-4">
-                  {due && (
-                    <span className="rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
-                      <BellIcon className="h-3.5 w-3.5" />
-                    </span>
-                  )}
-                  {status && (
-                    <span className={`rounded-md px-2 py-1 text-xs font-medium ${status.color}`}>
-                      {status.label}
-                    </span>
-                  )}
-                </div>
-              </Link>
+                  <div className="grid min-w-0 flex-1 grid-cols-1 gap-x-6 gap-y-0.5 sm:grid-cols-[1.4fr_1fr_1fr]">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-slate-900">{c.name}</p>
+                      <p className="truncate text-sm text-slate-500">
+                        {typeLabel}
+                        {c.property && ` · ${c.property}`}
+                      </p>
+                    </div>
+                    <div className="min-w-0 text-sm">
+                      <p className="truncate text-slate-700">{formatPhone(c.phone)}</p>
+                      <p className="truncate text-xs text-slate-500">
+                        {c.budget_pln != null ? formatPln(c.budget_pln) : "-"}
+                      </p>
+                    </div>
+                    <div className="hidden min-w-0 text-sm sm:block">
+                      <p className="truncate text-slate-500">
+                        <span className="text-slate-400">Opiekun: </span>
+                        {c.opiekunName ?? "-"}
+                      </p>
+                      <p className="truncate text-xs text-slate-500">{daysAgo(c.last_contact_at)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-shrink-0 items-center gap-3">
+                    {due && (
+                      <span className="rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
+                        <BellIcon className="h-3.5 w-3.5" />
+                      </span>
+                    )}
+                    {status && (
+                      <span className={`rounded-md px-2 py-1 text-xs font-medium ${status.color}`}>{status.label}</span>
+                    )}
+                  </div>
+                </Link>
+              </motion.div>
             );
           })}
         </div>
       )}
 
-      <Pagination
-        page={safePage}
-        total={filtered.length}
-        onPage={setPage}
-        label="kontaktów"
+      <ServerPagination base="/app/klienci" query={query} total={total} pages={pages} label="kontaktów" />
+
+      <BulkBar
+        entity="clients"
+        selection={selection}
+        statuses={CLIENT_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+        agents={agents}
+        canDelete={canDelete}
+        noun={["klient", "klientów", "klientów"]}
       />
     </div>
-  );
-}
-
-function ScopeBtn({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-        active ? "bg-emerald-500 text-white" : "text-slate-500 hover:text-slate-900"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-        active
-          ? "border-emerald-500/50 bg-emerald-100 text-emerald-700"
-          : "border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900"
-      }`}
-    >
-      {children}
-    </button>
   );
 }

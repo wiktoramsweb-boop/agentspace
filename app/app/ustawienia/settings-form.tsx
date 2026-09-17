@@ -8,11 +8,15 @@ export function SettingsForm({
   phone,
   monthlyGoal,
   defaultSplit,
+  jobTitle,
+  bio,
 }: {
   fullName: string;
   phone: string;
   monthlyGoal: number;
   defaultSplit: number;
+  jobTitle: string;
+  bio: string;
 }) {
   const [state, formAction, pending] = useActionState(updateProfile, undefined);
 
@@ -43,6 +47,37 @@ export function SettingsForm({
           className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
         <p className="mt-1.5 text-xs text-slate-500">Pokazuje się w PDF-ach dla klienta i w zespole.</p>
+      </div>
+
+      <div>
+        <label htmlFor="jobTitle" className="mb-2 block text-sm font-medium text-slate-700">
+          Stanowisko
+        </label>
+        <input
+          id="jobTitle"
+          name="jobTitle"
+          defaultValue={jobTitle}
+          maxLength={80}
+          placeholder="np. Agent nieruchomości, Ekspert ds. najmu"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+        />
+        <p className="mt-1.5 text-xs text-slate-500">Pokazuje się przy Twoim nazwisku w zespole.</p>
+      </div>
+
+      <div>
+        <label htmlFor="bio" className="mb-2 block text-sm font-medium text-slate-700">
+          O mnie
+        </label>
+        <textarea
+          id="bio"
+          name="bio"
+          rows={4}
+          maxLength={600}
+          defaultValue={bio}
+          placeholder="Krótko: w czym się specjalizujesz, jakie dzielnice znasz, ile lat w branży."
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+        />
+        <p className="mt-1.5 text-xs text-slate-500">Maksymalnie 600 znaków. Przyda się przy ofertach i prezentacjach.</p>
       </div>
 
       <div>

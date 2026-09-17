@@ -83,10 +83,12 @@ export function Sidebar({
   role,
   fullName,
   agencyName,
+  avatarUrl,
 }: {
   role: UserRole;
   fullName: string;
   agencyName: string;
+  avatarUrl?: string | null;
 }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -190,9 +192,14 @@ export function Sidebar({
   const account = (
     <div className="border-t border-white/10 pt-4">
       <div className="mb-3 flex items-center gap-3 px-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-sm font-bold text-zinc-950">
-          {fullName.charAt(0).toUpperCase()}
-        </div>
+        {avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatarUrl} alt={fullName} className="h-9 w-9 flex-shrink-0 rounded-full object-cover" />
+        ) : (
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-sm font-bold text-zinc-950">
+            {fullName.charAt(0).toUpperCase()}
+          </div>
+        )}
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-white">{fullName}</p>
           <p className="truncate text-xs text-white/50">

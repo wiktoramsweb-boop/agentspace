@@ -589,3 +589,53 @@ export async function getPendingInvitations(agencyId: string) {
     .order("created_at", { ascending: false });
   return data ?? [];
 }
+
+export type AgentWorkload = { callsWeek: number; activeOffers: number; clients: number };
+
+/**
+ * Obciążenie pracą per agent na karty zespołu: telefony z ostatnich 7 dni,
+ * aktywne oferty i liczba klientów. Liczymy w bazie (head count), żeby
+ * karty działały też przy bazie po imporcie z ASARI.
+ */
+export async function getTeamWorkload(
+  agencyId: string,
+  agentIds: string[],
+): Promise<Record<string, AgentWorkload>> {
+  const admin = createSupabaseAdmin();
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const out: Record<string, AgentWorkload> = {};
+  if (agentIds.length === 0) return out;
+
+  const results = await Promise.all(
+    agentIds.map(async (id) => {
+      const [calls, offers, clients] = await Promise.all([
+        admin
+          .from("activities")
+          .select("id", { count: "exact", head: true })
+          .eq("agency_id", agencyId)
+          .eq("kind", "polaczenie")
+          .eq("status", "wykonane")
+          .gte("completed_at", weekAgo)
+          .contains("assignee_ids", [id]),
+        admin
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .eq("agency_id", agencyId)
+          .eq("agent_id", id)
+          .eq("status", "aktywna"),
+        admin
+          .from("clients")
+          .select("id", { count: "exact", head: true })
+          .eq("agency_id", agencyId)
+          .eq("agent_id", id),
+      ]);
+      return [
+        id,
+        { callsWeek: calls.count ?? 0, activeOffers: offers.count ?? 0, clients: clients.count ?? 0 },
+      ] as const;
+    }),
+  );
+
+  for (const [id, load] of results) out[id] = load;
+  return out;
+}

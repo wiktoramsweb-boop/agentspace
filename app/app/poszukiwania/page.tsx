@@ -1,6 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { getSearches, getActiveProperties } from "@/lib/data-searches";
 import { getAgencyClientsLite } from "@/lib/data-platform";
+import { getAgencyAgents } from "@/lib/data-activities";
 import { findMatches } from "@/lib/matching";
 import { getAgencySettings, matchTolerance } from "@/lib/agency-settings";
 import { PageHeader, StatCard } from "../components/ui";
@@ -12,10 +13,11 @@ export default async function PoszukiwaniaPage() {
   const agencyId = user.agency_id;
   const tol = matchTolerance(await getAgencySettings(agencyId, user.agency?.name));
 
-  const [searches, properties, clients] = await Promise.all([
+  const [searches, properties, clients, agents] = await Promise.all([
     agencyId ? getSearches(agencyId, { limit: 300 }) : Promise.resolve([]),
     agencyId ? getActiveProperties(agencyId) : Promise.resolve([]),
     agencyId ? getAgencyClientsLite(agencyId) : Promise.resolve([]),
+    agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
   ]);
 
   // Dopasowania liczymy w locie: baza ofert biura jest mała, a dzięki temu
@@ -50,7 +52,13 @@ export default async function PoszukiwaniaPage() {
         <StatCard label="Aktywne oferty" value={properties.length} sub="z czego kojarzymy" />
       </div>
 
-      <SearchesBrowser searches={searches} matchCounts={matchCounts} currentUserId={user.id} />
+      <SearchesBrowser
+        searches={searches}
+        matchCounts={matchCounts}
+        currentUserId={user.id}
+        agents={agents}
+        canDelete={user.role === "owner" || user.role === "manager"}
+      />
     </>
   );
 }

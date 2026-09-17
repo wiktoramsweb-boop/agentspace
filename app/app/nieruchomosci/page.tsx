@@ -1,26 +1,87 @@
 import { requireUser } from "@/lib/auth";
-import { getAgencyProperties, getAgencyClientsLite } from "@/lib/data-platform";
+import { queryProperties } from "@/lib/data-lists";
+import { getAgencyAgents } from "@/lib/data-activities";
+import { getAgencyClientsLite } from "@/lib/data-platform";
+import { getAgencySettings, photoConfigFrom } from "@/lib/agency-settings";
+import { parseListQuery } from "@/lib/list-params";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PageHeader, EmptyState } from "../components/ui";
 import { PropertyWizard } from "./property-wizard";
-import { PropertiesBrowser } from "./properties-browser";
-import { getAgencySettings, photoConfigFrom } from "@/lib/agency-settings";
+import { PropertiesBrowser, type MapPoint } from "./properties-browser";
 
-export default async function NieruchomosciPage() {
-  const user = await requireUser();
-  const agencyId = user.agency_id;
-  const [properties, clients, settings] = await Promise.all([
-    agencyId ? getAgencyProperties(agencyId) : Promise.resolve([]),
-    agencyId ? getAgencyClientsLite(agencyId) : Promise.resolve([]),
-    getAgencySettings(agencyId, user.agency?.name),
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+/** Środek Krakowa (Rynek Główny) i promień, w jakim trzymamy mapę ofert. */
+const KRAKOW = { lat: 50.0619, lng: 19.9369 };
+const MAP_RADIUS_KM = 45;
+
+function distanceKm(lat: number, lng: number): number {
+  const toRad = (v: number) => (v * Math.PI) / 180;
+  const dLat = toRad(lat - KRAKOW.lat);
+  const dLng = toRad(lng - KRAKOW.lng);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(KRAKOW.lat)) * Math.cos(toRad(lat)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
+/**
+ * Punkty na mapę i liczniki pobieramy osobno od listy: mapa pokazuje wszystkie
+ * aktywne oferty biura, a nie tylko bieżącą stronę wyników.
+ */
+async function mapData(agencyId: string) {
+  const admin = createSupabaseAdmin();
+  const [{ data, count }, all] = await Promise.all([
+    admin
+      .from("properties")
+      .select("id, title, price_pln, lat, lng, deal_kind", { count: "exact" })
+      .eq("agency_id", agencyId)
+      .eq("status", "aktywna")
+      .limit(500),
+    admin.from("properties").select("id", { count: "exact", head: true }).eq("agency_id", agencyId),
   ]);
 
-  const active = properties.filter((p) => p.status === "aktywna");
+  const rows = (data ?? []) as { id: string; title: string; price_pln: number | null; lat: number | null; lng: number | null; deal_kind: string }[];
+  const located = rows.filter((p) => p.lat != null && p.lng != null);
+  const points: MapPoint[] = located.map((p) => ({
+    id: p.id,
+    title: p.title,
+    price: p.price_pln,
+    lat: p.lat!,
+    lng: p.lng!,
+    kind: p.deal_kind,
+  }));
+  const near = points.filter((p) => distanceKm(p.lat, p.lng) <= MAP_RADIUS_KM);
+  const far = points.filter((p) => distanceKm(p.lat, p.lng) > MAP_RADIUS_KM);
+  return {
+    near: near.length > 0 ? near : points,
+    far: near.length > 0 ? far.map((p) => ({ id: p.id, title: p.title })) : [],
+    located: located.length,
+    activeCount: count ?? rows.length,
+    allCount: all.count ?? 0,
+  };
+}
+
+export default async function NieruchomosciPage({ searchParams }: Props) {
+  const user = await requireUser();
+  const agencyId = user.agency_id;
+  const query = parseListQuery(await searchParams, { sort: "nowe", dateField: "zmiana" });
+
+  const [page, agents, clients, settings, map] = await Promise.all([
+    agencyId ? queryProperties(agencyId, query, user.id) : Promise.resolve({ rows: [], total: 0, pages: 1 }),
+    agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
+    agencyId ? getAgencyClientsLite(agencyId) : Promise.resolve([]),
+    getAgencySettings(agencyId, user.agency?.name),
+    agencyId
+      ? mapData(agencyId)
+      : Promise.resolve({ near: [], far: [], located: 0, activeCount: 0, allCount: 0 }),
+  ]);
 
   return (
     <>
       <PageHeader
         title="Nieruchomości"
-        subtitle={`${active.length} aktywnych · ${properties.length} w biurze`}
+        subtitle={`${map.activeCount} aktywnych · ${map.allCount} w biurze`}
         action={
           <PropertyWizard
             clients={clients}
@@ -31,7 +92,7 @@ export default async function NieruchomosciPage() {
         }
       />
 
-      {properties.length === 0 ? (
+      {map.allCount === 0 ? (
         <EmptyState
           title="Brak nieruchomości"
           body="Dodaj pierwszą ofertę - baza jest wspólna dla całego biura, więc każdy agent ją zobaczy (możesz filtrować na „Moje”)."
@@ -42,7 +103,19 @@ export default async function NieruchomosciPage() {
           }
         />
       ) : (
-        <PropertiesBrowser properties={properties} currentUserId={user.id} />
+        <PropertiesBrowser
+          rows={page.rows}
+          query={query}
+          total={page.total}
+          pages={page.pages}
+          agents={agents}
+          canDelete={user.role === "owner" || user.role === "manager"}
+          currentUserId={user.id}
+          mapNear={map.near}
+          mapFar={map.far}
+          located={map.located}
+          activeCount={map.activeCount}
+        />
       )}
     </>
   );

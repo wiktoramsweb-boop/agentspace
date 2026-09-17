@@ -1,15 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { PROPERTY_STATUSES, PROPERTY_DEAL_KINDS } from "@/lib/types";
-import type { PropertyWithOwner } from "@/lib/data-platform";
+import { motion, useReducedMotion } from "motion/react";
+import type { CSSProperties } from "react";
+import {
+  PROPERTY_STATUSES,
+  PROPERTY_DEAL_KINDS,
+  PROPERTY_TYPES,
+  PROCESS_STAGES,
+} from "@/lib/types";
+import type { PropertyRow } from "@/lib/data-lists";
+import type { ListQuery } from "@/lib/list-params";
 import { formatPln } from "@/lib/format";
 import { Card } from "../components/ui";
-import { SegmentedToggle } from "../components/kit";
 import { PropertiesMap } from "./properties-map";
 import { PROPERTY_ICONS, PinIcon } from "../components/icons";
-import { PAGE_SIZE, Pagination } from "../components/pagination";
+import { ListToolbar, ServerPagination } from "../components/list-controls";
+import { BulkBar, SelectBox, useSelection } from "../components/bulk-bar";
 
 function kindVisual(kind: string) {
   return kind === "wynajem"
@@ -17,145 +24,104 @@ function kindVisual(kind: string) {
     : { bar: "from-emerald-400 to-cyan-400", glow: "rgba(16,185,129,0.4)", chip: "text-emerald-700" };
 }
 
-/** Środek Krakowa (Rynek Główny) i promień, w jakim trzymamy mapę ofert. */
-const KRAKOW = { lat: 50.0619, lng: 19.9369 };
-const MAP_RADIUS_KM = 45;
+export type MapPoint = { id: string; title: string; price: number | null; lat: number; lng: number; kind: string };
 
-/** Odległość od centrum Krakowa w km (wzór haversine). */
-function distanceKm(lat: number, lng: number): number {
-  const toRad = (v: number) => (v * Math.PI) / 180;
-  const dLat = toRad(lat - KRAKOW.lat);
-  const dLng = toRad(lng - KRAKOW.lng);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(KRAKOW.lat)) * Math.cos(toRad(lat)) * Math.sin(dLng / 2) ** 2;
-  return 6371 * 2 * Math.asin(Math.sqrt(a));
-}
+const SORTS = [
+  { value: "nowe", label: "Najnowsze" },
+  { value: "zmiana", label: "Ostatnio zmienione" },
+  { value: "cena_rosnaco", label: "Cena rosnąco" },
+  { value: "cena_malejaco", label: "Cena malejąco" },
+  { value: "powierzchnia", label: "Powierzchnia malejąco" },
+];
 
+/**
+ * Lista ofert. Filtry, sortowanie i strony liczy baza; mapa dostaje osobno
+ * same punkty aktywnych ofert, żeby nie zależała od bieżącej strony listy.
+ */
 export function PropertiesBrowser({
-  properties,
+  rows,
+  query,
+  total,
+  pages,
+  agents,
+  canDelete,
   currentUserId,
+  mapNear,
+  mapFar,
+  located,
+  activeCount,
 }: {
-  properties: PropertyWithOwner[];
+  rows: PropertyRow[];
+  query: ListQuery;
+  total: number;
+  pages: number;
+  agents: { id: string; name: string }[];
+  canDelete: boolean;
   currentUserId: string;
+  mapNear: MapPoint[];
+  mapFar: { id: string; title: string }[];
+  located: number;
+  activeCount: number;
 }) {
-  const [query, setQuery] = useState("");
-  const [scope, setScope] = useState<"all" | "mine">("all");
-  const [sort, setSort] = useState<"nowe" | "cena_rosnaco" | "cena_malejaco" | "cena_m2">("nowe");
-  const [page, setPage] = useState(0);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return properties.filter((p) => {
-      if (scope === "mine" && p.agent_id !== currentUserId) return false;
-      if (!q) return true;
-      return (
-        p.title.toLowerCase().includes(q) ||
-        (p.city ?? "").toLowerCase().includes(q) ||
-        (p.address ?? "").toLowerCase().includes(q) ||
-        (p.opiekunName ?? "").toLowerCase().includes(q)
-      );
-    });
-  }, [properties, query, scope, currentUserId]);
-
-  // Sortowanie liczone po filtrach - agenci najczęściej szukają „najtańsze w tej
-  // dzielnicy", a nie „najtańsze w całej bazie".
-  const sorted = useMemo(() => {
-    const arr = [...filtered];
-    const perM2 = (p: PropertyWithOwner) =>
-      p.price_pln != null && p.area_m2 ? p.price_pln / p.area_m2 : Number.POSITIVE_INFINITY;
-    if (sort === "cena_rosnaco") arr.sort((a, b) => (a.price_pln ?? Infinity) - (b.price_pln ?? Infinity));
-    else if (sort === "cena_malejaco") arr.sort((a, b) => (b.price_pln ?? -1) - (a.price_pln ?? -1));
-    else if (sort === "cena_m2") arr.sort((a, b) => perM2(a) - perM2(b));
-    else arr.sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
-    return arr;
-  }, [filtered, sort]);
-
-  // Zmiana filtra wraca na pierwszą stronę, żeby nie wylądować na pustej.
-  useEffect(() => {
-    setPage(0);
-  }, [query, scope, sort]);
-
-  const pageCount = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-  const safePage = Math.min(page, pageCount - 1);
-  const visible = sorted.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
-
-  const mineCount = properties.filter((p) => p.agent_id === currentUserId).length;
-  const active = filtered.filter((p) => p.status === "aktywna");
-  const located = active
-    .filter((p) => p.lat != null && p.lng != null)
-    .map((p) => ({ id: p.id, title: p.title, price: p.price_pln, lat: p.lat!, lng: p.lng!, kind: p.deal_kind }));
-
-  // Pracujemy w Krakowie i okolicach. Pojedyncza oferta spod Oświęcimia
-  // rozciągała mapę na pół Małopolski i krakowskie pinezki zlewały się w kupkę,
-  // więc trzymamy na mapie tylko okolicę, a dalekie oferty wypisujemy pod nią.
-  const near = located.filter((p) => distanceKm(p.lat, p.lng) <= MAP_RADIUS_KM);
-  const far = located.filter((p) => distanceKm(p.lat, p.lng) > MAP_RADIUS_KM);
-  // Gdy akurat nic nie ma w okolicy, lepiej pokazać cokolwiek niż pustą mapę.
-  const mapPoints = near.length > 0 ? near : located;
-  const farShown = near.length > 0 ? far : [];
+  const reduce = useReducedMotion();
+  const selection = useSelection();
+  const pageIds = rows.map((r) => r.id);
+  const allOnPage = pageIds.length > 0 && pageIds.every((id) => selection.has(id));
 
   return (
     <div>
-      {/* Szukaj + zakres */}
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Szukaj po nazwie, adresie, mieście lub agencie…"
-          className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
-        />
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as typeof sort)}
-          className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
-          aria-label="Sortowanie"
-        >
-          <option value="nowe">Najnowsze</option>
-          <option value="cena_rosnaco">Cena rosnąco</option>
-          <option value="cena_malejaco">Cena malejąco</option>
-          <option value="cena_m2">Cena za m² rosnąco</option>
-        </select>
-        <SegmentedToggle
-          value={scope}
-          onChange={setScope}
-          accent="emerald"
-          options={[
-            { value: "all", label: `Wszystkie (${properties.length})` },
-            { value: "mine", label: `Moje (${mineCount})` },
-          ]}
-        />
-      </div>
+      <ListToolbar
+        base="/app/nieruchomosci"
+        query={query}
+        total={total}
+        sorts={SORTS}
+        agents={agents}
+        placeholder="Szukaj po nazwie, adresie, mieście, numerze oferty…"
+        filters={{
+          statuses: PROPERTY_STATUSES.map((s) => ({ value: s.value, label: s.label })),
+          types: { label: "Typ nieruchomości", options: PROPERTY_TYPES.map((t) => ({ value: t.value, label: t.label })) },
+          dateFields: [
+            { value: "zmiana", label: "ostatniej zmiany" },
+            { value: "nowe", label: "dodania" },
+          ],
+          city: true,
+          range: { label: "Cena", unit: "zł" },
+          extra: {
+            label: "Dodatkowo",
+            options: [
+              { value: "sprzedaz", label: "Tylko sprzedaż" },
+              { value: "wynajem", label: "Tylko wynajem" },
+              { value: "na_strone", label: "Oznaczone na stronę" },
+              { value: "bez_zdjec", label: "Bez zdjęć" },
+            ],
+          },
+        }}
+      />
 
-      {/* Mapa */}
-      {sorted.length > 0 && (
+      {/* Mapa: aktywne oferty w okolicy Krakowa, niezależnie od strony listy */}
+      {(mapNear.length > 0 || mapFar.length > 0) && (
         <Card className="mb-6 !overflow-hidden !p-0">
           <div className="flex items-center justify-between border-b border-slate-200 bg-gradient-to-r from-emerald-500/10 via-sky-500/5 to-transparent px-5 py-3">
-            <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-slate-700">
-              Mapa ofert
-            </h2>
-            {/* Agent od razu widzi, ile ofert wypada z mapy i dlaczego. */}
+            <h2 className="text-sm font-medium uppercase tracking-wider text-slate-700">Mapa ofert</h2>
             <span className="text-xs text-slate-500">
-              {mapPoints.length} z {active.length} na mapie
-              {active.length - located.length > 0
-                ? ` · ${active.length - located.length} bez lokalizacji`
-                : ""}
+              {mapNear.length} z {activeCount} aktywnych
+              {activeCount - located > 0 ? ` · ${activeCount - located} bez lokalizacji` : ""}
             </span>
           </div>
-          {mapPoints.length > 0 ? (
-            <PropertiesMap points={mapPoints} />
+          {mapNear.length > 0 ? (
+            <PropertiesMap points={mapNear} />
           ) : (
             <p className="p-6 text-sm text-slate-500">
-              Żadna oferta w tym widoku nie ma lokalizacji. Przy dodawaniu/edycji wybierz adres z podpowiedzi.
+              Żadna aktywna oferta nie ma lokalizacji. Przy dodawaniu albo edycji wybierz adres z podpowiedzi.
             </p>
           )}
-          {farShown.length > 0 && (
+          {mapFar.length > 0 && (
             <div className="border-t border-slate-200 px-5 py-3">
               <p className="mb-1.5 text-xs text-slate-500">
                 Poza okolicami Krakowa (nie na mapie, żeby jej nie rozciągać):
               </p>
               <div className="flex flex-wrap gap-2">
-                {farShown.map((p) => (
+                {mapFar.map((p) => (
                   <Link
                     key={p.id}
                     href={`/app/nieruchomosci/${p.id}`}
@@ -170,13 +136,27 @@ export function PropertiesBrowser({
         </Card>
       )}
 
-      {sorted.length === 0 ? (
+      {rows.length > 0 && (
+        <label className="mb-3 flex w-fit cursor-pointer items-center gap-2 text-xs font-medium text-slate-500">
+          <input
+            type="checkbox"
+            checked={allOnPage}
+            onChange={() => selection.setMany(pageIds, !allOnPage)}
+            className="h-4 w-4 accent-emerald-500"
+          />
+          Zaznacz wszystkie na stronie ({rows.length})
+        </label>
+      )}
+
+      {rows.length === 0 ? (
         <Card>
-          <p className="text-center text-sm text-slate-500">Brak ofert dla tego filtra.</p>
+          <p className="text-center text-sm text-slate-500">
+            Nic nie pasuje do tych filtrów. Zmień je albo wyczyść, żeby zobaczyć całą bazę ofert.
+          </p>
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {visible.map((p) => {
+          {rows.map((p, i) => {
             const status = PROPERTY_STATUSES.find((s) => s.value === p.status);
             const kind = PROPERTY_DEAL_KINDS.find((k) => k.value === p.deal_kind);
             const params = [
@@ -188,81 +168,107 @@ export function PropertiesBrowser({
             const mine = p.agent_id === currentUserId;
             const kv = kindVisual(p.deal_kind);
             const TypeIcon = PROPERTY_ICONS[p.property_type] ?? PinIcon;
+            const picked = selection.has(p.id);
             return (
-              <Link key={p.id} href={`/app/nieruchomosci/${p.id}`} className="block">
-                <div
-                  className="card-glow group h-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50"
-                  style={{ ["--glow"]: kv.glow } as CSSProperties}
-                >
-                  <div className={`h-1.5 w-full bg-gradient-to-r ${kv.bar}`} />
-                  {p.photos?.[0]?.url && (
-                    <div className="aspect-[16/10] overflow-hidden bg-slate-100">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={p.photos[0].url}
-                        alt={p.title}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-                      />
-                    </div>
-                  )}
-                  <div className="p-5">
-                    <div className="mb-3 flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-2.5">
-                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600">
-                          <TypeIcon className="h-5 w-5" />
-                        </span>
-                        <span className={`text-xs font-semibold uppercase tracking-wide ${kv.chip}`}>{kind?.label}</span>
+              <motion.div
+                key={p.id}
+                initial={reduce ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: reduce ? 0 : Math.min(0.2, i * 0.02), duration: 0.25 }}
+                className="relative"
+              >
+                <span className="absolute left-2 top-2 z-10 rounded-lg bg-white/90 shadow-sm backdrop-blur">
+                  <SelectBox checked={picked} onChange={() => selection.toggle(p.id)} label={`Zaznacz ${p.title}`} />
+                </span>
+                <Link href={`/app/nieruchomosci/${p.id}`} className="block h-full">
+                  <div
+                    className={`card-glow group h-full overflow-hidden rounded-2xl border bg-gradient-to-b from-white to-slate-50 ${
+                      picked ? "border-emerald-400 ring-1 ring-emerald-300" : "border-slate-200"
+                    }`}
+                    style={{ ["--glow"]: kv.glow } as CSSProperties}
+                  >
+                    <div className={`h-1.5 w-full bg-gradient-to-r ${kv.bar}`} />
+                    {p.photos?.[0]?.url && (
+                      <div className="aspect-[16/10] overflow-hidden bg-slate-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={p.photos[0].url}
+                          alt={p.title}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                        />
                       </div>
-                      <div className="flex flex-col items-end gap-1">
-                        {status && (
-                          <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${status.color}`}>{status.label}</span>
-                        )}
-                        {p.export_to_web ? (
-                          <span
-                            title="Oznaczona do publikacji na stronie"
-                            className="rounded-md bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700"
-                          >
-                            na stronę
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <h3 className="mb-1 truncate font-semibold text-slate-900">{p.title}</h3>
-                    {(p.city || p.address) && (
-                      <p className="mb-3 flex items-center gap-1 truncate text-sm text-slate-500">
-                        <PinIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                        {p.city ?? p.address}
-                      </p>
                     )}
+                    <div className="p-5">
+                      <div className="mb-3 flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-2.5">
+                          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600">
+                            <TypeIcon className="h-5 w-5" />
+                          </span>
+                          <span className={`text-xs font-semibold uppercase tracking-wide ${kv.chip}`}>{kind?.label}</span>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          {status && (
+                            <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${status.color}`}>{status.label}</span>
+                          )}
+                          {p.export_to_web ? (
+                            <span
+                              title="Oznaczona do publikacji na stronie"
+                              className="rounded-md bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700"
+                            >
+                              na stronę
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
 
-                    <p className="text-2xl font-bold text-slate-900">
-                      {p.price_pln != null ? formatPln(p.price_pln) : "-"}
-                      {p.deal_kind === "wynajem" && p.price_pln != null && (
-                        <span className="text-sm font-medium text-slate-500"> /mc</span>
+                      <h3 className="mb-1 truncate font-semibold text-slate-900">{p.title}</h3>
+                      {(p.city || p.address) && (
+                        <p className="mb-3 flex items-center gap-1 truncate text-sm text-slate-500">
+                          <PinIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                          {p.city ?? p.address}
+                        </p>
                       )}
-                    </p>
-                    {params && <p className="mt-1 text-sm text-slate-500">{params}</p>}
 
-                    <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-3">
-                      <span className="flex items-center gap-2 text-xs text-slate-500">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-[10px] font-bold text-white">
-                          {(p.opiekunName ?? "?").charAt(0).toUpperCase()}
+                      <p className="text-2xl font-bold text-slate-900">
+                        {p.price_pln != null ? formatPln(p.price_pln) : "-"}
+                        {p.deal_kind === "wynajem" && p.price_pln != null && (
+                          <span className="text-sm font-medium text-slate-500"> /mc</span>
+                        )}
+                      </p>
+                      {params && <p className="mt-1 text-sm text-slate-500">{params}</p>}
+
+                      <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-3">
+                        <span className="flex items-center gap-2 text-xs text-slate-500">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-[10px] font-bold text-white">
+                            {(p.opiekunName ?? "?").charAt(0).toUpperCase()}
+                          </span>
+                          {mine ? "Ty" : p.opiekunName ?? "-"}
                         </span>
-                        {mine ? "Ty" : p.opiekunName ?? "-"}
-                      </span>
-                      <span className="text-xs font-medium text-emerald-400/80 opacity-0 transition group-hover:opacity-100">Otwórz →</span>
+                        <span className="text-xs font-medium text-emerald-400/80 opacity-0 transition group-hover:opacity-100">
+                          Otwórz →
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
             );
           })}
         </div>
       )}
 
-      <Pagination page={safePage} total={sorted.length} onPage={setPage} label="ofert" />
+      <ServerPagination base="/app/nieruchomosci" query={query} total={total} pages={pages} label="ofert" />
+
+      <BulkBar
+        entity="properties"
+        selection={selection}
+        statuses={PROPERTY_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+        stages={PROCESS_STAGES.map((s) => ({ value: s.value, label: s.label }))}
+        agents={agents}
+        canDelete={canDelete}
+        noun={["oferta", "oferty", "ofert"]}
+      />
     </div>
   );
 }

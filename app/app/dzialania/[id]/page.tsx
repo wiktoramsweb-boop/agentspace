@@ -3,7 +3,11 @@ import { formatPhone } from "@/lib/format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { getActivity, getActivitiesByPhone, getClientsByPhone } from "@/lib/data-activities";
+import { getActivity, getActivitiesByPhone, getClientsByPhone, getAgencyAgents } from "@/lib/data-activities";
+import { getAgencyClientsLite, getAgencyProperties } from "@/lib/data-platform";
+import { getAgencySettings } from "@/lib/agency-settings";
+import { getThreadItems } from "../actions";
+import { ThreadPanel, type ThreadItem } from "./thread-panel";
 import { Card } from "../../components/ui";
 import { ACTIVITY_ICONS } from "../../components/icons";
 import { ActivityActions } from "./activity-actions";
@@ -36,14 +40,64 @@ export default async function ActivityDetailPage({ params }: Props) {
   const activity = await getActivity(id, agencyId);
   if (!activity) notFound();
 
-  const [history, matchingClients] = await Promise.all([
+  // Wątek: pierwsze działanie plus wszystkie kolejne rozmowy pod tym numerem.
+  const rootId = activity.parent_id ?? activity.id;
+
+  const [history, matchingClients, children, root, agents, clients, properties, settings] = await Promise.all([
     activity.contact_phone
       ? getActivitiesByPhone(agencyId, activity.contact_phone, activity.id)
       : Promise.resolve([]),
     activity.contact_phone && !activity.client_id
       ? getClientsByPhone(agencyId, activity.contact_phone)
       : Promise.resolve([]),
+    getThreadItems(rootId),
+    activity.parent_id ? getActivity(rootId, agencyId) : Promise.resolve(activity),
+    getAgencyAgents(agencyId),
+    getAgencyClientsLite(agencyId),
+    getAgencyProperties(agencyId),
+    getAgencySettings(agencyId, user.agency?.name),
   ]);
+
+  const agentName = new Map(agents.map((a) => [a.id, a.name]));
+  const threadRoot = root ?? activity;
+  const threadItems: ThreadItem[] = [
+    {
+      id: threadRoot.id,
+      subject: threadRoot.subject,
+      kind: threadRoot.kind,
+      status: threadRoot.status,
+      due_at: threadRoot.due_at,
+      description: threadRoot.description,
+      duration_s: threadRoot.duration_s,
+      call_direction: threadRoot.call_direction,
+      assigneeNames: (threadRoot.assignee_ids ?? []).map((id) => agentName.get(id) ?? "").filter(Boolean),
+      isRoot: true,
+      isCurrent: threadRoot.id === activity.id,
+    },
+    ...children.map((c) => ({
+      id: c.id,
+      subject: c.subject,
+      kind: c.kind,
+      status: c.status,
+      due_at: c.due_at,
+      description: c.description,
+      duration_s: c.duration_s,
+      call_direction: c.call_direction,
+      assigneeNames: ((c.assignee_ids ?? []) as string[]).map((id) => agentName.get(id) ?? "").filter(Boolean),
+      isRoot: false,
+      isCurrent: c.id === activity.id,
+    })),
+  ].sort((a, b) => (b.due_at ?? "").localeCompare(a.due_at ?? ""));
+
+  const threadParent = {
+    id: rootId,
+    subject: threadRoot.subject,
+    kind: threadRoot.kind,
+    contactName: threadRoot.contact_name,
+    contactPhone: threadRoot.contact_phone,
+    clientId: threadRoot.client_id,
+    count: threadItems.length,
+  };
 
   const km = ACTIVITY_KIND_MAP[activity.kind] ?? ACTIVITY_KIND_MAP.polaczenie;
   const sm = STATUS_MAP[activity.status] ?? STATUS_MAP.zaplanowane;
@@ -72,6 +126,14 @@ export default async function ActivityDetailPage({ params }: Props) {
             </div>
             <h1 className="text-2xl font-semibold text-slate-900">{activity.subject}</h1>
             <p className="text-slate-500">{fmt(activity.due_at)}</p>
+            {activity.parent_id && (
+              <Link
+                href={`/app/dzialania/${activity.parent_id}`}
+                className="mt-1 inline-block text-sm text-emerald-600 hover:underline"
+              >
+                Kolejna rozmowa w wątku · zobacz pierwszy kontakt
+              </Link>
+            )}
           </div>
         </div>
         <ActivityActions id={activity.id} done={activity.status === "wykonane"} />
@@ -144,6 +206,15 @@ export default async function ActivityDetailPage({ params }: Props) {
               <p className="text-sm text-slate-400">Brak opisu.</p>
             )}
           </Card>
+
+          <ThreadPanel
+            parent={threadParent}
+            items={threadItems}
+            agents={agents}
+            clients={clients.map((c) => ({ id: c.id, name: c.name, phone: c.phone }))}
+            properties={properties.map((p) => ({ id: p.id, name: p.title }))}
+            reportDefault={settings.options.report_default}
+          />
         </div>
 
         <div className="space-y-6">

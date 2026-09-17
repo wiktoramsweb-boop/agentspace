@@ -11,7 +11,8 @@ import { ActivityModal } from "../app/dzialania/activity-modal";
 import { ActivitiesBrowser } from "../app/dzialania/activities-browser";
 import { NewClientForm } from "../app/klienci/new-client-form";
 import { SearchWizard } from "../app/poszukiwania/search-wizard";
-import type { ActivityRich } from "@/lib/data-activities";
+import type { ActivityRow } from "@/lib/data-lists";
+import { parseListQuery } from "@/lib/list-params";
 import { Pagination } from "../app/components/pagination";
 import { PhotoPipelineTest } from "./photo-pipeline-test";
 import { CalendarDemo } from "./calendar-demo";
@@ -36,8 +37,10 @@ const base = {
   property_id: null as string | null, propertyTitle: null as string | null,
   include_in_report: false, created_at: "", updated_at: "",
   contact_name: null as string | null, contact_phone: null as string | null, contact_email: null as string | null,
+  parent_id: null as string | null, threadCount: 1, lastAt: null as string | null,
 };
-const MOCK_ACTIVITIES: ActivityRich[] = [
+const MOCK_QUERY = parseListQuery({}, { sort: "termin", per: 25 });
+const MOCK_ACTIVITIES: ActivityRow[] = [
   { ...base, id: "1", kind: "polaczenie", purpose: "rozmowa_pozyskowa", subject: "Pozysk ul. Warmijska",
     status: "wykonane", priority: "normalny", due_at: "2026-09-09T14:30:00Z", client_id: "c1",
     clientName: "Małgorzata Zielińska", assignee_ids: ["u1"], assigneeNames: ["Wiktor Szostek"],
@@ -178,7 +181,17 @@ export function ThemePreview() {
               <SearchWizard clients={MOCK_CLIENTS} />
               <ActivityModal agents={MOCK_AGENTS} clients={MOCK_CLIENTS} properties={MOCK_PROPS} />
             </div>
-            <ActivitiesBrowser activities={MOCK_ACTIVITIES} currentUserId="u1" agents={MOCK_AGENTS} />
+            <ActivitiesBrowser
+              rows={MOCK_ACTIVITIES}
+              query={MOCK_QUERY}
+              total={MOCK_ACTIVITIES.length}
+              pages={1}
+              agents={MOCK_AGENTS}
+              clients={MOCK_CLIENTS}
+              properties={MOCK_PROPS}
+              canDelete={false}
+              reportDefault={false}
+            />
           </div>
 
           <DocsDemo />

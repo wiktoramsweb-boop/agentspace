@@ -1,20 +1,29 @@
 import { requireUser } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { maskPhone } from "@/lib/format";
-import { getActivities, getActivityStats, getAgencyAgents } from "@/lib/data-activities";
+import { getActivityStats, getAgencyAgents } from "@/lib/data-activities";
 import { getAgencyClientsLite, getAgencyProperties, getGoal } from "@/lib/data-platform";
+import { queryActivities } from "@/lib/data-lists";
+import { parseListQuery } from "@/lib/list-params";
 import { computeFunnel } from "@/lib/funnel";
 import { PageHeader, StatCard } from "../components/ui";
 import { ActivitiesBrowser } from "./activities-browser";
 import { ActivityModal } from "./activity-modal";
 import Link from "next/link";
 
-export default async function DzialaniaPage() {
+export default async function DzialaniaPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const user = await requireUser();
   const agencyId = user.agency_id;
+  const query = parseListQuery(await searchParams, { sort: "termin", per: 25 });
 
-  const [activities, stats, agents, clients, properties, goalRow, settings] = await Promise.all([
-    agencyId ? getActivities(agencyId, { limit: 300 }) : Promise.resolve([]),
+  const [page, stats, agents, clients, properties, goalRow, settings] = await Promise.all([
+    agencyId
+      ? queryActivities(agencyId, query, user.id)
+      : Promise.resolve({ rows: [], total: 0, pages: 1 }),
     agencyId
       ? getActivityStats(agencyId, user.id)
       : Promise.resolve({ planned: 0, callsToday: 0, doneToday: 0, today: 0, overdue: 0, doneWeek: 0 }),
@@ -31,18 +40,18 @@ export default async function DzialaniaPage() {
   const callsLeft = Math.max(0, callTarget - stats.callsToday);
 
   const propsLite = properties.map((p) => ({ id: p.id, name: p.title }));
+  const clientsLite = clients.map((c) => ({ id: c.id, name: c.name, phone: c.phone }));
 
   // Ukrywanie kontaktów (Ustawienia → Pozostałe): agent widzi pełny numer
   // tylko przy swoich działaniach. Maskujemy przed wysłaniem do przeglądarki.
   const mask = settings.options.hide_contacts && user.role === "agent";
-  const listActivities = mask
-    ? activities.map((a) =>
-        a.created_by === user.id || a.assignee_ids.includes(user.id)
+  const rows = mask
+    ? page.rows.map((a) =>
+        a.created_by === user.id || (a.assignee_ids ?? []).includes(user.id)
           ? a
           : { ...a, contact_phone: maskPhone(a.contact_phone), contact_email: a.contact_email ? "ukryty" : null },
       )
-    : activities;
-  const clientsLite = clients.map((c) => ({ id: c.id, name: c.name }));
+    : page.rows;
 
   return (
     <>
@@ -88,7 +97,17 @@ export default async function DzialaniaPage() {
         <StatCard label="Wykonane" value={stats.doneWeek} sub="w ostatnich 7 dniach" />
       </div>
 
-      <ActivitiesBrowser activities={listActivities} currentUserId={user.id} agents={agents} />
+      <ActivitiesBrowser
+        rows={rows}
+        query={query}
+        total={page.total}
+        pages={page.pages}
+        agents={agents}
+        clients={clientsLite}
+        properties={propsLite}
+        canDelete={user.role === "owner" || user.role === "manager"}
+        reportDefault={settings.options.report_default}
+      />
     </>
   );
 }

@@ -85,6 +85,31 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
   const assigneeIds = assignees.length ? assignees : [user.id];
   const completedAt = status === "wykonane" ? new Date().toISOString() : null;
 
+  // Wątek: kolejna rozmowa pod tym samym numerem dopisuje się do istniejącego
+  // działania zamiast tworzyć drugi taki sam wpis. Zawsze celujemy w korzeń
+  // wątku, żeby nie robić drzewa na trzy poziomy.
+  let parentId: string | null = null;
+  let inherited: { client_id: string | null; property_id: string | null; contact_name: string | null; contact_phone: string | null; contact_email: string | null } | null = null;
+  const parentRaw = txt(formData, "parent_id");
+  if (parentRaw) {
+    const { data: parent } = await admin
+      .from("activities")
+      .select("id, parent_id, client_id, property_id, contact_name, contact_phone, contact_email")
+      .eq("id", parentRaw)
+      .eq("agency_id", user.agency_id)
+      .maybeSingle();
+    if (parent) {
+      parentId = parent.parent_id ?? parent.id;
+      inherited = parent;
+    }
+  }
+
+  if (inherited) {
+    contactPhone = contactPhone ?? inherited.contact_phone;
+    contactName = contactName ?? inherited.contact_name;
+    if (!linkedClientId) linkedClientId = inherited.client_id;
+  }
+
   const { error: insertError } = await admin.from("activities").insert({
     agency_id: user.agency_id,
     created_by: user.id,
@@ -101,8 +126,9 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
     contact_name: contactName,
     contact_phone: contactPhone,
     contact_email: txt(formData, "contact_email"),
-    property_id: txt(formData, "property_id"),
+    property_id: txt(formData, "property_id") ?? inherited?.property_id ?? null,
     assignee_ids: assigneeIds,
+    ...(parentId ? { parent_id: parentId } : {}),
     include_in_report: formData.get("include_in_report") === "1",
   });
 
@@ -277,4 +303,76 @@ export async function rescheduleActivity(
   revalidatePath("/app/dzialania");
   revalidatePath("/app");
   return { ok: true };
+}
+
+export type PhoneThread = {
+  id: string;
+  subject: string;
+  count: number;
+  lastAt: string | null;
+  clientId: string | null;
+  clientName: string | null;
+  contactName: string | null;
+};
+
+/**
+ * Czy pod tym numerem jest już wątek działań. Dzięki temu agent, który dzwoni
+ * po raz drugi, dopisuje rozmowę do istniejącego wpisu zamiast tworzyć drugi
+ * taki sam kontakt i drugie takie samo działanie.
+ */
+export async function findThreadByPhone(phone: string): Promise<PhoneThread | null> {
+  const user = await requireUser();
+  const digits = String(phone ?? "").replace(/\D/g, "");
+  if (!user.agency_id || digits.length < 7) return null;
+
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("activities")
+    .select("id, subject, due_at, client_id, contact_name, parent_id")
+    .eq("agency_id", user.agency_id)
+    .eq("contact_phone_digits", digits)
+    .order("due_at", { ascending: false })
+    .limit(20);
+  if (!data?.length) return null;
+
+  // Korzeń wątku: pierwsze działanie bez rodzica, a gdy takiego brak, najstarsze.
+  const rows = data as { id: string; subject: string; due_at: string | null; client_id: string | null; contact_name: string | null; parent_id: string | null }[];
+  const rootId = rows.find((r) => !r.parent_id)?.id ?? rows[rows.length - 1].parent_id ?? rows[rows.length - 1].id;
+  const root = rows.find((r) => r.id === rootId) ?? rows[0];
+
+  const { count } = await admin
+    .from("activities")
+    .select("id", { count: "exact", head: true })
+    .eq("agency_id", user.agency_id)
+    .or(`id.eq.${rootId},parent_id.eq.${rootId}`);
+
+  let clientName: string | null = null;
+  if (root.client_id) {
+    const { data: c } = await admin.from("clients").select("name").eq("id", root.client_id).maybeSingle();
+    clientName = c?.name ?? null;
+  }
+
+  return {
+    id: rootId,
+    subject: root.subject,
+    count: count ?? rows.length,
+    lastAt: rows[0]?.due_at ?? null,
+    clientId: root.client_id,
+    clientName,
+    contactName: root.contact_name,
+  };
+}
+
+/** Rozmowy dopisane do wątku, od najnowszej. */
+export async function getThreadItems(rootId: string) {
+  const user = await requireUser();
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("activities")
+    .select("id, subject, kind, status, due_at, description, duration_s, call_direction, assignee_ids, created_by")
+    .eq("agency_id", user.agency_id)
+    .eq("parent_id", rootId)
+    .order("due_at", { ascending: false })
+    .limit(200);
+  return data ?? [];
 }

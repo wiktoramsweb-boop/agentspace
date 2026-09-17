@@ -279,3 +279,37 @@ export async function setWeeklyLimit(memberId: string, limit: number | null): Pr
   revalidatePath("/app/zespol");
   return {};
 }
+
+/**
+ * Dane profilu członka zespołu (CEO): stanowisko, telefon i opis.
+ * Zdjęcie każdy wgrywa sobie sam w Ustawieniach, żeby CEO nie musiał
+ * zbierać plików od całego biura.
+ */
+export async function updateMemberProfile(
+  memberId: string,
+  patch: { jobTitle: string; phone: string; bio: string },
+): Promise<RoleActionResult> {
+  const owner = await requireOwner();
+  const admin = createSupabaseAdmin();
+
+  const { data: member } = await admin
+    .from("profiles")
+    .select("id, agency_id")
+    .eq("id", memberId)
+    .maybeSingle();
+  if (!member || member.agency_id !== owner.agency_id) return { error: "Nie znaleziono osoby." };
+
+  const { error } = await admin
+    .from("profiles")
+    .update({
+      job_title: patch.jobTitle.trim().slice(0, 80) || null,
+      phone: patch.phone.trim().slice(0, 40) || null,
+      bio: patch.bio.trim().slice(0, 600) || null,
+    })
+    .eq("id", memberId);
+  if (error) return { error: "Nie udało się zapisać. Uruchom w Supabase migrację SETUP-v24." };
+
+  revalidatePath("/app/zespol");
+  revalidatePath(`/app/zespol/${memberId}`);
+  return {};
+}

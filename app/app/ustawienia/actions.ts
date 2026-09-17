@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { ASSET_BUCKET } from "@/lib/storage";
+import { removeFiles, signUploads, type SignedUpload } from "@/lib/storage-server";
 
 export type SettingsResult = { error?: string; success?: string } | undefined;
 
@@ -17,6 +19,8 @@ export async function updateProfile(
   const splitRaw = parseInt(String(formData.get("defaultSplit") ?? "50"), 10);
   const defaultSplit = Math.min(100, Math.max(1, Number.isFinite(splitRaw) ? splitRaw : 50));
   const phone = String(formData.get("phone") ?? "").trim();
+  const jobTitle = String(formData.get("jobTitle") ?? "").trim().slice(0, 80);
+  const bio = String(formData.get("bio") ?? "").trim().slice(0, 600);
 
   if (!fullName || fullName.length < 2) return { error: "Podaj imię i nazwisko" };
 
@@ -28,14 +32,57 @@ export async function updateProfile(
       monthly_goal_pln: monthlyGoal,
       default_split_pct: defaultSplit,
       phone: phone || null,
+      job_title: jobTitle || null,
+      bio: bio || null,
     })
     .eq("id", user.id);
 
-  if (error) return { error: "Nie udało się zapisać zmian." };
+  if (error) {
+    // Najczęstsza przyczyna: nieuruchomiona migracja v24 (stanowisko i opis).
+    return { error: "Nie udało się zapisać zmian. Jeśli to nowe pola profilu, uruchom w Supabase SETUP-v24." };
+  }
 
   revalidatePath("/app/ustawienia");
+  revalidatePath("/app/zespol");
   revalidatePath("/app");
   return { success: "Zapisano zmiany." };
+}
+
+/**
+ * Zdjęcie profilowe: każdy zmienia własne. Plik ląduje w magazynie biura,
+ * w folderze użytkownika, więc podpisany link nie pozwala nadpisać cudzego.
+ */
+export async function signAvatarUpload(
+  ext: string,
+): Promise<{ upload: SignedUpload | null; error: string | null }> {
+  const user = await requireUser();
+  if (!user.agency_id) return { upload: null, error: "Konto nie jest przypisane do biura." };
+  const res = await signUploads(ASSET_BUCKET, `${user.agency_id}/avatars/${user.id}`, [{ ext }]);
+  return { upload: res.uploads[0] ?? null, error: res.error };
+}
+
+export async function setAvatar(path: string | null): Promise<{ ok: true } | { ok: false; error: string }> {
+  const user = await requireUser();
+  if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
+  if (path && !path.startsWith(`${user.agency_id}/avatars/${user.id}/`)) {
+    return { ok: false, error: "Nieprawidłowy plik." };
+  }
+
+  const admin = createSupabaseAdmin();
+  const { data: before } = await admin.from("profiles").select("avatar_path").eq("id", user.id).maybeSingle();
+  const { error } = await admin.from("profiles").update({ avatar_path: path }).eq("id", user.id);
+  if (error) {
+    if (path) await removeFiles(ASSET_BUCKET, [path]);
+    return { ok: false, error: "Nie udało się zapisać zdjęcia. Uruchom w Supabase SETUP-v24." };
+  }
+
+  const previous = before?.avatar_path as string | null | undefined;
+  if (previous && previous !== path) await removeFiles(ASSET_BUCKET, [previous]);
+
+  revalidatePath("/app/ustawienia");
+  revalidatePath("/app/zespol");
+  revalidatePath("/app");
+  return { ok: true };
 }
 
 /**

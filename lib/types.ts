@@ -27,6 +27,10 @@ export type Profile = {
   phone: string | null;
   manager_id: string | null;
   weekly_ai_limit: number | null; // null = bez limitu; liczba = maks. rozmów AI/tydzień
+  // v24: profil agenta widoczny w zespole i w materiałach dla klienta
+  avatar_path?: string | null;
+  job_title?: string | null;
+  bio?: string | null;
   created_at: string;
 };
 
@@ -605,6 +609,8 @@ export type Activity = {
   contact_phone: string | null;
   contact_email: string | null;
   contact_phone_digits?: string | null;
+  // v24: kolejne rozmowy pod tym samym numerem wiszą przy pierwszym działaniu
+  parent_id?: string | null;
   created_at: string;
   updated_at: string;
 };

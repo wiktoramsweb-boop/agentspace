@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { SearchRich } from "@/lib/data-searches";
 import { PROPERTY_ICONS } from "../components/icons";
+import { BulkBar, SelectBox, useSelection } from "../components/bulk-bar";
 import { PROPERTY_TYPES, SEARCH_STATUSES } from "@/lib/types";
 
 const STATUS_MAP = Object.fromEntries(SEARCH_STATUSES.map((s) => [s.value, s]));
@@ -26,11 +27,16 @@ export function SearchesBrowser({
   searches,
   matchCounts,
   currentUserId,
+  agents,
+  canDelete,
 }: {
   searches: SearchRich[];
   matchCounts: Record<string, { fits: number; near: number }>;
   currentUserId: string;
+  agents: { id: string; name: string }[];
+  canDelete: boolean;
 }) {
+  const selection = useSelection();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string>("aktualne");
   const [scope, setScope] = useState<"all" | "mine">("all");
@@ -53,6 +59,8 @@ export function SearchesBrowser({
   }, [searches, query, status, scope, currentUserId]);
 
   const mineCount = searches.filter((s) => s.agent_id === currentUserId).length;
+  const pageIds = filtered.map((s) => s.id);
+  const allOnPage = pageIds.length > 0 && pageIds.every((id) => selection.has(id));
 
   return (
     <div>
@@ -84,6 +92,18 @@ export function SearchesBrowser({
         ))}
       </div>
 
+      {filtered.length > 0 && (
+        <label className="mb-2 flex w-fit cursor-pointer items-center gap-2 text-xs font-medium text-slate-500">
+          <input
+            type="checkbox"
+            checked={allOnPage}
+            onChange={() => selection.setMany(pageIds, !allOnPage)}
+            className="h-4 w-4 accent-emerald-500"
+          />
+          Zaznacz wszystkie ({filtered.length})
+        </label>
+      )}
+
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-10 text-center text-sm text-slate-500">
           {searches.length === 0
@@ -95,12 +115,22 @@ export function SearchesBrowser({
           {filtered.map((s) => {
             const sm = STATUS_MAP[s.status] ?? STATUS_MAP.aktualne;
             const counts = matchCounts[s.id] ?? { fits: 0, near: 0 };
+            const picked = selection.has(s.id);
             return (
               <div
                 key={s.id}
-                className="flex items-stretch gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm"
+                className={`flex items-stretch gap-2 overflow-hidden rounded-2xl border bg-white transition hover:shadow-sm ${
+                  picked ? "border-emerald-400 ring-1 ring-emerald-300" : "border-slate-200 hover:border-slate-300"
+                }`}
               >
                 <span className={`w-1.5 flex-shrink-0 ${sm.bar}`} />
+                <div className="flex items-center pt-4">
+                  <SelectBox
+                    checked={picked}
+                    onChange={() => selection.toggle(s.id)}
+                    label={`Zaznacz ${s.clientName ?? s.title ?? "poszukiwanie"}`}
+                  />
+                </div>
 
                 <div className="min-w-0 flex-1 py-4 pr-4">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -182,6 +212,15 @@ export function SearchesBrowser({
           })}
         </div>
       )}
+
+      <BulkBar
+        entity="searches"
+        selection={selection}
+        statuses={SEARCH_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+        agents={agents}
+        canDelete={canDelete}
+        noun={["poszukiwanie", "poszukiwania", "poszukiwań"]}
+      />
     </div>
   );
 }

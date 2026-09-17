@@ -8,6 +8,7 @@ import {
   getTeamFunnelProgress,
   getAgencyMembers,
   getTeamInsights,
+  getTeamWorkload,
   type FunnelStageProgress,
   type AgentTrend,
 } from "@/lib/data";
@@ -21,6 +22,8 @@ import { ReportButton } from "./report-button";
 import { CopyLink } from "./copy-link";
 import { TeamRoles, type TeamMember } from "./team-roles";
 import { ManagerTeams } from "./manager-teams";
+import { TeamProfiles, type TeamProfile } from "./team-profiles";
+import { Avatar, avatarUrl } from "../components/avatar";
 import { APP_URL } from "@/lib/supabase/config";
 
 // Krótkie etykiety etapów lejka (klucz DB → skrót).
@@ -74,6 +77,24 @@ export default async function ZespolPage() {
         getAgencyMembers(agencyId),
       ])
     : [null, [], [], {} as Record<string, number>, []];
+
+  // Karty zespołu: CEO widzi całe biuro, menedżer swoich agentów.
+  const cardPeople = isOwner ? members : ranking;
+  const workload = await getTeamWorkload(agencyId, cardPeople.map((m) => m.id));
+  const profiles: TeamProfile[] = cardPeople.map((m) => ({
+    id: m.id,
+    name: m.full_name ?? m.email ?? "Agent",
+    email: m.email,
+    role: m.role,
+    phone: m.phone,
+    jobTitle: m.job_title ?? null,
+    bio: m.bio ?? null,
+    avatarUrl: avatarUrl(m.avatar_path),
+    commission: isOwner ? (commissions[m.id] ?? 0) : null,
+    callsWeek: workload[m.id]?.callsWeek ?? 0,
+    activeOffers: workload[m.id]?.activeOffers ?? 0,
+    clients: workload[m.id]?.clients ?? 0,
+  }));
 
   // Lista menedżerów/CEO (do przypisań) + członkowie (do zarządzania rolami) - tylko CEO.
   const managerOptions: ManagerOption[] = members
@@ -132,6 +153,22 @@ export default async function ZespolPage() {
           />
         )}
       </div>
+
+      {profiles.length > 0 && (
+        <div className="mb-8">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Ludzie w biurze</h2>
+              <p className="text-sm text-slate-500">
+                {isOwner
+                  ? "Zdjęcie, stanowisko i kontakt każdego z zespołu. Możesz poprawić dane, zdjęcie wgrywa każdy sobie."
+                  : "Twoi agenci: kontakt, specjalizacja i bieżące obciążenie."}
+              </p>
+            </div>
+          </div>
+          <TeamProfiles people={profiles} canEdit={isOwner} currentUserId={user.id} />
+        </div>
+      )}
 
       {/* Alerty proaktywne - kto wymaga uwagi */}
       {insights.alerts.length > 0 ? (
@@ -305,9 +342,7 @@ export default async function ZespolPage() {
                         <span className="w-6 flex-shrink-0 text-center font-mono text-sm font-bold text-slate-500">
                           {i + 1}
                         </span>
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-sm font-bold text-white">
-                          {(agent.full_name ?? "?").charAt(0).toUpperCase()}
-                        </div>
+                        <Avatar name={agent.full_name ?? agent.email ?? "?"} path={agent.avatar_path} size={36} />
                         <div className="min-w-0">
                           <p className="truncate font-medium text-slate-900">
                             {agent.full_name ?? agent.email}

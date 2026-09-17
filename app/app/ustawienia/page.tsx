@@ -3,6 +3,8 @@ import { APP_TZ } from "@/lib/datetime";
 import { ROLE_LABELS } from "@/lib/types";
 import { Card } from "../components/ui";
 import { SettingsForm } from "./settings-form";
+import { AvatarUploader } from "./avatar-uploader";
+import { avatarUrl } from "../components/avatar";
 import { PushToggle } from "./push-toggle";
 import { ChangeEmail } from "./change-email";
 
@@ -16,7 +18,12 @@ export default async function UstawieniaPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <h2 className="mb-5 text-lg font-semibold text-slate-900">Profil</h2>
+          <div className="mb-6 border-b border-slate-200 pb-6">
+            <AvatarUploader name={user.full_name ?? user.email ?? "?"} currentUrl={avatarUrl(user.avatar_path)} />
+          </div>
           <SettingsForm
+            jobTitle={user.job_title ?? ""}
+            bio={user.bio ?? ""}
             fullName={user.full_name ?? ""}
             phone={user.phone ?? ""}
             monthlyGoal={user.monthly_goal_pln ?? 0}

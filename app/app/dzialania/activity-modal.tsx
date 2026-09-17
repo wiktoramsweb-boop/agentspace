@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatPhone } from "@/lib/format";
 import { Modal } from "../components/modal";
 import { SubmitButton } from "../components/submit-button";
 import { ACTIVITY_ICONS } from "../components/icons";
-import { createActivity } from "./actions";
+import { createActivity, findThreadByPhone, type PhoneThread } from "./actions";
 import { nowTimePL, todayPL } from "@/lib/datetime";
 import {
   ACTIVITY_KINDS,
@@ -18,6 +18,17 @@ import {
 } from "@/lib/types";
 
 type ClientLite = { id: string; name: string; phone?: string | null };
+
+/** Rozmowa, do której dopisujemy kolejną (wątek pod jednym numerem). */
+export type ThreadParent = {
+  id: string;
+  subject: string;
+  kind: ActivityKind;
+  contactName?: string | null;
+  contactPhone?: string | null;
+  clientId?: string | null;
+  count?: number;
+};
 type Lite = { id: string; name: string };
 
 export function ActivityModal({
@@ -32,6 +43,7 @@ export function ActivityModal({
   presetTime,
   open: openProp,
   onOpenChange,
+  parent,
 }: {
   agents: Lite[];
   clients: ClientLite[];
@@ -47,6 +59,8 @@ export function ActivityModal({
   presetTime?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Tryb „kolejna rozmowa": dopisujemy do istniejącego wątku zamiast tworzyć nowy. */
+  parent?: ThreadParent;
 }) {
   const [openState, setOpenState] = useState(false);
   const open = openProp ?? openState;
@@ -55,6 +69,8 @@ export function ActivityModal({
     onOpenChange?.(v);
   };
   const [kind, setKind] = useState<ActivityKind | null>(null);
+  // W trybie wątku rodzaj bierzemy z rozmowy, do której dopisujemy.
+  const activeKind = parent ? parent.kind : kind;
 
   function close() {
     setOpen(false);
@@ -80,7 +96,7 @@ export function ActivityModal({
         </button>
       )}
 
-      {open && !kind && (
+      {open && !activeKind && (
         <Modal title="Wybierz rodzaj działania" onClose={close} maxWidth="max-w-xl">
           <div className="grid grid-cols-2 gap-4 px-6 py-8">
             {ACTIVITY_KINDS.map((k) => {
@@ -104,9 +120,10 @@ export function ActivityModal({
         </Modal>
       )}
 
-      {open && kind && (
+      {open && activeKind && (
         <ActivityForm
-          kind={kind}
+          kind={activeKind}
+          parent={parent}
           agents={agents}
           clients={clients}
           properties={properties}
@@ -115,7 +132,7 @@ export function ActivityModal({
           reportDefault={reportDefault}
           presetDate={presetDate}
           presetTime={presetTime}
-          onBack={() => setKind(null)}
+          onBack={parent ? undefined : () => setKind(null)}
           onClose={close}
         />
       )}
@@ -133,6 +150,7 @@ function ActivityForm({
   reportDefault,
   presetDate,
   presetTime,
+  parent,
   onBack,
   onClose,
 }: {
@@ -145,7 +163,8 @@ function ActivityForm({
   reportDefault: boolean;
   presetDate?: string;
   presetTime?: string;
-  onBack: () => void;
+  parent?: ThreadParent;
+  onBack?: () => void;
   onClose: () => void;
 }) {
   const meta = ACTIVITY_KIND_MAP[kind];
@@ -154,10 +173,33 @@ function ActivityForm({
   const purposes = ACTIVITY_PURPOSES.filter((p) => p.kinds.includes(kind));
 
   const [assignees, setAssignees] = useState<string[]>([]);
-  const [clientId, setClientId] = useState(presetClientId ?? "");
-  const [contactName, setContactName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
+  const [clientId, setClientId] = useState(presetClientId ?? parent?.clientId ?? "");
+  const [contactName, setContactName] = useState(parent?.contactName ?? "");
+  const [contactPhone, setContactPhone] = useState(parent?.contactPhone ?? "");
+  const [subject, setSubject] = useState(parent ? parent.subject : "");
   const [saveError, setSaveError] = useState<string | null>(null);
+  // Podpowiedź „ten numer już jest w bazie" i wybór agenta, czy dopisać do wątku.
+  const [thread, setThread] = useState<PhoneThread | null>(null);
+  const [attachTo, setAttachTo] = useState<string | null>(parent?.id ?? null);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    if (parent || dismissed) return;
+    const digits = contactPhone.replace(/\D/g, "");
+    if (digits.length < 7) {
+      setThread(null);
+      return;
+    }
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      const found = await findThreadByPhone(digits);
+      if (!cancelled) setThread(found);
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [contactPhone, parent, dismissed]);
 
   // Wybór klienta z bazy uzupełnia dane kontaktowe - agent nie przepisuje ręcznie.
   function pickClient(id: string) {
@@ -175,7 +217,11 @@ function ActivityForm({
   const isFuture = `${today}T${nowTime}` > `${todayPL()}T${nowTimePL()}`;
 
   return (
-    <Modal title={`Nowe: ${meta.label.toLowerCase()}`} onClose={onClose} maxWidth="max-w-3xl">
+    <Modal
+      title={attachTo ? `Kolejna rozmowa: ${parent?.subject ?? thread?.subject ?? ""}` : `Nowe: ${meta.label.toLowerCase()}`}
+      onClose={onClose}
+      maxWidth="max-w-3xl"
+    >
       <form
         action={async (fd) => {
           // Zamykamy dopiero po udanym zapisie. Inaczej agent nie wie, czy się
@@ -188,6 +234,7 @@ function ActivityForm({
         className="flex min-h-0 flex-1 flex-col"
       >
         <input type="hidden" name="kind" value={kind} />
+        {attachTo && <input type="hidden" name="parent_id" value={attachTo} />}
         {assignees.map((id) => (
           <input key={id} type="hidden" name="assignee_ids" value={id} />
         ))}
@@ -199,14 +246,76 @@ function ActivityForm({
               <Icon className="h-5 w-5" />
             </span>
             <p className="text-sm font-medium text-slate-700">{meta.label}</p>
-            <button
-              type="button"
-              onClick={onBack}
-              className="ml-auto text-xs text-slate-500 underline-offset-2 hover:text-slate-900 hover:underline"
-            >
-              zmień rodzaj
-            </button>
+            {onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="ml-auto text-xs text-slate-500 underline-offset-2 hover:text-slate-900 hover:underline"
+              >
+                zmień rodzaj
+              </button>
+            )}
           </div>
+
+          {/* Wątek: informacja, że dopisujemy do istniejącej historii kontaktu */}
+          {attachTo && (
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+              <span className="font-semibold">Dopisujesz do istniejącego kontaktu.</span>
+              <span>
+                Rozmowa trafi do wątku „{parent?.subject ?? thread?.subject}"
+                {(parent?.count ?? thread?.count) ? ` (${parent?.count ?? thread?.count} rozmów)` : ""}, bez tworzenia
+                drugiego takiego samego wpisu. Do celów liczy się normalnie.
+              </span>
+              {!parent && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAttachTo(null);
+                    setDismissed(true);
+                    setThread(null);
+                  }}
+                  className="ml-auto text-xs font-medium text-emerald-700 underline-offset-2 hover:underline"
+                >
+                  to jednak nowy kontakt
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Podpowiedź po wpisaniu numeru, który już jest w bazie */}
+          {!attachTo && thread && (
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <span>
+                Ten numer ma już wątek: <strong>{thread.subject}</strong>
+                {thread.count > 1 ? ` (${thread.count} rozmów)` : ""}
+                {thread.clientName ? `, klient ${thread.clientName}` : ""}.
+              </span>
+              <span className="ml-auto flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAttachTo(thread.id);
+                    if (!contactName && thread.contactName) setContactName(thread.contactName);
+                    if (thread.clientId) setClientId(thread.clientId);
+                    if (!subject.trim()) setSubject(thread.subject);
+                  }}
+                  className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-amber-400"
+                >
+                  Dopisz do wątku
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDismissed(true);
+                    setThread(null);
+                  }}
+                  className="rounded-lg px-2 py-1.5 text-xs font-medium text-amber-800 hover:underline"
+                >
+                  Nowy kontakt
+                </button>
+              </span>
+            </div>
+          )}
 
           {/* Cel + temat */}
           <div className="grid gap-3 sm:grid-cols-2">
@@ -228,6 +337,8 @@ function ActivityForm({
               <input
                 name="subject"
                 required
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
                 placeholder={isCall ? "np. Pozysk ul. Warmijska" : "np. Prezentacja Sołtysowska"}
                 className={inp}
               />

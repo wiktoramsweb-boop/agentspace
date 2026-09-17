@@ -1,51 +1,71 @@
 import { requireUser } from "@/lib/auth";
-import { getAgencyClients } from "@/lib/data-platform";
+import { queryClients } from "@/lib/data-lists";
+import { getAgencyAgents } from "@/lib/data-activities";
+import { getAgencySettings } from "@/lib/agency-settings";
+import { parseListQuery } from "@/lib/list-params";
+import { maskPhone } from "@/lib/format";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PageHeader, EmptyState } from "../components/ui";
 import { NewClientForm } from "./new-client-form";
 import { ClientsBrowser } from "./clients-browser";
-import { getAgencySettings } from "@/lib/agency-settings";
-import { maskPhone } from "@/lib/format";
 
-export default async function KlienciPage() {
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+/** Liczniki nad listą liczy baza, żeby nie ściągać wszystkich kontaktów. */
+async function counts(agencyId: string) {
+  const admin = createSupabaseAdmin();
+  const today = new Date().toISOString().slice(0, 10);
+  const [all, active, due] = await Promise.all([
+    admin.from("clients").select("id", { count: "exact", head: true }).eq("agency_id", agencyId),
+    admin
+      .from("clients")
+      .select("id", { count: "exact", head: true })
+      .eq("agency_id", agencyId)
+      .not("status", "in", "(zamkniety,stracony)"),
+    admin
+      .from("clients")
+      .select("id", { count: "exact", head: true })
+      .eq("agency_id", agencyId)
+      .not("next_contact_at", "is", null)
+      .lte("next_contact_at", today),
+  ]);
+  return { all: all.count ?? 0, active: active.count ?? 0, due: due.count ?? 0 };
+}
+
+export default async function KlienciPage({ searchParams }: Props) {
   const user = await requireUser();
-  const [clients, settings] = await Promise.all([
-    user.agency_id ? getAgencyClients(user.agency_id) : Promise.resolve([]),
-    getAgencySettings(user.agency_id, user.agency?.name),
+  const agencyId = user.agency_id;
+  const query = parseListQuery(await searchParams, { sort: "zmiana", dateField: "zmiana" });
+
+  const [page, agents, settings, stats] = await Promise.all([
+    agencyId
+      ? queryClients(agencyId, query, user.id)
+      : Promise.resolve({ rows: [], total: 0, pages: 1 }),
+    agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
+    getAgencySettings(agencyId, user.agency?.name),
+    agencyId ? counts(agencyId) : Promise.resolve({ all: 0, active: 0, due: 0 }),
   ]);
 
   // Ukrywanie kontaktów (Ustawienia → Pozostałe) dotyczy tylko agentów.
-  // Maskujemy na serwerze: do przeglądarki nie trafia pełny numer ani e-mail,
-  // więc nie da się ich wyciągnąć z kodu strony.
+  // Maskujemy na serwerze: do przeglądarki nie trafia pełny numer ani e-mail.
   const mask = settings.options.hide_contacts && user.role === "agent";
-  const listClients = mask
-    ? clients.map((c) =>
+  const rows = mask
+    ? page.rows.map((c) =>
         c.agent_id === user.id
           ? c
-          : { ...c, phone: maskPhone(c.phone), email: c.email ? "ukryty" : null, phones: [], emails: [] },
+          : { ...c, phone: maskPhone(c.phone), email: c.email ? "ukryty" : null },
       )
-    : clients;
-  const knownPhones = (mask ? clients.filter((c) => c.agent_id === user.id) : clients).map((c) => ({
-    phone: c.phone,
-    owner: c.opiekunName,
-  }));
-
-  const active = clients.filter((c) => !["zamkniety", "stracony"].includes(c.status));
-  const today = new Date().toISOString().slice(0, 10);
-  const dueCount = active.filter(
-    (c) => c.next_contact_at && c.next_contact_at <= today,
-  ).length;
+    : page.rows;
 
   return (
     <>
       <PageHeader
         title="Klienci"
-        subtitle={`${active.length} aktywnych · ${clients.length} w biurze${
-          dueCount > 0 ? ` · ${dueCount} do kontaktu` : ""
-        }`}
-        action={<NewClientForm existingPhones={knownPhones} />}
+        subtitle={`${stats.active} aktywnych · ${stats.all} w biurze${stats.due > 0 ? ` · ${stats.due} do kontaktu` : ""}`}
+        action={<NewClientForm existingPhones={[]} />}
       />
 
-      {clients.length === 0 ? (
+      {stats.all === 0 ? (
         <EmptyState
           title="Brak klientów"
           body="Dodaj pierwszego klienta - baza jest wspólna dla całego biura, więc każdy agent go zobaczy."
@@ -56,7 +76,14 @@ export default async function KlienciPage() {
           }
         />
       ) : (
-        <ClientsBrowser clients={listClients} currentUserId={user.id} />
+        <ClientsBrowser
+          rows={rows}
+          query={query}
+          total={page.total}
+          pages={page.pages}
+          agents={agents}
+          canDelete={user.role === "owner" || user.role === "manager"}
+        />
       )}
     </>
   );

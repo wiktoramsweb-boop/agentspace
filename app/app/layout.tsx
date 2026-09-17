@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth";
 import { Sidebar } from "./components/sidebar";
+import { avatarUrl } from "./components/avatar";
 import { OnboardingRedirect } from "./onboarding-redirect";
 import { ToastProvider } from "./components/toast";
 import { PageTransition } from "./components/page-transition";
@@ -32,6 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           role={user.role}
           fullName={user.full_name ?? "Użytkownik"}
           agencyName={user.agency?.name ?? "Biuro"}
+          avatarUrl={avatarUrl(user.avatar_path)}
         />
         <main className="flex-1 px-5 py-8 md:px-10 md:py-10">
           <div className="mx-auto max-w-6xl">
