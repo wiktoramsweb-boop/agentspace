@@ -1,0 +1,137 @@
+/* ─────────────────────────────────────────────────────────────
+   Wzór „Kamienica": redakcyjny, papierowy, szeryfowy.
+   Prosta zasada: dużo bieli, cienkie linie, zero zaokrągleń.
+   ───────────────────────────────────────────────────────────── */
+
+.wz-kam {
+  --d-bg: #f7f4ef;
+  --d-fg: #17130f;
+  --d-muted: #857b70;
+  --d-muted-strong: #5d554c;
+  --d-line: #e0d9cf;
+  --d-line-strong: #c9c0b3;
+  --d-accent: #b4543a;
+  --d-accent-fg: #fdf9f4;
+  --d-accent-soft: #f0e7de;
+  --d-accent-link: #b4543a;
+  --d-card: #fffdfa;
+  --d-chip-bg: rgba(23, 19, 15, .72);
+  --d-chip-fg: #f7f4ef;
+  --d-field-bg: #fffdfa;
+  --d-nav-bg: transparent;
+  --d-nav-fg: #17130f;
+  --d-nav-solid: rgba(247, 244, 239, .92);
+  --d-radius: 2px;
+  --d-radius-lg: 3px;
+  --d-shadow: 0 30px 60px -40px rgba(50, 35, 20, .5);
+  --d-display: var(--f-fraunces), "Times New Roman", serif;
+  --d-body: var(--f-manrope), ui-sans-serif, system-ui, sans-serif;
+  --d-display-w: 400;
+  --d-h-ls: -.015em;
+  --d-logo-w: 500;
+  --d-logo-ls: .01em;
+  --d-price-w: 500;
+  --d-ease: cubic-bezier(.22, .61, .36, 1);
+  --d-footer-bg: #17130f;
+  --d-footer-fg: #efe9e1;
+}
+
+.wz-kam h1, .wz-kam h2, .wz-kam h3 { font-variation-settings: "SOFT" 0, "WONK" 1; }
+.wz-kam .wzfo { --d-line: rgba(247, 244, 239, .14); --d-muted: #a79c90; }
+.wz-kam .wzn__logo b { letter-spacing: .04em; }
+
+/* nagłówek */
+.kam-hero { padding-top: clamp(30px, 5vw, 70px); }
+.kam-hero__grid { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 70px); align-items: end; }
+.kam-hero__eyebrow { display: flex; align-items: center; gap: 14px; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--d-muted); margin-bottom: 26px; }
+.kam-hero__eyebrow::after { content: ""; height: 1px; flex: 1; background: var(--d-line-strong); }
+.kam-hero h1 { font-size: clamp(44px, 7.2vw, 106px); line-height: .94; letter-spacing: -.03em; font-weight: 300; }
+.kam-hero h1 em { font-style: italic; color: var(--d-accent); }
+.kam-hero__sub { margin-top: 26px; font-size: clamp(17px, 1.5vw, 21px); color: var(--d-muted-strong); max-width: 46ch; }
+.kam-hero__meta { display: flex; flex-wrap: wrap; gap: 26px; margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--d-line); }
+.kam-hero__meta div b { display: block; font-family: var(--d-display); font-size: 27px; font-weight: 400; line-height: 1.1; }
+.kam-hero__meta div span { font-size: 12.5px; color: var(--d-muted); letter-spacing: .04em; }
+.kam-hero__img { position: relative; aspect-ratio: 3 / 3.6; overflow: hidden; }
+.kam-hero__img img { transform: scale(1.06); }
+.kam-hero__cap { margin-top: 10px; font-size: 12.5px; color: var(--d-muted); display: flex; justify-content: space-between; gap: 12px; }
+@media (max-width: 900px) {
+  .kam-hero__grid { grid-template-columns: 1fr; }
+  .kam-hero__img { aspect-ratio: 4 / 3; }
+}
+
+/* pasek wyszukiwarki */
+.kam-search { margin-top: clamp(40px, 5vw, 66px); padding: 22px clamp(18px, 2.5vw, 30px); background: var(--d-card); border: 1px solid var(--d-line); }
+.kam-search__t { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--d-muted); margin-bottom: 16px; }
+
+/* liczby */
+.kam-stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--d-line); border-bottom: 1px solid var(--d-line); }
+.kam-stats div { padding: 30px 26px; border-right: 1px solid var(--d-line); }
+.kam-stats div:last-child { border-right: 0; }
+.kam-stats b { display: block; font-family: var(--d-display); font-size: clamp(30px, 3.6vw, 46px); font-weight: 300; line-height: 1; }
+.kam-stats span { font-size: 13.5px; color: var(--d-muted); display: block; margin-top: 9px; }
+@media (max-width: 860px) {
+  .kam-stats { grid-template-columns: 1fr 1fr; }
+  .kam-stats div:nth-child(2n) { border-right: 0; }
+  .kam-stats div:nth-child(-n+2) { border-bottom: 1px solid var(--d-line); }
+}
+
+/* nagłówek sekcji */
+.kam-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 38px; }
+.kam-head p.wz-lead { margin-top: 14px; }
+
+/* wyróżniona oferta */
+.kam-spot { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+.kam-spot__img { position: relative; aspect-ratio: 16 / 11; overflow: hidden; }
+.kam-spot__no { font-family: var(--d-display); font-size: 13px; letter-spacing: .2em; color: var(--d-accent); }
+.kam-spot h3 { font-size: clamp(27px, 3.4vw, 42px); font-weight: 300; line-height: 1.06; margin: 14px 0 16px; }
+.kam-spot__params { display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 18px 0; margin: 18px 0; border-top: 1px solid var(--d-line); border-bottom: 1px solid var(--d-line); font-size: 14.5px; }
+.kam-spot__params b { font-family: var(--d-display); font-weight: 500; }
+.kam-spot__price { font-family: var(--d-display); font-size: clamp(26px, 3vw, 36px); font-weight: 400; }
+@media (max-width: 900px) { .kam-spot { grid-template-columns: 1fr; } }
+
+/* manifest */
+.kam-quote { background: var(--d-fg); color: #f4efe8; }
+.kam-quote blockquote { font-family: var(--d-display); font-weight: 300; font-size: clamp(25px, 3.6vw, 45px); line-height: 1.24; letter-spacing: -.015em; max-width: 22ch; margin: 0; }
+.kam-quote__grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(24px, 4vw, 60px); align-items: end; }
+.kam-quote__side { color: #b8ac9e; font-size: 16px; display: grid; gap: 16px; }
+.kam-quote__side b { color: #f4efe8; font-family: var(--d-display); font-weight: 400; }
+@media (max-width: 860px) { .kam-quote__grid { grid-template-columns: 1fr; } }
+
+/* jak pracujemy */
+.kam-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--d-line); }
+.kam-steps article { padding: 32px 30px 36px; border-right: 1px solid var(--d-line); }
+.kam-steps article:last-child { border-right: 0; }
+.kam-steps b { font-family: var(--d-display); font-size: 12px; letter-spacing: .2em; color: var(--d-accent); display: block; margin-bottom: 16px; }
+.kam-steps h3 { font-size: 24px; font-weight: 400; margin-bottom: 11px; }
+.kam-steps p { color: var(--d-muted-strong); font-size: 15.5px; }
+@media (max-width: 860px) { .kam-steps { grid-template-columns: 1fr; } .kam-steps article { border-right: 0; border-bottom: 1px solid var(--d-line); } }
+
+/* zespół */
+.kam-team { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(16px, 2vw, 26px); }
+.kam-team figure { margin: 0; }
+.kam-team__img { position: relative; aspect-ratio: 3 / 4; overflow: hidden; margin-bottom: 14px; filter: grayscale(1) contrast(1.04); transition: filter .5s var(--d-ease); }
+.kam-team figure:hover .kam-team__img { filter: none; }
+.kam-team b { font-family: var(--d-display); font-size: 19px; font-weight: 400; display: block; }
+.kam-team span { font-size: 13.5px; color: var(--d-muted); }
+.kam-team a { font-size: 14px; display: inline-block; margin-top: 8px; border-bottom: 1px solid var(--d-line-strong); }
+@media (max-width: 900px) { .kam-team { grid-template-columns: 1fr 1fr; } }
+
+/* dzielnice */
+.kam-areas { display: flex; flex-wrap: wrap; gap: 10px; }
+.kam-areas a { display: inline-flex; align-items: baseline; gap: 9px; padding: 13px 20px; border: 1px solid var(--d-line-strong); font-size: 16px; transition: background .25s, color .25s, border-color .25s; }
+.kam-areas a:hover { background: var(--d-fg); color: var(--d-bg); border-color: var(--d-fg); }
+.kam-areas a i { font-style: normal; font-size: 12.5px; opacity: .6; }
+
+/* wiedza */
+.kam-know { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(18px, 2.4vw, 34px); }
+.kam-know article { display: grid; gap: 14px; }
+.kam-know__img { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+.kam-know h3 { font-size: 22px; font-weight: 400; line-height: 1.2; }
+.kam-know p { font-size: 15px; color: var(--d-muted-strong); }
+.kam-know time { font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--d-muted); }
+@media (max-width: 860px) { .kam-know { grid-template-columns: 1fr; } }
+
+/* kontakt */
+.kam-cta { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: clamp(28px, 4vw, 64px); align-items: start; }
+.kam-cta__box { background: var(--d-card); border: 1px solid var(--d-line); padding: clamp(22px, 3vw, 34px); }
+@media (max-width: 900px) { .kam-cta { grid-template-columns: 1fr; } }
