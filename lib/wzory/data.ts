@@ -426,7 +426,17 @@ export const DEMO_OFFERS: DemoOffer[] = [
   },
 ];
 
-export type DemoArticle = { slug: string; title: string; lead: string; date: string; read: number; photo: string };
+export type DemoArticle = {
+  slug: string;
+  title: string;
+  lead: string;
+  date: string;
+  read: number;
+  photo: string;
+  tag: string;
+  author: string;
+  body: { h?: string; p: string[] }[];
+};
 
 export const DEMO_ARTICLES: DemoArticle[] = [
   {
@@ -436,6 +446,43 @@ export const DEMO_ARTICLES: DemoArticle[] = [
     date: "12 marca 2026",
     read: 6,
     photo: "/wzory/miasto-noc.jpg",
+    tag: "Rynek",
+    author: "Marta Lewandowska",
+    body: [
+      {
+        p: [
+          "Najczęstsze pytanie przy pierwszej rozmowie brzmi: ile to potrwa. Odpowiedź z portali, czyli średnia dla całego miasta, nic nie mówi, bo kawalerka na Kazimierzu i dom w Zielonkach to dwa różne światy.",
+          "Poniżej mediany z naszych 128 transakcji zamkniętych w zeszłym roku, liczone od dnia publikacji do podpisania umowy przedwstępnej.",
+        ],
+      },
+      {
+        h: "Mieszkania do 60 metrów",
+        p: [
+          "Mediana 19 dni. To najpłynniejszy segment rynku, bo kupują go zarówno pary na start, jak i inwestorzy pod wynajem. Przy cenie ustawionej na poziomie transakcyjnym pierwsze prezentacje są zwykle w ciągu trzech dni.",
+          "Co wydłuża sprzedaż: parter bez ogródka, kuchnia bez okna i czynsz powyżej 1000 zł. Każda z tych rzeczy to średnio dwa tygodnie więcej.",
+        ],
+      },
+      {
+        h: "Mieszkania powyżej 80 metrów",
+        p: [
+          "Mediana 47 dni. Kupujących jest mniej, za to decyzja zapada wolniej i częściej zależy od kredytu. Tutaj naprawdę opłaca się home staging, bo zdjęcia decydują, czy ktoś w ogóle zadzwoni.",
+        ],
+      },
+      {
+        h: "Domy i działki",
+        p: [
+          "Mediana 74 dni dla domów i 96 dni dla działek. Sezonowość jest wyraźna: od marca do czerwca ruch jest dwa razy większy niż zimą.",
+          "Jeśli planujesz sprzedaż domu, przygotowania zacznij w styczniu, żeby wejść na rynek z pierwszym ciepłym tygodniem.",
+        ],
+      },
+      {
+        h: "Co z tego wynika dla Ciebie",
+        p: [
+          "Cena ofertowa ustawiona 10 procent powyżej rynku wydłuża sprzedaż średnio o 41 dni i najczęściej kończy się obniżką poniżej poziomu, który dałoby się uzyskać od razu.",
+          "Zanim ustalimy cenę, pokazujemy akty notarialne z Twojego budynku i sąsiednich ulic. To jedyna twarda podstawa, jaką ma ten rynek.",
+        ],
+      },
+    ],
   },
   {
     slug: "co-sprawdzic-przed-podpisaniem-umowy-przedwstepnej",
@@ -444,6 +491,36 @@ export const DEMO_ARTICLES: DemoArticle[] = [
     date: "27 lutego 2026",
     read: 8,
     photo: "/wzory/schody.jpg",
+    tag: "Bezpieczeństwo",
+    author: "Paweł Zieliński",
+    body: [
+      {
+        p: [
+          "Umowa przedwstępna to moment, w którym pieniądze zaczynają realnie zmieniać właściciela. Zadatek przepada albo wraca w podwójnej wysokości, więc każdy zapis ma cenę.",
+          "Oto lista, którą przechodzimy przy każdej transakcji, zanim ktokolwiek cokolwiek podpisze.",
+        ],
+      },
+      {
+        h: "Dziewięć rzeczy do sprawdzenia",
+        p: [
+          "Księga wieczysta: dział III i IV, czyli roszczenia i hipoteki. Hipoteka nie blokuje sprzedaży, ale musi być rozliczona w akcie.",
+          "Podstawa nabycia: skąd właściciel ma tę nieruchomość. Spadek i darowizna wymagają zaświadczenia z urzędu skarbowego.",
+          "Zaświadczenie o braku zameldowanych osób i o braku zaległości w czynszu.",
+          "Uchwały wspólnoty: planowane remonty i fundusz remontowy. Nowa elewacja potrafi kosztować kilkanaście tysięcy na lokal.",
+          "Świadectwo energetyczne: obowiązkowe przy sprzedaży, wymagane przez notariusza.",
+          "Stan prawny gruntu przy domach: własność czy użytkowanie wieczyste, oraz dostęp do drogi publicznej.",
+          "Decyzje administracyjne: pozwolenie na budowę, zgłoszenie zakończenia, ewentualne samowole.",
+          "Zadatek czy zaliczka: to nie synonimy, różnica bywa warta kilkadziesiąt tysięcy.",
+          "Termin i warunek kredytowy: jeśli kupujący bierze kredyt, umowa musi opisywać, co się dzieje przy odmowie banku.",
+        ],
+      },
+      {
+        h: "Najczęstszy błąd",
+        p: [
+          "Podpisywanie umowy w formie zwykłej pisemnej przy transakcji z kredytem. Bank zwykle wymaga aktu notarialnego, a poprawianie tego po fakcie kosztuje czas i nerwy obu stron.",
+        ],
+      },
+    ],
   },
   {
     slug: "swiadectwo-energetyczne-bez-nerwow",
@@ -452,7 +529,174 @@ export const DEMO_ARTICLES: DemoArticle[] = [
     date: "9 lutego 2026",
     read: 4,
     photo: "/wzory/szklo.jpg",
+    tag: "Formalności",
+    author: "Karolina Mazur",
+    body: [
+      {
+        p: [
+          "Świadectwo charakterystyki energetycznej jest obowiązkowe przy sprzedaży i przy wynajmie na czas dłuższy niż rok. Notariusz zapyta o nie przy akcie, a jego brak potrafi przesunąć podpisanie o tydzień.",
+        ],
+      },
+      {
+        h: "Ile to kosztuje i jak długo trwa",
+        p: [
+          "Dla mieszkania: zwykle od 350 do 600 zł i dwa do czterech dni roboczych. Dla domu: od 600 do 1200 zł, bo potrzebna jest wizja lokalna i dokumentacja techniczna.",
+          "Świadectwo jest ważne dziesięć lat, chyba że zmienisz coś istotnego, na przykład wymienisz źródło ciepła albo docieplisz budynek.",
+        ],
+      },
+      {
+        h: "Dlaczego warto zrobić je przed sesją zdjęciową",
+        p: [
+          "Klasa energetyczna trafia do ogłoszenia i coraz więcej kupujących filtruje po niej oferty. Jeśli budynek wypada dobrze, to argument w negocjacjach. Jeśli słabo, lepiej wiedzieć wcześniej i przygotować odpowiedź niż tłumaczyć się przy trzeciej prezentacji.",
+        ],
+      },
+    ],
   },
+  {
+    slug: "home-staging-co-naprawde-dziala",
+    title: "Home staging: co naprawdę działa, a co jest stratą pieniędzy",
+    lead: "Pięć zmian, które podnoszą cenę, i trzy, na które szkoda budżetu tuż przed sprzedażą.",
+    date: "22 stycznia 2026",
+    read: 5,
+    photo: "/wzory/salon.jpg",
+    tag: "Sprzedaż",
+    author: "Marta Lewandowska",
+    body: [
+      {
+        p: [
+          "Home staging nie polega na remoncie. Polega na tym, żeby kupujący w pierwszych sekundach zobaczył przestrzeń, a nie cudze życie.",
+        ],
+      },
+      {
+        h: "Co działa",
+        p: [
+          "Wyniesienie połowy rzeczy. Puste blaty i szafy robią większe wrażenie niż nowa kanapa.",
+          "Jednolite światło: wymiana wszystkich żarówek na ciepłe białe o tej samej barwie.",
+          "Neutralna ściana za łóżkiem i w salonie, jeśli obecny kolor jest mocny.",
+          "Mycie okien przed sesją. Na zdjęciach robi większą różnicę, niż ktokolwiek się spodziewa.",
+          "Zieleń: dwie duże rośliny zamiast dziesięciu doniczek.",
+        ],
+      },
+      {
+        h: "Czego nie warto robić przed sprzedażą",
+        p: [
+          "Wymiany kuchni. Kupujący i tak zrobi po swojemu, a koszt rzadko wraca w cenie.",
+          "Kładzenia nowych paneli na całość, jeśli stare są tylko zużyte, a nie zniszczone.",
+          "Kupowania mebli pod sesję, które potem trzeba wywieźć.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "wynajem-okazjonalny-krok-po-kroku",
+    title: "Najem okazjonalny krok po kroku",
+    lead: "Dlaczego warto, ile kosztuje i jakie dokumenty musi dostarczyć najemca.",
+    date: "8 stycznia 2026",
+    read: 7,
+    photo: "/wzory/sypialnia.jpg",
+    tag: "Najem",
+    author: "Karolina Mazur",
+    body: [
+      {
+        p: [
+          "Najem okazjonalny to jedyna forma, która realnie pozwala odzyskać mieszkanie, gdy najemca przestaje płacić i nie chce się wyprowadzić.",
+        ],
+      },
+      {
+        h: "Co jest potrzebne",
+        p: [
+          "Oświadczenie najemcy w formie aktu notarialnego o poddaniu się egzekucji.",
+          "Wskazanie innego lokalu, do którego najemca może się wyprowadzić, oraz zgoda właściciela tego lokalu.",
+          "Zgłoszenie umowy do urzędu skarbowego w ciągu czternastu dni od rozpoczęcia najmu.",
+        ],
+      },
+      {
+        h: "Koszty i terminy",
+        p: [
+          "Taksa notarialna to zwykle od 250 do 400 zł i najczęściej płaci ją najemca. Cała procedura zajmuje dwa do czterech dni roboczych.",
+          "Brak zgłoszenia do urzędu skarbowego w terminie powoduje, że umowa traci charakter okazjonalny i zostaje zwykłym najmem.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "kupno-mieszkania-z-najemca",
+    title: "Kupno mieszkania z najemcą w środku",
+    lead: "Kiedy to okazja, a kiedy kupujesz cudzy problem razem z metrami.",
+    date: "19 grudnia 2025",
+    read: 6,
+    photo: "/wzory/wnetrze-slonce.jpg",
+    tag: "Inwestycje",
+    author: "Tomasz Bąk",
+    body: [
+      {
+        p: [
+          "Mieszkanie z czynną umową najmu potrafi być dobrym zakupem: masz przychód od pierwszego dnia i nie tracisz miesiąca na szukanie najemcy. Pod warunkiem, że wiesz, co kupujesz.",
+        ],
+      },
+      {
+        h: "Co sprawdzić w umowie",
+        p: [
+          "Okres wypowiedzenia i to, czy umowa jest na czas określony. Przy czasie określonym nie wypowiesz jej bez powodu wskazanego w umowie.",
+          "Wysokość kaucji i to, czy faktycznie została wpłacona oraz komu zostanie zwrócona.",
+          "Zapisy o podwyżkach czynszu i o tym, kto płaci za media i fundusz remontowy.",
+          "Protokół zdawczy: jego brak oznacza, że przy końcu najmu nie udowodnisz, w jakim stanie było mieszkanie.",
+        ],
+      },
+      {
+        h: "Jak liczyć rentowność",
+        p: [
+          "Od rocznego czynszu odejmij czynsz administracyjny, podatek, ubezpieczenie, koszt drobnych napraw i przynajmniej jeden miesiąc pustostanu. Dopiero ta liczba podzielona przez cenę zakupu to realna stopa zwrotu.",
+        ],
+      },
+    ],
+  },
+];
+
+/* ───────── opinie, portale i pytania ───────── */
+
+export type DemoReview = { text: string; who: string; what: string; initials: string };
+
+export const DEMO_REVIEWS: DemoReview[] = [
+  { text: "Sprzedali mieszkanie po mamie w trzy tygodnie, a ja mieszkam w Anglii i wszystko poszło zdalnie. Dostawałem raport co tydzień, bez dopytywania.", who: "Tomasz K.", what: "sprzedaż mieszkania, Podgórze", initials: "TK" },
+  { text: "Pierwszy raz kupowaliśmy nieruchomość. Agent wytłumaczył każdy papierek dwa razy i ani razu nie dał odczuć, że pytamy o oczywistości.", who: "Ewelina i Michał", what: "zakup mieszkania, Bronowice", initials: "EM" },
+  { text: "Wynajmuję dwa mieszkania i po roku współpracy nie pamiętam, kiedy ostatnio sam odbierałem telefon od najemcy.", who: "Piotr W.", what: "obsługa najmu, Grzegórzki", initials: "PW" },
+  { text: "Cena wyjściowa była o 40 tysięcy wyższa, niż sam bym ustawił, a mieszkanie sprzedało się w miesiąc. Do dziś się zastanawiam, jak to policzyli.", who: "Andrzej M.", what: "sprzedaż mieszkania, Stare Miasto", initials: "AM" },
+  { text: "Znaleźli nam dom poza ofertą publiczną, zanim w ogóle trafił na portale. Dokładnie to, czego szukaliśmy przez pół roku.", who: "Rodzina Nowaków", what: "zakup domu, Zielonki", initials: "RN" },
+  { text: "Profesjonalne zdjęcia, rzut i film. Pierwszy raz widziałem swoje mieszkanie na ogłoszeniu i pomyślałem, że sam bym je kupił.", who: "Karolina S.", what: "sprzedaż mieszkania, Nowa Huta", initials: "KS" },
+];
+
+export const DEMO_PORTALS = [
+  "Otodom",
+  "OLX",
+  "Nieruchomosci-online",
+  "Morizon",
+  "Gratka",
+  "Domiporta",
+  "Facebook Marketplace",
+  "Google Maps",
+];
+
+export const FAQ_SPRZEDAZ: [string, string][] = [
+  ["Ile kosztuje obsługa sprzedaży?", "Jedno wynagrodzenie płatne dopiero po podpisaniu aktu notarialnego. Obejmuje wycenę, sesję zdjęciową, rzut, publikację na portalach, prezentacje, negocjacje i obsługę u notariusza. Nie ma dopłat po drodze."],
+  ["Czy muszę podpisywać umowę na wyłączność?", "Nie musisz, ale przy wyłączności bierzemy na siebie koszty marketingu i pokazujemy ofertę także innym biurom w systemie wymiany. Statystycznie kończy się to wyższą ceną, bo kupujący konkurują ze sobą zamiast z innymi ogłoszeniami tej samej nieruchomości."],
+  ["Jak ustalacie cenę wyjściową?", "Na podstawie aktów notarialnych z Twojej okolicy z ostatnich dwunastu miesięcy, a nie cen z ogłoszeń. Różnica między jednym a drugim potrafi sięgać dziesięciu procent."],
+  ["Co, jeśli mieszkanie jest wynajęte?", "Prowadzimy sprzedaż z najemcą w środku. Ustalamy godziny prezentacji, informujemy najemcę na piśmie i pilnujemy terminów wypowiedzenia, jeśli kupujący chce lokal pusty."],
+  ["Ile trwa przygotowanie oferty?", "Jeden dzień roboczy od podpisania umowy do publikacji. Sesja zdjęciowa zwykle następnego dnia rano, bo wtedy jest najlepsze światło."],
+];
+
+export const FAQ_NAJEM: [string, string][] = [
+  ["Jak sprawdzacie najemcę?", "Weryfikacja tożsamości, potwierdzenie zatrudnienia albo działalności, sprawdzenie w rejestrze dłużników i rozmowa z poprzednim wynajmującym. Właściciel dostaje komplet dokumentów przed podpisaniem."],
+  ["Czy przygotowujecie umowę najmu okazjonalnego?", "Tak. Kompletujemy dokumenty, umawiamy notariusza i pilnujemy zgłoszenia do urzędu skarbowego w terminie czternastu dni."],
+  ["Co z rozliczaniem mediów?", "Prowadzimy rozliczenie liczników i czynszu administracyjnego. Właściciel dostaje raz w miesiącu jedno zestawienie i jeden przelew."],
+  ["Co, jeśli najemca przestanie płacić?", "Działamy od pierwszego dnia opóźnienia: kontakt, wezwanie, a przy najmie okazjonalnym procedura opuszczenia lokalu. Właściciel nie musi prowadzić tego sam."],
+];
+
+export const FAQ_ZAKUP: [string, string][] = [
+  ["Czy kupujący płaci za Waszą pomoc?", "Nie. Wynagrodzenie płaci strona sprzedająca, a my reprezentujemy interes kupującego przy negocjacjach i dokumentach."],
+  ["Czy pokażecie ofertę, której nie ma na portalach?", "Tak. Około jedna trzecia naszych transakcji zamyka się przed publikacją, wśród klientów z aktywnym zleceniem poszukiwania."],
+  ["Pomożecie z kredytem?", "Współpracujemy z niezależnym doradcą, który porównuje oferty banków. Badanie zdolności jest bezpłatne i niezobowiązujące."],
+  ["Sprawdzicie stan prawny przed zakupem?", "Zawsze. Księga wieczysta, podstawa nabycia, zaległości, uchwały wspólnoty i decyzje administracyjne. Raport dostajesz przed umową przedwstępną."],
 ];
 
 /* ───────── pomocnicze ───────── */

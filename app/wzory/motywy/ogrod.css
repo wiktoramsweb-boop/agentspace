@@ -1,0 +1,86 @@
+/* ─────────────────────────────────────────────────────────────
+   Wzór „Ogród": len, mech i drewno. Owalne zdjęcia, miękkie
+   przejścia, dużo powietrza. Dla domów i działek pod miastem.
+   ───────────────────────────────────────────────────────────── */
+
+.wz-ogr {
+  --d-bg: #f7f5ef;
+  --d-fg: #1f3d2b;
+  --d-muted: #7d8a7c;
+  --d-muted-strong: #4f6152;
+  --d-line: #e2ded1;
+  --d-line-strong: #cbc6b4;
+  --d-accent: #6c8f4f;
+  --d-accent-fg: #f8faf3;
+  --d-accent-soft: #eaf0e0;
+  --d-accent-link: #4f7038;
+  --d-card: #fffdf8;
+  --d-chip-bg: rgba(31, 61, 43, .74);
+  --d-chip-fg: #f7f5ef;
+  --d-field-bg: #fffdf8;
+  --d-nav-bg: rgba(247, 245, 239, .84);
+  --d-nav-fg: #1f3d2b;
+  --d-nav-solid: rgba(247, 245, 239, .96);
+  --d-radius: 999px;
+  --d-radius-lg: 26px;
+  --d-shadow: 0 30px 60px -34px rgba(40, 60, 35, .4);
+  --d-display: var(--f-lora), Georgia, serif;
+  --d-body: var(--f-nunito), ui-sans-serif, system-ui, sans-serif;
+  --d-display-w: 500;
+  --d-h-ls: -.015em;
+  --d-logo-w: 600;
+  --d-logo-ls: .01em;
+  --d-price-w: 600;
+  --d-ease: cubic-bezier(.33, 1.1, .5, 1);
+  --d-footer-bg: #1f3d2b;
+  --d-footer-fg: #eef3e8;
+}
+
+.wz-ogr .wzfo { --d-line: rgba(238, 243, 232, .16); --d-muted: #9fb09c; }
+.wz-ogr .wzc { border-radius: 26px; }
+.wz-ogr .wzc__media { border-radius: 26px 26px 0 0; }
+.wz-ogr .wzc__title { font-family: var(--d-display); font-size: 21px; }
+.wz-ogr .wz-box { border-radius: 26px; }
+.wz-ogr .wzs select, .wz-ogr .wzs input, .wz-ogr .wzf input, .wz-ogr .wzf textarea, .wz-ogr .wzf select { border-radius: 16px; }
+.wz-ogr .wzl__chip, .wz-ogr .wzn__fav { border-radius: 999px; }
+.wz-ogr .wz-h2 { font-weight: 500; }
+
+/* nagłówek */
+.ogr-hero { padding-top: clamp(20px, 3vw, 46px); position: relative; }
+.ogr-hero::before {
+  content: ""; position: absolute; top: -140px; right: -180px; width: 620px; height: 620px; border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, rgba(108, 143, 79, .22), transparent 62%); pointer-events: none;
+}
+.ogr-hero__grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: clamp(26px, 4vw, 64px); align-items: center; }
+.ogr-hero h1 { font-size: clamp(38px, 5.6vw, 74px); line-height: 1.04; font-weight: 500; }
+.ogr-hero h1 em { font-style: italic; color: var(--d-accent-link); }
+.ogr-hero__sub { margin-top: 20px; font-size: clamp(17px, 1.35vw, 20px); color: var(--d-muted-strong); max-width: 46ch; }
+.ogr-hero__img { position: relative; aspect-ratio: 4 / 5; border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%; overflow: hidden; }
+.ogr-hero__leaf { position: absolute; left: -18px; bottom: 12%; width: 128px; height: 128px; border-radius: 999px; background: var(--d-accent-soft); display: grid; place-items: center; text-align: center; font-size: 13px; line-height: 1.25; color: var(--d-accent-link); font-weight: 700; padding: 14px; box-shadow: var(--d-shadow); }
+.ogr-search { margin-top: clamp(32px, 4vw, 56px); background: var(--d-card); border: 1px solid var(--d-line); border-radius: 30px; padding: clamp(18px, 2.4vw, 26px); }
+@media (max-width: 920px) { .ogr-hero__grid { grid-template-columns: 1fr; } .ogr-hero__img { aspect-ratio: 4 / 3; border-radius: 40% 40% 34% 34% / 18% 18% 22% 22%; } }
+
+/* pory roku / usługi */
+.ogr-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2.2vw, 26px); }
+.ogr-card { display: grid; gap: 14px; padding: clamp(20px, 2.6vw, 30px); background: var(--d-card); border: 1px solid var(--d-line); border-radius: 26px; transition: transform .4s var(--d-ease), box-shadow .4s; }
+.ogr-card:hover { transform: translateY(-6px); box-shadow: var(--d-shadow); }
+.ogr-card__ico { width: 56px; height: 56px; border-radius: 999px; background: var(--d-accent-soft); display: grid; place-items: center; font-size: 24px; }
+.ogr-card h3 { font-size: 22px; }
+.ogr-card p { color: var(--d-muted-strong); font-size: 15.5px; }
+@media (max-width: 900px) { .ogr-cards { grid-template-columns: 1fr; } }
+
+/* okolica */
+.ogr-area { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+.ogr-area__img { position: relative; aspect-ratio: 5 / 4; border-radius: 40% 40% 36% 36% / 22% 22% 26% 26%; overflow: hidden; }
+.ogr-dist { display: grid; gap: 0; }
+.ogr-dist li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 15px 0; border-bottom: 1px dashed var(--d-line-strong); }
+.ogr-dist b { font-family: var(--d-display); font-size: 19px; white-space: nowrap; }
+.ogr-dist span { color: var(--d-muted-strong); }
+@media (max-width: 900px) { .ogr-area { grid-template-columns: 1fr; } }
+
+/* mapa */
+.ogr-map { height: clamp(360px, 46vh, 520px); border-radius: 30px; overflow: hidden; border: 1px solid var(--d-line); }
+
+/* kontakt */
+.ogr-cta { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: clamp(24px, 4vw, 56px); align-items: center; background: var(--d-accent-soft); border-radius: 34px; padding: clamp(24px, 4vw, 52px); }
+@media (max-width: 900px) { .ogr-cta { grid-template-columns: 1fr; } }

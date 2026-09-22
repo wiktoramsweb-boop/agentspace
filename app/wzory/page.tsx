@@ -24,8 +24,8 @@ export const metadata: Metadata = {
 const HOW: [string, string, string][] = [
   [
     "01",
-    "Wybierasz wzór",
-    "Cztery projekty, każdy inny: od redakcyjnego premium po wyszukiwarkę dla biura z setkami ofert. Zmieniamy kolory, kroje i teksty pod Wasze logo.",
+    "Wybieracie wzór",
+    "Osiem projektów, każdy inny: od redakcyjnego premium, przez brutalistyczny, po stronę jednej inwestycji dewelopera. Kolory, kroje i teksty dopasowujemy do Waszego logo.",
   ],
   [
     "02",
@@ -34,11 +34,16 @@ const HOW: [string, string, string][] = [
   ],
   [
     "03",
+    "Treści zmieniacie sami",
+    "W AgentSpace jest zakładka Strona www: logo, kolory, teksty sekcji, zespół i wpisy do poradnika. Bez dzwonienia do nas i bez dopłat za każdą zmianę przecinka.",
+  ],
+  [
+    "04",
     "Formularze wracają do CRM",
     "Zapytanie o ofertę, zgłoszenie nieruchomości i zlecenie poszukiwania tworzą w systemie kontakt, zadanie i przypisanie do agenta. Nic nie ginie w skrzynce.",
   ],
   [
-    "04",
+    "05",
     "Domena i hosting po naszej stronie",
     "Podpinamy Waszą domenę, certyfikat i kopie zapasowe. Strona działa tak długo, jak trwa abonament, bez osobnego serwera i bez aktualizowania wtyczek.",
   ],
@@ -69,8 +74,8 @@ export default function WzoryPage() {
       <Section>
         <SectionHead
           eyebrow="Wzory"
-          title="Cztery projekty, cztery różne biura"
-          lead="To nie są warianty kolorystyczne tego samego szablonu. Każdy ma własną typografię, siatkę i rytm, bo biuro premium i biuro z setkami mieszkań na wynajem potrzebują czegoś innego."
+          title="Osiem projektów, osiem różnych biur"
+          lead="To nie są warianty kolorystyczne tego samego szablonu. Każdy ma własną typografię, siatkę i rytm, bo biuro premium, biuro z setkami mieszkań na wynajem i deweloper potrzebują czegoś zupełnie innego. Każdy wzór ma komplet podstron: oferty z filtrami i mapą, karty ofert, usługi, zespół, poradnik, kalkulator i formularze."
         />
 
         <div className="mt-14 grid gap-6 md:grid-cols-2">
@@ -138,6 +143,40 @@ export default function WzoryPage() {
               </div>
             </Card>
           ))}
+        </div>
+      </Section>
+
+      <FrameRule />
+
+      <Section>
+        <div className="rounded-3xl border border-[var(--color-mk-line)] bg-[var(--color-mk-surface)] p-8 md:p-12">
+          <p className="mk-eyebrow mb-5">Projekt indywidualny</p>
+          <h2 className="mb-5 text-3xl font-medium text-[var(--color-mk-text)] md:text-4xl">
+            Żaden wzór nie pasuje? Zaprojektujemy stronę od zera
+          </h2>
+          <p className="mb-6 max-w-[70ch] text-[var(--color-mk-muted)]">
+            Wzory są po to, żeby ruszyć w tydzień i za rozsądne pieniądze. Jeśli macie własną identyfikację, mocny
+            pomysł albo stronę, która już działa i chcecie ją tylko podnieść na wyższy poziom, robimy projekt
+            indywidualny: makieta, konsultacje i strona napisana pod Was, nadal połączona z AgentSpace.
+          </p>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              ["Makieta przed kodem", "Najpierw widzicie projekt strony głównej i karty oferty. Dopiero po akceptacji piszemy kod."],
+              ["Wasza identyfikacja", "Logo, kolory, kroje i sposób mówienia. Jeśli tego nie macie, pomagamy to ułożyć."],
+              ["Ten sam silnik", "Oferty, formularze i zespół działają tak samo jak we wzorach, bo pod spodem jest ten sam system."],
+            ].map(([t, d]) => (
+              <div key={t}>
+                <h4 className="mb-2 text-lg text-[var(--color-mk-text)]">{t}</h4>
+                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">{d}</p>
+              </div>
+            ))}
+          </div>
+          <Link
+            href="/kontakt?temat=strona-indywidualna"
+            className="mt-8 inline-flex rounded-xl border border-[var(--color-mk-line)] px-6 py-3 font-medium text-[var(--color-mk-text)] transition hover:border-[var(--color-mk-line-lit)]"
+          >
+            Porozmawiajmy o projekcie indywidualnym
+          </Link>
         </div>
       </Section>
 

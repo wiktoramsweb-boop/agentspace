@@ -1,0 +1,106 @@
+/* ─────────────────────────────────────────────────────────────
+   Wzór „Horyzont": strona jednej inwestycji dewelopera.
+   Granat, szkło i chłodny błękit. Ceny jawne od pierwszego ekranu.
+   ───────────────────────────────────────────────────────────── */
+
+.wz-hor {
+  --d-bg: #070b18;
+  --d-fg: #eaf0ff;
+  --d-muted: #8892ab;
+  --d-muted-strong: #b3bcd1;
+  --d-line: rgba(234, 240, 255, .12);
+  --d-line-strong: rgba(234, 240, 255, .26);
+  --d-accent: #5b8cff;
+  --d-accent-fg: #04102e;
+  --d-accent-soft: rgba(91, 140, 255, .12);
+  --d-accent-link: #8fb0ff;
+  --d-card: #0d1428;
+  --d-chip-bg: rgba(7, 11, 24, .78);
+  --d-chip-fg: #eaf0ff;
+  --d-field-bg: rgba(255, 255, 255, .05);
+  --d-nav-bg: rgba(7, 11, 24, .6);
+  --d-nav-fg: #eaf0ff;
+  --d-nav-solid: rgba(7, 11, 24, .92);
+  --d-radius: 10px;
+  --d-radius-lg: 18px;
+  --d-shadow: 0 40px 80px -40px rgba(0, 0, 0, .9);
+  --d-display: var(--f-unbounded), ui-sans-serif, system-ui, sans-serif;
+  --d-body: var(--f-figtree), ui-sans-serif, system-ui, sans-serif;
+  --d-display-w: 600;
+  --d-h-ls: -.03em;
+  --d-logo-w: 600;
+  --d-logo-ls: -.01em;
+  --d-price-w: 600;
+  --d-ease: cubic-bezier(.2, .8, .25, 1);
+  --d-footer-bg: #05080f;
+}
+
+.wz-hor .wz-kick { color: var(--d-accent); }
+.wz-hor .wzc__price { color: var(--d-accent); }
+.wz-hor .wzc { background: linear-gradient(180deg, #0e1529 0%, #0a1020 100%); }
+
+/* nagłówek */
+.hor-hero { position: relative; min-height: min(92vh, 860px); margin-top: -74px; padding-top: 74px; display: grid; align-items: center; overflow: hidden; }
+.hor-hero__bg { position: absolute; inset: -8% 0; }
+.hor-hero__bg img { width: 100%; height: 100%; object-fit: cover; }
+.hor-hero__bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, rgba(7, 11, 24, .96) 12%, rgba(7, 11, 24, .72) 48%, rgba(7, 11, 24, .35) 100%); }
+.hor-hero__in { position: relative; padding-block: clamp(40px, 6vw, 80px); max-width: 760px; }
+.hor-hero__badge { display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: var(--d-accent-soft); border: 1px solid rgba(91, 140, 255, .38); color: var(--d-accent-link); font-size: 13px; margin-bottom: 22px; }
+.hor-hero h1 { font-size: clamp(38px, 6vw, 84px); line-height: .98; letter-spacing: -.04em; }
+.hor-hero p { margin-top: 20px; max-width: 52ch; color: var(--d-muted-strong); font-size: clamp(16px, 1.3vw, 19px); }
+.hor-hero__meta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+.hor-hero__meta div { padding: 14px 20px; border: 1px solid var(--d-line); border-radius: var(--d-radius); background: rgba(13, 20, 40, .66); backdrop-filter: blur(8px); }
+.hor-hero__meta b { display: block; font-family: var(--d-display); font-size: 21px; }
+.hor-hero__meta span { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--d-muted); }
+
+/* postęp budowy */
+.hor-progress { border: 1px solid var(--d-line); border-radius: var(--d-radius-lg); padding: clamp(20px, 2.6vw, 30px); background: var(--d-card); }
+.hor-progress__bar { position: relative; height: 8px; border-radius: 999px; background: rgba(255, 255, 255, .08); overflow: hidden; margin: 18px 0 14px; }
+.hor-progress__bar i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: linear-gradient(90deg, #5b8cff, #9ad0ff); animation: hor-fill 1.6s var(--d-ease) forwards; }
+@keyframes hor-fill { from { width: 0; } }
+.hor-progress__steps { display: flex; flex-wrap: wrap; gap: 8px 26px; font-size: 14px; color: var(--d-muted); }
+.hor-progress__steps b { color: var(--d-fg); }
+
+/* tabela mieszkań */
+.hor-units__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; padding-bottom: 18px; border-bottom: 1px solid var(--d-line); }
+.hor-units__chips { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.hor-units__label { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--d-muted); margin-right: 4px; }
+.hor-units__chips button { padding: 8px 14px; min-width: 42px; border-radius: var(--d-radius); border: 1px solid var(--d-line-strong); background: transparent; color: inherit; cursor: pointer; font-size: 14px; transition: background .2s, color .2s, border-color .2s; }
+.hor-units__chips button[aria-pressed="true"] { background: var(--d-accent); color: var(--d-accent-fg); border-color: var(--d-accent); }
+.hor-units__check { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; cursor: pointer; }
+.hor-units__check input { width: 17px; height: 17px; accent-color: var(--d-accent); }
+.hor-units__sort { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; color: var(--d-muted); margin-left: auto; }
+.hor-units__sort select { padding: 8px 12px; border-radius: var(--d-radius); border: 1px solid var(--d-line-strong); background: var(--d-field-bg); color: inherit; }
+.hor-units__sort select option { color: #111; }
+.hor-units__count { padding: 16px 0; font-size: 14.5px; color: var(--d-muted); }
+.hor-units__count b { color: var(--d-accent); }
+.hor-units__scroll { overflow-x: auto; border: 1px solid var(--d-line); border-radius: var(--d-radius-lg); }
+.hor-units table { width: 100%; min-width: 860px; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+.hor-units th { position: sticky; top: 0; text-align: left; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--d-muted); font-weight: 500; padding: 14px 16px; background: #0b1223; border-bottom: 1px solid var(--d-line); }
+.hor-units td { padding: 15px 16px; border-bottom: 1px solid var(--d-line); }
+.hor-units tbody tr { transition: background .2s; }
+.hor-units tbody tr:hover { background: rgba(91, 140, 255, .07); }
+.hor-units tr.is-taken { color: var(--d-muted); }
+.hor-units__empty { padding: 34px; text-align: center; color: var(--d-muted); }
+.hor-badge { padding: 5px 11px; border-radius: 999px; font-size: 11.5px; font-weight: 600; letter-spacing: .03em; }
+.hor-badge--wolne { background: rgba(52, 211, 153, .14); color: #6ee7b7; }
+.hor-badge--rezerwacja { background: rgba(251, 191, 36, .14); color: #fcd34d; }
+.hor-badge--sprzedane { background: rgba(148, 163, 184, .14); color: #cbd5e1; }
+
+/* udogodnienia */
+.hor-amen { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 1.8vw, 20px); }
+.hor-amen article { position: relative; aspect-ratio: 3 / 4; border-radius: var(--d-radius-lg); overflow: hidden; display: flex; align-items: flex-end; padding: 20px; }
+.hor-amen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--d-ease); }
+.hor-amen article::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(4, 7, 16, .9) 100%); }
+.hor-amen article:hover img { transform: scale(1.08); }
+.hor-amen b { position: relative; font-family: var(--d-display); font-size: 17px; }
+.hor-amen span { position: relative; display: block; font-size: 13px; color: var(--d-muted-strong); margin-top: 4px; }
+@media (max-width: 900px) { .hor-amen { grid-template-columns: 1fr 1fr; } }
+
+/* harmonogram */
+.hor-time { display: grid; gap: 0; border-left: 2px solid var(--d-line); padding-left: 26px; }
+.hor-time li { position: relative; padding: 0 0 26px; }
+.hor-time li::before { content: ""; position: absolute; left: -33px; top: 4px; width: 12px; height: 12px; border-radius: 999px; background: var(--d-bg); border: 2px solid var(--d-line-strong); }
+.hor-time li.is-done::before { background: var(--d-accent); border-color: var(--d-accent); }
+.hor-time b { display: block; font-family: var(--d-display); font-size: 17px; }
+.hor-time span { color: var(--d-muted); font-size: 14.5px; }

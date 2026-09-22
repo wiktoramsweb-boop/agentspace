@@ -3,7 +3,15 @@
  * kolor tego samego szablonu: inne fonty, inna siatka, inny rytm sekcji.
  */
 
-export type WzorSlug = "kamienica" | "nokturn" | "siatka" | "przystan";
+export type WzorSlug =
+  | "kamienica"
+  | "nokturn"
+  | "siatka"
+  | "przystan"
+  | "strategia"
+  | "beton"
+  | "ogrod"
+  | "horyzont";
 
 export type Wzor = {
   slug: WzorSlug;
@@ -124,6 +132,98 @@ export const WZORY: Wzor[] = [
     address: ["ul. Zamoyskiego 27", "30-523 Kraków"],
     nip: "NIP 676 000 00 03",
     navCta: "Porozmawiajmy",
+  },
+  {
+    slug: "strategia",
+    name: "Strategia",
+    office: "Strategia Nieruchomości",
+    tagline: "Ciemny nagłówek, cztery drogi dla klienta i twarde liczby zamiast haseł. Najbardziej sprzedażowy z całej ósemki.",
+    forWhom: "Biuro, które żyje z wyników i chce je pokazać wprost",
+    highlights: [
+      "Nagłówek z wyszukiwarką na zdjęciu miasta, jak w najlepszych biurach",
+      "Cztery kafelki celu: sprzedaję, wynajmuję, kupuję, wyceniam",
+      "Sekcja kredytowa i pasek portali, na których publikujecie oferty",
+    ],
+    swatch: ["#0E1420", "#F5F3EF", "#E2703A"],
+    preview: "/wzory/wieza.jpg",
+    root: "wz-str",
+    dark: false,
+    fonts: "Outfit + Karla",
+    sub: "Kraków",
+    phone: "12 430 50 60",
+    email: "biuro@strategia-wzor.pl",
+    address: ["ul. Zabłocie 23", "30-701 Kraków"],
+    nip: "NIP 676 000 00 04",
+    navCta: "Bezpłatna wycena",
+  },
+  {
+    slug: "beton",
+    name: "Beton",
+    office: "Beton Nieruchomości",
+    tagline: "Brutalistyczny, głośny, z ogromną typografią i żółtym akcentem. Dla biura, które chce być zapamiętane.",
+    forWhom: "Młode biuro, lofty i inwestycje, klient z miasta",
+    highlights: [
+      "Wielkie napisy, grube ramki i zero zaokrągleń",
+      "Przewijany pasek z hasłem zamiast grzecznego nagłówka",
+      "Oferty w siatce jak w katalogu aukcyjnym, z numeracją",
+    ],
+    swatch: ["#F2F0EB", "#0A0A0A", "#D7FF3E"],
+    preview: "/wzory/hala.jpg",
+    root: "wz-bet",
+    dark: false,
+    fonts: "Anton + DM Sans",
+    sub: "Kraków",
+    phone: "12 430 60 70",
+    email: "hey@beton-wzor.pl",
+    address: ["ul. Wadowicka 8A", "30-415 Kraków"],
+    nip: "NIP 676 000 00 05",
+    navCta: "Napisz do nas",
+  },
+  {
+    slug: "ogrod",
+    name: "Ogród",
+    office: "Ogród Nieruchomości",
+    tagline: "Miękki, zielony, z dużą ilością powietrza. Dla domów, działek i nieruchomości poza miastem.",
+    forWhom: "Biuro specjalizujące się w domach i działkach pod miastem",
+    highlights: [
+      "Organiczne kształty i zdjęcia w owalach zamiast prostokątów",
+      "Mapa okolic z dojazdem do centrum zamiast samych pinezek",
+      "Sekcja o okolicy: szkoły, sklepy, komunikacja",
+    ],
+    swatch: ["#F7F5EF", "#1F3D2B", "#7C9A5C"],
+    preview: "/wzory/las.jpg",
+    root: "wz-ogr",
+    dark: false,
+    fonts: "Lora + Nunito Sans",
+    sub: "Domy i działki",
+    phone: "12 430 70 80",
+    email: "kontakt@ogrod-wzor.pl",
+    address: ["ul. Modrzewiowa 4", "32-087 Zielonki"],
+    nip: "NIP 676 000 00 06",
+    navCta: "Umów spacer",
+  },
+  {
+    slug: "horyzont",
+    name: "Horyzont",
+    office: "Horyzont Deweloper",
+    tagline: "Dla dewelopera i jednej inwestycji: tabela mieszkań z cenami, etap budowy i harmonogram.",
+    forWhom: "Deweloper, inwestycja mieszkaniowa, sprzedaż z rzutów",
+    highlights: [
+      "Tabela mieszkań z filtrem po liczbie pokoi i piętrze",
+      "Jawne ceny i status każdego lokalu, bez pytania o cennik",
+      "Pasek postępu budowy i harmonogram odbiorów",
+    ],
+    swatch: ["#070B18", "#EAF0FF", "#5B8CFF"],
+    preview: "/wzory/szklo.jpg",
+    root: "wz-hor",
+    dark: true,
+    fonts: "Unbounded + Figtree",
+    sub: "Etap II",
+    phone: "12 430 80 90",
+    email: "sprzedaz@horyzont-wzor.pl",
+    address: ["ul. Nadwiślańska 11", "30-527 Kraków"],
+    nip: "NIP 676 000 00 07",
+    navCta: "Zapytaj o mieszkanie",
   },
 ];
 

@@ -7,6 +7,14 @@ import {
   Inter_Tight,
   Sora,
   Plus_Jakarta_Sans,
+  Outfit,
+  Karla,
+  Anton,
+  DM_Sans,
+  Lora,
+  Nunito_Sans,
+  Unbounded,
+  Figtree,
 } from "next/font/google";
 import type { WzorSlug } from "./themes";
 
@@ -23,10 +31,22 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin-ext"], weight: ["400", "50
 const interTight = Inter_Tight({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-inter-tight" });
 const sora = Sora({ subsets: ["latin-ext"], weight: ["400", "600", "700"], variable: "--f-sora" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-jakarta" });
+const outfit = Outfit({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-outfit" });
+const karla = Karla({ subsets: ["latin-ext"], weight: ["400", "500", "600"], variable: "--f-karla" });
+const anton = Anton({ subsets: ["latin-ext"], weight: ["400"], variable: "--f-anton" });
+const dmSans = DM_Sans({ subsets: ["latin-ext"], weight: ["400", "500", "700"], variable: "--f-dm" });
+const lora = Lora({ subsets: ["latin-ext"], weight: ["400", "500", "600"], variable: "--f-lora" });
+const nunito = Nunito_Sans({ subsets: ["latin-ext"], weight: ["400", "600", "700"], variable: "--f-nunito" });
+const unbounded = Unbounded({ subsets: ["latin-ext"], weight: ["400", "600", "800"], variable: "--f-unbounded" });
+const figtree = Figtree({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-figtree" });
 
 export const WZOR_FONTS: Record<WzorSlug, string> = {
   kamienica: `${fraunces.variable} ${manrope.variable}`,
   nokturn: `${cormorant.variable} ${jost.variable}`,
   siatka: `${spaceGrotesk.variable} ${interTight.variable}`,
   przystan: `${sora.variable} ${jakarta.variable}`,
+  strategia: `${outfit.variable} ${karla.variable}`,
+  beton: `${anton.variable} ${dmSans.variable}`,
+  ogrod: `${lora.variable} ${nunito.variable}`,
+  horyzont: `${unbounded.variable} ${figtree.variable}`,
 };

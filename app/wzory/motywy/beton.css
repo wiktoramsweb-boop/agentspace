@@ -1,0 +1,111 @@
+/* ─────────────────────────────────────────────────────────────
+   Wzór „Beton": brutalizm. Grube ramki, ogromne wersaliki,
+   kwasowa limonka jako jedyny kolor. Zero zaokrągleń.
+   ───────────────────────────────────────────────────────────── */
+
+.wz-bet {
+  --d-bg: #f2f0eb;
+  --d-fg: #0a0a0a;
+  --d-muted: #6f6f6a;
+  --d-muted-strong: #3d3d3a;
+  --d-line: #0a0a0a;
+  --d-line-strong: #0a0a0a;
+  --d-accent: #0a0a0a;
+  --d-accent-fg: #d7ff3e;
+  --d-accent-soft: #e9ff9b;
+  --d-accent-link: #0a0a0a;
+  --d-card: #ffffff;
+  --d-chip-bg: #0a0a0a;
+  --d-chip-fg: #d7ff3e;
+  --d-field-bg: #ffffff;
+  --d-nav-bg: #f2f0eb;
+  --d-nav-fg: #0a0a0a;
+  --d-nav-solid: #f2f0eb;
+  --d-nav-shadow: 0 2px 0 #0a0a0a;
+  --d-radius: 0px;
+  --d-radius-lg: 0px;
+  --d-shadow: 8px 8px 0 #0a0a0a;
+  --d-display: var(--f-anton), "Arial Black", sans-serif;
+  --d-body: var(--f-dm), ui-sans-serif, system-ui, sans-serif;
+  --d-display-w: 400;
+  --d-h-ls: -.01em;
+  --d-logo-w: 400;
+  --d-logo-ls: .02em;
+  --d-price-w: 400;
+  --d-ease: cubic-bezier(.2, .9, .3, 1);
+  --d-footer-bg: #0a0a0a;
+  --d-footer-fg: #f2f0eb;
+  --d-avatar-radius: 0px;
+}
+
+.wz-bet h1, .wz-bet h2, .wz-bet h3 { text-transform: uppercase; }
+.wz-bet .wz-h2 { line-height: .92; letter-spacing: -.005em; }
+.wz-bet .wzn { border-bottom: 2px solid #0a0a0a; }
+.wz-bet .wzn__logo b { font-size: 24px; letter-spacing: .04em; }
+.wz-bet .wz-btn { border: 2px solid #0a0a0a; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: 13.5px; }
+.wz-bet .wz-btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 #0a0a0a; filter: none; }
+.wz-bet .wz-btn--ghost { background: transparent; }
+.wz-bet .wz-btn--ghost:hover { background: #d7ff3e; color: #0a0a0a; }
+.wz-bet .wzc { border: 2px solid #0a0a0a; background: #fff; }
+.wz-bet .wzc:hover { transform: translate(-3px, -3px); box-shadow: 6px 6px 0 #0a0a0a; }
+.wz-bet .wzc__title { font-family: var(--d-display); font-size: 22px; text-transform: uppercase; line-height: 1.04; }
+.wz-bet .wzc__tag { border: 2px solid #0a0a0a; background: #d7ff3e; color: #0a0a0a; backdrop-filter: none; }
+.wz-bet .wzc__fav { border: 2px solid #0a0a0a; background: #fff; color: #0a0a0a; border-radius: 0; }
+.wz-bet .wz-box { border: 2px solid #0a0a0a; }
+.wz-bet .wz-kick { font-weight: 700; letter-spacing: .2em; color: #0a0a0a; }
+.wz-bet .wzs select, .wz-bet .wzs input, .wz-bet .wzf input, .wz-bet .wzf textarea, .wz-bet .wzf select { border: 2px solid #0a0a0a; }
+.wz-bet .wzfo { --d-line: rgba(242, 240, 235, .2); --d-muted: #a5a5a0; }
+.wz-bet .wz-steps li { border-top: 3px solid #0a0a0a; }
+
+/* nagłówek */
+.bet-hero { padding-block: clamp(26px, 4vw, 56px) 0; }
+.bet-hero h1 { font-size: clamp(42px, 10.4vw, 150px); line-height: .92; letter-spacing: -.005em; }
+.bet-hero h1 em { font-style: normal; -webkit-text-stroke: 2px #0a0a0a; color: transparent; }
+.bet-hero__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .78fr); gap: clamp(18px, 3vw, 40px); margin-top: clamp(22px, 3vw, 40px); align-items: end; }
+.bet-hero__lead { font-size: clamp(17px, 1.5vw, 21px); max-width: 44ch; }
+.bet-hero__img { position: relative; aspect-ratio: 4 / 3; border: 2px solid #0a0a0a; overflow: hidden; }
+.bet-search { margin-top: clamp(22px, 3vw, 38px); border: 2px solid #0a0a0a; background: #fff; padding: clamp(16px, 2vw, 22px); }
+@media (max-width: 900px) { .bet-hero__row { grid-template-columns: 1fr; } }
+
+/* pasek z hasłem */
+.bet-band { background: #d7ff3e; border-block: 2px solid #0a0a0a; padding-block: 14px; }
+.bet-band .wz-marquee__track { gap: 0; }
+.bet-band span { font-family: var(--d-display); font-size: clamp(22px, 3vw, 40px); text-transform: uppercase; letter-spacing: .01em; padding-inline: 22px; white-space: nowrap; }
+.bet-band i { font-style: normal; opacity: .45; }
+
+/* katalog ofert */
+.bet-list { border-top: 2px solid #0a0a0a; }
+.bet-row { display: grid; grid-template-columns: 62px minmax(0, 2.1fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 20px 0; border-bottom: 2px solid #0a0a0a; transition: background .2s, padding .25s; }
+.bet-row:hover { background: #d7ff3e; padding-inline: 14px; }
+.bet-row__n { font-family: var(--d-display); font-size: 22px; }
+.bet-row__t { font-family: var(--d-display); font-size: clamp(19px, 2vw, 27px); text-transform: uppercase; line-height: 1.03; }
+.bet-row__m { font-size: 14.5px; color: var(--d-muted-strong); }
+.bet-row__p { font-family: var(--d-display); font-size: clamp(18px, 1.9vw, 24px); white-space: nowrap; }
+.bet-row__go { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+@media (max-width: 860px) {
+  .bet-row { grid-template-columns: 44px 1fr auto; row-gap: 6px; }
+  .bet-row__m:nth-of-type(2) { display: none; }
+}
+
+/* co robimy */
+.bet-do { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 2px solid #0a0a0a; }
+.bet-do article { padding: clamp(22px, 3vw, 34px); border-right: 2px solid #0a0a0a; }
+.bet-do article:last-child { border-right: 0; }
+.bet-do article:hover { background: #d7ff3e; }
+.bet-do b { font-family: var(--d-display); font-size: 40px; display: block; line-height: 1; margin-bottom: 14px; }
+.bet-do h3 { font-size: 22px; margin-bottom: 10px; }
+.bet-do p { font-size: 15px; color: var(--d-muted-strong); }
+@media (max-width: 900px) { .bet-do { grid-template-columns: 1fr; } .bet-do article { border-right: 0; border-bottom: 2px solid #0a0a0a; } }
+
+/* wielkie liczby */
+.bet-nums { display: grid; grid-template-columns: repeat(4, 1fr); border: 2px solid #0a0a0a; }
+.bet-nums div { padding: clamp(20px, 2.6vw, 32px); border-right: 2px solid #0a0a0a; }
+.bet-nums div:last-child { border-right: 0; }
+.bet-nums b { font-family: var(--d-display); font-size: clamp(36px, 5vw, 70px); line-height: .9; display: block; }
+.bet-nums span { font-size: 12.5px; text-transform: uppercase; letter-spacing: .1em; }
+@media (max-width: 800px) { .bet-nums { grid-template-columns: 1fr 1fr; } .bet-nums div:nth-child(2n) { border-right: 0; } .bet-nums div:nth-child(-n+2) { border-bottom: 2px solid #0a0a0a; } }
+
+/* kontakt */
+.bet-cta { background: #d7ff3e; border: 2px solid #0a0a0a; padding: clamp(24px, 4vw, 52px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: clamp(22px, 4vw, 48px); align-items: center; }
+.bet-cta h2 { font-size: clamp(30px, 5vw, 66px); line-height: .92; }
+@media (max-width: 900px) { .bet-cta { grid-template-columns: 1fr; } }

@@ -16,6 +16,7 @@ export function WzNav({
   office,
   sub,
   links,
+  more = [],
   phone,
   cta,
 }: {
@@ -23,11 +24,14 @@ export function WzNav({
   office: React.ReactNode;
   sub?: string;
   links: NavLink[];
+  /** Pozycje schowane pod „Więcej", żeby pasek nie puchł do dziesięciu linków. */
+  more?: NavLink[];
   phone: string;
   cta?: string;
 }) {
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const path = usePathname();
   const { ids } = useFavorites(wzor);
 
@@ -38,7 +42,10 @@ export function WzNav({
     return () => window.removeEventListener("scroll", on);
   }, []);
 
-  useEffect(() => setOpen(false), [path]);
+  useEffect(() => {
+    setOpen(false);
+    setMoreOpen(false);
+  }, [path]);
 
   return (
     <header className={`wzn${solid ? " is-solid" : ""}${open ? " is-open" : ""}`}>
@@ -53,10 +60,29 @@ export function WzNav({
             {l.label}
           </Link>
         ))}
+
+        {more.length > 0 && (
+          <div
+            className={`wzn__more${moreOpen ? " is-open" : ""}`}
+            onMouseEnter={() => setMoreOpen(true)}
+            onMouseLeave={() => setMoreOpen(false)}
+          >
+            <button type="button" aria-expanded={moreOpen} onClick={() => setMoreOpen((v) => !v)}>
+              Więcej <i aria-hidden="true" />
+            </button>
+            <div className="wzn__drop">
+              {more.map((l) => (
+                <Link key={l.href} href={l.href} aria-current={path === l.href ? "page" : undefined}>
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       <div className="wzn__side">
-        <Link href={`/wzory/${wzor}/oferty?ulubione=1`} className="wzn__fav" aria-label="Ulubione oferty">
+        <Link href={`/wzory/${wzor}/ulubione`} className="wzn__fav" aria-label="Ulubione oferty">
           <HeartIcon filled={ids.length > 0} />
           <b>{ids.length}</b>
           <span>ulubione</span>
@@ -154,7 +180,13 @@ export function WzFooter({
               <Link href={`/wzory/${wzor}/oferty?typ=lokal`}>Lokale i biura</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/oferty?ulubione=1`}>Ulubione</Link>
+              <Link href={`/wzory/${wzor}/sprzedaj`}>Sprzedaj nieruchomość</Link>
+            </li>
+            <li>
+              <Link href={`/wzory/${wzor}/wynajmij`}>Oddaj w zarządzanie</Link>
+            </li>
+            <li>
+              <Link href={`/wzory/${wzor}/ulubione`}>Ulubione</Link>
             </li>
           </ul>
         </div>
@@ -166,16 +198,22 @@ export function WzFooter({
               <Link href={`/wzory/${wzor}/zespol`}>Zespół</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}#wiedza`}>Poradnik</Link>
+              <Link href={`/wzory/${wzor}/o-nas`}>O nas</Link>
+            </li>
+            <li>
+              <Link href={`/wzory/${wzor}/poradnik`}>Poradnik</Link>
+            </li>
+            <li>
+              <Link href={`/wzory/${wzor}/kalkulator`}>Kalkulator raty</Link>
             </li>
             <li>
               <Link href={`/wzory/${wzor}/kontakt`}>Kontakt</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/kontakt#zglos`}>Zgłoś nieruchomość</Link>
+              <Link href={`/wzory/${wzor}/zglos-nieruchomosc`}>Zgłoś nieruchomość</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/kontakt#poszukiwanie`}>Zleć poszukiwanie</Link>
+              <Link href={`/wzory/${wzor}/zlec-poszukiwanie`}>Zleć poszukiwanie</Link>
             </li>
           </ul>
         </div>
