@@ -71,8 +71,10 @@ html:has(.wz) .mk-progress { display: none !important; }
   padding: 16px var(--pad);
   background: var(--d-nav-bg); color: var(--d-nav-fg);
   border-bottom: 1px solid transparent;
-  transition: background .35s, border-color .35s, padding .35s, box-shadow .35s;
+  transition: background .35s, border-color .35s, padding .35s, box-shadow .35s, transform .4s var(--d-ease, ease);
 }
+.wzn.is-hidden { transform: translateY(-104%); }
+.wzn__progress { position: absolute; inset: auto 0 0 0; height: 2px; background: var(--d-accent); transform-origin: left; transform: scaleX(0); transition: transform .15s linear; opacity: .9; }
 .wzn.is-solid { background: var(--d-nav-solid); border-color: var(--d-line); padding-block: 11px; backdrop-filter: blur(16px); box-shadow: var(--d-nav-shadow, none); }
 .wzn__logo { margin-right: auto; display: flex; align-items: baseline; gap: 9px; font-family: var(--d-display); font-size: 20px; letter-spacing: var(--d-logo-ls, .02em); }
 .wzn__logo b { font-weight: var(--d-logo-w, 600); }

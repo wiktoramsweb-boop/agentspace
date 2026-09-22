@@ -148,6 +148,28 @@ Klucze Supabase (`sb_secret_...`) i Resend były wklejane w czacie. **Po testach
 - **AI Coach - głos AI** (żeby klient odpowiadał głosem: ElevenLabs + koszty). Na razie tylko wejście głosem agenta.
 - **Płatności** (Stripe/Tpay), **Google Calendar**.
 
+## 10b. Strony internetowe dla biur (wrzesień 2026)
+
+Osobny produkt sprzedawany razem z CRM, konkurencja: ASARI (WordPress + wtyczka).
+
+- **Galeria wzorów:** `/wzory` (marketing) + osiem pełnych wzorów pod `/wzory/[wzor]`:
+  kamienica, nokturn, siatka, przystan, strategia, beton, ogrod, horyzont.
+  Każdy ma: stronę główną, oferty z filtrami i mapą, kartę oferty, sprzedaż, najem,
+  o nas, poradnik z wpisami, kalkulator raty, ulubione, zespół, kontakt i dwa formularze.
+- **Kod:** `lib/wzory/*` (dane demo, motywy, fonty), `app/wzory/motywy/*.css` (osiem motywów
+  sterowanych zmiennymi `--d-*`), `app/components/wzory/*` (wspólne komponenty).
+- **Strona klienta:** `/strona/[slug]` renderuje wybrany motyw z danymi z CRM: oferty z
+  `properties.export_to_web`, zespół z `profiles` (`show_on_site`, `site_order`),
+  wpisy z `site_posts`, teksty z `site_config`.
+- **Panel dla klienta:** `/app/ustawienia/strona` (wygląd, marka, adres, kontakt),
+  `/tresci`, `/zespol`, `/wpisy`.
+- **Formularze** tworzą w CRM kontakt i zadanie dla agenta (`app/strona/actions.ts`),
+  surowe zgłoszenie zostaje w `site_leads`.
+- **Migracja:** `lib/SETUP-v25-strona-www.sql` (site_config, site_posts, site_leads,
+  show_on_site, site_order).
+- **Do zrobienia:** podpięcie własnych domen klientów na Vercel, sitemap i schema.org
+  per strona, baner cookies, statystyki odwiedzin.
+
 ## 11. Workflow
 
 Commit → push do `main` → Vercel auto-deploy (~30-60s). Weryfikacja deployu: `curl -sL https://www.agentspace.pl/app | grep Zaloguj`. Build lokalnie: `npm run build`. Dev: `npm run dev`.

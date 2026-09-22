@@ -18,6 +18,13 @@
 
 **Współpraca:** user chce autonomii ("rób sam bez pytania"), commituj+pushuj incrementalnie, tłumacz prosto po polsku. Klucze API były w czacie - do rotacji po testach.
 
+## Strony www dla biur (nowe)
+
+`/wzory` to galeria ośmiu wzorów stron dla biur nieruchomości (konkurencja dla stron ASARI).
+`/strona/[slug]` to działająca strona klienta: oferty, zespół i wpisy bierze z CRM, a wygląd
+z wybranego wzoru. Klient edytuje wszystko w `/app/ustawienia/strona`. Wymaga migracji
+`lib/SETUP-v25-strona-www.sql`. Szczegóły w `PROJEKT-STATUS.md`, sekcja 10b.
+
 ## Struktura projektu
 
 - **Landing / marketing** (`/`, `/blog`, `/cennik`, `/o-nas`, `/kontakt`, `/demo`, `/dla-agentow`, `/dla-wlascicieli`, `/polityka-prywatnosci`, `/regulamin`) - gotowe, live.

@@ -30,13 +30,27 @@ export function WzNav({
   cta?: string;
 }) {
   const [solid, setSolid] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const path = usePathname();
   const { ids } = useFavorites(base);
 
+  // Pasek chowa się przy przewijaniu w dół i wraca przy ruchu w górę, żeby
+  // na telefonie nie zabierał jednej trzeciej ekranu przy czytaniu oferty.
   useEffect(() => {
-    const on = () => setSolid(window.scrollY > 24);
+    let last = window.scrollY;
+    const on = () => {
+      const y = window.scrollY;
+      setSolid(y > 24);
+      setHidden(y > 320 && y > last + 6);
+      if (y < last - 6 || y < 320) setHidden(false);
+      last = y;
+
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(max > 0 ? Math.min(1, y / max) : 0);
+    };
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
@@ -48,7 +62,8 @@ export function WzNav({
   }, [path]);
 
   return (
-    <header className={`wzn${solid ? " is-solid" : ""}${open ? " is-open" : ""}`}>
+    <header className={`wzn${solid ? " is-solid" : ""}${open ? " is-open" : ""}${hidden && !open ? " is-hidden" : ""}`}>
+      <span className="wzn__progress" style={{ transform: `scaleX(${progress})` }} aria-hidden="true" />
       <Link href={`${base}`} className="wzn__logo">
         <b>{office}</b>
         {sub && <span>{sub}</span>}
