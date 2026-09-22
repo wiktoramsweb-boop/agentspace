@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getWzor } from "@/lib/wzory/themes";
 import { OffersBrowser, type OffersQuery } from "../../../components/wzory/offers-browser";
+import { DEMO_OFFERS } from "@/lib/wzory/data";
 
 export async function generateMetadata({ params }: { params: Promise<{ wzor: string }> }): Promise<Metadata> {
   const { wzor } = await params;
@@ -50,7 +51,7 @@ export default async function OfertyPage({
         </p>
 
         <div style={{ marginTop: 26 }}>
-          <OffersBrowser wzor={w.slug} initial={initial} dark={w.dark} />
+          <OffersBrowser base={`/wzory/${w.slug}`} initial={initial} offers={DEMO_OFFERS} dark={w.dark} />
         </div>
       </div>
     </section>

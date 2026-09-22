@@ -40,6 +40,7 @@ const STEPS: [string, string, string][] = [
 ];
 
 export function HomeKamienica({ wzor }: { wzor: string }) {
+  const base = `/wzory/${wzor}`;
   const spot = getOffer("o1")!;
   const featured = DEMO_OFFERS.filter((o) => o.featured && o.id !== spot.id).slice(0, 3);
   const fresh = DEMO_OFFERS.filter((o) => o.fresh).slice(0, 3);
@@ -76,7 +77,7 @@ export function HomeKamienica({ wzor }: { wzor: string }) {
 
         <div className="kam-search" data-rev>
           <p className="kam-search__t">Czego szukasz</p>
-          <WzSearch wzor={wzor} />
+          <WzSearch base={base} offers={DEMO_OFFERS} />
         </div>
       </section>
 
@@ -158,7 +159,7 @@ export function HomeKamienica({ wzor }: { wzor: string }) {
           </div>
           <div className="wz-grid" data-revs>
             {featured.map((o) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} />
+              <OfferCard key={o.id} offer={o} base={base} />
             ))}
           </div>
         </div>
@@ -229,7 +230,7 @@ export function HomeKamienica({ wzor }: { wzor: string }) {
           </div>
           <div className="wz-grid" data-revs>
             {fresh.map((o) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} />
+              <OfferCard key={o.id} offer={o} base={base} />
             ))}
           </div>
         </div>

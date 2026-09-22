@@ -9,45 +9,45 @@ import { useCallback, useEffect, useState } from "react";
  */
 const EVENT = "wz-fav-change";
 
-function key(wzor: string) {
-  return `wz-fav-${wzor}`;
+function key(base: string) {
+  return `wz-fav-${base}`;
 }
 
-function read(wzor: string): string[] {
+function read(base: string): string[] {
   try {
-    const raw = localStorage.getItem(key(wzor));
+    const raw = localStorage.getItem(key(base));
     return raw ? (JSON.parse(raw) as string[]) : [];
   } catch {
     return [];
   }
 }
 
-export function useFavorites(wzor: string) {
+export function useFavorites(base: string) {
   const [ids, setIds] = useState<string[]>([]);
 
   useEffect(() => {
-    setIds(read(wzor));
-    const sync = () => setIds(read(wzor));
+    setIds(read(base));
+    const sync = () => setIds(read(base));
     window.addEventListener(EVENT, sync);
     window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener(EVENT, sync);
       window.removeEventListener("storage", sync);
     };
-  }, [wzor]);
+  }, [base]);
 
   const toggle = useCallback(
     (id: string) => {
-      const next = read(wzor).includes(id) ? read(wzor).filter((x) => x !== id) : [...read(wzor), id];
+      const next = read(base).includes(id) ? read(base).filter((x) => x !== id) : [...read(base), id];
       try {
-        localStorage.setItem(key(wzor), JSON.stringify(next));
+        localStorage.setItem(key(base), JSON.stringify(next));
       } catch {
         // tryb prywatny: ulubione działają do przeładowania strony
       }
       setIds(next);
       window.dispatchEvent(new Event(EVENT));
     },
-    [wzor],
+    [base],
   );
 
   return { ids, toggle, has: (id: string) => ids.includes(id) };
@@ -62,8 +62,8 @@ export function HeartIcon({ filled }: { filled: boolean }) {
 }
 
 /** Serduszko na karcie oferty. */
-export function FavButton({ wzor, id, label }: { wzor: string; id: string; label: string }) {
-  const { has, toggle } = useFavorites(wzor);
+export function FavButton({ base, id, label }: { base: string; id: string; label: string }) {
+  const { has, toggle } = useFavorites(base);
   const active = has(id);
   return (
     <button

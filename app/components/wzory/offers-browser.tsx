@@ -6,7 +6,6 @@ import { OfferCard } from "./offer-card";
 import { WzMap } from "./map";
 import { useFavorites } from "./favorites";
 import {
-  DEMO_OFFERS,
   KIND_LABELS,
   districts,
   plOffers,
@@ -40,20 +39,23 @@ const SORTS: { value: string; label: string; cmp: (a: DemoOffer, b: DemoOffer) =
  * wyszukiwania można wysłać klientowi linkiem albo zapisać w zakładkach.
  */
 export function OffersBrowser({
-  wzor,
+  base,
   initial,
+  offers,
   dark = false,
 }: {
-  wzor: string;
+  base: string;
   initial: OffersQuery;
+  /** Oferty do pokazania: demo we wzorze, prawdziwe na stronie klienta. */
+  offers: DemoOffer[];
   dark?: boolean;
 }) {
   const router = useRouter();
-  const { ids: favIds } = useFavorites(wzor);
+  const { ids: favIds } = useFavorites(base);
   const [q, setQ] = useState(initial);
   const [view, setView] = useState<"lista" | "mapa">("lista");
   const [panel, setPanel] = useState(false);
-  const areas = useMemo(() => districts(), []);
+  const areas = useMemo(() => districts(offers), [offers]);
 
   // Adres strony nadąża za filtrami, ale bez przeładowania widoku.
   useEffect(() => {
@@ -73,7 +75,7 @@ export function OffersBrowser({
 
   const rows = useMemo(() => {
     const text = q.q.trim().toLowerCase();
-    const out = DEMO_OFFERS.filter((o) => {
+    const out = offers.filter((o) => {
       if (q.deal && o.deal !== (q.deal as DemoDeal)) return false;
       if (q.kind && o.kind !== (q.kind as DemoKind)) return false;
       if (q.district && o.district !== q.district) return false;
@@ -89,7 +91,7 @@ export function OffersBrowser({
     });
     const sort = SORTS.find((s) => s.value === q.sort) ?? SORTS[0];
     return [...out].sort(sort.cmp);
-  }, [q, favIds]);
+  }, [q, favIds, offers]);
 
   const active =
     [q.kind, q.district, q.min, q.max, q.rooms, q.q].filter(Boolean).length + (q.favOnly ? 1 : 0);
@@ -216,7 +218,7 @@ export function OffersBrowser({
               onClick={() =>
                 q.favOnly
                   ? set("favOnly", false)
-                  : router.push(`/wzory/${wzor}/kontakt#poszukiwanie`)
+                  : router.push(`${base}/kontakt#poszukiwanie`)
               }
             >
               {q.favOnly ? "Pokaż wszystkie oferty" : "Zleć poszukiwanie"}
@@ -226,17 +228,17 @@ export function OffersBrowser({
           <div className="wzl__split">
             <div className="wz-grid" style={{ gridTemplateColumns: "1fr" }}>
               {rows.map((o) => (
-                <OfferCard key={o.id} offer={o} wzor={wzor} sizes="(max-width: 1100px) 100vw, 45vw" />
+                <OfferCard key={o.id} offer={o} base={base} sizes="(max-width: 1100px) 100vw, 45vw" />
               ))}
             </div>
             <div className="wzl__map">
-              <WzMap offers={rows} wzor={wzor} dark={dark} />
+              <WzMap offers={rows} base={base} dark={dark} />
             </div>
           </div>
         ) : (
           <div className="wz-grid" data-revs>
             {rows.map((o, i) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} priority={i < 3} />
+              <OfferCard key={o.id} offer={o} base={base} priority={i < 3} />
             ))}
           </div>
         )}

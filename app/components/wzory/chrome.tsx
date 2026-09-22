@@ -12,7 +12,7 @@ export type NavLink = { href: string; label: string };
  * kształty bierze z motywu, więc za każdym razem wygląda inaczej.
  */
 export function WzNav({
-  wzor,
+  base,
   office,
   sub,
   links,
@@ -20,7 +20,7 @@ export function WzNav({
   phone,
   cta,
 }: {
-  wzor: string;
+  base: string;
   office: React.ReactNode;
   sub?: string;
   links: NavLink[];
@@ -33,7 +33,7 @@ export function WzNav({
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const path = usePathname();
-  const { ids } = useFavorites(wzor);
+  const { ids } = useFavorites(base);
 
   useEffect(() => {
     const on = () => setSolid(window.scrollY > 24);
@@ -49,7 +49,7 @@ export function WzNav({
 
   return (
     <header className={`wzn${solid ? " is-solid" : ""}${open ? " is-open" : ""}`}>
-      <Link href={`/wzory/${wzor}`} className="wzn__logo">
+      <Link href={`${base}`} className="wzn__logo">
         <b>{office}</b>
         {sub && <span>{sub}</span>}
       </Link>
@@ -82,7 +82,7 @@ export function WzNav({
       </nav>
 
       <div className="wzn__side">
-        <Link href={`/wzory/${wzor}/ulubione`} className="wzn__fav" aria-label="Ulubione oferty">
+        <Link href={`${base}/ulubione`} className="wzn__fav" aria-label="Ulubione oferty">
           <HeartIcon filled={ids.length > 0} />
           <b>{ids.length}</b>
           <span>ulubione</span>
@@ -91,7 +91,7 @@ export function WzNav({
           {phone}
         </a>
         {cta && (
-          <Link href={`/wzory/${wzor}/kontakt`} className="wz-btn wz-btn--sm wzn__cta">
+          <Link href={`${base}/kontakt`} className="wz-btn wz-btn--sm wzn__cta">
             {cta}
           </Link>
         )}
@@ -121,7 +121,7 @@ export function WzBadge({ name }: { name: string }) {
       <Link href="/wzory" className="wzb__link">
         Inne wzory
       </Link>
-      <Link href={`/kontakt?wzor=${encodeURIComponent(name)}`} className="wzb__cta">
+      <Link href={`/kontakt?base=${encodeURIComponent(name)}`} className="wzb__cta">
         Chcę taką stronę
       </Link>
     </aside>
@@ -129,14 +129,14 @@ export function WzBadge({ name }: { name: string }) {
 }
 
 export function WzFooter({
-  wzor,
+  base,
   office,
   address,
   phone,
   email,
   nip,
 }: {
-  wzor: string;
+  base: string;
   office: string;
   address: string[];
   phone: string;
@@ -168,25 +168,25 @@ export function WzFooter({
           <h4>Oferty</h4>
           <ul>
             <li>
-              <Link href={`/wzory/${wzor}/oferty?transakcja=sprzedaz`}>Na sprzedaż</Link>
+              <Link href={`${base}/oferty?transakcja=sprzedaz`}>Na sprzedaż</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/oferty?transakcja=wynajem`}>Na wynajem</Link>
+              <Link href={`${base}/oferty?transakcja=wynajem`}>Na wynajem</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/oferty?typ=dom`}>Domy</Link>
+              <Link href={`${base}/oferty?typ=dom`}>Domy</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/oferty?typ=lokal`}>Lokale i biura</Link>
+              <Link href={`${base}/oferty?typ=lokal`}>Lokale i biura</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/sprzedaj`}>Sprzedaj nieruchomość</Link>
+              <Link href={`${base}/sprzedaj`}>Sprzedaj nieruchomość</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/wynajmij`}>Oddaj w zarządzanie</Link>
+              <Link href={`${base}/wynajmij`}>Oddaj w zarządzanie</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/ulubione`}>Ulubione</Link>
+              <Link href={`${base}/ulubione`}>Ulubione</Link>
             </li>
           </ul>
         </div>
@@ -195,25 +195,25 @@ export function WzFooter({
           <h4>Biuro</h4>
           <ul>
             <li>
-              <Link href={`/wzory/${wzor}/zespol`}>Zespół</Link>
+              <Link href={`${base}/zespol`}>Zespół</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/o-nas`}>O nas</Link>
+              <Link href={`${base}/o-nas`}>O nas</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/poradnik`}>Poradnik</Link>
+              <Link href={`${base}/poradnik`}>Poradnik</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/kalkulator`}>Kalkulator raty</Link>
+              <Link href={`${base}/kalkulator`}>Kalkulator raty</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/kontakt`}>Kontakt</Link>
+              <Link href={`${base}/kontakt`}>Kontakt</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/zglos-nieruchomosc`}>Zgłoś nieruchomość</Link>
+              <Link href={`${base}/zglos-nieruchomosc`}>Zgłoś nieruchomość</Link>
             </li>
             <li>
-              <Link href={`/wzory/${wzor}/zlec-poszukiwanie`}>Zleć poszukiwanie</Link>
+              <Link href={`${base}/zlec-poszukiwanie`}>Zleć poszukiwanie</Link>
             </li>
           </ul>
         </div>

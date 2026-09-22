@@ -752,9 +752,9 @@ export function offerSummary(o: DemoOffer): string[] {
 }
 
 /** Dzielnice z ofert, do filtrów i kafelków lokalizacji. */
-export function districts(): { name: string; count: number; photo: string }[] {
+export function districts(offers: DemoOffer[] = DEMO_OFFERS): { name: string; count: number; photo: string }[] {
   const map = new Map<string, { count: number; photo: string }>();
-  for (const o of DEMO_OFFERS) {
+  for (const o of offers) {
     const cur = map.get(o.district);
     if (cur) cur.count += 1;
     else map.set(o.district, { count: 1, photo: o.photos[0] });

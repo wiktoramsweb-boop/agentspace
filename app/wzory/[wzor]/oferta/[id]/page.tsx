@@ -39,6 +39,7 @@ export default async function OfertaPage({ params }: { params: Promise<{ wzor: s
   const offer = getOffer(id);
   if (!w || !offer) notFound();
 
+  const base = `/wzory/${w.slug}`;
   const agent = getAgent(offer.agentId);
   const similar = DEMO_OFFERS.filter((o) => o.id !== offer.id && (o.district === offer.district || o.kind === offer.kind)).slice(0, 3);
 
@@ -141,7 +142,7 @@ export default async function OfertaPage({ params }: { params: Promise<{ wzor: s
               Lokalizacja
             </h2>
             <div style={{ height: 380, borderRadius: "var(--d-radius-lg)", overflow: "hidden", border: "1px solid var(--d-line)" }}>
-              <WzMap offers={[offer]} wzor={w.slug} dark={w.dark} />
+              <WzMap offers={[offer]} base={base} dark={w.dark} />
             </div>
           </div>
 
@@ -178,7 +179,7 @@ export default async function OfertaPage({ params }: { params: Promise<{ wzor: s
               <p style={{ fontSize: 14.5, paddingRight: 44 }}>
                 Zapisz ofertę na później, a przy kontakcie agent zobaczy, co Cię interesowało.
               </p>
-              <FavButton wzor={w.slug} id={offer.id} label={offer.title} />
+              <FavButton base={base} id={offer.id} label={offer.title} />
             </div>
           </aside>
         </div>
@@ -193,7 +194,7 @@ export default async function OfertaPage({ params }: { params: Promise<{ wzor: s
             </h2>
             <div className="wz-grid" data-revs>
               {similar.map((o) => (
-                <OfferCard key={o.id} offer={o} wzor={w.slug} />
+                <OfferCard key={o.id} offer={o} base={base} />
               ))}
             </div>
           </div>

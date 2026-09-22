@@ -13,6 +13,7 @@ const DO: [string, string, string][] = [
 ];
 
 export function HomeBeton({ wzor }: { wzor: string }) {
+  const base = `/wzory/${wzor}`;
   const list = DEMO_OFFERS.slice(0, 8);
   const cards = DEMO_OFFERS.filter((o) => o.featured).slice(0, 3);
 
@@ -50,7 +51,7 @@ export function HomeBeton({ wzor }: { wzor: string }) {
         </div>
 
         <div className="bet-search" data-rev>
-          <WzSearch wzor={wzor} compact />
+          <WzSearch base={base} offers={DEMO_OFFERS} compact />
         </div>
       </section>
 
@@ -116,7 +117,7 @@ export function HomeBeton({ wzor }: { wzor: string }) {
           <Head kick="Polecane" title="Warto zobaczyć" />
           <div className="wz-grid" data-revs>
             {cards.map((o) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} />
+              <OfferCard key={o.id} offer={o} base={base} />
             ))}
           </div>
         </div>

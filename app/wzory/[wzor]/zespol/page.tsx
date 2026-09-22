@@ -103,7 +103,7 @@ export default async function ZespolPage({ params }: { params: Promise<{ wzor: s
                         </p>
                         <div className="wz-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
                           {own.slice(0, 3).map((o) => (
-                            <OfferCard key={o.id} offer={o} wzor={w.slug} sizes="240px" />
+                            <OfferCard key={o.id} offer={o} base={`/wzory/${w.slug}`} sizes="240px" />
                           ))}
                         </div>
                       </div>

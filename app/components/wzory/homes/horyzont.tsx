@@ -29,6 +29,7 @@ const FAQ_DEV: [string, string][] = [
 ];
 
 export function HomeHoryzont({ wzor }: { wzor: string }) {
+  const base = `/wzory/${wzor}`;
   const units = buildUnits();
   const free = units.filter((u) => u.status === "wolne");
   const from = Math.min(...free.map((u) => u.price));
@@ -171,7 +172,7 @@ export function HomeHoryzont({ wzor }: { wzor: string }) {
         <div className="wz-wrap">
           <Head kick="Lokalizacja" title="Zabłocie, dwa kroki od bulwarów" />
           <div style={{ height: 440, borderRadius: "var(--d-radius-lg)", overflow: "hidden", border: "1px solid var(--d-line)" }} data-rev>
-            <WzMap offers={[spot]} wzor={wzor} dark />
+            <WzMap offers={[spot]} base={base} dark />
           </div>
         </div>
       </section>

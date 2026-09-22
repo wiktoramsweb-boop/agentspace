@@ -45,7 +45,7 @@ function esc(s: string): string {
  * Mapa ofert dla wzoru. Pinezka pokazuje od razu cenę, bo to pierwsza rzecz,
  * której szuka kupujący, a dopiero potem zdjęcie.
  */
-export function WzMap({ offers, wzor, dark = false }: { offers: DemoOffer[]; wzor: string; dark?: boolean }) {
+export function WzMap({ offers, base, dark = false }: { offers: DemoOffer[]; base: string; dark?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const layer = useRef<any>(null);
@@ -75,7 +75,7 @@ export function WzMap({ offers, wzor, dark = false }: { offers: DemoOffer[]; wzo
             <img src="${o.photos[0]}" alt="" style="width:100%;height:96px;object-fit:cover;border-radius:6px;margin-bottom:7px">
             <strong style="display:block;margin-bottom:2px">${esc(o.title)}</strong>
             <span style="color:#64748b;font-size:12px">${esc(o.district)} · ${o.area} m²</span><br>
-            <a href="/wzory/${wzor}/oferta/${o.id}" style="color:#2563eb">Zobacz ofertę →</a>
+            <a href="${base}/oferta/${o.id}" style="color:#2563eb">Zobacz ofertę →</a>
           </div>`,
         );
       });
@@ -88,7 +88,7 @@ export function WzMap({ offers, wzor, dark = false }: { offers: DemoOffer[]; wzo
     return () => {
       cancelled = true;
     };
-  }, [offers, wzor, dark]);
+  }, [offers, base, dark]);
 
   useEffect(() => {
     return () => {

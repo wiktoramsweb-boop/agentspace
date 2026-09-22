@@ -41,6 +41,7 @@ const QUOTES: [string, string, string, string][] = [
 ];
 
 export function HomePrzystan({ wzor }: { wzor: string }) {
+  const base = `/wzory/${wzor}`;
   const picks = DEMO_OFFERS.filter((o) => o.deal === "sprzedaz").slice(0, 3);
   const agent = DEMO_AGENTS[2];
 
@@ -83,7 +84,7 @@ export function HomePrzystan({ wzor }: { wzor: string }) {
         </div>
 
         <div className="prz-search" data-rev>
-          <WzSearch wzor={wzor} />
+          <WzSearch base={base} offers={DEMO_OFFERS} />
         </div>
       </section>
 
@@ -119,7 +120,7 @@ export function HomePrzystan({ wzor }: { wzor: string }) {
           </div>
           <div className="wz-grid" data-revs>
             {picks.map((o, i) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} priority={i === 0} />
+              <OfferCard key={o.id} offer={o} base={base} priority={i === 0} />
             ))}
           </div>
         </div>

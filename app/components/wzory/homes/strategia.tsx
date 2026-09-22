@@ -20,6 +20,7 @@ const PILLARS: [string, string, string][] = [
 ];
 
 export function HomeStrategia({ wzor }: { wzor: string }) {
+  const base = `/wzory/${wzor}`;
   const featured = DEMO_OFFERS.filter((o) => o.featured).slice(0, 3);
   const newest = DEMO_OFFERS.slice(0, 6);
   const areas = districts().slice(0, 5);
@@ -43,7 +44,7 @@ export function HomeStrategia({ wzor }: { wzor: string }) {
           </p>
 
           <div className="str-search" data-rev>
-            <WzSearch wzor={wzor} compact />
+            <WzSearch base={base} offers={DEMO_OFFERS} compact />
           </div>
 
           <div className="str-hero__facts">
@@ -116,7 +117,7 @@ export function HomeStrategia({ wzor }: { wzor: string }) {
           />
           <div className="wz-grid" data-revs>
             {featured.map((o, i) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} priority={i === 0} />
+              <OfferCard key={o.id} offer={o} base={base} priority={i === 0} />
             ))}
           </div>
         </div>
@@ -172,7 +173,7 @@ export function HomeStrategia({ wzor }: { wzor: string }) {
           />
           <div className="wz-grid" data-revs>
             {newest.map((o) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} />
+              <OfferCard key={o.id} offer={o} base={base} />
             ))}
           </div>
         </div>

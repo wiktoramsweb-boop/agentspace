@@ -52,7 +52,7 @@ export default async function WzorLayout({
     <div className={`wz ${w.root} ${WZOR_FONTS[w.slug]}`}>
       <WzMotion />
       <WzNav
-        wzor={w.slug}
+        base={`/wzory/${w.slug}`}
         office={w.office.split(" ")[0]}
         sub={w.sub}
         links={links}
@@ -62,7 +62,7 @@ export default async function WzorLayout({
       />
       <main>{children}</main>
       <WzFooter
-        wzor={w.slug}
+        base={`/wzory/${w.slug}`}
         office={w.office}
         address={w.address}
         phone={w.phone}

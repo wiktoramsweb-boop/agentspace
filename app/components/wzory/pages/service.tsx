@@ -31,6 +31,7 @@ export type ServiceContent = {
  * i dopiero na końcu formularz.
  */
 export function ServicePage({ wzor, c }: { wzor: string; c: ServiceContent }) {
+  const base = `/wzory/${wzor}`;
   return (
     <>
       <section className="wz-sec wz-sec--tight">
@@ -154,7 +155,7 @@ export function ServicePage({ wzor, c }: { wzor: string; c: ServiceContent }) {
             />
             <div className="wz-grid" data-revs>
               {c.offers.slice(0, 3).map((o) => (
-                <OfferCard key={o.id} offer={o} wzor={wzor} />
+                <OfferCard key={o.id} offer={o} base={base} />
               ))}
             </div>
           </div>

@@ -23,6 +23,7 @@ const DIST: [string, string][] = [
 ];
 
 export function HomeOgrod({ wzor }: { wzor: string }) {
+  const base = `/wzory/${wzor}`;
   const houses = DEMO_OFFERS.filter((o) => o.kind === "dom" || o.kind === "dzialka");
   const rest = DEMO_OFFERS.filter((o) => !houses.includes(o)).slice(0, 3);
 
@@ -63,7 +64,7 @@ export function HomeOgrod({ wzor }: { wzor: string }) {
         </div>
 
         <div className="ogr-search" data-rev>
-          <WzSearch wzor={wzor} />
+          <WzSearch base={base} offers={DEMO_OFFERS} />
         </div>
       </section>
 
@@ -99,7 +100,7 @@ export function HomeOgrod({ wzor }: { wzor: string }) {
           />
           <div className="wz-grid" data-revs>
             {houses.map((o, i) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} priority={i === 0} />
+              <OfferCard key={o.id} offer={o} base={base} priority={i === 0} />
             ))}
           </div>
         </div>
@@ -134,7 +135,7 @@ export function HomeOgrod({ wzor }: { wzor: string }) {
         <div className="wz-wrap">
           <Head kick="Na mapie" title="Gdzie są nasze oferty" />
           <div className="ogr-map" data-rev>
-            <WzMap offers={DEMO_OFFERS} wzor={wzor} />
+            <WzMap offers={DEMO_OFFERS} base={base} />
           </div>
         </div>
       </section>
@@ -157,7 +158,7 @@ export function HomeOgrod({ wzor }: { wzor: string }) {
           <Head kick="Nie tylko domy" title="Mamy też mieszkania w mieście" />
           <div className="wz-grid" data-revs>
             {rest.map((o) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} />
+              <OfferCard key={o.id} offer={o} base={base} />
             ))}
           </div>
         </div>

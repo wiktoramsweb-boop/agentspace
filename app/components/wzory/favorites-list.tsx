@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useFavorites } from "./favorites";
 import { OfferCard } from "./offer-card";
-import { DEMO_OFFERS, plOffers } from "@/lib/wzory/data";
+import { plOffers, type DemoOffer } from "@/lib/wzory/data";
 
 /** Lista ofert zapisanych przez odwiedzającego. Pusta lista też ma sens: podpowiadamy, co dalej. */
-export function FavoritesList({ wzor }: { wzor: string }) {
-  const { ids } = useFavorites(wzor);
-  const rows = DEMO_OFFERS.filter((o) => ids.includes(o.id));
+export function FavoritesList({ base, offers }: { base: string; offers: DemoOffer[] }) {
+  const { ids } = useFavorites(base);
+  const rows = offers.filter((o) => ids.includes(o.id));
 
   if (rows.length === 0) {
     return (
@@ -19,7 +19,7 @@ export function FavoritesList({ wzor }: { wzor: string }) {
         <p className="wz-muted" style={{ marginBottom: 20 }}>
           Klikaj serduszko przy ofertach, które Ci się podobają. Zostaną tutaj, nawet gdy zamkniesz przeglądarkę.
         </p>
-        <Link href={`/wzory/${wzor}/oferty`} className="wz-btn">
+        <Link href={`${base}/oferty`} className="wz-btn">
           Przeglądaj oferty
         </Link>
       </div>
@@ -33,7 +33,7 @@ export function FavoritesList({ wzor }: { wzor: string }) {
       </p>
       <div className="wz-grid" data-revs>
         {rows.map((o) => (
-          <OfferCard key={o.id} offer={o} wzor={wzor} />
+          <OfferCard key={o.id} offer={o} base={base} />
         ))}
       </div>
       <div className="wz-box wz-box--accent" style={{ marginTop: 28 }}>
@@ -44,7 +44,7 @@ export function FavoritesList({ wzor }: { wzor: string }) {
           Zamiast opisywać w mailu, które mieszkania Cię interesują, wyślij całą listę jednym kliknięciem. Agent
           przygotuje prezentacje w jednym dniu i podpowie, które z nich ma sens oglądać razem.
         </p>
-        <Link href={`/wzory/${wzor}/kontakt`} className="wz-btn">
+        <Link href={`${base}/kontakt`} className="wz-btn">
           Umów oglądanie
         </Link>
       </div>

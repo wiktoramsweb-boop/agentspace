@@ -23,6 +23,7 @@ const COMPARE: [string, string, string][] = [
 ];
 
 export function HomeSiatka({ wzor }: { wzor: string }) {
+  const base = `/wzory/${wzor}`;
   const newest = DEMO_OFFERS.slice(0, 6);
   const areas = districts();
   const kinds = (Object.keys(KIND_LABELS) as DemoKind[]).map((k) => ({
@@ -59,7 +60,7 @@ export function HomeSiatka({ wzor }: { wzor: string }) {
               <b>Wyszukiwarka</b>
               <span>Wynik odświeża się na żywo</span>
             </div>
-            <WzSearch wzor={wzor} compact />
+            <WzSearch base={base} offers={DEMO_OFFERS} compact />
           </div>
         </div>
       </section>
@@ -117,7 +118,7 @@ export function HomeSiatka({ wzor }: { wzor: string }) {
           </div>
           <div className="wz-grid" data-revs>
             {newest.map((o, i) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} priority={i < 3} />
+              <OfferCard key={o.id} offer={o} base={base} priority={i < 3} />
             ))}
           </div>
         </div>
@@ -135,7 +136,7 @@ export function HomeSiatka({ wzor }: { wzor: string }) {
             </div>
           </div>
           <div className="sia-map" data-rev>
-            <WzMap offers={DEMO_OFFERS} wzor={wzor} />
+            <WzMap offers={DEMO_OFFERS} base={base} />
           </div>
         </div>
       </section>

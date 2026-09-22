@@ -13,6 +13,13 @@ const COMPANY: Item[] = [
   { href: "/app/ustawienia/pozostale", label: "Pozostałe ustawienia" },
 ];
 
+const SITE: Item[] = [
+  { href: "/app/ustawienia/strona", label: "Wygląd i kontakt" },
+  { href: "/app/ustawienia/strona/tresci", label: "Teksty" },
+  { href: "/app/ustawienia/strona/zespol", label: "Zespół na stronie" },
+  { href: "/app/ustawienia/strona/wpisy", label: "Poradnik" },
+];
+
 /**
  * Boczne menu ustawień (układ jak w ASARI). Na telefonie zamienia się
  * w poziomy pasek, żeby nie zajmować pół ekranu nad formularzem.
@@ -54,6 +61,10 @@ export function SettingsNav({ isOwner }: { isOwner: boolean }) {
             Ustawienia firmy
           </p>
           {COMPANY.map(link)}
+          <p className="hidden px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400 lg:block">
+            Strona www
+          </p>
+          {SITE.map(link)}
         </>
       )}
     </nav>

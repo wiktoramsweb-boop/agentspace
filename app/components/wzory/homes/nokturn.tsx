@@ -31,6 +31,7 @@ const STATS: [string, string][] = [
 ];
 
 export function HomeNokturn({ wzor }: { wzor: string }) {
+  const base = `/wzory/${wzor}`;
   const collection = DEMO_OFFERS.filter((o) => o.price > 1_000_000).slice(0, 3);
   const rest = DEMO_OFFERS.filter((o) => !collection.includes(o)).slice(0, 6);
   const spot = getOffer("o8")!;
@@ -64,7 +65,7 @@ export function HomeNokturn({ wzor }: { wzor: string }) {
       {/* ───────── wyszukiwarka ───────── */}
       <section className="nok-search">
         <div className="wz-wrap nok-search__in">
-          <WzSearch wzor={wzor} compact />
+          <WzSearch base={base} offers={DEMO_OFFERS} compact />
         </div>
       </section>
 
@@ -82,7 +83,7 @@ export function HomeNokturn({ wzor }: { wzor: string }) {
           </div>
           <div className="nok-col" data-revs>
             {collection.map((o) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} />
+              <OfferCard key={o.id} offer={o} base={base} />
             ))}
           </div>
         </div>
@@ -190,7 +191,7 @@ export function HomeNokturn({ wzor }: { wzor: string }) {
           </h2>
           <div className="wz-grid" data-revs>
             {rest.map((o) => (
-              <OfferCard key={o.id} offer={o} wzor={wzor} />
+              <OfferCard key={o.id} offer={o} base={base} />
             ))}
           </div>
         </div>

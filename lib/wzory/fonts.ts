@@ -23,22 +23,22 @@ import type { WzorSlug } from "./themes";
  * więc sam arkusz wzoru nie musi wiedzieć, jak font się nazywa.
  */
 
-const fraunces = Fraunces({ subsets: ["latin-ext"], weight: ["300", "400", "600", "700"], variable: "--f-fraunces" });
-const manrope = Manrope({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-manrope" });
+const fraunces = Fraunces({ subsets: ["latin-ext"], variable: "--f-fraunces" });
+const manrope = Manrope({ subsets: ["latin-ext"], variable: "--f-manrope" });
 const cormorant = Cormorant_Garamond({ subsets: ["latin-ext"], weight: ["300", "400", "600"], variable: "--f-cormorant" });
-const jost = Jost({ subsets: ["latin-ext"], weight: ["300", "400", "500", "600"], variable: "--f-jost" });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin-ext"], weight: ["400", "500", "700"], variable: "--f-space" });
-const interTight = Inter_Tight({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-inter-tight" });
-const sora = Sora({ subsets: ["latin-ext"], weight: ["400", "600", "700"], variable: "--f-sora" });
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-jakarta" });
-const outfit = Outfit({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-outfit" });
-const karla = Karla({ subsets: ["latin-ext"], weight: ["400", "500", "600"], variable: "--f-karla" });
+const jost = Jost({ subsets: ["latin-ext"], variable: "--f-jost" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin-ext"], variable: "--f-space" });
+const interTight = Inter_Tight({ subsets: ["latin-ext"], variable: "--f-inter-tight" });
+const sora = Sora({ subsets: ["latin-ext"], variable: "--f-sora" });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin-ext"], variable: "--f-jakarta" });
+const outfit = Outfit({ subsets: ["latin-ext"], variable: "--f-outfit" });
+const karla = Karla({ subsets: ["latin-ext"], variable: "--f-karla" });
 const anton = Anton({ subsets: ["latin-ext"], weight: ["400"], variable: "--f-anton" });
-const dmSans = DM_Sans({ subsets: ["latin-ext"], weight: ["400", "500", "700"], variable: "--f-dm" });
-const lora = Lora({ subsets: ["latin-ext"], weight: ["400", "500", "600"], variable: "--f-lora" });
-const nunito = Nunito_Sans({ subsets: ["latin-ext"], weight: ["400", "600", "700"], variable: "--f-nunito" });
-const unbounded = Unbounded({ subsets: ["latin-ext"], weight: ["400", "600", "800"], variable: "--f-unbounded" });
-const figtree = Figtree({ subsets: ["latin-ext"], weight: ["400", "500", "600", "700"], variable: "--f-figtree" });
+const dmSans = DM_Sans({ subsets: ["latin-ext"], variable: "--f-dm" });
+const lora = Lora({ subsets: ["latin-ext"], variable: "--f-lora" });
+const nunito = Nunito_Sans({ subsets: ["latin-ext"], variable: "--f-nunito" });
+const unbounded = Unbounded({ subsets: ["latin-ext"], variable: "--f-unbounded" });
+const figtree = Figtree({ subsets: ["latin-ext"], variable: "--f-figtree" });
 
 export const WZOR_FONTS: Record<WzorSlug, string> = {
   kamienica: `${fraunces.variable} ${manrope.variable}`,

@@ -6,6 +6,7 @@ import { RateCalculator } from "../calculator";
 import { FavoritesList } from "../favorites-list";
 import {
   DEMO_AGENTS,
+  DEMO_OFFERS,
   DEMO_ARTICLES,
   DEMO_PORTALS,
   DEMO_REVIEWS,
@@ -349,7 +350,7 @@ export function FavoritesPage({ wzor }: { wzor: Wzor }) {
           Oferty zapisane sercem zostają w tej przeglądarce. Gdy wyślesz nam zapytanie, agent zobaczy, co Cię
           interesowało, i przygotuje rozmowę zamiast pytać o wszystko od zera.
         </p>
-        <FavoritesList wzor={wzor.slug} />
+        <FavoritesList base={`/wzory/${wzor.slug}`} offers={DEMO_OFFERS} />
       </div>
     </section>
   );
