@@ -78,9 +78,9 @@ export default async function BlogPost({ params }: Props) {
       <SiteNav />
       <ReadingProgress />
 
-      <main className="bg-zinc-950 text-white">
+      <main className="mk relative min-h-screen">
         {/* Hero z visual */}
-        <section className="relative overflow-hidden border-b border-zinc-900 pt-32 md:pt-40">
+        <section className="relative overflow-hidden border-b border-[var(--mk-hairline)] pt-32 md:pt-40">
           {/* Visual cover na pełną szerokość */}
           <div className="absolute inset-x-0 top-0 h-[440px] md:h-[520px]">
             <BlogVisual category={post.category} />
@@ -90,7 +90,7 @@ export default async function BlogPost({ params }: Props) {
           <div className="relative z-10 mx-auto max-w-3xl px-6 pb-12 pt-20 md:pt-24">
             <Link
               href="/blog"
-              className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-emerald-400"
+              className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--color-mk-muted)] transition hover:text-emerald-400"
             >
               <span>←</span> Wszystkie artykuły
             </Link>
@@ -103,15 +103,15 @@ export default async function BlogPost({ params }: Props) {
               {post.title}
             </h1>
 
-            <p className="mb-8 text-lg leading-relaxed text-zinc-300 md:text-xl">
+            <p className="mb-8 text-lg leading-relaxed text-[var(--color-mk-text)] md:text-xl">
               {post.description}
             </p>
 
-            <div className="flex items-center gap-3 border-t border-zinc-800 pt-6 text-sm text-zinc-400">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-xs font-bold text-zinc-950">
+            <div className="flex items-center gap-3 border-t border-[var(--mk-hairline)] pt-6 text-sm text-[var(--color-mk-muted)]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-xs font-bold text-[var(--mk-on-accent)]">
                 {post.author.charAt(0)}
               </div>
-              <span className="text-zinc-200">{post.author}</span>
+              <span className="text-[var(--color-mk-text)]">{post.author}</span>
               <span className="text-zinc-700">·</span>
               <span>{formatDate(post.date)}</span>
               <span className="text-zinc-700">·</span>
@@ -121,7 +121,7 @@ export default async function BlogPost({ params }: Props) {
         </section>
 
         {/* Article body */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-24">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-24">
           <article
             className="prose-blog mx-auto max-w-3xl"
             dangerouslySetInnerHTML={{ __html: post.html }}
@@ -130,7 +130,7 @@ export default async function BlogPost({ params }: Props) {
 
         {/* Related posts */}
         {relatedPosts.length > 0 && (
-          <section className="border-b border-zinc-900 px-6 py-20">
+          <section className="border-b border-[var(--mk-hairline)] px-6 py-20">
             <div className="mx-auto max-w-5xl">
               <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
                 Czytaj dalej
@@ -144,18 +144,18 @@ export default async function BlogPost({ params }: Props) {
                   <Link
                     key={p.slug}
                     href={`/blog/${p.slug}`}
-                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900/30 transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-zinc-900/50"
+                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)]"
                   >
                     <BlogVisual category={p.category} />
                     <div className="flex flex-1 flex-col p-6">
                       <p className="mb-2 text-xs font-medium uppercase tracking-[0.15em] text-emerald-400">
                         {p.category}
                       </p>
-                      <h3 className="mb-2 text-lg font-semibold text-white transition group-hover:text-emerald-50">
+                      <h3 className="mb-2 text-lg font-semibold text-[var(--color-mk-text)] transition group-hover:text-emerald-50">
                         {p.title}
                       </h3>
-                      <p className="flex-1 text-sm text-zinc-400">{p.description}</p>
-                      <p className="mt-4 text-xs text-zinc-500">
+                      <p className="flex-1 text-sm text-[var(--color-mk-muted)]">{p.description}</p>
+                      <p className="mt-4 text-xs text-[var(--color-mk-muted)]">
                         {formatDate(p.date)} · {p.readingTime}
                       </p>
                     </div>
@@ -175,13 +175,13 @@ export default async function BlogPost({ params }: Props) {
             <h2 className="mb-4 text-2xl font-semibold md:text-3xl">
               Zbuduj systematyczny trening agentów w swoim biurze
             </h2>
-            <p className="mb-6 text-zinc-400">
+            <p className="mb-6 text-[var(--color-mk-muted)]">
               CRM, cele, prowizje, AI Coach i panel właściciela w jednym systemie.
               Przyjmujemy jedno biuro na miasto.
             </p>
             <Link
               href="/#waitlist"
-              className="inline-flex items-center rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+              className="inline-flex items-center rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400"
             >
               Umów rozmowę →
             </Link>

@@ -2,6 +2,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from "./components/fade-in";
 import Link from "next/link";
 import { SiteNav } from "./components/site-nav";
 import { BrowserShot, MkMarquee, PhotoTile, ShotTabs, TemplateTile } from "./components/mk/showcase";
+import { Beams, RevealWords, SpotlightCard, StickySteps, Ticker, TiltPhoto } from "./components/mk/motion-bits";
 import { ShotOferty, ShotPanel, ShotPulpit } from "./components/mockups/light-shots";
 import { WZORY } from "@/lib/wzory/themes";
 import { SITE_ADDON } from "@/lib/site/addon";
@@ -74,16 +75,19 @@ const MODULES = [
 const STEPS = [
   {
     n: "01",
+    photo: "/wzory/dziedziniec.jpg",
     title: "Rozmowa i audyt biura",
     body: "30 minut. Sprawdzamy, jak dziś wygląda obieg leada w Twoim biurze i gdzie realnie tracisz transakcje. Dostajesz wnioski niezależnie od tego, czy zaczniemy współpracę.",
   },
   {
     n: "02",
+    photo: "/wzory/schody.jpg",
     title: "Wdrożenie w jeden dzień",
     body: "Zakładamy konto biura, wgrywamy bazę klientów i nieruchomości, zapraszamy agentów. Konfigurujemy cele i lejek pod Twój model pracy. Bez instalacji, bez działu IT.",
   },
   {
     n: "03",
+    photo: "/wzory/miasto-noc.jpg",
     title: "Pierwsze wnioski w 30 dni",
     body: "Po miesiącu masz komplet danych: kto realizuje cele, gdzie zespół traci leady, jak wyglądają rozmowy. Od tego momentu zarządzasz liczbami, nie wrażeniem.",
   },
@@ -210,11 +214,10 @@ export default function Home() {
             <FadeIn delay={0.4} className="mt-10">
               <div className="grid max-w-lg grid-cols-3 gap-0">
                 {FACTS.map((fact, i) => (
-                  <div key={fact.label} className={`pr-5 ${i > 0 ? "border-l border-white/[0.07] pl-5" : ""}`}>
+                  <div key={fact.label} className={`pr-5 ${i > 0 ? "border-l border-[var(--mk-hairline)] pl-5" : ""}`}>
                     <p className="mb-1 text-3xl font-semibold md:text-4xl">
                       <span className="grad">
-                        {fact.value}
-                        {fact.suffix}
+                        <Ticker value={fact.value} suffix={fact.suffix} />
                       </span>
                     </p>
                     <p className="text-[0.8125rem] leading-snug text-[var(--color-mk-muted)]">{fact.label}</p>
@@ -284,15 +287,15 @@ export default function Home() {
         />
 
         <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {MODULES.map((mod) => (
-            <StaggerItem key={mod.name}>
-              <a href={`/produkt/${mod.slug}`} className="block h-full">
-                <GlowCard className="mk-card group/card h-full rounded-[20px] p-8">
+          {MODULES.map((mod, i) => (
+            <StaggerItem key={mod.name} className={i === 0 ? "lg:col-span-2" : ""}>
+              <SpotlightCard href={`/produkt/${mod.slug}`} className="p-8">
+                <div className="flex h-full flex-col">
                   <h4 className="mb-3">{mod.name}</h4>
                   <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
                     {mod.body}
                   </p>
-                  <p className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-emerald-400">
+                  <p className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-mk-accent)]">
                     Zobacz moduł
                     <svg
                       aria-hidden="true"
@@ -309,8 +312,8 @@ export default function Home() {
                       />
                     </svg>
                   </p>
-                </GlowCard>
-              </a>
+                </div>
+              </SpotlightCard>
             </StaggerItem>
           ))}
         </StaggerContainer>
@@ -411,20 +414,8 @@ export default function Home() {
           }
         />
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {STEPS.map((step, i) => (
-            <FadeIn key={step.n} delay={i * 0.08}>
-              <Card className="h-full p-8">
-                <span className="mb-6 inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500/10 font-mono text-sm font-semibold text-emerald-400 ring-1 ring-emerald-500/25">
-                  {step.n}
-                </span>
-                <h4 className="mb-3">{step.title}</h4>
-                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                  {step.body}
-                </p>
-              </Card>
-            </FadeIn>
-          ))}
+        <div className="mt-12">
+          <StickySteps steps={STEPS} />
         </div>
       </Section>
 
@@ -541,6 +532,44 @@ export default function Home() {
       </Section>
 
       {/* ── KLIENT ZERO ── */}
+      {/* ── MANIFEST: zdanie odsłaniane przy przewijaniu + zdjęcia ── */}
+      <Section>
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-16">
+          <div>
+            <p className="mk-eyebrow mb-7">Po ludzku</p>
+            <RevealWords
+              text="Nie sprzedajemy oprogramowania. Sprzedajemy spokojniejszy poniedziałek: wiesz, kto do kogo dzwoni, która oferta stoi i skąd realnie biorą się transakcje w Twoim biurze."
+              className="text-[clamp(1.5rem,3.1vw,2.5rem)] font-medium leading-[1.25] tracking-[-0.025em] text-[var(--color-mk-text)]"
+            />
+            <div className="mt-9 grid gap-4 sm:grid-cols-3">
+              {[
+                ["Polski produkt", "Piszemy go w Krakowie, dla polskich biur i polskich umów."],
+                ["Człowiek odbiera", "Piszesz do mnie, nie do systemu zgłoszeń. Odpowiadam tego samego dnia."],
+                ["Zero lock-inu", "Twoje dane eksportujesz do Excela w każdej chwili, bez proszenia."],
+              ].map(([t, d]) => (
+                <div key={t}>
+                  <p className="mb-1.5 font-medium text-[var(--color-mk-text)]">{t}</p>
+                  <p className="text-sm leading-relaxed text-[var(--color-mk-muted)]">{d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <TiltPhoto
+              src="/wzory/kuchnia.jpg"
+              alt="Wnętrze mieszkania"
+              caption="Prezentacja, Podgórze"
+              className="aspect-[3/4]"
+            />
+            <div className="grid gap-4 pt-10">
+              <TiltPhoto src="/wzory/dom.jpg" alt="Dom" caption="Odbiór kluczy" className="aspect-square" />
+              <TiltPhoto src="/wzory/taras.jpg" alt="Taras" caption="Sesja zdjęciowa" className="aspect-square" />
+            </div>
+          </div>
+        </div>
+      </Section>
+
       <Section>
         <div className="mx-auto max-w-3xl">
           <SectionHead eyebrow="Klient zero" title="Buduję to dla własnego biura" />
@@ -554,7 +583,7 @@ export default function Home() {
                       aria-hidden="true"
                       className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 opacity-45 blur-xl"
                     />
-                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-2xl font-bold text-zinc-950">
+                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-2xl font-bold text-[var(--mk-on-accent)]">
                       W
                     </div>
                   </div>
@@ -664,7 +693,7 @@ export default function Home() {
               <Card className="h-full p-8">
                 <span
                   aria-hidden="true"
-                  className="mb-6 flex h-11 w-11 items-center justify-center rounded-full bg-white/[0.04] ring-1 ring-white/10"
+                  className="mb-6 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--mk-surface-2)] ring-1 ring-white/10"
                 >
                   <svg
                     className="h-4.5 w-4.5 text-zinc-400"
@@ -698,10 +727,10 @@ export default function Home() {
           <StaggerContainer className="mt-12 flex flex-col gap-3" staggerDelay={0.05}>
             {FAQ.map((item) => (
               <StaggerItem key={item.question}>
-                <details className="mk-card group px-6 py-5 md:px-8 [&[open]]:bg-white/[0.03]">
+                <details className="mk-card group px-6 py-5 md:px-8 [&[open]]:bg-[var(--mk-surface-2)]">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
                     {item.question}
-                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/[0.05] transition-all duration-300 group-open:rotate-180 group-open:bg-emerald-500/15">
+                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--mk-surface-2)] transition-all duration-300 group-open:rotate-180 group-open:bg-emerald-500/15">
                       <svg
                         aria-hidden="true"
                         className="h-4 w-4 text-[var(--color-mk-muted)] transition-colors group-open:text-emerald-400"

@@ -47,8 +47,8 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
               <p className="mb-2 inline-block rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-xs font-medium text-emerald-300">
                 {item.period}
               </p>
-              <h3 className="mb-2 text-lg font-semibold text-white md:text-xl">{item.title}</h3>
-              <p className="leading-relaxed text-zinc-400">{item.body}</p>
+              <h3 className="mb-2 text-lg font-semibold text-[var(--color-mk-text)] md:text-xl">{item.title}</h3>
+              <p className="leading-relaxed text-[var(--color-mk-muted)]">{item.body}</p>
             </div>
           </motion.div>
         ))}

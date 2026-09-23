@@ -65,7 +65,7 @@ export default function DlaAgentow() {
   return (
     <>
       <SiteNav />
-      <main className="bg-zinc-950 text-white">
+      <main className="mk relative min-h-screen">
         <PageHero
           eyebrow="Dla agentów nieruchomości"
           title="Mniej stresu, więcej zamknięć, wyższa prowizja"
@@ -73,7 +73,7 @@ export default function DlaAgentow() {
         />
 
         {/* Benefits - grid z ikonami */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
               <h2 className="mb-12 text-3xl font-semibold tracking-tight md:text-4xl">
@@ -86,17 +86,17 @@ export default function DlaAgentow() {
                 const Icon = benefit.icon;
                 return (
                   <StaggerItem key={benefit.title}>
-                    <div className="group relative h-full overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8 transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-zinc-900/50 hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.2)]">
+                    <div className="group relative h-full overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)] hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.2)]">
                       <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-all duration-500 group-hover:bg-emerald-500/15" />
 
                       <div className="relative">
                         <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 transition-all group-hover:scale-110 group-hover:bg-emerald-500/20">
                           <Icon />
                         </div>
-                        <h3 className="mb-3 text-lg font-semibold text-white md:text-xl">
+                        <h3 className="mb-3 text-lg font-semibold text-[var(--color-mk-text)] md:text-xl">
                           {benefit.title}
                         </h3>
-                        <p className="leading-relaxed text-zinc-400">{benefit.body}</p>
+                        <p className="leading-relaxed text-[var(--color-mk-muted)]">{benefit.body}</p>
                       </div>
                     </div>
                   </StaggerItem>
@@ -107,7 +107,7 @@ export default function DlaAgentow() {
         </section>
 
         {/* FAQ */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-3xl">
             <FadeIn>
               <h2 className="mb-12 text-3xl font-semibold tracking-tight md:text-4xl">
@@ -118,11 +118,11 @@ export default function DlaAgentow() {
             <div className="space-y-4">
               {FAQ_AGENT.map((item, index) => (
                 <FadeIn key={item.q} delay={index * 0.05}>
-                  <details className="group rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6 transition-all open:bg-zinc-900/50">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-white">
+                  <details className="group rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-6 transition-all open:bg-[var(--mk-card-bg)]">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-[var(--color-mk-text)]">
                       {item.q}
                       <svg
-                        className="h-5 w-5 flex-shrink-0 text-zinc-500 transition group-open:rotate-180 group-open:text-emerald-400"
+                        className="h-5 w-5 flex-shrink-0 text-[var(--color-mk-muted)] transition group-open:rotate-180 group-open:text-emerald-400"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -131,7 +131,7 @@ export default function DlaAgentow() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                       </svg>
                     </summary>
-                    <p className="mt-4 leading-relaxed text-zinc-400">{item.a}</p>
+                    <p className="mt-4 leading-relaxed text-[var(--color-mk-muted)]">{item.a}</p>
                   </details>
                 </FadeIn>
               ))}
@@ -146,13 +146,13 @@ export default function DlaAgentow() {
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
                 Powiedz szefowi o AgentSpace
               </h2>
-              <p className="mb-8 text-zinc-400">
+              <p className="mb-8 text-[var(--color-mk-muted)]">
                 Jeśli prowadzisz/pracujesz w biurze, które chciałbyś, żeby wdrożyło AgentSpace -
                 wyślij szefowi link do strony. Przyjmujemy jedno biuro na miasto.
               </p>
               <Link
                 href="/#waitlist"
-                className="inline-flex items-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+                className="inline-flex items-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400"
               >
                 Pokaż listę oczekujących →
               </Link>

@@ -44,7 +44,7 @@ export default function Demo() {
   return (
     <>
       <SiteNav />
-      <main className="bg-zinc-950 text-white">
+      <main className="mk relative min-h-screen">
         <PageHero
           eyebrow="Demo"
           title="Zobacz, jak wygląda AgentSpace od środka"
@@ -55,7 +55,7 @@ export default function Demo() {
         {MOCKUPS_LIST.map((item, index) => (
           <section
             key={item.title}
-            className={`px-6 py-20 ${index < MOCKUPS_LIST.length - 1 ? "border-b border-zinc-900" : ""}`}
+            className={`px-6 py-20 ${index < MOCKUPS_LIST.length - 1 ? "border-b border-[var(--mk-hairline)]" : ""}`}
           >
             <div className="mx-auto max-w-6xl">
               <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
@@ -66,15 +66,15 @@ export default function Demo() {
                   <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
                     {item.title}
                   </h2>
-                  <p className="text-lg leading-relaxed text-zinc-400">{item.body}</p>
+                  <p className="text-lg leading-relaxed text-[var(--color-mk-muted)]">{item.body}</p>
                 </FadeIn>
                 <FadeIn delay={0.15} className={index % 2 === 1 ? "md:order-1" : ""}>
-                  <TiltCard className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl shadow-emerald-500/10">
+                  <TiltCard className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--color-mk-bg)] p-3 shadow-2xl shadow-emerald-500/10">
                     <div className="mb-2 flex items-center gap-1.5 px-2 py-1">
                       <div className="h-2 w-2 rounded-full bg-red-500/60" />
                       <div className="h-2 w-2 rounded-full bg-amber-500/60" />
                       <div className="h-2 w-2 rounded-full bg-emerald-500/60" />
-                      <div className="ml-2 flex-1 rounded-md bg-zinc-900/80 px-2 py-0.5 font-mono text-[9px] text-zinc-500">
+                      <div className="ml-2 flex-1 rounded-md bg-[var(--mk-card-bg)] px-2 py-0.5 font-mono text-[9px] text-[var(--color-mk-muted)]">
                         agentspace.pl/app
                       </div>
                     </div>
@@ -87,7 +87,7 @@ export default function Demo() {
         ))}
 
         {/* Coach flow */}
-        <section className="border-b border-t border-zinc-900 px-6 py-24">
+        <section className="border-b border-t border-[var(--mk-hairline)] px-6 py-24">
           <div className="mx-auto max-w-6xl">
             <div className="mb-16 max-w-2xl">
               <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
@@ -107,19 +107,19 @@ export default function Demo() {
             <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
               Chcesz zobaczyć demo na żywo w swoim biurze?
             </h2>
-            <p className="mb-8 text-zinc-400">
+            <p className="mb-8 text-[var(--color-mk-muted)]">
               Zaplanuj 30-min rozmowę. Pokażemy konkretnie, jak AgentSpace zadziała u Was.
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href="/#waitlist"
-                className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400"
               >
                 Umów rozmowę
               </Link>
               <Link
                 href="/kontakt"
-                className="inline-flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 px-8 py-4 font-medium text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-900"
+                className="inline-flex items-center justify-center rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-8 py-4 font-medium text-[var(--color-mk-text)] transition hover:border-zinc-700 hover:bg-[var(--mk-card-bg)]"
               >
                 Napisz po demo
               </Link>

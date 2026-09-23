@@ -67,8 +67,8 @@ export function ContactForm() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="mb-2 text-xl font-semibold text-white">Dziękujemy!</h3>
-        <p className="text-zinc-400">
+        <h3 className="mb-2 text-xl font-semibold text-[var(--color-mk-text)]">Dziękujemy!</h3>
+        <p className="text-[var(--color-mk-muted)]">
           Otrzymaliśmy wiadomość. Odpowiemy w ciągu 24 godzin w dni robocze.
         </p>
       </div>
@@ -91,7 +91,7 @@ export function ContactForm() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label htmlFor="name" className="mb-2 block text-sm font-medium text-zinc-300">
+          <label htmlFor="name" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
             Imię i nazwisko <span className="text-emerald-400">*</span>
           </label>
           <input
@@ -100,12 +100,12 @@ export function ContactForm() {
             type="text"
             required
             placeholder="Jan Kowalski"
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+            className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="mb-2 block text-sm font-medium text-zinc-300">
+          <label htmlFor="email" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
             Email <span className="text-emerald-400">*</span>
           </label>
           <input
@@ -114,27 +114,27 @@ export function ContactForm() {
             type="email"
             required
             placeholder="jan@biuro.pl"
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+            className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="agency" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="agency" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
           Nazwa biura nieruchomości{" "}
-          <span className="text-zinc-600">(opcjonalnie)</span>
+          <span className="text-[var(--color-mk-muted)]">(opcjonalnie)</span>
         </label>
         <input
           id="agency"
           name="agency"
           type="text"
           placeholder="Np. Spectra Nieruchomości"
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
 
       <div>
-        <label htmlFor="topic" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="topic" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
           Temat <span className="text-emerald-400">*</span>
         </label>
         <select
@@ -142,7 +142,7 @@ export function ContactForm() {
           name="topic"
           required
           defaultValue=""
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         >
           <option value="" disabled>
             Wybierz temat...
@@ -156,7 +156,7 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="message" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="message" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
           Wiadomość <span className="text-emerald-400">*</span>
         </label>
         <textarea
@@ -166,7 +166,7 @@ export function ContactForm() {
           rows={5}
           minLength={10}
           placeholder="W czym możemy pomóc?"
-          className="w-full resize-y rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full resize-y rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
 
@@ -179,14 +179,14 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === "submitting" ? "Wysyłam..." : "Wyślij wiadomość"}
       </button>
 
-      <p className="text-center text-xs text-zinc-500">
+      <p className="text-center text-xs text-[var(--color-mk-muted)]">
         Klikając wysyłam akceptujesz{" "}
-        <a href="/polityka-prywatnosci" className="text-zinc-400 underline hover:text-emerald-400">
+        <a href="/polityka-prywatnosci" className="text-[var(--color-mk-muted)] underline hover:text-emerald-400">
           politykę prywatności
         </a>
         .

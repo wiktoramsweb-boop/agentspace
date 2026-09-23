@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ThemeSwitch } from "./mk/theme-switch";
 
 const NAV_LINKS = [
   { href: "/#moduly", label: "Produkt" },
@@ -48,7 +49,7 @@ export function SiteNav() {
     <header className="fixed inset-x-0 top-0 z-50 h-[68px]">
       <div
         aria-hidden="true"
-        className="absolute inset-0 border-b border-white/[0.07] bg-[rgba(8,9,11,0.6)] backdrop-blur-xl"
+        className="absolute inset-0 border-b border-[var(--mk-hairline)] bg-[var(--mk-nav-bg)] backdrop-blur-xl"
       />
 
       <nav className="relative mx-auto flex h-full max-w-[1080px] items-center justify-between gap-4 px-6">
@@ -68,7 +69,7 @@ export function SiteNav() {
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-full px-3 py-2 text-sm font-medium text-[rgba(244,247,246,0.7)] transition-colors hover:bg-white/[0.05] hover:text-[var(--color-mk-text)]"
+              className="rounded-full px-3 py-2 text-sm font-medium text-[var(--color-mk-muted)] transition-colors hover:bg-[var(--mk-surface-2)] hover:text-[var(--color-mk-text)]"
             >
               {link.label}
             </Link>
@@ -76,15 +77,16 @@ export function SiteNav() {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeSwitch />
           <Link
             href="/login"
-            className="hidden rounded-full px-3 py-2 text-sm font-medium text-[rgba(244,247,246,0.7)] transition-colors hover:text-[var(--color-mk-text)] sm:block"
+            className="hidden rounded-full px-3 py-2 text-sm font-medium text-[var(--color-mk-muted)] transition-colors hover:text-[var(--color-mk-text)] sm:block"
           >
             Zaloguj
           </Link>
           <Link
             href="/kontakt"
-            className="hidden h-9 items-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 text-sm font-semibold text-zinc-950 shadow-[0_6px_20px_-8px_rgba(16,185,129,0.9)] transition-all hover:shadow-[0_10px_28px_-8px_rgba(16,185,129,1)] hover:brightness-110 sm:inline-flex"
+            className="hidden h-9 items-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 text-sm font-semibold text-[var(--mk-on-accent)] shadow-[0_6px_20px_-8px_rgba(16,185,129,0.9)] transition-all hover:shadow-[0_10px_28px_-8px_rgba(16,185,129,1)] hover:brightness-110 sm:inline-flex"
           >
             Umów rozmowę
           </Link>
@@ -94,7 +96,7 @@ export function SiteNav() {
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Zamknij menu" : "Menu"}
             aria-expanded={open}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-[var(--color-mk-text)] transition-colors hover:bg-white/[0.06] md:hidden"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[var(--mk-hairline-strong)] text-[var(--color-mk-text)] transition-colors hover:bg-[var(--mk-surface-3)] md:hidden"
           >
             <span className="sr-only">Menu</span>
             <span aria-hidden="true" className="relative block h-3.5 w-5">
@@ -127,7 +129,7 @@ export function SiteNav() {
             transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
             className="absolute inset-x-0 top-[68px] md:hidden"
           >
-            <div className="border-b border-white/[0.07] bg-[rgba(8,9,11,0.97)] px-6 pb-8 pt-4 backdrop-blur-xl">
+            <div className="border-b border-[var(--mk-hairline)] bg-[var(--mk-nav-panel)] px-6 pb-8 pt-4 backdrop-blur-xl">
               <div className="mx-auto max-w-[1080px]">
                 {NAV_LINKS.map((link, i) => (
                   <motion.div
@@ -138,7 +140,7 @@ export function SiteNav() {
                   >
                     <Link
                       href={link.href}
-                      className="block border-b border-white/[0.06] py-4 text-lg text-[var(--color-mk-text)]"
+                      className="block border-b border-[var(--mk-hairline)] py-4 text-lg text-[var(--color-mk-text)]"
                     >
                       {link.label}
                     </Link>
@@ -148,13 +150,13 @@ export function SiteNav() {
                 <div className="mt-6 flex flex-col gap-3">
                   <Link
                     href="/kontakt"
-                    className="inline-flex h-12 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 font-semibold text-zinc-950"
+                    className="inline-flex h-12 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 font-semibold text-[var(--mk-on-accent)]"
                   >
                     Umów rozmowę
                   </Link>
                   <Link
                     href="/login"
-                    className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 px-5 font-medium text-[var(--color-mk-text)]"
+                    className="inline-flex h-12 items-center justify-center rounded-full border border-[var(--mk-hairline-strong)] px-5 font-medium text-[var(--color-mk-text)]"
                   >
                     Zaloguj się
                   </Link>

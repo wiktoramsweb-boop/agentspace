@@ -19,7 +19,7 @@ export function Spotlight() {
   const background = useTransform(
     [x, y],
     ([latestX, latestY]: number[]) =>
-      `radial-gradient(600px circle at ${latestX}px ${latestY}px, rgba(16, 185, 129, 0.15), transparent 60%)`,
+      `radial-gradient(600px circle at ${latestX}px ${latestY}px, color-mix(in srgb, var(--color-mk-accent) 15%, transparent), transparent 60%)`,
   );
 
   useEffect(() => {

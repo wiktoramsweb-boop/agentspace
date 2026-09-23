@@ -85,9 +85,10 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
+      suppressHydrationWarning
       className={`${interTight.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950">
+      <body className="min-h-full flex flex-col bg-[var(--color-mk-bg)]">
         <SchemaMarkup />
         <ScrollProgress />
         {children}

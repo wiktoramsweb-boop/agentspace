@@ -36,7 +36,7 @@ export default function Kontakt() {
   return (
     <>
       <SiteNav />
-      <main className="bg-zinc-950 text-white">
+      <main className="mk relative min-h-screen">
         <PageHero
           eyebrow="Kontakt"
           title="Porozmawiajmy o Twoim biurze"
@@ -45,16 +45,16 @@ export default function Kontakt() {
         />
 
         {/* Quick topics - co możesz napisać */}
-        <section className="border-b border-zinc-900 px-6 py-16">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-16">
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-4 md:grid-cols-3">
               {QUICK_TOPICS.map((topic, index) => (
                 <FadeIn key={topic.title} delay={index * 0.08}>
-                  <div className="group relative h-full overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900/30 p-6 transition-all hover:border-emerald-500/30 hover:bg-zinc-900/50">
+                  <div className="group relative h-full overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-6 transition-all hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)]">
                     <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-500/5 blur-xl transition-all duration-500 group-hover:bg-emerald-500/15" />
                     <div className="relative">
-                      <h3 className="mb-2 text-lg font-semibold text-white">{topic.title}</h3>
-                      <p className="mb-4 text-sm text-zinc-400">{topic.body}</p>
+                      <h3 className="mb-2 text-lg font-semibold text-[var(--color-mk-text)]">{topic.title}</h3>
+                      <p className="mb-4 text-sm text-[var(--color-mk-muted)]">{topic.body}</p>
                       <p className="text-xs text-emerald-400">{topic.cta}</p>
                     </div>
                   </div>
@@ -65,13 +65,13 @@ export default function Kontakt() {
         </section>
 
         {/* Contact info + form */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-24">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-24">
           <div className="mx-auto grid max-w-5xl gap-12 md:grid-cols-[1fr_1.3fr]">
             {/* Info column */}
             <FadeIn>
               <div className="sticky top-24 space-y-8">
                 <div>
-                  <h2 className="mb-6 text-xl font-semibold text-white">
+                  <h2 className="mb-6 text-xl font-semibold text-[var(--color-mk-text)]">
                     Jak nas znaleźć
                   </h2>
 
@@ -96,20 +96,20 @@ export default function Kontakt() {
                 </div>
 
                 {/* Operator card */}
-                <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-6 backdrop-blur-xl">
+                <div className="relative overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-6 backdrop-blur-xl">
                   <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl" />
                   <div className="relative">
-                    <h3 className="mb-3 text-base font-semibold text-white">
+                    <h3 className="mb-3 text-base font-semibold text-[var(--color-mk-text)]">
                       Operator AgentSpace
                     </h3>
-                    <div className="space-y-1 text-sm text-zinc-400">
-                      <p className="text-zinc-200">Spectra Nieruchomości</p>
+                    <div className="space-y-1 text-sm text-[var(--color-mk-muted)]">
+                      <p className="text-[var(--color-mk-text)]">Spectra Nieruchomości</p>
                       <p>ul. Zbożowa 2/1, 30-002 Kraków</p>
-                      <p className="pt-2 font-mono text-xs text-zinc-500">NIP: 6772516327</p>
-                      <p className="font-mono text-xs text-zinc-500">REGON: 529666353</p>
-                      <p className="pt-3 text-zinc-500">
+                      <p className="pt-2 font-mono text-xs text-[var(--color-mk-muted)]">NIP: 6772516327</p>
+                      <p className="font-mono text-xs text-[var(--color-mk-muted)]">REGON: 529666353</p>
+                      <p className="pt-3 text-[var(--color-mk-muted)]">
                         Founder:{" "}
-                        <span className="text-zinc-200">Wiktor Szostek</span>
+                        <span className="text-[var(--color-mk-text)]">Wiktor Szostek</span>
                       </p>
                     </div>
                   </div>
@@ -119,8 +119,8 @@ export default function Kontakt() {
 
             {/* Form column */}
             <FadeIn delay={0.15}>
-              <div className="rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900/60 to-zinc-900/30 p-8 backdrop-blur-xl md:p-10">
-                <h2 className="mb-6 text-xl font-semibold text-white">Napisz do nas</h2>
+              <div className="rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-zinc-900/60 to-zinc-900/30 p-8 backdrop-blur-xl md:p-10">
+                <h2 className="mb-6 text-xl font-semibold text-[var(--color-mk-text)]">Napisz do nas</h2>
                 <ContactForm />
               </div>
             </FadeIn>
@@ -145,12 +145,12 @@ function ContactInfoRow({
 }) {
   return (
     <div className="flex items-start gap-4">
-      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 text-emerald-400">
+      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] text-emerald-400">
         {icon}
       </div>
       <div>
-        <p className="mb-1 text-xs uppercase tracking-[0.15em] text-zinc-500">{label}</p>
-        <p className="text-zinc-200">
+        <p className="mb-1 text-xs uppercase tracking-[0.15em] text-[var(--color-mk-muted)]">{label}</p>
+        <p className="text-[var(--color-mk-text)]">
           {href ? (
             <a href={href} className="transition hover:text-emerald-400">
               {value}

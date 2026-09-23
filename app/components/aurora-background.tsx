@@ -50,18 +50,20 @@ export function AuroraBackground() {
         }}
       />
 
-      {/* Grid pattern overlay */}
+      {/* Siatka w tle. Kolor linii zależy od motywu, żeby w jasnym nie znikała. */}
       <div
-        className="absolute inset-0 opacity-[0.022]"
+        className="absolute inset-0"
         style={{
+          opacity: "var(--mk-grid-opacity, 0.022)",
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+            "linear-gradient(var(--mk-grid-line, rgba(255,255,255,0.5)) 1px, transparent 1px), linear-gradient(90deg, var(--mk-grid-line, rgba(255,255,255,0.5)) 1px, transparent 1px)",
           backgroundSize: "64px 64px",
         }}
       />
 
-      {/* Dolna maska - fade do czerni */}
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#08090b] via-[#08090b]/70 to-transparent" />
+      {/* Dolne wygaszenie do koloru tła strony, a nie do czerni: w jasnym
+          motywie czarny pas zjadał nagłówek podstrony. */}
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[var(--color-mk-bg)] via-[var(--mk-aurora-fade)] to-transparent" />
     </div>
   );
 }

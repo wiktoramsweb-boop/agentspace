@@ -66,7 +66,7 @@ export default function ONas() {
   return (
     <>
       <SiteNav />
-      <main className="bg-zinc-950 text-white">
+      <main className="mk relative min-h-screen">
         <PageHero
           eyebrow="O AgentSpace"
           title="Polski produkt dla polskich biur - bez kompromisów"
@@ -74,10 +74,10 @@ export default function ONas() {
         />
 
         {/* Founder story */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
-              <TiltCard className="rounded-3xl border border-zinc-800/80 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
+              <TiltCard className="rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
                 <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-12">
                   {/* Avatar - duży, animowany glow */}
                   <div className="flex justify-center md:justify-start">
@@ -87,12 +87,12 @@ export default function ONas() {
                       <div className="absolute inset-0 -m-2 rounded-full bg-gradient-to-br from-emerald-400/40 to-cyan-400/40 blur-lg" />
 
                       {/* Main avatar */}
-                      <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-5xl font-bold text-zinc-950 shadow-2xl">
+                      <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-5xl font-bold text-[var(--mk-on-accent)] shadow-2xl">
                         W
                       </div>
 
                       {/* Online dot */}
-                      <div className="absolute bottom-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-950">
+                      <div className="absolute bottom-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-mk-bg)]">
                         <div className="relative h-3 w-3">
                           <div className="absolute inset-0 animate-ping rounded-full bg-emerald-400 opacity-75" />
                           <div className="relative h-3 w-3 rounded-full bg-emerald-400" />
@@ -106,13 +106,13 @@ export default function ONas() {
                     <p className="mb-2 text-sm font-medium uppercase tracking-[0.15em] text-emerald-400">
                       Founder
                     </p>
-                    <h2 className="mb-4 text-2xl font-semibold text-white md:text-3xl">
+                    <h2 className="mb-4 text-2xl font-semibold text-[var(--color-mk-text)] md:text-3xl">
                       Wiktor Szostek
                     </h2>
-                    <div className="space-y-4 leading-relaxed text-zinc-300">
+                    <div className="space-y-4 leading-relaxed text-[var(--color-mk-text)]">
                       <p>
                         Prowadzę biuro nieruchomości{" "}
-                        <strong className="text-white">Spectra</strong> w Krakowie. Codziennie
+                        <strong className="text-[var(--color-mk-text)]">Spectra</strong> w Krakowie. Codziennie
                         pracuję z agentami, klientami sprzedającymi, kupującymi, doradcami
                         kredytowymi, prawnikami. Widzę dokładnie to, czego nie widać ze świata
                         software house&apos;ów: ile czasu agent traci, jak wygląda zła rozmowa
@@ -137,7 +137,7 @@ export default function ONas() {
         </section>
 
         {/* Filozofia */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
               <div className="mb-12 max-w-2xl">
@@ -153,17 +153,17 @@ export default function ONas() {
             <StaggerContainer className="grid gap-6 md:grid-cols-2" staggerDelay={0.1}>
               {PRINCIPLES.map((principle) => (
                 <StaggerItem key={principle.title}>
-                  <div className="group relative h-full overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8 transition-all hover:border-emerald-500/30 hover:bg-zinc-900/50">
+                  <div className="group relative h-full overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 transition-all hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)]">
                     <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-all duration-500 group-hover:bg-emerald-500/10" />
 
                     <div className="relative">
                       <p className="mb-4 bg-gradient-to-br from-emerald-400 to-cyan-400 bg-clip-text text-5xl font-semibold text-transparent">
                         {principle.number}
                       </p>
-                      <h3 className="mb-3 text-xl font-semibold text-white">
+                      <h3 className="mb-3 text-xl font-semibold text-[var(--color-mk-text)]">
                         {principle.title}
                       </h3>
-                      <p className="leading-relaxed text-zinc-400">{principle.body}</p>
+                      <p className="leading-relaxed text-[var(--color-mk-muted)]">{principle.body}</p>
                     </div>
                   </div>
                 </StaggerItem>
@@ -173,7 +173,7 @@ export default function ONas() {
         </section>
 
         {/* Roadmap - animowany timeline */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-3xl">
             <FadeIn>
               <div className="mb-12 max-w-2xl">
@@ -197,12 +197,12 @@ export default function ONas() {
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
                 Chcesz dołączyć do Programu Pierwszych 10 Biur?
               </h2>
-              <p className="mb-8 text-zinc-400">
+              <p className="mb-8 text-[var(--color-mk-muted)]">
                 Jedno biuro na miasto, cena zamrożona na 24 miesiące, wpływ na rozwój produktu.
               </p>
               <Link
                 href="/#waitlist"
-                className="inline-flex items-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+                className="inline-flex items-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400"
               >
                 Umów rozmowę →
               </Link>

@@ -62,7 +62,7 @@ export function DeploymentSteps() {
               <div className="relative mb-6 flex items-center gap-4">
                 {/* Number badge with gradient */}
                 <motion.div
-                  className="relative flex h-[88px] w-[88px] items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950"
+                  className="relative flex h-[88px] w-[88px] items-center justify-center rounded-2xl border border-[var(--mk-hairline)] bg-[var(--color-mk-bg)]"
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
@@ -80,8 +80,8 @@ export function DeploymentSteps() {
                 </div>
               </div>
 
-              <h3 className="mb-3 text-xl font-semibold text-white">{step.title}</h3>
-              <p className="leading-relaxed text-zinc-400">{step.body}</p>
+              <h3 className="mb-3 text-xl font-semibold text-[var(--color-mk-text)]">{step.title}</h3>
+              <p className="leading-relaxed text-[var(--color-mk-muted)]">{step.body}</p>
             </div>
           </StaggerItem>
         ))}

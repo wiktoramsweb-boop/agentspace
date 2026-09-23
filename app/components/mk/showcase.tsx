@@ -34,7 +34,7 @@ export function BrowserShot({
       whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.8, ease }}
-      className={`overflow-hidden rounded-2xl border border-white/10 bg-slate-100 shadow-[0_50px_120px_-40px_rgba(0,0,0,0.75)] ${className}`}
+      className={`overflow-hidden rounded-2xl border border-[var(--mk-hairline-strong)] bg-slate-100 shadow-[0_50px_120px_-40px_rgba(0,0,0,0.75)] ${className}`}
     >
       <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-2.5">
         <span className="flex gap-1.5">
@@ -71,14 +71,14 @@ export function PhotoTile({
   const y = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["-6%", "6%"]);
 
   return (
-    <div ref={ref} className={`group relative overflow-hidden rounded-[20px] border border-white/10 ${className}`}>
+    <div ref={ref} className={`group relative overflow-hidden rounded-[20px] border border-[var(--mk-hairline-strong)] ${className}`}>
       <motion.div style={{ y }} className="absolute inset-[-8%]">
         <Image src={src} alt={alt} fill sizes="(max-width: 768px) 100vw, 33vw" priority={priority} className="object-cover" />
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-t from-[#05070a] via-[#05070a]/55 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[var(--mk-scrim)] via-[var(--mk-scrim-soft)] to-transparent" />
       <div className="relative flex h-full flex-col justify-end p-7">
-        <h4 className="mb-2 text-xl text-white">{title}</h4>
-        <p className="max-w-[34ch] text-[0.9375rem] leading-relaxed text-white/70">{body}</p>
+        <h4 className="mb-2 text-xl text-[var(--color-mk-text)]">{title}</h4>
+        <p className="max-w-[34ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">{body}</p>
       </div>
     </div>
   );
@@ -162,7 +162,7 @@ export function TemplateTile({
   swatch: string[];
 }) {
   return (
-    <Link href={href} className="group block overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.02]">
+    <Link href={href} className="group block overflow-hidden rounded-[20px] border border-[var(--mk-hairline-strong)] bg-[var(--mk-surface-2)]">
       <span className="relative block aspect-[16/10] overflow-hidden">
         <Image
           src={photo}
@@ -171,7 +171,7 @@ export function TemplateTile({
           sizes="(max-width: 768px) 100vw, 25vw"
           className="object-cover transition duration-700 group-hover:scale-[1.05]"
         />
-        <span className="absolute inset-0 bg-gradient-to-t from-[#05070a] via-transparent to-transparent" />
+        <span className="absolute inset-0 bg-gradient-to-t from-[var(--mk-scrim)] via-transparent to-transparent" />
       </span>
       <span className="flex items-center justify-between gap-3 p-5">
         <span>
@@ -180,7 +180,7 @@ export function TemplateTile({
         </span>
         <span className="flex flex-shrink-0 gap-1">
           {swatch.map((c) => (
-            <span key={c} className="h-4 w-4 rounded-full border border-white/20" style={{ background: c }} />
+            <span key={c} className="h-4 w-4 rounded-full border border-[var(--mk-hairline-strong)]" style={{ background: c }} />
           ))}
         </span>
       </span>

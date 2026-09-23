@@ -97,8 +97,8 @@ export function Button({
 
   const styles =
     variant === "primary"
-      ? "text-zinc-950 shadow-[0_10px_36px_-12px_rgba(16,185,129,0.75)] hover:shadow-[0_16px_50px_-12px_rgba(16,185,129,0.95)] hover:-translate-y-0.5"
-      : "border border-white/12 bg-white/[0.03] font-medium text-[var(--color-mk-text)] backdrop-blur-sm hover:border-emerald-400/40 hover:bg-white/[0.06] hover:-translate-y-0.5";
+      ? "text-[var(--mk-on-accent)] shadow-[0_10px_36px_-12px_rgba(16,185,129,0.75)] hover:shadow-[0_16px_50px_-12px_rgba(16,185,129,0.95)] hover:-translate-y-0.5"
+      : "border border-[var(--mk-hairline)] bg-[var(--mk-surface-2)] font-medium text-[var(--color-mk-text)] backdrop-blur-sm hover:border-emerald-400/40 hover:bg-[var(--mk-surface-3)] hover:-translate-y-0.5";
 
   const isInternalRoute = href.startsWith("/");
   const cls = `${base} ${styles} ${className}`;

@@ -56,8 +56,8 @@ const BENEFITS_OWNER = [
 ];
 
 const ROI_MATH = [
-  { label: "Koszt AgentSpace", value: "od 499 zł", suffix: "/ mc", color: "text-zinc-300" },
-  { label: "Średnia prowizja z transakcji", value: "~8 000 zł", suffix: "", color: "text-zinc-300" },
+  { label: "Koszt AgentSpace", value: "od 499 zł", suffix: "/ mc", color: "text-[var(--color-mk-text)]" },
+  { label: "Średnia prowizja z transakcji", value: "~8 000 zł", suffix: "", color: "text-[var(--color-mk-text)]" },
   { label: "Próg break-even", value: "+1 transakcja", suffix: "/ mc", color: "text-emerald-400" },
   { label: "Średnio zespół 8-osobowy daje (po 30 dniach)", value: "+3-5 transakcji", suffix: "/ mc", color: "text-emerald-400" },
 ];
@@ -66,7 +66,7 @@ export default function DlaWlascicieli() {
   return (
     <>
       <SiteNav />
-      <main className="bg-zinc-950 text-white">
+      <main className="mk relative min-h-screen">
         <PageHero
           eyebrow="Dla właścicieli biur nieruchomości"
           title="Zespół który rośnie. Niższa rotacja. Decyzje oparte o dane."
@@ -74,7 +74,7 @@ export default function DlaWlascicieli() {
         />
 
         {/* Problemy z liczbami */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-6xl">
             <FadeIn>
               <h2 className="mb-12 text-3xl font-semibold tracking-tight md:text-4xl">
@@ -85,14 +85,14 @@ export default function DlaWlascicieli() {
             <StaggerContainer className="grid gap-6 md:grid-cols-3" staggerDelay={0.1}>
               {PROBLEMS_OWNER.map((problem) => (
                 <StaggerItem key={problem.title}>
-                  <div className="group relative h-full overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8 transition-all hover:-translate-y-1 hover:border-red-500/30 hover:bg-zinc-900/50">
+                  <div className="group relative h-full overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 transition-all hover:-translate-y-1 hover:border-red-500/30 hover:bg-[var(--mk-card-bg)]">
                     <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-red-500/5 blur-2xl transition-all duration-500 group-hover:bg-red-500/15" />
                     <div className="relative">
                       <p className="mb-4 bg-gradient-to-br from-red-400 to-amber-400 bg-clip-text text-5xl font-semibold text-transparent md:text-6xl">
                         {problem.stat}
                       </p>
-                      <h3 className="mb-3 text-lg font-semibold text-white">{problem.title}</h3>
-                      <p className="text-zinc-400">{problem.body}</p>
+                      <h3 className="mb-3 text-lg font-semibold text-[var(--color-mk-text)]">{problem.title}</h3>
+                      <p className="text-[var(--color-mk-muted)]">{problem.body}</p>
                     </div>
                   </div>
                 </StaggerItem>
@@ -102,7 +102,7 @@ export default function DlaWlascicieli() {
         </section>
 
         {/* Benefits */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
               <h2 className="mb-12 text-3xl font-semibold tracking-tight md:text-4xl">
@@ -113,14 +113,14 @@ export default function DlaWlascicieli() {
             <StaggerContainer className="grid gap-6 md:grid-cols-2" staggerDelay={0.1}>
               {BENEFITS_OWNER.map((benefit) => (
                 <StaggerItem key={benefit.title}>
-                  <div className="group relative h-full overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900/30 p-8 transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-zinc-900/50">
+                  <div className="group relative h-full overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)]">
                     <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-all duration-500 group-hover:bg-emerald-500/15" />
                     <div className="relative">
                       <p className="mb-2 text-xs font-medium uppercase tracking-[0.15em] text-emerald-400">
                         {benefit.eyebrow}
                       </p>
-                      <h3 className="mb-3 text-xl font-semibold text-white">{benefit.title}</h3>
-                      <p className="leading-relaxed text-zinc-400">{benefit.body}</p>
+                      <h3 className="mb-3 text-xl font-semibold text-[var(--color-mk-text)]">{benefit.title}</h3>
+                      <p className="leading-relaxed text-[var(--color-mk-muted)]">{benefit.body}</p>
                     </div>
                   </div>
                 </StaggerItem>
@@ -130,7 +130,7 @@ export default function DlaWlascicieli() {
         </section>
 
         {/* ROI math */}
-        <section className="border-b border-zinc-900 px-6 py-20 md:py-28">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-3xl">
             <FadeIn>
               <h2 className="mb-12 text-center text-3xl font-semibold tracking-tight md:text-4xl">
@@ -139,7 +139,7 @@ export default function DlaWlascicieli() {
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-10">
+              <div className="relative overflow-hidden rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-10">
                 <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl" />
                 <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
 
@@ -147,12 +147,12 @@ export default function DlaWlascicieli() {
                   {ROI_MATH.map((item) => (
                     <div
                       key={item.label}
-                      className="flex flex-col justify-between gap-2 border-b border-zinc-800 pb-6 last:border-0 last:pb-0 md:flex-row md:items-center"
+                      className="flex flex-col justify-between gap-2 border-b border-[var(--mk-hairline)] pb-6 last:border-0 last:pb-0 md:flex-row md:items-center"
                     >
-                      <dt className="text-zinc-400">{item.label}</dt>
+                      <dt className="text-[var(--color-mk-muted)]">{item.label}</dt>
                       <dd className={`text-2xl font-semibold ${item.color}`}>
                         {item.value}
-                        {item.suffix && <span className="text-base text-zinc-500"> {item.suffix}</span>}
+                        {item.suffix && <span className="text-base text-[var(--color-mk-muted)]"> {item.suffix}</span>}
                       </dd>
                     </div>
                   ))}
@@ -169,20 +169,20 @@ export default function DlaWlascicieli() {
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
                 Program Pierwszych 10 Biur
               </h2>
-              <p className="mb-8 text-zinc-400">
+              <p className="mb-8 text-[var(--color-mk-muted)]">
                 Jedno biuro na miasto, cena zamrożona na 24 miesiące. Plus bezpośredni wpływ na rozwój
                 produktu (1-on-1 z founderem co tydzień).
               </p>
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
                   href="/#waitlist"
-                  className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400"
+                  className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-8 py-4 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400"
                 >
                   Umów rozmowę
                 </Link>
                 <Link
                   href="/kontakt"
-                  className="inline-flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 px-8 py-4 font-medium text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-900"
+                  className="inline-flex items-center justify-center rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-8 py-4 font-medium text-[var(--color-mk-text)] transition hover:border-zinc-700 hover:bg-[var(--mk-card-bg)]"
                 >
                   Porozmawiajmy
                 </Link>

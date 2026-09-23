@@ -70,10 +70,10 @@ export function WaitlistForm() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="mb-2 text-xl font-semibold text-white">
+        <h3 className="mb-2 text-xl font-semibold text-[var(--color-mk-text)]">
           {alreadyOnList ? "Już jesteś na liście" : "Dziękujemy!"}
         </h3>
-        <p className="text-zinc-400">
+        <p className="text-[var(--color-mk-muted)]">
           {alreadyOnList
             ? "Ten email jest już zapisany. Odezwiemy się gdy AgentSpace będzie gotowy do testów."
             : "Jesteś na liście. Odezwiemy się jako pierwszy, gdy AgentSpace będzie gotowy do testów."}
@@ -97,7 +97,7 @@ export function WaitlistForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="email" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
           Email <span className="text-emerald-400">*</span>
         </label>
         <input
@@ -106,12 +106,12 @@ export function WaitlistForm() {
           type="email"
           required
           placeholder="ty@twojebiuro.pl"
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
 
       <div>
-        <label htmlFor="agencyName" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="agencyName" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
           Nazwa biura <span className="text-emerald-400">*</span>
         </label>
         <input
@@ -120,12 +120,12 @@ export function WaitlistForm() {
           type="text"
           required
           placeholder="Np. Spectra Nieruchomości"
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
 
       <div>
-        <label htmlFor="teamSize" className="mb-2 block text-sm font-medium text-zinc-300">
+        <label htmlFor="teamSize" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
           Wielkość zespołu <span className="text-emerald-400">*</span>
         </label>
         <select
@@ -133,7 +133,7 @@ export function WaitlistForm() {
           name="teamSize"
           required
           defaultValue=""
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         >
           <option value="" disabled>
             Wybierz...
@@ -147,15 +147,15 @@ export function WaitlistForm() {
       </div>
 
       <div>
-        <label htmlFor="phone" className="mb-2 block text-sm font-medium text-zinc-300">
-          Telefon <span className="text-zinc-600">(opcjonalnie, dla szybkiego kontaktu)</span>
+        <label htmlFor="phone" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
+          Telefon <span className="text-[var(--color-mk-muted)]">(opcjonalnie, dla szybkiego kontaktu)</span>
         </label>
         <input
           id="phone"
           name="phone"
           type="tel"
           placeholder="+48 600 000 000"
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+          className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
 
@@ -168,12 +168,12 @@ export function WaitlistForm() {
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === "submitting" ? "Wysyłam..." : "Wyślij zgłoszenie"}
       </button>
 
-      <p className="text-center text-xs text-zinc-500">
+      <p className="text-center text-xs text-[var(--color-mk-muted)]">
         Bez spamu. Powiadomimy Cię jako pierwszego, gdy będziemy gotowi.
       </p>
     </form>

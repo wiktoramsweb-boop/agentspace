@@ -30,7 +30,7 @@ const FOOTER_SECTIONS = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-zinc-900 bg-zinc-950 px-6 py-16">
+    <footer className="border-t border-zinc-900 bg-[var(--color-mk-bg)] px-6 py-16">
       <div className="mx-auto max-w-6xl">
         {/* Top: brand + columns */}
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
@@ -41,7 +41,7 @@ export function SiteFooter() {
                 <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              <span className="text-lg font-semibold text-white">AgentSpace</span>
+              <span className="text-lg font-semibold text-[var(--color-mk-text)]">AgentSpace</span>
             </Link>
             <p className="mb-6 max-w-xs text-sm leading-relaxed text-zinc-500">
               Polski system operacyjny dla biur nieruchomości. Zbudowany w działającym biurze w Krakowie.

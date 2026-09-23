@@ -24,7 +24,7 @@ export function Pricing() {
         Ilu agentów pracuje w Twoim biurze?
       </p>
 
-      <div className="mb-14 inline-flex items-center gap-[2px] rounded-full border border-white/10 bg-white/[0.04] p-[3px] backdrop-blur-sm">
+      <div className="mb-14 inline-flex items-center gap-[2px] rounded-full border border-[var(--mk-hairline-strong)] bg-[var(--mk-surface-2)] p-[3px] backdrop-blur-sm">
         <button
           type="button"
           onClick={() => setAgents((n) => Math.max(1, n - 1))}

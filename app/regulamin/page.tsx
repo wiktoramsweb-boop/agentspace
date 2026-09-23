@@ -17,15 +17,15 @@ export default function Regulamin() {
   return (
     <>
       <SiteNav />
-      <main className="bg-zinc-950 text-white">
+      <main className="mk relative min-h-screen">
         <PageHero
           eyebrow="Prawne"
           title="Regulamin"
-          description={<span className="text-zinc-500">Ostatnia aktualizacja: 15 maja 2026</span>}
+          description={<span className="text-[var(--color-mk-muted)]">Ostatnia aktualizacja: 15 maja 2026</span>}
           compact
         />
 
-        <section className="border-b border-zinc-900 px-6 py-16">
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-16">
           <article className="prose-blog mx-auto max-w-3xl">
             <h2>§1. Postanowienia ogólne</h2>
             <p>

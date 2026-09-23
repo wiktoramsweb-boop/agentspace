@@ -23,6 +23,149 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   MOTYW MARKETINGU
+   Wszystko, co rysuje stronę (powierzchnie, linie, cienie, mgły
+   na zdjęciach) siedzi w zmiennych. Jasny motyw to jedna lista
+   nadpisań, a nie druga wersja strony.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --mk-hairline: rgba(255, 255, 255, 0.09);
+  --mk-hairline-strong: rgba(255, 255, 255, 0.16);
+  --mk-surface-2: rgba(255, 255, 255, 0.025);
+  --mk-surface-3: rgba(255, 255, 255, 0.06);
+  --mk-card-bg: rgba(18, 20, 23, 0.62);
+  --mk-card-tint: linear-gradient(160deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 45%, transparent 100%);
+  --mk-card-shadow: 0 20px 50px -24px rgba(16, 185, 129, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.06);
+  --mk-nav-bg: rgba(8, 9, 11, 0.6);
+  --mk-nav-panel: rgba(8, 9, 11, 0.97);
+  --mk-scrim: #05070a;
+  --mk-scrim-soft: rgba(5, 7, 10, 0.55);
+  --mk-on-accent: #04170f;
+  --mk-grain: 0.035;
+  --mk-photo-brightness: 0.92;
+  --mk-glow-1: rgba(16, 185, 129, 0.055);
+  --mk-glow-2: rgba(34, 211, 238, 0.04);
+  --mk-glow-3: rgba(139, 92, 246, 0.035);
+  --mk-glow-4: rgba(16, 185, 129, 0.045);
+  --mk-grid-line: rgba(255, 255, 255, 0.5);
+  --mk-grid-opacity: 0.022;
+  --mk-aurora-fade: rgba(8, 9, 11, 0.7);
+}
+
+
+/* Domyślny motyw bierzemy z ustawień systemu, samym CSS-em. Dzięki temu
+   nie ma ani mignięcia, ani rozjazdu między serwerem a przeglądarką.
+   Ręczny wybór nadpisuje atrybutem data-mk na <html>. */
+@media (prefers-color-scheme: light) {
+  html:not([data-mk="dark"]) {
+    --mk-heading-fill: linear-gradient(180deg, #0b1218 0%, rgba(20, 34, 44, 0.86) 100%);
+    --color-mk-bg: #f6f7f8;
+    --color-mk-surface: rgba(255, 255, 255, 0.86);
+    --color-mk-line: #e2e6e9;
+    --color-mk-line-lit: #9aa4ad;
+    --color-mk-text: #0d141a;
+    --color-mk-muted: #55636e;
+    --color-mk-accent: #0d9668;
+    --color-mk-accent-2: #0891b2;
+    --color-mk-accent-soft: rgba(13, 150, 104, 0.12);
+  
+    --mk-hairline: rgba(13, 20, 26, 0.1);
+    --mk-hairline-strong: rgba(13, 20, 26, 0.2);
+    --mk-surface-2: rgba(255, 255, 255, 0.72);
+    --mk-surface-3: rgba(13, 20, 26, 0.05);
+    --mk-card-bg: #ffffff;
+    --mk-card-tint: linear-gradient(160deg, rgba(13, 150, 104, 0.05) 0%, rgba(8, 145, 178, 0.03) 45%, transparent 100%);
+    --mk-card-shadow: 0 24px 50px -30px rgba(15, 30, 40, 0.45), 0 0 0 1px rgba(13, 150, 104, 0.08);
+    --mk-nav-bg: rgba(246, 247, 248, 0.72);
+    --mk-nav-panel: rgba(255, 255, 255, 0.98);
+    --mk-scrim: #0b1a17;
+    --mk-scrim-soft: rgba(11, 26, 23, 0.45);
+    --mk-on-accent: #ffffff;
+    --mk-grain: 0.018;
+    --mk-photo-brightness: 1;
+    --mk-glow-1: rgba(13, 150, 104, 0.09);
+    --mk-glow-2: rgba(8, 145, 178, 0.07);
+    --mk-glow-3: rgba(139, 92, 246, 0.05);
+    --mk-glow-4: rgba(13, 150, 104, 0.07);
+  --mk-grid-line: rgba(13, 20, 26, 0.5);
+  --mk-grid-opacity: 0.04;
+  --mk-aurora-fade: rgba(246, 247, 248, 0.7);
+  }
+}
+
+html[data-mk="light"] {
+  --mk-heading-fill: linear-gradient(180deg, #0b1218 0%, rgba(20, 34, 44, 0.86) 100%);
+  --color-mk-bg: #f6f7f8;
+  --color-mk-surface: rgba(255, 255, 255, 0.86);
+  --color-mk-line: #e2e6e9;
+  --color-mk-line-lit: #9aa4ad;
+  --color-mk-text: #0d141a;
+  --color-mk-muted: #55636e;
+  --color-mk-accent: #0d9668;
+  --color-mk-accent-2: #0891b2;
+  --color-mk-accent-soft: rgba(13, 150, 104, 0.12);
+
+  --mk-hairline: rgba(13, 20, 26, 0.1);
+  --mk-hairline-strong: rgba(13, 20, 26, 0.2);
+  --mk-surface-2: rgba(255, 255, 255, 0.72);
+  --mk-surface-3: rgba(13, 20, 26, 0.05);
+  --mk-card-bg: #ffffff;
+  --mk-card-tint: linear-gradient(160deg, rgba(13, 150, 104, 0.05) 0%, rgba(8, 145, 178, 0.03) 45%, transparent 100%);
+  --mk-card-shadow: 0 24px 50px -30px rgba(15, 30, 40, 0.45), 0 0 0 1px rgba(13, 150, 104, 0.08);
+  --mk-nav-bg: rgba(246, 247, 248, 0.72);
+  --mk-nav-panel: rgba(255, 255, 255, 0.98);
+  --mk-scrim: #0b1a17;
+  --mk-scrim-soft: rgba(11, 26, 23, 0.45);
+  --mk-on-accent: #ffffff;
+  --mk-grain: 0.018;
+  --mk-photo-brightness: 1;
+  --mk-glow-1: rgba(13, 150, 104, 0.09);
+  --mk-glow-2: rgba(8, 145, 178, 0.07);
+  --mk-glow-3: rgba(139, 92, 246, 0.05);
+  --mk-glow-4: rgba(13, 150, 104, 0.07);
+  --mk-grid-line: rgba(13, 20, 26, 0.5);
+  --mk-grid-opacity: 0.04;
+  --mk-aurora-fade: rgba(246, 247, 248, 0.7);
+}
+
+html[data-mk="dark"] {
+  --mk-grid-line: rgba(255, 255, 255, 0.5);
+  --mk-grid-opacity: 0.022;
+  --mk-aurora-fade: rgba(8, 9, 11, 0.7);
+  --mk-hairline: rgba(255, 255, 255, 0.09);
+  --mk-hairline-strong: rgba(255, 255, 255, 0.16);
+  --mk-surface-2: rgba(255, 255, 255, 0.025);
+  --mk-surface-3: rgba(255, 255, 255, 0.06);
+  --mk-card-bg: rgba(18, 20, 23, 0.62);
+  --mk-card-tint: linear-gradient(160deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 45%, transparent 100%);
+  --mk-card-shadow: 0 20px 50px -24px rgba(16, 185, 129, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.06);
+  --mk-nav-bg: rgba(8, 9, 11, 0.6);
+  --mk-nav-panel: rgba(8, 9, 11, 0.97);
+  --mk-scrim: #05070a;
+  --mk-scrim-soft: rgba(5, 7, 10, 0.55);
+  --mk-on-accent: #04170f;
+  --mk-grain: 0.035;
+  --mk-photo-brightness: 0.92;
+  --mk-glow-1: rgba(16, 185, 129, 0.055);
+  --mk-glow-2: rgba(34, 211, 238, 0.04);
+  --mk-glow-3: rgba(139, 92, 246, 0.035);
+  --mk-glow-4: rgba(16, 185, 129, 0.045);
+  --mk-heading-fill: linear-gradient(180deg, #ffffff 0%, rgba(228, 240, 236, 0.78) 100%);
+  --color-mk-bg: #08090b;
+  --color-mk-surface: rgba(24, 24, 27, 0.5);
+  --color-mk-line: #23262b;
+  --color-mk-line-lit: #6b7280;
+  --color-mk-text: #f4f7f6;
+  --color-mk-muted: #9aa3a8;
+  --color-mk-accent: #10b981;
+  --color-mk-accent-2: #22d3ee;
+  --color-mk-accent-soft: rgba(16, 185, 129, 0.14);
+}
+
+/* Zanim motyw wczyta się z pamięci przeglądarki, nie chcemy mignięcia bieli. */
+html { background: var(--color-mk-bg, #08090b); }
+
 body {
   font-family: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
 }
@@ -39,10 +182,10 @@ body {
   background-color: var(--color-mk-bg);
   color: var(--color-mk-muted);
   background-image:
-    radial-gradient(1100px 640px at 82% 8%, rgba(16, 185, 129, 0.055), transparent 62%),
-    radial-gradient(950px 580px at 10% 34%, rgba(34, 211, 238, 0.04), transparent 60%),
-    radial-gradient(900px 560px at 62% 66%, rgba(139, 92, 246, 0.035), transparent 62%),
-    radial-gradient(1050px 660px at 22% 94%, rgba(16, 185, 129, 0.045), transparent 64%);
+    radial-gradient(1100px 640px at 82% 8%, var(--mk-glow-1), transparent 62%),
+    radial-gradient(950px 580px at 10% 34%, var(--mk-glow-2), transparent 60%),
+    radial-gradient(900px 560px at 62% 66%, var(--mk-glow-3), transparent 62%),
+    radial-gradient(1050px 660px at 22% 94%, var(--mk-glow-4), transparent 64%);
   background-attachment: fixed;
 }
 
@@ -53,7 +196,7 @@ body {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: var(--mk-grain);
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -74,7 +217,7 @@ body {
 .mk h2,
 .mk h3,
 .mk h4 {
-  background: linear-gradient(180deg, #ffffff 0%, rgba(228, 240, 236, 0.78) 100%);
+  background: var(--mk-heading-fill, linear-gradient(180deg, #ffffff 0%, rgba(228, 240, 236, 0.78) 100%));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -186,10 +329,8 @@ body {
 .mk-card {
   position: relative;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 45%, transparent 100%),
-    rgba(18, 20, 23, 0.62);
+  border: 1px solid var(--mk-hairline);
+  background: var(--mk-card-tint), var(--mk-card-bg);
   backdrop-filter: blur(6px);
   transition:
     transform 0.35s cubic-bezier(0.21, 0.47, 0.32, 0.98),
@@ -218,10 +359,8 @@ body {
 
 .mk-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(16, 185, 129, 0.32);
-  box-shadow:
-    0 20px 50px -24px rgba(16, 185, 129, 0.5),
-    0 0 0 1px rgba(16, 185, 129, 0.06);
+  border-color: color-mix(in srgb, var(--color-mk-accent) 34%, transparent);
+  box-shadow: var(--mk-card-shadow);
 }
 
 .mk-card:hover::after {
@@ -230,10 +369,10 @@ body {
 
 /* Wariant wyróżniony (polecany pakiet, główne CTA). */
 .mk-card-accent {
-  border-color: rgba(16, 185, 129, 0.28);
+  border-color: color-mix(in srgb, var(--color-mk-accent) 30%, transparent);
   background:
-    linear-gradient(160deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 211, 238, 0.045) 40%, transparent 100%),
-    rgba(18, 20, 23, 0.72);
+    linear-gradient(160deg, color-mix(in srgb, var(--color-mk-accent) 12%, transparent) 0%, color-mix(in srgb, var(--color-mk-accent-2) 6%, transparent) 40%, transparent 100%),
+    var(--mk-card-bg);
   box-shadow: 0 24px 60px -30px rgba(16, 185, 129, 0.55);
 }
 

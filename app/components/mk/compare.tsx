@@ -43,7 +43,7 @@ export function Compare() {
   return (
     <div className="flex flex-col items-center">
       {/* Przełącznik */}
-      <div className="mb-12 inline-flex items-center gap-[2px] rounded-full border border-white/10 bg-white/[0.04] p-[3px] backdrop-blur-sm">
+      <div className="mb-12 inline-flex items-center gap-[2px] rounded-full border border-[var(--mk-hairline-strong)] bg-[var(--mk-surface-2)] p-[3px] backdrop-blur-sm">
         {(Object.keys(STATES) as StateKey[]).map((key) => {
           const isActive = key === state;
           return (
@@ -55,8 +55,8 @@ export function Compare() {
               className={`h-12 rounded-full px-7 text-[0.9375rem] font-medium transition-all duration-300 ${
                 isActive
                   ? key === "with"
-                    ? "bg-gradient-to-r from-emerald-400 to-cyan-400 text-zinc-950 shadow-[0_8px_28px_-10px_rgba(16,185,129,0.8)]"
-                    : "bg-white/10 text-[var(--color-mk-text)]"
+                    ? "bg-gradient-to-r from-emerald-400 to-cyan-400 text-[var(--mk-on-accent)] shadow-[0_8px_28px_-10px_rgba(16,185,129,0.8)]"
+                    : "bg-[var(--mk-surface-3)] text-[var(--color-mk-text)]"
                   : "text-[var(--color-mk-muted)] hover:text-[var(--color-mk-text)]"
               }`}
             >
@@ -75,7 +75,7 @@ export function Compare() {
             <li
               key={label}
               className={`grid gap-2 px-6 py-5 md:grid-cols-[minmax(0,15rem)_1fr] md:gap-8 md:px-8 ${
-                i > 0 ? "border-t border-white/[0.06]" : ""
+                i > 0 ? "border-t border-[var(--mk-hairline)]" : ""
               }`}
             >
               <span className="text-[0.9375rem] text-[var(--color-mk-muted)]">
