@@ -71,6 +71,8 @@ export default function ONas() {
           eyebrow="O AgentSpace"
           title="Polski produkt dla polskich biur - bez kompromisów"
           description="AgentSpace nie jest kolejnym SaaS-em 'dla nieruchomości' tłumaczonym z angielskiego. Jest budowany w Krakowie, dla biur w Polsce, przez kogoś kto na co dzień prowadzi biuro nieruchomości i wie, co konkretnie boli."
+        
+          photo={{ src: "/wzory/miasto-noc.jpg", alt: "Kraków nocą", caption: "Kraków, nasze podwórko" }}
         />
 
         {/* Founder story */}

@@ -71,6 +71,8 @@ export default function DlaWlascicieli() {
           eyebrow="Dla właścicieli biur nieruchomości"
           title="Zespół który rośnie. Niższa rotacja. Decyzje oparte o dane."
           description="AgentSpace nie jest kolejnym CRM. To system rozwoju zespołu - codzienny dryl, tracking, ranking. Robione przez właściciela biura w Krakowie, dla właścicieli biur w Polsce."
+        
+          photo={{ src: "/wzory/wieza.jpg", alt: "Budynek mieszkalny", caption: "Biuro w liczbach, nie w przeczuciach" }}
         />
 
         {/* Problemy z liczbami */}

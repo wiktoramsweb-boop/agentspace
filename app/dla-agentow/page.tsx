@@ -70,6 +70,8 @@ export default function DlaAgentow() {
           eyebrow="Dla agentów nieruchomości"
           title="Mniej stresu, więcej zamknięć, wyższa prowizja"
           description="AgentSpace to nie kolejny system kontroli 'dla szefa'. To Twoje codzienne narzędzie - żeby ćwiczyć trudne rozmowy bez ryzyka, widzieć swój postęp, zarabiać więcej."
+        
+          photo={{ src: "/wzory/salon.jpg", alt: "Wnętrze mieszkania", caption: "Prezentacja oferty" }}
         />
 
         {/* Benefits - grid z ikonami */}

@@ -181,6 +181,25 @@ Osobny produkt sprzedawany razem z CRM, konkurencja: ASARI (WordPress + wtyczka)
 - **Migracje:** v25 (strona) i v26 (dodatek, statystyki, domeny).
 - **Do zrobienia:** obrazy OG per oferta, integracja płatności dodatku.
 
+## 10c. Strona marketingowa (wrzesień 2026)
+
+- **Dwa motywy:** przełącznik w nawigacji (`app/components/mk/theme-switch.tsx`).
+  Domyślny motyw bierze się z `prefers-color-scheme` czystym CSS-em, wybór
+  zapisuje się w `localStorage` pod `as_mk_theme`. Żadnego skryptu przed
+  renderem, więc nie ma ostrzeżeń o hydratacji.
+- **Tokeny:** wszystkie powierzchnie i linie marketingu siedzą w zmiennych
+  `--mk-*` i `--color-mk-*` w `app/globals.css` (bloki: `:root`,
+  `@media (prefers-color-scheme: light)`, `html[data-mk="light"]`,
+  `html[data-mk="dark"]`). Nowe komponenty MUSZĄ używać tych zmiennych,
+  a nie `text-white` czy `bg-zinc-900`.
+- **Ruch:** `app/components/mk/motion-bits.tsx` (liczniki, odsłanianie słów,
+  karty z poświatą, przyklejone kroki, smugi, zdjęcia reagujące na kursor)
+  i `app/components/mk/showcase.tsx` (okno przeglądarki, kafle, marquee).
+- **Makiety produktu:** `app/components/mockups/light-shots.tsx` (jasne,
+  zgodne z obecnym wyglądem aplikacji).
+- **Uwaga:** `.mk` jest wymagane na kontenerze strony, inaczej nagłówki nie
+  dostają skali marketingowej (h1 ma wtedy 16 px).
+
 ## 11. Workflow
 
 Commit → push do `main` → Vercel auto-deploy (~30-60s). Weryfikacja deployu: `curl -sL https://www.agentspace.pl/app | grep Zaloguj`. Build lokalnie: `npm run build`. Dev: `npm run dev`.

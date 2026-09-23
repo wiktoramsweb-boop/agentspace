@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { type ReactNode } from "react";
 import { AuroraBackground } from "./aurora-background";
 import { Spotlight } from "./effects/spotlight";
@@ -9,6 +10,8 @@ type PageHeroProps = {
   children?: ReactNode;
   /** Wersja kompaktowa - mniejsze paddingi, dla stron statycznych/prawnych. */
   compact?: boolean;
+  /** Zdjęcie obok nagłówka. Strona bez zdjęć czyta się jak dokumentacja. */
+  photo?: { src: string; alt: string; caption?: string };
 };
 
 /**
@@ -23,6 +26,7 @@ export function PageHero({
   description,
   children,
   compact = false,
+  photo,
 }: PageHeroProps) {
   return (
     <section
@@ -35,7 +39,12 @@ export function PageHero({
       <AuroraBackground />
       <Spotlight />
 
-      <div className="relative z-10 mx-auto max-w-[1120px]">
+      <div
+        className={`relative z-10 mx-auto max-w-[1120px] ${
+          photo ? "grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:gap-14" : ""
+        }`}
+      >
+        <div>
         {eyebrow && (
           <p className="mk-reveal mk-eyebrow mb-6">{eyebrow}</p>
         )}
@@ -63,6 +72,22 @@ export function PageHero({
           >
             {children}
           </div>
+        )}
+        </div>
+
+        {photo && (
+          <figure
+            className="mk-reveal relative m-0 aspect-[4/5] overflow-hidden rounded-[24px] border border-[var(--mk-hairline)]"
+            style={{ "--mk-delay": "0.22s" } as React.CSSProperties}
+          >
+            <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 1024px) 100vw, 42vw" priority className="object-cover" />
+            {photo.caption && (
+              <>
+                <span className="absolute inset-0 bg-gradient-to-t from-[var(--mk-scrim)] via-transparent to-transparent" />
+                <figcaption className="absolute bottom-5 left-5 right-5 text-sm text-white/90">{photo.caption}</figcaption>
+              </>
+            )}
+          </figure>
         )}
       </div>
     </section>

@@ -42,6 +42,8 @@ export default function Kontakt() {
           title="Porozmawiajmy o Twoim biurze"
           description="Pytanie o AgentSpace, propozycja pilotażu, współpraca? Napisz - odpowiadamy w 24h w dni robocze."
           compact
+        
+          photo={{ src: "/wzory/dziedziniec.jpg", alt: "Dziedziniec kamienicy", caption: "Odpowiadamy w 24 godziny" }}
         />
 
         {/* Quick topics - co możesz napisać */}

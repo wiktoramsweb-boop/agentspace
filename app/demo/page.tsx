@@ -49,6 +49,8 @@ export default function Demo() {
           eyebrow="Demo"
           title="Zobacz, jak wygląda AgentSpace od środka"
           description="Główne ekrany systemu. Chcesz zobaczyć go na żywo, na danych swojego biura - umów rozmowę."
+        
+          photo={{ src: "/wzory/szklo.jpg", alt: "Nowoczesny budynek", caption: "Zobacz system na żywo" }}
         />
 
         {/* Mockupy */}
