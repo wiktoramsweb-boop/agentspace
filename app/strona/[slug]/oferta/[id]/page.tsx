@@ -54,8 +54,32 @@ export default async function Page({ params }: { params: Promise<{ slug: string;
     ["Lokalizacja", [offer.city, offer.street].filter(Boolean).join(", ")],
   ];
 
+  // Dane strukturalne oferty: Google pokazuje wtedy cenę i metraż w wynikach.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: offer.title,
+    description: offer.lead || offer.description[0],
+    image: offer.photos.slice(0, 5),
+    sku: offer.no,
+    offers: {
+      "@type": "Offer",
+      price: offer.price,
+      priceCurrency: "PLN",
+      availability: "https://schema.org/InStock",
+      url: site.domain ? `https://${site.domain}/oferta/${offer.id}` : `https://agentspace.pl${base}/oferta/${offer.id}`,
+      seller: { "@type": "RealEstateAgent", name: site.brand.officeName },
+    },
+    additionalProperty: [
+      { "@type": "PropertyValue", name: "Powierzchnia", value: `${offer.area} m2` },
+      offer.rooms ? { "@type": "PropertyValue", name: "Pokoje", value: String(offer.rooms) } : null,
+      offer.floor ? { "@type": "PropertyValue", name: "Piętro", value: offer.floor } : null,
+    ].filter(Boolean),
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="wz-sec wz-sec--tight" style={{ paddingBottom: 0 }}>
         <div className="wz-wrap">
           <p className="wz-muted" style={{ fontSize: 14, marginBottom: 16 }}>

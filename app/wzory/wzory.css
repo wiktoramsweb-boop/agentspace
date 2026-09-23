@@ -404,3 +404,18 @@ html:has(.wz) .mk-progress { display: none !important; }
 .wz-linkbox b { font-family: var(--d-display); font-size: 19px; }
 .wz-linkbox .wz-muted { font-size: 15px; }
 .wz-linkbox__go { color: var(--d-accent); font-weight: 600; font-size: 14.5px; }
+
+/* ───────── pasek cookies ───────── */
+.wz-cookies {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 70;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px;
+  max-width: 860px; margin-inline: auto; padding: 16px 20px;
+  border-radius: var(--d-radius-lg); border: 1px solid var(--d-line-strong);
+  background: var(--d-card); color: var(--d-fg);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .45);
+  animation: wz-cookies-in .5s var(--d-ease, ease) .6s both;
+}
+.wz-cookies p { flex: 1 1 320px; font-size: 13.5px; line-height: 1.55; color: var(--d-muted-strong); }
+.wz-cookies__row { display: flex; gap: 8px; flex-shrink: 0; }
+@keyframes wz-cookies-in { from { opacity: 0; transform: translateY(20px); } }
+@media (prefers-reduced-motion: reduce) { .wz-cookies { animation: none; } }

@@ -5,6 +5,7 @@ import { getWzor } from "@/lib/wzory/themes";
 import { WZOR_FONTS } from "@/lib/wzory/fonts";
 import { WzNav, WzFooter } from "../../components/wzory/chrome";
 import { WzMotion } from "../../components/wzory/motion";
+import { CookieBar, ViewPing } from "../../components/wzory/site-bits";
 import "../../wzory/wzory.css";
 import "../../wzory/motywy/kamienica.css";
 import "../../wzory/motywy/nokturn.css";
@@ -53,9 +54,32 @@ export default async function SiteLayout({
     ? ({ ["--d-accent"]: site.brand.accent, ["--d-accent-link"]: site.brand.accent } as CSSProperties)
     : undefined;
 
+  // Dane strukturalne: dzięki nim Google pokazuje biuro z adresem, telefonem
+  // i godzinami pracy, zamiast samego tytułu strony.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    name: site.brand.officeName,
+    url: site.domain ? `https://${site.domain}` : `https://agentspace.pl${base}`,
+    telephone: site.contact.phone || undefined,
+    email: site.contact.email || undefined,
+    address: site.contact.addressLine
+      ? {
+          "@type": "PostalAddress",
+          streetAddress: site.contact.addressLine,
+          addressLocality: site.contact.addressCity,
+          addressCountry: "PL",
+        }
+      : undefined,
+    sameAs: [site.contact.facebook, site.contact.instagram].filter(Boolean),
+    areaServed: site.contact.addressCity || "Polska",
+  };
+
   return (
     <div className={`wz ${theme.root} ${WZOR_FONTS[theme.slug]}`} style={style}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <WzMotion />
+      <ViewPing agencyId={site.agencyId} />
       <WzNav
         base={base}
         office={site.brand.officeName}
@@ -74,6 +98,7 @@ export default async function SiteLayout({
         email={site.contact.email}
         nip={site.contact.nip}
       />
+      <CookieBar office={site.brand.officeName} />
     </div>
   );
 }

@@ -16,6 +16,9 @@ import {
   savePost,
   deletePost,
   signSiteUpload,
+  requestSiteAddon,
+  saveSiteDomain,
+  checkSiteDomain,
   type SiteResult,
 } from "./actions";
 
@@ -712,6 +715,219 @@ export function PostsEditor({ posts }: { posts: PostRow[] }) {
           </div>
         </form>
       )}
+    </div>
+  );
+}
+
+/* ───────────────────────── dodatek: oferta dla biur bez strony ───────────────────────── */
+
+export function AddonOffer({
+  price,
+  yearly,
+  setup,
+  includes,
+  requestedAt,
+  wzory,
+}: {
+  price: number;
+  yearly: number;
+  setup: number;
+  includes: [string, string][];
+  requestedAt: string | null;
+  wzory: { slug: string; name: string; forWhom: string; swatch: string[] }[];
+}) {
+  const [pending, start] = useTransition();
+  const [sent, setSent] = useState(false);
+  const zl = (n: number) => new Intl.NumberFormat("pl-PL").format(n) + " zł";
+
+  return (
+    <div className="space-y-6">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 bg-gradient-to-r from-emerald-500/10 via-cyan-500/5 to-transparent px-6 py-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Dodatek</p>
+          <h1 className="mt-1 text-2xl font-semibold text-slate-900">Strona internetowa biura</h1>
+          <p className="mt-2 max-w-[70ch] text-sm text-slate-600">
+            To osobna usługa, poza abonamentem za system. Jeśli ją włączycie, tutaj pojawi się pełna konfiguracja:
+            wybór wzoru, kolory, logo, wszystkie teksty, zespół i poradnik. Do tego czasu system działa bez zmian.
+          </p>
+        </div>
+
+        <div className="grid gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {includes.map(([t, d]) => (
+              <div key={t} className="rounded-xl border border-slate-200 p-4">
+                <h3 className="mb-1.5 font-semibold text-slate-900">{t}</h3>
+                <p className="text-sm text-slate-500">{d}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 lg:self-start">
+            <p className="text-sm text-slate-600">Abonament miesięczny</p>
+            <p className="mt-1 text-3xl font-semibold text-slate-900">
+              {zl(price)}
+              <span className="text-base font-normal text-slate-500"> /mc</span>
+            </p>
+            <p className="mt-2 text-sm text-slate-600">
+              albo {zl(yearly)} za rok, czyli dwa miesiące gratis
+            </p>
+            <p className="mt-4 border-t border-emerald-200 pt-4 text-sm text-slate-600">
+              Wdrożenie {zl(setup)} jednorazowo: przeniesienie treści, zdjęcia, podpięcie domeny i ustawienie
+              wszystkiego pod Wasze biuro.
+            </p>
+
+            {requestedAt || sent ? (
+              <p className="mt-5 rounded-xl bg-white px-4 py-3 text-sm text-emerald-700">
+                Zgłoszenie przyjęte. Odezwiemy się, żeby ustalić szczegóły i termin.
+              </p>
+            ) : (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() =>
+                  start(async () => {
+                    const res = await requestSiteAddon();
+                    if (res.ok) setSent(true);
+                  })
+                }
+                className="mt-5 w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
+              >
+                {pending ? "Wysyłam..." : "Chcę stronę dla biura"}
+              </button>
+            )}
+            <p className="mt-3 text-xs text-slate-500">
+              Bez zobowiązania. Najpierw pokażemy podgląd na Waszych ofertach i logo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="mb-1 text-base font-semibold text-slate-900">Wzory do wyboru</h2>
+        <p className="mb-4 text-sm text-slate-500">Kliknij, żeby obejrzeć całą stronę na przykładowych danych.</p>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {wzory.map((w) => (
+            <Link
+              key={w.slug}
+              href={`/wzory/${w.slug}`}
+              target="_blank"
+              className="rounded-2xl border border-slate-200 p-3 transition hover:border-emerald-400 hover:shadow-sm"
+            >
+              <span className="mb-2 flex gap-1.5">
+                {w.swatch.map((c) => (
+                  <span key={c} className="h-5 w-5 rounded-full border border-slate-200" style={{ background: c }} />
+                ))}
+              </span>
+              <span className="block font-semibold text-slate-900">{w.name}</span>
+              <span className="block text-xs text-slate-500">{w.forWhom}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────────── własna domena ───────────────────────── */
+
+const DOMAIN_LABEL: Record<string, string> = {
+  brak: "Brak własnej domeny",
+  czeka_na_dns: "Czeka na wpisy DNS",
+  dodana_do_hostingu: "Dodana do hostingu, czeka na DNS",
+  dziala: "Działa",
+};
+
+export function DomainForm({ domain, status, slug }: { domain: string | null; status: string; slug: string }) {
+  const [pending, start] = useTransition();
+  const [res, setRes] = useState<SiteResult | null>(null);
+  const [check, setCheck] = useState<string | null>(null);
+
+  return (
+    <div className="space-y-5">
+      <form
+        className="space-y-4"
+        action={(fd) => {
+          setCheck(null);
+          start(async () => setRes(await saveSiteDomain(fd)));
+        }}
+      >
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div>
+            <label className={label} htmlFor="domain">
+              Adres Waszej domeny
+            </label>
+            <input id="domain" name="domain" defaultValue={domain ?? ""} placeholder="np. twojebiuro.pl" className={input} />
+          </div>
+          <button
+            type="submit"
+            disabled={pending}
+            className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
+          >
+            {pending ? "Zapisuję..." : "Zapisz domenę"}
+          </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <span
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
+              status === "dziala" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+            }`}
+          >
+            {DOMAIN_LABEL[status] ?? status}
+          </span>
+          {domain && (
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() =>
+                start(async () => {
+                  const r = await checkSiteDomain();
+                  setCheck(r.message);
+                })
+              }
+              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            >
+              Sprawdź teraz
+            </button>
+          )}
+          <Status res={res} />
+          {check && <span className="text-sm text-slate-600">{check}</span>}
+        </div>
+      </form>
+
+      <div className="rounded-2xl bg-slate-50 p-5">
+        <h3 className="mb-2 font-semibold text-slate-900">Co ustawić u rejestratora domeny</h3>
+        <p className="mb-3 text-sm text-slate-600">
+          Wejdź tam, gdzie kupiłeś domenę (na przykład OVH, home.pl, nazwa.pl), znajdź ustawienia DNS i dodaj dwa
+          wpisy. Jeśli coś tam już jest dla tych nazw, podmień wartości.
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] border-collapse text-sm">
+            <thead>
+              <tr className="text-left text-xs uppercase tracking-wider text-slate-500">
+                <th className="py-2">Typ</th>
+                <th className="py-2">Nazwa</th>
+                <th className="py-2">Wartość</th>
+              </tr>
+            </thead>
+            <tbody className="font-mono">
+              <tr className="border-t border-slate-200">
+                <td className="py-2">A</td>
+                <td className="py-2">@</td>
+                <td className="py-2">76.76.21.21</td>
+              </tr>
+              <tr className="border-t border-slate-200">
+                <td className="py-2">CNAME</td>
+                <td className="py-2">www</td>
+                <td className="py-2">cname.vercel-dns.com</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 text-sm text-slate-600">
+          Zmiany w DNS wchodzą zwykle w kilkanaście minut, czasem do doby. Certyfikat wystawiamy automatycznie. Do
+          tego czasu strona działa pod adresem /strona/{slug}.
+        </p>
+      </div>
     </div>
   );
 }

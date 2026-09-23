@@ -54,6 +54,9 @@ export type SiteConfig = {
   template: WzorSlug;
   published: boolean;
   domain: string | null;
+  domainStatus: string;
+  /** Czy biuro ma wykupiony dodatek „strona www". */
+  addon: boolean;
   brand: SiteBrand;
   content: SiteContent;
   contact: SiteContact;
@@ -128,18 +131,21 @@ type Row = {
   template: string | null;
   published: boolean | null;
   domain: string | null;
+  domain_status?: string | null;
   brand: Partial<SiteBrand> | null;
   content: Partial<SiteContent> | null;
   contact: Partial<SiteContact> | null;
 };
 
-function shape(row: Row | null, agencyId: string, fallbackName: string): SiteConfig {
+function shape(row: Row | null, agencyId: string, fallbackName: string, addon: boolean): SiteConfig {
   return {
     agencyId,
     slug: row?.slug ?? slugify(fallbackName || "biuro"),
     template: ((row?.template ?? "kamienica") as WzorSlug),
     published: row?.published ?? false,
     domain: row?.domain ?? null,
+    domainStatus: row?.domain_status ?? "brak",
+    addon,
     brand: { ...DEFAULT_BRAND, officeName: fallbackName, ...(row?.brand ?? {}) },
     content: { ...DEFAULT_CONTENT, ...(row?.content ?? {}) },
     contact: { ...DEFAULT_CONTACT, ...(row?.contact ?? {}) },
@@ -149,18 +155,42 @@ function shape(row: Row | null, agencyId: string, fallbackName: string): SiteCon
 /** Konfiguracja dla panelu (po identyfikatorze biura). */
 export async function getSiteConfig(agencyId: string, agencyName: string): Promise<SiteConfig> {
   const admin = createSupabaseAdmin();
-  const { data } = await admin.from("site_config").select("*").eq("agency_id", agencyId).maybeSingle();
-  return shape((data as Row) ?? null, agencyId, agencyName);
+  const [{ data }, { data: agency }] = await Promise.all([
+    admin.from("site_config").select("*").eq("agency_id", agencyId).maybeSingle(),
+    admin.from("agencies").select("site_addon").eq("id", agencyId).maybeSingle(),
+  ]);
+  return shape((data as Row) ?? null, agencyId, agencyName, agency?.site_addon === true);
 }
 
-/** Konfiguracja dla strony publicznej (po adresie). Null = nie ma albo nieopublikowana. */
+/**
+ * Konfiguracja dla strony publicznej. Zwraca null, gdy strony nie ma, nie jest
+ * opublikowana albo biuro nie ma już wykupionego dodatku: wtedy adres pokazuje
+ * zwykłe „nie znaleziono", a nie pustą stronę biura.
+ */
 export async function getSiteBySlug(slug: string): Promise<SiteConfig | null> {
   const admin = createSupabaseAdmin();
   const { data } = await admin.from("site_config").select("*").eq("slug", slug).maybeSingle();
   if (!data) return null;
 
-  const { data: agency } = await admin.from("agencies").select("name").eq("id", data.agency_id).maybeSingle();
-  return shape(data as Row, data.agency_id as string, (agency?.name as string) ?? "Biuro");
+  const { data: agency } = await admin
+    .from("agencies")
+    .select("name, site_addon")
+    .eq("id", data.agency_id)
+    .maybeSingle();
+
+  const site = shape(data as Row, data.agency_id as string, (agency?.name as string) ?? "Biuro", agency?.site_addon === true);
+  return site.addon ? site : null;
+}
+
+/** Adres strony po własnej domenie biura (używane w middleware). */
+export async function getSlugByDomain(domain: string): Promise<string | null> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("site_config")
+    .select("slug, published")
+    .eq("domain", domain.toLowerCase())
+    .maybeSingle();
+  return data?.published ? ((data.slug as string) ?? null) : null;
 }
 
 export async function listPublishedSlugs(): Promise<string[]> {

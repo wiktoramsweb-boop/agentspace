@@ -7,6 +7,7 @@ import { PageHero } from "../components/page-hero";
 import { FrameRule } from "../components/mk/frame";
 import { Card, Section, SectionHead } from "../components/mk/ui";
 import { WZORY } from "@/lib/wzory/themes";
+import { SITE_ADDON } from "@/lib/site/addon";
 
 export const metadata: Metadata = {
   title: "Strony internetowe dla biur nieruchomości | wzory | AgentSpace",
@@ -220,9 +221,13 @@ export default function WzoryPage() {
           <h2 className="mb-5 text-3xl font-medium text-[var(--color-mk-text)] md:text-4xl">
             Chcecie zobaczyć swoje oferty w tym wzorze?
           </h2>
-          <p className="mb-8 text-[var(--color-mk-muted)]">
+          <p className="mb-4 text-[var(--color-mk-muted)]">
             Przygotujemy podgląd na Waszych ofertach i logo, zanim cokolwiek podpiszecie. Wystarczy nam eksport z
             obecnego systemu albo link do Waszej strony.
+          </p>
+          <p className="mb-8 text-[0.9375rem] text-[var(--color-mk-muted)]">
+            Strona to osobna usługa: {SITE_ADDON.monthly} zł miesięcznie plus {SITE_ADDON.setup} zł wdrożenia. Nie
+            musicie jej brać razem z systemem, a system działa bez niej normalnie.
           </p>
           <Link
             href="/kontakt"

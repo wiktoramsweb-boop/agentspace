@@ -278,3 +278,131 @@ export async function deletePost(id: string): Promise<SiteResult> {
   refresh((data?.slug as string) ?? "");
   return { ok: true };
 }
+
+/* ───────────────────────── dodatek „strona www" ───────────────────────── */
+
+/**
+ * Zgłoszenie chęci wykupienia dodatku. Nie włączamy go sami: to osobna
+ * usługa z własną ceną, więc wysyłamy sygnał do nas i czekamy na rozmowę.
+ */
+export async function requestSiteAddon(): Promise<SiteResult> {
+  const owner = await requireOwner();
+  if (!owner.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
+
+  const admin = createSupabaseAdmin();
+  await admin
+    .from("agencies")
+    .update({ site_addon_requested_at: new Date().toISOString() })
+    .eq("id", owner.agency_id);
+
+  const key = process.env.RESEND_API_KEY;
+  if (key) {
+    try {
+      const { Resend } = await import("resend");
+      const resend = new Resend(key);
+      await resend.emails.send({
+        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        to: process.env.NOTIFICATION_EMAIL ?? "wiktor.amsweb@gmail.com",
+        subject: `Zapytanie o stronę www: ${owner.agency?.name ?? "biuro"}`,
+        html: `<p><strong>${owner.agency?.name ?? "Biuro"}</strong> chce stronę internetową.</p>
+               <p>Osoba: ${owner.full_name ?? "-"} (${owner.email ?? "-"})<br>
+               Telefon: ${owner.phone ?? "-"}</p>`,
+      });
+    } catch {
+      // Brak maila nie może zablokować zgłoszenia: zapis w bazie już jest.
+    }
+  }
+
+  revalidatePath("/app/ustawienia/strona");
+  return { ok: true };
+}
+
+/* ───────────────────────── własna domena ───────────────────────── */
+
+const DOMAIN_RE = /^(?!-)[a-z0-9-]{1,63}(\.[a-z0-9-]{1,63})+$/;
+
+/**
+ * Zapis własnej domeny biura. Gdy w środowisku jest token do Vercela,
+ * od razu dopisujemy domenę do projektu, więc klientowi zostaje tylko
+ * ustawienie wpisu DNS u swojego rejestratora.
+ */
+export async function saveSiteDomain(formData: FormData): Promise<SiteResult> {
+  const owner = await requireOwner();
+  if (!owner.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
+
+  const raw = String(formData.get("domain") ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/\/.*$/, "");
+
+  if (raw && !DOMAIN_RE.test(raw)) return { ok: false, error: "To nie wygląda na poprawną domenę." };
+
+  const admin = createSupabaseAdmin();
+  if (raw) {
+    const { data: taken } = await admin.from("site_config").select("agency_id").eq("domain", raw).maybeSingle();
+    if (taken && taken.agency_id !== owner.agency_id) {
+      return { ok: false, error: "Ta domena jest już podpięta do innego biura." };
+    }
+  }
+
+  let status = raw ? "czeka_na_dns" : "brak";
+  const token = process.env.VERCEL_TOKEN;
+  const projectId = process.env.VERCEL_PROJECT_ID;
+
+  if (raw && token && projectId) {
+    try {
+      const teamQuery = process.env.VERCEL_TEAM_ID ? `?teamId=${process.env.VERCEL_TEAM_ID}` : "";
+      const res = await fetch(`https://api.vercel.com/v10/projects/${projectId}/domains${teamQuery}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ name: raw }),
+      });
+      if (res.ok || res.status === 409) status = "dodana_do_hostingu";
+    } catch {
+      // Zostaje status „czeka na DNS": domenę dopniemy ręcznie.
+    }
+  }
+
+  const err = await upsert(owner.agency_id, {
+    domain: raw || null,
+    domain_status: status,
+    domain_checked_at: new Date().toISOString(),
+  });
+  if (err) return { ok: false, error: `Nie udało się zapisać: ${err}. Uruchom w Supabase SETUP-v26.` };
+
+  const { data } = await admin.from("site_config").select("slug").eq("agency_id", owner.agency_id).maybeSingle();
+  refresh((data?.slug as string) ?? "");
+  return { ok: true };
+}
+
+/** Sprawdza, czy domena kieruje już na stronę biura. */
+export async function checkSiteDomain(): Promise<{ ok: boolean; message: string }> {
+  const owner = await requireOwner();
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("site_config")
+    .select("domain, slug")
+    .eq("agency_id", owner.agency_id!)
+    .maybeSingle();
+
+  const domain = data?.domain as string | undefined;
+  if (!domain) return { ok: false, message: "Najpierw wpisz i zapisz domenę." };
+
+  try {
+    const res = await fetch(`https://${domain}`, { redirect: "follow", cache: "no-store" });
+    const html = await res.text();
+    const works = res.ok && html.includes("wz-wrap");
+    await admin
+      .from("site_config")
+      .update({ domain_status: works ? "dziala" : "czeka_na_dns", domain_checked_at: new Date().toISOString() })
+      .eq("agency_id", owner.agency_id!);
+
+    revalidatePath("/app/ustawienia/strona");
+    return works
+      ? { ok: true, message: `Domena ${domain} pokazuje już Waszą stronę.` }
+      : { ok: false, message: "Domena odpowiada, ale nie pokazuje jeszcze strony. Zmiany w DNS potrafią wchodzić do doby." };
+  } catch {
+    return { ok: false, message: "Domena jeszcze nie odpowiada. Sprawdź wpisy DNS u rejestratora." };
+  }
+}

@@ -1,9 +1,14 @@
+import { redirect } from "next/navigation";
 import { requireOwner } from "@/lib/auth";
+import { getAddonState } from "@/lib/site/addon";
 import { getSiteConfig } from "@/lib/site/config";
 import { ContentForm } from "../site-forms";
 
 export default async function TresciPage() {
   const owner = await requireOwner();
+  const addon = await getAddonState(owner.agency_id!);
+  if (!addon.active) redirect("/app/ustawienia/strona");
+
   const site = await getSiteConfig(owner.agency_id!, owner.agency?.name ?? "Biuro");
 
   return (

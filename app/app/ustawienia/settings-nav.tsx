@@ -18,6 +18,7 @@ const SITE: Item[] = [
   { href: "/app/ustawienia/strona/tresci", label: "Teksty" },
   { href: "/app/ustawienia/strona/zespol", label: "Zespół na stronie" },
   { href: "/app/ustawienia/strona/wpisy", label: "Poradnik" },
+  { href: "/app/ustawienia/strona/statystyki", label: "Statystyki" },
 ];
 
 /**

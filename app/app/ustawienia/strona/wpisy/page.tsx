@@ -1,11 +1,15 @@
+import { redirect } from "next/navigation";
 import { requireOwner } from "@/lib/auth";
+import { getAddonState } from "@/lib/site/addon";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PostsEditor, type PostRow } from "../site-forms";
 
 export default async function WpisyPage() {
   const owner = await requireOwner();
-  const admin = createSupabaseAdmin();
+  const addon = await getAddonState(owner.agency_id!);
+  if (!addon.active) redirect("/app/ustawienia/strona");
 
+  const admin = createSupabaseAdmin();
   const { data } = await admin
     .from("site_posts")
     .select("*")

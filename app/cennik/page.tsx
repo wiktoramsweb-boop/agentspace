@@ -4,6 +4,8 @@ import { SiteFooter } from "../components/site-footer";
 import { FrameRule } from "../components/mk/frame";
 import { Card, Button, Section, SectionHead } from "../components/mk/ui";
 import { Pricing } from "../components/mk/pricing";
+import Link from "next/link";
+import { SITE_ADDON, SITE_ADDON_INCLUDES } from "@/lib/site/addon";
 import { FadeIn } from "../components/fade-in";
 
 export const metadata: Metadata = {
@@ -35,6 +37,10 @@ const FAQ = [
   {
     q: "Czy są koszty wdrożenia?",
     a: "W pakietach Start i Pro nie ma opłaty wdrożeniowej. W pakiecie Biuro wdrożenie 1:1 i szkolenie zespołu wyceniamy indywidualnie, w zależności od liczby oddziałów.",
+  },
+  {
+    q: "Czy strona internetowa jest w cenie systemu?",
+    a: `Nie. Strona www to osobna usługa za ${SITE_ADDON.monthly} zł miesięcznie plus jednorazowe wdrożenie ${SITE_ADDON.setup} zł. System działa bez niej normalnie, a jeśli macie już własną stronę, nic nie musicie zmieniać.`,
   },
   {
     q: "Co z danymi, jeśli zrezygnuję?",
@@ -69,6 +75,51 @@ export default function CennikPage() {
 
       <Section className="pt-4">
         <Pricing />
+      </Section>
+
+      <FrameRule />
+
+      <Section>
+        <SectionHead
+          eyebrow="Dodatek"
+          title="Strona internetowa biura"
+          lead="Osobna usługa, poza abonamentem za system. Bierzecie ją tylko wtedy, gdy chcecie mieć stronę połączoną z bazą ofert. Jeśli macie już własną, system działa bez zmian."
+        />
+
+        <div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {SITE_ADDON_INCLUDES.map(([t, d]) => (
+              <Card key={t} className="h-full p-6">
+                <h4 className="mb-2 text-lg text-[var(--color-mk-text)]">{t}</h4>
+                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">{d}</p>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="h-full p-8">
+            <p className="text-[0.9375rem] text-[var(--color-mk-muted)]">Abonament</p>
+            <p className="mt-2 text-4xl font-medium text-[var(--color-mk-text)]">
+              {SITE_ADDON.monthly} zł
+              <span className="text-base font-normal text-[var(--color-mk-muted)]"> /mc</span>
+            </p>
+            <p className="mt-3 text-[0.9375rem] text-[var(--color-mk-muted)]">
+              albo {SITE_ADDON.yearly} zł za rok, czyli dwa miesiące gratis
+            </p>
+            <p className="mt-6 border-t border-[var(--color-mk-line)] pt-6 text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+              Wdrożenie {SITE_ADDON.setup} zł jednorazowo: przeniesienie treści, zdjęcia, podpięcie Waszej domeny i
+              ustawienie wszystkiego pod biuro. Hosting, certyfikat i kopie w abonamencie.
+            </p>
+            <div className="mt-8 flex flex-col gap-3">
+              <Button href="/wzory">Zobacz osiem wzorów</Button>
+              <Link
+                href="/kontakt?temat=strona-www"
+                className="rounded-xl border border-[var(--color-mk-line)] px-5 py-3 text-center text-[0.9375rem] font-medium text-[var(--color-mk-text)] transition hover:border-[var(--color-mk-line-lit)]"
+              >
+                Zamów podgląd na swoich ofertach
+              </Link>
+            </div>
+          </Card>
+        </div>
       </Section>
 
       <FrameRule />
