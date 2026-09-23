@@ -1,5 +1,10 @@
 import { FadeIn, StaggerContainer, StaggerItem } from "./components/fade-in";
+import Link from "next/link";
 import { SiteNav } from "./components/site-nav";
+import { BrowserShot, MkMarquee, PhotoTile, ShotTabs, TemplateTile } from "./components/mk/showcase";
+import { ShotOferty, ShotPanel, ShotPulpit } from "./components/mockups/light-shots";
+import { WZORY } from "@/lib/wzory/themes";
+import { SITE_ADDON } from "@/lib/site/addon";
 import { SiteFooter } from "./components/site-footer";
 import { AuroraBackground } from "./components/aurora-background";
 import { Spotlight } from "./components/effects/spotlight";
@@ -160,78 +165,85 @@ export default function Home() {
       <SiteNav />
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden px-6 pt-[132px] pb-16 md:pt-[156px] md:pb-20">
+      <section className="relative overflow-hidden px-6 pt-[120px] pb-14 md:pt-[148px] md:pb-20">
         <AuroraBackground />
         <Spotlight />
 
-        <div className="relative z-10 mx-auto flex max-w-[1120px] flex-col items-center text-center">
-          <FadeIn>
-            <p className="mk-eyebrow mb-7">Dla biur nieruchomości w Polsce</p>
-          </FadeIn>
+        <div className="relative z-10 mx-auto grid max-w-[1240px] items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
+          <div>
+            <FadeIn>
+              <p className="mk-eyebrow mb-6">Dla biur nieruchomości w Polsce</p>
+            </FadeIn>
 
-          <FadeIn delay={0.08}>
-            <h1 className="max-w-[17ch]">
-              System operacyjny
-              <br />
-              <span className="grad">dla biura nieruchomości</span>
-            </h1>
-          </FadeIn>
+            <FadeIn delay={0.08}>
+              <h1 className="max-w-[15ch] !text-left">
+                Całe biuro <span className="grad">w jednym miejscu</span>
+              </h1>
+            </FadeIn>
 
-          <FadeIn delay={0.16}>
-            <p className="mt-7 max-w-[54ch] text-lg leading-relaxed text-[var(--color-mk-muted)]">
-              Klienci, nieruchomości, cele, prowizje i trening zespołu w jednym
-              miejscu. Twoi agenci pracują w jednym systemie, a Ty{" "}
-              <span className="text-[var(--color-mk-text)]">
-                pierwszy raz widzisz biuro w liczbach
-              </span>
-              .
-            </p>
-          </FadeIn>
+            <FadeIn delay={0.16}>
+              <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-[var(--color-mk-muted)]">
+                Klienci, oferty, cele, prowizje i strona internetowa biura. Agenci pracują w jednym systemie, a Ty{" "}
+                <span className="text-[var(--color-mk-text)]">pierwszy raz widzisz biuro w liczbach</span>.
+              </p>
+            </FadeIn>
 
-          <FadeIn delay={0.24}>
-            <div className="mt-11 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
-              <Magnetic strength={0.24}>
-                <Button href="/kontakt">Umów rozmowę</Button>
-              </Magnetic>
-              <Magnetic strength={0.18}>
-                <Button href="#moduly" variant="ghost">
-                  Zobacz, co jest w środku
-                </Button>
-              </Magnetic>
-            </div>
-          </FadeIn>
+            <FadeIn delay={0.24}>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
+                <Magnetic strength={0.24}>
+                  <Button href="/kontakt">Umów rozmowę</Button>
+                </Magnetic>
+                <Magnetic strength={0.18}>
+                  <Button href="#w-srodku" variant="ghost">
+                    Zobacz, jak to wygląda
+                  </Button>
+                </Magnetic>
+              </div>
+            </FadeIn>
 
-          <FadeIn delay={0.32}>
-            <p className="mt-7 text-sm text-[var(--color-mk-muted)]">
-              Wdrożenie w jeden dzień · Bez umowy na czas określony
-            </p>
-          </FadeIn>
+            <FadeIn delay={0.32}>
+              <p className="mt-6 text-sm text-[var(--color-mk-muted)]">
+                Wdrożenie w jeden dzień · Bez umowy na czas określony · Polski produkt
+              </p>
+            </FadeIn>
 
-          {/* Pasek liczb - ożywia hero i od razu daje konkret */}
-          <FadeIn delay={0.4} className="mt-14 w-full">
-            <div className="mx-auto grid max-w-3xl gap-0 sm:grid-cols-3">
-              {FACTS.map((fact, i) => (
-                <div
-                  key={fact.label}
-                  className={`px-6 py-6 ${
-                    i > 0 ? "sm:border-l sm:border-white/[0.07]" : ""
-                  }`}
-                >
-                  <p className="mb-1.5 text-4xl font-semibold md:text-5xl">
-                    <span className="grad">
-                      {fact.value}
-                      {fact.suffix}
-                    </span>
-                  </p>
-                  <p className="text-sm leading-snug text-[var(--color-mk-muted)]">
-                    {fact.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </FadeIn>
+            <FadeIn delay={0.4} className="mt-10">
+              <div className="grid max-w-lg grid-cols-3 gap-0">
+                {FACTS.map((fact, i) => (
+                  <div key={fact.label} className={`pr-5 ${i > 0 ? "border-l border-white/[0.07] pl-5" : ""}`}>
+                    <p className="mb-1 text-3xl font-semibold md:text-4xl">
+                      <span className="grad">
+                        {fact.value}
+                        {fact.suffix}
+                      </span>
+                    </p>
+                    <p className="text-[0.8125rem] leading-snug text-[var(--color-mk-muted)]">{fact.label}</p>
+                  </div>
+                ))}
+              </div>
+            </FadeIn>
+          </div>
+
+          {/* Podgląd produktu zamiast kolejnego akapitu: w trzy sekundy widać,
+              czy to wygląda jak coś, w czym agent chce pracować. */}
+          <div className="relative">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-10 -z-10 opacity-60"
+              style={{ background: "radial-gradient(50% 50% at 60% 40%, rgba(16,185,129,0.22), transparent 70%)" }}
+            />
+            <BrowserShot label="agentspace.pl/app" tilt>
+              <ShotPulpit />
+            </BrowserShot>
+          </div>
         </div>
       </section>
+
+      <div className="py-6">
+        <MkMarquee
+          items={["Klienci", "Nieruchomości", "Cele", "Prowizje", "Kalendarz", "Dokumenty", "AI Coach", "Strona www"]}
+        />
+      </div>
 
       {/* ── WARTOŚCI ── */}
       <Section>
@@ -301,6 +313,89 @@ export default function Home() {
               </a>
             </StaggerItem>
           ))}
+        </StaggerContainer>
+      </Section>
+
+      {/* ── W ŚRODKU: jasna przerwa z podglądem produktu ── */}
+      <section id="w-srodku" className="mk-paper py-24 md:py-32">
+        <div className="mx-auto max-w-[1240px] px-6">
+          <p className="mk-eyebrow mb-5">Tak to wygląda w środku</p>
+          <h2 className="max-w-[20ch] text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] tracking-[-0.03em]">
+            Trzy ekrany, w których biuro spędza cały dzień
+          </h2>
+          <p className="mt-5 max-w-[60ch] text-[1.0625rem] leading-relaxed mk-soft">
+            Bez ciemnych paneli rodem z narzędzi dla programistów. Jasny, czytelny interfejs, który agent otwiera rano i
+            zamyka wieczorem, a właściciel sprawdza z telefonu między spotkaniami.
+          </p>
+
+          <div className="mt-12">
+            <ShotTabs
+              tabs={[
+                {
+                  key: "pulpit",
+                  label: "Pulpit agenta",
+                  note: "Cele dnia, zadania i prowizja w jednym widoku. Agent wie, co ma zrobić dziś, zanim wypije kawę.",
+                  node: <ShotPulpit />,
+                },
+                {
+                  key: "nieruchomosci",
+                  label: "Oferty",
+                  note: "Wspólna baza ofert ze zdjęciami po obróbce i znakiem wodnym biura. Jedno zaznaczenie publikuje ofertę na stronie biura i na portalach.",
+                  node: <ShotOferty />,
+                },
+                {
+                  key: "zespol",
+                  label: "Panel właściciela",
+                  note: "Prowizje, telefony i oferty w rozbiciu na ludzi. System sam podpowiada, kto wymaga rozmowy, zanim zrobi się problem.",
+                  node: <ShotPanel />,
+                },
+              ]}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── DZIEŃ W BIURZE: zdjęcia zamiast kolejnych kart z tekstem ── */}
+      <Section>
+        <SectionHead
+          eyebrow="Dzień w biurze"
+          title={
+            <>
+              Robota dzieje się <span className="grad">w terenie</span>, nie w tabelkach
+            </>
+          }
+          lead="System ma być z boku, a nie zamiast pracy. Dlatego wszystko, co agent robi w ciągu dnia, zapisuje się jednym kliknięciem z telefonu."
+        />
+
+        <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-3">
+          <StaggerItem>
+            <PhotoTile
+              src="/wzory/kamienica.jpg"
+              alt="Kamienica w centrum"
+              title="Pozyskanie"
+              body="Telefon do właściciela zapisuje się jako kontakt i od razu liczy do celu dziennego. Kolejna rozmowa z tym numerem dopina się do tej samej historii."
+              className="aspect-[3/4]"
+              priority
+            />
+          </StaggerItem>
+          <StaggerItem>
+            <PhotoTile
+              src="/wzory/salon.jpg"
+              alt="Salon w mieszkaniu"
+              title="Prezentacja"
+              body="Zdjęcia z sesji wrzucasz z telefonu, a system sam dokłada znak wodny biura i wysyła ofertę na stronę oraz na portale."
+              className="aspect-[3/4]"
+            />
+          </StaggerItem>
+          <StaggerItem>
+            <PhotoTile
+              src="/wzory/schody.jpg"
+              alt="Klatka schodowa"
+              title="Transakcja"
+              body="Umowa, zaświadczenia i prowizja w jednym miejscu. Rozliczenie z agentem liczy się samo, razem z podziałem i podatkiem."
+              className="aspect-[3/4]"
+            />
+          </StaggerItem>
         </StaggerContainer>
       </Section>
 
@@ -502,6 +597,40 @@ export default function Home() {
               </div>
             </Card>
           </FadeIn>
+        </div>
+      </Section>
+
+      {/* ── STRONY WWW: osobny dodatek, ale wizualnie najmocniejszy argument ── */}
+      <Section>
+        <SectionHead
+          eyebrow="Dodatek"
+          title={
+            <>
+              Strona biura, która <span className="grad">sama się aktualizuje</span>
+            </>
+          }
+          lead={`Osiem gotowych wzorów. Oferta dodana w systemie jest na stronie w tej samej minucie, a zapytanie ze strony wraca do CRM jako kontakt i zadanie dla agenta. Osobna usługa, ${SITE_ADDON.monthly} zł miesięcznie.`}
+        />
+
+        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {WZORY.slice(0, 4).map((w) => (
+            <StaggerItem key={w.slug}>
+              <TemplateTile
+                href={`/wzory/${w.slug}`}
+                photo={w.preview}
+                name={w.name}
+                forWhom={w.forWhom}
+                swatch={[...w.swatch]}
+              />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          <Button href="/wzory">Zobacz wszystkie osiem wzorów</Button>
+          <Link href="/cennik" className="text-[0.9375rem] text-[var(--color-mk-muted)] underline-offset-4 hover:underline">
+            Ile to kosztuje
+          </Link>
         </div>
       </Section>
 

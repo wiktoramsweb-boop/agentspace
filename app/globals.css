@@ -58,10 +58,16 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Treść musi być nad ziarnem. */
-.mk > * {
+/* Treść musi być nad ziarnem. Nagłówek zostaje wyłączony: ta reguła
+   nadpisywała mu pozycję „fixed" i warstwę, przez co pasek nie był
+   przyklejony do góry, a rozwinięte menu na telefonie chowało się pod
+   treścią strony. */
+.mk > *:not(header) {
   position: relative;
   z-index: 2;
+}
+.mk > header {
+  z-index: 60;
 }
 
 .mk h1,
@@ -923,3 +929,57 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-dashed { border-co
 html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) .bg-white\/60 {
   background-color: #ffffff !important;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   MARKETING: jasna sekcja i przewijany pasek
+   Strona była w całości ciemna i wyglądała przez to jak narzędzie
+   dla programistów. Jasne przerwy dają oddech i pokazują produkt,
+   który sam w sobie jest jasny.
+   ───────────────────────────────────────────────────────────── */
+.mk-paper {
+  position: relative;
+  background: linear-gradient(180deg, #f7f8f9 0%, #eef1f3 100%);
+  color: #0f1720;
+}
+/* Nagłówki marketingu mają gradientowe wypełnienie tekstu; w jasnej sekcji
+   trzeba je zdjąć, inaczej biały tekst ląduje na jasnym tle. */
+.mk-paper h1,
+.mk-paper h2,
+.mk-paper h3,
+.mk-paper h4 {
+  background: none;
+  -webkit-text-fill-color: #0b1118;
+  color: #0b1118;
+}
+.mk-paper .grad {
+  background: linear-gradient(100deg, #0f766e 0%, #0891b2 55%, #0f766e 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.mk-paper .mk-eyebrow { color: #0f766e; }
+.mk-paper .mk-soft { color: #4b5563; }
+.mk-paper .mk-card-light {
+  background: #fff;
+  border: 1px solid #e3e7ea;
+  border-radius: 20px;
+  transition: transform .35s cubic-bezier(.22,.61,.36,1), box-shadow .35s, border-color .35s;
+}
+.mk-paper .mk-card-light:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px -38px rgba(15, 23, 32, .5);
+  border-color: #cfd6db;
+}
+
+.mk-marquee { display: flex; overflow: hidden; gap: 0; mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+.mk-marquee__track { display: flex; flex-shrink: 0; min-width: max-content; animation: mk-slide 34s linear infinite; }
+.mk-marquee:hover .mk-marquee__track { animation-play-state: paused; }
+.mk-marquee__item {
+  display: inline-flex; align-items: center; gap: 22px;
+  padding-inline: 22px; white-space: nowrap;
+  font-size: clamp(18px, 2.4vw, 30px); letter-spacing: -.02em;
+  color: var(--color-mk-muted);
+}
+.mk-marquee__item i { font-style: normal; color: var(--color-mk-accent); font-size: .55em; }
+@keyframes mk-slide { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) { .mk-marquee__track { animation: none; } .mk-marquee { overflow-x: auto; } }

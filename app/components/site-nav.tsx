@@ -1,4 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 const NAV_LINKS = [
   { href: "/#moduly", label: "Produkt" },
@@ -15,10 +20,32 @@ const NAV_LINKS = [
  * UWAGA: żaden rodzic tego elementu nie może mieć `transform` -
  * transform tworzy nowy kontekst kompozycji i zabija backdrop-filter
  * (pasek przestaje być matowy, robi się płaski).
+ *
+ * Na telefonie linki są schowane pod przyciskiem menu. Wcześniej ich tam
+ * po prostu nie było: strona pokazywała samo logo i przycisk kontaktu, więc
+ * z telefonu nie dało się wejść ani w cennik, ani w produkt.
  */
 export function SiteNav() {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const reduce = useReducedMotion();
+
+  useEffect(() => setOpen(false), [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
-    <header className="fixed inset-x-0 top-0 z-40 h-[68px]">
+    <header className="fixed inset-x-0 top-0 z-50 h-[68px]">
       <div
         aria-hidden="true"
         className="absolute inset-0 border-b border-white/[0.07] bg-[rgba(8,9,11,0.6)] backdrop-blur-xl"
@@ -57,12 +84,86 @@ export function SiteNav() {
           </Link>
           <Link
             href="/kontakt"
-            className="inline-flex h-9 items-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 text-sm font-semibold text-zinc-950 shadow-[0_6px_20px_-8px_rgba(16,185,129,0.9)] transition-all hover:shadow-[0_10px_28px_-8px_rgba(16,185,129,1)] hover:brightness-110"
+            className="hidden h-9 items-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 text-sm font-semibold text-zinc-950 shadow-[0_6px_20px_-8px_rgba(16,185,129,0.9)] transition-all hover:shadow-[0_10px_28px_-8px_rgba(16,185,129,1)] hover:brightness-110 sm:inline-flex"
           >
             Umów rozmowę
           </Link>
+
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Zamknij menu" : "Menu"}
+            aria-expanded={open}
+            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-[var(--color-mk-text)] transition-colors hover:bg-white/[0.06] md:hidden"
+          >
+            <span className="sr-only">Menu</span>
+            <span aria-hidden="true" className="relative block h-3.5 w-5">
+              <span
+                className={`absolute inset-x-0 top-0 h-[1.5px] bg-current transition-transform duration-300 ${
+                  open ? "translate-y-[6.5px] rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`absolute inset-x-0 top-[6.5px] h-[1.5px] bg-current transition-opacity duration-200 ${
+                  open ? "opacity-0" : ""
+                }`}
+              />
+              <span
+                className={`absolute inset-x-0 bottom-0 h-[1.5px] bg-current transition-transform duration-300 ${
+                  open ? "-translate-y-[6.5px] -rotate-45" : ""
+                }`}
+              />
+            </span>
+          </button>
         </div>
       </nav>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12 }}
+            transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
+            className="absolute inset-x-0 top-[68px] md:hidden"
+          >
+            <div className="border-b border-white/[0.07] bg-[rgba(8,9,11,0.97)] px-6 pb-8 pt-4 backdrop-blur-xl">
+              <div className="mx-auto max-w-[1080px]">
+                {NAV_LINKS.map((link, i) => (
+                  <motion.div
+                    key={link.href}
+                    initial={reduce ? false : { opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 + i * 0.04, duration: 0.3 }}
+                  >
+                    <Link
+                      href={link.href}
+                      className="block border-b border-white/[0.06] py-4 text-lg text-[var(--color-mk-text)]"
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+
+                <div className="mt-6 flex flex-col gap-3">
+                  <Link
+                    href="/kontakt"
+                    className="inline-flex h-12 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 font-semibold text-zinc-950"
+                  >
+                    Umów rozmowę
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 px-5 font-medium text-[var(--color-mk-text)]"
+                  >
+                    Zaloguj się
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

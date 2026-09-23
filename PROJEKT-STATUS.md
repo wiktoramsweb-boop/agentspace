@@ -167,8 +167,19 @@ Osobny produkt sprzedawany razem z CRM, konkurencja: ASARI (WordPress + wtyczka)
   surowe zgłoszenie zostaje w `site_leads`.
 - **Migracja:** `lib/SETUP-v25-strona-www.sql` (site_config, site_posts, site_leads,
   show_on_site, site_order).
-- **Do zrobienia:** podpięcie własnych domen klientów na Vercel, sitemap i schema.org
-  per strona, baner cookies, statystyki odwiedzin.
+- **Dodatek płatny osobno:** `agencies.site_addon`. Bez niego panel pokazuje ofertę
+  (`AddonOffer`) i przycisk zgłoszenia, a `/strona/[slug]` zwraca 404. Ceny w
+  `lib/site/addon.ts` (199 zł/mc, 1990 zł/rok, 990 zł wdrożenia) i stamtąd lecą do
+  panelu, cennika i na `/wzory`.
+- **Własne domeny:** `site_config.domain` + `middleware.ts` (rewrite po domenie,
+  cache 5 min w `lib/site/domains.ts`). Z `VERCEL_TOKEN` i `VERCEL_PROJECT_ID`
+  domena dopina się do projektu sama, bez nich zostaje instrukcja DNS w panelu.
+- **SEO:** `app/strona/[slug]/sitemap.ts`, dane strukturalne biura (layout) i oferty
+  (karta oferty).
+- **Statystyki:** `site_views` + RPC `bump_site_view`, licznik bez cookies i bez IP,
+  widok w `/app/ustawienia/strona/statystyki`. Baner cookies w `site-bits.tsx`.
+- **Migracje:** v25 (strona) i v26 (dodatek, statystyki, domeny).
+- **Do zrobienia:** obrazy OG per oferta, integracja płatności dodatku.
 
 ## 11. Workflow
 
