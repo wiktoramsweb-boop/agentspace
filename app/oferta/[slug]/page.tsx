@@ -167,7 +167,7 @@ export default async function OfertaPage({
               <ul className="flex flex-col gap-3">
                 {[
                   "Wdrożenie i import bazy - bez opłaty",
-                  "Wyłączność na Wasze miasto w ramach Programu Pierwszych 10 Biur",
+                  "Opiekun wdrożenia po naszej stronie, nie dział zgłoszeń",
                   "Cena zamrożona na 24 miesiące",
                   "Bez umowy na czas określony",
                 ].map((item) => (

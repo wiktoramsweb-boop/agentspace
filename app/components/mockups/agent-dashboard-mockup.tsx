@@ -17,7 +17,7 @@ const STATS = [
 
 export function AgentDashboardMockup() {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black p-5 font-sans text-xs">
+    <div className="mk-force-dark relative h-full w-full overflow-hidden rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black p-5 font-sans text-xs">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>

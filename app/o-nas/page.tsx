@@ -10,7 +10,7 @@ import { TiltCard } from "../components/effects/tilt-card";
 export const metadata: Metadata = {
   title: "O AgentSpace | Polski system dla biur nieruchomości",
   description:
-    "Kto, dlaczego i po co buduje AgentSpace. Historia foundera, klient zero, filozofia produktu. Polska platforma dla biur nieruchomości.",
+    "Kto i po co zbudował AgentSpace. Polski system dla biur nieruchomości, napisany w działającym biurze w Krakowie.",
   alternates: {
     canonical: "https://agentspace.pl/o-nas",
   },
@@ -34,31 +34,31 @@ const PRINCIPLES = [
   },
   {
     number: "04",
-    title: "Klient zero przed klientem 100",
-    body: "Każda funkcja jest najpierw testowana w Spectrze. Jeśli nie pomaga moim agentom, nie wchodzi do produktu. Dopiero potem otwieramy ją innym biurom.",
+    title: "Najpierw rynek, potem kod",
+    body: "Każda funkcja jest najpierw sprawdzana w działającym biurze. Jeśli nie pomaga agentom w codziennej pracy, nie wchodzi do produktu.",
   },
 ];
 
 const ROADMAP = [
   {
-    period: "2026",
-    title: "Program Pierwszych 10 Biur",
-    body: "AI Coach z 5 podstawowymi scenariuszami, dashboard agenta, panel właściciela.",
+    period: "Działa dziś",
+    title: "CRM, oferty, cele i prowizje",
+    body: "Wspólna baza klientów i nieruchomości, lejek celów od rocznego do dziennego, rozliczanie prowizji i panel właściciela.",
   },
   {
-    period: "Q2 2026",
-    title: "Publiczna premiera",
-    body: "Otwarte zapisy, marketing, partnerstwa branżowe, rozbudowa scenariuszy.",
+    period: "Działa dziś",
+    title: "AI Coach i strony www biur",
+    body: "Trening rozmów z klientem AI w trzech kategoriach oraz strona internetowa biura połączona z bazą ofert.",
   },
   {
-    period: "Q3 2026",
-    title: "Integracja z kalendarzem Google",
-    body: "Plan dnia agenta synchronizowany ze spotkaniami, automatyczne notatki post-spotkanie.",
+    period: "W drodze",
+    title: "Synchronizacja z kalendarzem Google",
+    body: "Plan dnia agenta zgrany ze spotkaniami w obie strony, bez przepisywania terminów.",
   },
   {
-    period: "Q4 2026",
-    title: "Tracking umów i KPI",
-    body: "Integracja z popularnymi CRM-ami (Asari, Galactica), automatyczne raporty miesięczne.",
+    period: "W drodze",
+    title: "Eksport na portale i import z systemów ofertowych",
+    body: "Jedno kliknięcie zamiast wklejania tej samej oferty w pięciu miejscach.",
   },
 ];
 
@@ -79,7 +79,7 @@ export default function ONas() {
         <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
-              <TiltCard className="rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-12">
+              <TiltCard className="rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 backdrop-blur-xl md:p-12">
                 <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-12">
                   {/* Avatar - duży, animowany glow */}
                   <div className="flex justify-center md:justify-start">
@@ -114,7 +114,8 @@ export default function ONas() {
                     <div className="space-y-4 leading-relaxed text-[var(--color-mk-text)]">
                       <p>
                         Prowadzę biuro nieruchomości{" "}
-                        <strong className="text-[var(--color-mk-text)]">Spectra</strong> w Krakowie. Codziennie
+                        <strong className="text-[var(--color-mk-text)]">Spectra</strong>{" "}
+                        w Krakowie. Codziennie
                         pracuję z agentami, klientami sprzedającymi, kupującymi, doradcami
                         kredytowymi, prawnikami. Widzę dokładnie to, czego nie widać ze świata
                         software house&apos;ów: ile czasu agent traci, jak wygląda zła rozmowa
@@ -195,12 +196,13 @@ export default function ONas() {
         {/* CTA */}
         <section className="px-6 py-20">
           <FadeIn>
-            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 text-center md:p-12">
+            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 text-center md:p-12">
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
-                Chcesz dołączyć do Programu Pierwszych 10 Biur?
+                Porozmawiajmy o Waszym biurze
               </h2>
               <p className="mb-8 text-[var(--color-mk-muted)]">
-                Jedno biuro na miasto, cena zamrożona na 24 miesiące, wpływ na rozwój produktu.
+                Pokażemy system na Waszych danych i powiemy wprost, czy ma u Was sens. Wdrożenie
+                zajmuje jeden dzień roboczy.
               </p>
               <Link
                 href="/#waitlist"

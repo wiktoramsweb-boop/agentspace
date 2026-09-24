@@ -192,8 +192,8 @@ export function StickySteps({
                 <Image src={s.photo} alt="" fill sizes="45vw" className="object-cover" />
               </motion.div>
             ))}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--mk-scrim)] via-transparent to-transparent" />
-            <p className="absolute bottom-6 left-6 right-6 text-lg text-white">{steps[active].title}</p>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(4,7,10,0.92)] via-[rgba(4,7,10,0.15)] to-transparent" />
+            <p className="absolute bottom-6 left-6 right-6 text-lg text-white [text-shadow:0_2px_14px_rgba(0,0,0,0.5)]">{steps[active].title}</p>
           </div>
         </div>
       </div>
@@ -296,8 +296,8 @@ export function TiltPhoto({
       <Image src={src} alt={alt} fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
       {caption && (
         <>
-          <span className="absolute inset-0 bg-gradient-to-t from-[var(--mk-scrim)] via-transparent to-transparent" />
-          <span className="absolute bottom-5 left-5 right-5 text-sm text-white/90">{caption}</span>
+          <span className="absolute inset-0 bg-gradient-to-t from-[rgba(4,7,10,0.9)] via-[rgba(4,7,10,0.15)] to-transparent" />
+          <span className="absolute bottom-5 left-5 right-5 text-sm text-white/90 [text-shadow:0_2px_12px_rgba(0,0,0,0.5)]">{caption}</span>
         </>
       )}
     </motion.div>

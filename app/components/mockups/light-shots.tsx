@@ -191,3 +191,254 @@ export function ShotPanel() {
     </div>
   );
 }
+
+/** Cele: lejek roczny rozbity na dzień i dzienny tracker. */
+export function ShotCele() {
+  const funnel: [string, number, number, string][] = [
+    ["Telefony", 34, 40, "emerald"],
+    ["Rozmowy", 12, 14, "sky"],
+    ["Spotkania", 5, 6, "amber"],
+    ["Umowy", 2, 3, "emerald"],
+  ];
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <div className="mb-3 flex items-end justify-between">
+        <div>
+          <p className="text-slate-400">Cel roczny</p>
+          <p className="text-base font-semibold text-slate-900">420 000 zł prowizji</p>
+        </div>
+        <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700">62% planu</span>
+      </div>
+
+      <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-200">
+        <motion.div
+          className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500"
+          initial={{ width: 0 }}
+          whileInView={{ width: "62%" }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease }}
+        />
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-3">
+        <p className="mb-3 text-slate-400">Dziś do zrobienia</p>
+        <div className="grid gap-3">
+          {funnel.map(([label, done, target, tone], i) => (
+            <div key={label}>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-slate-600">{label}</span>
+                <span className="font-semibold text-slate-900">
+                  {done} / {target}
+                </span>
+              </div>
+              <Bar value={(done / target) * 100} tone={(i === 1 ? "sky" : i === 2 ? "amber" : "emerald") as "emerald"} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+        <p className="font-medium text-emerald-800">Passa: 9 dni z rzędu</p>
+        <p className="text-emerald-700">Zrób jeszcze 6 telefonów, żeby nie przerwać serii.</p>
+      </div>
+    </div>
+  );
+}
+
+/** Kalendarz z rytmem dzwonienia. */
+export function ShotKalendarz() {
+  const hours = ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"];
+  const load = [10, 35, 80, 65, 30, 20, 45, 70, 90, 55, 25];
+  const events: [string, string, string][] = [
+    ["9:30", "Telefon: pan Kowalski", "emerald"],
+    ["11:00", "Prezentacja, ul. Wielicka", "sky"],
+    ["15:30", "Podpisanie umowy, notariusz", "amber"],
+  ];
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-base font-semibold text-slate-900">Środa, 23 września</p>
+        <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">Tydzień</span>
+      </div>
+
+      <div className="mb-3 grid gap-2">
+        {events.map(([time, title, tone]) => (
+          <div key={title} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-2.5">
+            <span className="font-mono text-slate-400">{time}</span>
+            <span
+              className={`h-8 w-1 rounded-full ${
+                tone === "emerald" ? "bg-emerald-500" : tone === "sky" ? "bg-sky-500" : "bg-amber-500"
+              }`}
+            />
+            <span className="flex-1 truncate font-medium text-slate-800">{title}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-3">
+        <p className="mb-2 text-slate-400">O której najczęściej dzwonisz</p>
+        <div className="flex h-16 items-end gap-1">
+          {hours.map((h, i) => (
+            <motion.div
+              key={h}
+              className="flex-1 rounded-t bg-emerald-400/80"
+              initial={{ height: 0 }}
+              whileInView={{ height: `${load[i]}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: i * 0.04, ease }}
+            />
+          ))}
+        </div>
+        <div className="mt-1 flex justify-between text-[9px] text-slate-400">
+          <span>8:00</span>
+          <span>13:00</span>
+          <span>18:00</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Prowizje i etapy transakcji. */
+export function ShotProwizje() {
+  const stages = ["Umowa", "Zadatek", "Kredyt", "Akt", "Rozliczenie"];
+  const active = 3;
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <div className="mb-3 rounded-xl border border-slate-200 bg-white p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="font-semibold text-slate-900">ul. Nadwiślańska 12/34</p>
+          <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">w toku</span>
+        </div>
+        <div className="flex items-center gap-1">
+          {stages.map((s, i) => (
+            <div key={s} className="flex flex-1 flex-col items-center gap-1">
+              <motion.span
+                className={`h-1.5 w-full rounded-full ${i <= active ? "bg-emerald-500" : "bg-slate-200"}`}
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1, ease }}
+                style={{ originX: 0 }}
+              />
+              <span className={`text-[9px] ${i <= active ? "text-slate-700" : "text-slate-400"}`}>{s}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-3 grid grid-cols-3 gap-2">
+        {[
+          ["Cena", "1 690 000 zł"],
+          ["Prowizja", "41 400 zł"],
+          ["Twój udział", "20 700 zł"],
+        ].map(([l, v]) => (
+          <div key={l} className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-slate-400">{l}</p>
+            <p className="text-sm font-semibold text-slate-900">{v}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-3">
+        <p className="mb-2 text-slate-400">Dokumenty transakcji</p>
+        {["Umowa pośrednictwa.pdf", "Zaświadczenie ze wspólnoty.pdf", "Świadectwo energetyczne.pdf"].map((d, i) => (
+          <div key={d} className={`flex items-center gap-2 py-1.5 ${i > 0 ? "border-t border-slate-100" : ""}`}>
+            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500">PDF</span>
+            <span className="flex-1 truncate">{d}</span>
+            <span className="text-emerald-600">✓</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Karta klienta z historią kontaktu. */
+export function ShotKlient() {
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <div className="mb-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-fuchsia-500 text-sm font-bold text-white">
+          M
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-slate-900">Małgorzata Zielińska</p>
+          <p className="text-slate-500">Kupująca · budżet do 900 000 zł · Podgórze</p>
+        </div>
+        <span className="rounded-md bg-violet-50 px-2 py-0.5 text-[10px] font-medium text-violet-700">ogląda</span>
+      </div>
+
+      <div className="mb-3 rounded-xl border border-slate-200 bg-white p-3">
+        <p className="mb-2 text-slate-400">Historia kontaktu</p>
+        {[
+          ["dziś, 10:12", "Telefon, 4 min 12 s", "Prosi o drugie oglądanie w sobotę"],
+          ["12 września", "Prezentacja, ul. Kalwaryjska", "Za mała kuchnia, reszta na tak"],
+          ["4 września", "Telefon, 2 min 40 s", "Pierwszy kontakt z ogłoszenia"],
+        ].map(([when, what, note], i) => (
+          <div key={when} className={`flex gap-3 py-2 ${i > 0 ? "border-t border-slate-100" : ""}`}>
+            <span className="w-20 flex-shrink-0 text-slate-400">{when}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium text-slate-800">{what}</span>
+              <span className="block text-slate-500">{note}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+        <p className="font-medium text-emerald-800">Dopasowania z bazy: 3 oferty</p>
+        <p className="text-emerald-700">System sam sprawdził poszukiwanie i znalazł nowe mieszkanie na Kalwaryjskiej.</p>
+      </div>
+    </div>
+  );
+}
+
+/** Dokumenty przy ofercie i kliencie. */
+export function ShotDokumenty() {
+  const docs: [string, string, string][] = [
+    ["Umowa pośrednictwa", "PDF · 240 kB", "podpisana"],
+    ["Odpis z księgi wieczystej", "PDF · 1,1 MB", "aktualny"],
+    ["Świadectwo energetyczne", "PDF · 380 kB", "ważne do 2035"],
+    ["Zaświadczenie o zameldowaniu", "PDF · 120 kB", "do odebrania"],
+    ["Zdjęcia po obróbce", "ZIP · 24 MB", "gotowe"],
+  ];
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-base font-semibold text-slate-900">Dokumenty oferty</p>
+        <span className="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">+ Dodaj</span>
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white">
+        {docs.map(([name, meta, status], i) => (
+          <motion.div
+            key={name}
+            className={`flex items-center gap-3 p-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.06, ease }}
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-[9px] font-bold text-rose-600">
+              {name.includes("Zdjęcia") ? "ZIP" : "PDF"}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-medium text-slate-800">{name}</span>
+              <span className="block text-slate-400">{meta}</span>
+            </span>
+            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">{status}</span>
+          </motion.div>
+        ))}
+      </div>
+
+      <p className="mt-3 text-slate-500">
+        Pliki leżą przy ofercie i przy kliencie naraz, a link do pobrania wygasa, więc nie krąży po WhatsAppie.
+      </p>
+    </div>
+  );
+}

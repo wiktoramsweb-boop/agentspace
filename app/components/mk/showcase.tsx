@@ -75,10 +75,12 @@ export function PhotoTile({
       <motion.div style={{ y }} className="absolute inset-[-8%]">
         <Image src={src} alt={alt} fill sizes="(max-width: 768px) 100vw, 33vw" priority={priority} className="object-cover" />
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-t from-[var(--mk-scrim)] via-[var(--mk-scrim-soft)] to-transparent" />
+      {/* Napisy leżą na zdjęciu, więc przyciemnienie musi być mocne niezależnie
+          od motywu strony, inaczej biały tytuł ginie w jasnym wariancie. */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(4,7,10,0.94)] via-[rgba(4,7,10,0.55)] to-[rgba(4,7,10,0.08)]" />
       <div className="relative flex h-full flex-col justify-end p-7">
-        <h4 className="mb-2 text-xl text-[var(--color-mk-text)]">{title}</h4>
-        <p className="max-w-[34ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">{body}</p>
+        <h4 className="mb-2 text-xl !text-white [-webkit-text-fill-color:#fff] [text-shadow:0_2px_14px_rgba(0,0,0,0.5)]">{title}</h4>
+        <p className="max-w-[34ch] text-[0.9375rem] leading-relaxed text-white/80">{body}</p>
       </div>
     </div>
   );
@@ -171,7 +173,7 @@ export function TemplateTile({
           sizes="(max-width: 768px) 100vw, 25vw"
           className="object-cover transition duration-700 group-hover:scale-[1.05]"
         />
-        <span className="absolute inset-0 bg-gradient-to-t from-[var(--mk-scrim)] via-transparent to-transparent" />
+        <span className="absolute inset-0 bg-gradient-to-t from-[rgba(4,7,10,0.92)] via-[rgba(4,7,10,0.2)] to-transparent" />
       </span>
       <span className="flex items-center justify-between gap-3 p-5">
         <span>

@@ -16,12 +16,12 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
   return (
     <div className="relative">
       {/* Gradient line po lewej */}
-      <div className="absolute left-[15px] top-2 bottom-2 w-px bg-gradient-to-b from-emerald-500/60 via-zinc-700 to-zinc-900 md:left-[19px]" />
+      <div className="absolute left-[15px] top-2 bottom-2 w-px bg-gradient-to-b from-emerald-500/60 via-[var(--mk-hairline-strong)] to-[var(--mk-card-bg)] md:left-[19px]" />
 
       <div className="space-y-10">
         {items.map((item, index) => (
           <motion.div
-            key={item.period}
+            key={item.title}
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}

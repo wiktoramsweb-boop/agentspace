@@ -3,7 +3,17 @@ import Link from "next/link";
 import { SiteNav } from "./components/site-nav";
 import { BrowserShot, MkMarquee, PhotoTile, ShotTabs, TemplateTile } from "./components/mk/showcase";
 import { Beams, RevealWords, SpotlightCard, StickySteps, Ticker, TiltPhoto } from "./components/mk/motion-bits";
-import { ShotOferty, ShotPanel, ShotPulpit } from "./components/mockups/light-shots";
+import {
+  ShotCele,
+  ShotDokumenty,
+  ShotKalendarz,
+  ShotKlient,
+  ShotOferty,
+  ShotPanel,
+  ShotProwizje,
+  ShotPulpit,
+} from "./components/mockups/light-shots";
+import { CoachLive } from "./components/mk/coach-live";
 import { WZORY } from "@/lib/wzory/themes";
 import { SITE_ADDON } from "@/lib/site/addon";
 import { SiteFooter } from "./components/site-footer";
@@ -127,7 +137,7 @@ const FAQ = [
   {
     question: "Czy AgentSpace działa już dziś?",
     answer:
-      "Tak. Platforma działa na produkcji i jest codziennie używana w biurze Spectra Nieruchomości w Krakowie - to biuro założyciela i pierwszy klient produktu. Przyjmujemy kolejne biura w ramach Programu Pierwszych 10 Biur.",
+      "Tak. System działa na produkcji i jest codziennie używany w biurach nieruchomości, między innymi w Spectrze w Krakowie, gdzie powstaje. Wdrożenie nowego biura zajmuje jeden dzień roboczy.",
   },
   {
     question: "Czy AgentSpace zastąpi mój obecny system?",
@@ -323,12 +333,12 @@ export default function Home() {
       <section id="w-srodku" className="mk-paper py-24 md:py-32">
         <div className="mx-auto max-w-[1240px] px-6">
           <p className="mk-eyebrow mb-5">Tak to wygląda w środku</p>
-          <h2 className="max-w-[20ch] text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] tracking-[-0.03em]">
-            Trzy ekrany, w których biuro spędza cały dzień
+          <h2 className="max-w-[22ch] text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] tracking-[-0.03em]">
+            Cały dzień biura w jednym systemie
           </h2>
-          <p className="mt-5 max-w-[60ch] text-[1.0625rem] leading-relaxed mk-soft">
-            Bez ciemnych paneli rodem z narzędzi dla programistów. Jasny, czytelny interfejs, który agent otwiera rano i
-            zamyka wieczorem, a właściciel sprawdza z telefonu między spotkaniami.
+          <p className="mt-5 max-w-[62ch] text-[1.0625rem] leading-relaxed mk-soft">
+            Od porannego planu, przez oferty i prezentacje, po prowizje i dokumenty u notariusza. Poniżej osiem
+            ekranów, z których zespół korzysta codziennie. Kliknij, żeby zobaczyć każdy z nich.
           </p>
 
           <div className="mt-12">
@@ -347,6 +357,36 @@ export default function Home() {
                   node: <ShotOferty />,
                 },
                 {
+                  key: "klienci",
+                  label: "Karta klienta",
+                  note: "Cała historia kontaktu w jednym miejscu: telefony, prezentacje i ustalenia. Kolejna rozmowa dopina się do tej samej historii, zamiast tworzyć drugi kontakt.",
+                  node: <ShotKlient />,
+                },
+                {
+                  key: "cele",
+                  label: "Cele",
+                  note: "Cel roczny rozbity aż do dziennego: telefony, rozmowy, spotkania, umowy. Agent widzi, ile mu zostało dziś, a nie w abstrakcyjnym kwartale.",
+                  node: <ShotCele />,
+                },
+                {
+                  key: "kalendarz",
+                  label: "Kalendarz",
+                  note: "Spotkania, prezentacje i telefony w jednym widoku, razem z rytmem dnia: o której zespół faktycznie dzwoni i kiedy odbiera najwięcej osób.",
+                  node: <ShotKalendarz />,
+                },
+                {
+                  key: "prowizje",
+                  label: "Transakcje",
+                  note: "Pięć etapów transakcji, komplet dokumentów i prowizja licząca się sama, razem z podziałem między agentów.",
+                  node: <ShotProwizje />,
+                },
+                {
+                  key: "dokumenty",
+                  label: "Dokumenty",
+                  note: "Umowy, odpisy i świadectwa leżą przy ofercie i przy kliencie naraz. Linki do pobrania wygasają, więc nie krążą po WhatsAppie.",
+                  node: <ShotDokumenty />,
+                },
+                {
                   key: "zespol",
                   label: "Panel właściciela",
                   note: "Prowizje, telefony i oferty w rozbiciu na ludzi. System sam podpowiada, kto wymaga rozmowy, zanim zrobi się problem.",
@@ -357,6 +397,14 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── AI COACH: rozmowa, która odtwarza się sama ── */}
+      <Section className="relative">
+        <Beams />
+        <div className="relative">
+          <CoachLive />
+        </div>
+      </Section>
 
       {/* ── DZIEŃ W BIURZE: zdjęcia zamiast kolejnych kart z tekstem ── */}
       <Section>
@@ -491,22 +539,22 @@ export default function Home() {
               />
 
               <div className="relative flex flex-col items-center text-center">
-                <p className="mk-eyebrow mb-7">Program Pierwszych 10 Biur</p>
+                <p className="mk-eyebrow mb-7">Wdrożenie</p>
                 <h3 className="max-w-[20ch]">
-                  Przyjmujemy <span className="grad">jedno biuro na miasto</span>
+                  Zaczynacie pracę <span className="grad">następnego dnia</span>
                 </h3>
                 <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                  Wdrażamy powoli i z każdym biurem pracujemy indywidualnie -
-                  dlatego przyjmujemy ograniczoną liczbę biur, po jednym na
-                  miasto (w Warszawie i Krakowie po jednym na dzielnicę).
+                  Wdrożenie prowadzimy sami, od początku do końca. Importujemy bazę
+                  klientów i ofert, ustawiamy cele oraz podział prowizji pod Wasz
+                  model i szkolimy zespół na Waszych danych.
                 </p>
 
                 <ul className="mt-10 flex w-full max-w-md flex-col gap-4 text-left">
                   {[
-                    "Wyłączność na Twoje miasto na czas trwania umowy",
-                    "Wdrożenie 1:1 z założycielem, nie z działem supportu",
-                    "Wpływ na mapę drogową - budujemy pod realne potrzeby biur",
-                    "Cena zamrożona na 24 miesiące",
+                    "Import bazy klientów i ofert z obecnego systemu",
+                    "Szkolenie zespołu na Waszych danych, nie na przykładach",
+                    "Opiekun, który odbiera telefon, a nie system zgłoszeń",
+                    "Cena zamrożona na 24 miesiące przy umowie rocznej",
                   ].map((item) => (
                     <li
                       key={item}
@@ -520,9 +568,7 @@ export default function Home() {
 
                 <div className="mt-11">
                   <Magnetic strength={0.2}>
-                    <Button href="/kontakt">
-                      Sprawdź, czy Twoje miasto jest wolne
-                    </Button>
+                    <Button href="/kontakt">Umów wdrożenie</Button>
                   </Magnetic>
                 </div>
               </div>
@@ -531,7 +577,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* ── KLIENT ZERO ── */}
+      {/* ── SKĄD TO SIĘ WZIĘŁO ── */}
       {/* ── MANIFEST: zdanie odsłaniane przy przewijaniu + zdjęcia ── */}
       <Section>
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-16">
@@ -572,7 +618,7 @@ export default function Home() {
 
       <Section>
         <div className="mx-auto max-w-3xl">
-          <SectionHead eyebrow="Klient zero" title="Buduję to dla własnego biura" />
+          <SectionHead eyebrow="Skąd to się wzięło" title="System napisany w biurze nieruchomości" />
 
           <FadeIn delay={0.1}>
             <Card className="mt-12 p-8 md:p-12">

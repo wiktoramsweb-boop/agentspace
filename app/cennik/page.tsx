@@ -32,7 +32,7 @@ const FAQ = [
   },
   {
     q: "Czy mogę zapłacić za rok z góry?",
-    a: "Tak, przy rozliczeniu rocznym dwa miesiące są gratis. Dla biur z Programu Pierwszych 10 Biur cena jest dodatkowo zamrożona na 24 miesiące.",
+    a: "Tak, przy rozliczeniu rocznym dwa miesiące są gratis, a cena jest zamrożona na 24 miesiące.",
   },
   {
     q: "Czy są koszty wdrożenia?",

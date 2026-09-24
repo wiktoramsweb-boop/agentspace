@@ -51,6 +51,10 @@ html {
   --mk-grid-line: rgba(255, 255, 255, 0.5);
   --mk-grid-opacity: 0.022;
   --mk-aurora-fade: rgba(8, 9, 11, 0.7);
+  --mk-eyebrow-text: #6ee7b7;
+  --mk-eyebrow-bg-1: rgba(16, 185, 129, 0.12);
+  --mk-eyebrow-bg-2: rgba(34, 211, 238, 0.08);
+  --mk-eyebrow-border: rgba(16, 185, 129, 0.22);
 }
 
 
@@ -91,6 +95,10 @@ html {
   --mk-grid-line: rgba(13, 20, 26, 0.5);
   --mk-grid-opacity: 0.04;
   --mk-aurora-fade: rgba(246, 247, 248, 0.7);
+  --mk-eyebrow-text: #0b6b4f;
+  --mk-eyebrow-bg-1: rgba(13, 150, 104, 0.1);
+  --mk-eyebrow-bg-2: rgba(8, 145, 178, 0.07);
+  --mk-eyebrow-border: rgba(13, 150, 104, 0.28);
   }
 }
 
@@ -115,8 +123,8 @@ html[data-mk="light"] {
   --mk-card-shadow: 0 24px 50px -30px rgba(15, 30, 40, 0.45), 0 0 0 1px rgba(13, 150, 104, 0.08);
   --mk-nav-bg: rgba(246, 247, 248, 0.72);
   --mk-nav-panel: rgba(255, 255, 255, 0.98);
-  --mk-scrim: #0b1a17;
-  --mk-scrim-soft: rgba(11, 26, 23, 0.45);
+  --mk-scrim: #04070a;
+  --mk-scrim-soft: rgba(4, 7, 10, 0.55);
   --mk-on-accent: #ffffff;
   --mk-grain: 0.018;
   --mk-photo-brightness: 1;
@@ -127,6 +135,10 @@ html[data-mk="light"] {
   --mk-grid-line: rgba(13, 20, 26, 0.5);
   --mk-grid-opacity: 0.04;
   --mk-aurora-fade: rgba(246, 247, 248, 0.7);
+  --mk-eyebrow-text: #0b6b4f;
+  --mk-eyebrow-bg-1: rgba(13, 150, 104, 0.1);
+  --mk-eyebrow-bg-2: rgba(8, 145, 178, 0.07);
+  --mk-eyebrow-border: rgba(13, 150, 104, 0.28);
 }
 
 html[data-mk="dark"] {
@@ -387,17 +399,13 @@ body {
   gap: 8px;
   padding: 7px 16px;
   border-radius: 500px;
-  background: linear-gradient(
-    90deg,
-    rgba(16, 185, 129, 0.12),
-    rgba(34, 211, 238, 0.08)
-  );
-  border: 1px solid rgba(16, 185, 129, 0.22);
+  background: linear-gradient(90deg, var(--mk-eyebrow-bg-1), var(--mk-eyebrow-bg-2));
+  border: 1px solid var(--mk-eyebrow-border);
   font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.25rem;
   letter-spacing: 0.02em;
-  color: #6ee7b7;
+  color: var(--mk-eyebrow-text);
 }
 
 /* Kropka pulsująca w etykiecie - sygnał „to żyje”. */
@@ -1122,3 +1130,21 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print
 .mk-marquee__item i { font-style: normal; color: var(--color-mk-accent); font-size: .55em; }
 @keyframes mk-slide { from { transform: translateX(0); } to { transform: translateX(-100%); } }
 @media (prefers-reduced-motion: reduce) { .mk-marquee__track { animation: none; } .mk-marquee { overflow-x: auto; } }
+
+/* ── Jasny motyw: akcenty, które na białym tle robiły się nieczytelne ──
+   Ciemne makiety (.mk-force-dark) zostawiamy w spokoju - tam blada zieleń
+   i jasna szarość mają pełny kontrast na czarnym panelu. */
+@media (prefers-color-scheme: light) {
+  html:not([data-mk="dark"]) :is(.mk, footer) :is(.text-emerald-400, .text-emerald-300):not(.mk-force-dark *) {
+    color: #0b6b4f;
+  }
+  html:not([data-mk="dark"]) :is(.mk, footer) :is(.text-zinc-300, .text-zinc-200):not(.mk-force-dark *) {
+    color: var(--color-mk-muted);
+  }
+}
+html[data-mk="light"] :is(.mk, footer) :is(.text-emerald-400, .text-emerald-300):not(.mk-force-dark *) {
+  color: #0b6b4f;
+}
+html[data-mk="light"] :is(.mk, footer) :is(.text-zinc-300, .text-zinc-200):not(.mk-force-dark *) {
+  color: var(--color-mk-muted);
+}

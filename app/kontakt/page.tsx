@@ -98,7 +98,7 @@ export default function Kontakt() {
                 </div>
 
                 {/* Operator card */}
-                <div className="relative overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-6 backdrop-blur-xl">
+                <div className="relative overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-gradient-to-br from-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-6 backdrop-blur-xl">
                   <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl" />
                   <div className="relative">
                     <h3 className="mb-3 text-base font-semibold text-[var(--color-mk-text)]">
@@ -121,7 +121,7 @@ export default function Kontakt() {
 
             {/* Form column */}
             <FadeIn delay={0.15}>
-              <div className="rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-zinc-900/60 to-zinc-900/30 p-8 backdrop-blur-xl md:p-10">
+              <div className="rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 backdrop-blur-xl md:p-10">
                 <h2 className="mb-6 text-xl font-semibold text-[var(--color-mk-text)]">Napisz do nas</h2>
                 <ContactForm />
               </div>

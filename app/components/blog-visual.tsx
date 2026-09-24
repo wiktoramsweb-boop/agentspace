@@ -59,7 +59,7 @@ export function BlogVisual({ category }: { category: Category }) {
       </div>
 
       {/* Dolna maska - fade do koloru karty */}
-      <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-zinc-900/30 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[var(--mk-card-bg)] to-transparent" />
     </div>
   );
 }

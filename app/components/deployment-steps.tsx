@@ -52,7 +52,7 @@ export function DeploymentSteps() {
   return (
     <div className="relative">
       {/* Połącznik między krokami - tylko desktop */}
-      <div className="absolute left-0 right-0 top-[44px] hidden h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent md:block" />
+      <div className="absolute left-0 right-0 top-[44px] hidden h-px bg-gradient-to-r from-transparent via-[var(--mk-hairline)] to-transparent md:block" />
 
       <StaggerContainer className="relative grid gap-8 md:grid-cols-3 md:gap-6" staggerDelay={0.15}>
         {STEPS.map((step) => (

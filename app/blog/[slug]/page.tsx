@@ -84,7 +84,7 @@ export default async function BlogPost({ params }: Props) {
           {/* Visual cover na pełną szerokość */}
           <div className="absolute inset-x-0 top-0 h-[440px] md:h-[520px]">
             <BlogVisual category={post.category} />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/60 to-zinc-950" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--mk-card-bg)] to-[var(--mk-card-bg)]" />
           </div>
 
           <div className="relative z-10 mx-auto max-w-3xl px-6 pb-12 pt-20 md:pt-24">
@@ -168,7 +168,7 @@ export default async function BlogPost({ params }: Props) {
 
         {/* CTA */}
         <section className="px-6 py-20">
-          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 md:p-12">
+          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 md:p-12">
             <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
               AgentSpace
             </p>
@@ -177,7 +177,7 @@ export default async function BlogPost({ params }: Props) {
             </h2>
             <p className="mb-6 text-[var(--color-mk-muted)]">
               CRM, cele, prowizje, AI Coach i panel właściciela w jednym systemie.
-              Przyjmujemy jedno biuro na miasto.
+              Wdrożenie razem z importem bazy zajmuje jeden dzień roboczy.
             </p>
             <Link
               href="/#waitlist"

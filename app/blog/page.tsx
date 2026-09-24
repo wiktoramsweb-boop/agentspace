@@ -85,12 +85,12 @@ export default function BlogIndex() {
 
         {/* CTA na końcu */}
         <section className="border-t border-[var(--mk-hairline)] px-6 py-20">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 text-center md:p-12">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 text-center md:p-12">
             <h2 className="mb-4 text-2xl font-semibold tracking-tight md:text-3xl">
               Buduj wiedzę. Buduj zespół.
             </h2>
             <p className="mb-6 text-[var(--color-mk-muted)]">
-              AgentSpace działa na produkcji. Przyjmujemy jedno biuro na miasto w ramach Programu Pierwszych 10 Biur.
+              AgentSpace działa na produkcji w polskich biurach nieruchomości. Wdrożenie zajmuje jeden dzień roboczy.
             </p>
             <Link
               href="/#waitlist"

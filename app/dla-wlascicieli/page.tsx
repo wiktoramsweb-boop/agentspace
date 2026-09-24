@@ -141,7 +141,7 @@ export default function DlaWlascicieli() {
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <div className="relative overflow-hidden rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-zinc-900/60 to-zinc-900/20 p-8 backdrop-blur-xl md:p-10">
+              <div className="relative overflow-hidden rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 backdrop-blur-xl md:p-10">
                 <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl" />
                 <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
 
@@ -167,13 +167,13 @@ export default function DlaWlascicieli() {
         {/* CTA */}
         <section className="px-6 py-20">
           <FadeIn>
-            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-900/50 to-zinc-900/50 p-8 text-center md:p-12">
+            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 text-center md:p-12">
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
-                Program Pierwszych 10 Biur
+                Zobacz swoje biuro w liczbach
               </h2>
               <p className="mb-8 text-[var(--color-mk-muted)]">
-                Jedno biuro na miasto, cena zamrożona na 24 miesiące. Plus bezpośredni wpływ na rozwój
-                produktu (1-on-1 z founderem co tydzień).
+                Wdrożenie razem z importem bazy zajmuje jeden dzień roboczy, a cena jest zamrożona na
+                24 miesiące przy umowie rocznej. Bez umowy na czas określony.
               </p>
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
                 <Link

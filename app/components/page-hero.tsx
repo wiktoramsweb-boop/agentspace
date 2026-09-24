@@ -83,8 +83,8 @@ export function PageHero({
             <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 1024px) 100vw, 42vw" priority className="object-cover" />
             {photo.caption && (
               <>
-                <span className="absolute inset-0 bg-gradient-to-t from-[var(--mk-scrim)] via-transparent to-transparent" />
-                <figcaption className="absolute bottom-5 left-5 right-5 text-sm text-white/90">{photo.caption}</figcaption>
+                <span className="absolute inset-0 bg-gradient-to-t from-[rgba(4,7,10,0.9)] via-[rgba(4,7,10,0.15)] to-transparent" />
+                <figcaption className="absolute bottom-5 left-5 right-5 text-sm text-white/90 [text-shadow:0_2px_12px_rgba(0,0,0,0.5)]">{photo.caption}</figcaption>
               </>
             )}
           </figure>

@@ -30,7 +30,7 @@ const FOOTER_SECTIONS = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-zinc-900 bg-[var(--color-mk-bg)] px-6 py-16">
+    <footer className="border-t border-[var(--mk-hairline)] bg-[var(--color-mk-bg)] px-6 py-16">
       <div className="mx-auto max-w-6xl">
         {/* Top: brand + columns */}
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
@@ -47,7 +47,7 @@ export function SiteFooter() {
               Polski system operacyjny dla biur nieruchomości. Zbudowany w działającym biurze w Krakowie.
             </p>
             <p className="text-xs text-zinc-600">
-              Klient zero: <span className="text-zinc-400">Spectra Nieruchomości</span>,
+              Powstaje w biurze <span className="text-[var(--color-mk-muted)]">Spectra Nieruchomości</span>,
               Kraków
             </p>
           </div>

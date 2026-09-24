@@ -14,7 +14,7 @@ const CHART_POINTS = "0,40 25,38 50,32 75,28 100,24 125,22 150,18 175,16 200,12"
 
 export function OwnerPanelMockup() {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black p-5 font-sans text-xs">
+    <div className="mk-force-dark relative h-full w-full overflow-hidden rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black p-5 font-sans text-xs">
       {/* Header */}
       <div className="mb-3 flex items-center justify-between">
         <div>

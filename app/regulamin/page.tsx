@@ -99,20 +99,16 @@ export default function Regulamin() {
               AgentSpace. Zgodę można w dowolnym momencie wycofać poprzez kontakt mailowy.
             </p>
 
-            <h2>§5. Program Pierwszych 10 Biur (warunki szczególne)</h2>
+            <h2>§5. Umowa roczna (warunki szczególne)</h2>
             <p>
-              Biura nieruchomości przyjęte do Programu Pierwszych 10 Biur otrzymują:
+              Biura, które wybiorą rozliczenie roczne, otrzymują:
             </p>
             <ul>
-              <li>
-                wyłączność terytorialną - w okresie obowiązywania umowy Operator nie
-                zawrze umowy z innym biurem nieruchomości z tego samego miasta
-                (w Warszawie i Krakowie: z tej samej dzielnicy),
-              </li>
               <li>
                 cenę abonamentu niezmienną przez 24 miesiące od dnia zawarcia umowy,
                 przy zachowaniu ciągłości subskrypcji,
               </li>
+              <li>dwa miesiące abonamentu gratis w stosunku do rozliczenia miesięcznego,</li>
               <li>wdrożenie i import danych bez dodatkowej opłaty.</li>
             </ul>
             <p>

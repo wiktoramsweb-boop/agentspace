@@ -10,7 +10,7 @@
 const FAQ_ENTRIES = [
   {
     q: "Czy AgentSpace działa już dziś?",
-    a: "Tak. Platforma działa na produkcji i jest codziennie używana w biurze Spectra Nieruchomości w Krakowie - to biuro założyciela i pierwszy klient produktu. Przyjmujemy kolejne biura w ramach Programu Pierwszych 10 Biur.",
+    a: "Tak. System działa na produkcji i jest codziennie używany w biurach nieruchomości, między innymi w Spectrze w Krakowie, gdzie powstaje. Wdrożenie nowego biura zajmuje jeden dzień roboczy.",
   },
   {
     q: "Czy AgentSpace zastąpi mój obecny system?",
@@ -123,7 +123,7 @@ const organizationSchema = {
   legalName: "Spectra Nieruchomości",
   url: "https://agentspace.pl",
   description:
-    "Polski system operacyjny dla biur nieruchomości. Klient zero: Spectra Nieruchomości w Krakowie.",
+    "Polski system operacyjny dla biur nieruchomości: CRM, oferty, cele, prowizje, AI Coach i strona internetowa biura.",
   founder: {
     "@type": "Person",
     name: "Wiktor Szostek",
