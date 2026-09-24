@@ -2,23 +2,19 @@
 
 import { motion } from "motion/react";
 import { StaggerContainer, StaggerItem } from "./fade-in";
+import { getDict, toLocale } from "@/lib/i18n";
 
-const SCENARIOS = ["Zimny telefon", "Follow-up", "Obiekcje cenowe", "Negocjacja prowizji", "Muszę pomyśleć"];
-
-const PERSONALITIES = [
-  { label: "Agresywny", color: "from-red-500/40 to-red-500/0" },
-  { label: "Wahający", color: "from-amber-500/40 to-amber-500/0" },
-  { label: "Cenowy", color: "from-blue-500/40 to-blue-500/0" },
-  { label: "Emocjonalny", color: "from-violet-500/40 to-violet-500/0" },
-  { label: "Biznesowy", color: "from-emerald-500/40 to-emerald-500/0" },
+/** Kolory osobowości - kolejność zgodna ze słownikiem. */
+const PERSONALITY_COLORS = [
+  "from-red-500/40 to-red-500/0",
+  "from-amber-500/40 to-amber-500/0",
+  "from-blue-500/40 to-blue-500/0",
+  "from-violet-500/40 to-violet-500/0",
+  "from-emerald-500/40 to-emerald-500/0",
 ];
 
-const SCORES = [
-  { label: "Otwarcie", value: 8 },
-  { label: "Kwalifikacja", value: 4 },
-  { label: "Obiekcje", value: 7 },
-  { label: "Zamknięcie", value: 6 },
-];
+/** Przykładowe punkty w makiecie oceny. */
+const SCORE_VALUES = [8, 4, 7, 6];
 
 function StepCard({
   number,
@@ -55,7 +51,12 @@ function StepCard({
   );
 }
 
-export function CoachFlow() {
+export function CoachFlow({ lang = "pl" }: { lang?: string }) {
+  const t = getDict(toLocale(lang)).coachFlow;
+  const SCENARIOS = t.scenarios;
+  const PERSONALITIES = t.personalities.map((label, i) => ({ label, color: PERSONALITY_COLORS[i] }));
+  const SCORES = t.scores.map((label, i) => ({ label, value: SCORE_VALUES[i] }));
+
   return (
     <StaggerContainer
       className="grid gap-4 md:grid-cols-2 lg:grid-cols-5"
@@ -65,8 +66,8 @@ export function CoachFlow() {
       <StaggerItem>
         <StepCard
           number="01"
-          title="Wybierz scenariusz"
-          body="5 sytuacji z polskiego rynku RE: od zimnego telefonu po negocjację prowizji."
+          title={t.steps[0].title}
+          body={t.steps[0].body}
         >
           <div className="flex h-full flex-col justify-center gap-1.5">
             {SCENARIOS.slice(0, 4).map((scenario, i) => (
@@ -93,8 +94,8 @@ export function CoachFlow() {
       <StaggerItem>
         <StepCard
           number="02"
-          title="Wybierz osobowość klienta"
-          body="AI gra klienta z konkretną postawą - od agresywnego po biznesowego."
+          title={t.steps[1].title}
+          body={t.steps[1].body}
         >
           <div className="flex h-full flex-col justify-center gap-1">
             {PERSONALITIES.slice(0, 3).map((p, i) => (
@@ -119,8 +120,8 @@ export function CoachFlow() {
       <StaggerItem>
         <StepCard
           number="03"
-          title="Rozmawiasz głosem"
-          body="Mikrofon w przeglądarce. Mówisz jak do prawdziwego klienta - naturalne tempo."
+          title={t.steps[2].title}
+          body={t.steps[2].body}
         >
           <div className="flex h-full items-center justify-center gap-1">
             {Array.from({ length: 22 }).map((_, i) => (
@@ -147,8 +148,8 @@ export function CoachFlow() {
       <StaggerItem>
         <StepCard
           number="04"
-          title="AI odpowiada głosem"
-          body="Polski głos, naturalny ton, kontruje argumenty. To nie ChatGPT - to symulacja klienta."
+          title={t.steps[3].title}
+          body={t.steps[3].body}
         >
           <div className="flex h-full flex-col justify-center gap-2">
             <motion.div
@@ -181,8 +182,8 @@ export function CoachFlow() {
       <StaggerItem>
         <StepCard
           number="05"
-          title="Scoring + feedback PL"
-          body="Po sesji: wynik 1-10 w 4 kategoriach + konkretne sugestie poprawy."
+          title={t.steps[4].title}
+          body={t.steps[4].body}
         >
           <div className="flex h-full flex-col justify-center gap-1.5">
             {SCORES.map((score, i) => (

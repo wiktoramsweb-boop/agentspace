@@ -1,3 +1,5 @@
+import { INTEGRATIONS_EN, STATUS_LABEL_EN } from "./integrations-en";
+
 /**
  * Dane stron integracji (pSEO).
  *
@@ -87,6 +89,20 @@ export const INTEGRATIONS: Integration[] = [
   },
 ];
 
-export function getIntegration(slug: string): Integration | undefined {
-  return INTEGRATIONS.find((i) => i.slug === slug);
+/** Integracja w danym języku - slug i status są wspólne. */
+export function getIntegration(slug: string, lang: string = "pl"): Integration | undefined {
+  const base = INTEGRATIONS.find((i) => i.slug === slug);
+  if (!base) return undefined;
+  if (lang !== "en") return base;
+
+  const translated = INTEGRATIONS_EN[slug];
+  return translated ? { ...base, ...translated } : base;
+}
+
+export function listIntegrations(lang: string = "pl"): Integration[] {
+  return INTEGRATIONS.map((i) => getIntegration(i.slug, lang) ?? i);
+}
+
+export function statusLabel(status: IntegrationStatus, lang: string = "pl"): string {
+  return lang === "en" ? STATUS_LABEL_EN[status] : STATUS_LABEL[status];
 }

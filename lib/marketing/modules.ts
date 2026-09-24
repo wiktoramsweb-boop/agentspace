@@ -1,3 +1,5 @@
+import { MODULES_EN } from "./modules-en";
+
 /**
  * Dane stron modułów produktu (/produkt/[slug]).
  * Każdy moduł = osobna strona pod długi ogon fraz, np. „rozliczanie prowizji
@@ -207,6 +209,20 @@ export const MODULES: ProductModule[] = [
   },
 ];
 
-export function getModule(slug: string): ProductModule | undefined {
-  return MODULES.find((m) => m.slug === slug);
+/**
+ * Moduł w danym języku. Slug jest wspólny dla obu wersji, więc adres strony
+ * nie zmienia się przy przełączeniu języka - zmienia się tylko treść.
+ */
+export function getModule(slug: string, lang: string = "pl"): ProductModule | undefined {
+  const base = MODULES.find((m) => m.slug === slug);
+  if (!base) return undefined;
+  if (lang !== "en") return base;
+
+  const translated = MODULES_EN[slug];
+  return translated ? { slug, ...translated } : base;
+}
+
+/** Lista modułów w danym języku - do list i map strony. */
+export function listModules(lang: string = "pl"): ProductModule[] {
+  return MODULES.map((m) => getModule(m.slug, lang) ?? m);
 }

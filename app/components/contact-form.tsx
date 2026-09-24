@@ -1,18 +1,15 @@
 "use client";
 
+import { getDict, localeHref, toLocale } from "@/lib/i18n";
+
 import { useState } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-const TOPIC_OPTIONS = [
-  { value: "pilotaz", label: "Chcę dołączyć do pilotażu" },
-  { value: "demo", label: "Pokażcie mi demo" },
-  { value: "wspolpraca", label: "Propozycja współpracy" },
-  { value: "media", label: "Kontakt mediowy" },
-  { value: "inne", label: "Inny temat" },
-];
 
-export function ContactForm() {
+export function ContactForm({ lang = "pl" }: { lang?: string }) {
+  const locale = toLocale(lang);
+  const t = getDict(locale).form;
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -41,14 +38,14 @@ export function ContactForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrorMessage(data.error ?? "Coś poszło nie tak. Spróbuj za chwilę.");
+        setErrorMessage(data.error ?? t.genericError);
         setStatus("error");
         return;
       }
 
       setStatus("success");
     } catch {
-      setErrorMessage("Brak połączenia. Sprawdź internet i spróbuj ponownie.");
+      setErrorMessage(t.offlineError);
       setStatus("error");
     }
   }
@@ -67,9 +64,9 @@ export function ContactForm() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="mb-2 text-xl font-semibold text-[var(--color-mk-text)]">Dziękujemy!</h3>
+        <h3 className="mb-2 text-xl font-semibold text-[var(--color-mk-text)]">{t.successTitle}</h3>
         <p className="text-[var(--color-mk-muted)]">
-          Otrzymaliśmy wiadomość. Odpowiemy w ciągu 24 godzin w dni robocze.
+          {t.successBody}
         </p>
       </div>
     );
@@ -79,7 +76,7 @@ export function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       {/* Honeypot */}
       <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-        <label htmlFor="website-contact">Zostaw puste</label>
+        <label htmlFor="website-contact">{t.honeypot}</label>
         <input
           id="website-contact"
           name="website"
@@ -92,28 +89,28 @@ export function ContactForm() {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label htmlFor="name" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
-            Imię i nazwisko <span className="text-emerald-400">*</span>
+            {t.name} <span className="text-emerald-400">*</span>
           </label>
           <input
             id="name"
             name="name"
             type="text"
             required
-            placeholder="Jan Kowalski"
+            placeholder={t.namePlaceholder}
             className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
           />
         </div>
 
         <div>
           <label htmlFor="email" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
-            Email <span className="text-emerald-400">*</span>
+            {t.email} <span className="text-emerald-400">*</span>
           </label>
           <input
             id="email"
             name="email"
             type="email"
             required
-            placeholder="jan@biuro.pl"
+            placeholder={t.emailPlaceholder}
             className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
           />
         </div>
@@ -121,21 +118,21 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="agency" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
-          Nazwa biura nieruchomości{" "}
-          <span className="text-[var(--color-mk-muted)]">(opcjonalnie)</span>
+          {t.agency}{" "}
+          <span className="text-[var(--color-mk-muted)]">{t.optional}</span>
         </label>
         <input
           id="agency"
           name="agency"
           type="text"
-          placeholder="Np. Spectra Nieruchomości"
+          placeholder={t.agencyPlaceholder}
           className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
 
       <div>
         <label htmlFor="topic" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
-          Temat <span className="text-emerald-400">*</span>
+          {t.topic} <span className="text-emerald-400">*</span>
         </label>
         <select
           id="topic"
@@ -145,9 +142,9 @@ export function ContactForm() {
           className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         >
           <option value="" disabled>
-            Wybierz temat...
+            {t.topicPlaceholder}
           </option>
-          {TOPIC_OPTIONS.map((option) => (
+          {t.topics.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -157,7 +154,7 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="message" className="mb-2 block text-sm font-medium text-[var(--color-mk-text)]">
-          Wiadomość <span className="text-emerald-400">*</span>
+          {t.message} <span className="text-emerald-400">*</span>
         </label>
         <textarea
           id="message"
@@ -165,7 +162,7 @@ export function ContactForm() {
           required
           rows={5}
           minLength={10}
-          placeholder="W czym możemy pomóc?"
+          placeholder={t.messagePlaceholder}
           className="w-full resize-y rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
@@ -181,15 +178,18 @@ export function ContactForm() {
         disabled={status === "submitting"}
         className="w-full rounded-xl bg-emerald-500 px-6 py-4 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {status === "submitting" ? "Wysyłam..." : "Wyślij wiadomość"}
+        {status === "submitting" ? t.submitting : t.submit}
       </button>
 
       <p className="text-center text-xs text-[var(--color-mk-muted)]">
-        Klikając wysyłam akceptujesz{" "}
-        <a href="/polityka-prywatnosci" className="text-[var(--color-mk-muted)] underline hover:text-emerald-400">
-          politykę prywatności
+        {t.consentBefore}
+        <a
+          href={localeHref(locale, "/polityka-prywatnosci")}
+          className="text-[var(--color-mk-muted)] underline hover:text-emerald-400"
+        >
+          {t.consentLink}
         </a>
-        .
+        {t.consentAfter}
       </p>
     </form>
   );

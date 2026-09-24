@@ -1,0 +1,194 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getAllPostSlugs, getPostBySlug, getAllPostsMeta, formatDate } from "@/lib/blog";
+import { SiteNav } from "@/app/components/site-nav";
+import { SiteFooter } from "@/app/components/site-footer";
+import { ReadingProgress } from "@/app/components/reading-progress";
+import { BlogVisual } from "@/app/components/blog-visual";
+
+type Props = {
+  params: Promise<{ lang: string; slug: string }>;
+};
+
+export async function generateStaticParams() {
+  return getAllPostSlugs().map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
+  if (!post) return { title: "Nie znaleziono | AgentSpace" };
+
+  return {
+    title: `${post.title} | AgentSpace`,
+    description: post.description,
+    keywords: post.keywords,
+    alternates: {
+      canonical: `https://agentspace.pl/blog/${slug}`,
+    },
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      url: `https://agentspace.pl/blog/${slug}`,
+      type: "article",
+      publishedTime: post.date,
+      authors: [post.author],
+      locale: "pl_PL",
+    },
+  };
+}
+
+export default async function BlogPost({ params }: Props) {
+  const { lang, slug } = await params;
+  const post = await getPostBySlug(slug);
+  if (!post) notFound();
+
+  // Pozostałe artykuły do sekcji "Czytaj dalej"
+  const allPosts = getAllPostsMeta();
+  const relatedPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 2);
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { "@type": "Person", name: post.author },
+    publisher: {
+      "@type": "Organization",
+      name: "AgentSpace",
+      url: "https://agentspace.pl",
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://agentspace.pl/blog/${slug}`,
+    },
+    inLanguage: "pl-PL",
+    keywords: post.keywords.join(", "),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <SiteNav lang={lang} />
+      <ReadingProgress />
+
+      <main className="mk relative min-h-screen">
+        {/* Hero z visual */}
+        <section className="relative overflow-hidden border-b border-[var(--mk-hairline)] pt-32 md:pt-40">
+          {/* Visual cover na pełną szerokość */}
+          <div className="absolute inset-x-0 top-0 h-[440px] md:h-[520px]">
+            <BlogVisual category={post.category} />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--mk-card-bg)] to-[var(--mk-card-bg)]" />
+          </div>
+
+          <div className="relative z-10 mx-auto max-w-3xl px-6 pb-12 pt-20 md:pt-24">
+            <Link
+              href="/blog"
+              className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--color-mk-muted)] transition hover:text-emerald-400"
+            >
+              <span>←</span> Wszystkie artykuły
+            </Link>
+
+            <p className="mb-4 inline-block rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.15em] text-emerald-300">
+              {post.category}
+            </p>
+
+            <h1 className="mb-6 text-3xl font-semibold leading-[1.15] tracking-tight md:text-5xl">
+              {post.title}
+            </h1>
+
+            <p className="mb-8 text-lg leading-relaxed text-[var(--color-mk-text)] md:text-xl">
+              {post.description}
+            </p>
+
+            <div className="flex items-center gap-3 border-t border-[var(--mk-hairline)] pt-6 text-sm text-[var(--color-mk-muted)]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-xs font-bold text-[var(--mk-on-accent)]">
+                {post.author.charAt(0)}
+              </div>
+              <span className="text-[var(--color-mk-text)]">{post.author}</span>
+              <span className="text-zinc-700">·</span>
+              <span>{formatDate(post.date)}</span>
+              <span className="text-zinc-700">·</span>
+              <span>{post.readingTime}</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Article body */}
+        <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-24">
+          <article
+            className="prose-blog mx-auto max-w-3xl"
+            dangerouslySetInnerHTML={{ __html: post.html }}
+          />
+        </section>
+
+        {/* Related posts */}
+        {relatedPosts.length > 0 && (
+          <section className="border-b border-[var(--mk-hairline)] px-6 py-20">
+            <div className="mx-auto max-w-5xl">
+              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
+                Czytaj dalej
+              </p>
+              <h2 className="mb-12 text-3xl font-semibold tracking-tight md:text-4xl">
+                Inne artykuły
+              </h2>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                {relatedPosts.map((p) => (
+                  <Link
+                    key={p.slug}
+                    href={`/blog/${p.slug}`}
+                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)]"
+                  >
+                    <BlogVisual category={p.category} />
+                    <div className="flex flex-1 flex-col p-6">
+                      <p className="mb-2 text-xs font-medium uppercase tracking-[0.15em] text-emerald-400">
+                        {p.category}
+                      </p>
+                      <h3 className="mb-2 text-lg font-semibold text-[var(--color-mk-text)] transition group-hover:text-emerald-50">
+                        {p.title}
+                      </h3>
+                      <p className="flex-1 text-sm text-[var(--color-mk-muted)]">{p.description}</p>
+                      <p className="mt-4 text-xs text-[var(--color-mk-muted)]">
+                        {formatDate(p.date)} · {p.readingTime}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* CTA */}
+        <section className="px-6 py-20">
+          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 md:p-12">
+            <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
+              AgentSpace
+            </p>
+            <h2 className="mb-4 text-2xl font-semibold md:text-3xl">
+              Zbuduj systematyczny trening agentów w swoim biurze
+            </h2>
+            <p className="mb-6 text-[var(--color-mk-muted)]">
+              CRM, cele, prowizje, AI Coach i panel właściciela w jednym systemie.
+              Wdrożenie razem z importem bazy zajmuje jeden dzień roboczy.
+            </p>
+            <Link
+              href="/#waitlist"
+              className="inline-flex items-center rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-[var(--mk-on-accent)] transition hover:bg-emerald-400"
+            >
+              Umów rozmowę →
+            </Link>
+          </div>
+        </section>
+      </main>
+      <SiteFooter lang={lang} />
+    </>
+  );
+}

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
+import { shotText } from "@/lib/i18n/shots";
 
 /**
  * Jasne makiety produktu na stronę marketingową.
@@ -30,13 +31,14 @@ function Bar({ value, tone = "emerald" }: { value: number; tone?: "emerald" | "s
 }
 
 /** Pulpit agenta: cele dnia, zadania i prowizja. */
-export function ShotPulpit() {
+export function ShotPulpit({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
   return (
     <div className="h-full w-full bg-slate-50 p-4 text-[11px] leading-snug text-slate-700 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-slate-400">Środa, 23 września</p>
-          <p className="text-base font-semibold text-slate-900">Dzień dobry, Marta</p>
+          <p className="text-slate-400">{s("Środa, 23 września")}</p>
+          <p className="text-base font-semibold text-slate-900">{s("Dzień dobry, Marta")}</p>
         </div>
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-[11px] font-bold text-white">
           M
@@ -45,9 +47,9 @@ export function ShotPulpit() {
 
       <div className="mb-3 grid grid-cols-3 gap-2">
         {[
-          ["Telefony", "7 / 10", 70, "emerald"],
-          ["Spotkania", "3 / 4", 75, "sky"],
-          ["Oferty", "12 / 15", 80, "amber"],
+          [s("Telefony"), "7 / 10", 70, "emerald"],
+          [s("Spotkania"), "3 / 4", 75, "sky"],
+          [s("Oferty"), "12 / 15", 80, "amber"],
         ].map(([label, value, pct, tone]) => (
           <div key={label as string} className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-slate-400">{label as string}</p>
@@ -58,16 +60,16 @@ export function ShotPulpit() {
       </div>
 
       <div className="mb-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-        <p className="text-emerald-700">Prowizja w tym miesiącu</p>
-        <p className="text-lg font-semibold text-slate-900">14 200 zł</p>
+        <p className="text-emerald-700">{s("Prowizja w tym miesiącu")}</p>
+        <p className="text-lg font-semibold text-slate-900">{s("14 200 zł")}</p>
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white">
         {[
-          ["Oddzwoń do pana Kowalskiego", "10:30", true],
-          ["Prezentacja, ul. Wielicka 134", "15:00", true],
-          ["Follow-up: rodzina Nowak", "17:00", false],
-          ["Trening AI Coach: obiekcje", "wieczorem", false],
+          [s("Oddzwoń do pana Kowalskiego"), "10:30", true],
+          [s("Prezentacja, ul. Wielicka 134"), "15:00", true],
+          [s("Follow-up: rodzina Nowak"), "17:00", false],
+          [s("Trening AI Coach: obiekcje"), s("wieczorem"), false],
         ].map(([task, time, done], i) => (
           <div key={task as string} className={`flex items-center gap-2.5 p-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}>
             <span
@@ -87,20 +89,21 @@ export function ShotPulpit() {
 }
 
 /** Lista ofert ze zdjęciami: to najczęściej otwierany ekran w biurze. */
-export function ShotOferty() {
+export function ShotOferty({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
   const rows: [string, string, string, string][] = [
-    ["/wzory/salon-widok.jpg", "Apartament z widokiem na Wawel", "Zabłocie · 84 m² · 3 pok.", "1 690 000 zł"],
-    ["/wzory/dom-las.jpg", "Dom przy lesie, gotowy do wejścia", "Zielonki · 214 m² · 6 pok.", "2 150 000 zł"],
-    ["/wzory/loft.jpg", "Loft w dawnej fabryce", "Podgórze · 96 m² · 2 pok.", "1 240 000 zł"],
+    ["/wzory/salon-widok.jpg", s("Apartament z widokiem na Wawel"), s("Zabłocie · 84 m² · 3 pok."), s("1 690 000 zł")],
+    ["/wzory/dom-las.jpg", s("Dom przy lesie, gotowy do wejścia"), s("Zielonki · 214 m² · 6 pok."), s("2 150 000 zł")],
+    ["/wzory/loft.jpg", s("Loft w dawnej fabryce"), s("Podgórze · 96 m² · 2 pok."), s("1 240 000 zł")],
   ];
 
   return (
     <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <span className="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">Wszystkie</span>
-        <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">Sprzedaż</span>
-        <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">Wynajem</span>
-        <span className="ml-auto rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">Filtry</span>
+        <span className="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">{s("Wszystkie")}</span>
+        <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">{s("Sprzedaż")}</span>
+        <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">{s("Wynajem")}</span>
+        <span className="ml-auto rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">{s("Filtry")}</span>
       </div>
 
       <div className="grid gap-2">
@@ -126,9 +129,9 @@ export function ShotOferty() {
       </div>
 
       <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3">
-        <p className="mb-2 text-slate-400">Publikacja</p>
+        <p className="mb-2 text-slate-400">{s("Publikacja")}</p>
         <div className="flex flex-wrap gap-1.5">
-          {["Strona biura", "Otodom", "OLX", "Nieruchomosci-online"].map((p) => (
+          {[s("Strona biura"), "Otodom", "OLX", s("Nieruchomosci-online")].map((p) => (
             <span key={p} className="rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-medium text-emerald-700">
               {p}
             </span>
@@ -140,21 +143,22 @@ export function ShotOferty() {
 }
 
 /** Panel właściciela: zespół w liczbach. */
-export function ShotPanel() {
+export function ShotPanel({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
   const team: [string, string, number, string][] = [
-    ["Marta L.", "187 transakcji", 92, "34 200 zł"],
-    ["Paweł Z.", "143 transakcje", 74, "21 800 zł"],
-    ["Karolina M.", "264 najmy", 61, "12 400 zł"],
-    ["Tomasz B.", "96 transakcji", 48, "9 100 zł"],
+    ["Marta L.", s("187 transakcji"), 92, s("34 200 zł")],
+    ["Paweł Z.", s("143 transakcje"), 74, s("21 800 zł")],
+    ["Karolina M.", s("264 najmy"), 61, s("12 400 zł")],
+    ["Tomasz B.", s("96 transakcji"), 48, s("9 100 zł")],
   ];
 
   return (
     <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
       <div className="mb-3 grid grid-cols-3 gap-2">
         {[
-          ["Prowizje, miesiąc", "77 500 zł"],
-          ["Telefony, tydzień", "312"],
-          ["Oferty aktywne", "48"],
+          [s("Prowizje, miesiąc"), s("77 500 zł")],
+          [s("Telefony, tydzień"), "312"],
+          [s("Oferty aktywne"), "48"],
         ].map(([l, v]) => (
           <div key={l} className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-slate-400">{l}</p>
@@ -164,7 +168,7 @@ export function ShotPanel() {
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-3">
-        <p className="mb-3 text-slate-400">Zespół w tym miesiącu</p>
+        <p className="mb-3 text-slate-400">{s("Zespół w tym miesiącu")}</p>
         <div className="grid gap-3">
           {team.map(([name, sub, pct, money], i) => (
             <div key={name} className="grid grid-cols-[1fr_auto] items-center gap-2">
@@ -185,44 +189,45 @@ export function ShotPanel() {
       </div>
 
       <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
-        <p className="font-medium text-amber-800">Wymaga uwagi</p>
-        <p className="text-amber-700">Tomasz nie dzwonił od czterech dni, a ma sześć zaległych kontaktów.</p>
+        <p className="font-medium text-amber-800">{s("Wymaga uwagi")}</p>
+        <p className="text-amber-700">{s("Tomasz nie dzwonił od czterech dni, a ma sześć zaległych kontaktów.")}</p>
       </div>
     </div>
   );
 }
 
 /** Cele: lejek roczny rozbity na dzień i dzienny tracker. */
-export function ShotCele() {
+export function ShotCele({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
   const funnel: [string, number, number, string][] = [
-    ["Telefony", 34, 40, "emerald"],
-    ["Rozmowy", 12, 14, "sky"],
-    ["Spotkania", 5, 6, "amber"],
-    ["Umowy", 2, 3, "emerald"],
+    [s("Telefony"), 34, 40, "emerald"],
+    [s("Rozmowy"), 12, 14, "sky"],
+    [s("Spotkania"), 5, 6, "amber"],
+    [s("Umowy"), 2, 3, "emerald"],
   ];
 
   return (
     <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
       <div className="mb-3 flex items-end justify-between">
         <div>
-          <p className="text-slate-400">Cel roczny</p>
-          <p className="text-base font-semibold text-slate-900">420 000 zł prowizji</p>
+          <p className="text-slate-400">{s("Cel roczny")}</p>
+          <p className="text-base font-semibold text-slate-900">{s("420 000 zł prowizji")}</p>
         </div>
-        <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700">62% planu</span>
+        <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700">{s("62% planu")}</span>
       </div>
 
       <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-200">
         <motion.div
           className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500"
           initial={{ width: 0 }}
-          whileInView={{ width: "62%" }}
+          whileInView={{ width: s("62%") }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease }}
         />
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-3">
-        <p className="mb-3 text-slate-400">Dziś do zrobienia</p>
+        <p className="mb-3 text-slate-400">{s("Dziś do zrobienia")}</p>
         <div className="grid gap-3">
           {funnel.map(([label, done, target, tone], i) => (
             <div key={label}>
@@ -239,28 +244,29 @@ export function ShotCele() {
       </div>
 
       <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-        <p className="font-medium text-emerald-800">Passa: 9 dni z rzędu</p>
-        <p className="text-emerald-700">Zrób jeszcze 6 telefonów, żeby nie przerwać serii.</p>
+        <p className="font-medium text-emerald-800">{s("Passa: 9 dni z rzędu")}</p>
+        <p className="text-emerald-700">{s("Zrób jeszcze 6 telefonów, żeby nie przerwać serii.")}</p>
       </div>
     </div>
   );
 }
 
 /** Kalendarz z rytmem dzwonienia. */
-export function ShotKalendarz() {
+export function ShotKalendarz({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
   const hours = ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"];
   const load = [10, 35, 80, 65, 30, 20, 45, 70, 90, 55, 25];
   const events: [string, string, string][] = [
-    ["9:30", "Telefon: pan Kowalski", "emerald"],
-    ["11:00", "Prezentacja, ul. Wielicka", "sky"],
-    ["15:30", "Podpisanie umowy, notariusz", "amber"],
+    ["9:30", s("Telefon: pan Kowalski"), "emerald"],
+    ["11:00", s("Prezentacja, ul. Wielicka"), "sky"],
+    ["15:30", s("Podpisanie umowy, notariusz"), "amber"],
   ];
 
   return (
     <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-base font-semibold text-slate-900">Środa, 23 września</p>
-        <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">Tydzień</span>
+        <p className="text-base font-semibold text-slate-900">{s("Środa, 23 września")}</p>
+        <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px]">{s("Tydzień")}</span>
       </div>
 
       <div className="mb-3 grid gap-2">
@@ -278,7 +284,7 @@ export function ShotKalendarz() {
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-3">
-        <p className="mb-2 text-slate-400">O której najczęściej dzwonisz</p>
+        <p className="mb-2 text-slate-400">{s("O której najczęściej dzwonisz")}</p>
         <div className="flex h-16 items-end gap-1">
           {hours.map((h, i) => (
             <motion.div
@@ -302,16 +308,17 @@ export function ShotKalendarz() {
 }
 
 /** Prowizje i etapy transakcji. */
-export function ShotProwizje() {
-  const stages = ["Umowa", "Zadatek", "Kredyt", "Akt", "Rozliczenie"];
+export function ShotProwizje({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
+  const stages = [s("Umowa"), s("Zadatek"), s("Kredyt"), s("Akt"), s("Rozliczenie")];
   const active = 3;
 
   return (
     <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
       <div className="mb-3 rounded-xl border border-slate-200 bg-white p-3">
         <div className="mb-2 flex items-center justify-between">
-          <p className="font-semibold text-slate-900">ul. Nadwiślańska 12/34</p>
-          <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">w toku</span>
+          <p className="font-semibold text-slate-900">{s("ul. Nadwiślańska 12/34")}</p>
+          <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">{s("w toku")}</span>
         </div>
         <div className="flex items-center gap-1">
           {stages.map((s, i) => (
@@ -332,9 +339,9 @@ export function ShotProwizje() {
 
       <div className="mb-3 grid grid-cols-3 gap-2">
         {[
-          ["Cena", "1 690 000 zł"],
-          ["Prowizja", "41 400 zł"],
-          ["Twój udział", "20 700 zł"],
+          [s("Cena"), s("1 690 000 zł")],
+          [s("Prowizja"), s("41 400 zł")],
+          [s("Twój udział"), s("20 700 zł")],
         ].map(([l, v]) => (
           <div key={l} className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-slate-400">{l}</p>
@@ -344,8 +351,8 @@ export function ShotProwizje() {
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-3">
-        <p className="mb-2 text-slate-400">Dokumenty transakcji</p>
-        {["Umowa pośrednictwa.pdf", "Zaświadczenie ze wspólnoty.pdf", "Świadectwo energetyczne.pdf"].map((d, i) => (
+        <p className="mb-2 text-slate-400">{s("Dokumenty transakcji")}</p>
+        {[s("Umowa pośrednictwa.pdf"), s("Zaświadczenie ze wspólnoty.pdf"), s("Świadectwo energetyczne.pdf")].map((d, i) => (
           <div key={d} className={`flex items-center gap-2 py-1.5 ${i > 0 ? "border-t border-slate-100" : ""}`}>
             <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500">PDF</span>
             <span className="flex-1 truncate">{d}</span>
@@ -358,7 +365,8 @@ export function ShotProwizje() {
 }
 
 /** Karta klienta z historią kontaktu. */
-export function ShotKlient() {
+export function ShotKlient({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
   return (
     <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
       <div className="mb-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
@@ -366,18 +374,18 @@ export function ShotKlient() {
           M
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-slate-900">Małgorzata Zielińska</p>
-          <p className="text-slate-500">Kupująca · budżet do 900 000 zł · Podgórze</p>
+          <p className="font-semibold text-slate-900">{s("Małgorzata Zielińska")}</p>
+          <p className="text-slate-500">{s("Kupująca · budżet do 900 000 zł · Podgórze")}</p>
         </div>
-        <span className="rounded-md bg-violet-50 px-2 py-0.5 text-[10px] font-medium text-violet-700">ogląda</span>
+        <span className="rounded-md bg-violet-50 px-2 py-0.5 text-[10px] font-medium text-violet-700">{s("ogląda")}</span>
       </div>
 
       <div className="mb-3 rounded-xl border border-slate-200 bg-white p-3">
-        <p className="mb-2 text-slate-400">Historia kontaktu</p>
+        <p className="mb-2 text-slate-400">{s("Historia kontaktu")}</p>
         {[
-          ["dziś, 10:12", "Telefon, 4 min 12 s", "Prosi o drugie oglądanie w sobotę"],
-          ["12 września", "Prezentacja, ul. Kalwaryjska", "Za mała kuchnia, reszta na tak"],
-          ["4 września", "Telefon, 2 min 40 s", "Pierwszy kontakt z ogłoszenia"],
+          [s("dziś, 10:12"), s("Telefon, 4 min 12 s"), s("Prosi o drugie oglądanie w sobotę")],
+          [s("12 września"), s("Prezentacja, ul. Kalwaryjska"), s("Za mała kuchnia, reszta na tak")],
+          [s("4 września"), s("Telefon, 2 min 40 s"), s("Pierwszy kontakt z ogłoszenia")],
         ].map(([when, what, note], i) => (
           <div key={when} className={`flex gap-3 py-2 ${i > 0 ? "border-t border-slate-100" : ""}`}>
             <span className="w-20 flex-shrink-0 text-slate-400">{when}</span>
@@ -390,28 +398,31 @@ export function ShotKlient() {
       </div>
 
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-        <p className="font-medium text-emerald-800">Dopasowania z bazy: 3 oferty</p>
-        <p className="text-emerald-700">System sam sprawdził poszukiwanie i znalazł nowe mieszkanie na Kalwaryjskiej.</p>
+        <p className="font-medium text-emerald-800">{s("Dopasowania z bazy: 3 oferty")}</p>
+        <p className="text-emerald-700">
+          {s("System sam sprawdził poszukiwanie i znalazł nowe mieszkanie na Kalwaryjskiej.")}
+        </p>
       </div>
     </div>
   );
 }
 
 /** Dokumenty przy ofercie i kliencie. */
-export function ShotDokumenty() {
+export function ShotDokumenty({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
   const docs: [string, string, string][] = [
-    ["Umowa pośrednictwa", "PDF · 240 kB", "podpisana"],
-    ["Odpis z księgi wieczystej", "PDF · 1,1 MB", "aktualny"],
-    ["Świadectwo energetyczne", "PDF · 380 kB", "ważne do 2035"],
-    ["Zaświadczenie o zameldowaniu", "PDF · 120 kB", "do odebrania"],
-    ["Zdjęcia po obróbce", "ZIP · 24 MB", "gotowe"],
+    [s("Umowa pośrednictwa"), s("PDF · 240 kB"), s("podpisana")],
+    [s("Odpis z księgi wieczystej"), s("PDF · 1,1 MB"), s("aktualny")],
+    [s("Świadectwo energetyczne"), s("PDF · 380 kB"), s("ważne do 2035")],
+    [s("Zaświadczenie o zameldowaniu"), s("PDF · 120 kB"), s("do odebrania")],
+    [s("Zdjęcia po obróbce"), s("ZIP · 24 MB"), s("gotowe")],
   ];
 
   return (
     <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-base font-semibold text-slate-900">Dokumenty oferty</p>
-        <span className="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">+ Dodaj</span>
+        <p className="text-base font-semibold text-slate-900">{s("Dokumenty oferty")}</p>
+        <span className="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">{s("+ Dodaj")}</span>
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white">
@@ -425,7 +436,7 @@ export function ShotDokumenty() {
             transition={{ duration: 0.4, delay: i * 0.06, ease }}
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-[9px] font-bold text-rose-600">
-              {name.includes("Zdjęcia") ? "ZIP" : "PDF"}
+              {name.includes(s("Zdjęcia")) ? "ZIP" : "PDF"}
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate font-medium text-slate-800">{name}</span>
@@ -436,9 +447,7 @@ export function ShotDokumenty() {
         ))}
       </div>
 
-      <p className="mt-3 text-slate-500">
-        Pliki leżą przy ofercie i przy kliencie naraz, a link do pobrania wygasa, więc nie krąży po WhatsAppie.
-      </p>
+      <p className="mt-3 text-slate-500">{s("Pliki leżą przy ofercie i przy kliencie naraz, a link do pobrania wygasa, więc nie krąży po WhatsAppie.")}</p>
     </div>
   );
 }

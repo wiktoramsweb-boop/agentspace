@@ -1,34 +1,11 @@
 import Link from "next/link";
+import { getDict, localeHref, toLocale } from "@/lib/i18n";
 
-const FOOTER_SECTIONS = [
-  {
-    title: "Produkt",
-    links: [
-      { href: "/", label: "Strona główna" },
-      { href: "/cennik", label: "Cennik" },
-      { href: "/demo", label: "Demo" },
-      { href: "/dla-agentow", label: "Dla agentów" },
-      { href: "/dla-wlascicieli", label: "Dla właścicieli biur" },
-    ],
-  },
-  {
-    title: "Wiedza",
-    links: [
-      { href: "/blog", label: "Blog" },
-      { href: "/o-nas", label: "O AgentSpace" },
-      { href: "/kontakt", label: "Kontakt" },
-    ],
-  },
-  {
-    title: "Prawne",
-    links: [
-      { href: "/polityka-prywatnosci", label: "Polityka prywatności" },
-      { href: "/regulamin", label: "Regulamin" },
-    ],
-  },
-];
+export function SiteFooter({ lang = "pl" }: { lang?: string }) {
+  const locale = toLocale(lang);
+  const t = getDict(locale).footer;
+  const href = (path: string) => localeHref(locale, path);
 
-export function SiteFooter() {
   return (
     <footer className="border-t border-[var(--mk-hairline)] bg-[var(--color-mk-bg)] px-6 py-16">
       <div className="mx-auto max-w-6xl">
@@ -36,24 +13,23 @@ export function SiteFooter() {
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           {/* Brand */}
           <div>
-            <Link href="/" className="mb-4 flex items-center gap-2">
+            <Link href={href("/")} className="mb-4 flex items-center gap-2">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
               </span>
               <span className="text-lg font-semibold text-[var(--color-mk-text)]">AgentSpace</span>
             </Link>
-            <p className="mb-6 max-w-xs text-sm leading-relaxed text-zinc-500">
-              Polski system operacyjny dla biur nieruchomości. Zbudowany w działającym biurze w Krakowie.
-            </p>
+            <p className="mb-6 max-w-xs text-sm leading-relaxed text-zinc-500">{t.tagline}</p>
             <p className="text-xs text-zinc-600">
-              Powstaje w biurze <span className="text-[var(--color-mk-muted)]">Spectra Nieruchomości</span>,
-              Kraków
+              {t.madeIn.before}
+              <span className="text-[var(--color-mk-muted)]">{t.madeIn.company}</span>
+              {t.madeIn.after}
             </p>
           </div>
 
           {/* Columns */}
-          {FOOTER_SECTIONS.map((section) => (
+          {t.sections.map((section) => (
             <div key={section.title}>
               <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-300">
                 {section.title}
@@ -62,7 +38,7 @@ export function SiteFooter() {
                 {section.links.map((link) => (
                   <li key={link.href}>
                     <Link
-                      href={link.href}
+                      href={href(link.href)}
                       className="text-sm text-zinc-500 transition hover:text-emerald-400"
                     >
                       {link.label}
@@ -75,7 +51,7 @@ export function SiteFooter() {
         </div>
 
         {/* Bottom: legal */}
-        <div className="mt-12 space-y-2 border-t border-zinc-900 pt-8 text-xs text-zinc-600">
+        <div className="mt-12 space-y-2 border-t border-[var(--mk-hairline)] pt-8 text-xs text-zinc-600">
           <p>
             © 2026 AgentSpace ·{" "}
             <a href="https://agentspace.pl" className="hover:text-zinc-400">
@@ -83,11 +59,11 @@ export function SiteFooter() {
             </a>
           </p>
           <p>
-            Operator: <span className="text-zinc-400">Spectra Nieruchomości</span>,
+            {t.operator} <span className="text-zinc-400">Spectra Nieruchomości</span>,
             ul. Zbożowa 2/1, 30-002 Kraków · NIP: 6772516327 · REGON: 529666353
           </p>
           <p>
-            Kontakt:{" "}
+            {t.contact}{" "}
             <a
               href="mailto:nieruchomoscispectra@gmail.com"
               className="hover:text-zinc-400"

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BorderBeam } from "../effects/border-beam";
 import { Button, Card, Tick } from "./ui";
 import { PLANS, planForAgents } from "@/lib/marketing/plans";
+import { getDict, toLocale } from "@/lib/i18n";
 
 /**
  * Cennik z licznikiem agentów - pakiet podświetla się sam w zależności
@@ -13,22 +14,27 @@ import { PLANS, planForAgents } from "@/lib/marketing/plans";
  * Dane pakietów: lib/marketing/plans.ts
  */
 
-export function Pricing() {
+export function Pricing({ lang = "pl" }: { lang?: string }) {
+  const locale = toLocale(lang);
+  const dict = getDict(locale);
+  const t = dict.pricingWidget;
   const [agents, setAgents] = useState(6);
   const recommended = planForAgents(agents);
+  // Nazwy i listy funkcji biorą się ze słownika, ceny i limity z lib/marketing/plans.
+  const copyFor = (id: string) => t.plans.find((plan) => plan.id === id) ?? t.plans[0];
 
   return (
     <div className="flex flex-col items-center">
       {/* Licznik agentów */}
       <p className="mb-4 text-[0.9375rem] text-[var(--color-mk-muted)]">
-        Ilu agentów pracuje w Twoim biurze?
+        {t.question}
       </p>
 
       <div className="mb-14 inline-flex items-center gap-[2px] rounded-full border border-[var(--mk-hairline-strong)] bg-[var(--mk-surface-2)] p-[3px] backdrop-blur-sm">
         <button
           type="button"
           onClick={() => setAgents((n) => Math.max(1, n - 1))}
-          aria-label="Mniej agentów"
+          aria-label={t.less}
           className="flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-mk-text)] transition-colors hover:bg-emerald-500/15 disabled:opacity-25"
           disabled={agents <= 1}
         >
@@ -44,7 +50,7 @@ export function Pricing() {
         <button
           type="button"
           onClick={() => setAgents((n) => Math.min(30, n + 1))}
-          aria-label="Więcej agentów"
+          aria-label={t.more}
           className="flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-mk-text)] transition-colors hover:bg-emerald-500/15 disabled:opacity-25"
           disabled={agents >= 30}
         >
@@ -63,6 +69,7 @@ export function Pricing() {
       <div className="grid w-full gap-5 md:grid-cols-3">
         {PLANS.map((plan) => {
           const isRecommended = plan.id === recommended.id;
+          const copy = copyFor(plan.id);
           return (
             <Card
               key={plan.id}
@@ -87,22 +94,22 @@ export function Pricing() {
 
               <div className="relative flex items-center justify-between gap-3">
                 <span className="text-lg font-semibold text-[var(--color-mk-text)]">
-                  {plan.name}
+                  {copy.name}
                 </span>
                 {isRecommended ? (
                   <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/25">
-                    Dla Ciebie
+                    {t.forYou}
                   </span>
                 ) : null}
               </div>
 
               <div className="relative">
                 <p className="mb-3 text-sm text-[var(--color-mk-muted)]">
-                  {plan.tagline}
+                  {copy.tagline}
                 </p>
                 <p className="flex items-baseline gap-1.5">
                   {plan.priceFrom ? (
-                    <span className="text-lg text-[var(--color-mk-muted)]">od</span>
+                    <span className="text-lg text-[var(--color-mk-muted)]">{dict.common.from}</span>
                   ) : null}
                   <span
                     className={`text-5xl font-semibold ${
@@ -111,12 +118,12 @@ export function Pricing() {
                   >
                     {plan.price}
                   </span>
-                  <span className="text-lg text-[var(--color-mk-muted)]">zł / mc</span>
+                  <span className="text-lg text-[var(--color-mk-muted)]">{dict.common.priceSuffix}</span>
                 </p>
               </div>
 
               <ul className="relative flex flex-1 flex-col gap-3">
-                {plan.features.map((feature) => (
+                {copy.features.map((feature) => (
                   <li
                     key={feature}
                     className="flex items-start gap-3 text-[0.9375rem] leading-snug text-[var(--color-mk-muted)]"
@@ -129,11 +136,11 @@ export function Pricing() {
 
               <div className="relative">
                 <Button
-                  href="/kontakt"
+                  href={locale === "en" ? "/en/contact" : "/kontakt"}
                   variant={isRecommended ? "primary" : "ghost"}
                   className="w-full"
                 >
-                  Umów rozmowę
+                  {dict.common.bookCall}
                 </Button>
               </div>
             </Card>
@@ -142,8 +149,7 @@ export function Pricing() {
       </div>
 
       <p className="mt-10 text-center text-sm text-[var(--color-mk-muted)]">
-        Ceny netto, rozliczenie miesięczne. Bez umowy na czas określony -
-        rezygnujesz kiedy chcesz.
+        {t.note}
       </p>
     </div>
   );

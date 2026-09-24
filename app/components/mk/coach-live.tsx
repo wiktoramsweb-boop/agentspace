@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
+import type { Dict } from "@/lib/i18n/pl";
 
 /**
  * Pokaz AI Coacha na stronie głównej.
@@ -13,86 +14,10 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/rea
 
 const ease = [0.22, 0.61, 0.36, 1] as const;
 
-type Line = { who: "klient" | "agent"; text: string; tag?: string };
+type CoachDict = Dict["coach"];
 
-type Scenario = {
-  key: string;
-  chip: string;
-  title: string;
-  person: string;
-  mood: string;
-  lines: Line[];
-  scores: [string, number][];
-  tip: string;
-};
-
-const SCENARIOS: Scenario[] = [
-  {
-    key: "za-drogo",
-    chip: "Za wysoka prowizja",
-    title: "Obiekcja cenowa",
-    person: "Krzysztof, właściciel mieszkania",
-    mood: "nieufny, rozmawiał już z trzema biurami",
-    lines: [
-      { who: "klient", text: "Trzy procent? Konkurencja robi to za półtora.", tag: "obiekcja cenowa" },
-      { who: "agent", text: "Rozumiem. Mogę zapytać, co dokładnie jest w tych półtora procent?" },
-      { who: "klient", text: "No... ogłoszenie na portalu i tyle chyba." },
-      { who: "agent", text: "Właśnie dlatego pytam. U nas w tej cenie jest fotograf, rzut, home staging i prowadzenie negocjacji. Ostatnie trzy mieszkania z tej ulicy sprzedaliśmy średnio 4 procent powyżej ceny wyjściowej sąsiadów." },
-      { who: "klient", text: "Hm. A ile realnie to trwa?", tag: "sygnał zainteresowania" },
-    ],
-    scores: [
-      ["Reakcja na obiekcję", 9],
-      ["Pytania otwarte", 8],
-      ["Argument z danych", 9],
-      ["Domknięcie", 6],
-    ],
-    tip: "Dobrze, że nie broniłeś ceny od razu. Zamknij jeszcze pytaniem o termin spotkania, zanim klient sam skończy rozmowę.",
-  },
-  {
-    key: "mam-biuro",
-    chip: "Mam już biuro",
-    title: "Zimny telefon",
-    person: "Pani Anna, ogłoszenie z portalu",
-    mood: "zajęta, mało czasu",
-    lines: [
-      { who: "klient", text: "Dziękuję, współpracuję już z biurem.", tag: "zbycie" },
-      { who: "agent", text: "Jasne, nie namawiam do zmiany. Jedno pytanie: mieszkanie wisi od sześciu tygodni, było już obniżane?" },
-      { who: "klient", text: "Raz, o dwadzieścia tysięcy. Ruchu nie ma." },
-      { who: "agent", text: "To typowe, gdy zdjęcia nie pokazują metrażu. Mogę Pani wysłać bezpłatnie zestawienie cen transakcyjnych z Pani ulicy? Bez zobowiązań, sama Pani oceni." },
-      { who: "klient", text: "Dobrze, proszę wysłać na maila.", tag: "zgoda na kontakt" },
-    ],
-    scores: [
-      ["Otwarcie", 8],
-      ["Kwalifikacja", 9],
-      ["Obiekcje", 8],
-      ["Umówienie kroku", 9],
-    ],
-    tip: "Świetne przejście z odmowy na konkret. Następnym razem dopytaj o termin wysyłki, żeby umówić powód do kolejnego telefonu.",
-  },
-  {
-    key: "sam-sprzedam",
-    chip: "Sprzedam sam",
-    title: "Pozyskanie oferty",
-    person: "Marek, ogłoszenie prywatne",
-    mood: "pewny siebie, liczy na oszczędność",
-    lines: [
-      { who: "klient", text: "Po co mi pośrednik? Sam sobie wystawię.", tag: "obiekcja wartości" },
-      { who: "agent", text: "Może się udać. Ile telefonów odebrał Pan w tym tygodniu?" },
-      { who: "klient", text: "Ze czternaście. Połowa to biura, reszta pyta o cenę i znika." },
-      { who: "agent", text: "Czyli traci Pan czas na rozmowy, z których nic nie wynika. My tę część bierzemy na siebie i pokazujemy mieszkanie tylko sprawdzonym kupującym. Pan pojawia się dopiero u notariusza." },
-      { who: "klient", text: "A jak wygląda umowa?", tag: "pytanie o warunki" },
-    ],
-    scores: [
-      ["Otwarcie", 7],
-      ["Zbieranie faktów", 9],
-      ["Pokazanie wartości", 9],
-      ["Domknięcie", 7],
-    ],
-    tip: "Pytanie o liczbę telefonów zrobiło całą robotę. Przy pytaniu o umowę od razu proponuj spotkanie, zamiast tłumaczyć warunki przez telefon.",
-  },
-];
-
-export function CoachLive() {
+export function CoachLive({ t }: { t: CoachDict }) {
+  const SCENARIOS = t.scenarios;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.35 });
   const reduce = useReducedMotion();
@@ -231,14 +156,14 @@ export function CoachLive() {
                   className="mt-4 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.07] p-3.5"
                 >
                   <div className="mb-3 flex items-center justify-between">
-                    <span className="text-[12px] font-semibold text-white">Ocena rozmowy</span>
+                    <span className="text-[12px] font-semibold text-white">{t.scoreTitle}</span>
                     <span className="font-mono text-lg font-semibold text-emerald-300">
-                      {(current.scores.reduce((a, [, v]) => a + v, 0) / current.scores.length).toFixed(1)}
+                      {(current.scores.reduce((a, s) => a + s.value, 0) / current.scores.length).toFixed(1)}
                       <span className="text-[11px] text-emerald-500/70">/10</span>
                     </span>
                   </div>
                   <div className="grid gap-2">
-                    {current.scores.map(([label, value], i) => (
+                    {current.scores.map(({ label, value }, i) => (
                       <div key={label} className="grid grid-cols-[1fr_auto] items-center gap-2">
                         <span className="text-[11px] text-zinc-400">{label}</span>
                         <span className="flex items-center gap-2">
@@ -289,17 +214,16 @@ export function CoachLive() {
 
       {/* ── opis i wybór obiekcji ── */}
       <div className="flex flex-col justify-center">
-        <p className="mk-eyebrow mb-6">AI Coach</p>
+        <p className="mk-eyebrow mb-6">{t.eyebrow}</p>
         <h2 className="mb-5 text-[clamp(1.9rem,3.6vw,2.9rem)] leading-[1.1]">
-          Agent trenuje rozmowę, <span className="grad">zanim zadzwoni do klienta</span>
+          {t.title.a}<span className="grad">{t.title.b}</span>
         </h2>
         <p className="mb-7 max-w-[54ch] text-[1.0625rem] leading-relaxed text-[var(--color-mk-muted)]">
-          Klient jest sztuczny, obiekcje prawdziwe. Rozmowa idzie głosem albo tekstem, a po jej zakończeniu agent
-          dostaje ocenę i jedną konkretną rzecz do poprawy. Bez oceniania przy całym zespole.
+          {t.lead}
         </p>
 
         <p className="mb-3 text-[13px] uppercase tracking-wider text-[var(--color-mk-muted)]">
-          Wybierz obiekcję, którą trenujesz
+          {t.pick}
         </p>
         <div className="mb-8 flex flex-wrap gap-2">
           {SCENARIOS.map((s, i) => (
@@ -322,16 +246,12 @@ export function CoachLive() {
         </div>
 
         <ul className="grid gap-3">
-          {[
-            ["13 scenariuszy", "Cold call, pozyskanie, prezentacja, najem i negocjacja prowizji."],
-            ["9 typów klienta", "Od zdawkowego po agresywnego. Każdy reaguje inaczej na ten sam argument."],
-            ["Ocena i wskazówka", "Punkty za otwarcie, kwalifikację, obiekcje i domknięcie, plus jedna rzecz do poprawy."],
-          ].map(([t, d]) => (
-            <li key={t} className="flex gap-3">
+          {t.points.map((point) => (
+            <li key={point.title} className="flex gap-3">
               <span className="mt-[7px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--color-mk-accent)]" />
               <span>
-                <span className="font-medium text-[var(--color-mk-text)]">{t}. </span>
-                <span className="text-[0.9375rem] text-[var(--color-mk-muted)]">{d}</span>
+                <span className="font-medium text-[var(--color-mk-text)]">{point.title}. </span>
+                <span className="text-[0.9375rem] text-[var(--color-mk-muted)]">{point.body}</span>
               </span>
             </li>
           ))}
