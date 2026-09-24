@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { isOwnHost, slugForDomain } from "@/lib/site/domains";
-import { MARKETING_SEGMENTS, SEGMENTS_REVERSED } from "@/lib/i18n/config";
+import { MARKETING_EXACT, MARKETING_SEGMENTS, toPolishPath } from "@/lib/i18n/config";
 
 const AUTH_PATHS = ["/app", "/login", "/signup"];
 
@@ -15,15 +15,18 @@ const AUTH_PATHS = ["/app", "/login", "/signup"];
  */
 function marketingPath(pathname: string): string | null {
   if (pathname === "/en" || pathname.startsWith("/en/")) {
-    const rest = pathname.slice(3).split("/").filter(Boolean);
-    if (rest.length > 0 && SEGMENTS_REVERSED[rest[0]]) rest[0] = SEGMENTS_REVERSED[rest[0]];
-    return rest.length ? `/en/${rest.join("/")}` : "/en";
+    const plPath = toPolishPath(pathname.slice(3));
+    return plPath === "/" ? "/en" : `/en${plPath}`;
   }
 
   if (pathname === "/") return "/pl";
 
-  const first = pathname.split("/")[1] ?? "";
+  const parts = pathname.split("/").filter(Boolean);
+  const first = parts[0] ?? "";
+
   if (MARKETING_SEGMENTS.includes(first)) return `/pl${pathname}`;
+  // Galeria wzorów ma wersję językową, ale same wzory stron pod nią nie.
+  if (parts.length === 1 && MARKETING_EXACT.includes(first)) return `/pl${pathname}`;
 
   return null;
 }

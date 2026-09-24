@@ -531,7 +531,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </StaggerContainer>
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          <Button href="/wzory">{t.sites.cta}</Button>
+          <Button href={href("/wzory")}>{t.sites.cta}</Button>
           <Link
             href={href("/cennik")}
             className="text-[0.9375rem] text-[var(--color-mk-muted)] underline-offset-4 hover:underline"

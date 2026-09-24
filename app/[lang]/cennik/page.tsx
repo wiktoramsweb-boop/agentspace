@@ -90,7 +90,7 @@ export default async function CennikPage({ params }: { params: Promise<{ lang: s
               {fill(t.addon.setupNote)}
             </p>
             <div className="mt-8 flex flex-col gap-3">
-              <Button href="/wzory">{t.addon.ctaTemplates}</Button>
+              <Button href={href("/wzory")}>{t.addon.ctaTemplates}</Button>
               <Link
                 href={`${href("/kontakt")}?temat=strona-www`}
                 className="rounded-xl border border-[var(--color-mk-line)] px-5 py-3 text-center text-[0.9375rem] font-medium text-[var(--color-mk-text)] transition hover:border-[var(--color-mk-line-lit)]"

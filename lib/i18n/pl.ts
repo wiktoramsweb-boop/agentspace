@@ -798,6 +798,71 @@ export const pl = {
       cta: "Zapytaj o tę integrację",
     },
 
+    wzory: {
+      meta: {
+        title: "Strony internetowe dla biur nieruchomości | wzory | AgentSpace",
+        description:
+          "Gotowe wzory stron dla biur nieruchomości i deweloperów. Oferty z CRM trafiają na stronę automatycznie, a formularze ze strony wracają do systemu jako kontakty i poszukiwania.",
+      },
+      hero: {
+        eyebrow: "Strony internetowe",
+        title: "Strona biura połączona z systemem, a nie obok niego",
+        description:
+          "Wybieracie wzór, my podłączamy Waszą bazę ofert i domenę. Oferta dodana w AgentSpace jest na stronie od razu, a zapytanie ze strony ląduje u konkretnego agenta.",
+      },
+      demoNotice: "",
+      gallery: {
+        eyebrow: "Wzory",
+        title: "Osiem projektów, osiem różnych biur",
+        lead: "To nie są warianty kolorystyczne tego samego szablonu. Każdy ma własną typografię, siatkę i rytm, bo biuro premium, biuro z setkami mieszkań na wynajem i deweloper potrzebują czegoś zupełnie innego. Każdy wzór ma komplet podstron: oferty z filtrami i mapą, karty ofert, usługi, zespół, poradnik, kalkulator i formularze.",
+        previewAlt: "Podgląd wzoru",
+        forWhom: "Dla kogo:",
+        see: "Zobacz wzór",
+        listings: "Lista ofert",
+      },
+      custom: {
+        eyebrow: "Projekt indywidualny",
+        title: "Żaden wzór nie pasuje? Zaprojektujemy stronę od zera",
+        body: "Wzory są po to, żeby ruszyć w tydzień i za rozsądne pieniądze. Jeśli macie własną identyfikację, mocny pomysł albo stronę, która już działa i chcecie ją tylko podnieść na wyższy poziom, robimy projekt indywidualny: makieta, konsultacje i strona napisana pod Was, nadal połączona z AgentSpace.",
+        points: [
+          { title: "Makieta przed kodem", body: "Najpierw widzicie projekt strony głównej i karty oferty. Dopiero po akceptacji piszemy kod." },
+          { title: "Wasza identyfikacja", body: "Logo, kolory, kroje i sposób mówienia. Jeśli tego nie macie, pomagamy to ułożyć." },
+          { title: "Ten sam silnik", body: "Oferty, formularze i zespół działają tak samo jak we wzorach, bo pod spodem jest ten sam system." },
+        ],
+        cta: "Porozmawiajmy o projekcie indywidualnym",
+      },
+      how: {
+        eyebrow: "Jak to działa",
+        title: "Od wyboru wzoru do działającej strony",
+        steps: [
+          { n: "01", title: "Wybieracie wzór", body: "Osiem projektów, każdy inny: od redakcyjnego premium, przez brutalistyczny, po stronę jednej inwestycji dewelopera. Kolory, kroje i teksty dopasowujemy do Waszego logo." },
+          { n: "02", title: "Podłączamy Waszą bazę", body: "Strona czyta oferty prosto z AgentSpace. Agent zaznacza w ofercie „publikuj” i po chwili jest ona na stronie, ze zdjęciami po obróbce i znakiem wodnym biura." },
+          { n: "03", title: "Treści zmieniacie sami", body: "W AgentSpace jest zakładka Strona www: logo, kolory, teksty sekcji, zespół i wpisy do poradnika. Bez dzwonienia do nas i bez dopłat za każdą zmianę przecinka." },
+          { n: "04", title: "Formularze wracają do CRM", body: "Zapytanie o ofertę, zgłoszenie nieruchomości i zlecenie poszukiwania tworzą w systemie kontakt, zadanie i przypisanie do agenta. Nic nie ginie w skrzynce." },
+          { n: "05", title: "Domena i hosting po naszej stronie", body: "Podpinamy Waszą domenę, certyfikat i kopie zapasowe. Strona działa tak długo, jak trwa abonament, bez osobnego serwera i bez aktualizowania wtyczek." },
+        ],
+      },
+      diff: {
+        eyebrow: "Czym się różnimy",
+        title: "Dlaczego nie robimy tego na WordPressie",
+        lead: "Większość stron dla biur to WordPress z wtyczką do ofert. Działa, dopóki ktoś pilnuje aktualizacji, kopii i wydajności. My poszliśmy inną drogą.",
+        items: [
+          { title: "Bez WordPressa i wtyczek", body: "Nie ma czego łatać ani co się nie zaktualizuje. Strona to część systemu, nie kolejne oprogramowanie do pilnowania." },
+          { title: "Oferty zawsze aktualne", body: "Zmiana ceny w CRM zmienia cenę na stronie. Sprzedana oferta znika ze strony sama." },
+          { title: "Zdjęcia raz, wszędzie", body: "Ten sam zestaw zdjęć ze znakiem wodnym idzie na stronę, do PDF dla klienta i na portale." },
+          { title: "Szybkość i Google", body: "Strony budujemy statycznie, więc ładują się w ułamku sekundy, co Google traktuje jako sygnał rankingowy." },
+          { title: "Ulubione i historia", body: "Odwiedzający odkłada oferty do ulubionych, a agent widzi przy kontakcie, co ten człowiek oglądał." },
+          { title: "Jeden abonament", body: "Strona, CRM i obsługa w jednej cenie. Bez faktur od trzech różnych firm co miesiąc." },
+        ],
+      },
+      cta: {
+        title: "Chcecie zobaczyć swoje oferty w tym wzorze?",
+        body: "Przygotujemy podgląd na Waszych ofertach i logo, zanim cokolwiek podpiszecie. Wystarczy nam eksport z obecnego systemu albo link do Waszej strony.",
+        price: "Strona to osobna usługa: {monthly} zł miesięcznie plus {setup} zł wdrożenia. Nie musicie jej brać razem z systemem, a system działa bez niej normalnie.",
+        button: "Zamów podgląd na swoich ofertach",
+      },
+    },
+
     blog: {
       meta: {
         title: "Blog | AgentSpace",

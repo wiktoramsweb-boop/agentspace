@@ -797,6 +797,72 @@ export const en: Dict = {
       cta: "Ask about this integration",
     },
 
+    wzory: {
+      meta: {
+        title: "Websites for real estate agencies | templates | AgentSpace",
+        description:
+          "Ready-made website templates for real estate agencies and developers. Listings flow from the CRM to the website automatically, and forms on the website come back into the system as contacts and searches.",
+      },
+      hero: {
+        eyebrow: "Websites",
+        title: "An agency website wired into the system, not sitting beside it",
+        description:
+          "You pick a template, we connect your listing database and your domain. A listing added in AgentSpace is on the website immediately, and an enquiry from the website lands with a specific agent.",
+      },
+      demoNotice:
+        "The live demos below are filled with Polish sample agencies and listings, so they open in Polish. Your own site is built in whatever language you work in.",
+      gallery: {
+        eyebrow: "Templates",
+        title: "Eight designs for eight different agencies",
+        lead: "These are not colour variants of one theme. Each has its own typography, grid and rhythm, because a premium agency, an agency with hundreds of rentals and a property developer need completely different things. Every template comes with the full set of pages: listings with filters and a map, listing pages, services, team, guides, a calculator and forms.",
+        previewAlt: "Preview of the template",
+        forWhom: "Built for:",
+        see: "Open the template",
+        listings: "Listing page",
+      },
+      custom: {
+        eyebrow: "Custom design",
+        title: "None of the templates fit? We will design the site from scratch",
+        body: "The templates exist so you can launch in a week for sensible money. If you have your own identity, a strong idea, or a site that already works and you only want to raise it a level, we do a custom project: mock-up, consultations and a site written for you, still wired into AgentSpace.",
+        points: [
+          { title: "Mock-up before code", body: "First you see the design of the home page and a listing page. We only write code once you approve it." },
+          { title: "Your identity", body: "Logo, colours, typefaces and tone of voice. If you do not have them, we help you put them together." },
+          { title: "The same engine", body: "Listings, forms and the team work exactly as in the templates, because the same system sits underneath." },
+        ],
+        cta: "Let us talk about a custom design",
+      },
+      how: {
+        eyebrow: "How it works",
+        title: "From picking a template to a live website",
+        steps: [
+          { n: "01", title: "You pick a template", body: "Eight designs, each different: from editorial premium, through brutalist, to a single-development page for a property developer. We match colours, typefaces and copy to your logo." },
+          { n: "02", title: "We connect your database", body: "The site reads listings straight from AgentSpace. An agent ticks “publish” on a listing and moments later it is on the site, with retouched photos and the agency watermark." },
+          { n: "03", title: "You change the content yourself", body: "AgentSpace has a Website tab: logo, colours, section copy, the team and guide articles. No calling us and no surcharge for moving a comma." },
+          { n: "04", title: "Forms come back to the CRM", body: "A listing enquiry, a property submission and a search request all create a contact, a task and an agent assignment in the system. Nothing gets lost in an inbox." },
+          { n: "05", title: "Domain and hosting on us", body: "We connect your domain, the certificate and the backups. The site runs as long as the subscription does, with no separate server and no plugins to update." },
+        ],
+      },
+      diff: {
+        eyebrow: "What makes us different",
+        title: "Why we do not build this on WordPress",
+        lead: "Most agency websites are WordPress with a listings plugin. That works as long as somebody keeps an eye on updates, backups and performance. We went a different way.",
+        items: [
+          { title: "No WordPress, no plugins", body: "Nothing to patch and nothing that fails to update. The website is part of the system, not another piece of software to babysit." },
+          { title: "Listings always current", body: "Change the price in the CRM and the price on the site changes. A sold listing disappears from the site on its own." },
+          { title: "Photos once, everywhere", body: "The same watermarked photo set goes to the website, to the client PDF and to the portals." },
+          { title: "Speed and Google", body: "We build the sites statically, so they load in a fraction of a second, which Google treats as a ranking signal." },
+          { title: "Favourites and history", body: "A visitor saves listings to favourites, and the agent sees on the contact record what that person was looking at." },
+          { title: "One subscription", body: "Website, CRM and support in one price. No invoices from three different companies every month." },
+        ],
+      },
+      cta: {
+        title: "Want to see your own listings in one of these?",
+        body: "We will prepare a preview on your listings and your logo before you sign anything. All we need is an export from your current system or a link to your website.",
+        price: "The website is a separate service: {monthly} PLN per month plus {setup} PLN setup. You do not have to take it with the system, and the system works perfectly well without it.",
+        button: "Request a preview on your listings",
+      },
+    },
+
     blog: {
       meta: {
         title: "Blog | AgentSpace",

@@ -15,7 +15,10 @@ export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value);
 }
 
-/** Polski segment adresu -> angielski odpowiednik. */
+/**
+ * Sekcje przetłumaczone razem z podstronami: `/produkt/crm` ma swój
+ * odpowiednik pod `/en/product/crm`.
+ */
 export const SEGMENTS: Record<string, string> = {
   cennik: "pricing",
   "o-nas": "about",
@@ -31,43 +34,77 @@ export const SEGMENTS: Record<string, string> = {
   regulamin: "terms",
 };
 
-/** Angielski segment -> polski (do przepisania adresu w middleware). */
-export const SEGMENTS_REVERSED: Record<string, string> = Object.fromEntries(
+/**
+ * Sekcje przetłumaczone tylko na pierwszym poziomie.
+ *
+ * `/wzory` to galeria i ma wersję angielską, ale same wzory stron pod
+ * `/wzory/kamienica` są demami polskich biur, z polskimi ofertami, i
+ * zostają po polsku. Dlatego ich adresy nie dostają przedrostka `/en`.
+ */
+export const EXACT_SEGMENTS: Record<string, string> = {
+  wzory: "website-templates",
+};
+
+const SEGMENTS_REVERSED: Record<string, string> = Object.fromEntries(
   Object.entries(SEGMENTS).map(([pl, en]) => [en, pl]),
 );
 
-/** Pierwsze segmenty, które należą do strony marketingowej. */
+const EXACT_REVERSED: Record<string, string> = Object.fromEntries(
+  Object.entries(EXACT_SEGMENTS).map(([pl, en]) => [en, pl]),
+);
+
 export const MARKETING_SEGMENTS = Object.keys(SEGMENTS);
+export const MARKETING_EXACT = Object.keys(EXACT_SEGMENTS);
+
+function split(path: string): string[] {
+  return path.split("/").filter(Boolean);
+}
 
 /**
- * Adres tej samej strony w danym języku.
- * Na wejściu zawsze polska ścieżka, np. `/cennik` albo `/produkt/crm`.
+ * Adres tej samej strony w danym języku. Na wejściu zawsze polska ścieżka.
+ *
+ * Ścieżka, która nie ma angielskiej wersji, wraca bez zmian - bez tego
+ * nawigacja robiłaby linki w stylu `/en/wzory`, pod którymi nic nie ma.
  */
 export function localeHref(lang: Locale, plPath: string): string {
   const [pathOnly, hash] = plPath.split("#");
-  const clean = pathOnly === "/" ? "" : pathOnly;
+  const suffix = hash ? `#${hash}` : "";
+  const parts = split(pathOnly);
 
-  if (lang === "pl") return `${clean || "/"}${hash ? `#${hash}` : ""}`;
+  if (lang === "pl") return `${pathOnly === "" ? "/" : pathOnly}${suffix}`;
+  if (parts.length === 0) return `/en${suffix}`;
 
-  const parts = clean.split("/").filter(Boolean);
-  if (parts.length > 0 && SEGMENTS[parts[0]]) parts[0] = SEGMENTS[parts[0]];
+  if (parts.length === 1 && EXACT_SEGMENTS[parts[0]]) {
+    return `/en/${EXACT_SEGMENTS[parts[0]]}${suffix}`;
+  }
 
-  const path = parts.length ? `/en/${parts.join("/")}` : "/en";
-  return `${path}${hash ? `#${hash}` : ""}`;
+  if (SEGMENTS[parts[0]]) {
+    const rest = [SEGMENTS[parts[0]], ...parts.slice(1)];
+    return `/en/${rest.join("/")}${suffix}`;
+  }
+
+  // Brak angielskiej wersji: zostawiamy polski adres, zamiast prowadzić w 404.
+  return `${pathOnly}${suffix}`;
+}
+
+/** Angielski adres z paska -> polska ścieżka pliku strony. */
+export function toPolishPath(enPath: string): string {
+  const parts = split(enPath);
+  if (parts.length === 0) return "/";
+
+  if (parts.length === 1 && EXACT_REVERSED[parts[0]]) return `/${EXACT_REVERSED[parts[0]]}`;
+  if (SEGMENTS_REVERSED[parts[0]]) return `/${[SEGMENTS_REVERSED[parts[0]], ...parts.slice(1)].join("/")}`;
+
+  return `/${parts.join("/")}`;
 }
 
 /** Ta sama strona w drugim języku - dla przełącznika w nawigacji. */
 export function switchLocaleHref(current: string, to: Locale): string {
-  const withoutEn = current.startsWith("/en/")
-    ? current.slice(3)
+  const plPath = current.startsWith("/en/")
+    ? toPolishPath(current.slice(3))
     : current === "/en"
       ? "/"
       : current;
 
-  const parts = withoutEn.split("/").filter(Boolean);
-  if (parts.length > 0 && SEGMENTS_REVERSED[parts[0]]) {
-    parts[0] = SEGMENTS_REVERSED[parts[0]];
-  }
-
-  return localeHref(to, parts.length ? `/${parts.join("/")}` : "/");
+  return localeHref(to, plPath);
 }
