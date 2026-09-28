@@ -1,6 +1,7 @@
 "use server";
 
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { sendPushToAgency, sendPushToAgent } from "@/lib/push";
 
 /**
  * Zgłoszenia z publicznej strony biura.
@@ -132,6 +133,25 @@ export async function submitSiteLead(formData: FormData): Promise<LeadResult> {
       assignee_ids: agent?.agent_id ? [agent.agent_id] : [],
       include_in_report: true,
     });
+
+    // Zadanie z terminem za dwie godziny nic nie da, jeśli nikt o nim nie wie.
+    // Przy zgłoszeniu ze strony liczy się pierwszych kilka minut, więc budzimy
+    // opiekuna od razu, a gdy go nie ma, całe biuro. Push nie może wywrócić
+    // zgłoszenia: klient ma zobaczyć „dziękujemy" niezależnie od tego.
+    const push = {
+      title: LABEL[kind],
+      body: `${name}${phone ? ` · ${phone}` : ""}${message ? ` · ${message.slice(0, 80)}` : ""}`,
+      url: `/app/klienci/${clientId}`,
+      tag: `lead-${lead?.id ?? clientId}`,
+      important: true,
+    };
+
+    try {
+      const sent = agent?.agent_id ? await sendPushToAgent(agent.agent_id as string, push) : 0;
+      if (sent === 0) await sendPushToAgency(agencyId, push);
+    } catch (err) {
+      console.error("push przy zgłoszeniu ze strony:", err);
+    }
   }
 
   return { ok: true };

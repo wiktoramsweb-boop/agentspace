@@ -14,7 +14,15 @@ function ensureConfigured(): boolean {
   return true;
 }
 
-export type PushPayload = { title: string; body: string; url?: string };
+export type PushPayload = {
+  title: string;
+  body: string;
+  url?: string;
+  /** Powiadomienia z tym samym znacznikiem podmieniają się zamiast mnożyć. */
+  tag?: string;
+  /** Zostaje na ekranie, dopóki agent go nie dotknie. Dla leadów i pilnych zadań. */
+  important?: boolean;
+};
 
 export type WebPushSubscription = {
   endpoint: string;
@@ -76,6 +84,29 @@ export async function sendPushToAgent(
       }
     }
   }
+  return sent;
+}
+
+/**
+ * Powiadomienie do całego biura.
+ *
+ * Używane, gdy zgłoszenie ze strony nie ma jeszcze przypisanego opiekuna:
+ * lepiej, żeby zobaczyli je wszyscy, niż żeby przeleżało do rana.
+ */
+export async function sendPushToAgency(
+  agencyId: string,
+  payload: PushPayload,
+): Promise<number> {
+  if (!ensureConfigured()) return 0;
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("push_subscriptions")
+    .select("agent_id")
+    .eq("agency_id", agencyId);
+
+  const agentIds = [...new Set((data ?? []).map((row) => row.agent_id as string))];
+  let sent = 0;
+  for (const agentId of agentIds) sent += await sendPushToAgent(agentId, payload);
   return sent;
 }
 

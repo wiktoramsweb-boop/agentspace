@@ -142,7 +142,7 @@ Klucze Supabase (`sb_secret_...`) i Resend były wklejane w czacie. **Po testach
 
 ## 10. Następne kroki (omówione, NIE zbudowane)
 
-- **Wersja mobilna (PWA)** + **powiadomienia** (mail/push) - domykają pętlę nawyku dla agentów w terenie. Rekomendowane następne.
+- ~~**Wersja mobilna (PWA)** + **powiadomienia**~~ - zrobione, patrz sekcja 10d.
 - **Moduł Nieruchomości** (oferty + zdjęcia via Supabase Storage) + publiczne oferty na stronie. Wykonalne.
 - **OtoDom/portale eksport** - NIE problem kodu, tylko dostępu: OtoDom (Grupa OLX) nie ma otwartego API, wymaga konta Pro dla biur + umowy partnerskiej (fosa Asari). Etap 2 gdy będą płacący klienci. Do wyjaśnienia: co to "agencja5000" (owner wspomniał).
 - **AI Coach - głos AI** (żeby klient odpowiadał głosem: ElevenLabs + koszty). Na razie tylko wejście głosem agenta.
@@ -199,6 +199,47 @@ Osobny produkt sprzedawany razem z CRM, konkurencja: ASARI (WordPress + wtyczka)
   zgodne z obecnym wyglądem aplikacji).
 - **Uwaga:** `.mk` jest wymagane na kontenerze strony, inaczej nagłówki nie
   dostają skali marketingowej (h1 ma wtedy 16 px).
+
+## 10d. PWA i powiadomienia (wrzesień 2026)
+
+**Działa bez zasięgu.** `public/sw.js`: precache ekranu `/offline` i ikon,
+network-first dla wejść na stronę z własnym ekranem zamiast błędu przeglądarki,
+cache-first dla plików z hashem (`/_next/static`, zdjęcia, fonty). `/api/*`
+i `/auth/*` **nigdy** nie idą do cache'u - to dane zalogowanego człowieka,
+a z jednego telefonu korzysta czasem więcej niż jedna osoba. Ekran offline:
+`app/offline/page.tsx`, sam wraca do apki po powrocie sieci (zdarzenie `online`).
+
+**Push przy zgłoszeniu ze strony biura.** `app/strona/actions.ts` po utworzeniu
+kontaktu i zadania budzi opiekuna, a gdy go nie ma, całe biuro
+(`sendPushToAgency` w `lib/push.ts`). Wcześniej powstawało tylko zadanie
+z terminem za dwie godziny i nikt się o nim nie dowiadywał. Push jest w try/catch:
+klient ma zobaczyć „dziękujemy" nawet gdy powiadomienie padnie.
+
+**Przypomnienia o zadaniach.** `app/api/cron/task-reminders/route.ts`: bierze
+zaplanowane działania z terminem w oknie od minus 6 godzin do plus godzina,
+grupuje po agencie (trzy zadania = jedno powiadomienie) i oznacza kolumną
+`reminded_at`, żeby nie dzwonić w kółko o tym samym. Zmiana terminu kasuje
+znacznik (trigger w migracji). **Wymaga `lib/SETUP-v27-przypomnienia.sql`.**
+
+**⚠️ Harmonogram do decyzji właściciela.** Endpointu `task-reminders` celowo
+NIE ma w `vercel.json`. Plan Hobby dopuszcza dwa zadania cron uruchamiane raz
+dziennie, a te dwa są już zajęte (raport miesięczny, poranna odprawa).
+Przypomnienia mają sens tylko co godzinę. Dwie drogi:
+- Vercel Pro: dopisać do `vercel.json` wpis
+  `{ "path": "/api/cron/task-reminders", "schedule": "0 7-19 * * *" }`.
+- Zostając na Hobby: darmowy zewnętrzny scheduler (np. cron-job.org) pukający
+  co godzinę pod `https://agentspace.pl/api/cron/task-reminders`
+  z nagłówkiem `Authorization: Bearer <CRON_SECRET>`.
+
+**Manifest.** `app/manifest.ts`: kolory poprawione na jasne (`#f1f4f9`), bo
+aplikacja ma jasny interfejs, a w manifeście zostało czarne tło z pierwszej
+wersji i pasek tytułu na Androidzie był czarny nad jasnym ekranem. Doszły
+skróty pod przytrzymanie ikony: Klienci, Zadania, Nieruchomości.
+
+**Env wymagane, żeby push w ogóle wyszedł:** `NEXT_PUBLIC_VAPID_PUBLIC_KEY`,
+`VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` w Vercel (lokalnie w `.env.local` są).
+Bez nich `sendPushToAgent` po cichu zwraca 0 i nic się nie dzieje.
+
 
 ## 11. Workflow
 
