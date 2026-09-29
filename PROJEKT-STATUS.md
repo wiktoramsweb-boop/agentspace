@@ -323,6 +323,29 @@ i wynik mówi wprost, który wariant zadziałał.
 **Czego jeszcze nie ma:** raportu PDF dla klienta, wskaźnika trendu cen
 w czasie.
 
+## 10f. Konto demo (wrzesień 2026)
+
+Pusty system nie sprzedaje się na spotkaniu. Prospekt ma kliknąć i zobaczyć
+pracujące biuro, a nie puste tabele i analizę cenową, która odmawia liczenia.
+
+**Skrypt:** `npm run seed:demo -- <agency_id>`. Tworzy 24 klientów, 38 ofert
+rozrzuconych po dwunastu dzielnicach Krakowa (`lib/demo/dzielnice.ts`, realne
+współrzędne i proporcje cen) oraz 16 zamkniętych transakcji z prowizjami.
+
+- `--dry` pokazuje, co powstanie, i nic nie zapisuje,
+- `--clean` sprząta (oferty `DEMO-xxx`, klienci ze źródłem `demo`, transakcje
+  z tytułem `[DEMO]`),
+- bez `--force` skrypt **odmawia** działania, gdy biuro ma więcej niż pięć
+  prawdziwych ofert. To zabezpieczenie przed wsypaniem zmyślonych transakcji
+  do bazy działającego biura.
+
+Dane demo nie są przypadkowe: liczba pokoi wynika z metrażu, piętro mieści się
+w liczbie pięter, a ceny odwzorowują proporcje między dzielnicami. Na tym
+zestawie analiza cenowa daje 17 tys. zł/m² dla Starego Miasta, 15 tys. dla
+Ruczaju i 13,5 tys. dla Nowej Huty, czyli zachowuje gradient dzielnic.
+
+**Uruchamiaj wyłącznie na osobnym koncie demo**, nie na koncie Spectry.
+
 ## 11. Workflow
 
 Commit → push do `main` → Vercel auto-deploy (~30-60s). Weryfikacja deployu: `curl -sL https://www.agentspace.pl/app | grep Zaloguj`. Build lokalnie: `npm run build`. Dev: `npm run dev`.

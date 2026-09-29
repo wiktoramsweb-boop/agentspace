@@ -38,6 +38,7 @@
   ],
   "exclude": [
     "node_modules",
-    "lib/**/sprawdz-*.ts"
+    "lib/**/sprawdz-*.ts",
+    "lib/demo/seed.ts"
   ]
 }

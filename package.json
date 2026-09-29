@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:wycena": "node --experimental-strip-types --no-warnings lib/wycena/sprawdz-model.ts"
+    "test:wycena": "node --experimental-strip-types --no-warnings lib/wycena/sprawdz-model.ts",
+    "seed:demo": "node --experimental-strip-types --no-warnings lib/demo/seed.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",
