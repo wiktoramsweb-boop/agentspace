@@ -16,7 +16,7 @@ export default function LoginPage() {
       footer={
         <>
           Nie masz jeszcze konta?{" "}
-          <Link href="/signup" className="text-emerald-400 hover:text-emerald-300">
+          <Link href="/signup" className="font-medium text-emerald-400 underline-offset-2 hover:text-emerald-300 hover:underline">
             Załóż biuro
           </Link>
         </>
@@ -26,7 +26,7 @@ export default function LoginPage() {
         <FormField label="Email" name="email" type="email" autoComplete="email" placeholder="ty@biuro.pl" />
         <FormField label="Hasło" name="password" type="password" autoComplete="current-password" placeholder="••••••••" />
         <div className="-mt-1 text-right">
-          <Link href="/reset-hasla" className="text-sm text-zinc-400 hover:text-emerald-300">
+          <Link href="/reset-hasla" className="text-sm text-zinc-300 hover:text-emerald-300">
             Nie pamiętasz hasła?
           </Link>
         </div>

@@ -33,11 +33,11 @@ export function FormField({
         autoComplete={autoComplete}
         defaultValue={defaultValue}
         readOnly={readOnly}
-        className={`w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 ${
+        className={`w-full rounded-xl border border-white/12 bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 ${
           readOnly ? "cursor-not-allowed text-zinc-400" : ""
         }`}
       />
-      {hint && <p className="mt-1.5 text-xs text-zinc-500">{hint}</p>}
+      {hint && <p className="mt-1.5 text-xs text-zinc-400">{hint}</p>}
     </div>
   );
 }

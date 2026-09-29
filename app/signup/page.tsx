@@ -16,7 +16,7 @@ export default function SignupPage() {
       footer={
         <>
           Masz już konto?{" "}
-          <Link href="/login" className="text-emerald-400 hover:text-emerald-300">
+          <Link href="/login" className="font-medium text-emerald-400 underline-offset-2 hover:text-emerald-300 hover:underline">
             Zaloguj się
           </Link>
         </>
@@ -37,10 +37,10 @@ export default function SignupPage() {
         />
         <FormError message={state?.error} />
         <SubmitButton pending={pending}>Załóż biuro →</SubmitButton>
-        <p className="text-center text-xs text-zinc-500">
+        <p className="text-center text-xs text-zinc-400">
           Zakładając konto akceptujesz{" "}
-          <Link href="/regulamin" className="underline hover:text-zinc-400">regulamin</Link> i{" "}
-          <Link href="/polityka-prywatnosci" className="underline hover:text-zinc-400">politykę prywatności</Link>.
+          <Link href="/regulamin" className="underline underline-offset-2 hover:text-emerald-300">regulamin</Link> i{" "}
+          <Link href="/polityka-prywatnosci" className="underline underline-offset-2 hover:text-emerald-300">politykę prywatności</Link>.
         </p>
       </form>
     </AuthShell>
