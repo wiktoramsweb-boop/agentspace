@@ -2,7 +2,8 @@
 
 import { requireUser } from "@/lib/auth";
 import { comparablePool } from "@/lib/wycena/data";
-import { estimate, type Estimate, type Subject } from "@/lib/wycena/model";
+import { estimate, MAX_DISTANCE_M, type Estimate, type Subject } from "@/lib/wycena/model";
+import { geocodePl } from "@/lib/geocode";
 
 /**
  * Analiza porównawcza cen dla podanych parametrów nieruchomości.
@@ -46,11 +47,28 @@ export async function runValuation(formData: FormData): Promise<Estimate> {
     return { ...EMPTY, reason: "Podaj powierzchnię w metrach kwadratowych." };
   }
 
+  const address = str("address");
+  let city = str("city");
+  let lat = num("lat");
+  let lng = num("lng");
+
+  // Agent mógł wpisać adres z ręki i nie kliknąć podpowiedzi. Wtedy nie mamy
+  // ani współrzędnych, ani miasta, a bez nich nie ma czego porównywać.
+  // Dopytujemy geokoder po stronie serwera, zamiast zwracać pusty wynik.
+  if ((lat == null || lng == null) && address) {
+    const [hit] = await geocodePl(address, 1);
+    if (hit) {
+      lat = hit.lat;
+      lng = hit.lng;
+      city = city ?? hit.city;
+    }
+  }
+
   const subject: Subject = {
     propertyType: str("property_type") ?? "mieszkanie",
-    city: str("city"),
-    lat: num("lat"),
-    lng: num("lng"),
+    city,
+    lat,
+    lng,
     areaM2,
     rooms: num("rooms"),
     floor: num("floor"),
@@ -60,6 +78,19 @@ export async function runValuation(formData: FormData): Promise<Estimate> {
     market: str("market"),
   };
 
+  if (!city && lat == null) {
+    return {
+      ...EMPTY,
+      reason: "Podaj adres albo miasto. Bez lokalizacji nie ma czego porównywać.",
+    };
+  }
+
   const pool = await comparablePool(user.agency_id, subject);
-  return estimate(subject, pool);
+  const result = estimate(subject, pool);
+
+  return {
+    ...result,
+    usedAddress: address ?? city,
+    usedRadiusM: lat != null && lng != null ? MAX_DISTANCE_M : null,
+  };
 }

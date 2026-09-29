@@ -69,6 +69,10 @@ export type Estimate = {
   usedCount: number;
   droppedCount: number;
   spreadPct: number;
+  /** Adres, dla którego faktycznie liczyliśmy - agent ma widzieć, co poszło do obliczeń. */
+  usedAddress?: string | null;
+  /** Promień wyszukiwania porównań w metrach, albo null gdy liczyliśmy po samym mieście. */
+  usedRadiusM?: number | null;
 };
 
 /* ── parametry modelu ───────────────────────────────────────── */
@@ -85,7 +89,7 @@ const CONDITION_VALUE: Record<string, number> = {
 /** Rynek pierwotny bywa droższy za metr niż porównywalny wtórny. */
 const MARKET_VALUE: Record<string, number> = { pierwotny: 0.04, wtorny: 0 };
 
-const MAX_DISTANCE_M = 2500;
+export const MAX_DISTANCE_M = 2500;
 const MAX_MONTHS = 18;
 const MIN_COMPS = 3;
 const TARGET_COMPS = 12;

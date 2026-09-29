@@ -289,9 +289,15 @@ moduł z testami, bo na jego podstawie agent podaje klientowi kwotę.
 szacunkowy**. Operaty sporządzają wyłącznie rzeczoznawcy majątkowi i tego
 nazewnictwa nie wolno zmieniać.
 
-**Czego jeszcze nie ma:** raportu PDF dla klienta, geokodowania adresu
-(współrzędne wpisuje się ręcznie, choć `/api/geocode` już istnieje),
-wskaźnika trendu cen w czasie.
+**Adres:** pole z podpowiadaniem (`AddressInput`, ten sam komponent co przy
+kliencie i ofercie) ustawia miasto i współrzędne. Gdy agent wpisze adres
+z ręki i nie kliknie podpowiedzi, akcja dogeokodowuje go po stronie serwera
+przez `lib/geocode.ts` - inaczej zostawalibyśmy bez lokalizacji i bez wyniku.
+Ze współrzędnymi porównujemy w promieniu 2,5 km, bez nich w obrębie miasta,
+i wynik mówi wprost, który wariant zadziałał.
+
+**Czego jeszcze nie ma:** raportu PDF dla klienta, wskaźnika trendu cen
+w czasie.
 
 ## 11. Workflow
 

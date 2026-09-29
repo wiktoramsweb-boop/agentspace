@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CONDITIONS } from "@/lib/types";
+import { AddressInput } from "../components/address-input";
 import { formatPln } from "@/lib/format";
 import type { Estimate } from "@/lib/wycena/model";
 import { runValuation } from "./actions";
@@ -64,10 +65,10 @@ export function WycenaForm() {
             </select>
           </div>
 
-          <div>
-            <label className={label} htmlFor="city">Miasto</label>
-            <input id="city" name="city" className={field} placeholder="Kraków" />
-          </div>
+          <AddressInput
+            label="Adres nieruchomości"
+            placeholder="Zacznij pisać, np. Kraków Zbożowa 2…"
+          />
 
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -114,20 +115,6 @@ export function WycenaForm() {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={label} htmlFor="lat">Szerokość geogr.</label>
-              <input id="lat" name="lat" inputMode="decimal" className={field} placeholder="50.0614" />
-            </div>
-            <div>
-              <label className={label} htmlFor="lng">Długość geogr.</label>
-              <input id="lng" name="lng" inputMode="decimal" className={field} placeholder="19.9366" />
-            </div>
-          </div>
-          <p className="-mt-2 text-xs text-slate-500">
-            Współrzędne są opcjonalne, ale mocno poprawiają wynik: bez nich porównujemy
-            w obrębie całego miasta, a z nimi w promieniu do 2,5 km.
-          </p>
 
           <button
             type="submit"
@@ -143,7 +130,8 @@ export function WycenaForm() {
         {!result ? (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-10 text-center text-slate-500">
             Uzupełnij dane po lewej. Wynik oprzemy na transakcjach Twojego biura
-            i danych rynkowych z okolicy.
+            i danych rynkowych z okolicy. Wybierz adres z podpowiedzi, wtedy
+            porównamy w promieniu 2,5 km zamiast w obrębie całego miasta.
           </div>
         ) : !result.ok ? (
           <div className="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-amber-900">
@@ -174,6 +162,15 @@ function Result({ result }: { result: Estimate }) {
         <p className="text-3xl font-semibold text-slate-900 md:text-4xl">
           {formatPln(result.low)} <span className="text-slate-400">do</span> {formatPln(result.high)}
         </p>
+
+        {result.usedAddress && (
+          <p className="mt-3 text-sm text-slate-500">
+            Dla: <span className="text-slate-700">{result.usedAddress}</span>
+            {result.usedRadiusM
+              ? `, porównania w promieniu ${(result.usedRadiusM / 1000).toFixed(1).replace(".", ",")} km`
+              : ", porównania z całego miasta (brak dokładnej lokalizacji)"}
+          </p>
+        )}
 
         <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-3">
           <Stat label="Środek przedziału" value={formatPln(result.mid)} />
