@@ -53,6 +53,7 @@ export const en: Dict = {
         links: [
           { href: "/polityka-prywatnosci", label: "Privacy policy" },
           { href: "/regulamin", label: "Terms of service" },
+          { href: "/umowa-powierzenia", label: "Data processing agreement" },
         ],
       },
     ],

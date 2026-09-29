@@ -40,6 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ["/blog", "weekly", 0.8],
     ["/integracje", "monthly", 0.8],
     ["/polityka-prywatnosci", "yearly", 0.3],
+    ["/umowa-powierzenia", "yearly", 0.3],
     ["/regulamin", "yearly", 0.3],
   ] as const;
 

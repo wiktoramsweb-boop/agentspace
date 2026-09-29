@@ -54,6 +54,7 @@ export const pl = {
         links: [
           { href: "/polityka-prywatnosci", label: "Polityka prywatności" },
           { href: "/regulamin", label: "Regulamin" },
+          { href: "/umowa-powierzenia", label: "Umowa powierzenia danych" },
         ],
       },
     ],

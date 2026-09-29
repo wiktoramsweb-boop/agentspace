@@ -32,6 +32,7 @@ export const SEGMENTS: Record<string, string> = {
   blog: "blog",
   "polityka-prywatnosci": "privacy",
   regulamin: "terms",
+  "umowa-powierzenia": "data-processing",
 };
 
 /**
