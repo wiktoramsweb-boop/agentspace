@@ -57,9 +57,29 @@ export type ScoredComparable = {
   weight: number;
 };
 
+/** Średnia cena transakcyjna za metr w mieście, z publicznego źródła. */
+export type Anchor = {
+  pricePerM2: number;
+  city: string;
+  period: string;
+  source: string;
+  market: string | null;
+  sampleSize: number | null;
+};
+
+/**
+ * Jak powstał wynik:
+ *  porownania - z transakcji z okolicy, to jest właściwa metoda,
+ *  wskaznik   - ze średniej ceny transakcyjnej dla miasta, gdy okolicy brak,
+ *  brak       - nie ma z czego liczyć i mówimy to wprost.
+ */
+export type Method = "porownania" | "wskaznik" | "brak";
+
 export type Estimate = {
   ok: boolean;
   reason?: string;
+  method: Method;
+  anchor?: Anchor | null;
   pricePerM2: number;
   low: number;
   mid: number;
@@ -73,6 +93,12 @@ export type Estimate = {
   usedAddress?: string | null;
   /** Promień wyszukiwania porównań w metrach, albo null gdy liczyliśmy po samym mieście. */
   usedRadiusM?: number | null;
+  /** Ile miesięcy wstecz sięgnęliśmy po transakcje. */
+  usedMonths?: number;
+  /** Ile porównań w ogóle było w puli, zanim zadziałały filtry. Do diagnostyki. */
+  poolSize?: number;
+  /** Korekty naniesione na średnią miejską przy metodzie wskaźnikowej. */
+  anchorAdjustments?: Adjustment[];
 };
 
 /* ── parametry modelu ───────────────────────────────────────── */
@@ -89,8 +115,25 @@ const CONDITION_VALUE: Record<string, number> = {
 /** Rynek pierwotny bywa droższy za metr niż porównywalny wtórny. */
 const MARKET_VALUE: Record<string, number> = { pierwotny: 0.04, wtorny: 0 };
 
-export const MAX_DISTANCE_M = 2500;
-const MAX_MONTHS = 18;
+/**
+ * Wyszukiwanie porównań idzie stopniami: najpierw blisko i świeżo, a gdy
+ * porównań jest za mało, rozluźniamy kryteria. Sztywny promień 2,5 km
+ * wyglądał dobrze na papierze, ale w biurze z kilkunastoma ofertami
+ * w całym mieście odcinał wszystko i wycena zwracała pustkę.
+ *
+ * Wynik zawsze mówi, którego stopnia użyliśmy, więc agent wie, czy patrzy
+ * na sąsiedztwo, czy na całe miasto.
+ */
+const SEARCH_STEPS: { radiusM: number | null; months: number }[] = [
+  { radiusM: 1000, months: 12 },
+  { radiusM: 2500, months: 18 },
+  { radiusM: 5000, months: 24 },
+  { radiusM: 12000, months: 36 },
+  { radiusM: null, months: 36 },
+];
+
+export const MAX_DISTANCE_M = SEARCH_STEPS[SEARCH_STEPS.length - 2].radiusM ?? 12000;
+const MAX_MONTHS = 36;
 const MIN_COMPS = 3;
 const TARGET_COMPS = 12;
 
@@ -212,8 +255,14 @@ function buildAdjustments(subject: Subject, comp: Comparable): Adjustment[] {
 }
 
 /** Im bliżej i im świeższa transakcja, tym większa waga w wyniku. */
-function weightFor(distanceM: number | null, monthsAgo: number, source: Comparable["source"]): number {
-  const distW = distanceM == null ? 0.45 : Math.max(0.15, 1 - distanceM / MAX_DISTANCE_M);
+function weightFor(
+  distanceM: number | null,
+  monthsAgo: number,
+  source: Comparable["source"],
+  radiusM: number | null,
+): number {
+  const scale = radiusM ?? MAX_DISTANCE_M;
+  const distW = distanceM == null ? 0.45 : Math.max(0.15, 1 - distanceM / (scale * 1.2));
   const timeW = Math.max(0.2, 1 - monthsAgo / MAX_MONTHS);
   // Cena ofertowa to nie cena transakcyjna, więc waży mniej.
   const sourceW = source === "oferta" ? 0.5 : 1;
@@ -222,9 +271,77 @@ function weightFor(distanceM: number | null, monthsAgo: number, source: Comparab
 
 /* ── wycena ─────────────────────────────────────────────────── */
 
-export function estimate(subject: Subject, pool: Comparable[], now = new Date()): Estimate {
+/** Typowy metraż, względem którego korygujemy średnią miejską. */
+const TYPICAL_AREA_M2 = 55;
+/** Widełki przy metodzie wskaźnikowej: średnia miejska ukrywa różnice dzielnic. */
+const ANCHOR_BAND = 0.15;
+
+/**
+ * Wycena ze średniej miejskiej, gdy w okolicy nie ma transakcji.
+ *
+ * Średnia dotyczy typowego mieszkania, więc korygujemy ją o to, czym nasze
+ * się od typowego różni: stan, rynek, piętro i metraż. Widełki są szerokie
+ * z premedytacją, bo średnia dla miasta nie odróżnia dzielnic.
+ */
+function fromAnchor(subject: Subject, anchor: Anchor, context: ScoredComparable[]): Estimate {
+  const adjustments: Adjustment[] = [];
+
+  const cond = (c: string | null) => (c && c in CONDITION_VALUE ? CONDITION_VALUE[c] : 0);
+  const condPct = cond(subject.condition);
+  if (Math.abs(condPct) > 0.001) adjustments.push({ label: "Stan wykończenia", pct: condPct });
+
+  // Gdy wskaźnik dotyczy tego samego rynku, nie ma czego korygować.
+  if (anchor.market == null && subject.market && subject.market in MARKET_VALUE) {
+    const pct = MARKET_VALUE[subject.market];
+    if (Math.abs(pct) > 0.001) adjustments.push({ label: "Rynek pierwotny", pct });
+  }
+
+  if (subject.floor === 0) adjustments.push({ label: "Parter", pct: -0.03 });
+  else if (subject.floor != null && subject.floorsTotal != null && subject.floor === subject.floorsTotal && subject.floorsTotal > 3) {
+    adjustments.push({ label: "Ostatnie piętro bez windy", pct: -0.02 });
+  }
+
+  // Mniejsze mieszkania mają wyższą cenę za metr niż przeciętne.
+  const areaPct = Math.max(-0.08, Math.min(0.08, (1 - subject.areaM2 / TYPICAL_AREA_M2) * 0.12));
+  if (Math.abs(areaPct) > 0.005) {
+    adjustments.push({ label: `Metraż wobec typowego (${TYPICAL_AREA_M2} m²)`, pct: areaPct });
+  }
+
+  const totalPct = adjustments.reduce((sum, a) => sum + a.pct, 0);
+  const pricePerM2 = anchor.pricePerM2 * (1 + totalPct);
+  const round = (n: number) => Math.round(n / 1000) * 1000;
+
+  return {
+    ok: true,
+    method: "wskaznik",
+    anchor,
+    pricePerM2: Math.round(pricePerM2),
+    mid: round(pricePerM2 * subject.areaM2),
+    low: round(pricePerM2 * (1 - ANCHOR_BAND) * subject.areaM2),
+    high: round(pricePerM2 * (1 + ANCHOR_BAND) * subject.areaM2),
+    // Średnia miejska nigdy nie daje wysokiej pewności co do konkretnego adresu.
+    confidence: "niska",
+    // Porównania pokazujemy jako kontekst, ale nie one wyznaczyły wynik.
+    comparables: context,
+    usedCount: 0,
+    droppedCount: 0,
+    spreadPct: 0,
+    anchorAdjustments: adjustments,
+  };
+}
+
+export function estimate(
+  subject: Subject,
+  pool: Comparable[],
+  options: { anchor?: Anchor | null; now?: Date } = {},
+): Estimate {
+  const now = options.now ?? new Date();
+  const anchor = options.anchor ?? null;
+
   const empty: Estimate = {
     ok: false,
+    method: "brak",
+    anchor,
     pricePerM2: 0,
     low: 0,
     mid: 0,
@@ -240,49 +357,84 @@ export function estimate(subject: Subject, pool: Comparable[], now = new Date())
     return { ...empty, reason: "Podaj powierzchnię nieruchomości." };
   }
 
-  const scored: ScoredComparable[] = [];
+  /** Kandydaci przy danym stopniu rozluźnienia kryteriów. */
+  function collect(radiusM: number | null, months: number): ScoredComparable[] {
+    const out: ScoredComparable[] = [];
 
-  for (const comp of pool) {
-    if (comp.propertyType !== subject.propertyType) continue;
-    if (!comp.areaM2 || comp.areaM2 <= 0 || !comp.pricePln || comp.pricePln <= 0) continue;
+    for (const comp of pool) {
+      if (comp.propertyType !== subject.propertyType) continue;
+      if (!comp.areaM2 || comp.areaM2 <= 0 || !comp.pricePln || comp.pricePln <= 0) continue;
 
-    const monthsAgo = monthsBetween(comp.transactedAt, now);
-    if (monthsAgo > MAX_MONTHS) continue;
+      const monthsAgo = monthsBetween(comp.transactedAt, now);
+      if (monthsAgo > months) continue;
 
-    const distanceM = distanceMeters(subject, comp);
-    if (distanceM != null && distanceM > MAX_DISTANCE_M) continue;
-    // Bez współrzędnych zostaje tylko miasto. Lepsze to niż nic, ale
-    // z mniejszą wagą (patrz weightFor).
-    if (distanceM == null && (!subject.city || comp.city !== subject.city)) continue;
+      const distanceM = distanceMeters(subject, comp);
+      if (radiusM != null && distanceM != null && distanceM > radiusM) continue;
+      // Bez współrzędnych zostaje tylko miasto. Lepsze to niż nic, ale
+      // z mniejszą wagą (patrz weightFor).
+      if (distanceM == null && (!subject.city || comp.city !== subject.city)) continue;
 
-    // Skrajnie inny metraż to już inny produkt, nie porównanie.
-    const ratio = comp.areaM2 / subject.areaM2;
-    if (ratio > 1.8 || ratio < 0.55) continue;
+      // Skrajnie inny metraż to już inny produkt, nie porównanie.
+      const ratio = comp.areaM2 / subject.areaM2;
+      if (ratio > 1.8 || ratio < 0.55) continue;
 
-    const basePricePerM2 = comp.pricePln / comp.areaM2;
-    const adjustments = buildAdjustments(subject, comp);
-    const totalPct = adjustments.reduce((sum, a) => sum + a.pct, 0);
+      const basePricePerM2 = comp.pricePln / comp.areaM2;
+      const adjustments = buildAdjustments(subject, comp);
+      const totalPct = adjustments.reduce((sum, a) => sum + a.pct, 0);
 
-    scored.push({
-      comp,
-      distanceM,
-      monthsAgo,
-      basePricePerM2,
-      adjustments,
-      adjustedPricePerM2: basePricePerM2 * (1 + totalPct),
-      weight: weightFor(distanceM, monthsAgo, comp.source),
-    });
+      out.push({
+        comp,
+        distanceM,
+        monthsAgo,
+        basePricePerM2,
+        adjustments,
+        adjustedPricePerM2: basePricePerM2 * (1 + totalPct),
+        weight: weightFor(distanceM, monthsAgo, comp.source, radiusM),
+      });
+    }
+    return out;
+  }
+
+  // Zaczynamy od najostrzejszych kryteriów i luzujemy, dopóki nie uzbieramy
+  // sensownej próbki. Bierzemy pierwszy stopień, który daje minimum porównań.
+  let scored: ScoredComparable[] = [];
+  let usedStep = SEARCH_STEPS[SEARCH_STEPS.length - 1];
+
+  for (const step of SEARCH_STEPS) {
+    const candidates = collect(step.radiusM, step.months);
+    if (candidates.length > scored.length) {
+      scored = candidates;
+      usedStep = step;
+    }
+    if (scored.length >= MIN_COMPS) break;
+  }
+
+  // Porównania z okolicy są właściwą metodą. Wszystko dalej niż 2,5 km to
+  // w dużym mieście inna dzielnica i inna półka cenowa, więc wtedy wolimy
+  // uczciwą średnią miejską od porównania Starego Miasta z Nową Hutą.
+  const local = usedStep.radiusM != null && usedStep.radiusM <= 2500;
+
+  if (!local && anchor) {
+    return fromAnchor(subject, anchor, scored.slice(0, TARGET_COMPS));
   }
 
   if (scored.length < MIN_COMPS) {
+    if (anchor) return fromAnchor(subject, anchor, scored);
+
+    const sameType = pool.filter((c) => c.propertyType === subject.propertyType).length;
+    const reason =
+      pool.length === 0
+        ? "Baza porównań jest pusta. Dodaj transakcje w module Nieruchomości albo zaimportuj dane rynkowe z RCN."
+        : sameType === 0
+          ? `W bazie nie ma żadnej nieruchomości tego rodzaju (jest ${pool.length} innych) i brak wskaźnika cen dla tego miasta.`
+          : `Za mało porównań w okolicy (${scored.length}) i brak wskaźnika cen dla tego miasta. Zaimportuj dane rynkowe, żeby wycena miała na czym się oprzeć.`;
+
     return {
       ...empty,
-      reason:
-        scored.length === 0
-          ? "Brak porównywalnych transakcji w bazie. Dodaj transakcje albo zaimportuj dane rynkowe."
-          : `Za mało porównań (${scored.length}). Potrzebujemy co najmniej ${MIN_COMPS}, żeby wynik miał sens.`,
+      reason,
       comparables: scored,
       usedCount: scored.length,
+      poolSize: pool.length,
     };
   }
 
@@ -314,13 +466,21 @@ export function estimate(subject: Subject, pool: Comparable[], now = new Date())
   const p75 = percentile(values, 0.75);
   const spreadPct = pricePerM2 > 0 ? (p75 - p25) / pricePerM2 : 0;
 
-  const confidence: Estimate["confidence"] =
+  let confidence: Estimate["confidence"] =
     used.length >= 8 && spreadPct < 0.18 ? "wysoka" : used.length >= 5 && spreadPct < 0.3 ? "srednia" : "niska";
+
+  // Porównania z drugiego końca miasta albo sprzed dwóch lat to nadal
+  // porównania, ale nie udawajmy, że wiemy tyle samo co przy sąsiedztwie.
+  const relaxed = usedStep.radiusM == null || usedStep.radiusM > 2500;
+  if (relaxed && confidence === "wysoka") confidence = "srednia";
+  else if (relaxed && confidence === "srednia") confidence = "niska";
 
   const round = (n: number) => Math.round(n / 1000) * 1000;
 
   return {
     ok: true,
+    method: "porownania",
+    anchor,
     pricePerM2: Math.round(pricePerM2),
     mid: round(pricePerM2 * subject.areaM2),
     low: round(Math.min(p25, pricePerM2 * 0.94) * subject.areaM2),
@@ -330,5 +490,8 @@ export function estimate(subject: Subject, pool: Comparable[], now = new Date())
     usedCount: used.length,
     droppedCount: dropped,
     spreadPct,
+    usedRadiusM: usedStep.radiusM,
+    usedMonths: usedStep.months,
+    poolSize: pool.length,
   };
 }

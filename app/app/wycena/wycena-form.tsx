@@ -5,6 +5,7 @@ import { CONDITIONS } from "@/lib/types";
 import { AddressInput } from "../components/address-input";
 import { formatPln } from "@/lib/format";
 import type { Estimate } from "@/lib/wycena/model";
+import Link from "next/link";
 import { runValuation } from "./actions";
 
 /**
@@ -137,6 +138,12 @@ export function WycenaForm() {
           <div className="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-amber-900">
             <p className="font-semibold">Nie da się policzyć</p>
             <p className="mt-1 text-sm">{result.reason}</p>
+            <Link
+              href="/app/wycena/dane"
+              className="mt-4 inline-flex rounded-xl bg-amber-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-800"
+            >
+              Dodaj dane rynkowe
+            </Link>
           </div>
         ) : (
           <Result result={result} />
@@ -168,7 +175,8 @@ function Result({ result }: { result: Estimate }) {
             Dla: <span className="text-slate-700">{result.usedAddress}</span>
             {result.usedRadiusM
               ? `, porównania w promieniu ${(result.usedRadiusM / 1000).toFixed(1).replace(".", ",")} km`
-              : ", porównania z całego miasta (brak dokładnej lokalizacji)"}
+              : ", porównania z całego miasta"}
+            {result.usedMonths ? `, z ostatnich ${result.usedMonths} miesięcy` : ""}
           </p>
         )}
 
@@ -176,14 +184,54 @@ function Result({ result }: { result: Estimate }) {
           <Stat label="Środek przedziału" value={formatPln(result.mid)} />
           <Stat label="Cena za metr" value={`${result.pricePerM2.toLocaleString("pl-PL")} zł`} />
           <Stat
-            label="Porównań użyto"
+            label={result.method === "wskaznik" ? "Podstawa" : "Porównań użyto"}
             value={
-              result.droppedCount > 0
-                ? `${result.usedCount} (odrzucono ${result.droppedCount})`
-                : String(result.usedCount)
+              result.method === "wskaznik"
+                ? "średnia miejska"
+                : result.droppedCount > 0
+                  ? `${result.usedCount} (odrzucono ${result.droppedCount})`
+                  : String(result.usedCount)
             }
           />
         </div>
+
+        {result.method === "wskaznik" && result.anchor && (
+          <div className="mt-5 rounded-xl border border-sky-300 bg-sky-50 p-4 text-sm leading-relaxed text-sky-950">
+            <p className="font-semibold">Liczone ze średniej rynkowej, nie z sąsiedztwa</p>
+            <p className="mt-1">
+              W okolicy tego adresu nie mamy transakcji, więc podstawą jest średnia cena
+              transakcyjna dla miasta{" "}
+              <strong>
+                {result.anchor.city}: {Math.round(result.anchor.pricePerM2).toLocaleString("pl-PL")} zł/m²
+              </strong>{" "}
+              za okres {result.anchor.period} (źródło: {result.anchor.source.toUpperCase()}).
+            </p>
+            <p className="mt-2">
+              Średnia miejska nie odróżnia dzielnic, a różnice sięgają kilkudziesięciu procent.
+              To jest <strong>rząd wielkości, nie wycena konkretnego adresu</strong>. Żeby
+              liczyć z sąsiedztwa, potrzebne są dane z{" "}
+              <Link href="/app/wycena/dane" className="underline underline-offset-2">
+                Rejestru Cen Nieruchomości
+              </Link>
+              .
+            </p>
+            {result.anchorAdjustments && result.anchorAdjustments.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {result.anchorAdjustments.map((a) => (
+                  <span
+                    key={a.label}
+                    className={`rounded-md px-2 py-0.5 text-[11px] ${
+                      a.pct >= 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+                    }`}
+                  >
+                    {a.label}: {a.pct >= 0 ? "+" : ""}
+                    {(a.pct * 100).toFixed(1)}%
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <p className="mt-5 rounded-xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-500">
           To jest analiza porównawcza cen, a <strong>nie operat szacunkowy</strong>
@@ -192,11 +240,16 @@ function Result({ result }: { result: Estimate }) {
         </p>
       </div>
 
+      {result.comparables.length > 0 && (
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="border-b border-slate-100 px-6 py-4">
-          <p className="font-semibold text-slate-900">Na czym opieramy wynik</p>
+          <p className="font-semibold text-slate-900">
+            {result.method === "wskaznik" ? "Transakcje w szerszej okolicy (kontekst)" : "Na czym opieramy wynik"}
+          </p>
           <p className="text-sm text-slate-500">
-            Każde porównanie skorygowane o różnice względem wycenianej nieruchomości.
+            {result.method === "wskaznik"
+              ? "Te transakcje NIE wyznaczyły wyniku, są za daleko. Pokazujemy je, żebyś widział, czym dysponujemy."
+              : "Każde porównanie skorygowane o różnice względem wycenianej nieruchomości."}
           </p>
         </div>
 
@@ -238,6 +291,7 @@ function Result({ result }: { result: Estimate }) {
           ))}
         </ul>
       </div>
+      )}
     </div>
   );
 }

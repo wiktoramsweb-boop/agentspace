@@ -14,7 +14,9 @@ import type { Comparable, Subject } from "./model";
  * i tak ma zostać. Wspólny jest tylko RCN, bo to dane publiczne.
  */
 
-const MONTHS_BACK = 18;
+// Model sam decyduje, jak daleko wstecz sięgnąć. Tutaj bierzemy najszerszy
+// zakres, jakiego może potrzebować, czyli najluźniejszy stopień wyszukiwania.
+const MONTHS_BACK = 36;
 
 function cutoffDate(): string {
   const d = new Date();
@@ -144,8 +146,14 @@ type MarketRow = {
   transacted_at: string;
 };
 
-/** Dane z Rejestru Cen Nieruchomości, wspólne dla wszystkich biur. */
-async function marketTransactions(subject: Subject): Promise<Comparable[]> {
+/**
+ * Dane z Rejestru Cen Nieruchomości.
+ *
+ * Widzimy dane publiczne (puste agency_id) oraz własny import biura. Import
+ * jednego biura nie trafia do wycen innego: wystarczyłby jeden zepsuty plik,
+ * żeby popsuć wyniki wszystkim.
+ */
+async function marketTransactions(agencyId: string, subject: Subject): Promise<Comparable[]> {
   const admin = createSupabaseAdmin();
   let q = admin
     .from("market_transactions")
@@ -153,6 +161,7 @@ async function marketTransactions(subject: Subject): Promise<Comparable[]> {
       "id, address, city, district, lat, lng, property_type, area_m2, rooms, floor, floors_total, year_built, condition_std, market, price_pln, transacted_at",
     )
     .eq("property_type", subject.propertyType)
+    .or(`agency_id.is.null,agency_id.eq.${agencyId}`)
     .gte("transacted_at", cutoffDate())
     .limit(600);
 
@@ -189,7 +198,7 @@ export async function comparablePool(agencyId: string, subject: Subject): Promis
   const [deals, props, market] = await Promise.all([
     ownDeals(agencyId, subject),
     ownProperties(agencyId, subject),
-    marketTransactions(subject),
+    marketTransactions(agencyId, subject),
   ]);
 
   // Ta sama nieruchomość mogła trafić i z karty transakcji, i z oferty.

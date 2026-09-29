@@ -261,7 +261,31 @@ wartości odstających** (próg 3×MAD, a przy rynku jednorodnym ±8% od mediany
 przesuwała wynik o 7%. Przy mieszkaniu za 900 tys. to 60 tys. zł błędu. Jeśli
 kiedyś będziesz tu majstrować, **nie wracaj do średniej.**
 
-**Skąd dane:** `lib/wycena/data.ts`, trzy źródła:
+⚠️ **Druga poprawka, ważniejsza.** Pierwsza wersja liczyła wyłącznie z bazy
+biura. Przy dziewięciu ofertach rozrzuconych po Krakowie wycena mieszkania na
+Starym Mieście wyszła 605 tys., bo oparła się na Nowej Hucie i os. Stalowym
+z odległości 7-9 km. To był błąd w założeniu: **pojedyncze biuro nigdy nie ma
+takiej gęstości transakcji, żeby pokryć dzielnice miasta.** Dane rynkowe są
+podstawą, własna baza jest dodatkiem.
+
+**Trzy metody, w tej kolejności:**
+1. `porownania` - transakcje w promieniu do 2,5 km. To jest właściwa metoda.
+2. `wskaznik` - średnia cena transakcyjna dla miasta (`market_price_levels`),
+   gdy w okolicy nic nie ma. Interfejs mówi wprost, że to rząd wielkości.
+3. `brak` - nie ma ani jednego, ani drugiego, więc **odmawiamy podania liczby**
+   zamiast podawać złą. Przycisk prowadzi do `/app/wycena/dane`.
+
+Wyszukiwanie porównań idzie stopniami (1 km, 2,5 km, 5 km, 12 km, całe miasto)
+i zatrzymuje się na pierwszym, który da minimum trzy porównania. Powyżej 2,5 km
+wolimy wskaźnik od porównań z drugiego końca miasta.
+
+**Dane rynkowe:** `/app/wycena/dane` (tylko właściciel). Trzy drogi:
+GUS jednym kliknięciem (`lib/wycena/import-gus.ts`, szuka zmiennych po nazwie,
+bo identyfikatory w BDL się zmieniają), wgranie CSV z RCN, ręczny wpis
+(np. z raportu NBP). Import RCN należy do biura, dane publiczne mają puste
+`agency_id` i widzą je wszyscy.
+
+**Skąd dane porównawcze:** `lib/wycena/data.ts`, trzy źródła:
 1. własne transakcje biura (`deals` zamknięte + `properties`), najcenniejsze,
 2. `market_transactions`, czyli dane z RCN, wspólne dla wszystkich biur,
 3. aktualne oferty biura jako ceny ofertowe, z mniejszą wagą.
@@ -277,10 +301,10 @@ odrzuca wiersze z ceną za metr poza zakresem 500-80 000 zł (zwykle udział
 w nieruchomości albo cena za cały budynek). Powtórny import tego samego pliku
 aktualizuje, a nie dubluje (klucz `source` + `source_ref`).
 
-**Wymaga migracji `lib/SETUP-v28-wycena.sql`.** Bez niej wycena nadal działa,
+**Wymaga migracji `lib/SETUP-v28-wycena.sql` oraz `lib/SETUP-v29-wycena-dane-rynkowe.sql`.** Bez niej wycena nadal działa,
 tylko na samych danych biura.
 
-**Testy:** `npm run test:wycena`. Sześć przypadków: rynek jednorodny, korekta
+**Testy:** `npm run test:wycena`. Dziewięć przypadków: rynek jednorodny, korekta
 za stan, odporność na wartość odstającą, brak wyniku przy zbyt małej próbce,
 ważenie cen ofertowych, odrzucanie transakcji starych i odległych. To jedyny
 moduł z testami, bo na jego podstawie agent podaje klientowi kwotę.

@@ -129,6 +129,8 @@ export type ImportResult = { parsed: number; imported: number; skipped: number; 
 export async function importRcnCsv(
   csv: string,
   sourceTag: string,
+  /** Biuro, do którego należy import. null oznacza dane publiczne dla wszystkich. */
+  agencyId: string | null,
   columnMap?: ColumnMap,
 ): Promise<ImportResult> {
   const rows = parseCsv(csv);
@@ -154,6 +156,7 @@ export async function importRcnCsv(
 
     const ref = pick(row, "sourceRef", columnMap);
     payload.push({
+      agency_id: agencyId,
       source: "rcn",
       source_ref: ref ? `${sourceTag}:${ref}` : null,
       city: pick(row, "city", columnMap) || null,
@@ -179,7 +182,7 @@ export async function importRcnCsv(
     const chunk = payload.slice(i, i + 500);
     const { error } = await admin
       .from("market_transactions")
-      .upsert(chunk, { onConflict: "source,source_ref", ignoreDuplicates: false });
+      .upsert(chunk, { onConflict: "agency_id,source,source_ref", ignoreDuplicates: false });
     if (error) errors.push(`Zapis porcji ${i / 500 + 1}: ${error.message}`);
     else imported += chunk.length;
   }

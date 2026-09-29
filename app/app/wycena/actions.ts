@@ -2,8 +2,9 @@
 
 import { requireUser } from "@/lib/auth";
 import { comparablePool } from "@/lib/wycena/data";
-import { estimate, MAX_DISTANCE_M, type Estimate, type Subject } from "@/lib/wycena/model";
+import { estimate, type Estimate, type Subject } from "@/lib/wycena/model";
 import { geocodePl } from "@/lib/geocode";
+import { getPriceAnchor } from "@/lib/wycena/poziomy";
 
 /**
  * Analiza porównawcza cen dla podanych parametrów nieruchomości.
@@ -14,6 +15,7 @@ import { geocodePl } from "@/lib/geocode";
  */
 const EMPTY: Omit<Estimate, "reason"> = {
   ok: false,
+  method: "brak",
   pricePerM2: 0,
   low: 0,
   mid: 0,
@@ -85,12 +87,13 @@ export async function runValuation(formData: FormData): Promise<Estimate> {
     };
   }
 
-  const pool = await comparablePool(user.agency_id, subject);
-  const result = estimate(subject, pool);
+  const [pool, anchor] = await Promise.all([
+    comparablePool(user.agency_id, subject),
+    getPriceAnchor(subject.city, subject.propertyType, subject.market),
+  ]);
+  const result = estimate(subject, pool, { anchor });
 
-  return {
-    ...result,
-    usedAddress: address ?? city,
-    usedRadiusM: lat != null && lng != null ? MAX_DISTANCE_M : null,
-  };
+  // Promień i okno czasu ustala model (dobiera je stopniowo), my dokładamy
+  // tylko adres, bo tego model nie zna.
+  return { ...result, usedAddress: address ?? city };
 }
