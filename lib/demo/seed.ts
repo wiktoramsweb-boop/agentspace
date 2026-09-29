@@ -37,15 +37,12 @@ let DRY = false;
 let dryId = 0;
 
 async function db(path: string, init?: RequestInit): Promise<unknown> {
-  if (DRY) {
-    if (init?.method === "DELETE") return null;
-    if (init?.method === "POST") {
-      const rows = JSON.parse(String(init.body)) as Record<string, unknown>[];
-      return rows.map((r) => ({ ...r, id: `dry-${++dryId}` }));
-    }
-    // Odczyty w podglądzie udają puste biuro z jednym użytkownikiem.
-    if (path.startsWith("profiles")) return [{ id: "dry-agent", full_name: "Agent Demo" }];
-    return [];
+  // W podglądzie blokujemy wyłącznie zapisy. Odczyty idą normalnie, dzięki
+  // czemu podgląd pokazuje, co naprawdę by się stało z tym konkretnym biurem.
+  if (DRY && init?.method && init.method !== "GET") {
+    if (init.method !== "POST") return null;
+    const rows = JSON.parse(String(init.body)) as Record<string, unknown>[];
+    return rows.map((r) => ({ ...r, id: `dry-${++dryId}` }));
   }
 
   const res = await fetch(`${URL_}/rest/v1/${path}`, {
@@ -76,6 +73,35 @@ const intBetween = (a: number, b: number): number => Math.floor(between(a, b + 1
 const IMIONA = ["Anna", "Piotr", "Katarzyna", "Marcin", "Magdalena", "Tomasz", "Joanna", "Paweł", "Agnieszka", "Michał", "Ewa", "Krzysztof"];
 const NAZWISKA = ["Kowalska", "Nowak", "Wiśniewski", "Wójcik", "Kowalczyk", "Kamiński", "Lewandowska", "Zieliński", "Szymański", "Woźniak", "Dąbrowska", "Mazur"];
 const STANY = ["do_wprowadzenia", "do_odswiezenia", "do_remontu"];
+
+/**
+ * Zdjęcia bierzemy z tych, które już leżą w /public/wzory i służą wzorom stron.
+ * Nie wgrywamy nic do Storage: demo ma być łatwe do usunięcia, a te pliki
+ * i tak jadą z aplikacją.
+ */
+const WNETRZA = ["salon.jpg", "kuchnia.jpg", "sypialnia.jpg", "salon-widok.jpg", "wnetrze-slonce.jpg", "loft.jpg", "lounge.jpg", "taras.jpg"];
+const BUDYNKI = ["kamienica.jpg", "cegla.jpg", "szklo.jpg", "wieza.jpg", "dziedziniec.jpg", "schody.jpg", "dom.jpg", "widok.jpg"];
+
+/** Cztery, pięć zdjęć na ofertę: pierwsze jest okładką. */
+function zdjecia(i: number): Record<string, unknown>[] {
+  const elewacja = BUDYNKI[i % BUDYNKI.length];
+  const wnetrza = [0, 1, 2, 3].map((k) => WNETRZA[(i + k) % WNETRZA.length]);
+  return [elewacja, ...wnetrza].map((plik, k) => ({
+    url: `/wzory/${plik}`,
+    caption: k === 0 ? "Budynek" : ["Salon", "Kuchnia", "Sypialnia", "Taras"][k - 1] ?? "Wnętrze",
+    export: true,
+    print: k < 3,
+  }));
+}
+
+const NOTATKI = [
+  "Zainteresowany, prosi o drugie oglądanie w weekend.",
+  "Czeka na decyzję kredytową, termin do końca miesiąca.",
+  "Cena do negocjacji, właściciel schodzi maksymalnie o 3 procent.",
+  "Szuka od trzech miesięcy, obejrzał już sześć mieszkań.",
+  "Sprzedaje, bo przeprowadza się za granicę. Termin elastyczny.",
+  "Kontakt telefoniczny, nie odbiera przed 16.",
+];
 
 function daysAgoIso(days: number): string {
   const d = new Date();
@@ -126,6 +152,8 @@ async function seed(agencyId: string, force: boolean): Promise<void> {
       status: pick(["nowy", "w_kontakcie", "oglada", "negocjacje", "zamkniety"]),
       budget_pln: typ === "kupujacy" ? intBetween(45, 130) * 10000 : null,
       source: "demo",
+      notes: pick(NOTATKI),
+      property: typ === "kupujacy" ? `${intBetween(2, 4)} pokoje, ${pick(DZIELNICE).nazwa}` : null,
       last_contact_at: daysAgoIso(intBetween(0, 40)),
     });
   }
@@ -173,7 +201,12 @@ async function seed(agencyId: string, force: boolean): Promise<void> {
       year_built: intBetween(1935, 2023),
       condition_std: stan,
       market: rnd() > 0.85 ? "pierwotny" : "wtorny",
-      description: "Oferta demonstracyjna, dane przykładowe.",
+      description:
+        `Mieszkanie ${pokoje}-pokojowe o powierzchni ${area} m² w dzielnicy ${d.nazwa}. ` +
+        `Budynek z ${intBetween(1935, 2023)} roku, ${stan === "do_wprowadzenia" ? "gotowe do wprowadzenia" : stan === "do_odswiezenia" ? "do odświeżenia" : "do remontu"}. ` +
+        "Dane przykładowe, oferta demonstracyjna.",
+      photos: zdjecia(i),
+      export_to_web: true,
       updated_at: daysAgoIso(sprzedane ? intBetween(20, 500) : intBetween(1, 60)),
     });
   }
@@ -239,6 +272,16 @@ async function rozpoznajBiuro(arg: string): Promise<string> {
   const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (UUID.test(arg)) return arg;
 
+  // Skrót po założeniu konta demo: nie trzeba niczego przepisywać.
+  if (arg === "--najnowsze") {
+    const [ostatnie] = (await db(
+      "agencies?select=id,name&order=created_at.desc&limit=1",
+    )) as { id: string; name: string }[];
+    if (!ostatnie) throw new Error("W bazie nie ma żadnego biura.");
+    console.log(`Najnowsze biuro: ${ostatnie.name}`);
+    return ostatnie.id;
+  }
+
   const trafienia = (await db(
     `agencies?select=id,name&name=ilike.*${encodeURIComponent(arg)}*&limit=5`,
   )) as { id: string; name: string }[];
@@ -260,6 +303,7 @@ async function rozpoznajBiuro(arg: string): Promise<string> {
 const [, , arg, ...flags] = process.argv;
 if (!arg) {
   console.error('Podaj nazwę albo identyfikator biura, np.: npm run seed:demo -- "Biuro Demo"');
+  console.error("Albo --najnowsze, żeby wziąć ostatnio założone biuro.");
   console.error("Flagi: --dry (podgląd bez zapisu), --clean (sprzątanie), --force (mimo prawdziwych danych)");
   process.exit(1);
 }
