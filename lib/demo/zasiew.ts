@@ -34,6 +34,28 @@ export type WynikZasiewu = {
   wpisyDziennika: number;
 };
 
+/** Zapis w porcjach: tysiąc działań w jednym żądaniu potrafi się wywrócić. */
+async function wstawPorcjami(
+  tabela: string,
+  wiersze: Record<string, unknown>[],
+  rozmiar = 400,
+): Promise<number> {
+  const admin = createSupabaseAdmin();
+  let zapisanych = 0;
+  for (let i = 0; i < wiersze.length; i += rozmiar) {
+    const { data, error } = await admin
+      .from(tabela)
+      .insert(wiersze.slice(i, i + rozmiar))
+      .select("id");
+    if (error) {
+      console.error(`Zapis do ${tabela}, porcja ${Math.floor(i / rozmiar) + 1}:`, error.message);
+      continue;
+    }
+    zapisanych += (data ?? []).length;
+  }
+  return zapisanych;
+}
+
 async function wyczysc(agencyId: string): Promise<void> {
   const admin = createSupabaseAdmin();
   // Kolejność ma znaczenie przez klucze obce: najpierw to, co się odwołuje.
@@ -56,10 +78,13 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
   const zespol = (profile ?? []) as { id: string; full_name: string | null; role: string; monthly_goal_pln: number | null }[];
   if (zespol.length === 0) throw new Error("To biuro nie ma żadnego użytkownika.");
 
-  // Właściciel bywa jedynym kontem na starcie. Agenci dostają dane w pierwszej
-  // kolejności, bo to ich pulpity pokazujemy na spotkaniu.
-  const agenci = zespol.filter((p) => p.role !== "owner").map((p) => p.id);
-  const wszyscy = agenci.length > 0 ? agenci : zespol.map((p) => p.id);
+  // Dane dostają WSZYSCY, razem z właścicielem.
+  //
+  // Na pokazie prowadzący loguje się jako właściciel, a kalendarz, cele
+  // i pulpit pokazują domyślnie dane zalogowanej osoby. Gdy właściciel nie
+  // miał własnych działań, widział pusty kalendarz i komunikat „brak
+  // wykonanych telefonów", mimo pełnej bazy.
+  const wszyscy = zespol.map((p) => p.id);
 
   await wyczysc(agencyId);
 
@@ -100,25 +125,24 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
   };
 
   const dzialania = generujDzialania(los, agencyId, wszyscy, listaKlientow, listaOfert, now);
-  const zapisaneDzialania = (await admin.from("activities").insert(dzialania).select("id")) as {
-    data: { id: string }[] | null;
-  };
+  const iloscDzialan = await wstawPorcjami("activities", dzialania);
 
   const cele = generujCele(
     agencyId,
-    zespol
-      .filter((p) => p.role !== "owner" || agenci.length === 0)
-      .map((p) => ({ id: p.id, celMiesieczny: p.monthly_goal_pln || 12000 })),
+    zespol.map((p) => ({
+      id: p.id,
+      // Właściciel zwykle nie ma ustawionego celu, a bez niego moduł Cele
+      // na jego koncie jest pusty. Na pokazie to akurat ten ekran, który
+      // najczęściej się otwiera.
+      celMiesieczny: p.monthly_goal_pln || (p.role === "owner" ? 20000 : 12000),
+    })),
   );
   const zapisaneCele = (await admin.from("goals").upsert(cele, { onConflict: "agent_id" }).select("id")) as {
     data: { id: string }[] | null;
   };
 
   const dziennik = generujDziennik(los, agencyId, wszyscy, now);
-  const zapisanyDziennik = (await admin
-    .from("daily_logs")
-    .upsert(dziennik, { onConflict: "agent_id,log_date" })
-    .select("id")) as { data: { id: string }[] | null };
+  const iloscDziennika = await wstawPorcjami("daily_logs", dziennik);
 
   // Brak tych kolumn oznacza nieuruchomioną migrację v30. Dane i tak się
   // zapiszą, tylko automatyczne odświeżanie nie ruszy - mówimy o tym wprost.
@@ -132,9 +156,9 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
     klienci: listaKlientow.length,
     oferty: listaOfert.length,
     transakcje: (zapisaneTransakcje.data ?? []).length,
-    dzialania: (zapisaneDzialania.data ?? []).length,
+    dzialania: iloscDzialan,
     cele: (zapisaneCele.data ?? []).length,
-    wpisyDziennika: (zapisanyDziennik.data ?? []).length,
+    wpisyDziennika: iloscDziennika,
   };
 }
 
@@ -182,11 +206,39 @@ export async function odswiezDemoJesliTrzeba(agency: {
  * zapisywane: na pokazie logujesz się jako właściciel, a te konta istnieją
  * po to, żeby dane miały właścicieli.
  */
-export async function utworzZespolDemo(agencyId: string): Promise<{ utworzonych: number; pominietych: string[] }> {
+export async function utworzZespolDemo(
+  agencyId: string,
+): Promise<{ utworzonych: number; usunietych: number; pominietych: string[] }> {
   const admin = createSupabaseAdmin();
 
-  const { data: istniejace } = await admin.from("profiles").select("full_name").eq("agency_id", agencyId);
-  const juzSa = new Set((istniejace ?? []).map((p) => (p.full_name ?? "").trim()));
+  const { data: istniejace } = await admin
+    .from("profiles")
+    .select("id, full_name, email")
+    .eq("agency_id", agencyId);
+
+  const chcianeNazwiska = new Set(ZESPOL.map((os) => `${os.imie} ${os.nazwisko}`));
+
+  // Sprzątamy konta demo, których nie ma już w składzie. Dzięki temu zmiana
+  // listy nazwisk w kodzie przebudowuje zespół, zamiast dokładać ludzi obok
+  // starych. Ruszamy WYŁĄCZNIE adresy @demo.agentspace.pl, więc prawdziwe
+  // konta są bezpieczne.
+  let usunietych = 0;
+  for (const p of istniejace ?? []) {
+    const email = (p.email ?? "") as string;
+    const imie = ((p.full_name ?? "") as string).trim();
+    if (!email.endsWith("@demo.agentspace.pl")) continue;
+    if (chcianeNazwiska.has(imie)) continue;
+
+    await admin.from("profiles").delete().eq("id", p.id);
+    await admin.auth.admin.deleteUser(p.id as string).catch(() => {});
+    usunietych++;
+  }
+
+  const juzSa = new Set(
+    (istniejace ?? [])
+      .filter((p) => chcianeNazwiska.has(((p.full_name ?? "") as string).trim()))
+      .map((p) => ((p.full_name ?? "") as string).trim()),
+  );
 
   const pominietych: string[] = [];
   let utworzonych = 0;
@@ -233,5 +285,5 @@ export async function utworzZespolDemo(agencyId: string): Promise<{ utworzonych:
     utworzonych++;
   }
 
-  return { utworzonych, pominietych };
+  return { utworzonych, usunietych, pominietych };
 }

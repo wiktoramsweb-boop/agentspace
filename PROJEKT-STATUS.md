@@ -337,6 +337,14 @@ faktycznie liczy.
 2. „Wypełnij dane" - klienci, oferty ze zdjęciami, transakcje, cele,
    dziennik wyników i kalendarz.
 
+⚠️ **Dwie pułapki, na które już wpadliśmy:**
+1. Nazwiska zespołu MUSZĄ być zmyślone. Pierwsza wersja miała tu prawdziwych
+   pracowników Spectry, co na pokazie u obcego klienta wygląda fatalnie.
+2. Działania dostają WSZYSCY, razem z właścicielem. Kalendarz, cele i pulpit
+   pokazują domyślnie dane zalogowanej osoby, a nie całego biura. Gdy
+   właściciel nie miał własnych działań, prowadzący pokaz widział pusty
+   kalendarz i „brak wykonanych telefonów", mimo pełnej bazy.
+
 **Dane liczone są od dzisiaj**, nie od sztywnej daty: 30 dni wykonanych
 telefonów i spotkań wstecz, 21 dni zaplanowanych spotkań w przód, dziennik
 wyników z sześciu tygodni. Ziarno losowania pochodzi z dzisiejszej daty, więc

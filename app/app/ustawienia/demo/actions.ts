@@ -36,7 +36,10 @@ async function upewnijSieZeToDemo(agencyId: string): Promise<string | null> {
   return null;
 }
 
-/** Zakłada konta agentów, bez nich nie ma zespołu, rankingu ani prowizji per agent. */
+/**
+ * Buduje zespół demo: zakłada brakujące konta i usuwa te, których nie ma
+ * już w składzie. Bez profili nie ma rankingu ani prowizji per osoba.
+ */
 export async function zalozZespol(): Promise<Wynik> {
   const user = await requireOwner();
   if (!user.agency_id) return { ok: false, message: "Brak biura." };
@@ -44,16 +47,25 @@ export async function zalozZespol(): Promise<Wynik> {
   const blokada = await upewnijSieZeToDemo(user.agency_id);
   if (blokada) return { ok: false, message: blokada };
 
-  const { utworzonych, pominietych } = await utworzZespolDemo(user.agency_id);
-  revalidatePath("/app/ustawienia/demo");
+  const { utworzonych, usunietych, pominietych } = await utworzZespolDemo(user.agency_id);
+
+  // Usunięcie profilu kasuje kaskadą jego klientów i oferty, więc po zmianie
+  // składu zespołu dane trzeba złożyć od nowa. Robimy to od razu, zamiast
+  // zostawiać konto w połowicznym stanie.
+  const w = usunietych > 0 || utworzonych > 0 ? await zasiejDemo(user.agency_id) : null;
+  revalidatePath("/app", "layout");
+
+  const czesci: string[] = [];
+  if (usunietych > 0) czesci.push(`usunięto ${usunietych} nieaktualnych kont`);
+  if (utworzonych > 0) czesci.push(`dodano ${utworzonych} osób`);
 
   return {
-    ok: utworzonych > 0 || pominietych.length === 0,
-    message:
-      utworzonych > 0
-        ? `Dodano ${utworzonych} osób do zespołu.`
-        : "Zespół już istnieje, nic nie trzeba było dodawać.",
-    szczegoly: pominietych,
+    ok: true,
+    message: czesci.length > 0 ? `Zespół gotowy: ${czesci.join(", ")}.` : "Zespół jest już aktualny.",
+    szczegoly: [
+      ...(w ? [`Dane odtworzone: ${w.dzialania} działań, ${w.oferty} ofert, ${w.klienci} klientów.`] : []),
+      ...pominietych,
+    ],
   };
 }
 

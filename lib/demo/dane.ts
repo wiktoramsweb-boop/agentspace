@@ -27,13 +27,19 @@ const NOTATKI = [
   "Kontakt telefoniczny, nie odbiera przed 16.",
 ];
 
-/** Skład zespołu w koncie demo. Kolejność ma znaczenie: pierwszy to menedżer. */
+/**
+ * Skład zespołu w koncie demo.
+ *
+ * Nazwiska MUSZĄ być zmyślone. Pierwsza wersja miała tu prawdziwych
+ * pracowników Spectry, co na pokazie u obcego klienta wygląda fatalnie
+ * i niepotrzebnie ujawnia, kto pracuje w biurze.
+ */
 export const ZESPOL = [
-  { imie: "Martyna", nazwisko: "Bielawska", rola: "manager", celMiesieczny: 18000 },
-  { imie: "Karolina", nazwisko: "Chałda", rola: "agent", celMiesieczny: 14000 },
-  { imie: "Julian", nazwisko: "Szczepaniak", rola: "agent", celMiesieczny: 12000 },
-  { imie: "Natalia", nazwisko: "Grygiel", rola: "agent", celMiesieczny: 11000 },
-  { imie: "Dawid", nazwisko: "Florczak", rola: "agent", celMiesieczny: 9000 },
+  { imie: "Zofia", nazwisko: "Malinowska", rola: "manager", celMiesieczny: 18000 },
+  { imie: "Adam", nazwisko: "Wróbel", rola: "agent", celMiesieczny: 14000 },
+  { imie: "Klara", nazwisko: "Sikorska", rola: "agent", celMiesieczny: 12000 },
+  { imie: "Bartosz", nazwisko: "Lis", rola: "agent", celMiesieczny: 11000 },
+  { imie: "Emilia", nazwisko: "Rutkowska", rola: "agent", celMiesieczny: 9000 },
 ];
 
 /* ── losowość powtarzalna ─────────────────────────────────── */
@@ -192,7 +198,7 @@ const TEMATY_WYDARZENIE = ["Akt notarialny", "Odbiór kluczy", "Przegląd techni
 export function generujDzialania(
   los: Los,
   agencyId: string,
-  agenci: string[],
+  osoby: string[],
   klienci: { id: string }[],
   oferty: { id: string }[],
   now: Date,
@@ -200,6 +206,7 @@ export function generujDzialania(
   const out: Record<string, unknown>[] = [];
 
   const dodaj = (
+    osoba: string,
     dzien: number,
     godzina: number,
     kind: string,
@@ -207,11 +214,10 @@ export function generujDzialania(
     status: string,
     opts: { priority?: string; purpose?: string } = {},
   ) => {
-    const due = przesun(now, dzien, godzina, los.pick([0, 15, 30]));
-    const agent = los.pick(agenci);
+    const due = przesun(now, dzien, godzina, los.pick([0, 15, 30, 45]));
     out.push({
       agency_id: agencyId,
-      created_by: agent,
+      created_by: osoba,
       kind,
       purpose: opts.purpose ?? null,
       subject,
@@ -221,7 +227,7 @@ export function generujDzialania(
       due_at: due.toISOString(),
       client_id: klienci.length ? los.pick(klienci).id : null,
       property_id: oferty.length && los.rnd() > 0.5 ? los.pick(oferty).id : null,
-      assignee_ids: [agent],
+      assignee_ids: [osoba],
       include_in_report: true,
       ...(status === "wykonane"
         ? { completed_at: due.toISOString(), duration_s: kind === "polaczenie" ? los.int(90, 600) : null }
@@ -229,48 +235,71 @@ export function generujDzialania(
     });
   };
 
-  // ── przeszłość: wykonane, gęsto, w godzinach pracy ──
-  for (let dzien = -30; dzien <= -1; dzien++) {
-    const data = przesun(now, dzien);
-    if (data.getDay() === 0 || data.getDay() === 6) continue;
+  // Każda osoba dostaje własny kalendarz, łącznie z właścicielem.
+  //
+  // Kalendarz domyślnie pokazuje działania zalogowanego użytkownika, a nie
+  // całego biura. Pierwsza wersja przypisywała wszystko agentom, więc CEO,
+  // na którego loguje się prowadzący pokaz, widział pusty ekran i komunikat
+  // „brak wykonanych telefonów".
+  for (const osoba of osoby) {
+    // ── ostatnie 30 dni roboczych: wykonane ──
+    for (let dzien = -30; dzien <= -1; dzien++) {
+      const data = przesun(now, dzien);
+      if (data.getDay() === 0 || data.getDay() === 6) continue;
 
-    // Telefony kumulują się rano i po południu, tak jak w prawdziwym biurze.
-    for (let i = 0; i < los.int(4, 9); i++) {
-      dodaj(dzien, los.pick([9, 10, 11, 14, 15, 16, 17]), "polaczenie", los.pick(TEMATY_TELEFON), "wykonane", {
-        purpose: los.pick(["pozyskowa", "aktualizacyjna", "prezentacja"]),
+      for (let i = 0; i < los.int(3, 7); i++) {
+        dodaj(osoba, dzien, los.pick([9, 10, 11, 12, 14, 15, 16, 17]), "polaczenie", los.pick(TEMATY_TELEFON), "wykonane", {
+          purpose: los.pick(["pozyskowa", "aktualizacyjna", "prezentacja"]),
+        });
+      }
+      if (los.rnd() > 0.45) {
+        dodaj(osoba, dzien, los.pick([10, 12, 16, 18]), "spotkanie", los.pick(TEMATY_SPOTKANIE), "wykonane");
+      }
+      if (los.rnd() > 0.7) dodaj(osoba, dzien, los.pick([13, 15]), "zadanie", los.pick(TEMATY_ZADANIE), "wykonane");
+    }
+
+    // ── dzisiaj: część odhaczona, część jeszcze przed nami ──
+    for (let i = 0; i < los.int(3, 5); i++) {
+      dodaj(osoba, 0, los.pick([8, 9, 10, 11]), "polaczenie", los.pick(TEMATY_TELEFON), "wykonane", { purpose: "pozyskowa" });
+    }
+    dodaj(osoba, 0, los.pick([13, 14]), "spotkanie", los.pick(TEMATY_SPOTKANIE), "zaplanowane", { priority: "wysoki" });
+    dodaj(osoba, 0, 16, "polaczenie", los.pick(TEMATY_TELEFON), "zaplanowane", { purpose: "aktualizacyjna" });
+    dodaj(osoba, 0, 17, "zadanie", los.pick(TEMATY_ZADANIE), "zaplanowane", { priority: "wysoki" });
+
+    // ── jutro i pojutrze gęściej: to widać zaraz po wejściu w kalendarz ──
+    for (const dzien of [1, 2]) {
+      const data = przesun(now, dzien);
+      if (data.getDay() === 0 || data.getDay() === 6) continue;
+      for (let i = 0; i < los.int(2, 4); i++) {
+        dodaj(osoba, dzien, los.pick([9, 10, 11, 14, 16]), "polaczenie", los.pick(TEMATY_TELEFON), "zaplanowane", {
+          purpose: los.pick(["pozyskowa", "aktualizacyjna"]),
+        });
+      }
+      dodaj(osoba, dzien, los.pick([12, 15, 17]), "spotkanie", los.pick(TEMATY_SPOTKANIE), "zaplanowane", {
+        priority: los.rnd() > 0.6 ? "wysoki" : "normalny",
       });
     }
-    for (let i = 0; i < los.int(0, 2); i++) {
-      dodaj(dzien, los.pick([10, 12, 16, 18]), "spotkanie", los.pick(TEMATY_SPOTKANIE), "wykonane");
-    }
-    if (los.rnd() > 0.6) dodaj(dzien, los.pick([13, 15]), "zadanie", los.pick(TEMATY_ZADANIE), "wykonane");
-  }
 
-  // ── dzisiaj: mieszanka zrobionych i czekających ──
-  for (let i = 0; i < los.int(3, 5); i++) {
-    dodaj(0, los.pick([9, 10, 11]), "polaczenie", los.pick(TEMATY_TELEFON), "wykonane", { purpose: "pozyskowa" });
-  }
-  dodaj(0, 14, "spotkanie", los.pick(TEMATY_SPOTKANIE), "zaplanowane", { priority: "wysoki" });
-  dodaj(0, 16, "polaczenie", los.pick(TEMATY_TELEFON), "zaplanowane");
-  dodaj(0, 17, "zadanie", los.pick(TEMATY_ZADANIE), "zaplanowane", { priority: "wysoki" });
+    // ── kolejne trzy tygodnie: rzadziej, ale kalendarz nie jest pusty ──
+    for (let dzien = 3; dzien <= 21; dzien++) {
+      const data = przesun(now, dzien);
+      if (data.getDay() === 0 || data.getDay() === 6) continue;
 
-  // ── przyszłość: zaplanowane, żeby kalendarz nie był pusty ──
-  for (let dzien = 1; dzien <= 21; dzien++) {
-    const data = przesun(now, dzien);
-    if (data.getDay() === 0 || data.getDay() === 6) continue;
-
-    for (let i = 0; i < los.int(1, 3); i++) {
-      dodaj(dzien, los.pick([10, 12, 15, 17, 18]), "spotkanie", los.pick(TEMATY_SPOTKANIE), "zaplanowane", {
-        priority: los.rnd() > 0.75 ? "wysoki" : "normalny",
-      });
+      if (los.rnd() > 0.35) {
+        dodaj(osoba, dzien, los.pick([10, 12, 15, 17]), "spotkanie", los.pick(TEMATY_SPOTKANIE), "zaplanowane", {
+          priority: los.rnd() > 0.75 ? "wysoki" : "normalny",
+        });
+      }
+      for (let i = 0; i < los.int(1, 3); i++) {
+        dodaj(osoba, dzien, los.pick([9, 11, 14, 16]), "polaczenie", los.pick(TEMATY_TELEFON), "zaplanowane", {
+          purpose: los.pick(["pozyskowa", "aktualizacyjna"]),
+        });
+      }
+      if (los.rnd() > 0.8) dodaj(osoba, dzien, 13, "zadanie", los.pick(TEMATY_ZADANIE), "zaplanowane");
+      if (los.rnd() > 0.9) {
+        dodaj(osoba, dzien, los.pick([11, 13]), "wydarzenie", los.pick(TEMATY_WYDARZENIE), "zaplanowane", { priority: "wysoki" });
+      }
     }
-    for (let i = 0; i < los.int(1, 4); i++) {
-      dodaj(dzien, los.pick([9, 11, 14, 16]), "polaczenie", los.pick(TEMATY_TELEFON), "zaplanowane", {
-        purpose: los.pick(["pozyskowa", "aktualizacyjna"]),
-      });
-    }
-    if (los.rnd() > 0.65) dodaj(dzien, 13, "zadanie", los.pick(TEMATY_ZADANIE), "zaplanowane");
-    if (los.rnd() > 0.85) dodaj(dzien, los.pick([11, 13]), "wydarzenie", los.pick(TEMATY_WYDARZENIE), "zaplanowane", { priority: "wysoki" });
   }
 
   return out;
