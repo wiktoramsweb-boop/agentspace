@@ -47,12 +47,14 @@ export const metadata: Metadata = {
     siteName: "AgentSpace",
     locale: "pl_PL",
     type: "website",
+    images: [{ url: "https://agentspace.pl/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "AgentSpace | System operacyjny dla biura nieruchomości",
     description:
       "CRM, wspólna baza nieruchomości, cele, prowizje, AI Coach i panel właściciela w jednym miejscu. Dla biur nieruchomości w Polsce.",
+    images: [{ url: "https://agentspace.pl/opengraph-image", width: 1200, height: 630 }],
   },
   robots: {
     index: true,

@@ -21,9 +21,27 @@ export function PwaInstall() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Rejestracja service workera
+    // Rejestracja service workera.
+    //
+    // NIE na localhoscie. Service worker trzyma pliki z /_next/static jako
+    // niezmienne, bo w produkcji mają hash w nazwie. W trybie deweloperskim
+    // ten sam adres potrafi dostać nową treść, więc przeglądarka serwowała
+    // stary CSS i zmiany w stylach nie były widoczne. Przy okazji sprzątamy
+    // workera, który został z wcześniejszych wejść.
+    const isDev =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.hostname.endsWith(".local");
+
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+      if (isDev) {
+        navigator.serviceWorker.getRegistrations().then((regs) => {
+          for (const reg of regs) reg.unregister();
+        });
+        caches?.keys().then((keys) => keys.forEach((k) => caches.delete(k)));
+      } else {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      }
     }
 
     // Już zainstalowana? (tryb standalone / iOS)

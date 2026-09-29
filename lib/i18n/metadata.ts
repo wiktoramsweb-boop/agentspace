@@ -26,6 +26,12 @@ export function pageMetadata(
     LOCALES.map((code) => [HREFLANG[code], `${SITE}${localeHref(code, plPath)}`]),
   );
 
+  // Obraz podglądu podajemy jawnie. Konwencja plikowa Next.js nie dokłada go
+  // do metadanych, które same definiują `openGraph`, a wszystkie strony
+  // marketingu to robią - bez tego link wklejony na Facebooka byl golym tekstem.
+  const ogUrl = `${SITE}/${lang}/opengraph-image`;
+  const images = [{ url: ogUrl, width: 1200, height: 630, alt: title }];
+
   return {
     title,
     description,
@@ -40,8 +46,9 @@ export function pageMetadata(
       siteName: "AgentSpace",
       locale: OG_LOCALE[lang],
       type: "website",
+      images,
     },
-    twitter: { card: "summary_large_image", title, description },
+    twitter: { card: "summary_large_image", title, description, images },
     ...extra,
   };
 }
