@@ -241,6 +241,58 @@ skróty pod przytrzymanie ikony: Klienci, Zadania, Nieruchomości.
 Bez nich `sendPushToAgent` po cichu zwraca 0 i nic się nie dzieje.
 
 
+## 10e. Analiza cenowa, czyli wyceniarka (wrzesień 2026)
+
+Odpowiednik „wyceniarki" z Propertly. Ekran: `/app/wycena`.
+
+**Dlaczego porównania, a nie uczenie maszynowe.** Agent musi obronić kwotę
+przed klientem, który zapyta „skąd to". Model uczony daje liczbę bez
+uzasadnienia. Liczymy więc tak, jak liczy rzeczoznawca: bierzemy podobne
+transakcje, korygujemy o różnice i pokazujemy korekty. Model statystyczny
+ma sens przy kilku tysiącach własnych transakcji, nie wcześniej.
+
+**Silnik:** `lib/wycena/model.ts`. Pracuje na cenie za metr. Korekty: metraż,
+stan wykończenia, rynek pierwotny/wtórny, piętro (parter i ostatnie bez windy),
+rok budowy. Wagi: odległość, świeżość transakcji, rodzaj źródła (cena ofertowa
+waży połowę tego co transakcyjna). Wynik to **mediana ważona po odcięciu
+wartości odstających** (próg 3×MAD, a przy rynku jednorodnym ±8% od mediany).
+
+⚠️ Pierwsza wersja używała średniej ważonej i jedna transakcja za podwójną cenę
+przesuwała wynik o 7%. Przy mieszkaniu za 900 tys. to 60 tys. zł błędu. Jeśli
+kiedyś będziesz tu majstrować, **nie wracaj do średniej.**
+
+**Skąd dane:** `lib/wycena/data.ts`, trzy źródła:
+1. własne transakcje biura (`deals` zamknięte + `properties`), najcenniejsze,
+2. `market_transactions`, czyli dane z RCN, wspólne dla wszystkich biur,
+3. aktualne oferty biura jako ceny ofertowe, z mniejszą wagą.
+
+**Biuro widzi wyłącznie własne transakcje.** Dane jednego biura nigdy nie
+trafiają do wyceny drugiego, bo tak stanowi umowa powierzenia. Wspólny jest
+tylko RCN, bo to dane publiczne. Przy zmianach w `comparablePool` pilnuj tego.
+
+**Import RCN:** `lib/wycena/import-rcn.ts`. RCN nie ma jednego ogólnopolskiego
+API, każde starostwo udostępnia dane inaczej. Importer bierze CSV, rozpoznaje
+typowe nazwy kolumn (z polskimi znakami i bez), przelicza formaty dat i liczb,
+odrzuca wiersze z ceną za metr poza zakresem 500-80 000 zł (zwykle udział
+w nieruchomości albo cena za cały budynek). Powtórny import tego samego pliku
+aktualizuje, a nie dubluje (klucz `source` + `source_ref`).
+
+**Wymaga migracji `lib/SETUP-v28-wycena.sql`.** Bez niej wycena nadal działa,
+tylko na samych danych biura.
+
+**Testy:** `npm run test:wycena`. Sześć przypadków: rynek jednorodny, korekta
+za stan, odporność na wartość odstającą, brak wyniku przy zbyt małej próbce,
+ważenie cen ofertowych, odrzucanie transakcji starych i odległych. To jedyny
+moduł z testami, bo na jego podstawie agent podaje klientowi kwotę.
+
+**Prawne:** w interfejsie stoi notka, że to analiza porównawcza, a **nie operat
+szacunkowy**. Operaty sporządzają wyłącznie rzeczoznawcy majątkowi i tego
+nazewnictwa nie wolno zmieniać.
+
+**Czego jeszcze nie ma:** raportu PDF dla klienta, geokodowania adresu
+(współrzędne wpisuje się ręcznie, choć `/api/geocode` już istnieje),
+wskaźnika trendu cen w czasie.
+
 ## 11. Workflow
 
 Commit → push do `main` → Vercel auto-deploy (~30-60s). Weryfikacja deployu: `curl -sL https://www.agentspace.pl/app | grep Zaloguj`. Build lokalnie: `npm run build`. Dev: `npm run dev`.
