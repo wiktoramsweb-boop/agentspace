@@ -230,13 +230,43 @@ async function seed(agencyId: string, force: boolean): Promise<void> {
   console.log("Analiza cenowa ma teraz z czego liczyć w każdej dzielnicy Krakowa.");
 }
 
-const [, , agencyId, ...flags] = process.argv;
-if (!agencyId) {
-  console.error("Podaj identyfikator biura: node --experimental-strip-types lib/demo/seed.ts <agency_id> [--clean] [--force]");
+/**
+ * Pozwalamy podać nazwę biura zamiast identyfikatora. Przepisywanie UUID-a
+ * z panelu Supabase to prosta droga do pomyłki, a pomyłka oznacza tu wsypanie
+ * zmyślonych transakcji do prawdziwej bazy.
+ */
+async function rozpoznajBiuro(arg: string): Promise<string> {
+  const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (UUID.test(arg)) return arg;
+
+  const trafienia = (await db(
+    `agencies?select=id,name&name=ilike.*${encodeURIComponent(arg)}*&limit=5`,
+  )) as { id: string; name: string }[];
+
+  if (trafienia.length === 0) {
+    const wszystkie = (await db("agencies?select=name&limit=20")) as { name: string }[];
+    throw new Error(
+      `Nie znalazłem biura o nazwie „${arg}". W bazie są: ${wszystkie.map((a) => a.name).join(", ")}`,
+    );
+  }
+  if (trafienia.length > 1) {
+    throw new Error(`Pasuje więcej niż jedno biuro: ${trafienia.map((a) => a.name).join(", ")}. Doprecyzuj nazwę.`);
+  }
+
+  console.log(`Biuro: ${trafienia[0].name}`);
+  return trafienia[0].id;
+}
+
+const [, , arg, ...flags] = process.argv;
+if (!arg) {
+  console.error('Podaj nazwę albo identyfikator biura, np.: npm run seed:demo -- "Biuro Demo"');
+  console.error("Flagi: --dry (podgląd bez zapisu), --clean (sprzątanie), --force (mimo prawdziwych danych)");
   process.exit(1);
 }
 
 DRY = flags.includes("--dry");
+
+const agencyId = await rozpoznajBiuro(arg);
 
 if (flags.includes("--clean")) {
   await clean(agencyId);

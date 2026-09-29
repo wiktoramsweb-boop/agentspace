@@ -328,7 +328,14 @@ w czasie.
 Pusty system nie sprzedaje się na spotkaniu. Prospekt ma kliknąć i zobaczyć
 pracujące biuro, a nie puste tabele i analizę cenową, która odmawia liczenia.
 
-**Skrypt:** `npm run seed:demo -- <agency_id>`. Tworzy 24 klientów, 38 ofert
+**Jak uruchomić:**
+1. Załóż osobne biuro przez `/signup` (inny e-mail, nazwa np. „Biuro Demo").
+2. `npm run seed:demo -- "Biuro Demo"` - skrypt przyjmuje nazwę biura albo
+   jego identyfikator, bo przepisywanie UUID-a z Supabase to prosta droga
+   do pomyłki, a pomyłka oznacza tu wsypanie zmyślonych transakcji do
+   prawdziwej bazy.
+
+**Skrypt:** `npm run seed:demo -- <nazwa albo agency_id>`. Tworzy 24 klientów, 38 ofert
 rozrzuconych po dwunastu dzielnicach Krakowa (`lib/demo/dzielnice.ts`, realne
 współrzędne i proporcje cen) oraz 16 zamkniętych transakcji z prowizjami.
 
