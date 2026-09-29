@@ -1,0 +1,321 @@
+import { DZIELNICE } from "./dzielnice";
+
+/**
+ * Generatory danych konta demo.
+ *
+ * Czysta logika, bez zapisu do bazy: dzięki temu korzysta z niej zarówno
+ * skrypt z terminala, jak i automatyczne odświeżanie po stronie serwera.
+ *
+ * Wszystkie daty liczymy względem „teraz", a nie od sztywnego punktu.
+ * Pokaz może się odbyć za tydzień albo za dwa miesiące i kalendarz ma
+ * wtedy wyglądać tak samo: wypełniony w tył i w przód.
+ */
+
+export const IMIONA = ["Anna", "Piotr", "Katarzyna", "Marcin", "Magdalena", "Tomasz", "Joanna", "Paweł", "Agnieszka", "Michał", "Ewa", "Krzysztof"];
+export const NAZWISKA = ["Kowalska", "Nowak", "Wiśniewski", "Wójcik", "Kowalczyk", "Kamiński", "Lewandowska", "Zieliński", "Szymański", "Woźniak", "Dąbrowska", "Mazur"];
+
+const STANY = ["do_wprowadzenia", "do_odswiezenia", "do_remontu"];
+const WNETRZA = ["salon.jpg", "kuchnia.jpg", "sypialnia.jpg", "salon-widok.jpg", "wnetrze-slonce.jpg", "loft.jpg", "lounge.jpg", "taras.jpg"];
+const BUDYNKI = ["kamienica.jpg", "cegla.jpg", "szklo.jpg", "wieza.jpg", "dziedziniec.jpg", "schody.jpg", "dom.jpg", "widok.jpg"];
+
+const NOTATKI = [
+  "Zainteresowany, prosi o drugie oglądanie w weekend.",
+  "Czeka na decyzję kredytową, termin do końca miesiąca.",
+  "Cena do negocjacji, właściciel schodzi maksymalnie o 3 procent.",
+  "Szuka od trzech miesięcy, obejrzał już sześć mieszkań.",
+  "Sprzedaje, bo przeprowadza się za granicę. Termin elastyczny.",
+  "Kontakt telefoniczny, nie odbiera przed 16.",
+];
+
+/** Skład zespołu w koncie demo. Kolejność ma znaczenie: pierwszy to menedżer. */
+export const ZESPOL = [
+  { imie: "Martyna", nazwisko: "Bielawska", rola: "manager", celMiesieczny: 18000 },
+  { imie: "Karolina", nazwisko: "Chałda", rola: "agent", celMiesieczny: 14000 },
+  { imie: "Julian", nazwisko: "Szczepaniak", rola: "agent", celMiesieczny: 12000 },
+  { imie: "Natalia", nazwisko: "Grygiel", rola: "agent", celMiesieczny: 11000 },
+  { imie: "Dawid", nazwisko: "Florczak", rola: "agent", celMiesieczny: 9000 },
+];
+
+/* ── losowość powtarzalna ─────────────────────────────────── */
+
+/**
+ * Generator z ziarnem: ten sam dzień daje ten sam zestaw danych, więc
+ * odświeżenie w trakcie pokazu nie przetasuje nagle całego biura.
+ */
+export function utworzLosowanie(ziarno: number) {
+  let stan = ziarno;
+  const rnd = () => {
+    stan = (stan * 1103515245 + 12345) % 2147483648;
+    return stan / 2147483648;
+  };
+  return {
+    rnd,
+    pick: <T>(arr: T[]): T => arr[Math.floor(rnd() * arr.length)],
+    between: (a: number, b: number) => a + rnd() * (b - a),
+    int: (a: number, b: number) => Math.floor(a + rnd() * (b - a + 1)),
+  };
+}
+
+/** Ziarno z dzisiejszej daty: dane są stabilne w obrębie jednego dnia. */
+export function ziarnoDnia(now: Date): number {
+  return Number(`${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, "0")}${String(now.getUTCDate()).padStart(2, "0")}`);
+}
+
+/* ── pomocnicze daty ──────────────────────────────────────── */
+
+export function przesun(now: Date, dni: number, godzina?: number, minuta = 0): Date {
+  const d = new Date(now);
+  d.setDate(d.getDate() + dni);
+  if (godzina != null) d.setHours(godzina, minuta, 0, 0);
+  return d;
+}
+
+/** Dzień roboczy: pokaz w poniedziałek ma wyglądać tak samo jak w piątek. */
+export function najblizszyRoboczy(d: Date): Date {
+  const x = new Date(d);
+  while (x.getDay() === 0 || x.getDay() === 6) x.setDate(x.getDate() + 1);
+  return x;
+}
+
+/* ── generatory ───────────────────────────────────────────── */
+
+type Los = ReturnType<typeof utworzLosowanie>;
+
+export function generujKlientow(los: Los, agencyId: string, agenci: string[], now: Date, ile = 24) {
+  const out: Record<string, unknown>[] = [];
+  for (let i = 0; i < ile; i++) {
+    const typ = los.pick(["kupujacy", "sprzedajacy", "kupujacy", "najem"]);
+    out.push({
+      agency_id: agencyId,
+      agent_id: los.pick(agenci),
+      name: `${los.pick(IMIONA)} ${los.pick(NAZWISKA)}`,
+      phone: `5${los.int(10, 99)} ${los.int(100, 999)} ${los.int(100, 999)}`,
+      email: `kontakt${i}@przyklad.pl`,
+      type: typ,
+      status: los.pick(["nowy", "w_kontakcie", "oglada", "negocjacje", "zamkniety"]),
+      budget_pln: typ === "kupujacy" ? los.int(45, 130) * 10000 : null,
+      property: typ === "kupujacy" ? `${los.int(2, 4)} pokoje, ${los.pick(DZIELNICE).nazwa}` : null,
+      notes: los.pick(NOTATKI),
+      source: "demo",
+      last_contact_at: przesun(now, -los.int(0, 40)).toISOString(),
+    });
+  }
+  return out;
+}
+
+export function generujOferty(los: Los, agencyId: string, agenci: string[], now: Date, ile = 38, sprzedanych = 16) {
+  const out: Record<string, unknown>[] = [];
+  for (let i = 0; i < ile; i++) {
+    const d = los.pick(DZIELNICE);
+    const area = Math.round(los.between(28, 96));
+    const stan = los.pick(STANY);
+    const korekta = stan === "do_remontu" ? 0.88 : stan === "do_odswiezenia" ? 0.95 : 1;
+    const cenaM2 = d.cenaM2 * korekta * los.between(0.92, 1.08);
+    const sprzedane = i < sprzedanych;
+    const pokoje = area < 34 ? 1 : area < 50 ? 2 : area < 72 ? 3 : 4;
+    const pieter = los.int(3, 8);
+    const rok = los.int(1935, 2023);
+
+    const elewacja = BUDYNKI[i % BUDYNKI.length];
+    const zdjecia = [elewacja, ...[0, 1, 2, 3].map((k) => WNETRZA[(i + k) % WNETRZA.length])].map((plik, k) => ({
+      url: `/wzory/${plik}`,
+      caption: k === 0 ? "Budynek" : (["Salon", "Kuchnia", "Sypialnia", "Taras"][k - 1] ?? "Wnętrze"),
+      export: true,
+      print: k < 3,
+    }));
+
+    out.push({
+      agency_id: agencyId,
+      agent_id: los.pick(agenci),
+      offer_no: `DEMO-${String(i + 1).padStart(3, "0")}`,
+      title: `${pokoje} pok., ${area} m², ${d.nazwa}`,
+      deal_kind: "sprzedaz",
+      property_type: "mieszkanie",
+      status: sprzedane ? "sfinalizowana" : "aktywna",
+      city: "Kraków",
+      address: `${los.pick(d.ulice)} ${los.int(1, 80)}, Kraków`,
+      lat: d.lat + los.between(-0.006, 0.006),
+      lng: d.lng + los.between(-0.008, 0.008),
+      price_pln: Math.round((cenaM2 * area) / 1000) * 1000,
+      area_m2: area,
+      rooms: pokoje,
+      floor: los.int(0, pieter),
+      floors_total: pieter,
+      year_built: rok,
+      condition_std: stan,
+      market: los.rnd() > 0.85 ? "pierwotny" : "wtorny",
+      description:
+        `Mieszkanie ${pokoje}-pokojowe o powierzchni ${area} m² w dzielnicy ${d.nazwa}. ` +
+        `Budynek z ${rok} roku, ${stan === "do_wprowadzenia" ? "gotowe do wprowadzenia" : stan === "do_odswiezenia" ? "do odświeżenia" : "do remontu"}. ` +
+        "Dane przykładowe, oferta demonstracyjna.",
+      photos: zdjecia,
+      export_to_web: true,
+      updated_at: przesun(now, -(sprzedane ? los.int(20, 500) : los.int(1, 60))).toISOString(),
+    });
+  }
+  return out;
+}
+
+/* ── działania: kalendarz w tył i w przód ─────────────────── */
+
+const TEMATY_TELEFON = [
+  "Telefon pozyskowy z ogłoszenia",
+  "Oddzwonienie do właściciela",
+  "Follow-up po prezentacji",
+  "Telefon do klienta kupującego",
+  "Ustalenie terminu oglądania",
+];
+const TEMATY_SPOTKANIE = [
+  "Spotkanie pozyskowe u właściciela",
+  "Podpisanie umowy pośrednictwa",
+  "Prezentacja mieszkania",
+  "Drugie oglądanie z rodziną",
+  "Spotkanie z doradcą kredytowym",
+];
+const TEMATY_ZADANIE = [
+  "Przygotować zestawienie cen z ulicy",
+  "Zamówić sesję zdjęciową",
+  "Wysłać ofertę do klienta",
+  "Zebrać dokumenty do aktu",
+  "Zaktualizować opis oferty",
+];
+const TEMATY_WYDARZENIE = ["Akt notarialny", "Odbiór kluczy", "Przegląd techniczny z rzeczoznawcą"];
+
+/**
+ * Kalendarz konta demo.
+ *
+ * Trzydzieści dni wstecz wypełniamy wykonanymi telefonami i spotkaniami,
+ * żeby rytm dnia i statystyki miały z czego powstać. Trzy tygodnie w przód
+ * planujemy spotkania i prezentacje, bo pusty kalendarz na pokazie wygląda
+ * jak system, z którego nikt nie korzysta.
+ */
+export function generujDzialania(
+  los: Los,
+  agencyId: string,
+  agenci: string[],
+  klienci: { id: string }[],
+  oferty: { id: string }[],
+  now: Date,
+) {
+  const out: Record<string, unknown>[] = [];
+
+  const dodaj = (
+    dzien: number,
+    godzina: number,
+    kind: string,
+    subject: string,
+    status: string,
+    opts: { priority?: string; purpose?: string } = {},
+  ) => {
+    const due = przesun(now, dzien, godzina, los.pick([0, 15, 30]));
+    const agent = los.pick(agenci);
+    out.push({
+      agency_id: agencyId,
+      created_by: agent,
+      kind,
+      purpose: opts.purpose ?? null,
+      subject,
+      description: null,
+      status,
+      priority: opts.priority ?? "normalny",
+      due_at: due.toISOString(),
+      client_id: klienci.length ? los.pick(klienci).id : null,
+      property_id: oferty.length && los.rnd() > 0.5 ? los.pick(oferty).id : null,
+      assignee_ids: [agent],
+      include_in_report: true,
+      ...(status === "wykonane"
+        ? { completed_at: due.toISOString(), duration_s: kind === "polaczenie" ? los.int(90, 600) : null }
+        : {}),
+    });
+  };
+
+  // ── przeszłość: wykonane, gęsto, w godzinach pracy ──
+  for (let dzien = -30; dzien <= -1; dzien++) {
+    const data = przesun(now, dzien);
+    if (data.getDay() === 0 || data.getDay() === 6) continue;
+
+    // Telefony kumulują się rano i po południu, tak jak w prawdziwym biurze.
+    for (let i = 0; i < los.int(4, 9); i++) {
+      dodaj(dzien, los.pick([9, 10, 11, 14, 15, 16, 17]), "polaczenie", los.pick(TEMATY_TELEFON), "wykonane", {
+        purpose: los.pick(["pozyskowa", "aktualizacyjna", "prezentacja"]),
+      });
+    }
+    for (let i = 0; i < los.int(0, 2); i++) {
+      dodaj(dzien, los.pick([10, 12, 16, 18]), "spotkanie", los.pick(TEMATY_SPOTKANIE), "wykonane");
+    }
+    if (los.rnd() > 0.6) dodaj(dzien, los.pick([13, 15]), "zadanie", los.pick(TEMATY_ZADANIE), "wykonane");
+  }
+
+  // ── dzisiaj: mieszanka zrobionych i czekających ──
+  for (let i = 0; i < los.int(3, 5); i++) {
+    dodaj(0, los.pick([9, 10, 11]), "polaczenie", los.pick(TEMATY_TELEFON), "wykonane", { purpose: "pozyskowa" });
+  }
+  dodaj(0, 14, "spotkanie", los.pick(TEMATY_SPOTKANIE), "zaplanowane", { priority: "wysoki" });
+  dodaj(0, 16, "polaczenie", los.pick(TEMATY_TELEFON), "zaplanowane");
+  dodaj(0, 17, "zadanie", los.pick(TEMATY_ZADANIE), "zaplanowane", { priority: "wysoki" });
+
+  // ── przyszłość: zaplanowane, żeby kalendarz nie był pusty ──
+  for (let dzien = 1; dzien <= 21; dzien++) {
+    const data = przesun(now, dzien);
+    if (data.getDay() === 0 || data.getDay() === 6) continue;
+
+    for (let i = 0; i < los.int(1, 3); i++) {
+      dodaj(dzien, los.pick([10, 12, 15, 17, 18]), "spotkanie", los.pick(TEMATY_SPOTKANIE), "zaplanowane", {
+        priority: los.rnd() > 0.75 ? "wysoki" : "normalny",
+      });
+    }
+    for (let i = 0; i < los.int(1, 4); i++) {
+      dodaj(dzien, los.pick([9, 11, 14, 16]), "polaczenie", los.pick(TEMATY_TELEFON), "zaplanowane", {
+        purpose: los.pick(["pozyskowa", "aktualizacyjna"]),
+      });
+    }
+    if (los.rnd() > 0.65) dodaj(dzien, 13, "zadanie", los.pick(TEMATY_ZADANIE), "zaplanowane");
+    if (los.rnd() > 0.85) dodaj(dzien, los.pick([11, 13]), "wydarzenie", los.pick(TEMATY_WYDARZENIE), "zaplanowane", { priority: "wysoki" });
+  }
+
+  return out;
+}
+
+/* ── cele i dzienne wyniki ────────────────────────────────── */
+
+export function generujCele(agencyId: string, zespol: { id: string; celMiesieczny: number }[]) {
+  return zespol.map((os) => ({
+    agency_id: agencyId,
+    agent_id: os.id,
+    annual_income_pln: os.celMiesieczny * 12,
+    avg_commission_pln: 9000,
+    workdays_per_week: 5,
+    calls_per_meeting: 12,
+    meetings_per_listing: 3,
+    listings_per_sale: 1.6,
+  }));
+}
+
+/**
+ * Dzienny dziennik wyników z ostatnich tygodni.
+ *
+ * Bez niego tracker celu i historia realizacji są puste, a to one pokazują,
+ * że system żyje codziennie, a nie raz na kwartał.
+ */
+export function generujDziennik(los: Los, agencyId: string, agenci: string[], now: Date, dni = 42) {
+  const out: Record<string, unknown>[] = [];
+  for (const agentId of agenci) {
+    for (let dzien = -dni; dzien <= 0; dzien++) {
+      const data = przesun(now, dzien);
+      if (data.getDay() === 0 || data.getDay() === 6) continue;
+
+      const telefony = los.int(3, 14);
+      out.push({
+        agency_id: agencyId,
+        agent_id: agentId,
+        log_date: data.toISOString().slice(0, 10),
+        cold_calls: telefony,
+        meetings: los.rnd() > 0.55 ? los.int(1, 2) : 0,
+        listings: los.rnd() > 0.82 ? 1 : 0,
+        buyers: los.rnd() > 0.75 ? 1 : 0,
+        sales: los.rnd() > 0.93 ? 1 : 0,
+      });
+    }
+  }
+  return out;
+}

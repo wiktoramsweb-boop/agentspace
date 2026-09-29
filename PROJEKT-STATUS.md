@@ -325,33 +325,40 @@ w czasie.
 
 ## 10f. Konto demo (wrzesień 2026)
 
-Pusty system nie sprzedaje się na spotkaniu. Prospekt ma kliknąć i zobaczyć
-pracujące biuro, a nie puste tabele i analizę cenową, która odmawia liczenia.
+Pusty system nie sprzedaje się na spotkaniu. Konto demo ma pokazywać
+pracujące biuro: zespół, kalendarz, cele, prowizje i analizę cenową, która
+faktycznie liczy.
 
-**Jak uruchomić:**
-1. Załóż osobne biuro przez `/signup` (inny e-mail, nazwa np. „Biuro Demo").
-2. `npm run seed:demo -- "Biuro Demo"` - skrypt przyjmuje nazwę biura albo
-   jego identyfikator, bo przepisywanie UUID-a z Supabase to prosta droga
-   do pomyłki, a pomyłka oznacza tu wsypanie zmyślonych transakcji do
-   prawdziwej bazy.
+**Ekran:** `/app/ustawienia/demo` (właściciel). Dwa kroki:
+1. „Załóż zespół" - tworzy konta pięciu agentów. Konieczne, bo `profiles.id`
+   ma klucz obcy do `auth.users`, a bez profili nie ma rankingu ani prowizji
+   per osoba. Hasła są losowe i nigdzie nie zapisywane: na pokazie logujesz
+   się jako właściciel.
+2. „Wypełnij dane" - klienci, oferty ze zdjęciami, transakcje, cele,
+   dziennik wyników i kalendarz.
 
-**Skrypt:** `npm run seed:demo -- <nazwa albo agency_id>`. Tworzy 24 klientów, 38 ofert
-rozrzuconych po dwunastu dzielnicach Krakowa (`lib/demo/dzielnice.ts`, realne
-współrzędne i proporcje cen) oraz 16 zamkniętych transakcji z prowizjami.
+**Dane liczone są od dzisiaj**, nie od sztywnej daty: 30 dni wykonanych
+telefonów i spotkań wstecz, 21 dni zaplanowanych spotkań w przód, dziennik
+wyników z sześciu tygodni. Ziarno losowania pochodzi z dzisiejszej daty, więc
+w obrębie jednego dnia odświeżenie nie przetasuje całego biura.
 
-- `--dry` pokazuje, co powstanie, i nic nie zapisuje,
-- `--clean` sprząta (oferty `DEMO-xxx`, klienci ze źródłem `demo`, transakcje
-  z tytułem `[DEMO]`),
-- bez `--force` skrypt **odmawia** działania, gdy biuro ma więcej niż pięć
-  prawdziwych ofert. To zabezpieczenie przed wsypaniem zmyślonych transakcji
-  do bazy działającego biura.
+**Odświeżanie jest automatyczne.** `odswiezDemoJesliTrzeba` w layoucie
+`/app` przelicza dane przy wejściu, gdy minęło ponad 12 godzin. Dzięki temu
+pokaz za dwa miesiące wygląda tak samo jak dziś, bez pamiętania o skrypcie.
+Dotyczy wyłącznie biur z `agencies.is_demo`.
 
-Dane demo nie są przypadkowe: liczba pokoi wynika z metrażu, piętro mieści się
-w liczbie pięter, a ceny odwzorowują proporcje między dzielnicami. Na tym
-zestawie analiza cenowa daje 17 tys. zł/m² dla Starego Miasta, 15 tys. dla
-Ruczaju i 13,5 tys. dla Nowej Huty, czyli zachowuje gradient dzielnic.
+**Zabezpieczenia:** każda operacja odmawia działania, gdy biuro nie jest
+oznaczone jako demo i ma więcej niż pięć prawdziwych ofert. To skrypt, który
+kasuje klientów i transakcje, więc lepiej jedno sprawdzenie za dużo.
 
-**Uruchamiaj wyłącznie na osobnym koncie demo**, nie na koncie Spectry.
+**Pliki:** `lib/demo/dane.ts` (generatory, bez zapisu), `lib/demo/zasiew.ts`
+(zapis i odświeżanie, używane też przez serwer), `lib/demo/dzielnice.ts`
+(dwanaście dzielnic Krakowa z realnymi współrzędnymi i proporcjami cen).
+**Wymaga migracji `lib/SETUP-v30-konto-demo.sql`.**
+
+⚠️ Nie próbuj uruchamiać tego jako skryptu Node przez `--experimental-strip-types`.
+Turbopack nie przyjmuje jawnych rozszerzeń `.ts` w importach, a Node bez nich
+nie rozwiąże modułu. Dlatego całość siedzi w aplikacji, a nie w `package.json`.
 
 ## 11. Workflow
 

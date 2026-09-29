@@ -6,6 +6,7 @@ import { OnboardingRedirect } from "./onboarding-redirect";
 import { ToastProvider } from "./components/toast";
 import { PageTransition } from "./components/page-transition";
 import { PwaInstall } from "./components/pwa-install";
+import { odswiezDemoJesliTrzeba } from "@/lib/demo/zasiew";
 
 export const metadata: Metadata = {
   title: "Panel AgentSpace",
@@ -18,6 +19,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // User bez agencji (przerwana rejestracja) - obsłuż łagodnie
   if (!user.agency_id) {
     return <OnboardingRedirect />;
+  }
+
+  // Konto demo odświeża się samo. Pokaz może się odbyć za tydzień albo za dwa
+  // miesiące, a kalendarz i statystyki mają wtedy wyglądać tak samo. Dotyczy
+  // wyłącznie biur oznaczonych jako demo, więc zwykłych kont nie rusza.
+  if (user.agency?.is_demo) {
+    await odswiezDemoJesliTrzeba({
+      id: user.agency_id,
+      is_demo: user.agency.is_demo,
+      demo_refreshed_at: user.agency.demo_refreshed_at,
+    });
   }
 
   return (

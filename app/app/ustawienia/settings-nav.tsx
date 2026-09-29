@@ -66,6 +66,14 @@ export function SettingsNav({ isOwner }: { isOwner: boolean }) {
             Strona www
           </p>
           {SITE.map(link)}
+          {/* Widoczne dla właściciela zawsze: na świeżym koncie flaga demo
+              jest jeszcze wyłączona, więc link schowany za nią byłby
+              nieosiągalny dokładnie wtedy, gdy jest potrzebny. Sam ekran
+              odmawia działania na biurze z prawdziwymi danymi. */}
+          <p className="hidden px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400 lg:block">
+            Pokazy
+          </p>
+          {link({ href: "/app/ustawienia/demo", label: "Dane demonstracyjne" })}
         </>
       )}
     </nav>

@@ -14,6 +14,9 @@ export type Agency = {
   plan: string;
   trial_ends_at: string | null;
   created_at: string;
+  /** Biuro do pokazów: aplikacja odświeża mu dane, żeby kalendarz nie był pusty. */
+  is_demo?: boolean | null;
+  demo_refreshed_at?: string | null;
 };
 
 export type Profile = {
