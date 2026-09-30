@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:wycena": "node --experimental-strip-types --no-warnings lib/wycena/sprawdz-model.ts",
-    "test:pola": "node --experimental-strip-types --no-warnings lib/sprawdz-pola.ts"
+    "test:pola": "node --experimental-strip-types --no-warnings lib/sprawdz-pola.ts",
+    "test:warianty": "node lib/sprawdz-warianty.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",

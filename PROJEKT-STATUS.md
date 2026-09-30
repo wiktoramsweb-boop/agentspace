@@ -471,6 +471,29 @@ czytają, więc audyt kontrastu potrafi pokazać 1,0:1 tam, gdzie naprawdę jest
 17:1. Zanim uwierzysz w zły wynik, wypisz surowe `getComputedStyle(...).color`:
 jeśli widzisz `lab(...)`, to błąd pomiaru, nie interfejsu.
 
+**Tytuły ekranów: ikona modułu i jego kolor.** `PageHeader` jest teraz
+komponentem klienckim (`app/app/components/page-header.tsx`): czyta adres przez
+`usePathname()` i dobiera ikonę, etykietę i kolor z `nav-meta.tsx`. To ta sama
+lista, z której rysuje się menu boczne, więc Kalendarz ma w menu i w nagłówku
+tę samą ikonę i ten sam błękit, a nowy moduł dostaje jedno i drugie bez
+dopisywania czegokolwiek na jego ekranie. Adres dopasowujemy dokładnie albo
+jako podstronę (`/app/klienci/123`), nie samym `startsWith`. Ekrany spoza menu
+dostają szary kafelek zastępczy.
+
+**Systemowe domknięcie pułapki wariantów: `npm run test:warianty`**
+(`lib/sprawdz-warianty.mjs`). Przegląd całego kodu znalazł 84 klasy koloru
+z wariantem bez nadpisania w ciemnym motywie. Groźne są z tego jasne,
+nieprzezroczyste tła: to one zostają jasne, gdy tekst na nich robi się jasny.
+Tak zniknął napis „Tylko ulica" na zaznaczonej opcji w kreatorze oferty
+(`has-[:checked]:bg-emerald-50`). Dopisane 10 reguł, skrypt pilnuje reszty
+i przy nowym takim przypadku kończy się błędem.
+
+**Uwaga przy sprawdzaniu zmian w CSS.** Karta w przeglądarce potrafi trzymać
+stary arkusz mimo przeładowania, bo Turbopack w trybie deweloperskim nadaje
+plikom CSS stałe nazwy. Zanim uznasz regułę za niedziałającą, pobierz arkusz
+prosto z serwera (`curl` na adres z `<link>`) i sprawdź, czy w ogóle się
+skompilowała. Na tym straciłem kilka podejść przy tej poprawce.
+
 **Świadomie NIE zaglądaliśmy do ASARI.** To płatny produkt konkurencji i
 systematyczne przeglądanie jego formularzy pod odtworzenie w produkcie, który z
 nim konkuruje, łamie regulamin i psuje pozycję AgentSpace przy sprzedaży innym
