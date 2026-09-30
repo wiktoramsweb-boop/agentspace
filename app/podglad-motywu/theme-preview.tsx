@@ -65,7 +65,14 @@ export function ThemePreview() {
       <Sidebar role="owner" fullName="Wiktor Szostek" agencyName="Spectra Nieruchomości" />
       <main className="flex-1 px-5 py-8 md:px-10 md:py-10">
         <div className="mx-auto max-w-6xl space-y-8">
+          {/* Podgląd nagłówka bez etykiety, do porównania obok wariantu z nią. */}
           <PageHeader
+            title="Cześć, Wiktor"
+            subtitle="środa, 30 września"
+          />
+
+          <PageHeader
+            eyebrow="Sprzedaż"
             title="Nieruchomości"
             subtitle="12 aktywnych, 34 w biurze"
             action={

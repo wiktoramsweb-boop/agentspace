@@ -368,6 +368,34 @@ kasuje klientów i transakcje, więc lepiej jedno sprawdzenie za dużo.
 Turbopack nie przyjmuje jawnych rozszerzeń `.ts` w importach, a Node bez nich
 nie rozwiąże modułu. Dlatego całość siedzi w aplikacji, a nie w `package.json`.
 
+## 10g. Kontrast i nagłówki ekranów (wrzesień 2026)
+
+**Czytelność w obu motywach.** Ciemny motyw to warstwa nadpisań nad jasnym
+(sekcja „CIEMNY MOTYW APLIKACJI" w `globals.css`). Pierwsza wersja pokrywała
+tylko część odcieni: audyt pokazał **249 klas kolorów używanych w aplikacji
+bez odpowiednika**. Objaw: tło tinta (np. `.bg-emerald-50`) ciemniało, a tekst
+pisany odcieniem 800 czy 900 zostawał ciemny i komunikat znikał.
+
+Dopisane zostały odcienie 300-950 dla piętnastu rodzin kolorów, rodzina
+`zinc` (używana zamiennie ze `slate`) oraz jasne tła i obramowania.
+
+**Weryfikacja liczbowa, nie na oko:** skrypt w przeglądarce składa pary
+tło + tekst, uwzględnia przezroczystość przez blendowanie na canvasie i liczy
+współczynnik WCAG. Wynik: **273 kombinacje, zero poniżej 4,5:1 w obu motywach.**
+Przy zmianach kolorów warto ten pomiar powtórzyć, bo oko myli się przy
+półprzezroczystych tintach.
+
+Poprawione przy okazji w jasnym motywie: `emerald-600` (3,7:1), `sky-600` (4,0),
+`amber-600` (3,1), `cyan-600` (3,3), `rose-600` (4,1), `red-600` (4,4),
+`blue-600` na `blue-100` (4,3) oraz szarości `slate-400/500`.
+
+**Nagłówki ekranów.** `PageHeader` pisał tytuł gradientem granat-morze
+(`.text-gradient`), przez co litery zmieniały kolor w połowie wyrazu. Teraz
+tytuł jest jednolity, pod spodem biegnie kreska z krótkim akcentem, a nowy
+opcjonalny `eyebrow` daje miejsce na nazwę sekcji.
+
+Podgląd obu motywów: `/podglad-motywu` (tylko tryb deweloperski).
+
 ## 11. Workflow
 
 Commit → push do `main` → Vercel auto-deploy (~30-60s). Weryfikacja deployu: `curl -sL https://www.agentspace.pl/app | grep Zaloguj`. Build lokalnie: `npm run build`. Dev: `npm run dev`.

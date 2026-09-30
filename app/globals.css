@@ -1148,3 +1148,492 @@ html[data-mk="light"] :is(.mk, footer) :is(.text-emerald-400, .text-emerald-300)
 html[data-mk="light"] :is(.mk, footer) :is(.text-zinc-300, .text-zinc-200):not(.mk-force-dark *) {
   color: var(--color-mk-muted);
 }
+
+
+/* ── Uzupełnienie: odcienie, których pierwsza wersja nie pokrywała ──
+   Objaw: tło tinta (np. .bg-emerald-50) ciemniało, ale tekst pisany
+   odcieniem 800/900 zostawał ciemny, więc komunikat robił się
+   nieczytelny. Audyt pokazał 249 takich klas w aplikacji. */
+
+/* emerald */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-800 { color: #a7f3d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-900 { color: #a7f3d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-950 { color: #a7f3d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-500 { color: #6ee7b7 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-400 { color: #6ee7b7 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-300 { color: #6ee7b7 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-emerald-700:hover { color: #a7f3d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-emerald-800:hover { color: #a7f3d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-emerald-900:hover { color: #a7f3d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-emerald-50 { background-color: rgba(16, 185, 129, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-emerald-200 { background-color: rgba(16, 185, 129, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-emerald-200 { border-color: rgba(16, 185, 129, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-emerald-200:hover { border-color: rgba(16, 185, 129, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-emerald-300 { border-color: rgba(16, 185, 129, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-emerald-300:hover { border-color: rgba(16, 185, 129, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-emerald-400 { border-color: rgba(16, 185, 129, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-emerald-400:hover { border-color: rgba(16, 185, 129, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-emerald-200 { --tw-ring-color: rgba(16, 185, 129, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-emerald-300 { --tw-ring-color: rgba(16, 185, 129, 0.4) !important; }
+
+/* green */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-green-800 { color: #bbf7d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-green-900 { color: #bbf7d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-green-950 { color: #bbf7d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-green-500 { color: #86efac !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-green-400 { color: #86efac !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-green-300 { color: #86efac !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-green-700:hover { color: #bbf7d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-green-800:hover { color: #bbf7d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-green-900:hover { color: #bbf7d0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-green-50 { background-color: rgba(34, 197, 94, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-green-100 { background-color: rgba(34, 197, 94, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-green-200 { background-color: rgba(34, 197, 94, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-green-200 { border-color: rgba(34, 197, 94, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-green-200:hover { border-color: rgba(34, 197, 94, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-green-300 { border-color: rgba(34, 197, 94, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-green-300:hover { border-color: rgba(34, 197, 94, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-green-400 { border-color: rgba(34, 197, 94, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-green-400:hover { border-color: rgba(34, 197, 94, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-green-200 { --tw-ring-color: rgba(34, 197, 94, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-green-300 { --tw-ring-color: rgba(34, 197, 94, 0.4) !important; }
+
+/* teal */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-teal-800 { color: #99f6e4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-teal-900 { color: #99f6e4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-teal-950 { color: #99f6e4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-teal-500 { color: #5eead4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-teal-400 { color: #5eead4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-teal-300 { color: #5eead4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-teal-700:hover { color: #99f6e4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-teal-800:hover { color: #99f6e4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-teal-900:hover { color: #99f6e4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-teal-50 { background-color: rgba(20, 184, 166, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-teal-100 { background-color: rgba(20, 184, 166, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-teal-200 { background-color: rgba(20, 184, 166, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-teal-200 { border-color: rgba(20, 184, 166, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-teal-200:hover { border-color: rgba(20, 184, 166, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-teal-300 { border-color: rgba(20, 184, 166, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-teal-300:hover { border-color: rgba(20, 184, 166, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-teal-400 { border-color: rgba(20, 184, 166, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-teal-400:hover { border-color: rgba(20, 184, 166, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-teal-200 { --tw-ring-color: rgba(20, 184, 166, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-teal-300 { --tw-ring-color: rgba(20, 184, 166, 0.4) !important; }
+
+/* cyan */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-cyan-800 { color: #a5f3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-cyan-900 { color: #a5f3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-cyan-950 { color: #a5f3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-cyan-500 { color: #67e8f9 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-cyan-400 { color: #67e8f9 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-cyan-300 { color: #67e8f9 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-cyan-700:hover { color: #a5f3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-cyan-800:hover { color: #a5f3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-cyan-900:hover { color: #a5f3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-cyan-50 { background-color: rgba(6, 182, 212, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-cyan-100 { background-color: rgba(6, 182, 212, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-cyan-200 { background-color: rgba(6, 182, 212, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-cyan-200 { border-color: rgba(6, 182, 212, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-cyan-200:hover { border-color: rgba(6, 182, 212, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-cyan-300 { border-color: rgba(6, 182, 212, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-cyan-300:hover { border-color: rgba(6, 182, 212, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-cyan-400 { border-color: rgba(6, 182, 212, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-cyan-400:hover { border-color: rgba(6, 182, 212, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-cyan-200 { --tw-ring-color: rgba(6, 182, 212, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-cyan-300 { --tw-ring-color: rgba(6, 182, 212, 0.4) !important; }
+
+/* sky */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-sky-800 { color: #bae6fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-sky-900 { color: #bae6fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-sky-950 { color: #bae6fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-sky-500 { color: #7dd3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-sky-400 { color: #7dd3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-sky-300 { color: #7dd3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-sky-700:hover { color: #bae6fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-sky-800:hover { color: #bae6fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-sky-900:hover { color: #bae6fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-sky-50 { background-color: rgba(14, 165, 233, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-sky-100 { background-color: rgba(14, 165, 233, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-sky-200 { background-color: rgba(14, 165, 233, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-sky-200 { border-color: rgba(14, 165, 233, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-sky-200:hover { border-color: rgba(14, 165, 233, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-sky-300 { border-color: rgba(14, 165, 233, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-sky-300:hover { border-color: rgba(14, 165, 233, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-sky-400 { border-color: rgba(14, 165, 233, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-sky-400:hover { border-color: rgba(14, 165, 233, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-sky-200 { --tw-ring-color: rgba(14, 165, 233, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-sky-300 { --tw-ring-color: rgba(14, 165, 233, 0.4) !important; }
+
+/* blue */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-blue-800 { color: #bfdbfe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-blue-900 { color: #bfdbfe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-blue-950 { color: #bfdbfe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-blue-500 { color: #93c5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-blue-400 { color: #93c5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-blue-300 { color: #93c5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-blue-700:hover { color: #bfdbfe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-blue-800:hover { color: #bfdbfe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-blue-900:hover { color: #bfdbfe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-blue-50 { background-color: rgba(59, 130, 246, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-blue-100 { background-color: rgba(59, 130, 246, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-blue-200 { background-color: rgba(59, 130, 246, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-blue-200 { border-color: rgba(59, 130, 246, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-blue-200:hover { border-color: rgba(59, 130, 246, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-blue-300 { border-color: rgba(59, 130, 246, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-blue-300:hover { border-color: rgba(59, 130, 246, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-blue-400 { border-color: rgba(59, 130, 246, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-blue-400:hover { border-color: rgba(59, 130, 246, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-blue-200 { --tw-ring-color: rgba(59, 130, 246, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-blue-300 { --tw-ring-color: rgba(59, 130, 246, 0.4) !important; }
+
+/* indigo */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-indigo-800 { color: #c7d2fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-indigo-900 { color: #c7d2fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-indigo-950 { color: #c7d2fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-indigo-500 { color: #a5b4fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-indigo-400 { color: #a5b4fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-indigo-300 { color: #a5b4fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-indigo-700:hover { color: #c7d2fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-indigo-800:hover { color: #c7d2fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-indigo-900:hover { color: #c7d2fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-indigo-100 { background-color: rgba(99, 102, 241, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-indigo-200 { background-color: rgba(99, 102, 241, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-indigo-200 { border-color: rgba(99, 102, 241, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-indigo-200:hover { border-color: rgba(99, 102, 241, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-indigo-300 { border-color: rgba(99, 102, 241, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-indigo-300:hover { border-color: rgba(99, 102, 241, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-indigo-400 { border-color: rgba(99, 102, 241, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-indigo-400:hover { border-color: rgba(99, 102, 241, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-indigo-200 { --tw-ring-color: rgba(99, 102, 241, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-indigo-300 { --tw-ring-color: rgba(99, 102, 241, 0.4) !important; }
+
+/* violet */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-violet-800 { color: #ddd6fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-violet-900 { color: #ddd6fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-violet-950 { color: #ddd6fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-violet-500 { color: #c4b5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-violet-400 { color: #c4b5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-violet-300 { color: #c4b5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-violet-700:hover { color: #ddd6fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-violet-800:hover { color: #ddd6fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-violet-900:hover { color: #ddd6fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-violet-50 { background-color: rgba(139, 92, 246, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-violet-100 { background-color: rgba(139, 92, 246, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-violet-200 { background-color: rgba(139, 92, 246, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-violet-200 { border-color: rgba(139, 92, 246, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-violet-200:hover { border-color: rgba(139, 92, 246, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-violet-300 { border-color: rgba(139, 92, 246, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-violet-300:hover { border-color: rgba(139, 92, 246, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-violet-400 { border-color: rgba(139, 92, 246, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-violet-400:hover { border-color: rgba(139, 92, 246, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-violet-200 { --tw-ring-color: rgba(139, 92, 246, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-violet-300 { --tw-ring-color: rgba(139, 92, 246, 0.4) !important; }
+
+/* fuchsia */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-fuchsia-800 { color: #f5d0fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-fuchsia-900 { color: #f5d0fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-fuchsia-950 { color: #f5d0fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-fuchsia-500 { color: #f0abfc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-fuchsia-400 { color: #f0abfc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-fuchsia-300 { color: #f0abfc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-fuchsia-700:hover { color: #f5d0fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-fuchsia-800:hover { color: #f5d0fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-fuchsia-900:hover { color: #f5d0fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-fuchsia-50 { background-color: rgba(217, 70, 239, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-fuchsia-100 { background-color: rgba(217, 70, 239, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-fuchsia-200 { background-color: rgba(217, 70, 239, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-fuchsia-200 { border-color: rgba(217, 70, 239, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-fuchsia-200:hover { border-color: rgba(217, 70, 239, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-fuchsia-300 { border-color: rgba(217, 70, 239, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-fuchsia-300:hover { border-color: rgba(217, 70, 239, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-fuchsia-400 { border-color: rgba(217, 70, 239, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-fuchsia-400:hover { border-color: rgba(217, 70, 239, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-fuchsia-200 { --tw-ring-color: rgba(217, 70, 239, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-fuchsia-300 { --tw-ring-color: rgba(217, 70, 239, 0.4) !important; }
+
+/* rose */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-rose-800 { color: #fecdd3 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-rose-900 { color: #fecdd3 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-rose-950 { color: #fecdd3 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-rose-500 { color: #fda4af !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-rose-400 { color: #fda4af !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-rose-300 { color: #fda4af !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-rose-700:hover { color: #fecdd3 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-rose-800:hover { color: #fecdd3 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-rose-900:hover { color: #fecdd3 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-rose-50 { background-color: rgba(244, 63, 94, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-rose-100 { background-color: rgba(244, 63, 94, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-rose-200 { background-color: rgba(244, 63, 94, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-rose-200 { border-color: rgba(244, 63, 94, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-rose-200:hover { border-color: rgba(244, 63, 94, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-rose-300 { border-color: rgba(244, 63, 94, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-rose-300:hover { border-color: rgba(244, 63, 94, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-rose-400 { border-color: rgba(244, 63, 94, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-rose-400:hover { border-color: rgba(244, 63, 94, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-rose-200 { --tw-ring-color: rgba(244, 63, 94, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-rose-300 { --tw-ring-color: rgba(244, 63, 94, 0.4) !important; }
+
+/* red */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-red-800 { color: #fecaca !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-red-900 { color: #fecaca !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-red-950 { color: #fecaca !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-red-500 { color: #fca5a5 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-red-400 { color: #fca5a5 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-red-300 { color: #fca5a5 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-red-700:hover { color: #fecaca !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-red-800:hover { color: #fecaca !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-red-900:hover { color: #fecaca !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-red-50 { background-color: rgba(239, 68, 68, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-red-100 { background-color: rgba(239, 68, 68, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-red-200 { background-color: rgba(239, 68, 68, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-red-200 { border-color: rgba(239, 68, 68, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-red-200:hover { border-color: rgba(239, 68, 68, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-red-300 { border-color: rgba(239, 68, 68, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-red-300:hover { border-color: rgba(239, 68, 68, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-red-400 { border-color: rgba(239, 68, 68, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-red-400:hover { border-color: rgba(239, 68, 68, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-red-200 { --tw-ring-color: rgba(239, 68, 68, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-red-300 { --tw-ring-color: rgba(239, 68, 68, 0.4) !important; }
+
+/* amber */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-amber-800 { color: #fde68a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-amber-900 { color: #fde68a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-amber-950 { color: #fde68a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-amber-500 { color: #fcd34d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-amber-400 { color: #fcd34d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-amber-300 { color: #fcd34d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-amber-700:hover { color: #fde68a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-amber-800:hover { color: #fde68a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-amber-900:hover { color: #fde68a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-amber-50 { background-color: rgba(245, 158, 11, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-amber-100 { background-color: rgba(245, 158, 11, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-amber-200 { background-color: rgba(245, 158, 11, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-amber-200 { border-color: rgba(245, 158, 11, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-amber-200:hover { border-color: rgba(245, 158, 11, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-amber-300 { border-color: rgba(245, 158, 11, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-amber-300:hover { border-color: rgba(245, 158, 11, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-amber-400 { border-color: rgba(245, 158, 11, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-amber-400:hover { border-color: rgba(245, 158, 11, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-amber-200 { --tw-ring-color: rgba(245, 158, 11, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-amber-300 { --tw-ring-color: rgba(245, 158, 11, 0.4) !important; }
+
+/* orange */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-orange-800 { color: #fed7aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-orange-900 { color: #fed7aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-orange-950 { color: #fed7aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-orange-500 { color: #fdba74 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-orange-400 { color: #fdba74 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-orange-300 { color: #fdba74 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-orange-700:hover { color: #fed7aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-orange-800:hover { color: #fed7aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-orange-900:hover { color: #fed7aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-orange-50 { background-color: rgba(249, 115, 22, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-orange-100 { background-color: rgba(249, 115, 22, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-orange-200 { background-color: rgba(249, 115, 22, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-orange-200 { border-color: rgba(249, 115, 22, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-orange-200:hover { border-color: rgba(249, 115, 22, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-orange-300 { border-color: rgba(249, 115, 22, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-orange-300:hover { border-color: rgba(249, 115, 22, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-orange-400 { border-color: rgba(249, 115, 22, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-orange-400:hover { border-color: rgba(249, 115, 22, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-orange-200 { --tw-ring-color: rgba(249, 115, 22, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-orange-300 { --tw-ring-color: rgba(249, 115, 22, 0.4) !important; }
+
+/* yellow */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-yellow-800 { color: #fef08a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-yellow-900 { color: #fef08a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-yellow-950 { color: #fef08a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-yellow-500 { color: #fde047 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-yellow-400 { color: #fde047 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-yellow-300 { color: #fde047 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-yellow-700:hover { color: #fef08a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-yellow-800:hover { color: #fef08a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-yellow-900:hover { color: #fef08a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-yellow-50 { background-color: rgba(234, 179, 8, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-yellow-100 { background-color: rgba(234, 179, 8, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-yellow-200 { background-color: rgba(234, 179, 8, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-yellow-200 { border-color: rgba(234, 179, 8, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-yellow-200:hover { border-color: rgba(234, 179, 8, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-yellow-300 { border-color: rgba(234, 179, 8, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-yellow-300:hover { border-color: rgba(234, 179, 8, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-yellow-400 { border-color: rgba(234, 179, 8, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-yellow-400:hover { border-color: rgba(234, 179, 8, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-yellow-200 { --tw-ring-color: rgba(234, 179, 8, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-yellow-300 { --tw-ring-color: rgba(234, 179, 8, 0.4) !important; }
+
+/* lime */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-lime-800 { color: #d9f99d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-lime-900 { color: #d9f99d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-lime-950 { color: #d9f99d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-lime-500 { color: #bef264 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-lime-400 { color: #bef264 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-lime-300 { color: #bef264 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-lime-700:hover { color: #d9f99d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-lime-800:hover { color: #d9f99d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-lime-900:hover { color: #d9f99d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-lime-50 { background-color: rgba(132, 204, 22, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-lime-100 { background-color: rgba(132, 204, 22, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-lime-200 { background-color: rgba(132, 204, 22, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-lime-200 { border-color: rgba(132, 204, 22, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-lime-200:hover { border-color: rgba(132, 204, 22, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-lime-300 { border-color: rgba(132, 204, 22, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-lime-300:hover { border-color: rgba(132, 204, 22, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-lime-400 { border-color: rgba(132, 204, 22, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-lime-400:hover { border-color: rgba(132, 204, 22, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-lime-200 { --tw-ring-color: rgba(132, 204, 22, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-lime-300 { --tw-ring-color: rgba(132, 204, 22, 0.4) !important; }
+
+/* purple */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-purple-800 { color: #e9d5ff !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-purple-900 { color: #e9d5ff !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-purple-950 { color: #e9d5ff !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-purple-500 { color: #d8b4fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-purple-400 { color: #d8b4fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-purple-300 { color: #d8b4fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-purple-700:hover { color: #e9d5ff !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-purple-800:hover { color: #e9d5ff !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-purple-900:hover { color: #e9d5ff !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-purple-50 { background-color: rgba(168, 85, 247, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-purple-100 { background-color: rgba(168, 85, 247, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-purple-200 { background-color: rgba(168, 85, 247, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-purple-200 { border-color: rgba(168, 85, 247, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-purple-200:hover { border-color: rgba(168, 85, 247, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-purple-300 { border-color: rgba(168, 85, 247, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-purple-300:hover { border-color: rgba(168, 85, 247, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-purple-400 { border-color: rgba(168, 85, 247, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-purple-400:hover { border-color: rgba(168, 85, 247, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-purple-200 { --tw-ring-color: rgba(168, 85, 247, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-purple-300 { --tw-ring-color: rgba(168, 85, 247, 0.4) !important; }
+
+/* pink */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-pink-800 { color: #fbcfe8 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-pink-900 { color: #fbcfe8 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-pink-950 { color: #fbcfe8 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-pink-500 { color: #f9a8d4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-pink-400 { color: #f9a8d4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-pink-300 { color: #f9a8d4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-pink-700:hover { color: #fbcfe8 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-pink-800:hover { color: #fbcfe8 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-pink-900:hover { color: #fbcfe8 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-pink-50 { background-color: rgba(236, 72, 153, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-pink-100 { background-color: rgba(236, 72, 153, 0.15) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-pink-200 { background-color: rgba(236, 72, 153, 0.22) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-pink-200 { border-color: rgba(236, 72, 153, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-pink-200:hover { border-color: rgba(236, 72, 153, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-pink-300 { border-color: rgba(236, 72, 153, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-pink-300:hover { border-color: rgba(236, 72, 153, 0.4) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-pink-400 { border-color: rgba(236, 72, 153, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-pink-400:hover { border-color: rgba(236, 72, 153, 0.5) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-pink-200 { --tw-ring-color: rgba(236, 72, 153, 0.3) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-pink-300 { --tw-ring-color: rgba(236, 72, 153, 0.4) !important; }
+
+/* zinc: w aplikacji używany zamiennie ze slate */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-zinc-950 { color: #fafafa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-zinc-900 { color: #fafafa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-zinc-800 { color: #e4e4e7 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-zinc-700 { color: #d4d4d8 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-zinc-600 { color: #a1a1aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-zinc-500 { color: #a1a1aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-zinc-400 { color: #71717a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-zinc-400:hover { color: #a1a1aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-zinc-50 { background-color: rgba(24, 24, 27, 0.6) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-zinc-100 { background-color: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-zinc-200 { background-color: #3f3f46 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-zinc-100 { border-color: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-zinc-200 { border-color: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-zinc-300 { border-color: #3f3f46 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .divide-zinc-100 > * + * { border-color: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-100 { border-color: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-slate-200:hover { border-color: #3f3f46 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .group-hover\:border-slate-300:hover { border-color: #3f3f46 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-slate-800:hover { color: #e4e4e7 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .disabled\:text-slate-400:disabled { color: #52525b !important; }
+
+/* Odcienie 600 i 700 dla rodzin, których pierwotny blok nie obejmował. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-600 { color: #6ee7b7 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-700 { color: #6ee7b7 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-emerald-600:hover { color: #6ee7b7 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-green-600 { color: #86efac !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-green-700 { color: #86efac !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-green-600:hover { color: #86efac !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-teal-600 { color: #5eead4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-teal-700 { color: #5eead4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-teal-600:hover { color: #5eead4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-cyan-600 { color: #67e8f9 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-cyan-700 { color: #67e8f9 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-cyan-600:hover { color: #67e8f9 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-sky-600 { color: #7dd3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-sky-700 { color: #7dd3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-sky-600:hover { color: #7dd3fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-blue-600 { color: #93c5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-blue-700 { color: #93c5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-blue-600:hover { color: #93c5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-indigo-600 { color: #a5b4fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-indigo-700 { color: #a5b4fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-indigo-600:hover { color: #a5b4fc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-violet-600 { color: #c4b5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-violet-700 { color: #c4b5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-violet-600:hover { color: #c4b5fd !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-fuchsia-600 { color: #f0abfc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-fuchsia-700 { color: #f0abfc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-fuchsia-600:hover { color: #f0abfc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-rose-600 { color: #fda4af !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-rose-700 { color: #fda4af !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-rose-600:hover { color: #fda4af !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-red-600 { color: #fca5a5 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-red-700 { color: #fca5a5 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-red-600:hover { color: #fca5a5 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-amber-600 { color: #fcd34d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-amber-700 { color: #fcd34d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-amber-600:hover { color: #fcd34d !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-orange-600 { color: #fdba74 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-orange-700 { color: #fdba74 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-orange-600:hover { color: #fdba74 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-yellow-600 { color: #fde047 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-yellow-700 { color: #fde047 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-yellow-600:hover { color: #fde047 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-lime-600 { color: #bef264 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-lime-700 { color: #bef264 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-lime-600:hover { color: #bef264 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-purple-600 { color: #d8b4fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-purple-700 { color: #d8b4fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-purple-600:hover { color: #d8b4fe !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-pink-600 { color: #f9a8d4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-pink-700 { color: #f9a8d4 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-pink-600:hover { color: #f9a8d4 !important; }
+
+/* ── Jasny motyw: dwa akcenty, które nie dobijały do progu czytelności ──
+   Zmierzone na białym tle: emerald-600 dawał 3,7:1, sky-600 4,0:1, przy
+   wymaganych 4,5:1 dla zwykłego tekstu. Przyciemniamy o jeden stopień. */
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-emerald-600,
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .hover\:text-emerald-600:hover {
+  color: #047857;
+}
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-sky-600 {
+  color: #0369a1;
+}
+
+/* Akcenty 600 na własnym tincie wychodziły poniżej progu (amber 3,1:1,
+   cyan 3,3:1, rose 4,1:1, red 4,4:1). Schodzimy o stopień niżej. */
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-amber-600 { color: #b45309; }
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-red-600,
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .hover\:text-red-600:hover { color: #b91c1c; }
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-rose-600 { color: #be123c; }
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-cyan-600 { color: #0e7490; }
+
+/* slate-400 to kolor podpisów i etykiet, nie ozdoba. Na bieli dawał 2,6:1,
+   w ciemnym 3,7:1, czyli w obu motywach za mało jak na tekst do czytania. */
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-slate-400,
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-slate-500 { color: #5a6473; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-slate-400 { color: #a1a1aa !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-zinc-400 { color: #a1a1aa !important; }
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-zinc-400,
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-zinc-500 { color: #5a6473; }
+
+/* Ostatnie dwa przypadki z audytu kontrastu.
+   Ciemny: szary tekst na chipie .bg-slate-200 dawał 4,1:1, więc chip
+   przyciemniamy. Jasny: blue-600 na blue-100 dawał 4,3:1. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-slate-200 { background-color: #2e2e34 !important; }
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-blue-600 { color: #1d4ed8; }
