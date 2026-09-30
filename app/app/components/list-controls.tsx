@@ -166,6 +166,7 @@ export function ListToolbar({
                 <select value={query.agent} onChange={(e) => go({ agent: e.target.value })} className={input}>
                   <option value="">wszyscy</option>
                   <option value="ja">tylko moje</option>
+                  <option value="bez">bez opiekuna (pula biura)</option>
                   {agents.map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.name}

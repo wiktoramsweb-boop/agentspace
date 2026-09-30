@@ -56,7 +56,10 @@ export async function queryClients(agencyId: string, q: ListQuery, userId: strin
         ? sel.or(`name.ilike.${like(q.q)},phone_digits.ilike.%${digits}%,phone.ilike.%${digits}%`)
         : sel.or(`name.ilike.${like(q.q)},email.ilike.${like(q.q)},company.ilike.${like(q.q)}`);
   }
-  if (q.agent) sel = sel.eq("agent_id", q.agent === "ja" ? userId : q.agent);
+  // "bez" to pula biura: rekordy, które zostały po kimś, kto odszedł z zespołu,
+  // i czekają na przypisanie. Bez tego filtra ginęłyby w liście.
+  if (q.agent === "bez") sel = sel.is("agent_id", null);
+  else if (q.agent) sel = sel.eq("agent_id", q.agent === "ja" ? userId : q.agent);
   if (q.status) sel = sel.eq("status", q.status);
   if (q.type) sel = sel.eq("type", q.type);
   if (q.city) sel = sel.ilike("city", like(q.city));
@@ -116,7 +119,10 @@ export async function queryProperties(agencyId: string, q: ListQuery, userId: st
       `title.ilike.${like(q.q)},city.ilike.${like(q.q)},address.ilike.${like(q.q)},offer_no.ilike.${like(q.q)}`,
     );
   }
-  if (q.agent) sel = sel.eq("agent_id", q.agent === "ja" ? userId : q.agent);
+  // "bez" to pula biura: rekordy, które zostały po kimś, kto odszedł z zespołu,
+  // i czekają na przypisanie. Bez tego filtra ginęłyby w liście.
+  if (q.agent === "bez") sel = sel.is("agent_id", null);
+  else if (q.agent) sel = sel.eq("agent_id", q.agent === "ja" ? userId : q.agent);
   if (q.status) sel = sel.eq("status", q.status);
   if (q.type) sel = sel.eq("property_type", q.type);
   if (q.city) sel = sel.ilike("city", like(q.city));
@@ -191,7 +197,8 @@ export async function queryActivities(
         ? sel.or(`subject.ilike.${like(q.q)},contact_name.ilike.${like(q.q)},contact_phone_digits.ilike.%${digits}%`)
         : sel.or(`subject.ilike.${like(q.q)},contact_name.ilike.${like(q.q)},description.ilike.${like(q.q)}`);
   }
-  if (q.agent) sel = sel.contains("assignee_ids", [q.agent === "ja" ? userId : q.agent]);
+  if (q.agent === "bez") sel = sel.eq("assignee_ids", "{}");
+  else if (q.agent) sel = sel.contains("assignee_ids", [q.agent === "ja" ? userId : q.agent]);
   if (q.status) sel = sel.eq("status", q.status);
   if (q.type) sel = sel.eq("kind", q.type);
   if (q.extra) sel = sel.eq("purpose", q.extra);

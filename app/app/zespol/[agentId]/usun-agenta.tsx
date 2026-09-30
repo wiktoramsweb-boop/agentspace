@@ -60,7 +60,7 @@ export function UsunAgenta({
 
       <div className="mt-4 rounded-xl border border-red-200 bg-white p-4">
         <p className="text-sm font-medium text-slate-900">
-          {maDane ? "Dorobek zostanie przepisany, nie skasowany" : "Ta osoba nie ma przypisanych danych"}
+          {maDane ? "Dorobek zostaje w systemie, nic nie znika" : "Ta osoba nie ma przypisanych danych"}
         </p>
         {maDane && (
           <ul className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-slate-600 sm:grid-cols-4">
@@ -78,19 +78,26 @@ export function UsunAgenta({
 
       <form action={formAction} className="mt-5">
         <label className="mb-1.5 block text-sm font-medium text-slate-700" htmlFor="przejmujacy">
-          Kto przejmuje klientów i oferty
+          Co zrobić z klientami i ofertami
         </label>
         <select
           id="przejmujacy"
           name="przejmujacy"
+          defaultValue=""
           className="w-full max-w-sm rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-200"
         >
+          <option value="">Zostaw w puli biura (przypiszesz później)</option>
           {kandydaci.map((k) => (
             <option key={k.id} value={k.id}>
-              {k.name}
+              Przekaż od razu: {k.name}
             </option>
           ))}
         </select>
+        <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-slate-500">
+          Pula biura oznacza, że klienci, oferty i działania zostają w systemie
+          bez opiekuna. Znajdziesz je na listach filtrem „bez opiekuna" i przypiszesz
+          komu zechcesz, pojedynczo albo zaznaczając wiele naraz.
+        </p>
 
         {state?.error && (
           <p className="mt-3 rounded-lg border border-red-300 bg-white p-3 text-sm text-red-700">{state.error}</p>

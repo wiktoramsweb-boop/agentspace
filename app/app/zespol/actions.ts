@@ -186,6 +186,9 @@ export type UsuniecieResult = { error?: string } | undefined;
  * ze sobą całą bazę klientów i ofert tej osoby. Dlatego NAJPIERW przepisujemy
  * dane na przejmującego, a dopiero potem kasujemy profil.
  *
+ * Domyślnie dane trafiają do puli biura (`agent_id` puste) i czekają tam na
+ * przypisanie. Można też od razu wskazać osobę, która je przejmie.
+ *
  * To, co jest ściśle osobiste (sesje AI Coacha, cele, dziennik wyników,
  * subskrypcje powiadomień), znika razem z osobą i tak ma być.
  */
@@ -202,11 +205,14 @@ export async function removeAgent(agentId: string, formData: FormData): Promise<
   if (!agent || agent.agency_id !== owner.agency_id) return { error: "Nie ma takiej osoby w Twoim biurze." };
   if (agent.role === "owner") return { error: "Nie można usunąć właściciela biura." };
 
-  // Kto przejmuje dorobek. Domyślnie właściciel, który wykonuje operację.
+  // Kto przejmuje dorobek. Puste pole oznacza pulę biura: rekordy zostają
+  // w systemie bez opiekuna i czekają na przypisanie. To sensowniejsze niż
+  // zmuszanie do wskazania osoby w momencie, w którym ktoś odchodzi.
   const wskazany = String(formData.get("przejmujacy") ?? "").trim();
-  let przejmujacy = owner.id;
+  let przejmujacy: string | null = null;
 
-  if (wskazany && wskazany !== owner.id) {
+  if (wskazany) {
+    if (wskazany === agentId) return { error: "Nie można przepisać danych na osobę, którą usuwasz." };
     const { data: kandydat } = await admin
       .from("profiles")
       .select("id, agency_id")
@@ -215,7 +221,6 @@ export async function removeAgent(agentId: string, formData: FormData): Promise<
     if (!kandydat || kandydat.agency_id !== owner.agency_id) {
       return { error: "Wskazana osoba nie należy do Twojego biura." };
     }
-    if (kandydat.id === agentId) return { error: "Nie można przepisać danych na osobę, którą usuwasz." };
     przejmujacy = kandydat.id;
   }
 
@@ -237,7 +242,10 @@ export async function removeAgent(agentId: string, formData: FormData): Promise<
     .contains("assignee_ids", [agentId]);
 
   for (const d of (dzialania ?? []) as { id: string; assignee_ids: string[] | null }[]) {
-    const nowe = [...new Set((d.assignee_ids ?? []).map((x) => (x === agentId ? przejmujacy : x)))];
+    const bezNiego = (d.assignee_ids ?? []).filter((x) => x !== agentId);
+    // Do puli trafia pusta lista, a wtedy działanie znajdziesz filtrem
+    // „bez opiekuna" na liście działań.
+    const nowe = przejmujacy ? [...new Set([...bezNiego, przejmujacy])] : bezNiego;
     await admin.from("activities").update({ assignee_ids: nowe }).eq("id", d.id);
   }
 
