@@ -100,9 +100,16 @@ export function TeamProfiles({
               <Stat label="Klienci" value={p.clients} />
             </div>
 
-            <div className="mt-3 flex items-center justify-between gap-2">
-              <a href={`/app/zespol/${p.id}`} className="text-xs font-medium text-emerald-600 hover:underline">
-                Wyniki i szczegóły →
+            <div className="mt-4 flex items-center justify-between gap-2">
+              {/* Wejście w profil było małym linkiem tekstowym, przez co nie
+                  dało się znaleźć ani wyników agenta, ani usuwania z zespołu.
+                  Teraz to pełnoprawny przycisk. */}
+              <a
+                href={`/app/zespol/${p.id}`}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
+              >
+                {canEdit ? "Otwórz i zarządzaj" : "Wyniki i szczegóły"}
+                <span aria-hidden="true">→</span>
               </a>
               {canEdit && (
                 <button

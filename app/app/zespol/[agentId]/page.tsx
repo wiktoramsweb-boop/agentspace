@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireManagerOrOwner } from "@/lib/auth";
-import { getAgentDetail } from "@/lib/data";
+import { getAgencyMembers, getAgentDetail } from "@/lib/data";
 import { PageHeader, StatCard, Card, ScoreBadge, scoreColor } from "../../components/ui";
 import { formatPln } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
@@ -9,7 +9,8 @@ import { ROLE_LABELS, FUNNEL_STAGES } from "@/lib/types";
 import { computeFunnel } from "@/lib/funnel";
 import { buildMonthCalendar } from "@/lib/goal-calendar";
 import { MonthCalendarView } from "../../cele/month-calendar";
-import { removeAgent } from "../actions";
+import { policzDorobek } from "../actions";
+import { UsunAgenta } from "./usun-agenta";
 
 const STAGE_SHORT: Record<string, string> = Object.fromEntries(
   FUNNEL_STAGES.map((s) => [s.key, s.short]),
@@ -45,6 +46,17 @@ export default async function AgentDetailPage({ params }: Props) {
 
   // Menedżer widzi tylko swoich przypisanych agentów.
   if (!isOwner && profile.manager_id !== user.id) notFound();
+
+  // Pod sekcję usuwania: ile ta osoba trzyma i kto może to przejąć.
+  const dorobek = isOwner && profile.role !== "owner" ? await policzDorobek(agentId) : { klienci: 0, oferty: 0, transakcje: 0, zadania: 0 };
+  const kandydaci = isOwner
+    ? (await getAgencyMembers(user.agency_id!))
+        .filter((m) => m.id !== agentId)
+        .map((m) => ({
+          id: m.id,
+          name: `${m.full_name ?? m.email ?? "Bez nazwy"}${m.id === user.id ? " (Ty)" : ""}`,
+        }))
+    : [];
 
   const targets = goal ? computeFunnel(goal) : null;
   const todayVals: Record<string, number> = {
@@ -223,11 +235,12 @@ export default async function AgentDetailPage({ params }: Props) {
       )}
 
       {isOwner && profile.role !== "owner" && (
-        <form action={removeAgent.bind(null, profile.id)} className="mt-8">
-          <button className="text-xs text-slate-400 transition hover:text-red-600">
-            Usuń z zespołu
-          </button>
-        </form>
+        <UsunAgenta
+          agentId={profile.id}
+          imie={(profile.full_name ?? profile.email ?? "tę osobę").split(" ")[0]}
+          dorobek={dorobek}
+          kandydaci={kandydaci}
+        />
       )}
     </>
   );

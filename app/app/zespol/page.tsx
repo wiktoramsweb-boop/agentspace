@@ -161,7 +161,7 @@ export default async function ZespolPage() {
               <h2 className="text-lg font-semibold text-slate-900">Ludzie w biurze</h2>
               <p className="text-sm text-slate-500">
                 {isOwner
-                  ? "Zdjęcie, stanowisko i kontakt każdego z zespołu. Możesz poprawić dane, zdjęcie wgrywa każdy sobie."
+                  ? "Wejdź w osobę, żeby zobaczyć jej wyniki, zmienić rolę albo usunąć ją z zespołu. Zdjęcie każdy wgrywa sobie sam."
                   : "Twoi agenci: kontakt, specjalizacja i bieżące obciążenie."}
               </p>
             </div>

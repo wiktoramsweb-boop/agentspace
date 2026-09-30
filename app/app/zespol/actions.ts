@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { Resend } from "resend";
 import { requireOwner } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
@@ -144,24 +145,109 @@ export async function inviteAgent(
 /**
  * Usuwa agenta z zespołu (profil + konto auth).
  */
-export async function removeAgent(agentId: string): Promise<void> {
+/** Co dana osoba trzyma w systemie. Pokazujemy to przed usunięciem. */
+export type DorobekAgenta = {
+  klienci: number;
+  oferty: number;
+  transakcje: number;
+  zadania: number;
+};
+
+export async function policzDorobek(agentId: string): Promise<DorobekAgenta> {
   const owner = await requireOwner();
   const admin = createSupabaseAdmin();
 
-  // Weryfikacja: agent należy do agencji ownera i nie jest samym ownerem
+  const licz = async (tabela: string) => {
+    const { count } = await admin
+      .from(tabela)
+      .select("id", { count: "exact", head: true })
+      .eq("agent_id", agentId)
+      .eq("agency_id", owner.agency_id!);
+    return count ?? 0;
+  };
+
+  const [klienci, oferty, transakcje, zadania] = await Promise.all([
+    licz("clients"),
+    licz("properties"),
+    licz("deals"),
+    licz("tasks"),
+  ]);
+
+  return { klienci, oferty, transakcje, zadania };
+}
+
+export type UsuniecieResult = { error?: string } | undefined;
+
+/**
+ * Usuwa osobę z zespołu, przepisując jej dorobek na kogoś innego.
+ *
+ * UWAGA na klucze obce: `clients`, `properties`, `deals`, `tasks` i notatki
+ * mają `on delete cascade` na profilu. Samo skasowanie profilu zabierało więc
+ * ze sobą całą bazę klientów i ofert tej osoby. Dlatego NAJPIERW przepisujemy
+ * dane na przejmującego, a dopiero potem kasujemy profil.
+ *
+ * To, co jest ściśle osobiste (sesje AI Coacha, cele, dziennik wyników,
+ * subskrypcje powiadomień), znika razem z osobą i tak ma być.
+ */
+export async function removeAgent(agentId: string, formData: FormData): Promise<UsuniecieResult> {
+  const owner = await requireOwner();
+  const admin = createSupabaseAdmin();
+
   const { data: agent } = await admin
     .from("profiles")
     .select("id, agency_id, role")
     .eq("id", agentId)
     .single();
 
-  if (!agent || agent.agency_id !== owner.agency_id || agent.role === "owner") {
-    return;
+  if (!agent || agent.agency_id !== owner.agency_id) return { error: "Nie ma takiej osoby w Twoim biurze." };
+  if (agent.role === "owner") return { error: "Nie można usunąć właściciela biura." };
+
+  // Kto przejmuje dorobek. Domyślnie właściciel, który wykonuje operację.
+  const wskazany = String(formData.get("przejmujacy") ?? "").trim();
+  let przejmujacy = owner.id;
+
+  if (wskazany && wskazany !== owner.id) {
+    const { data: kandydat } = await admin
+      .from("profiles")
+      .select("id, agency_id")
+      .eq("id", wskazany)
+      .maybeSingle();
+    if (!kandydat || kandydat.agency_id !== owner.agency_id) {
+      return { error: "Wskazana osoba nie należy do Twojego biura." };
+    }
+    if (kandydat.id === agentId) return { error: "Nie można przepisać danych na osobę, którą usuwasz." };
+    przejmujacy = kandydat.id;
+  }
+
+  for (const tabela of ["clients", "properties", "deals", "tasks"]) {
+    const { error } = await admin
+      .from(tabela)
+      .update({ agent_id: przejmujacy })
+      .eq("agent_id", agentId)
+      .eq("agency_id", owner.agency_id!);
+    if (error) return { error: `Nie udało się przepisać danych (${tabela}): ${error.message}` };
+  }
+
+  // Działania trzymają przypisanych w tablicy, więc nie łapie ich klucz obcy.
+  // Bez tego w kalendarzu zostałyby zadania przypisane do nikogo.
+  const { data: dzialania } = await admin
+    .from("activities")
+    .select("id, assignee_ids")
+    .eq("agency_id", owner.agency_id!)
+    .contains("assignee_ids", [agentId]);
+
+  for (const d of (dzialania ?? []) as { id: string; assignee_ids: string[] | null }[]) {
+    const nowe = [...new Set((d.assignee_ids ?? []).map((x) => (x === agentId ? przejmujacy : x)))];
+    await admin.from("activities").update({ assignee_ids: nowe }).eq("id", d.id);
   }
 
   await admin.from("profiles").delete().eq("id", agentId);
   await admin.auth.admin.deleteUser(agentId).catch(() => {});
+
   revalidatePath("/app/zespol");
+  // Bez tego strona usuniętej osoby renderuje się jeszcze raz, profilu już
+  // nie ma i użytkownik ląduje na stronie „nie znaleziono".
+  redirect("/app/zespol");
 }
 
 /**
