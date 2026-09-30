@@ -297,6 +297,8 @@ export type Property = {
   energy_cert_status?: string | null;
   energy_ep?: number | null;
   energy_cert_valid_until?: string | null;
+  // ── v31: pola zależne od typu nieruchomości (lib/property-fields.ts) ──
+  details?: Record<string, unknown> | null;
 };
 
 /** Stan świadectwa energetycznego oferty (od 2023 wymagane w ogłoszeniu). */

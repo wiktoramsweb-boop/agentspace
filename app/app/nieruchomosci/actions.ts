@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PROPERTY_TYPES, type PropertyDealKind, type PropertyStatus, type PropertyType } from "@/lib/types";
+import { DETAIL_PREFIX, detailFieldsFor } from "@/lib/property-fields";
 import { sanitizePhotos } from "@/lib/property-photos";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { PHOTO_BUCKET } from "@/lib/storage";
@@ -69,6 +70,41 @@ function extraFromForm(formData: FormData) {
   };
 }
 
+/**
+ * Pola zależne od typu nieruchomości. Bierzemy tylko te, które słownik
+ * przewiduje dla wybranego typu i rodzaju transakcji - formularz z przeglądarki
+ * nie może dorzucić własnych kluczy, a zmiana typu w edycji czyści pola,
+ * które do niego nie pasują.
+ */
+function detailsFromForm(formData: FormData, type: PropertyType, dealKind: PropertyDealKind) {
+  const out: Record<string, unknown> = {};
+  for (const f of detailFieldsFor(type, dealKind)) {
+    const name = DETAIL_PREFIX + f.key;
+    if (f.kind === "multi") {
+      const picked = formData.getAll(name).map((v) => String(v)).filter(Boolean);
+      if (picked.length) out[f.key] = picked;
+      continue;
+    }
+    if (f.kind === "bool") {
+      if (formData.get(name) === "1") out[f.key] = true;
+      continue;
+    }
+    const raw = String(formData.get(name) ?? "").trim();
+    if (!raw) continue;
+    if (f.kind === "number") {
+      const num = floatOrNull(raw);
+      if (num != null) out[f.key] = num;
+      continue;
+    }
+    if (f.kind === "date") {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) out[f.key] = raw;
+      continue;
+    }
+    out[f.key] = raw.slice(0, 500);
+  }
+  return out;
+}
+
 /** Nazwa oferty, gdy agent jej nie wpisał: typ + miasto + metraż (jak w ASARI). */
 function buildTitle(f: ReturnType<typeof propertyFromForm>): string {
   const typeLabel =
@@ -123,6 +159,25 @@ async function saveEnergyCert(
       energy_ep: floatOrNull(formData.get("energy_ep")),
       energy_cert_valid_until: /^\d{4}-\d{2}-\d{2}$/.test(until) ? until : null,
     })
+    .eq("id", id)
+    .eq("agency_id", agencyId);
+}
+
+/**
+ * Pola zależne od typu (kolumna details z v31). Osobny, opcjonalny zapis:
+ * bez migracji błąd tutaj nie może zablokować zapisania oferty.
+ */
+async function saveDetails(
+  admin: ReturnType<typeof createSupabaseAdmin>,
+  id: string,
+  agencyId: string | null,
+  formData: FormData,
+  type: PropertyType,
+  dealKind: PropertyDealKind,
+): Promise<void> {
+  await admin
+    .from("properties")
+    .update({ details: detailsFromForm(formData, type, dealKind) })
     .eq("id", id)
     .eq("agency_id", agencyId);
 }
@@ -197,6 +252,7 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
     };
   }
   await saveEnergyCert(admin, data.id, user.agency_id, formData);
+  await saveDetails(admin, data.id, user.agency_id, formData, fields.property_type, fields.deal_kind);
 
   revalidatePath("/app/nieruchomosci");
   redirect(`/app/nieruchomosci/${data.id}`);
@@ -261,6 +317,7 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
   }
 
   await saveEnergyCert(admin, id, user.agency_id, formData);
+  await saveDetails(admin, id, user.agency_id, formData, fields.property_type, fields.deal_kind);
 
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");

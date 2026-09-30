@@ -396,6 +396,67 @@ opcjonalny `eyebrow` daje miejsce na nazwę sekcji.
 
 Podgląd obu motywów: `/podglad-motywu` (tylko tryb deweloperski).
 
+## 10h. Pola oferty zależne od typu nieruchomości (wrzesień 2026)
+
+**Problem.** Kreator oferty pokazywał praktycznie ten sam zestaw pól dla
+mieszkania, domu i działki. W praktyce to zupełnie różne nieruchomości:
+działkę opisują warunki zabudowy i media w granicy, dom - dach, materiał ścian
+i kondygnacje, halę - wysokość w świetle, nośność posadzki i liczba doków,
+a pokój - współlokatorzy i zasady najmu. Bez tego agent i tak dopisywał wszystko
+w polu Opis, czyli w miejscu, którego nie da się filtrować ani wyeksportować.
+
+**Rozwiązanie: słownik pól, nie kod formularza.** Całość siedzi w
+`lib/property-fields.ts`. Dla każdego z 10 typów jest lista sekcji, a w sekcji
+lista pól: klucz, etykieta, rodzaj (liczba, tekst, data, wybór, wielokrotny
+wybór, przełącznik), lista opcji, jednostka i podpowiedź. Pole może być
+oznaczone `only: "wynajem"` albo `only: "sprzedaz"` - wtedy pokazuje się tylko
+przy tym rodzaju transakcji. Sekcje powtarzalne (media, koszty, warunki najmu,
+stan prawny, świadectwo energetyczne, otoczenie, bezpieczeństwo, parking) są
+funkcjami, więc typ bierze je jedną linią i może dorzucić własne pola.
+
+Skala: **1425 pól** łącznie, od 40 dla pokoju do 93 dla domu.
+
+**Gdzie to trafia w bazie.** Jedna kolumna `details jsonb` (migracja
+`lib/SETUP-v31-pola-typow.sql`) plus indeks GIN, żeby dało się po tym filtrować.
+Świadomie NIE robimy stu kolumn: dodanie pola albo pozycji w liście wyboru to
+dziś jedna linia w słowniku i zero migracji. Pola, które już mają swoje kolumny
+z v17 (cena, metraż, pokoje, piętro, rok budowy, czynsz, kaucja, rynek, forma
+własności, ogrzewanie, stan), są w słowniku oznaczone `column: true` i lecą tam
+gdzie dotąd - dzięki temu wyceniarka i listy nic nie tracą.
+
+**Wartością pola wyboru jest jego etykieta**, nie osobny slug. To celowe: te
+dane wyświetlamy dosłownie i nigdy nie porównujemy w kodzie, więc druga warstwa
+tłumaczenia tylko by przeszkadzała, a Wiktor może dopisać pozycję do listy sam.
+Gdy dojdzie eksport na portale, mapowanie na ich słowniki zrobimy osobnym plikiem.
+
+**Bezpieczeństwo zapisu.** `detailsFromForm` w `app/app/nieruchomosci/actions.ts`
+przyjmuje wyłącznie klucze, które słownik przewiduje dla wybranego typu i rodzaju
+transakcji - przeglądarka nie dorzuci własnych. Zapis `details` idzie osobnym,
+opcjonalnym zapytaniem (tak samo jak świadectwo energetyczne z v23), więc brak
+migracji nie blokuje zapisania oferty.
+
+**W interfejsie.** `app/app/nieruchomosci/param-fields.tsx` rysuje krok
+„Parametry" ze słownika, sekcja po sekcji, zwijane elementem `<details>`.
+Zwijamy, a nie odmontowujemy - zwinięta sekcja zostaje w DOM, więc jej pola
+normalnie idą w zapisie. Sekcja pokazuje licznik uzupełnionych pól i otwiera się
+sama, gdy coś w niej jest. Na karcie oferty te same sekcje wyświetla
+`app/app/nieruchomosci/[id]/details-card.tsx` przez `describeDetails`, więc
+kreator i podgląd nie mają jak się rozjechać.
+
+**Kontrola: `npm run test:pola`** (`lib/sprawdz-pola.ts`). Sprawdza powtórzony
+klucz w jednym typie (dwa inputy o tej samej nazwie to cicha utrata danych),
+pole wyboru bez opcji, powtórzoną opcję, klucz spoza `[a-z0-9_]` i kolizję nazwy
+z kolumną bazy. Przy pierwszym uruchomieniu znalazł 10 realnych duplikatów
+(`droga_dojazdowa`, `vat`, `media_moc_kw`, `media_sila`) - uruchamiaj po każdej
+zmianie w słowniku.
+
+**Świadomie NIE zaglądaliśmy do ASARI.** To płatny produkt konkurencji i
+systematyczne przeglądanie jego formularzy pod odtworzenie w produkcie, który z
+nim konkuruje, łamie regulamin i psuje pozycję AgentSpace przy sprzedaży innym
+biurom. Zestawy pól wynikają z tego, czym dana nieruchomość jest, oraz z
+wymagań portali i przepisów (EP/EU/ECO2 od 2023) - to wiedza jawna.
+
+
 ## 11. Workflow
 
 Commit → push do `main` → Vercel auto-deploy (~30-60s). Weryfikacja deployu: `curl -sL https://www.agentspace.pl/app | grep Zaloguj`. Build lokalnie: `npm run build`. Dev: `npm run dev`.

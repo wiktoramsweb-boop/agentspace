@@ -9,20 +9,17 @@ import { SubmitButton } from "../components/submit-button";
 import { PROPERTY_ICONS } from "../components/icons";
 import { WizardNav, WizardSteps } from "../components/wizard-steps";
 import { PhotoManager } from "./photo-manager";
+import { ParamFields } from "./param-fields";
 import { discardPhotoUploads } from "./photo-actions";
 import type { PhotoConfig } from "@/lib/agency-settings-shared";
+import { hasFeatureChips } from "@/lib/property-fields";
 import {
   PROPERTY_DEAL_KINDS,
   PROPERTY_TYPE_TILES,
   PROPERTY_STATUSES,
-  MARKETS,
-  OWNERSHIPS,
-  BUILDING_TYPES,
-  CONDITIONS,
-  HEATINGS,
+  PROPERTY_TYPES,
   PROPERTY_FEATURES,
   EXPORT_ADDRESS_MODES,
-  ENERGY_CERT_STATUSES,
   type Property,
   type PropertyDealKind,
   type PropertyPhoto,
@@ -76,8 +73,8 @@ export function PropertyWizard({
   // aktualnych danych oferty, a nie od tego, co wpisano i porzucono wcześniej.
   const [session, setSession] = useState(0);
 
-  const isRent = dealKind === "wynajem";
-  const isLand = type === "dzialka";
+  const showFeatureChips = hasFeatureChips(type);
+  const typeLabel = PROPERTY_TYPES.find((t) => t.value === type)?.label ?? "Nieruchomość";
 
   function openWizard() {
     setDealKind(property?.deal_kind ?? "sprzedaz");
@@ -228,53 +225,29 @@ export function PropertyWizard({
           </div>
 
           {/* ── KROK 3: parametry ─────────────────────────────────── */}
-          <div hidden={step !== 2} className="space-y-6">
-            <Group title="Podstawowe">
-              <div className="grid gap-3 sm:grid-cols-3">
-                <Field label={isRent ? "Czynsz najmu (zł/mc)" : "Cena (zł)"} name="price" type="number" value={p?.price_pln} placeholder="650000" />
-                <Field label="Powierzchnia (m²)" name="area" type="number" value={p?.area_m2} placeholder="48" />
-                {isLand ? (
-                  <Field label="Powierzchnia działki (m²)" name="plot_area_m2" type="number" value={p?.plot_area_m2} placeholder="800" />
-                ) : (
-                  <Field label="Liczba pokoi" name="rooms" type="number" value={p?.rooms} placeholder="2" />
-                )}
-              </div>
-              {!isLand && (
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <Field label="Piętro (0 = parter)" name="floor" type="number" value={p?.floor} placeholder="2" />
-                  <Field label="Pięter w budynku" name="floors_total" type="number" value={p?.floors_total} placeholder="5" />
-                  <Field label="Rok budowy" name="year_built" type="number" value={p?.year_built} placeholder="2015" />
-                </div>
-              )}
-            </Group>
-
-            <Group title="Stan i standard">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Select label="Rynek" name="market" options={MARKETS} value={p?.market} empty />
-                <Select label="Stan prawny" name="ownership" options={OWNERSHIPS} value={p?.ownership} empty />
-                {!isLand && <Select label="Rodzaj budynku" name="building_type" options={BUILDING_TYPES} value={p?.building_type} empty />}
-                {!isLand && <Select label="Stan nieruchomości" name="condition_std" options={CONDITIONS} value={p?.condition_std} empty />}
-                {!isLand && <Select label="Ogrzewanie" name="heating" options={HEATINGS} value={p?.heating} empty />}
-                <Field label="Czynsz administracyjny (zł/mc)" name="admin_fee_pln" type="number" value={p?.admin_fee_pln} placeholder="700" />
-                {isRent && <Field label="Kaucja (zł)" name="deposit_pln" type="number" value={p?.deposit_pln} placeholder="3000" />}
-                <Field label="Dostępne od" name="available_from" type="date" value={p?.available_from} />
-              </div>
-            </Group>
-
-            <Group title="Świadectwo energetyczne">
-              <div className="grid gap-3 sm:grid-cols-3">
-                <Select label="Stan świadectwa" name="energy_cert_status" options={ENERGY_CERT_STATUSES} value={p?.energy_cert_status} empty />
-                <Field label="Wskaźnik EP (kWh/m²·rok)" name="energy_ep" type="number" value={p?.energy_ep} placeholder="95" />
-                <Field label="Ważne do" name="energy_cert_valid_until" type="date" value={p?.energy_cert_valid_until} />
-              </div>
-              <p className="text-xs text-slate-400">
-                Od 2023 roku ogłoszenie sprzedaży i najmu musi podawać wskaźnik EP. Skan świadectwa
-                dodasz na karcie oferty w sekcji Dokumenty.
+          <div hidden={step !== 2} className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-50 px-4 py-3">
+              <p className="text-sm text-emerald-900">
+                Pola dobrane pod <span className="font-semibold">{typeLabel.toLowerCase()}</span>
+                {dealKind === "wynajem" ? " na wynajem" : " na sprzedaż"}. Wypełnij tyle, ile wiesz - resztę uzupełnisz później.
               </p>
-            </Group>
+              <button
+                type="button"
+                onClick={() => setStep(0)}
+                className="text-xs font-semibold text-emerald-700 underline decoration-emerald-400 underline-offset-2"
+              >
+                zmień typ
+              </button>
+            </div>
 
-            {!isLand && (
-              <Group title="Udogodnienia">
+            <ParamFields type={type} dealKind={dealKind} property={p} />
+
+            {showFeatureChips && (
+              <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                <p className="mb-1 text-sm font-semibold text-slate-900">Udogodnienia</p>
+                <p className="mb-3 text-xs text-slate-500">
+                  Po tych znacznikach dopasowujemy oferty do poszukiwań klientów.
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {PROPERTY_FEATURES.map((f) => {
                     const on = !!features[f.key];
@@ -295,7 +268,7 @@ export function PropertyWizard({
                     );
                   })}
                 </div>
-              </Group>
+              </div>
             )}
             <input type="hidden" name="features" value={JSON.stringify(features)} />
           </div>
@@ -481,15 +454,6 @@ const inp =
 
 function Label({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-sm text-slate-500">{children}</label>;
-}
-
-function Group({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{title}</p>
-      <div className="space-y-3">{children}</div>
-    </div>
-  );
 }
 
 function Field({

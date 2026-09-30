@@ -29,6 +29,7 @@ import { ProcessBar, OwnerCard } from "./property-extras";
 import { MatchingSearches } from "./matching-searches";
 import { getActiveSearches } from "@/lib/data-searches";
 import { NearbyCard } from "./nearby-card";
+import { DetailsCard } from "./details-card";
 import { getDocuments } from "@/lib/data-documents";
 import { DocumentsCard } from "../../dokumenty/documents-card";
 import { PhotoManager } from "../photo-manager";
@@ -161,6 +162,8 @@ export default async function PropertyDetailPage({ params }: Props) {
               ))}
             </div>
           </Card>
+
+          <DetailsCard property={property} />
 
           {property.description && (
             <Card>
