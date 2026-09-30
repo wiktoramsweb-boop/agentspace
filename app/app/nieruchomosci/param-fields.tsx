@@ -7,6 +7,7 @@ import {
   type PropertySection,
 } from "@/lib/property-fields";
 import type { Property, PropertyDealKind, PropertyType } from "@/lib/types";
+import { SectionIcon, SECTION_TONE } from "./section-icon";
 
 /**
  * Krok „Parametry" kreatora oferty. Całość rysujemy ze słownika
@@ -45,33 +46,52 @@ export function ParamFields({
     <div className="space-y-3">
       {sections.map((sec) => {
         const filled = filledCount(sec);
+        const preview = sec.fields.slice(0, 5).map((f) => f.label).join(" · ");
         return (
           <details
             key={sec.title}
             open={sec.open || filled > 0}
-            className="group overflow-hidden rounded-2xl border border-slate-200 bg-white"
+            className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition open:border-slate-300 open:shadow-sm"
           >
-            <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 transition hover:bg-slate-50">
+            <summary className="flex cursor-pointer list-none items-center gap-3.5 px-4 py-3.5 transition hover:bg-slate-50 group-open:bg-slate-50">
+              <span
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${SECTION_TONE[sec.icon]}`}
+              >
+                <SectionIcon name={sec.icon} />
+              </span>
+
+              <span className="min-w-0 flex-1">
+                <span className="block text-[0.9375rem] font-semibold leading-tight tracking-[-0.01em] text-slate-900">
+                  {sec.title}
+                </span>
+                <span className="mt-1 block truncate text-xs text-slate-400 group-open:hidden">{preview}</span>
+                <span className="mt-1 hidden text-xs text-slate-400 group-open:block">
+                  {sec.fields.length} {polaLabel(sec.fields.length)} do uzupełnienia
+                </span>
+              </span>
+
+              {filled > 0 && (
+                <span className="flex flex-shrink-0 items-center gap-1.5 rounded-full bg-emerald-100 py-1 pl-2 pr-2.5 text-[11px] font-semibold text-emerald-700">
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
+                  </svg>
+                  {filled}
+                </span>
+              )}
+
               <svg
-                className="h-4 w-4 flex-shrink-0 text-slate-400 transition group-open:rotate-90"
+                className="h-4 w-4 flex-shrink-0 text-slate-400 transition group-open:rotate-180"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={2.2}
                 aria-hidden="true"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19 9-7 7-7-7" />
               </svg>
-              <span className="flex-1 text-sm font-semibold text-slate-900">{sec.title}</span>
-              {filled > 0 && (
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
-                  {filled} uzupełnione
-                </span>
-              )}
-              <span className="text-[11px] text-slate-400">{sec.fields.length} pól</span>
             </summary>
 
-            <div className="border-t border-slate-200 px-4 py-4">
+            <div className="border-t border-slate-200 px-4 py-5">
               {sec.hint && <p className="mb-4 text-xs leading-relaxed text-slate-500">{sec.hint}</p>}
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {sec.fields.map((f) => (
@@ -84,6 +104,14 @@ export function ParamFields({
       })}
     </div>
   );
+}
+
+/** „1 pole", „3 pola", „12 pól" - bez tego nagłówki brzmią jak automat. */
+function polaLabel(n: number): string {
+  if (n === 1) return "pole";
+  const d = n % 10;
+  const s = n % 100;
+  return d >= 2 && d <= 4 && !(s >= 12 && s <= 14) ? "pola" : "pól";
 }
 
 const inp =

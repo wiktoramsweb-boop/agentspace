@@ -34,8 +34,16 @@ export type PropertyField = {
   wide?: true;
 };
 
+/** Ikona nagłówka sekcji; rysuje ją app/app/nieruchomosci/section-icon.tsx. */
+export type SectionIcon =
+  | "podstawy" | "pokoje" | "budynek" | "instalacje" | "parking" | "media"
+  | "koszty" | "najem" | "otoczenie" | "bezpieczenstwo" | "prawne" | "energia"
+  | "teren" | "zabudowa" | "dojazd" | "przeznaczenie" | "ekonomia" | "terminy"
+  | "ludzie" | "technika" | "logistyka" | "potencjal" | "handel" | "noclegi";
+
 export type PropertySection = {
   title: string;
+  icon: SectionIcon;
   hint?: string;
   fields: PropertyField[];
   only?: PropertyDealKind;
@@ -100,6 +108,7 @@ const OTOCZENIE = [
 function sekcjaMedia(rozszerzona = false): PropertySection {
   return {
     title: "Media i przyłącza",
+    icon: "media",
     fields: [
       s("media_prad", "Prąd", MEDIUM),
       s("media_gaz", "Gaz", rozszerzona ? ["Sieć", "Zbiornik na działce", "Butla", "W drodze", "Brak"] : MEDIUM),
@@ -117,6 +126,7 @@ function sekcjaMedia(rozszerzona = false): PropertySection {
 function sekcjaKoszty(dodatkowe: PropertyField[] = []): PropertySection {
   return {
     title: "Koszty i opłaty",
+    icon: "koszty",
     fields: [
       n("admin_fee_pln", "Czynsz administracyjny", { unit: "zł/mc", column: true, placeholder: "700" }),
       m("czynsz_zawiera", "Co zawiera czynsz", [
@@ -134,6 +144,7 @@ function sekcjaKoszty(dodatkowe: PropertyField[] = []): PropertySection {
 function sekcjaNajem(dodatkowe: PropertyField[] = []): PropertySection {
   return {
     title: "Warunki najmu",
+    icon: "najem",
     only: "wynajem",
     fields: [
       d("available_from", "Dostępne od", { column: true }),
@@ -150,6 +161,7 @@ function sekcjaNajem(dodatkowe: PropertyField[] = []): PropertySection {
 function sekcjaPrawne(dodatkowe: PropertyField[] = []): PropertySection {
   return {
     title: "Stan prawny i umowa",
+    icon: "prawne",
     fields: [
       s("ownership", "Forma własności", WLASNOSC, { column: true }),
       s("market", "Rynek", ["Wtórny", "Pierwotny"], { column: true }),
@@ -170,6 +182,7 @@ function sekcjaPrawne(dodatkowe: PropertyField[] = []): PropertySection {
 function sekcjaEnergia(): PropertySection {
   return {
     title: "Świadectwo charakterystyki energetycznej",
+    icon: "energia",
     hint: "Od 2023 roku ogłoszenie sprzedaży i najmu musi podawać wskaźnik EP. Skan świadectwa dodasz na karcie oferty w Dokumentach.",
     fields: [
       s("energy_cert_status", "Stan świadectwa", ["Posiada świadectwo", "W przygotowaniu", "Zwolniona z obowiązku"], { column: true }),
@@ -185,6 +198,7 @@ function sekcjaEnergia(): PropertySection {
 function sekcjaOtoczenie(extra: readonly string[] = [], bezDrogi = false): PropertySection {
   return {
     title: "Okolica i otoczenie",
+    icon: "otoczenie",
     fields: [
       m("otoczenie", "W pobliżu", [...OTOCZENIE, ...extra]),
       n("odleglosc_centrum_km", "Odległość od centrum", { unit: "km", placeholder: "4" }),
@@ -197,6 +211,7 @@ function sekcjaOtoczenie(extra: readonly string[] = [], bezDrogi = false): Prope
 function sekcjaBezpieczenstwo(): PropertySection {
   return {
     title: "Bezpieczeństwo",
+    icon: "bezpieczenstwo",
     fields: [
       m("bezpieczenstwo", "Zabezpieczenia", [
         "Drzwi antywłamaniowe", "Rolety antywłamaniowe", "Okna antywłamaniowe", "System alarmowy",
@@ -211,6 +226,7 @@ function sekcjaBezpieczenstwo(): PropertySection {
 function sekcjaParking(): PropertySection {
   return {
     title: "Garaż i parking",
+    icon: "parking",
     fields: [
       s("parking_rodzaj", "Rodzaj miejsca", PARKING),
       n("parking_liczba", "Liczba miejsc", { placeholder: "1" }),
@@ -227,6 +243,7 @@ const MIESZKANIE: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena", { unit: "zł", column: true, placeholder: "650000" }),
@@ -239,6 +256,7 @@ const MIESZKANIE: TypeSchema = {
     },
     {
       title: "Rozkład i pomieszczenia",
+      icon: "pokoje",
       open: true,
       fields: [
         s("kuchnia", "Kuchnia", KUCHNIA),
@@ -261,6 +279,7 @@ const MIESZKANIE: TypeSchema = {
     },
     {
       title: "Budynek",
+      icon: "budynek",
       fields: [
         s("building_type", "Rodzaj budynku", [
           "Blok", "Niski blok (do 4 pięter)", "Wysoki blok", "Apartamentowiec", "Kamienica",
@@ -284,6 +303,7 @@ const MIESZKANIE: TypeSchema = {
     },
     {
       title: "Standard i instalacje",
+      icon: "instalacje",
       fields: [
         s("condition_std", "Stan mieszkania", [
           "Do wprowadzenia", "Wysoki standard", "Po remoncie", "Do odświeżenia", "Do remontu",
@@ -324,6 +344,7 @@ const DOM: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena", { unit: "zł", column: true, placeholder: "1250000" }),
@@ -337,6 +358,7 @@ const DOM: TypeSchema = {
     },
     {
       title: "Typ i konstrukcja",
+      icon: "zabudowa",
       open: true,
       fields: [
         s("typ_domu", "Typ domu", [
@@ -366,6 +388,7 @@ const DOM: TypeSchema = {
     },
     {
       title: "Pomieszczenia i kondygnacje",
+      icon: "pokoje",
       fields: [
         area("salon_m2", "Powierzchnia salonu"),
         n("lazienki", "Liczba łazienek", { placeholder: "2" }),
@@ -385,6 +408,7 @@ const DOM: TypeSchema = {
     },
     {
       title: "Garaż i budynki gospodarcze",
+      icon: "parking",
       fields: [
         s("garaz_rodzaj", "Garaż", ["Brak", "W bryle budynku", "Przybudowany", "Wolnostojący", "Podziemny", "Wiata", "Blaszak"]),
         n("garaz_stanowiska", "Liczba stanowisk", { placeholder: "2" }),
@@ -398,6 +422,7 @@ const DOM: TypeSchema = {
     },
     {
       title: "Instalacje i technika",
+      icon: "instalacje",
       fields: [
         s("heating", "Ogrzewanie", OGRZEWANIE, { column: true }),
         s("ciepla_woda", "Ciepła woda", CIEPLA_WODA),
@@ -417,6 +442,7 @@ const DOM: TypeSchema = {
     },
     {
       title: "Działka i ogród",
+      icon: "teren",
       fields: [
         s("ksztalt_dzialki", "Kształt działki", ["Prostokątna", "Kwadratowa", "Trapez", "Wielokąt", "Nieregularna", "Wąska i długa"]),
         t("wymiary_dzialki", "Wymiary działki", { placeholder: "20 x 40 m" }),
@@ -448,6 +474,7 @@ const DZIALKA: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena", { unit: "zł", column: true, placeholder: "320000" }),
@@ -460,6 +487,7 @@ const DZIALKA: TypeSchema = {
     },
     {
       title: "Przeznaczenie",
+      icon: "przeznaczenie",
       open: true,
       fields: [
         s("rodzaj_dzialki", "Rodzaj działki", [
@@ -473,6 +501,7 @@ const DZIALKA: TypeSchema = {
     },
     {
       title: "Warunki zabudowy",
+      icon: "zabudowa",
       open: true,
       fields: [
         s("plan_miejscowy", "Plan miejscowy (MPZP)", ["Jest", "W przygotowaniu", "Brak", "W trakcie uchwalania", "Studium"]),
@@ -492,6 +521,7 @@ const DZIALKA: TypeSchema = {
     },
     {
       title: "Wygląd i kształt gruntu",
+      icon: "teren",
       fields: [
         s("ksztalt_dzialki", "Kształt działki", ["Prostokątna", "Kwadratowa", "Trapez", "Wielokąt", "Nieregularna", "Wąska i długa", "Trójkątna"]),
         t("wymiary_dzialki", "Wymiary", { placeholder: "25 x 48 m" }),
@@ -509,6 +539,7 @@ const DZIALKA: TypeSchema = {
     },
     {
       title: "Media i przyłącza",
+      icon: "media",
       hint: "Przy działkach najważniejsze jest, czy media są w granicy, czy dopiero w drodze.",
       fields: [
         s("media_prad", "Prąd", ["W granicy działki", "Na działce", "W drodze", "Brak"]),
@@ -523,6 +554,7 @@ const DZIALKA: TypeSchema = {
     },
     {
       title: "Dojazd",
+      icon: "dojazd",
       fields: [
         s("droga_dojazdowa", "Droga dojazdowa", DROGA),
         n("szerokosc_drogi_m", "Szerokość drogi", { unit: "m", placeholder: "6" }),
@@ -535,6 +567,7 @@ const DZIALKA: TypeSchema = {
     sekcjaOtoczenie(["Jezioro", "Morze", "Góry", "Pola uprawne", "Zabudowa jednorodzinna", "Zabudowa wielorodzinna", "Strefa przemysłowa", "Linia wysokiego napięcia", "Tory kolejowe", "Gazociąg"], true),
     {
       title: "Koszty i opłaty",
+      icon: "koszty",
       fields: [
         n("podatek_nieruchomosc_pln", "Podatek od nieruchomości", { unit: "zł/rok" }),
         n("oplata_uzytkowanie_pln", "Opłata za użytkowanie wieczyste", { unit: "zł/rok" }),
@@ -558,6 +591,7 @@ const LOKAL: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena", { unit: "zł", column: true, placeholder: "890000" }),
@@ -574,6 +608,7 @@ const LOKAL: TypeSchema = {
     },
     {
       title: "Przeznaczenie lokalu",
+      icon: "przeznaczenie",
       open: true,
       fields: [
         s("rodzaj_lokalu", "Rodzaj lokalu", [
@@ -593,6 +628,7 @@ const LOKAL: TypeSchema = {
     },
     {
       title: "Opis budynku",
+      icon: "budynek",
       fields: [
         t("nazwa_budynku", "Nazwa budynku", { placeholder: "Kraków Business Park" }),
         s("building_type", "Rodzaj budynku", [
@@ -611,6 +647,7 @@ const LOKAL: TypeSchema = {
     },
     {
       title: "Standard lokalu",
+      icon: "instalacje",
       fields: [
         s("condition_std", "Stan lokalu", [
           "Gotowy do wejścia", "Wysoki standard", "Po remoncie", "Do odświeżenia", "Do remontu",
@@ -635,6 +672,7 @@ const LOKAL: TypeSchema = {
     },
     {
       title: "Ekspozycja i handel",
+      icon: "handel",
       fields: [
         n("witryna_szerokosc_m", "Szerokość witryny", { unit: "m", placeholder: "6" }),
         n("witryny_liczba", "Liczba witryn"),
@@ -651,6 +689,7 @@ const LOKAL: TypeSchema = {
     },
     {
       title: "Parking i dostawy",
+      icon: "parking",
       fields: [
         s("parking_rodzaj", "Parking", PARKING),
         n("parking_liczba", "Liczba miejsc", { placeholder: "4" }),
@@ -664,6 +703,7 @@ const LOKAL: TypeSchema = {
     sekcjaMedia(),
     {
       title: "Koszty i opłaty",
+      icon: "koszty",
       fields: [
         n("oplata_eksploatacyjna", "Opłata eksploatacyjna", { unit: "zł/m²/mc", placeholder: "18" }),
         n("admin_fee_pln", "Czynsz administracyjny", { unit: "zł/mc", column: true }),
@@ -691,6 +731,7 @@ const MAGAZYN: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena", { unit: "zł", column: true }),
@@ -706,6 +747,7 @@ const MAGAZYN: TypeSchema = {
     },
     {
       title: "Parametry techniczne",
+      icon: "technika",
       open: true,
       fields: [
         n("wysokosc_w_swietle_m", "Wysokość w świetle", { unit: "m", placeholder: "10" }),
@@ -723,6 +765,7 @@ const MAGAZYN: TypeSchema = {
     },
     {
       title: "Bramy, doki i plac",
+      icon: "logistyka",
       open: true,
       fields: [
         n("bramy_liczba", "Liczba bram wjazdowych", { placeholder: "4" }),
@@ -739,6 +782,7 @@ const MAGAZYN: TypeSchema = {
     },
     {
       title: "Instalacje",
+      icon: "instalacje",
       fields: [
         s("ogrzewanie_hali", "Ogrzewanie hali", ["Nagrzewnice gazowe", "Nagrzewnice wodne", "Promienniki", "Podłogowe", "Pompa ciepła", "Brak"]),
         n("temperatura_utrzymywana", "Utrzymywana temperatura", { unit: "°C", placeholder: "16" }),
@@ -755,6 +799,7 @@ const MAGAZYN: TypeSchema = {
     },
     {
       title: "Dojazd i lokalizacja",
+      icon: "dojazd",
       fields: [
         n("odleglosc_autostrada_km", "Odległość od autostrady lub S", { unit: "km", placeholder: "3" }),
         n("odleglosc_dk_km", "Odległość od drogi krajowej", { unit: "km" }),
@@ -768,6 +813,7 @@ const MAGAZYN: TypeSchema = {
     sekcjaMedia(true),
     {
       title: "Koszty i opłaty",
+      icon: "koszty",
       fields: [
         n("oplata_eksploatacyjna", "Opłata eksploatacyjna", { unit: "zł/m²/mc", placeholder: "4" }),
         n("koszty_media_pln", "Media", { unit: "zł/mc" }),
@@ -791,6 +837,7 @@ const OBIEKT: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena", { unit: "zł", column: true }),
@@ -804,6 +851,7 @@ const OBIEKT: TypeSchema = {
     },
     {
       title: "Rodzaj obiektu",
+      icon: "przeznaczenie",
       open: true,
       fields: [
         s("rodzaj_obiektu", "Rodzaj obiektu", [
@@ -822,6 +870,7 @@ const OBIEKT: TypeSchema = {
     },
     {
       title: "Obiekt noclegowy i gastronomiczny",
+      icon: "noclegi",
       hint: "Uzupełnij, jeśli obiekt przyjmuje gości.",
       fields: [
         n("pokoi_liczba", "Liczba pokoi", { placeholder: "24" }),
@@ -841,6 +890,7 @@ const OBIEKT: TypeSchema = {
     },
     {
       title: "Stan i konstrukcja",
+      icon: "zabudowa",
       fields: [
         s("stan_budynku", "Stan budynku", STAN_BUD),
         s("condition_std", "Stan wykończenia", ["Do wprowadzenia", "Wysoki standard", "Po remoncie", "Do odświeżenia", "Do remontu", "Stan surowy", "W budowie"], { column: true }),
@@ -853,6 +903,7 @@ const OBIEKT: TypeSchema = {
     },
     {
       title: "Ekonomia obiektu",
+      icon: "ekonomia",
       hint: "Kupujący komercję liczy zwrot, nie metry. Te liczby najbardziej przyspieszają decyzję.",
       fields: [
         n("przychod_rok_pln", "Przychód roczny", { unit: "zł" }),
@@ -883,6 +934,7 @@ const POKOJ: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena najmu", { unit: "zł/mc", column: true, placeholder: "1400" }),
@@ -894,6 +946,7 @@ const POKOJ: TypeSchema = {
     },
     {
       title: "Mieszkanie, w którym jest pokój",
+      icon: "pokoje",
       open: true,
       fields: [
         area("pow_mieszkania_m2", "Powierzchnia całego mieszkania", { placeholder: "62" }),
@@ -907,6 +960,7 @@ const POKOJ: TypeSchema = {
     },
     {
       title: "Wyposażenie pokoju",
+      icon: "pokoje",
       open: true,
       fields: [
         m("pokoj_wyposazenie", "W pokoju", [
@@ -923,6 +977,7 @@ const POKOJ: TypeSchema = {
     },
     {
       title: "Współlokatorzy",
+      icon: "ludzie",
       fields: [
         n("wspollokatorzy_liczba", "Liczba współlokatorów", { placeholder: "2" }),
         s("wspollokatorzy_plec", "Płeć współlokatorów", ["Mieszana", "Kobiety", "Mężczyźni", "Nikt jeszcze nie mieszka"]),
@@ -933,6 +988,7 @@ const POKOJ: TypeSchema = {
     },
     {
       title: "Warunki najmu",
+      icon: "najem",
       open: true,
       fields: [
         d("available_from", "Dostępne od", { column: true }),
@@ -950,6 +1006,7 @@ const POKOJ: TypeSchema = {
     },
     {
       title: "Okolica",
+      icon: "otoczenie",
       fields: [
         m("otoczenie", "W pobliżu", [...OTOCZENIE]),
         t("uczelnia", "Uczelnia w pobliżu", { placeholder: "AGH - 10 min tramwajem" }),
@@ -967,6 +1024,7 @@ const INWESTYCJA: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         t("nazwa_inwestycji", "Nazwa inwestycji", { placeholder: "Osiedle Zielone Tarasy", wide: true }),
@@ -983,6 +1041,7 @@ const INWESTYCJA: TypeSchema = {
     },
     {
       title: "Oferta lokali",
+      icon: "pokoje",
       open: true,
       fields: [
         area("area", "Metraż od", { column: true, placeholder: "32" }),
@@ -997,6 +1056,7 @@ const INWESTYCJA: TypeSchema = {
     },
     {
       title: "Terminy i etap",
+      icon: "terminy",
       open: true,
       fields: [
         s("etap_realizacji", "Etap realizacji", ["Planowana", "W przygotowaniu", "W budowie", "Na ukończeniu", "Gotowa do odbioru", "Zakończona"]),
@@ -1010,6 +1070,7 @@ const INWESTYCJA: TypeSchema = {
     },
     {
       title: "Osiedle i budynek",
+      icon: "budynek",
       fields: [
         s("winda", "Winda", ["Tak", "Nie", "Dwie i więcej"]),
         n("garaz_miejsca", "Miejsca w garażu podziemnym", { placeholder: "140" }),
@@ -1028,6 +1089,7 @@ const INWESTYCJA: TypeSchema = {
     },
     {
       title: "Finansowanie i zakup",
+      icon: "koszty",
       fields: [
         n("wklad_wlasny_proc", "Wymagany wkład własny", { unit: "%", placeholder: "10" }),
         t("harmonogram_plat", "Harmonogram płatności", { placeholder: "20 / 30 / 30 / 20", wide: true }),
@@ -1043,6 +1105,7 @@ const INWESTYCJA: TypeSchema = {
     sekcjaOtoczenie(),
     {
       title: "Stan prawny",
+      icon: "prawne",
       fields: [
         s("ownership", "Forma własności", ["Pełna własność (KW)", "Użytkowanie wieczyste", "Własność z udziałem w gruncie"], { column: true }),
         s("market", "Rynek", ["Pierwotny", "Wtórny"], { column: true }),
@@ -1061,6 +1124,7 @@ const BUDYNEK: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena", { unit: "zł", column: true }),
@@ -1075,6 +1139,7 @@ const BUDYNEK: TypeSchema = {
     },
     {
       title: "Rodzaj budynku",
+      icon: "budynek",
       open: true,
       fields: [
         s("building_type", "Rodzaj budynku", [
@@ -1088,6 +1153,7 @@ const BUDYNEK: TypeSchema = {
     },
     {
       title: "Struktura lokali",
+      icon: "pokoje",
       open: true,
       fields: [
         n("mieszkan_liczba", "Liczba mieszkań", { placeholder: "10" }),
@@ -1104,6 +1170,7 @@ const BUDYNEK: TypeSchema = {
     },
     {
       title: "Stan i konstrukcja",
+      icon: "zabudowa",
       fields: [
         s("stan_budynku", "Stan budynku", STAN_BUD),
         s("condition_std", "Stan wykończenia", ["Po generalnym remoncie", "Dobry", "Do odświeżenia", "Do remontu", "Do generalnego remontu", "Stan surowy"], { column: true }),
@@ -1119,6 +1186,7 @@ const BUDYNEK: TypeSchema = {
     },
     {
       title: "Potencjał",
+      icon: "potencjal",
       fields: [
         area("poddasze_do_adaptacji_m2", "Poddasze do adaptacji"),
         b("mozliwosc_nadbudowy", "Możliwość nadbudowy"),
@@ -1130,6 +1198,7 @@ const BUDYNEK: TypeSchema = {
     },
     {
       title: "Ekonomia budynku",
+      icon: "ekonomia",
       hint: "Budynek kupuje się pod zwrot. Te liczby sprzedają ofertę najszybciej.",
       fields: [
         n("przychod_rok_pln", "Przychód z najmu", { unit: "zł/rok" }),
@@ -1160,6 +1229,7 @@ const INNE: TypeSchema = {
   sections: [
     {
       title: "Podstawowe",
+      icon: "podstawy",
       open: true,
       fields: [
         n("price", "Cena", { unit: "zł", column: true }),
@@ -1174,6 +1244,7 @@ const INNE: TypeSchema = {
     },
     {
       title: "Stan i standard",
+      icon: "podstawy",
       fields: [
         s("condition_std", "Stan", ["Do wprowadzenia", "Dobry", "Do odświeżenia", "Do remontu", "Stan surowy", "W budowie"], { column: true }),
         s("heating", "Ogrzewanie", OGRZEWANIE, { column: true }),
@@ -1230,9 +1301,9 @@ export function describeDetails(
   type: PropertyType,
   dealKind: PropertyDealKind,
   details: Record<string, unknown> | null | undefined,
-): { title: string; items: { label: string; value: string; unit?: string }[] }[] {
+): { title: string; icon: SectionIcon; items: { label: string; value: string; unit?: string }[] }[] {
   if (!details) return [];
-  const out: { title: string; items: { label: string; value: string; unit?: string }[] }[] = [];
+  const out: { title: string; icon: SectionIcon; items: { label: string; value: string; unit?: string }[] }[] = [];
   for (const sec of sectionsFor(type, dealKind)) {
     const items: { label: string; value: string; unit?: string }[] = [];
     for (const f of sec.fields) {
@@ -1248,7 +1319,7 @@ export function describeDetails(
         items.push({ label: f.label, value: String(raw), unit: f.unit });
       }
     }
-    if (items.length) out.push({ title: sec.title, items });
+    if (items.length) out.push({ title: sec.title, icon: sec.icon, items });
   }
   return out;
 }

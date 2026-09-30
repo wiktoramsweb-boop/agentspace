@@ -1,6 +1,7 @@
 import { Card } from "../../components/ui";
 import { describeDetails } from "@/lib/property-fields";
 import type { Property } from "@/lib/types";
+import { SectionIcon, SECTION_TONE } from "../section-icon";
 
 /**
  * Pola zależne od typu nieruchomości na karcie oferty. Sekcje i etykiety bierzemy
@@ -29,19 +30,28 @@ export function DetailsCard({ property }: { property: Property }) {
             open={i < 2}
             className="group rounded-xl border border-slate-200 bg-slate-50/60"
           >
-            <summary className="flex cursor-pointer list-none items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-900">
+            <summary className="flex cursor-pointer list-none items-center gap-3 px-3.5 py-3 transition hover:bg-slate-100/70">
+              <span
+                className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${SECTION_TONE[g.icon]}`}
+              >
+                <SectionIcon name={g.icon} className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1 text-sm font-semibold tracking-[-0.01em] text-slate-900">
+                {g.title}
+              </span>
+              <span className="flex-shrink-0 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                {g.items.length}
+              </span>
               <svg
-                className="h-3.5 w-3.5 flex-shrink-0 text-slate-400 transition group-open:rotate-90"
+                className="h-3.5 w-3.5 flex-shrink-0 text-slate-400 transition group-open:rotate-180"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={2.4}
                 aria-hidden="true"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19 9-7 7-7-7" />
               </svg>
-              <span className="flex-1">{g.title}</span>
-              <span className="text-[11px] font-normal text-slate-400">{g.items.length}</span>
             </summary>
             <dl className="grid gap-x-6 gap-y-2.5 border-t border-slate-200 px-3.5 py-3 sm:grid-cols-2">
               {g.items.map((it) => (

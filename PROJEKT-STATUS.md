@@ -450,6 +450,27 @@ z kolumną bazy. Przy pierwszym uruchomieniu znalazł 10 realnych duplikatów
 (`droga_dojazdowa`, `vat`, `media_moc_kw`, `media_sila`) - uruchamiaj po każdej
 zmianie w słowniku.
 
+**Nagłówki sekcji: ikona w kafelku, podgląd zawartości.** Każda sekcja ma w
+słowniku pole `icon` (24 ikony, `app/app/nieruchomosci/section-icon.tsx`), kolor
+kafelka niesie znaczenie: pieniądze zielone, prawo fioletowe, technika
+bursztynowa, bezpieczeństwo różowe. Zwinięta sekcja pokazuje pierwsze pięć nazw
+pól, otwarta ile pól ma w środku. Świadomie SVG, nie emoji: emoji renderują się
+inaczej na każdym systemie.
+
+**Pułapka ciemnego motywu, zapamiętaj to.** Warstwa ciemnego motywu nadpisuje
+klasy po nazwie (`.bg-slate-50`, `.hover\:bg-slate-50`). Wariant zapisany
+inaczej, np. `group-open:bg-slate-50` albo `open:border-slate-300`, kompiluje
+się do **innego selektora i nie łapie się w tej warstwie**. Tak właśnie otwarty
+nagłówek sekcji dostał w ciemnym motywie prawie białe tło pod białym tekstem.
+Dodając nową klasę koloru z wariantem, którego jeszcze nie ma w `globals.css`,
+dopisz jej nadpisanie w sekcji ciemnego motywu.
+
+**I druga pułapka, tym razem w mierzeniu.** Tailwind podaje swoje kolory jako
+`lab()` / `oklch()`. Ani zwykły `match(/\d+/g)`, ani `canvas.fillStyle` ich nie
+czytają, więc audyt kontrastu potrafi pokazać 1,0:1 tam, gdzie naprawdę jest
+17:1. Zanim uwierzysz w zły wynik, wypisz surowe `getComputedStyle(...).color`:
+jeśli widzisz `lab(...)`, to błąd pomiaru, nie interfejsu.
+
 **Świadomie NIE zaglądaliśmy do ASARI.** To płatny produkt konkurencji i
 systematyczne przeglądanie jego formularzy pod odtworzenie w produkcie, który z
 nim konkuruje, łamie regulamin i psuje pozycję AgentSpace przy sprzedaży innym
