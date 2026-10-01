@@ -1,3 +1,4 @@
+import { cronUnauthorized } from "@/lib/cron-auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { sendAgencyMonthlyReport } from "@/lib/report";
 
@@ -6,16 +7,11 @@ export const maxDuration = 300;
 /**
  * Wysyła raport miesięczny do wszystkich właścicieli.
  * Uruchamiany przez Vercel Cron (patrz vercel.json).
- * Zabezpieczony CRON_SECRET (jeśli ustawiony w env).
+ * Zabezpieczony CRON_SECRET (bez niego odmawia, patrz lib/cron-auth.ts).
  */
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-  }
+  const denied = cronUnauthorized(request);
+  if (denied) return denied;
 
   const admin = createSupabaseAdmin();
   const { data: agencies } = await admin.from("agencies").select("id");

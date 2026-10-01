@@ -2,6 +2,7 @@
 
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { sendPushToAgency, sendPushToAgent } from "@/lib/push";
+import { hitLimit, visitorKey } from "@/lib/rate-limit";
 
 /**
  * Zgłoszenia z publicznej strony biura.
@@ -41,6 +42,15 @@ export async function submitSiteLead(formData: FormData): Promise<LeadResult> {
   if (name.length < 3) return { ok: false, error: "Podaj imię i nazwisko." };
   if (!phone && !email) return { ok: false, error: "Zostaw telefon albo e-mail, żebyśmy mogli odpowiedzieć." };
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: "Sprawdź adres e-mail." };
+
+  // Bot wypełnił ukryte pole: udajemy sukces, żeby nie uczył się omijać pułapki.
+  if (clean(formData.get("website"), 200)) return { ok: true };
+
+  // Każde zgłoszenie tworzy klienta, zadanie i powiadomienie dla całego biura,
+  // więc jeden adres może wysłać najwyżej kilka zgłoszeń na godzinę.
+  if (await hitLimit(`lead:ip:${await visitorKey()}`, 5, 3600)) {
+    return { ok: false, error: "Wysłano już kilka zgłoszeń. Spróbuj ponownie za godzinę albo zadzwoń do biura." };
+  }
 
   const admin = createSupabaseAdmin();
 

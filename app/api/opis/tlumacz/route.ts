@@ -1,3 +1,4 @@
+import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/auth";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 
@@ -16,6 +17,7 @@ Zasady:
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user) return Response.json({ error: "Brak dostępu." }, { status: 401 });
+  if (await aiLimitReached(user)) return aiLimitResponse();
 
   let tekst = "";
   try {

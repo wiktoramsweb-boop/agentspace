@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { hitLimit, visitorKey } from "@/lib/rate-limit";
 
 export type AuthResult = { error: string } | undefined;
 
@@ -24,6 +25,15 @@ export async function signUpOwner(
   if (!agencyName || agencyName.length < 2) return { error: "Podaj nazwę biura" };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Niepoprawny email" };
   if (password.length < 8) return { error: "Hasło min. 8 znaków" };
+
+  // Boty wypełniają ukryte pole. Udajemy błąd ogólny, żeby nie podpowiadać.
+  if (String(formData.get("website") ?? "")) return { error: "Nie udało się utworzyć konta. Spróbuj ponownie." };
+
+  // Każde konto dostaje AI na koszt operatora, więc ograniczamy zakładanie
+  // biur z jednego adresu (np. bot w pętli).
+  if (await hitLimit(`signup:ip:${await visitorKey()}`, 3, 24 * 3600)) {
+    return { error: "Zbyt wiele rejestracji z tego adresu. Spróbuj jutro albo napisz do nas." };
+  }
 
   const admin = createSupabaseAdmin();
 
@@ -91,6 +101,11 @@ export async function signIn(
   const password = String(formData.get("password") ?? "");
 
   if (!email || !password) return { error: "Podaj email i hasło" };
+
+  // Ochrona przed zgadywaniem haseł: 20 prób na godzinę na adres e-mail.
+  if (await hitLimit(`login:${email}`, 20, 3600)) {
+    return { error: "Zbyt wiele prób logowania. Odczekaj chwilę albo zresetuj hasło." };
+  }
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });

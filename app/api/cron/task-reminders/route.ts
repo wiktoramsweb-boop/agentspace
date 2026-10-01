@@ -1,3 +1,4 @@
+import { cronUnauthorized } from "@/lib/cron-auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { sendPushToAgent } from "@/lib/push";
 import { APP_TZ } from "@/lib/datetime";
@@ -38,11 +39,8 @@ function timeLabel(iso: string): string {
 }
 
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) return new Response("Unauthorized", { status: 401 });
-  }
+  const denied = cronUnauthorized(request);
+  if (denied) return denied;
 
   const admin = createSupabaseAdmin();
   const now = Date.now();

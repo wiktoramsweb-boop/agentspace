@@ -1,3 +1,4 @@
+import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/auth";
 import {
   getClientsNeedingContact,
@@ -21,6 +22,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export async function POST() {
   const user = await getCurrentUser();
   if (!user) return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
+  if (await aiLimitReached(user)) return aiLimitResponse();
 
   try {
     const [clients, tasks, deals, commission, agentStats] = await Promise.all([

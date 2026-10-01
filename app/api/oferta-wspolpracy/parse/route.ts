@@ -1,3 +1,4 @@
+import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/auth";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 
@@ -14,6 +15,7 @@ Wywołuj narzędzie tylko z polami, które faktycznie padły; resztę zostaw jak
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
+  if (await aiLimitReached(user)) return aiLimitResponse();
 
   let body: { transcript?: string };
   try {
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
   } catch {
     return new Response(JSON.stringify({ error: "Złe dane" }), { status: 400 });
   }
-  const transcript = (body.transcript ?? "").trim();
+  const transcript = (body.transcript ?? "").trim().slice(0, 4000);
   if (!transcript) return new Response(JSON.stringify({ error: "Brak tekstu" }), { status: 400 });
 
   let anthropic;

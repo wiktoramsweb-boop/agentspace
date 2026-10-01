@@ -1,5 +1,6 @@
 "use server";
 
+import { escapeHtml } from "@/lib/html";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Resend } from "resend";
@@ -112,8 +113,8 @@ export async function inviteAgent(
           <div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
             <h2 style="color:#10b981;">Zaproszenie do zespołu</h2>
             <p style="color:#3f3f46;font-size:15px;line-height:1.6;">
-              <strong>${owner.full_name ?? "Właściciel biura"}</strong> zaprasza Cię do
-              <strong>${owner.agency?.name ?? "biura"}</strong> w AgentSpace - platformie do
+              <strong>${escapeHtml(owner.full_name ?? "Właściciel biura")}</strong> zaprasza Cię do
+              <strong>${escapeHtml(owner.agency?.name ?? "biura")}</strong> w AgentSpace - platformie do
               treningu sprzedaży nieruchomości z AI, w roli <strong>${ROLE_LABELS[role]}</strong>.
             </p>
             <p style="margin:28px 0;">

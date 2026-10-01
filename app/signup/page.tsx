@@ -23,6 +23,8 @@ export default function SignupPage() {
       }
     >
       <form action={formAction} className="space-y-4">
+        {/* Pułapka na boty: człowiek tego pola nie widzi i go nie wypełni. */}
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
         <FormField label="Imię i nazwisko" name="fullName" autoComplete="name" placeholder="Jan Kowalski" />
         <FormField label="Nazwa biura" name="agencyName" placeholder="Np. Spectra Nieruchomości" />
         <FormField label="Email" name="email" type="email" autoComplete="email" placeholder="ty@biuro.pl" />

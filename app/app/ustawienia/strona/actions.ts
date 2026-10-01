@@ -1,5 +1,6 @@
 "use server";
 
+import { escapeHtml } from "@/lib/html";
 import { revalidatePath } from "next/cache";
 import { requireOwner, requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
@@ -304,9 +305,9 @@ export async function requestSiteAddon(): Promise<SiteResult> {
         from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
         to: process.env.NOTIFICATION_EMAIL ?? "wiktor.amsweb@gmail.com",
         subject: `Zapytanie o stronę www: ${owner.agency?.name ?? "biuro"}`,
-        html: `<p><strong>${owner.agency?.name ?? "Biuro"}</strong> chce stronę internetową.</p>
-               <p>Osoba: ${owner.full_name ?? "-"} (${owner.email ?? "-"})<br>
-               Telefon: ${owner.phone ?? "-"}</p>`,
+        html: `<p><strong>${escapeHtml(owner.agency?.name ?? "Biuro")}</strong> chce stronę internetową.</p>
+               <p>Osoba: ${escapeHtml(owner.full_name ?? "-")} (${escapeHtml(owner.email ?? "-")})<br>
+               Telefon: ${escapeHtml(owner.phone ?? "-")}</p>`,
       });
     } catch {
       // Brak maila nie może zablokować zgłoszenia: zapis w bazie już jest.

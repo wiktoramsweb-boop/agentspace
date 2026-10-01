@@ -177,6 +177,7 @@ export function SessionChat({
           )}
           <input
             value={input}
+            maxLength={2000}
             onChange={(e) => setInput(e.target.value)}
             placeholder={listening ? "Mów..." : "Napisz albo powiedz co mówisz do klienta..."}
             disabled={streaming}

@@ -1,3 +1,5 @@
+import { hitLimit } from "@/lib/rate-limit";
+import { escapeHtml } from "@/lib/html";
 import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { Resend } from "resend";
@@ -42,6 +44,11 @@ export async function POST(request: Request) {
   // Honeypot - jeśli wypełnione, udajemy sukces bez zapisu
   if (body.website && body.website.length > 0) {
     return NextResponse.json({ ok: true });
+  }
+
+  // Ochrona przed zalewem wiadomości z jednego adresu.
+  if (await hitLimit(`waitlist:ip:${hashIp(getClientIp(request))}`, 5, 3600)) {
+    return NextResponse.json({ error: "Za dużo wiadomości. Spróbuj ponownie za godzinę." }, { status: 429 });
   }
 
   const email = (body.email ?? "").toString().trim().toLowerCase();
@@ -119,10 +126,10 @@ export async function POST(request: Request) {
             <p style="color: #52525b; font-size: 14px; margin: 0 0 24px;">Ktoś właśnie zapisał się przez formularz na stronie głównej.</p>
 
             <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-              <tr><td style="padding: 8px 0; color: #71717a;">Email:</td><td style="padding: 8px 0;"><a href="mailto:${email}">${email}</a></td></tr>
-              <tr><td style="padding: 8px 0; color: #71717a;">Biuro:</td><td style="padding: 8px 0; font-weight: 600;">${agencyName}</td></tr>
-              <tr><td style="padding: 8px 0; color: #71717a;">Zespół:</td><td style="padding: 8px 0;">${teamSize} agentów</td></tr>
-              ${phone ? `<tr><td style="padding: 8px 0; color: #71717a;">Telefon:</td><td style="padding: 8px 0;"><a href="tel:${phone}">${phone}</a></td></tr>` : ""}
+              <tr><td style="padding: 8px 0; color: #71717a;">Email:</td><td style="padding: 8px 0;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
+              <tr><td style="padding: 8px 0; color: #71717a;">Biuro:</td><td style="padding: 8px 0; font-weight: 600;">${escapeHtml(agencyName)}</td></tr>
+              <tr><td style="padding: 8px 0; color: #71717a;">Zespół:</td><td style="padding: 8px 0;">${escapeHtml(teamSize)} agentów</td></tr>
+              ${phone ? `<tr><td style="padding: 8px 0; color: #71717a;">Telefon:</td><td style="padding: 8px 0;"><a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a></td></tr>` : ""}
             </table>
 
             <p style="color: #71717a; font-size: 12px; margin-top: 24px;">Sprawdź wszystkie zapisy w panelu Supabase.</p>

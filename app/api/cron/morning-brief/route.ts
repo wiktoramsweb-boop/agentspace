@@ -1,3 +1,4 @@
+import { cronUnauthorized } from "@/lib/cron-auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import {
   getGoal,
@@ -15,13 +16,8 @@ export const maxDuration = 300;
  * Uruchamiany przez Vercel Cron (patrz vercel.json). Zabezpieczony CRON_SECRET.
  */
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-  }
+  const denied = cronUnauthorized(request);
+  if (denied) return denied;
 
   const admin = createSupabaseAdmin();
   const { data: subs } = await admin.from("push_subscriptions").select("agent_id");

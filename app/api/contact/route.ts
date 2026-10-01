@@ -1,3 +1,5 @@
+import { hitLimit } from "@/lib/rate-limit";
+import { escapeHtml } from "@/lib/html";
 import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { Resend } from "resend";
@@ -40,6 +42,11 @@ export async function POST(request: Request) {
   // Honeypot
   if (body.website && body.website.length > 0) {
     return NextResponse.json({ ok: true });
+  }
+
+  // Ochrona przed zalewem wiadomości z jednego adresu.
+  if (await hitLimit(`contact:ip:${hashIp(getClientIp(request))}`, 5, 3600)) {
+    return NextResponse.json({ error: "Za dużo wiadomości. Spróbuj ponownie za godzinę." }, { status: 429 });
   }
 
   const name = (body.name ?? "").toString().trim();
@@ -115,16 +122,16 @@ export async function POST(request: Request) {
             <h2 style="color: #10b981; margin: 0 0 16px;">Nowa wiadomość przez formularz kontaktowy</h2>
 
             <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 24px;">
-              <tr><td style="padding: 8px 0; color: #71717a;">Od:</td><td style="padding: 8px 0; font-weight: 600;">${name}</td></tr>
-              <tr><td style="padding: 8px 0; color: #71717a;">Email:</td><td style="padding: 8px 0;"><a href="mailto:${email}">${email}</a></td></tr>
-              ${agency ? `<tr><td style="padding: 8px 0; color: #71717a;">Biuro:</td><td style="padding: 8px 0;">${agency}</td></tr>` : ""}
-              <tr><td style="padding: 8px 0; color: #71717a;">Temat:</td><td style="padding: 8px 0;">${topic}</td></tr>
-              <tr><td style="padding: 8px 0; color: #71717a;">Skąd:</td><td style="padding: 8px 0;">${zrodlo ?? "nieznane"}</td></tr>
+              <tr><td style="padding: 8px 0; color: #71717a;">Od:</td><td style="padding: 8px 0; font-weight: 600;">${escapeHtml(name)}</td></tr>
+              <tr><td style="padding: 8px 0; color: #71717a;">Email:</td><td style="padding: 8px 0;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
+              ${agency ? `<tr><td style="padding: 8px 0; color: #71717a;">Biuro:</td><td style="padding: 8px 0;">${escapeHtml(agency)}</td></tr>` : ""}
+              <tr><td style="padding: 8px 0; color: #71717a;">Temat:</td><td style="padding: 8px 0;">${escapeHtml(topic)}</td></tr>
+              <tr><td style="padding: 8px 0; color: #71717a;">Skąd:</td><td style="padding: 8px 0;">${escapeHtml(zrodlo ?? "nieznane")}</td></tr>
             </table>
 
-            <div style="background: #f4f4f5; border-radius: 8px; padding: 16px; white-space: pre-wrap; color: #18181b; font-size: 14px; line-height: 1.6;">${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+            <div style="background: #f4f4f5; border-radius: 8px; padding: 16px; white-space: pre-wrap; color: #18181b; font-size: 14px; line-height: 1.6;">${escapeHtml(message)}</div>
 
-            <p style="color: #71717a; font-size: 12px; margin-top: 24px;">Możesz odpowiedzieć bezpośrednio na ten email - pójdzie do ${email}.</p>
+            <p style="color: #71717a; font-size: 12px; margin-top: 24px;">Możesz odpowiedzieć bezpośrednio na ten email - pójdzie do ${escapeHtml(email)}.</p>
           </div>
         `,
       });

@@ -58,6 +58,15 @@ export function SiteLeadForm({
         });
       }}
     >
+      {/* Pułapka na boty: niewidoczne pole, którego człowiek nie wypełni. */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+      />
       <div className="wzf__row">
         <label>
           Imię i nazwisko

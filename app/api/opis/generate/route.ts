@@ -1,3 +1,4 @@
+import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/auth";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 import { standardClosing, type OpisInput } from "@/lib/opis";
@@ -82,12 +83,16 @@ function factsFromInput(i: OpisInput): string {
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
+  if (await aiLimitReached(user)) return aiLimitResponse();
 
   let input: OpisInput;
   try {
     input = (await request.json()) as OpisInput;
   } catch {
     return new Response(JSON.stringify({ error: "Złe dane" }), { status: 400 });
+  }
+  if (JSON.stringify(input).length > 20000) {
+    return new Response(JSON.stringify({ error: "Za dużo tekstu w formularzu." }), { status: 400 });
   }
 
   let anthropic;

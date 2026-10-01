@@ -1,3 +1,4 @@
+import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/auth";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 
@@ -16,6 +17,7 @@ Zawsze wywołaj narzędzie dodaj_zapis.`;
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
+  if (await aiLimitReached(user)) return aiLimitResponse();
 
   let body: { request?: string; mode?: string; depositType?: string };
   try {
@@ -23,7 +25,7 @@ export async function POST(request: Request) {
   } catch {
     return new Response(JSON.stringify({ error: "Złe dane" }), { status: 400 });
   }
-  const prompt = (body.request ?? "").trim();
+  const prompt = (body.request ?? "").trim().slice(0, 2000);
   if (!prompt) return new Response(JSON.stringify({ error: "Napisz, co dopisać." }), { status: 400 });
 
   let anthropic;

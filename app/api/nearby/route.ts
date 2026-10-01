@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { hitLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 30;
 
@@ -71,6 +73,12 @@ function labelFor(t: Record<string, string>): string {
 }
 
 export async function GET(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Brak dostępu" }, { status: 401 });
+  if (await hitLimit(`nearby:${user.id}`, 100, 3600)) {
+    return NextResponse.json({ error: "Za dużo zapytań, spróbuj za chwilę" }, { status: 429 });
+  }
+
   const { searchParams } = new URL(request.url);
   const lat = parseFloat(searchParams.get("lat") ?? "");
   const lng = parseFloat(searchParams.get("lng") ?? "");

@@ -1,3 +1,4 @@
+import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/auth";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 
@@ -21,6 +22,7 @@ const SYSTEMS: Record<string, string> = {
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
+  if (await aiLimitReached(user)) return aiLimitResponse();
 
   let body: { kind?: string; context?: string; clientName?: string };
   try {
@@ -30,7 +32,7 @@ export async function POST(request: Request) {
   }
 
   const kind = body.kind ?? "custom";
-  const context = (body.context ?? "").trim();
+  const context = (body.context ?? "").trim().slice(0, 4000);
   const system = (SYSTEMS[kind] ?? SYSTEMS.custom) + NO_DASH_RULE;
 
   if (!context && kind !== "followup") {
@@ -50,7 +52,7 @@ export async function POST(request: Request) {
   try {
     const userMsg =
       kind === "followup"
-        ? `Napisz wiadomość follow-up do klienta${body.clientName ? ` (${body.clientName})` : ""}. Kontekst: ${context || "standardowy follow-up po kontakcie, podtrzymanie relacji"}.`
+        ? `Napisz wiadomość follow-up do klienta${body.clientName ? ` (${String(body.clientName).slice(0, 120)})` : ""}. Kontekst: ${context || "standardowy follow-up po kontakcie, podtrzymanie relacji"}.`
         : context;
 
     const response = await anthropic.messages.create({

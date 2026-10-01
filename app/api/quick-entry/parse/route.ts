@@ -1,3 +1,4 @@
+import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/auth";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 
@@ -20,6 +21,7 @@ Zawsze wywołaj narzędzie zapisz_wpis z wszystkimi polami.`;
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
+  if (await aiLimitReached(user)) return aiLimitResponse();
 
   let body: { transcript?: string };
   try {
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
   } catch {
     return new Response(JSON.stringify({ error: "Złe dane" }), { status: 400 });
   }
-  const transcript = (body.transcript ?? "").trim();
+  const transcript = (body.transcript ?? "").trim().slice(0, 6000);
   if (!transcript) return new Response(JSON.stringify({ error: "Brak tekstu" }), { status: 400 });
 
   let anthropic;

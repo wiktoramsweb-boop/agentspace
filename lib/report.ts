@@ -1,3 +1,4 @@
+import { escapeHtml } from "@/lib/html";
 import { Resend } from "resend";
 import { createSupabaseAdmin } from "./supabase/admin";
 import {
@@ -55,7 +56,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
 
   const html = `
     <div style="font-family:-apple-system,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#18181b;">
-      <h1 style="color:#10b981;font-size:22px;margin:0 0 4px;">Raport miesięczny - ${agency.name}</h1>
+      <h1 style="color:#10b981;font-size:22px;margin:0 0 4px;">Raport miesięczny - ${escapeHtml(agency.name)}</h1>
       <p style="color:#71717a;margin:0 0 24px;">${monthName}</p>
 
       <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
@@ -83,12 +84,12 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
         Do poprawy: <strong>${weakest.label}</strong> (${weakest.avg}/10) - rozważ wspólne szkolenie.
       </p>` : ""}
 
-      ${topAgent ? `<p style="font-size:15px;">Najlepszy agent: <strong>${topAgent.full_name ?? topAgent.email}</strong> (${topAgent.avgScore}/10)</p>` : ""}
+      ${topAgent ? `<p style="font-size:15px;">Najlepszy agent: <strong>${escapeHtml(topAgent.full_name ?? topAgent.email)}</strong> (${topAgent.avgScore}/10)</p>` : ""}
 
       ${notTraining.length > 0 ? `
       <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin:16px 0;">
         <strong style="color:#b45309;">⚠ Nie trenowali w tym tygodniu:</strong>
-        <span style="color:#78350f;">${notTraining.map((a) => a.full_name ?? a.email).join(", ")}</span>
+        <span style="color:#78350f;">${escapeHtml(notTraining.map((a) => a.full_name ?? a.email).join(", "))}</span>
       </div>` : ""}
 
       <p style="margin-top:28px;">
