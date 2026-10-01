@@ -10,6 +10,8 @@ type Payload = {
   topic?: string;
   message?: string;
   website?: string; // honeypot
+  /** Skąd przyszedł odwiedzający: referrer, UTM-y, pierwsza podstrona. */
+  zrodlo?: string;
 };
 
 function hashIp(ip: string): string {
@@ -64,6 +66,7 @@ export async function POST(request: Request) {
 
   const ipHash = hashIp(getClientIp(request));
   const userAgent = request.headers.get("user-agent") ?? null;
+  const zrodlo = String(body.zrodlo ?? "").slice(0, 300) || null;
 
   let supabase;
   try {
@@ -84,6 +87,7 @@ export async function POST(request: Request) {
     message,
     user_agent: userAgent,
     ip_hash: ipHash,
+    zrodlo,
   });
 
   if (dbError) {
@@ -115,6 +119,7 @@ export async function POST(request: Request) {
               <tr><td style="padding: 8px 0; color: #71717a;">Email:</td><td style="padding: 8px 0;"><a href="mailto:${email}">${email}</a></td></tr>
               ${agency ? `<tr><td style="padding: 8px 0; color: #71717a;">Biuro:</td><td style="padding: 8px 0;">${agency}</td></tr>` : ""}
               <tr><td style="padding: 8px 0; color: #71717a;">Temat:</td><td style="padding: 8px 0;">${topic}</td></tr>
+              <tr><td style="padding: 8px 0; color: #71717a;">Skąd:</td><td style="padding: 8px 0;">${zrodlo ?? "nieznane"}</td></tr>
             </table>
 
             <div style="background: #f4f4f5; border-radius: 8px; padding: 16px; white-space: pre-wrap; color: #18181b; font-size: 14px; line-height: 1.6;">${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>

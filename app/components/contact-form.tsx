@@ -2,7 +2,8 @@
 
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { odczytajZrodlo, opiszZrodlo, zapamietajZrodlo } from "@/lib/skad-przyszedl";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -12,6 +13,10 @@ export function ContactForm({ lang = "pl" }: { lang?: string }) {
   const t = getDict(locale).form;
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
+
+  // Źródło zapamiętujemy przy wejściu, bo zanim ktoś dojdzie do formularza,
+  // document.referrer pokazuje już tylko naszą własną stronę.
+  useEffect(zapamietajZrodlo, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,6 +31,7 @@ export function ContactForm({ lang = "pl" }: { lang?: string }) {
       topic: formData.get("topic"),
       message: formData.get("message"),
       website: formData.get("website"), // honeypot
+      zrodlo: opiszZrodlo(odczytajZrodlo()),
     };
 
     try {
