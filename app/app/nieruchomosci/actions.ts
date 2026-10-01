@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PROPERTY_TYPES, type PropertyDealKind, type PropertyStatus, type PropertyType } from "@/lib/types";
-import { DETAIL_PREFIX, detailFieldsFor } from "@/lib/property-fields";
+import { DETAIL_PREFIX, detailFieldsFor, PIETRO_NA_LICZBE } from "@/lib/property-fields";
 import { sanitizePhotos } from "@/lib/property-photos";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { PHOTO_BUCKET } from "@/lib/storage";
@@ -14,6 +14,18 @@ import { removeFiles } from "@/lib/storage-server";
 function intOrNull(v: FormDataEntryValue | null): number | null {
   const n = parseInt(String(v ?? "").replace(/\s/g, ""), 10);
   return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Piętro wybiera się z listy w brzmieniu portali („Suterena", „Parter", „> 10",
+ * „Poddasze"), ale w bazie trzymamy liczbę, bo po piętrze filtrujemy listy
+ * i liczy je wyceniarka. Tutaj tłumaczymy jedno na drugie.
+ */
+function pietroOrNull(v: FormDataEntryValue | null): number | null {
+  const raw = String(v ?? "").trim();
+  if (!raw) return null;
+  if (raw in PIETRO_NA_LICZBE) return PIETRO_NA_LICZBE[raw];
+  return intOrNull(raw);
 }
 
 function floatOrNull(v: FormDataEntryValue | null): number | null {
@@ -34,8 +46,9 @@ function propertyFromForm(formData: FormData) {
     price_pln: intOrNull(formData.get("price")),
     area_m2: floatOrNull(formData.get("area")),
     rooms: intOrNull(formData.get("rooms")),
-    floor: intOrNull(formData.get("floor")),
-    description: String(formData.get("description") ?? "").trim() || null,
+    floor: pietroOrNull(formData.get("floor")),
+    // 8500 znaków to limit, który przyjmują portale.
+    description: String(formData.get("description") ?? "").trim().slice(0, 8500) || null,
     owner_client_id: String(formData.get("owner_client_id") ?? "") || null,
   };
 }
@@ -102,16 +115,37 @@ function detailsFromForm(formData: FormData, type: PropertyType, dealKind: Prope
     }
     out[f.key] = raw.slice(0, 500);
   }
+  // Opis po angielsku nie jest polem ze słownika (ma własne miejsce w kroku
+  // Opis), ale zapisujemy go razem z resztą pól zależnych od typu.
+  const en = String(formData.get("description_en") ?? "").trim();
+  if (en) out.opis_en = en.slice(0, 8500);
   return out;
 }
 
-/** Nazwa oferty, gdy agent jej nie wpisał: typ + miasto + metraż (jak w ASARI). */
-function buildTitle(f: ReturnType<typeof propertyFromForm>): string {
+/**
+ * Nazwa oferty: miasto i ulica. Agent jej nie wpisuje, bo przy ręcznym
+ * nazywaniu lista ofert w biurze robi się nieczytelna („mieszkanie Nowak").
+ * Ulicę bierzemy z podpowiedzi adresu, a gdy agent wpisał adres z palca -
+ * z pierwszych członów tego, co wpisał.
+ */
+function buildTitle(f: ReturnType<typeof propertyFromForm>, street: string): string {
+  const ulica = street || ulicaZAdresu(f.address, f.city);
+  const gdzie = [f.city, ulica].filter(Boolean).join(", ");
+  if (gdzie) return gdzie;
   const typeLabel =
     PROPERTY_TYPES.find((t) => t.value === f.property_type)?.label ?? "Nieruchomość";
-  const where = f.city || f.address || "";
-  const size = f.area_m2 ? `${f.area_m2} m2` : "";
-  return [typeLabel, where, size].filter(Boolean).join(", ");
+  return [typeLabel, f.area_m2 ? `${f.area_m2} m2` : ""].filter(Boolean).join(", ");
+}
+
+/** Z „327, Królowej Jadwigi, Chełm, Kraków, ..." robi „Królowej Jadwigi 327". */
+function ulicaZAdresu(address: string | null, city: string | null): string {
+  if (!address) return "";
+  const czesci = address.split(",").map((c) => c.trim()).filter(Boolean);
+  if (!czesci.length) return "";
+  const bezMiasta = czesci.filter((c) => !city || c.toLowerCase() !== city.toLowerCase());
+  const numer = /^\d+[A-Za-z]?$/.test(bezMiasta[0] ?? "") ? bezMiasta.shift() : null;
+  const nazwa = bezMiasta[0] ?? "";
+  return [nazwa, numer].filter(Boolean).join(" ");
 }
 
 /** Człon URL pod stronę www: mieszkanie-sprzedaz-47m2-krakow-soltysowska. */
@@ -185,10 +219,9 @@ async function saveDetails(
 export async function createProperty(formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
   const fields = propertyFromForm(formData);
-  // Kreator nie wymaga nazwy: jeśli agent jej nie wpisał, układamy ją z danych.
-  if (!fields.title) fields.title = buildTitle(fields);
+  fields.title = buildTitle(fields, String(formData.get("street") ?? "").trim());
   if (!fields.title) {
-    return { ok: false, error: "Uzupełnij nazwę oferty albo typ, miasto i metraż." };
+    return { ok: false, error: "Uzupełnij adres oferty." };
   }
 
   const admin = createSupabaseAdmin();
@@ -266,9 +299,9 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
   const user = await requireUser();
   if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
   const fields = propertyFromForm(formData);
-  if (!fields.title) fields.title = buildTitle(fields);
+  fields.title = buildTitle(fields, String(formData.get("street") ?? "").trim());
   if (!fields.title) {
-    return { ok: false, error: "Uzupełnij nazwę oferty albo typ, miasto i metraż." };
+    return { ok: false, error: "Uzupełnij adres oferty." };
   }
 
   const admin = createSupabaseAdmin();

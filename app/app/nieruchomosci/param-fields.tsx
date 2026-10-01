@@ -2,6 +2,7 @@
 
 import {
   DETAIL_PREFIX,
+  pietroEtykieta,
   sectionsFor,
   type PropertyField,
   type PropertySection,
@@ -32,7 +33,11 @@ export function ParamFields({
   const details = (property?.details ?? {}) as Record<string, unknown>;
 
   function valueOf(f: PropertyField): unknown {
-    return f.column ? cols[f.key] : details[f.key];
+    if (!f.column) return details[f.key];
+    // Piętro trzymamy w bazie jako liczbę, a wybiera się je z listy etykiet
+    // („Parter", „> 10"), więc przy wczytywaniu tłumaczymy je z powrotem.
+    if (f.key === "floor") return pietroEtykieta(cols.floor as number | null);
+    return cols[f.key];
   }
 
   function filledCount(sec: PropertySection): number {

@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Suggestion = { label: string; city: string | null; lat: number; lng: number };
+type Suggestion = { label: string; city: string | null; street: string | null; lat: number; lng: number };
 
 /**
  * Pole adresu z podpowiadaniem (darmowe OSM/Nominatim przez /api/geocode).
- * Zapisuje do formularza pola: address (widoczny tekst), city, lat, lng.
+ * Zapisuje do formularza pola: address (widoczny tekst), city, street, lat, lng.
  * Można wpisać dowolny tekst (zapisze się jako adres), a wybór z listy
  * dodatkowo ustawia miasto i współrzędne do mapy.
  */
@@ -27,6 +27,7 @@ export function AddressInput({
 }) {
   const [query, setQuery] = useState(defaultAddress);
   const [city, setCity] = useState(defaultCity);
+  const [street, setStreet] = useState("");
   const [lat, setLat] = useState(defaultLat);
   const [lng, setLng] = useState(defaultLng);
   const [items, setItems] = useState<Suggestion[]>([]);
@@ -73,6 +74,7 @@ export function AddressInput({
     skipRef.current = true;
     setQuery(s.label);
     setCity(s.city ?? "");
+    setStreet(s.street ?? "");
     setLat(String(s.lat));
     setLng(String(s.lng));
     setItems([]);
@@ -118,6 +120,7 @@ export function AddressInput({
       {/* Ukryte pola przekazywane do server action */}
       <input type="hidden" name="address" value={query} />
       <input type="hidden" name="city" value={city} />
+      <input type="hidden" name="street" value={street} />
       <input type="hidden" name="lat" value={lat} />
       <input type="hidden" name="lng" value={lng} />
     </div>

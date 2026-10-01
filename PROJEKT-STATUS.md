@@ -559,6 +559,45 @@ cichego naprawienia: żeby biel przeszła, zielone tło musiałoby zejść mniej
 więcej do `emerald-700`, czyli marka wyraźnie ciemnieje. Do czasu decyzji
 zostawiamy jak jest.
 
+**Słowniki zgodne z Otodom (październik 2026).** Pozycje, które ma Otodom, stoją
+w naszych listach na początku i mają **dokładnie ich brzmienie** - od tego zależy,
+czy przyszły eksport ogłoszenia trafi w ich słownik. Po nich dopisujemy własne,
+bo agent często potrzebuje czegoś spoza listy portalu. Dotyczy to: ogrzewania,
+stanu wykończenia, piętra, formy własności, rodzaju zabudowy, materiału budynku,
+okien, wyposażenia i zabezpieczeń.
+
+**Piętro jest wyjątkiem i warto o tym pamiętać.** Na liście widać „Suterena",
+„Parter", „> 10", „Poddasze", ale w bazie trzymamy liczbę, bo po piętrze
+filtrujemy listy i liczy je wyceniarka. Tłumaczenie w obie strony robią
+`PIETRO_NA_LICZBE` i `pietroEtykieta` w `lib/property-fields.ts`; przy eksporcie
+pójdzie z powrotem etykieta.
+
+**Cena to dwa pola, nie jedno.** Przy jednym polu wynajem mieszkania podpowiadał
+„650000", bo podpowiedź była pisana pod sprzedaż. Teraz helper `cena()` tworzy
+parę pól z `only: "sprzedaz"` i `only: "wynajem"`, z własną etykietą
+(„Cena" / „Czynsz najmu") i własną podpowiedzią.
+
+**Nazwa oferty znika z kreatora.** Układamy ją z miasta i ulicy, bo przy ręcznym
+nazywaniu lista ofert w biurze robi się nieczytelna. Ulica przychodzi
+z podpowiedzi adresu (dodane pole `street` w `lib/geocode.ts`), a gdy agent wpisał
+adres z palca, wyciągamy ją z pierwszych członów (`ulicaZAdresu`).
+
+**Opis: 70 znaków na tytuł, 8500 na treść, plus wersja angielska.** Limity są po
+stronie portali, więc licznik pokazujemy na bieżąco, a nie dopiero przy zapisie.
+Tłumaczenie robi `/api/opis/tlumacz` na żądanie: agent i tak pisze najpierw po
+polsku, a tłumaczenie ręczne po prostu nie powstaje. Wersja angielska siedzi
+w `details.opis_en`.
+
+**Mieszkanie bez sekcji „Media i przyłącza".** Prąd, gaz, woda i kanalizacja
+opisują grunt albo cały budynek, nie lokal w bloku. Dla mieszkania zostaje lista
+mediów w standardzie (internet, kablówka, telefon), jak na Otodom. Usunięte też:
+„mieszkanie rozkładowe", „mieszkań w budynku", „liczba klatek", „ostatni remont
+budynku". Ekspozycja okien jest teraz wyborem wielokrotnym, bo mieszkania mają
+okna na kilka stron.
+
+**Moduł „Asystent mailowy" usunięty.** Był zbudowany wokół naszej skrzynki, więc
+nie nadawał się do sprzedaży innym biurom.
+
 **Świadomie NIE zaglądaliśmy do ASARI.** To płatny produkt konkurencji i
 systematyczne przeglądanie jego formularzy pod odtworzenie w produkcie, który z
 nim konkuruje, łamie regulamin i psuje pozycję AgentSpace przy sprzedaży innym

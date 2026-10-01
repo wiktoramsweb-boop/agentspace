@@ -72,18 +72,52 @@ const m = (key: string, label: string, options: readonly string[], x: X = {}): P
 const b = (key: string, label: string, x: X = {}): PropertyField => ({ kind: "bool", key, label, ...x });
 const area = (key: string, label: string, x: X = {}): PropertyField => n(key, label, { unit: "m²", ...x });
 
+/**
+ * Cena jako dwa pola, jedno dla sprzedaży i jedno dla najmu. Przy jednym polu
+ * wynajem mieszkania podpowiadał „650000", bo podpowiedź była pisana pod
+ * sprzedaż - a agent wpisuje tam 3000 zł miesięcznie.
+ */
+const cena = (sprzedaz: string, najem: string): PropertyField[] => [
+  n("price", "Cena", { unit: "zł", column: true, placeholder: sprzedaz, only: "sprzedaz" }),
+  n("price", "Czynsz najmu", { unit: "zł/mc", column: true, placeholder: najem, only: "wynajem" }),
+];
+
+/**
+ * Piętro w brzmieniu Otodom. W bazie trzymamy je jako liczbę, bo po piętrze
+ * filtrujemy listy i liczy je wyceniarka, więc przy zapisie tłumaczymy etykietę
+ * na liczbę według tej mapy, a przy eksporcie pójdzie z powrotem etykieta.
+ */
+export const PIETRA = [
+  "Suterena", "Parter", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "> 10", "Poddasze",
+] as const;
+
+export const PIETRO_NA_LICZBE: Record<string, number> = {
+  Suterena: -1, Parter: 0, "> 10": 11, Poddasze: 99,
+};
+
+/** Odwrotnie: liczba z bazy na etykietę, żeby kreator pokazał to, co zapisano. */
+export function pietroEtykieta(n: number | null | undefined): string {
+  if (n == null) return "";
+  const wpis = Object.entries(PIETRO_NA_LICZBE).find(([, v]) => v === n);
+  if (wpis) return wpis[0];
+  return n >= 1 && n <= 10 ? String(n) : "";
+}
+
 // ── Wspólne słowniki ────────────────────────────────────────────────────
 const MEDIUM = ["Jest", "W drodze", "Możliwość podłączenia", "Brak"] as const;
 const STAN_BUD = [
   "Bardzo dobry", "Dobry", "Do odświeżenia", "Do remontu", "Do generalnego remontu",
   "Stan surowy zamknięty", "Stan surowy otwarty", "W budowie", "Nowy",
 ] as const;
-const OKNA = ["PVC", "Drewniane", "Aluminiowe", "Drewno-aluminium", "Stare skrzynkowe"] as const;
+// Pozycje, które ma Otodom, stoją na początku i mają dokładnie ich brzmienie -
+// od tego zależy, czy przyszły eksport ogłoszenia trafi w ich słownik.
+// Po nich dopisujemy swoje, bo agent często potrzebuje czegoś spoza listy portalu.
+const OKNA = ["Plastikowe", "Drewniane", "Aluminiowe", "Drewno-aluminium", "Stare skrzynkowe"] as const;
 const DRZWI = ["Antywłamaniowe", "Drewniane", "Stalowe", "PVC", "Zwykłe"] as const;
 const OGRZEWANIE = [
-  "Miejskie (MPEC)", "Gazowe", "Gazowe kondensacyjne", "Elektryczne", "Pompa ciepła",
-  "Pompa ciepła powietrzna", "Pompa ciepła gruntowa", "Kominek z rozprowadzeniem",
-  "Piec kaflowy", "Kocioł na pellet", "Kocioł na węgiel", "Olejowe", "Podłogowe", "Brak",
+  "Miejskie", "Gazowe", "Piece kaflowe", "Elektryczne", "Kotłownia", "Inne",
+  "Gazowe kondensacyjne", "Pompa ciepła", "Pompa ciepła powietrzna", "Pompa ciepła gruntowa",
+  "Kominek z rozprowadzeniem", "Kocioł na pellet", "Kocioł na węgiel", "Olejowe", "Podłogowe", "Brak",
 ] as const;
 const CIEPLA_WODA = ["Z sieci", "Piec gazowy", "Bojler elektryczny", "Pompa ciepła", "Kolektory słoneczne", "Przepływowy"] as const;
 const PODLOGI = ["Parkiet", "Deska barlinecka", "Laminat", "Winyl", "Płytki", "Wykładzina", "Beton", "Do wyboru przez kupującego"] as const;
@@ -91,8 +125,8 @@ const KUCHNIA = ["Osobna", "Aneks kuchenny", "Otwarta na salon", "Kuchnia z jada
 const PARKING = ["Brak", "Miejsce naziemne", "Miejsce podziemne", "Hala garażowa", "Garaż wolnostojący", "Garaż w bryle budynku", "Wiata", "Postój na posesji"] as const;
 const W_CENIE = ["W cenie", "Dodatkowo płatne", "Do wynajęcia osobno", "Brak"] as const;
 const WLASNOSC = [
-  "Pełna własność (KW)", "Spółdzielcze własnościowe", "Spółdzielcze własnościowe z KW",
-  "Spółdzielcze lokatorskie", "Udział w nieruchomości", "Użytkowanie wieczyste", "Własność z udziałem w gruncie",
+  "Spółdzielcze wł. prawo do lokalu", "Użytkowanie wieczyste / dzierżawa", "Pełna własność", "Udział",
+  "Spółdzielcze własnościowe z KW", "Spółdzielcze lokatorskie", "Własność z udziałem w gruncie",
 ] as const;
 const UMOWA = ["Otwarta", "Z klauzulą wyłączności", "Umowa z deweloperem", "Brak umowy"] as const;
 const KLASA_ENERG = ["A+", "A", "B", "C", "D", "E", "F", "G"] as const;
@@ -246,11 +280,11 @@ const MIESZKANIE: TypeSchema = {
       icon: "podstawy",
       open: true,
       fields: [
-        n("price", "Cena", { unit: "zł", column: true, placeholder: "650000" }),
+        ...cena("650000", "3200"),
         area("area", "Powierzchnia", { column: true, placeholder: "48" }),
         n("rooms", "Liczba pokoi", { column: true, placeholder: "2" }),
-        n("floor", "Piętro", { column: true, hint: "0 = parter", placeholder: "2" }),
-        n("floors_total", "Pięter w budynku", { column: true, placeholder: "5" }),
+        s("floor", "Piętro", PIETRA, { column: true }),
+        n("floors_total", "Liczba pięter", { column: true, placeholder: "5" }),
         n("year_built", "Rok budowy", { column: true, placeholder: "2015" }),
       ],
     },
@@ -262,9 +296,9 @@ const MIESZKANIE: TypeSchema = {
         s("kuchnia", "Kuchnia", KUCHNIA),
         n("lazienki", "Liczba łazienek", { placeholder: "1" }),
         b("wc_osobno", "Osobna toaleta"),
-        b("rozkladowe", "Mieszkanie rozkładowe"),
-        b("dwupoziomowe", "Dwupoziomowe"),
-        s("uklad_okien", "Ekspozycja okien", ["Wschód", "Zachód", "Północ", "Południe", "Wschód-zachód", "Północ-południe", "Na dwie strony", "Na trzy strony"]),
+        // Mieszkanie ma zwykle okna na kilka stron, więc to wybór wielokrotny,
+        // a nie jedna pozycja z listy.
+        m("uklad_okien", "Ekspozycja okien", ["Wschód", "Zachód", "Północ", "Południe"]),
         area("balkon_m2", "Powierzchnia balkonu"),
         n("balkony", "Liczba balkonów"),
         area("taras_m2", "Powierzchnia tarasu"),
@@ -281,20 +315,17 @@ const MIESZKANIE: TypeSchema = {
       title: "Budynek",
       icon: "budynek",
       fields: [
-        s("building_type", "Rodzaj budynku", [
-          "Blok", "Niski blok (do 4 pięter)", "Wysoki blok", "Apartamentowiec", "Kamienica",
-          "Plomba", "Dom wielolokalowy", "Loft", "Willa miejska", "Segment", "Budynek mieszkalno-usługowy",
+        s("building_type", "Rodzaj zabudowy", [
+          "Blok", "Kamienica", "Dom wolnostojący", "Plomba", "Szeregowiec", "Apartamentowiec", "Loft",
+          "Niski blok (do 4 pięter)", "Wysoki blok", "Dom wielolokalowy", "Willa miejska",
+          "Budynek mieszkalno-usługowy", "Pozostałe",
         ], { column: true }),
         s("material_budynku", "Materiał budynku", [
-          "Cegła", "Pustak", "Beton komórkowy", "Silikat", "Keramzyt", "Wielka płyta",
-          "Żelbet", "Szkielet drewniany", "Drewno", "Kamień", "Prefabrykat",
+          "Cegła", "Drewno", "Pustak", "Keramzyt", "Wielka płyta", "Beton", "Silikat",
+          "Beton komórkowy", "Żelbet", "Inne", "Kamień", "Prefabrykat", "Szkielet drewniany",
         ]),
         s("stan_budynku", "Stan budynku", STAN_BUD),
         s("winda", "Winda", ["Tak", "Nie", "Dwie i więcej"]),
-        n("mieszkan_w_budynku", "Mieszkań w budynku", { placeholder: "40" }),
-        n("klatki_w_budynku", "Liczba klatek"),
-        b("teren_zamkniety", "Teren zamknięty"),
-        d("remont_budynku", "Ostatni remont budynku"),
         m("czesci_wspolne", "Części wspólne", [
           "Rowerownia", "Wózkownia", "Plac zabaw", "Siłownia", "Sala fitness", "Concierge",
           "Sauna", "Zieleń wewnętrzna", "Paczkomat w budynku", "Poczekalnia", "Myjnia dla psów",
@@ -305,9 +336,9 @@ const MIESZKANIE: TypeSchema = {
       title: "Standard i instalacje",
       icon: "instalacje",
       fields: [
-        s("condition_std", "Stan mieszkania", [
-          "Do wprowadzenia", "Wysoki standard", "Po remoncie", "Do odświeżenia", "Do remontu",
-          "Stan deweloperski", "Pod klucz", "W budowie",
+        s("condition_std", "Stan wykończenia", [
+          "Do zamieszkania", "Do wykończenia", "Do remontu",
+          "Wysoki standard", "Po remoncie", "Do odświeżenia", "Stan deweloperski", "Pod klucz", "W budowie",
         ], { column: true }),
         s("heating", "Ogrzewanie", OGRZEWANIE, { column: true }),
         s("ciepla_woda", "Ciepła woda", CIEPLA_WODA),
@@ -318,14 +349,17 @@ const MIESZKANIE: TypeSchema = {
         b("rekuperacja", "Rekuperacja"),
         b("rolety", "Rolety zewnętrzne"),
         n("wysokosc_pomieszczen_m", "Wysokość pomieszczeń", { unit: "m", placeholder: "2,6" }),
-        m("wyposazenie", "Wyposażenie w cenie", [
-          "Kuchnia w zabudowie", "Płyta indukcyjna", "Płyta gazowa", "Piekarnik", "Zmywarka",
-          "Pralka", "Lodówka", "Mikrofalówka", "Okap", "Szafy wnękowe", "Meble", "Telewizor", "Klimatyzator",
+        m("wyposazenie", "Wyposażenie", [
+          "Meble", "Pralka", "Zmywarka", "Lodówka", "Kuchenka", "Piekarnik", "Telewizor",
+          "Kuchnia w zabudowie", "Płyta indukcyjna", "Płyta gazowa", "Mikrofalówka", "Okap", "Szafy wnękowe",
         ]),
+        m("media_lokalu", "Media", ["Internet", "Telewizja kablowa", "Telefon"]),
       ],
     },
     sekcjaParking(),
-    sekcjaMedia(),
+    // Bez sekcji „Media i przyłącza": prąd, gaz, woda i kanalizacja opisują
+    // grunt albo cały budynek, a nie mieszkanie w bloku. Dla mieszkania
+    // zostaje lista mediów w standardzie (internet, kablówka, telefon).
     sekcjaKoszty(),
     sekcjaNajem([
       n("najem_miejsc_spania", "Liczba miejsc do spania"),
@@ -347,7 +381,7 @@ const DOM: TypeSchema = {
       icon: "podstawy",
       open: true,
       fields: [
-        n("price", "Cena", { unit: "zł", column: true, placeholder: "1250000" }),
+        ...cena("1250000", "6500"),
         area("area", "Powierzchnia użytkowa", { column: true, placeholder: "140" }),
         area("pow_calkowita_m2", "Powierzchnia całkowita", { placeholder: "180" }),
         area("plot_area_m2", "Powierzchnia działki", { column: true, placeholder: "800" }),
@@ -477,7 +511,7 @@ const DZIALKA: TypeSchema = {
       icon: "podstawy",
       open: true,
       fields: [
-        n("price", "Cena", { unit: "zł", column: true, placeholder: "320000" }),
+        ...cena("320000", "1500"),
         area("plot_area_m2", "Powierzchnia działki", { column: true, placeholder: "1200" }),
         n("pow_ha", "Powierzchnia", { unit: "ha", hint: "Uzupełnij przy dużych działkach rolnych", placeholder: "1,5" }),
         n("dzialek_liczba", "Liczba działek w ofercie", { placeholder: "1" }),
@@ -594,7 +628,7 @@ const LOKAL: TypeSchema = {
       icon: "podstawy",
       open: true,
       fields: [
-        n("price", "Cena", { unit: "zł", column: true, placeholder: "890000" }),
+        ...cena("890000", "4500"),
         n("cena_za_m2_mc", "Stawka najmu za m²", { unit: "zł/m²/mc", only: "wynajem", placeholder: "65" }),
         area("area", "Powierzchnia całkowita", { column: true, placeholder: "120" }),
         area("pow_biurowa_m2", "Powierzchnia biurowa"),
@@ -734,7 +768,7 @@ const MAGAZYN: TypeSchema = {
       icon: "podstawy",
       open: true,
       fields: [
-        n("price", "Cena", { unit: "zł", column: true }),
+        ...cena("2500000", "18000"),
         n("cena_za_m2_mc", "Stawka najmu za m²", { unit: "zł/m²/mc", only: "wynajem", placeholder: "22" }),
         area("area", "Powierzchnia całkowita", { column: true, placeholder: "2000" }),
         area("pow_magazynowa_m2", "Powierzchnia magazynowa"),
@@ -840,7 +874,7 @@ const OBIEKT: TypeSchema = {
       icon: "podstawy",
       open: true,
       fields: [
-        n("price", "Cena", { unit: "zł", column: true }),
+        ...cena("3500000", "25000"),
         area("area", "Powierzchnia użytkowa", { column: true }),
         area("pow_calkowita_m2", "Powierzchnia całkowita"),
         area("pow_zabudowy_m2", "Powierzchnia zabudowy"),
@@ -1127,7 +1161,7 @@ const BUDYNEK: TypeSchema = {
       icon: "podstawy",
       open: true,
       fields: [
-        n("price", "Cena", { unit: "zł", column: true }),
+        ...cena("4500000", "30000"),
         area("area", "Powierzchnia użytkowa (PUM)", { column: true }),
         area("pow_calkowita_m2", "Powierzchnia całkowita"),
         area("pow_zabudowy_m2", "Powierzchnia zabudowy"),
@@ -1232,7 +1266,7 @@ const INNE: TypeSchema = {
       icon: "podstawy",
       open: true,
       fields: [
-        n("price", "Cena", { unit: "zł", column: true }),
+        ...cena("250000", "2000"),
         area("area", "Powierzchnia", { column: true }),
         area("plot_area_m2", "Powierzchnia działki", { column: true }),
         n("rooms", "Liczba pomieszczeń", { column: true }),

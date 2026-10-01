@@ -12,6 +12,8 @@
 export type GeoResult = {
   label: string;
   city: string | null;
+  /** Ulica z numerem - z niej układamy nazwę oferty. */
+  street: string | null;
   lat: number;
   lng: number;
 };
@@ -60,6 +62,7 @@ export async function geocodePl(query: string, limit = 6): Promise<GeoResult[]> 
       label: r.display_name,
       city:
         r.address?.city ?? r.address?.town ?? r.address?.village ?? r.address?.municipality ?? null,
+      street: [r.address?.road, r.address?.house_number].filter(Boolean).join(" ") || null,
       lat: parseFloat(r.lat),
       lng: parseFloat(r.lon),
     }));

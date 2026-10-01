@@ -10,6 +10,7 @@ import { PROPERTY_ICONS } from "../components/icons";
 import { WizardNav, WizardSteps } from "../components/wizard-steps";
 import { PhotoManager } from "./photo-manager";
 import { ParamFields } from "./param-fields";
+import { OpisPola } from "./opis-pola";
 import { Select as SelectBox } from "../components/select";
 import { discardPhotoUploads } from "./photo-actions";
 import type { PhotoConfig } from "@/lib/agency-settings-shared";
@@ -18,7 +19,6 @@ import {
   PROPERTY_DEAL_KINDS,
   PROPERTY_TYPE_TILES,
   PROPERTY_STATUSES,
-  PROPERTY_TYPES,
   PROPERTY_FEATURES,
   EXPORT_ADDRESS_MODES,
   type Property,
@@ -75,7 +75,6 @@ export function PropertyWizard({
   const [session, setSession] = useState(0);
 
   const showFeatureChips = hasFeatureChips(type);
-  const typeLabel = PROPERTY_TYPES.find((t) => t.value === type)?.label ?? "Nieruchomość";
 
   function openWizard() {
     setDealKind(property?.deal_kind ?? "sprzedaz");
@@ -187,15 +186,11 @@ export function PropertyWizard({
 
           {/* ── KROK 2: adres ─────────────────────────────────────── */}
           <div hidden={step !== 1} className="space-y-4">
-            <Field
-              label="Nazwa oferty"
-              name="title"
-              value={p?.title}
-              placeholder="Kraków, os. Stalowe (zostaw puste, ułożymy z adresu)"
-              hint="Tak zobaczysz ofertę na liście. Puste = zbudujemy nazwę z typu, miasta i metrażu."
-            />
+            {/* Nazwy oferty nie wpisuje się ręcznie: układamy ją z miasta i ulicy,
+                dzięki czemu lista ofert jest spójna i nikt nie nazwie oferty
+                „mieszkanie Nowak". */}
             <AddressInput
-              label="Adres (podpowiada się)"
+              label="Adres"
               defaultAddress={p?.address ?? ""}
               defaultCity={p?.city ?? ""}
               defaultLat={p?.lat != null ? String(p.lat) : ""}
@@ -227,20 +222,6 @@ export function PropertyWizard({
 
           {/* ── KROK 3: parametry ─────────────────────────────────── */}
           <div hidden={step !== 2} className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-50 px-4 py-3">
-              <p className="text-sm text-emerald-900">
-                Pola dobrane pod <span className="font-semibold">{typeLabel.toLowerCase()}</span>
-                {dealKind === "wynajem" ? " na wynajem" : " na sprzedaż"}. Wypełnij tyle, ile wiesz - resztę uzupełnisz później.
-              </p>
-              <button
-                type="button"
-                onClick={() => setStep(0)}
-                className="text-xs font-semibold text-emerald-700 underline decoration-emerald-400 underline-offset-2"
-              >
-                zmień typ
-              </button>
-            </div>
-
             <ParamFields type={type} dealKind={dealKind} property={p} />
 
             {showFeatureChips && (
@@ -277,25 +258,18 @@ export function PropertyWizard({
           {/* ── KROK 4: opis ──────────────────────────────────────── */}
           <div hidden={step !== 3} className="space-y-4">
             <Field
-              label="Nagłówek marketingowy"
+              label="Tytuł ogłoszenia"
               name="headline"
               value={p?.headline}
+              maxLength={70}
               placeholder="2 pokoje 47 m² | Kraków Czyżyny | Od zaraz"
-              hint="To zdanie zobaczy klient jako pierwsze na stronie z ofertą."
+              hint="Maksymalnie 70 znaków - tyle przyjmują portale. To zdanie klient zobaczy jako pierwsze."
             />
-            <div>
-              <Label>Opis oferty</Label>
-              <textarea
-                name="description"
-                rows={9}
-                defaultValue={p?.description ?? ""}
-                placeholder="Rozkładowe, po remoncie, balkon, blisko tramwaju..."
-                className={inp}
-              />
-              <p className="mt-1.5 text-xs text-slate-400">
-                Pełny opis możesz też wygenerować w module Opisy i wkleić tutaj.
-              </p>
-            </div>
+            <OpisPola
+              key={session}
+              opis={p?.description}
+              opisEn={(p?.details as Record<string, unknown> | null)?.opis_en as string | undefined}
+            />
             <div>
               <Label>
                 Właściciel <span className="text-slate-400">(klient sprzedający lub wynajmujący)</span>
@@ -463,6 +437,7 @@ function Field({
   placeholder,
   hint,
   value,
+  maxLength,
 }: {
   label: string;
   name: string;
@@ -470,6 +445,7 @@ function Field({
   placeholder?: string;
   hint?: string;
   value?: string | number | null;
+  maxLength?: number;
 }) {
   return (
     <div>
@@ -477,6 +453,7 @@ function Field({
       <input
         name={name}
         type={type}
+        maxLength={maxLength}
         placeholder={placeholder}
         defaultValue={value ?? ""}
         step={type === "number" ? "any" : undefined}

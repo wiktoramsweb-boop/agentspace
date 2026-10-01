@@ -145,6 +145,19 @@ export function Select({
     close();
   }
 
+  // Lista leci przez portal, więc nie zniknie sama, gdy pole przestanie być
+  // widoczne - a tak dzieje się przy zmianie kroku kreatora, bo nieaktywny krok
+  // tylko ukrywamy. Pilnujemy więc rozmiaru pola i zamykamy listę, gdy znika.
+  useEffect(() => {
+    if (!open || !btnRef.current) return;
+    const obs = new ResizeObserver(([wpis]) => {
+      const r = wpis.contentRect;
+      if (r.width === 0 && r.height === 0) setOpen(false);
+    });
+    obs.observe(btnRef.current);
+    return () => obs.disconnect();
+  }, [open]);
+
   // Zamykanie kliknięciem obok i Escape, oraz podążanie za przewijaniem strony.
   useEffect(() => {
     if (!open) return;

@@ -71,7 +71,6 @@ export const SECTIONS: NavSection[] = [
       { href: "/app/wycena", label: "Analiza cenowa", icon: <ScaleIcon />, color: "violet" },
       { href: "/app/poszukiwania", label: "Poszukiwania", icon: <SearchIcon />, color: "sky" },
       { href: "/app/opisy", label: "Opisy", icon: <DocIcon />, color: "amber" },
-      { href: "/app/maile", label: "Asystent mailowy", icon: <MailIcon />, color: "cyan" },
       { href: "/app/ofertowka", label: "Ofertówka", icon: <PhotoIcon />, color: "fuchsia" },
       { href: "/app/oferta-wspolpracy", label: "Oferta współpracy", icon: <HandshakeIcon />, color: "teal" },
       { href: "/app/rezerwacje", label: "Umowa rezerwacyjna", icon: <KeyIcon />, color: "amber" },
@@ -167,9 +166,6 @@ function DocIcon() {
 }
 function KeyIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>;
-}
-function MailIcon() {
-  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>;
 }
 function HandshakeIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>;
