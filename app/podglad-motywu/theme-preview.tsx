@@ -20,6 +20,8 @@ import { DocsDemo } from "./docs-demo";
 import { KontrastAudyt } from "./kontrast";
 import { ThreadPanel, type ThreadItem } from "../app/dzialania/[id]/thread-panel";
 import { PropertyTabs } from "../app/nieruchomosci/[id]/property-tabs";
+import { Lejek } from "../app/raporty/lejek";
+import { Tempo } from "../app/raporty/tempo";
 
 
 const MOCK_AGENTS = [
@@ -221,6 +223,38 @@ export function ThemePreview() {
           </div>
 
           <KontrastAudyt />
+
+          {/* Lejek i tempo z Raportów dla właściciela. */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">Lejek ofert</h2>
+              <Lejek
+                jednostka="ofert"
+                szczeble={[
+                  { etap: "przyjeta", label: "Przyjęta", ile: 34, przejscie: null },
+                  { etap: "male", label: "Małe zainter.", ile: 28, przejscie: 82 },
+                  { etap: "prez", label: "Prezentacje", ile: 19, przejscie: 68 },
+                  { etap: "oferta", label: "Oferta", ile: 7, przejscie: 37 },
+                  { etap: "rezerwacja", label: "Rezerwacja", ile: 5, przejscie: 71 },
+                  { etap: "przedwstepna", label: "Przedwstępna", ile: 4, przejscie: 80 },
+                  { etap: "wygrana", label: "Wygrana", ile: 4, przejscie: 100 },
+                ]}
+              />
+            </Card>
+            <Card>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">Tempo pracy biura</h2>
+              <Tempo
+                dane={[
+                  { tydzien: "08.07", dzialania: 62 }, { tydzien: "15.07", dzialania: 71 },
+                  { tydzien: "22.07", dzialania: 48 }, { tydzien: "29.07", dzialania: 80 },
+                  { tydzien: "05.08", dzialania: 77 }, { tydzien: "12.08", dzialania: 34 },
+                  { tydzien: "19.08", dzialania: 59 }, { tydzien: "26.08", dzialania: 66 },
+                  { tydzien: "02.09", dzialania: 84 }, { tydzien: "09.09", dzialania: 73 },
+                  { tydzien: "16.09", dzialania: 41 }, { tydzien: "23.09", dzialania: 69 },
+                ]}
+              />
+            </Card>
+          </div>
 
           {/* Zakładki na karcie nieruchomości. */}
           <PropertyTabs
