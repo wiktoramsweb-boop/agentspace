@@ -3,6 +3,8 @@ import { getAgencySettings } from "@/lib/agency-settings";
 import { SetupBanner } from "../setup-banner";
 import { CompanyForm } from "./company-form";
 import { AssetUploader } from "../asset-uploader";
+import { SellersForm } from "./sellers-form";
+import { sprzedawcy } from "@/lib/invoice";
 
 export default async function DaneFirmyPage() {
   const owner = await requireOwner();
@@ -26,6 +28,12 @@ export default async function DaneFirmyPage() {
             disabled={!settings.ready}
           />
         </div>
+      </div>
+      <div className="mt-6">
+        <SellersForm
+          sellers={sprzedawcy(settings.sellers, settings.company)}
+          disabled={!settings.ready}
+        />
       </div>
     </>
   );

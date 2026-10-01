@@ -9,6 +9,7 @@ import {
   type MarkPosition,
   type PhotoSize,
   type CompanyData,
+  type InvoiceSeller,
   type WatermarkConfig,
   type StampConfig,
   type AgencyOptions,
@@ -27,6 +28,7 @@ export type {
   MarkPosition,
   PhotoSize,
   CompanyData,
+  InvoiceSeller,
   WatermarkConfig,
   StampConfig,
   AgencyOptions,
@@ -71,6 +73,7 @@ export async function getAgencySettings(
   const base: AgencySettings = {
     ready: false,
     company: { name: agencyName ?? undefined, country: "Polska" },
+    sellers: [],
     logo_path: null,
     logoUrl: null,
     watermark: { ...DEFAULT_WATERMARK },
@@ -112,6 +115,7 @@ export async function getAgencySettings(
   return {
     ready: true,
     company: { ...base.company, ...(data.company ?? {}) },
+    sellers: Array.isArray(data.sellers) ? (data.sellers as InvoiceSeller[]) : [],
     logo_path: data.logo_path ?? null,
     logoUrl: data.logo_path ? publicAssetUrl("agency-assets", data.logo_path) : null,
     watermark,
@@ -170,6 +174,7 @@ export async function saveAgencySettings(
   agencyId: string,
   patch: Partial<{
     company: CompanyData;
+    sellers: InvoiceSeller[];
     logo_path: string | null;
     watermark: WatermarkConfig;
     stamp: StampConfig;

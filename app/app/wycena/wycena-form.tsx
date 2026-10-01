@@ -69,7 +69,7 @@ export function WycenaForm() {
 
           <AddressInput
             label="Adres nieruchomości"
-            placeholder="Zacznij pisać, np. Kraków Zbożowa 2…"
+            placeholder="Zacznij pisać, np. Warszawa Polna 12…"
           />
 
           <div className="grid grid-cols-2 gap-3">

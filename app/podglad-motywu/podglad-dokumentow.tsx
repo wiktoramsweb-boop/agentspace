@@ -80,10 +80,10 @@ export function PodgladDokumentow() {
     }];
     d.reprezentant = "Patrycja Gdowska";
     d.przedsiebiorca =
-      "Agencja Nieruchomości Spectra s.c. Wiktor Szostek, Krystian Sławęta, NIP: 6772516327, z siedzibą w 30-002 Kraków, ul. Zbożowa 2/1";
+      "Przykładowe Nieruchomości s.c., NIP: 1234567890, z siedzibą w 00-001 Miasto, ul. Przykładowa 1/2";
     return generujAneksPdf(
       d,
-      { nazwa: "Agencja Nieruchomości Spectra s.c. Wiktor Szostek, Krystian Sławęta", nip: "6772516327", adres: "30-002 Kraków, ul. Zbożowa 2/1" },
+      { nazwa: "Przykładowe Nieruchomości s.c.", nip: "1234567890", adres: "00-001 Miasto, ul. Przykładowa 1/2" },
       "Agencja Nieruchomości Spectra s.c. · NIP 6772516327 · Kraków",
     );
   }

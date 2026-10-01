@@ -78,7 +78,7 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
             label="Adres lokalu"
             value={d.lokalAdres}
             onChange={(v) => set("lokalAdres", v)}
-            placeholder="ul. Piastów 69/24, 31-483 Kraków"
+            placeholder="ul. Przykładowa 1/2, 00-001 Miasto"
           />
           <div>
             <label className="mb-1.5 block text-sm text-slate-500">Rodzaj umowy</label>
@@ -327,7 +327,7 @@ function ListaStron({
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <Pole label="Imię i nazwisko" value={o.name} onChange={(v) => zmien(i, { name: v })} placeholder="imię i nazwisko" />
-              <Pole label="Adres zamieszkania" value={o.address} onChange={(v) => zmien(i, { address: v })} placeholder="ul. Piastów 69/24, 31-483 Kraków" />
+              <Pole label="Adres zamieszkania" value={o.address} onChange={(v) => zmien(i, { address: v })} placeholder="ul. Przykładowa 1/2, 00-001 Miasto" />
               <Pole label="Seria i numer dowodu" value={o.docNumber} onChange={(v) => zmien(i, { docNumber: v })} placeholder="ABC 123456" />
               <Pole label="PESEL" value={o.pesel} onChange={(v) => zmien(i, { pesel: v })} placeholder="11 cyfr" maxLength={11} />
             </div>

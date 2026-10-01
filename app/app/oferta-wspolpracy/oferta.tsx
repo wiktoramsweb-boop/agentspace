@@ -76,7 +76,7 @@ export function OfertaWspolpracy({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const safeAdres = values.adres.trim().replace(/[\\/:*?"<>|]/g, "-") || "Spectra";
+      const safeAdres = values.adres.trim().replace(/[\\/:*?"<>|]/g, "-") || "oferta";
       a.download = `Oferta wspolpracy - ${safeAdres}.pdf`;
       document.body.appendChild(a);
       a.click();

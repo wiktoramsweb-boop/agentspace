@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { formatMoney, getSeller } from "@/lib/invoice";
+import { formatMoney, getSeller, type Seller } from "@/lib/invoice";
 import { formatDateShort } from "@/lib/format";
 import { Select } from "@/app/app/components/select";
 
@@ -20,7 +20,13 @@ function yearOf(iso: string | null): string {
   return iso ? iso.slice(0, 4) : "bez daty";
 }
 
-export function InvoicesBrowser({ invoices }: { invoices: InvoiceRow[] }) {
+export function InvoicesBrowser({
+  invoices,
+  sellers,
+}: {
+  invoices: InvoiceRow[];
+  sellers: Seller[];
+}) {
   const [q, setQ] = useState("");
   const [year, setYear] = useState("all");
 
@@ -79,7 +85,7 @@ export function InvoicesBrowser({ invoices }: { invoices: InvoiceRow[] }) {
       ) : (
         <div className="space-y-2.5">
           {shown.map((inv) => {
-            const seller = getSeller(inv.seller_key);
+            const seller = getSeller(inv.seller_key, sellers);
             return (
               <Link
                 key={inv.id}

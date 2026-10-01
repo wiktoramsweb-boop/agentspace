@@ -362,9 +362,9 @@ function VatTab({ c }: { c: TaxConstants }) {
   const [kosztyVat, setKosztyVat] = usePersistedState("as_tax_vat_koszty", 40000);
 
   const subjects = [
-    { name: "s.c. Spectra", przychod: sc },
+    { name: "Spółka cywilna", przychod: sc },
     { name: "JDG Wiktor", przychod: w },
-    { name: "JDG Krystian", przychod: k },
+    { name: "Działalność wspólnika", przychod: k },
   ];
   const v = useMemo(() => computeVat(subjects, kosztyVat, c), [sc, w, k, kosztyVat, c]);
   const nadLimit = v.nadPojemnosc > 0;
@@ -372,9 +372,9 @@ function VatTab({ c }: { c: TaxConstants }) {
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,380px)_1fr]">
       <Panel title="Przychód roczny per podmiot">
-        <Num label="s.c. Spectra" value={sc} onChange={setSc} />
+        <Num label="Spółka cywilna" value={sc} onChange={setSc} />
         <Num label="JDG Wiktor" value={w} onChange={setW} />
-        <Num label="JDG Krystian" value={k} onChange={setK} />
+        <Num label="Działalność wspólnika" value={k} onChange={setK} />
         <Num label="Roczne koszty z VAT (do odliczenia)" value={kosztyVat} onChange={setKosztyVat} />
       </Panel>
 

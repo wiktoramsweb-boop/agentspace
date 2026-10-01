@@ -16,7 +16,7 @@ export function AddressInput({
   defaultCity = "",
   defaultLat = "",
   defaultLng = "",
-  placeholder = "Zacznij pisać, np. Kraków Zbożowa 2...",
+  placeholder = "Zacznij pisać, np. Warszawa Polna 12...",
 }: {
   label?: string;
   defaultAddress?: string;

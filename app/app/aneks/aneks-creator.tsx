@@ -142,7 +142,7 @@ export function AneksCreator({
                 <Pole label="Imię i nazwisko" value={z.name} onChange={(v) => zmienZleceniodawce(i, { name: v })} placeholder="imię i nazwisko" />
                 <Pole label="PESEL" value={z.pesel} onChange={(v) => zmienZleceniodawce(i, { pesel: v })} placeholder="11 cyfr" maxLength={11} />
                 <Pole label="Dokument tożsamości" value={z.docNumber} onChange={(v) => zmienZleceniodawce(i, { docNumber: v })} placeholder="ABC 123456" />
-                <Pole label="Adres zamieszkania" value={z.address} onChange={(v) => zmienZleceniodawce(i, { address: v })} placeholder="ul. Piastów 69/24, 31-483 Kraków" />
+                <Pole label="Adres zamieszkania" value={z.address} onChange={(v) => zmienZleceniodawce(i, { address: v })} placeholder="ul. Przykładowa 1/2, 00-001 Miasto" />
               </div>
             </div>
           ))}

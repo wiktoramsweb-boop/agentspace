@@ -38,7 +38,7 @@ export function CompanyForm({ company, disabled }: { company: CompanyData; disab
             <label className="sm:col-span-2">
               <FieldLabel required>Nazwa firmy</FieldLabel>
               <input name="name" required defaultValue={company.name ?? ""} className={inputCls}
-                placeholder="Agencja Nieruchomości Spectra s.c." />
+                placeholder="Np. Nowak Nieruchomości s.c." />
             </label>
             <label>
               <FieldLabel>Ulica i numer</FieldLabel>

@@ -104,7 +104,7 @@ export function ReservationCreator({ city }: { city: string }) {
       const bytes = await generateReservationPdf(doc);
       const blob = new Blob([bytes.slice()], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
-      const safe = (d.propAddress.trim() || "Spectra").replace(/[\\/:*?"<>|]/g, "-");
+      const safe = (d.propAddress.trim() || "rezerwacja").replace(/[\\/:*?"<>|]/g, "-");
       const a = document.createElement("a");
       a.href = url;
       a.download = `Umowa rezerwacyjna - ${safe}.pdf`;
@@ -207,7 +207,7 @@ export function ReservationCreator({ city }: { city: string }) {
             </div>
             <Field label="Miejscowość zawarcia" value={d.city} onChange={(v) => set("city", v)} />
           </div>
-          <Field label="Adres nieruchomości" value={d.propAddress} onChange={(v) => set("propAddress", v)} placeholder="os. Spółdzielcze 8/40, 31-994 Kraków" />
+          <Field label="Adres nieruchomości" value={d.propAddress} onChange={(v) => set("propAddress", v)} placeholder="ul. Przykładowa 1/2, 00-001 Miasto" />
           <Field label="Szczegóły (opcjonalnie)" value={d.propDetails} onChange={(v) => set("propDetails", v)} placeholder="nr KW, powierzchnia m²…" />
           <Field label="Data umowy" type="date" value={d.date} onChange={(v) => set("date", v)} />
         </Section>

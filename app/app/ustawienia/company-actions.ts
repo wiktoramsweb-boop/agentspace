@@ -9,6 +9,7 @@ import {
   PHOTO_SIZES,
   type AgencyOptions,
   type CompanyData,
+  type InvoiceSeller,
   type MarkPosition,
   type PhotoSize,
 } from "@/lib/agency-settings";
@@ -165,5 +166,50 @@ export async function setAsset(kind: AssetKind, path: string | null): Promise<Ac
   if (previous && previous !== path) await removeFiles(ASSET_BUCKET, [previous]);
 
   revalidateSettings();
+  return { ok: true };
+}
+
+/**
+ * Sprzedawcy na fakturach (v36).
+ *
+ * Do wersji v36 lista siedziała w kodzie razem z numerami kont, więc każde
+ * biuro wystawiałoby faktury z cudzym rachunkiem. Teraz każde biuro trzyma
+ * własną listę: spółkę i ewentualne jednoosobowe działalności wspólników.
+ */
+export async function saveSellers(sellers: InvoiceSeller[]): Promise<ActionResult> {
+  const owner = await requireOwner();
+  if (!owner.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
+
+  const czyste: InvoiceSeller[] = [];
+  for (const s of sellers.slice(0, 10)) {
+    const name = (s.name ?? "").trim().slice(0, 200);
+    if (!name) continue;
+    const nip = (s.nip ?? "").replace(/[^\d]/g, "").slice(0, 10);
+    if (nip && nip.length !== 10) {
+      return { ok: false, error: `NIP sprzedawcy „${name}" powinien mieć 10 cyfr.` };
+    }
+    czyste.push({
+      key: (s.key ?? "").trim().slice(0, 40) || `s${czyste.length + 1}`,
+      name,
+      address: (s.address ?? "").trim().slice(0, 200),
+      city: (s.city ?? "").trim().slice(0, 100),
+      postcode: (s.postcode ?? "").trim().slice(0, 12),
+      nip,
+      bank: (s.bank ?? "").trim().slice(0, 100),
+      account: (s.account ?? "").trim().slice(0, 60),
+      brand: Boolean(s.brand),
+    });
+  }
+  if (!czyste.length) return { ok: false, error: "Dodaj przynajmniej jednego sprzedawcę." };
+
+  const klucze = new Set(czyste.map((s) => s.key));
+  if (klucze.size !== czyste.length) {
+    return { ok: false, error: "Każdy sprzedawca musi mieć inny identyfikator." };
+  }
+
+  const err = await saveAgencySettings(owner.agency_id, { sellers: czyste });
+  if (err) return { ok: false, error: err };
+  revalidateSettings();
+  revalidatePath("/app/faktury", "layout");
   return { ok: true };
 }

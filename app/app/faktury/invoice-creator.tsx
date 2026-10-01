@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { SELLERS, type InvoiceItem } from "@/lib/invoice";
+import { type InvoiceItem, type Seller } from "@/lib/invoice";
 import { InvoiceSheet, type SheetData } from "./invoice-sheet";
 import { createInvoice, updateInvoice } from "./actions";
 import { printInvoice } from "./print-button";
@@ -10,9 +10,15 @@ import { Select } from "@/app/app/components/select";
 export function InvoiceCreator({
   initial,
   editId,
+  sellers,
+  logoUrl,
+  agencyName,
 }: {
   initial: SheetData;
   editId?: string;
+  sellers: Seller[];
+  logoUrl: string | null;
+  agencyName: string;
 }) {
   const [d, setD] = useState<SheetData>(initial);
   const [buyerType, setBuyerType] = useState<"firma" | "osoba">(
@@ -43,7 +49,7 @@ export function InvoiceCreator({
       <div className="print-hide space-y-5">
         <Section title="Sprzedawca">
           <Select value={d.sellerKey} onChange={(e) => set("sellerKey", e.target.value)}>
-            {SELLERS.map((s) => (
+            {sellers.map((s: Seller) => (
               <option key={s.key} value={s.key}>
                 {s.name}
               </option>
@@ -174,7 +180,7 @@ export function InvoiceCreator({
 
       {/* PODGLĄD */}
       <div className="lg:sticky lg:top-4 lg:h-fit">
-        <InvoiceSheet data={d} />
+        <InvoiceSheet data={d} sellers={sellers} logoUrl={logoUrl} agencyName={agencyName} />
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ export default function SignupPage() {
         {/* Pułapka na boty: człowiek tego pola nie widzi i go nie wypełni. */}
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
         <FormField label="Imię i nazwisko" name="fullName" autoComplete="name" placeholder="Jan Kowalski" />
-        <FormField label="Nazwa biura" name="agencyName" placeholder="Np. Spectra Nieruchomości" />
+        <FormField label="Nazwa biura" name="agencyName" placeholder="Np. Nowak Nieruchomości" />
         <FormField label="Email" name="email" type="email" autoComplete="email" placeholder="ty@biuro.pl" />
         <FormField label="Telefon" name="phone" type="tel" autoComplete="tel" placeholder="+48 600 000 000" />
         <FormField

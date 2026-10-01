@@ -63,7 +63,7 @@ export function HomePrzystan({ wzor }: { wzor: string }) {
               <Link href={`/wzory/${wzor}/oferty`} className="wz-btn">
                 Zobacz oferty
               </Link>
-              <a href={`tel:+48124304050`} className="wz-btn wz-btn--ghost">
+              <a href={`tel:+48500600700`} className="wz-btn wz-btn--ghost">
                 Zadzwoń: 12 430 40 50
               </a>
             </div>

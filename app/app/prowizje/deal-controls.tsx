@@ -104,7 +104,7 @@ export function NewDealButton({
             <input
               name="title"
               required
-              placeholder="Sprzedaż mieszkania ul. Zbożowa"
+              placeholder="Sprzedaż mieszkania, ul. Polna 12"
               className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
             />
           </Labeled>

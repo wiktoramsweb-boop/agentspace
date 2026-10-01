@@ -1,12 +1,17 @@
 import { addDaysKey, todayPL } from "@/lib/datetime";
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
+import { getAgencySettings } from "@/lib/agency-settings";
+import { sprzedawcy } from "@/lib/invoice";
 import { getInvoiceNumberSuggestion } from "@/lib/data-invoices";
 import { PageHeader } from "../../components/ui";
 import { InvoiceCreator } from "../invoice-creator";
 
 export default async function NowaFakturaPage() {
   const owner = await requireOwner();
+  const ustawienia = await getAgencySettings(owner.agency_id, owner.agency?.name);
+  const listaSprzedawcow = sprzedawcy(ustawienia.sellers, ustawienia.company);
+  const nazwaBiura = ustawienia.company.name ?? owner.agency?.name ?? "";
   const number = owner.agency_id ? await getInvoiceNumberSuggestion(owner.agency_id) : "";
 
   // Daty po polsku: o 0:30 w nocy UTC wskazywałby jeszcze wczoraj.
@@ -28,16 +33,19 @@ export default async function NowaFakturaPage() {
         />
       </div>
       <InvoiceCreator
+        sellers={listaSprzedawcow}
+        logoUrl={ustawienia.logoUrl}
+        agencyName={nazwaBiura}
         initial={{
           number,
-          sellerKey: "spectra",
+          sellerKey: listaSprzedawcow[0]?.key ?? "firma",
           buyerName: "",
           buyerAddress: "",
           buyerCity: "",
           buyerPostcode: "",
           buyerNip: "",
           buyerPesel: "",
-          place: "Kraków",
+          place: ustawienia.company.city ?? "",
           issueDate: today,
           saleDate: today,
           paymentDate: pay,

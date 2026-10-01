@@ -15,7 +15,7 @@ export default async function ProtokolPage() {
         subtitle="Wydanie albo zwrot lokalu. Liczniki i klucze dopisujesz w dowolnej liczbie, a puste wiersze zostają na wydruku do uzupełnienia długopisem."
       />
       <ProtokolCreator
-        city={c.city || "Kraków"}
+        city={c.city ?? ""}
         stopka={[c.name, c.nip ? `NIP ${c.nip}` : "", c.phone, c.email].filter(Boolean).join(" · ")}
       />
     </>

@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
+import { getAgencySettings } from "@/lib/agency-settings";
+import { sprzedawcy } from "@/lib/invoice";
 import { getInvoices } from "@/lib/data-invoices";
 import { PageHeader, EmptyState } from "../components/ui";
 import { InvoicesBrowser } from "./invoices-browser";
 
 export default async function FakturyPage() {
   const owner = await requireOwner();
+  const ustawienia = await getAgencySettings(owner.agency_id, owner.agency?.name);
+  const listaSprzedawcow = sprzedawcy(ustawienia.sellers, ustawienia.company);
+  const nazwaBiura = ustawienia.company.name ?? owner.agency?.name ?? "";
   const invoices = owner.agency_id ? await getInvoices(owner.agency_id) : [];
 
   return (
@@ -36,7 +41,7 @@ export default async function FakturyPage() {
           }
         />
       ) : (
-        <InvoicesBrowser invoices={invoices} />
+        <InvoicesBrowser invoices={invoices} sellers={listaSprzedawcow} />
       )}
     </>
   );

@@ -1,5 +1,6 @@
 import {
   getSeller,
+  type Seller,
   amountToWordsPL,
   formatMoney,
   invoiceTotal,
@@ -27,13 +28,24 @@ export type SheetData = {
   issuer: string;
 };
 
-function Logo() {
+function Logo({ url, nazwa }: { url: string | null; nazwa: string }) {
+  if (!url) return null;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src="/logo.png" alt="Logo Spectra" width={56} height={56} className="rounded-full" />;
+  return <img src={url} alt={`Logo ${nazwa}`} width={56} height={56} className="rounded-full" />;
 }
 
-export function InvoiceSheet({ data }: { data: SheetData }) {
-  const seller = getSeller(data.sellerKey);
+export function InvoiceSheet({
+  data,
+  sellers,
+  logoUrl,
+  agencyName,
+}: {
+  data: SheetData;
+  sellers: Seller[];
+  logoUrl: string | null;
+  agencyName: string;
+}) {
+  const seller = getSeller(data.sellerKey, sellers);
   const total = invoiceTotal(data.items);
 
   return (
@@ -42,20 +54,20 @@ export function InvoiceSheet({ data }: { data: SheetData }) {
       <div className="flex items-start justify-between gap-6 border-b border-zinc-200 pb-5">
         {seller.brand ? (
           <div className="flex items-center gap-3">
-            <Logo />
+            <Logo url={logoUrl} nazwa={agencyName} />
             <div>
-              <p className="text-sm font-semibold text-zinc-900">Agencja Nieruchomości Spectra</p>
+              <p className="text-sm font-semibold text-zinc-900">{agencyName}</p>
             </div>
           </div>
         ) : (
-          // Jednoosobowa działalność: bez logo i marki Spectra, sama nazwa sprzedawcy.
+          // Jednoosobowa działalność: bez logo i marki biura, sama nazwa sprzedawcy.
           <p className="max-w-[60%] text-sm font-semibold text-zinc-900">{seller.name}</p>
         )}
         <div className="text-right">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">FAKTURA</h1>
           <p className="text-sm font-medium text-slate-400">Nr {data.number || "-"}</p>
           <p className="mt-1 text-xs text-slate-500">
-            {data.place || "Kraków"}, {data.issueDate || "-"}
+            {data.place || "-"}, {data.issueDate || "-"}
           </p>
         </div>
       </div>

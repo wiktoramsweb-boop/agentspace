@@ -20,7 +20,7 @@ export default async function AneksPage() {
         subtitle="Przedłużenie współpracy, zmiana wynagrodzenia albo ceny ofertowej. Dane biura wchodzą z Ustawień, resztę uzupełniasz tutaj."
       />
       <AneksCreator
-        city={c.city || "Kraków"}
+        city={c.city ?? ""}
         firma={{
           nazwa: c.name || "Agencja Nieruchomości",
           nip: c.nip || "",

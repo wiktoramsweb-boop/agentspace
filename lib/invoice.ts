@@ -10,51 +10,61 @@ export type Seller = {
   bank: string;
   account: string;
   /**
-   * Czy faktura nosi markę Spectra (logo i nazwę w nagłówku). Tylko s.c.
-   * działa pod tą marką; faktury z jednoosobowych działalności wystawiamy
-   * bez logo, żeby nie sugerowały, że sprzedawcą jest spółka.
+   * Czy faktura nosi markę biura (logo i nazwa w nagłówku). Spółka działa pod
+   * marką biura, a faktury z jednoosobowych działalności wspólników
+   * wystawiamy bez logo, żeby nie sugerowały, że sprzedawcą jest spółka.
    */
   brand: boolean;
 };
 
-export const SELLERS: Seller[] = [
-  {
-    key: "spectra",
-    name: "Agencja Nieruchomości Spectra s.c. Wiktor Szostek, Krystian Sławęta",
-    address: "ul. Zbożowa 2/1",
-    city: "Kraków",
-    postcode: "30-002",
-    nip: "6772516327",
-    bank: "mBank",
-    account: "61 1140 2004 0000 3802 8526 2390",
-    brand: true,
-  },
-  {
-    key: "slaweta",
-    name: "Krystian Sławęta Agencja Nieruchomości",
-    address: "ul. Śledziejowice 497",
-    city: "Śledziejowice",
-    postcode: "32-020",
-    nip: "6832140513",
-    bank: "mBank",
-    account: "21 1140 2004 0000 3202 8525 9912",
-    brand: false,
-  },
-  {
-    key: "szostek",
-    name: "Wiktor Szostek Agencja Nieruchomości",
-    address: "ul. Batalionów Chłopskich 26c",
-    city: "Skawina",
-    postcode: "32-050",
-    nip: "9442290347",
-    bank: "mBank",
-    account: "54 1140 2004 0000 3502 8526 0044",
-    brand: false,
-  },
-];
+/**
+ * Sprzedawcy są per biuro i siedzą w ustawieniach (`agency_settings.sellers`,
+ * migracja v36). W kodzie nie ma i nie może być żadnych prawdziwych danych:
+ * numer konta z pliku źródłowego trafiłby na faktury obcego biura.
+ */
+export const PUSTY_SPRZEDAWCA: Seller = {
+  key: "firma",
+  name: "",
+  address: "",
+  city: "",
+  postcode: "",
+  nip: "",
+  bank: "",
+  account: "",
+  brand: true,
+};
 
-export function getSeller(key: string): Seller {
-  return SELLERS.find((s) => s.key === key) ?? SELLERS[0];
+type DaneFirmy = {
+  name?: string;
+  street?: string;
+  city?: string;
+  postal_code?: string;
+  nip?: string;
+};
+
+/**
+ * Sprzedawca złożony z danych firmy. Dzięki temu nowe biuro może wystawić
+ * fakturę zaraz po wpisaniu danych w ustawieniach, bez osobnej konfiguracji.
+ * Numer konta trzeba uzupełnić ręcznie, bo danych firmy nie obejmuje.
+ */
+export function sprzedawcaZDanychFirmy(company: DaneFirmy): Seller {
+  return {
+    ...PUSTY_SPRZEDAWCA,
+    name: company.name ?? "",
+    address: company.street ?? "",
+    city: company.city ?? "",
+    postcode: company.postal_code ?? "",
+    nip: company.nip ?? "",
+  };
+}
+
+/** Lista sprzedawców biura, zawsze z co najmniej jedną pozycją. */
+export function sprzedawcy(zapisani: Seller[], company: DaneFirmy): Seller[] {
+  return zapisani.length > 0 ? zapisani : [sprzedawcaZDanychFirmy(company)];
+}
+
+export function getSeller(key: string, lista: Seller[]): Seller {
+  return lista.find((s) => s.key === key) ?? lista[0] ?? PUSTY_SPRZEDAWCA;
 }
 
 export const VAT_NOTE = "Zw z VAT na podstawie art. 113 ust. 1 ustawy o VAT.";

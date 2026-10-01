@@ -22,6 +22,18 @@ export const PHOTO_SIZES = [
 
 export type PhotoSize = (typeof PHOTO_SIZES)[number]["value"];
 
+export type InvoiceSeller = {
+  key: string;
+  name: string;
+  address: string;
+  city: string;
+  postcode: string;
+  nip: string;
+  bank: string;
+  account: string;
+  brand: boolean;
+};
+
 export type CompanyData = {
   name?: string;
   street?: string;
@@ -75,6 +87,8 @@ export type AgencySettings = {
   /** false = brak tabeli (nieuruchomiona migracja v22). */
   ready: boolean;
   company: CompanyData;
+  /** Sprzedawcy na fakturach (v36). Pusta lista = złóż jednego z danych firmy. */
+  sellers: InvoiceSeller[];
   logo_path: string | null;
   logoUrl: string | null;
   watermark: WatermarkConfig;

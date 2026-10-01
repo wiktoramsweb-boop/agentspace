@@ -302,7 +302,7 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label="Nr dokumentu tożsamości" name="id_document" placeholder="ABC 123456" />
               <Field label="PESEL" name="pesel" placeholder="90010112345" />
-              <Field label="NIP" name="nip" placeholder="6772516327" />
+              <Field label="NIP" name="nip" placeholder="1234567890" />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <Select label="Źródło" name="source" options={CLIENT_SOURCES} empty />

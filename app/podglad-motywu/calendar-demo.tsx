@@ -27,7 +27,7 @@ export function CalendarDemo({ view = "tydzien" }: { view?: "tydzien" | "miesiac
     clientName: null,
     propertyTitle: kind === "spotkanie" ? "Kraków, ul. Sołtysowska" : null,
     assignee_ids: ["u1"],
-    assigneeNames: ["Wiktor Szostek"],
+    assigneeNames: ["Anna Kowalska"],
   });
 
   const events: CalendarEvent[] = [

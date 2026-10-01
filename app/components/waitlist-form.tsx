@@ -119,7 +119,7 @@ export function WaitlistForm() {
           name="agencyName"
           type="text"
           required
-          placeholder="Np. Spectra Nieruchomości"
+          placeholder="Np. Nowak Nieruchomości"
           className="w-full rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-4 py-3 text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
       </div>
