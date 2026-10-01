@@ -997,6 +997,8 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-slate-200\/70 { backgr
 /* Biały pierścień wokół awatara i kropki na osi czasu udawał tło karty.
    W ciemnym motywie musi udawać ciemne tło, inaczej świeci jak obwódka. */
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-white { --tw-ring-color: #18181b !important; }
+/* Obwódki punktów na wykresach SVG mają udawać tło karty, a nie świecić. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .stroke-white { stroke: #18181b !important; }
 
 /* Jasne gradienty: ramka strefy zrzutu zdjęć i tło kafelka przed wczytaniem. */
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .from-emerald-200 { --tw-gradient-from: rgba(16, 185, 129, 0.35) !important; }

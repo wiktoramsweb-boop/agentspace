@@ -23,7 +23,7 @@ import { PropertyTabs } from "../app/nieruchomosci/[id]/property-tabs";
 import { PodgladDokumentow } from "./podglad-dokumentow";
 import { Lejek } from "../app/raporty/lejek";
 import { Tempo } from "../app/raporty/tempo";
-import { PrzychodMiesiacami, UdzialZrodel } from "../app/raporty/wykresy";
+import { WykresPrzychodu, DonutZrodel, KafelekKPI } from "../app/raporty/wykresy";
 import { PRZYKLADOWY_RAPORT } from "./przykladowy-raport";
 
 
@@ -230,18 +230,37 @@ export function ThemePreview() {
           <PodgladDokumentow />
 
           {/* Wykresy z Raportów dla właściciela. */}
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <KafelekKPI
+              label="Prowizja zamknięta"
+              value="184 300 zł"
+              sub="7 transakcji"
+              trend={{ proc: 22 }}
+              przebieg={PRZYKLADOWY_RAPORT.przychodMiesiacami.map((m) => m.pln)}
+              akcent
+            />
+            <KafelekKPI label="W toku" value="296 400 zł" sub="11 transakcji w pipelinie" />
+            <KafelekKPI label="Prognoza" value="118 560 zł" sub="ważona etapem obsługi" />
+            <KafelekKPI
+              label="Tempo pracy"
+              value="64 / tydz."
+              sub="średnia z 12 tygodni"
+              przebieg={PRZYKLADOWY_RAPORT.tempo.map((t) => t.dzialania)}
+            />
+          </div>
+
           <Card>
             <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
               Prowizja miesiąc po miesiącu
             </h2>
-            <PrzychodMiesiacami dane={PRZYKLADOWY_RAPORT.przychodMiesiacami} />
+            <WykresPrzychodu dane={PRZYKLADOWY_RAPORT.przychodMiesiacami} />
           </Card>
 
           <Card>
             <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
               Udział źródeł w prowizji
             </h2>
-            <UdzialZrodel zrodla={PRZYKLADOWY_RAPORT.zrodla} />
+            <DonutZrodel zrodla={PRZYKLADOWY_RAPORT.zrodla} />
           </Card>
 
           {/* Lejek i tempo z Raportów dla właściciela. */}

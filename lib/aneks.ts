@@ -23,18 +23,15 @@ export type Zleceniodawca = {
   address: string;
 };
 
-export type UkladAneksu = "punkty" | "paragrafy";
-
 export type AneksData = {
   rodzaj: RodzajAneksu;
-  /**
-   * Jak numerujemy postanowienia. „Punkty" (1., 2., 3.) czytają się lepiej
-   * w krótkim aneksie, „paragrafy" (§ 1, § 2) pasują, gdy klient albo notariusz
-   * oczekuje formy takiej jak w samej umowie.
-   */
-  uklad: UkladAneksu;
   /** Pełne dane przedsiębiorcy, z możliwością poprawienia przed wydrukiem. */
   przedsiebiorca: string;
+  /**
+   * Kto podpisuje w imieniu biura. Umowy przedłuża zwykle agent prowadzący,
+   * a nie wspólnicy, więc na dokumencie musi stać jego nazwisko.
+   */
+  reprezentant: string;
   /** Rodzaj umowy w tytule: sprzedaży albo najmu. */
   przedmiot: string;
   umowaNr: string;
@@ -62,8 +59,8 @@ export function domyslnyAneks(city: string): AneksData {
   const dzis = new Date().toISOString().slice(0, 10);
   return {
     rodzaj: "termin",
-    uklad: "punkty",
     przedsiebiorca: "",
+    reprezentant: "",
     przedmiot: "sprzedaży nieruchomości",
     umowaNr: "",
     umowaData: "",

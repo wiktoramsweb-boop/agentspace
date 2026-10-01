@@ -7,7 +7,7 @@ import { formatPln } from "@/lib/format";
 import { PROCESS_STAGES } from "@/lib/types";
 import { Lejek } from "./lejek";
 import { Tempo } from "./tempo";
-import { PrzychodMiesiacami, UdzialZrodel } from "./wykresy";
+import { WykresPrzychodu, DonutZrodel, KafelekKPI } from "./wykresy";
 import { EksportRaportu } from "./eksport";
 
 type Props = { searchParams: Promise<{ okres?: string }> };
@@ -30,6 +30,13 @@ export default async function RaportyPage({ searchParams }: Props) {
   const r = await getRaportWlasciciela(user.agency_id, okres);
 
   const etykietaOkresu = OKRESY.find((o) => o.value === okres)?.label ?? "";
+
+  // Zmiana prowizji: ostatni kwartał do poprzedniego. Trzy miesiące wygładzają
+  // przypadek jednej dużej transakcji, który na pojedynczym miesiącu zrobiłby
+  // skok o kilkaset procent.
+  const ost3 = r.przychodMiesiacami.slice(-3).reduce((a, m) => a + m.pln, 0);
+  const pop3 = r.przychodMiesiacami.slice(-6, -3).reduce((a, m) => a + m.pln, 0);
+  const trendPrzychodu = pop3 > 0 ? { proc: Math.round(((ost3 - pop3) / pop3) * 100) } : null;
 
   return (
     <>
@@ -73,44 +80,45 @@ export default async function RaportyPage({ searchParams }: Props) {
           Pieniądze · {etykietaOkresu.toLowerCase()}
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Kafelek
+          <KafelekKPI
             label="Prowizja zamknięta"
             value={formatPln(r.pieniadze.zamknietePln)}
             sub={`${r.pieniadze.zamknieteSzt} transakcji`}
-            accent
+            trend={trendPrzychodu}
+            przebieg={r.przychodMiesiacami.map((m) => m.pln)}
+            akcent
           />
-          <Kafelek
-            label="W toku (pełna wartość)"
+          <KafelekKPI
+            label="W toku"
             value={formatPln(r.pieniadze.wTokuPln)}
-            sub={`${r.pieniadze.wTokuSzt} transakcji`}
+            sub={`${r.pieniadze.wTokuSzt} transakcji w pipelinie`}
           />
-          <Kafelek
+          <KafelekKPI
             label="Prognoza z pipeline'u"
             value={formatPln(r.pieniadze.prognozaPln)}
             sub="ważona etapem obsługi"
           />
-          <Kafelek
+          <KafelekKPI
             label="Skuteczność"
             value={r.pieniadze.skutecznosc != null ? `${r.pieniadze.skutecznosc}%` : "-"}
             sub={`${r.pieniadze.przepadloSzt} przepadło`}
           />
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Card>
-            <p className="text-xs uppercase tracking-wider text-slate-500">Średnia prowizja</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">
-              {formatPln(r.pieniadze.sredniaProwizja)}
-            </p>
-          </Card>
-          <Card>
-            <p className="text-xs uppercase tracking-wider text-slate-500">Średni czas do zamknięcia</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">
-              {r.pieniadze.sredniDniDoZamkniecia != null
-                ? `${r.pieniadze.sredniDniDoZamkniecia} dni`
-                : "-"}
-            </p>
-          </Card>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <KafelekKPI label="Średnia prowizja" value={formatPln(r.pieniadze.sredniaProwizja)} />
+          <KafelekKPI
+            label="Średni czas do zamknięcia"
+            value={r.pieniadze.sredniDniDoZamkniecia != null ? `${r.pieniadze.sredniDniDoZamkniecia} dni` : "-"}
+          />
+          <KafelekKPI
+            label="Tempo pracy"
+            value={`${Math.round(r.tempo.reduce((a, t) => a + t.dzialania, 0) / (r.tempo.length || 1))} / tydz.`}
+            sub="wykonane działania, średnia z 12 tygodni"
+            przebieg={r.tempo.map((t) => t.dzialania)}
+          />
         </div>
+
         <p className="mt-3 text-xs leading-relaxed text-slate-500">
           Prognoza nie jest sumą wszystkiego, co w toku. Każdą transakcję mnożymy przez szansę
           przypisaną etapowi obsługi oferty:{" "}
@@ -128,7 +136,7 @@ export default async function RaportyPage({ searchParams }: Props) {
             Zawsze ostatnie 12 miesięcy, niezależnie od wybranego okresu. Trend widać dopiero
             na dłuższym kawałku niż jeden kwartał.
           </p>
-          <PrzychodMiesiacami dane={r.przychodMiesiacami} />
+          <WykresPrzychodu dane={r.przychodMiesiacami} />
         </Card>
       </section>
 
@@ -164,7 +172,9 @@ export default async function RaportyPage({ searchParams }: Props) {
           <p className="mb-4 text-xs text-slate-400">
             Nie liczba kontaktów decyduje, tylko ile z nich zrobiło się pieniędzy.
           </p>
-          <UdzialZrodel zrodla={r.zrodla} />
+          <div className="mb-6">
+            <DonutZrodel zrodla={r.zrodla} />
+          </div>
           {r.zrodla.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">
               Brak danych. Źródło ustawia się na karcie kontaktu w polu „Skąd mamy klienta”.
@@ -270,18 +280,3 @@ export default async function RaportyPage({ searchParams }: Props) {
   );
 }
 
-function Kafelek({
-  label, value, sub, accent,
-}: {
-  label: string; value: string; sub?: string; accent?: boolean;
-}) {
-  return (
-    <Card className={accent ? "!border-emerald-500/25 !bg-emerald-500/[0.05]" : undefined}>
-      <p className="text-xs uppercase tracking-wider text-slate-500">{label}</p>
-      <p className={`mt-1 text-2xl font-semibold tracking-tight ${accent ? "text-emerald-700" : "text-slate-900"}`}>
-        {value}
-      </p>
-      {sub && <p className="mt-0.5 text-xs text-slate-500">{sub}</p>}
-    </Card>
-  );
-}

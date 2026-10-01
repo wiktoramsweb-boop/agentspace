@@ -78,6 +78,7 @@ export function PodgladDokumentow() {
       name: "Jan Testowy", pesel: "00000000000",
       docNumber: "ABC 123456", address: "ul. Piastów 69/24, 31-483 Kraków",
     }];
+    d.reprezentant = "Patrycja Gdowska";
     d.przedsiebiorca =
       "Agencja Nieruchomości Spectra s.c. Wiktor Szostek, Krystian Sławęta, NIP: 6772516327, z siedzibą w 30-002 Kraków, ul. Zbożowa 2/1";
     return generujAneksPdf(

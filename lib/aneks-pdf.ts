@@ -44,7 +44,11 @@ export async function generujAneksPdf(
   // komplet (spółka cywilna ma w nazwie wspólników), a na aneksie musi stać
   // dokładnie to, co w umowie.
   const przedsiebiorca = d.przedsiebiorca.trim() || liniaPrzedsiebiorcy(firma);
-  a.ramka([`**${przedsiebiorca}**, zwaną dalej **„Przedsiębiorcą”**,`], { gapAfter: 6 });
+  const repr = d.reprezentant.trim();
+  a.ramka(
+    [`**${przedsiebiorca}**${repr ? `, reprezentowaną przez: **${repr}**` : ""}, zwaną dalej **„Przedsiębiorcą”**,`],
+    { gapAfter: 6 },
+  );
   a.tekst("a", { gapAfter: 6 });
   a.ramka(
     [
@@ -60,43 +64,36 @@ export async function generujAneksPdf(
     { gapAfter: 6 },
   );
 
-  // Postanowienia aneksu. W układzie „punkty" numerujemy je 1., 2., 3.,
-  // w układzie „paragrafy" każde dostaje własny wyśrodkowany nagłówek § n.
-  const postanowienia = [
+  // Układ jak w umowie: paragraf jako wyśrodkowany nagłówek, a pod nim
+  // ponumerowane ustępy. § 1 to zmiany, § 2 to postanowienia końcowe.
+  const zmiany = [
     (() => {
       const z = zmianaAneksu(d);
       return `Strony zgodnie zmieniają treść **${z.paragraf}** Umowy, który otrzymuje nowe brzmienie: „${z.tresc}”`;
     })(),
     ...d.dodatkowe.map((x) => x.trim()).filter(Boolean),
+  ];
+  const koncowe = [
     "Pozostałe postanowienia Umowy pozostają bez zmian.",
+    "Niniejszy aneks stanowi integralną część Umowy i wchodzi w życie z dniem jego podpisania przez obie strony.",
+    "Aneks sporządzono w dwóch jednobrzmiących egzemplarzach, po jednym dla każdej ze Stron.",
   ];
 
-  if (d.uklad === "paragrafy") {
-    postanowienia.forEach((t, i) => {
-      a.paragraf(`§ ${i + 1}`);
-      a.tekst(t, { gapAfter: 6 });
-    });
-    a.odstep(4);
-  } else {
-    a.odstep(4);
-    postanowienia.forEach((t, i) => {
-      a.tekst(`**${i + 1}.** ${t}`, { gapAfter: 7 });
-    });
-    a.odstep(4);
+  function ustepy(naglowek: string, pozycje: string[]) {
+    a.paragraf(naglowek);
+    pozycje.forEach((t, i) => a.tekst(`**${i + 1}.** ${t}`, { gapAfter: 7 }));
   }
 
-  a.tekst(
-    "Niniejszy aneks stanowi integralną część Umowy i wchodzi w życie z dniem jego podpisania przez obie strony.",
-    { gapAfter: 4 },
-  );
-  a.tekst("Aneks sporządzono w dwóch jednobrzmiących egzemplarzach, po jednym dla każdej ze Stron.");
+  ustepy("§ 1", zmiany);
+  ustepy("§ 2", koncowe);
+  a.odstep(6);
 
   a.podpisy(
     {
       rola: d.zleceniodawcy.length > 1 ? "Zleceniodawcy" : "Zleceniodawca",
       osoby: d.zleceniodawcy.map((z2) => z2.name.trim()),
     },
-    { rola: "Przedsiębiorca", osoby: [firma.nazwa] },
+    { rola: "Przedsiębiorca", osoby: [repr || firma.nazwa] },
   );
 
   return a.zapisz();

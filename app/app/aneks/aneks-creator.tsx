@@ -11,11 +11,12 @@ import {
 } from "@/lib/aneks";
 
 export function AneksCreator({
-  city, firma, stopka,
+  city, firma, stopka, agenci,
 }: {
   city: string;
   firma: DanePrzedsiebiorcy;
   stopka?: string;
+  agenci: { id: string; name: string }[];
 }) {
   const [d, setD] = useState<AneksData>(() => ({
     ...domyslnyAneks(city),
@@ -98,6 +99,21 @@ export function AneksCreator({
             Tak, jak ma się pojawić w dokumencie, razem z NIP-em i siedzibą.
           </p>
         </div>
+
+        <div className="mt-4">
+          <label className="mb-1.5 block text-sm text-slate-500">Reprezentowana przez</label>
+          <Select
+            aria-label="Reprezentowana przez"
+            value={d.reprezentant}
+            onChange={(e) => set("reprezentant", e.target.value)}
+            options={agenci.map((a) => ({ value: a.name, label: a.name }))}
+            placeholder="nikt, podpisuje biuro"
+          />
+          <p className="mt-1.5 text-xs text-slate-400">
+            Kto podpisuje w imieniu biura. Umowy przedłuża zwykle agent prowadzący,
+            więc na dokumencie staje jego nazwisko, nie wspólników.
+          </p>
+        </div>
       </Sekcja>
 
       <Sekcja
@@ -135,19 +151,6 @@ export function AneksCreator({
 
       <Sekcja tytul="Co zmieniamy" opis="Wybierz rodzaj zmiany, a treść paragrafu ułoży się sama.">
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <label className="mb-1.5 block text-sm text-slate-500">Numeracja postanowień</label>
-            <Select
-              aria-label="Numeracja postanowień"
-              value={d.uklad}
-              onChange={(e) => set("uklad", e.target.value as AneksData["uklad"])}
-              options={[
-                { value: "punkty", label: "Punkty: 1., 2., 3.", hint: "czytelniejsze w krótkim aneksie" },
-                { value: "paragrafy", label: "Paragrafy: § 1, § 2", hint: "jak w samej umowie" },
-              ]}
-              placeholder=""
-            />
-          </div>
           <div className="sm:col-span-2">
             <label className="mb-1.5 block text-sm text-slate-500">Rodzaj zmiany</label>
             <Select
