@@ -8,6 +8,17 @@ export type DanePrzedsiebiorcy = {
   adres: string;
 };
 
+/** Jedna linia z pełnymi danymi firmy: nazwa, NIP i siedziba. */
+export function liniaPrzedsiebiorcy(f: DanePrzedsiebiorcy): string {
+  return [
+    f.nazwa,
+    f.nip ? `NIP: ${f.nip}` : "",
+    f.adres ? `z siedzibą w ${f.adres}` : "",
+  ]
+    .filter(Boolean)
+    .join(", ");
+}
+
 /** Aneks do umowy pośrednictwa jako gotowy plik PDF. */
 export async function generujAneksPdf(
   d: AneksData,
@@ -29,12 +40,11 @@ export async function generujAneksPdf(
     { gapAfter: 8 },
   );
 
-  a.ramka(
-    [
-      `**${firma.nazwa}**${firma.nip ? `, NIP: ${firma.nip}` : ""}${firma.adres ? `, z siedzibą w ${firma.adres}` : ""}, zwaną dalej **„Przedsiębiorcą”**,`,
-    ],
-    { gapAfter: 6 },
-  );
+  // Pełne dane firmy bierzemy z pola formularza, bo Ustawienia nie zawsze mają
+  // komplet (spółka cywilna ma w nazwie wspólników), a na aneksie musi stać
+  // dokładnie to, co w umowie.
+  const przedsiebiorca = d.przedsiebiorca.trim() || liniaPrzedsiebiorcy(firma);
+  a.ramka([`**${przedsiebiorca}**, zwaną dalej **„Przedsiębiorcą”**,`], { gapAfter: 6 });
   a.tekst("a", { gapAfter: 6 });
   a.ramka(
     [
@@ -50,22 +60,30 @@ export async function generujAneksPdf(
     { gapAfter: 6 },
   );
 
-  const z = zmianaAneksu(d);
-  a.paragraf("§ 1");
-  a.tekst(
-    `Strony zgodnie zmieniają treść **${z.paragraf}** Umowy, który otrzymuje nowe brzmienie: „${z.tresc}”`,
-    { gapAfter: 6 },
-  );
+  // Postanowienia aneksu. W układzie „punkty" numerujemy je 1., 2., 3.,
+  // w układzie „paragrafy" każde dostaje własny wyśrodkowany nagłówek § n.
+  const postanowienia = [
+    (() => {
+      const z = zmianaAneksu(d);
+      return `Strony zgodnie zmieniają treść **${z.paragraf}** Umowy, który otrzymuje nowe brzmienie: „${z.tresc}”`;
+    })(),
+    ...d.dodatkowe.map((x) => x.trim()).filter(Boolean),
+    "Pozostałe postanowienia Umowy pozostają bez zmian.",
+  ];
 
-  let nr = 2;
-  for (const dod of d.dodatkowe.filter((x) => x.trim())) {
-    a.paragraf(`§ ${nr}`);
-    a.tekst(dod.trim(), { gapAfter: 6 });
-    nr++;
+  if (d.uklad === "paragrafy") {
+    postanowienia.forEach((t, i) => {
+      a.paragraf(`§ ${i + 1}`);
+      a.tekst(t, { gapAfter: 6 });
+    });
+    a.odstep(4);
+  } else {
+    a.odstep(4);
+    postanowienia.forEach((t, i) => {
+      a.tekst(`**${i + 1}.** ${t}`, { gapAfter: 7 });
+    });
+    a.odstep(4);
   }
-
-  a.paragraf(`§ ${nr}`);
-  a.tekst("Pozostałe postanowienia Umowy pozostają bez zmian.", { gapAfter: 10 });
 
   a.tekst(
     "Niniejszy aneks stanowi integralną część Umowy i wchodzi w życie z dniem jego podpisania przez obie strony.",

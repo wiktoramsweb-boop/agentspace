@@ -25,7 +25,13 @@ export type Klucz = {
   ilosc: string;
 };
 
-export type Kierunek = "wydanie" | "zwrot";
+export type Kierunek = "wydanie" | "zwrot" | "sprzedaz";
+
+export const KIERUNKI: { value: Kierunek; label: string; umowa: string }[] = [
+  { value: "wydanie", label: "Wydanie lokalu najemcy", umowa: "najmu" },
+  { value: "zwrot", label: "Zwrot lokalu właścicielowi", umowa: "najmu" },
+  { value: "sprzedaz", label: "Przekazanie lokalu po sprzedaży", umowa: "sprzedaży" },
+];
 
 export type ProtokolData = {
   kierunek: Kierunek;
@@ -120,22 +126,32 @@ function zenskie(name: string): boolean {
   return /a$/i.test(imie) && !/^(kuba|barnaba|bonawentura)$/i.test(imie);
 }
 
-/** Podpis pod kreską: mianownik, odmieniony przez liczbę i rodzaj. */
-export function rolaPodpisu(osoby: Strona[], rola: "zdajacy" | "przejmujacy"): string {
+/**
+ * Nazwa strony: przy sprzedaży to sprzedający i kupujący, a nie zdający
+ * i przejmujący. Mianownik, odmieniony przez liczbę i rodzaj.
+ */
+export function rolaPodpisu(
+  osoby: Strona[],
+  rola: "zdajacy" | "przejmujacy",
+  kierunek: Kierunek = "wydanie",
+): string {
   const nazwane = osoby.map((o) => o.name.trim()).filter(Boolean);
   const wiele = nazwane.length > 1;
-  if (rola === "zdajacy") {
-    if (wiele) return "Zdający";
-    return zenskie(nazwane[0] ?? "") ? "Zdająca" : "Zdający";
+  const zen = !wiele && zenskie(nazwane[0] ?? "");
+  if (kierunek === "sprzedaz") {
+    if (rola === "zdajacy") return wiele ? "Sprzedający" : zen ? "Sprzedająca" : "Sprzedający";
+    return wiele ? "Kupujący" : zen ? "Kupująca" : "Kupujący";
   }
-  if (wiele) return "Przejmujący";
-  return zenskie(nazwane[0] ?? "") ? "Przejmująca" : "Przejmujący";
+  if (rola === "zdajacy") return wiele ? "Zdający" : zen ? "Zdająca" : "Zdający";
+  return wiele ? "Przejmujący" : zen ? "Przejmująca" : "Przejmujący";
 }
 
 export function wierszStrony(s: Strona): string {
+  // „zamieszkały(a)", bo przy wypełnianiu nie wiadomo, czy to kobieta,
+  // czy mężczyzna, a dokument musi być poprawny w obu przypadkach.
   const czesci = [
     `**${s.name.trim() || "…………………………………"}**`,
-    s.address.trim() ? `zamieszkał(a) przy ${s.address.trim()}` : "zamieszkał(a) przy …………………………………",
+    s.address.trim() ? `zamieszkały(a) przy ${s.address.trim()}` : "zamieszkały(a) przy …………………………………",
   ];
   const dok: string[] = [];
   if (s.docNumber.trim()) dok.push(`seria i numer dowodu osobistego: ${s.docNumber.trim()}`);

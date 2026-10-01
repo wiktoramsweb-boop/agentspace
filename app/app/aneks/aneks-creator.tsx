@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Select } from "../components/select";
 import { Pole, Sekcja, PrzyciskDodaj, PrzyciskUsun, PasekAkcji, pole } from "../dokumenty-wzory/klocki";
-import { generujAneksPdf, type DanePrzedsiebiorcy } from "@/lib/aneks-pdf";
+import { generujAneksPdf, liniaPrzedsiebiorcy, type DanePrzedsiebiorcy } from "@/lib/aneks-pdf";
 import { pobierzPdf, drukujPdf } from "@/lib/pdf-kit";
 import {
   domyslnyAneks, pustyZleceniodawca, RODZAJE_ANEKSU, zmianaAneksu,
@@ -17,7 +17,10 @@ export function AneksCreator({
   firma: DanePrzedsiebiorcy;
   stopka?: string;
 }) {
-  const [d, setD] = useState<AneksData>(() => domyslnyAneks(city));
+  const [d, setD] = useState<AneksData>(() => ({
+    ...domyslnyAneks(city),
+    przedsiebiorca: liniaPrzedsiebiorcy(firma),
+  }));
   const [pracuje, setPracuje] = useState<false | "zapis" | "druk">(false);
   const [blad, setBlad] = useState<string | null>(null);
   const [gotowe, setGotowe] = useState<string | null>(null);
@@ -61,7 +64,7 @@ export function AneksCreator({
     <div className="space-y-5">
       <Sekcja tytul="Umowa, której dotyczy aneks">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Pole label="Numer umowy" value={d.umowaNr} onChange={(v) => set("umowaNr", v)} placeholder="04/03/2025" />
+          <Pole label="Numer umowy" value={d.umowaNr} onChange={(v) => set("umowaNr", v)} placeholder="12/09/2026" />
           <Pole label="Data zawarcia umowy" type="date" value={d.umowaData} onChange={(v) => set("umowaData", v)} />
           <div>
             <label className="mb-1.5 block text-sm text-slate-500">Przedmiot umowy</label>
@@ -79,8 +82,27 @@ export function AneksCreator({
       </Sekcja>
 
       <Sekcja
+        tytul="Przedsiębiorca"
+        opis="Wchodzi z Ustawień firmy, ale na aneksie musi stać dokładnie to, co w umowie. Przy spółce cywilnej dopisz wspólników."
+      >
+        <div>
+          <label className="mb-1.5 block text-sm text-slate-500">Pełne dane biura</label>
+          <textarea
+            rows={2}
+            value={d.przedsiebiorca}
+            onChange={(e) => set("przedsiebiorca", e.target.value)}
+            placeholder="Nazwa spółki, NIP, z siedzibą w ..."
+            className={pole}
+          />
+          <p className="mt-1.5 text-xs text-slate-400">
+            Tak, jak ma się pojawić w dokumencie, razem z NIP-em i siedzibą.
+          </p>
+        </div>
+      </Sekcja>
+
+      <Sekcja
         tytul="Zleceniodawca"
-        opis="Dane biura wchodzą automatycznie z Ustawień firmy, więc uzupełniasz tylko drugą stronę."
+        opis="Druga strona umowy."
         akcja={
           <PrzyciskDodaj onClick={() => set("zleceniodawcy", [...d.zleceniodawcy, pustyZleceniodawca()])}>
             Dodaj osobę
@@ -101,10 +123,10 @@ export function AneksCreator({
                 )}
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Pole label="Imię i nazwisko" value={z.name} onChange={(v) => zmienZleceniodawce(i, { name: v })} placeholder="Witold Niewitała" />
-                <Pole label="PESEL" value={z.pesel} onChange={(v) => zmienZleceniodawce(i, { pesel: v })} placeholder="54061602354" maxLength={11} />
-                <Pole label="Dokument tożsamości" value={z.docNumber} onChange={(v) => zmienZleceniodawce(i, { docNumber: v })} placeholder="DGH 177614" />
-                <Pole label="Adres zamieszkania" value={z.address} onChange={(v) => zmienZleceniodawce(i, { address: v })} placeholder="ul. Zręczyce 225, 32-420 Zręczyce" />
+                <Pole label="Imię i nazwisko" value={z.name} onChange={(v) => zmienZleceniodawce(i, { name: v })} placeholder="imię i nazwisko" />
+                <Pole label="PESEL" value={z.pesel} onChange={(v) => zmienZleceniodawce(i, { pesel: v })} placeholder="11 cyfr" maxLength={11} />
+                <Pole label="Dokument tożsamości" value={z.docNumber} onChange={(v) => zmienZleceniodawce(i, { docNumber: v })} placeholder="ABC 123456" />
+                <Pole label="Adres zamieszkania" value={z.address} onChange={(v) => zmienZleceniodawce(i, { address: v })} placeholder="ul. Piastów 69/24, 31-483 Kraków" />
               </div>
             </div>
           ))}
@@ -113,6 +135,19 @@ export function AneksCreator({
 
       <Sekcja tytul="Co zmieniamy" opis="Wybierz rodzaj zmiany, a treść paragrafu ułoży się sama.">
         <div className="grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="mb-1.5 block text-sm text-slate-500">Numeracja postanowień</label>
+            <Select
+              aria-label="Numeracja postanowień"
+              value={d.uklad}
+              onChange={(e) => set("uklad", e.target.value as AneksData["uklad"])}
+              options={[
+                { value: "punkty", label: "Punkty: 1., 2., 3.", hint: "czytelniejsze w krótkim aneksie" },
+                { value: "paragrafy", label: "Paragrafy: § 1, § 2", hint: "jak w samej umowie" },
+              ]}
+              placeholder=""
+            />
+          </div>
           <div className="sm:col-span-2">
             <label className="mb-1.5 block text-sm text-slate-500">Rodzaj zmiany</label>
             <Select

@@ -15,8 +15,9 @@ import fontkit from "@pdf-lib/fontkit";
  */
 
 export const A4 = { w: 595.28, h: 841.89 };
-export const MARGIN = 56;
-export const CONTENT_W = A4.w - 2 * MARGIN;
+const MARGIN_DOMYSLNY = 56;
+export const MARGIN = MARGIN_DOMYSLNY;
+export const CONTENT_W = A4.w - 2 * MARGIN_DOMYSLNY;
 export const INK = rgb(0.094, 0.094, 0.106);
 export const SZARY = rgb(0.45, 0.45, 0.5);
 export const LINIA = rgb(0.82, 0.83, 0.85);
@@ -42,7 +43,14 @@ async function loadBytes(url: string): Promise<Uint8Array> {
 
 export type Arkusz = Awaited<ReturnType<typeof nowyDokument>>;
 
-export async function nowyDokument(opts: { tytulPliku: string; stopka?: string }) {
+export async function nowyDokument(opts: {
+  tytulPliku: string;
+  stopka?: string;
+  /** Margines strony. Mniejszy dla dokumentów, które mają zmieścić się na jednej kartce. */
+  margines?: number;
+}) {
+  const MARGIN = opts.margines ?? MARGIN_DOMYSLNY;
+  const CONTENT_W = A4.w - 2 * MARGIN;
   const [regB, boldB] = await Promise.all([
     loadBytes("/oferta/fonts/Arimo-Regular.ttf"),
     loadBytes("/oferta/fonts/Arimo-Bold.ttf"),
@@ -132,23 +140,23 @@ export async function nowyDokument(opts: { tytulPliku: string; stopka?: string }
   }
 
   /** Tytuł dokumentu z cienką linią akcentu pod spodem. */
-  function tytul(s: string) {
-    tekst(s.toUpperCase(), { size: 15, align: "center", gapAfter: 6 });
+  function tytul(s: string, o: { ciasno?: boolean } = {}) {
+    tekst(s.toUpperCase(), { size: 15, align: "center", gapAfter: o.ciasno ? 4 : 6 });
     const w = 64;
     page.drawRectangle({ x: MARGIN + (CONTENT_W - w) / 2, y, width: w, height: 2, color: AKCENT });
-    y -= 20;
+    y -= o.ciasno ? 12 : 20;
   }
 
   /** Nagłówek paragrafu, wyśrodkowany, nie zostaje sam na dole strony. */
-  function paragraf(s: string) {
-    zmiesc(64);
-    y -= 6;
-    tekst(`**${s}**`, { size: 11.5, align: "center", gapAfter: 8 });
+  function paragraf(s: string, o: { ciasno?: boolean } = {}) {
+    zmiesc(o.ciasno ? 48 : 64);
+    y -= o.ciasno ? 2 : 6;
+    tekst(`**${s}**`, { size: o.ciasno ? 11 : 11.5, align: "center", gapAfter: o.ciasno ? 5 : 8 });
   }
 
   /** Ramka z danymi strony umowy. Treść w środku, lekkie tło. */
-  function ramka(linie: string[], o: { gapAfter?: number } = {}) {
-    const pad = 10;
+  function ramka(linie: string[], o: { gapAfter?: number; ciasno?: boolean } = {}) {
+    const pad = o.ciasno ? 7 : 10;
     const size = 10;
     const h = linie.reduce((a, l) => a + wysokoscTekstu(l, size, CONTENT_W - 2 * pad), 0) + 2 * pad;
     zmiesc(h + 6);
@@ -310,11 +318,15 @@ export async function nowyDokument(opts: { tytulPliku: string; stopka?: string }
   }
 
   /** Dwie kolumny podpisów na dole. */
-  function podpisy(lewa: { rola: string; osoby: string[] }, prawa: { rola: string; osoby: string[] }) {
-    zmiesc(96);
-    y -= 30;
+  function podpisy(
+    lewa: { rola: string; osoby: string[] },
+    prawa: { rola: string; osoby: string[] },
+    o: { ciasno?: boolean } = {},
+  ) {
+    zmiesc(o.ciasno ? 60 : 96);
+    y -= o.ciasno ? 8 : 30;
     const colW = (CONTENT_W - 44) / 2;
-    const lineY = y - 26;
+    const lineY = y - (o.ciasno ? 20 : 26);
     for (const [i, c] of [lewa, prawa].entries()) {
       const x = MARGIN + i * (colW + 44);
       page.drawLine({
@@ -322,16 +334,16 @@ export async function nowyDokument(opts: { tytulPliku: string; stopka?: string }
         color: LINIA, thickness: 0.7, dashArray: [1.5, 2.5],
       });
       const lw = bold.widthOfTextAtSize(c.rola, 10);
-      page.drawText(c.rola, { x: x + (colW - lw) / 2, y: lineY - 14, size: 10, font: bold, color: INK });
+      page.drawText(c.rola, { x: x + (colW - lw) / 2, y: lineY - (o.ciasno ? 12 : 14), size: 10, font: bold, color: INK });
       const osoby = c.osoby.filter(Boolean);
       const linia = osoby.length ? osoby.join(", ") : "(imię i nazwisko)";
       const nw = reg.widthOfTextAtSize(linia, 9);
       page.drawText(linia, {
-        x: x + (colW - nw) / 2, y: lineY - 27, size: 9, font: reg,
+        x: x + (colW - nw) / 2, y: lineY - (o.ciasno ? 24 : 27), size: 9, font: reg,
         color: osoby.length ? SZARY : rgb(0.72, 0.72, 0.75),
       });
     }
-    y = lineY - 40;
+    y = lineY - (o.ciasno ? 34 : 40);
   }
 
   /** Numeracja stron i stopka. Dopisywana na końcu, gdy znamy liczbę stron. */
@@ -349,6 +361,9 @@ export async function nowyDokument(opts: { tytulPliku: string; stopka?: string }
   }
 
   return {
+    szerokosc: CONTENT_W,
+    /** Ile miejsca zostało do dołu strony, z zapasem na stopkę. */
+    wolneMiejsce: () => y - MARGIN - 24,
     get y() { return y; },
     set y(v: number) { y = v; },
     tekst, tytul, paragraf, ramka, tabela, liniePuste, podpisy, pasek, slupki, kafelki, zapisz,

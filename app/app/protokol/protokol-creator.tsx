@@ -6,7 +6,7 @@ import { Pole, Sekcja, PrzyciskDodaj, PrzyciskUsun, PasekAkcji, pole } from "../
 import { generujProtokolPdf } from "@/lib/protokol-pdf";
 import { pobierzPdf, drukujPdf } from "@/lib/pdf-kit";
 import {
-  domyslneDane, pustaStrona, JEDNOSTKI, KLUCZE_PODPOWIEDZI, LICZNIKI_PODPOWIEDZI,
+  domyslneDane, pustaStrona, JEDNOSTKI, KIERUNKI, KLUCZE_PODPOWIEDZI, LICZNIKI_PODPOWIEDZI,
   KLAUZULA_FOTO, type ProtokolData, type Strona,
 } from "@/lib/protokol";
 
@@ -55,11 +55,20 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
             <Select
               aria-label="Rodzaj protokołu"
               value={d.kierunek}
-              onChange={(e) => set("kierunek", e.target.value as ProtokolData["kierunek"])}
-              options={[
-                { value: "wydanie", label: "Wydanie lokalu najemcy" },
-                { value: "zwrot", label: "Zwrot lokalu właścicielowi" },
-              ]}
+              onChange={(e) => {
+                const k = e.target.value as ProtokolData["kierunek"];
+                // Przy sprzedaży zmienia się rodzaj umowy w zdaniu wstępnym,
+                // a klauzula o zdjęciach dotyczy tylko najmu.
+                setD((p) => ({
+                  ...p,
+                  kierunek: k,
+                  umowaRodzaj: k === "sprzedaz" ? "sprzedaży" : p.umowaRodzaj === "sprzedaży" ? "najmu okazjonalnego" : p.umowaRodzaj,
+                  klauzulaFoto: k === "sprzedaz" ? false : p.klauzulaFoto,
+                  pustychUwag: k === "sprzedaz" ? 1 : p.pustychUwag,
+                }));
+                setGotowe(null);
+              }}
+              options={KIERUNKI.map((k) => ({ value: k.value, label: k.label }))}
               placeholder=""
             />
           </div>
@@ -69,7 +78,7 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
             label="Adres lokalu"
             value={d.lokalAdres}
             onChange={(v) => set("lokalAdres", v)}
-            placeholder="os. Oświecenia 40/14 w Krakowie"
+            placeholder="ul. Piastów 69/24, 31-483 Kraków"
           />
           <div>
             <label className="mb-1.5 block text-sm text-slate-500">Rodzaj umowy</label>
@@ -77,7 +86,11 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
               aria-label="Rodzaj umowy"
               value={d.umowaRodzaj}
               onChange={(e) => set("umowaRodzaj", e.target.value)}
-              options={["najmu okazjonalnego", "najmu", "najmu instytucjonalnego", "użyczenia"]}
+              options={
+                d.kierunek === "sprzedaz"
+                  ? ["sprzedaży", "przedwstępnej sprzedaży", "deweloperskiej"]
+                  : ["najmu okazjonalnego", "najmu", "najmu instytucjonalnego", "użyczenia"]
+              }
               placeholder=""
             />
           </div>
@@ -86,15 +99,19 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
       </Sekcja>
 
       <ListaStron
-        tytul={d.kierunek === "wydanie" ? "Zdająca / Zdający" : "Przejmująca / Przejmujący lokal"}
+        tytul={
+          d.kierunek === "sprzedaz" ? "Sprzedający" : d.kierunek === "wydanie" ? "Zdający lokal" : "Przejmujący lokal"
+        }
         opis="Zwykle właściciel lokalu. Możesz dodać więcej osób, jeśli właścicieli jest kilku."
         osoby={d.zdajacy}
         onChange={(v) => set("zdajacy", v)}
       />
 
       <ListaStron
-        tytul={d.kierunek === "wydanie" ? "Przejmujący lokal" : "Zdający lokal"}
-        opis="Najemcy. Przy dwóch i więcej osobach dokument sam odmieni nazwy stron."
+        tytul={
+          d.kierunek === "sprzedaz" ? "Kupujący" : d.kierunek === "wydanie" ? "Przejmujący lokal" : "Zdający lokal"
+        }
+        opis="Przy dwóch i więcej osobach dokument sam odmieni nazwy stron."
         osoby={d.przejmujacy}
         onChange={(v) => set("przejmujacy", v)}
       />
@@ -222,6 +239,7 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
         tytul="§ 3. Uwagi"
         akcja={<PrzyciskDodaj onClick={() => set("uwagi", [...d.uwagi, ""])}>Dodaj uwagę</PrzyciskDodaj>}
       >
+        {d.kierunek !== "sprzedaz" && (
         <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-xl border border-slate-300 p-3.5 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
           <input
             type="checkbox"
@@ -234,6 +252,7 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
             <span className="mt-1 block text-xs leading-relaxed text-slate-500">{KLAUZULA_FOTO}</span>
           </span>
         </label>
+        )}
 
         <div className="space-y-2">
           {d.uwagi.map((u, i) => (
@@ -246,7 +265,7 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
                   n[i] = e.target.value;
                   set("uwagi", n);
                 }}
-                placeholder="Np. w kuchni rysa na blacie, zgłoszona przy wydaniu."
+                placeholder="Np. rysa na blacie kuchennym, zgłoszona i zaakceptowana przy przekazaniu."
                 className={pole}
               />
               <PrzyciskUsun onClick={() => set("uwagi", d.uwagi.filter((_, j) => j !== i))} />
@@ -307,10 +326,10 @@ function ListaStron({
               )}
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Pole label="Imię i nazwisko" value={o.name} onChange={(v) => zmien(i, { name: v })} placeholder="Anna Kowalik" />
-              <Pole label="Adres zamieszkania" value={o.address} onChange={(v) => zmien(i, { address: v })} placeholder="ul. Żmujdzkiej 23/26, 31-426 Kraków" />
-              <Pole label="Seria i numer dowodu" value={o.docNumber} onChange={(v) => zmien(i, { docNumber: v })} placeholder="CFE 603189" />
-              <Pole label="PESEL" value={o.pesel} onChange={(v) => zmien(i, { pesel: v })} placeholder="81032506728" maxLength={11} />
+              <Pole label="Imię i nazwisko" value={o.name} onChange={(v) => zmien(i, { name: v })} placeholder="imię i nazwisko" />
+              <Pole label="Adres zamieszkania" value={o.address} onChange={(v) => zmien(i, { address: v })} placeholder="ul. Piastów 69/24, 31-483 Kraków" />
+              <Pole label="Seria i numer dowodu" value={o.docNumber} onChange={(v) => zmien(i, { docNumber: v })} placeholder="ABC 123456" />
+              <Pole label="PESEL" value={o.pesel} onChange={(v) => zmien(i, { pesel: v })} placeholder="11 cyfr" maxLength={11} />
             </div>
           </div>
         ))}

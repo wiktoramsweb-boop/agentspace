@@ -31,15 +31,21 @@ export function PodgladDokumentow() {
     }
   }
 
-  function protokol() {
+  function protokol(kierunek: "wydanie" | "sprzedaz" = "wydanie") {
     const d = domyslneDane("Kraków");
-    d.lokalAdres = "os. Oświecenia 40/14 w Krakowie";
+    d.kierunek = kierunek;
+    if (kierunek === "sprzedaz") {
+      d.umowaRodzaj = "sprzedaży";
+      d.klauzulaFoto = false;
+      d.pustychUwag = 1;
+    }
+    d.lokalAdres = "ul. Piastów 69/24, 31-483 Kraków";
     d.umowaData = "2026-08-28";
     d.date = "2026-08-28";
-    d.zdajacy = [{ name: "Anna Kowalik", address: "ul. Żmujdzkiej 23/26, 31-426 Kraków", docNumber: "CFE 603189", pesel: "81032506728" }];
+    d.zdajacy = [{ name: "Maria Przykładowa", address: "ul. Piastów 69/24, 31-483 Kraków", docNumber: "ABC 123456", pesel: "00000000000" }];
     d.przejmujacy = [
-      { name: "Emilia Elżbieta Mucha", address: "os. Piastów 19/18, 31-623 Kraków", docNumber: "CGZ 503841", pesel: "06241009604" },
-      { name: "Jonatan Podyma", address: "ul. Raszówek 10, 32-218 Słaboszów", docNumber: "DAZ 594938", pesel: "02310611536" },
+      { name: "Jan Testowy", address: "ul. Przykładowa 12/3, 31-000 Kraków", docNumber: "DEF 654321", pesel: "00000000000" },
+      { name: "Piotr Testowy", address: "ul. Przykładowa 12/3, 31-000 Kraków", docNumber: "GHI 112233", pesel: "00000000000" },
     ];
     d.liczniki = [
       { rodzaj: "Energia elektryczna", numer: "72311904", stan: "14 208", jednostka: "kWh" },
@@ -63,15 +69,17 @@ export function PodgladDokumentow() {
 
   function aneks() {
     const d = domyslnyAneks("Kraków");
-    d.umowaNr = "04/03/2025";
-    d.umowaData = "2025-03-06";
-    d.aneksData = "2025-04-10";
-    d.terminOd = "2025-04-10";
-    d.terminDo = "2025-06-10";
+    d.umowaNr = "12/09/2026";
+    d.umowaData = "2026-09-12";
+    d.aneksData = "2026-10-01";
+    d.terminOd = "2026-10-01";
+    d.terminDo = "2026-12-31";
     d.zleceniodawcy = [{
-      name: "Witold Niewitała", pesel: "54061602354",
-      docNumber: "DGH 177614", address: "ul. Zręczyce 225, 32-420 Zręczyce",
+      name: "Jan Testowy", pesel: "00000000000",
+      docNumber: "ABC 123456", address: "ul. Piastów 69/24, 31-483 Kraków",
     }];
+    d.przedsiebiorca =
+      "Agencja Nieruchomości Spectra s.c. Wiktor Szostek, Krystian Sławęta, NIP: 6772516327, z siedzibą w 30-002 Kraków, ul. Zbożowa 2/1";
     return generujAneksPdf(
       d,
       { nazwa: "Agencja Nieruchomości Spectra s.c. Wiktor Szostek, Krystian Sławęta", nip: "6772516327", adres: "30-002 Kraków, ul. Zbożowa 2/1" },
@@ -88,10 +96,17 @@ export function PodgladDokumentow() {
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={() => pokaz("Protokół zdawczo-odbiorczy", protokol)}
+          onClick={() => pokaz("Protokół: najem", () => protokol("wydanie"))}
           className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-400"
         >
-          Protokół zdawczo-odbiorczy
+          Protokół: najem
+        </button>
+        <button
+          type="button"
+          onClick={() => pokaz("Protokół: sprzedaż", () => protokol("sprzedaz"))}
+          className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+        >
+          Protokół: sprzedaż
         </button>
         <button
           type="button"
