@@ -352,6 +352,9 @@ export async function nowyDokument(opts: { tytulPliku: string; stopka?: string }
     get y() { return y; },
     set y(v: number) { y = v; },
     tekst, tytul, paragraf, ramka, tabela, liniePuste, podpisy, pasek, slupki, kafelki, zapisz,
+    /** Łamie stronę, jeśli nie zostało tyle miejsca. Chroni nagłówek sekcji
+     *  przed zostaniem samemu na dole strony. */
+    zarezerwuj: (ile: number) => zmiesc(ile),
     odstep: (n: number) => { y -= n; },
   };
 }

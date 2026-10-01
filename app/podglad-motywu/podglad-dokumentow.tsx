@@ -5,6 +5,8 @@ import { generujProtokolPdf } from "@/lib/protokol-pdf";
 import { generujAneksPdf } from "@/lib/aneks-pdf";
 import { domyslneDane } from "@/lib/protokol";
 import { domyslnyAneks } from "@/lib/aneks";
+import { generujRaportPdf } from "@/lib/raport-pdf";
+import { PRZYKLADOWY_RAPORT } from "./przykladowy-raport";
 
 /**
  * Podgląd gotowych dokumentów PDF bez logowania i bez wypełniania formularza.
@@ -97,6 +99,15 @@ export function PodgladDokumentow() {
           className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-500"
         >
           Aneks do umowy
+        </button>
+        <button
+          type="button"
+          onClick={() => pokaz("Raport biura", () =>
+            generujRaportPdf(PRZYKLADOWY_RAPORT, "Agencja Nieruchomości Spectra", "Spectra · raport wygenerowany w AgentSpace"),
+          )}
+          className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+        >
+          Raport biura
         </button>
         {co && <span className="text-sm text-slate-500">{co}</span>}
         {blad && <span className="text-sm text-red-600">{blad}</span>}

@@ -47,6 +47,7 @@ export async function generujRaportPdf(
   );
 
   // ── Przychód miesiącami ───────────────────────────────────────────────
+  a.zarezerwuj(170);
   a.tekst("**Prowizja miesiąc po miesiącu**", { size: 10.5, gapAfter: 10 });
   a.slupki(
     r.przychodMiesiacami.map((m) => ({
@@ -58,6 +59,7 @@ export async function generujRaportPdf(
   );
 
   // ── 2. Lejek ──────────────────────────────────────────────────────────
+  a.zarezerwuj(230);
   a.tekst("**2. Gdzie sypie się lejek**", { size: 11.5, gapAfter: 10 });
   const maxOfert = Math.max(...r.lejekOfert.map((s) => s.ile), 1);
   for (const s of r.lejekOfert) {
@@ -70,6 +72,7 @@ export async function generujRaportPdf(
   a.odstep(14);
 
   // ── 3. Źródła ─────────────────────────────────────────────────────────
+  a.zarezerwuj(180);
   a.tekst("**3. Skąd przychodzą pieniądze**", { size: 11.5, gapAfter: 10 });
   if (r.zrodla.length) {
     a.tabela(
@@ -94,6 +97,7 @@ export async function generujRaportPdf(
   }
 
   // ── 4. Zespół ─────────────────────────────────────────────────────────
+  a.zarezerwuj(180);
   a.tekst("**4. Kto pracuje**", { size: 11.5, gapAfter: 10 });
   a.tabela(
     [
@@ -118,6 +122,7 @@ export async function generujRaportPdf(
   );
 
   // ── Tempo ─────────────────────────────────────────────────────────────
+  a.zarezerwuj(150);
   a.tekst("**Tempo pracy biura, ostatnie 12 tygodni**", { size: 10.5, gapAfter: 10 });
   a.slupki(
     r.tempo.map((t) => ({ etykieta: t.tydzien, wartosc: t.dzialania, opis: String(t.dzialania) })),

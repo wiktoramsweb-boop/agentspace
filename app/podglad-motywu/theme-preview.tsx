@@ -23,6 +23,8 @@ import { PropertyTabs } from "../app/nieruchomosci/[id]/property-tabs";
 import { PodgladDokumentow } from "./podglad-dokumentow";
 import { Lejek } from "../app/raporty/lejek";
 import { Tempo } from "../app/raporty/tempo";
+import { PrzychodMiesiacami, UdzialZrodel } from "../app/raporty/wykresy";
+import { PRZYKLADOWY_RAPORT } from "./przykladowy-raport";
 
 
 const MOCK_AGENTS = [
@@ -226,6 +228,21 @@ export function ThemePreview() {
           <KontrastAudyt />
 
           <PodgladDokumentow />
+
+          {/* Wykresy z Raportów dla właściciela. */}
+          <Card>
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Prowizja miesiąc po miesiącu
+            </h2>
+            <PrzychodMiesiacami dane={PRZYKLADOWY_RAPORT.przychodMiesiacami} />
+          </Card>
+
+          <Card>
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+              Udział źródeł w prowizji
+            </h2>
+            <UdzialZrodel zrodla={PRZYKLADOWY_RAPORT.zrodla} />
+          </Card>
 
           {/* Lejek i tempo z Raportów dla właściciela. */}
           <div className="grid gap-4 lg:grid-cols-2">
