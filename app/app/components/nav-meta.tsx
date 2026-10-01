@@ -66,6 +66,7 @@ export const SECTIONS: NavSection[] = [
   {
     title: "Sprzedaż",
     items: [
+      { href: "/app/leady", label: "Leady", icon: <LeadIcon />, color: "fuchsia" },
       { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon />, color: "rose" },
       { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue" },
       { href: "/app/wycena", label: "Analiza cenowa", icon: <ScaleIcon />, color: "violet" },
@@ -204,4 +205,7 @@ function ClipboardIcon() {
 }
 function AnnexIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>;
+}
+function LeadIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-4.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" /></svg>;
 }

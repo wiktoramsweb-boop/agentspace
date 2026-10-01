@@ -25,6 +25,10 @@ import { Lejek } from "../app/raporty/lejek";
 import { Tempo } from "../app/raporty/tempo";
 import { WykresPrzychodu, DonutZrodel, KafelekKPI } from "../app/raporty/wykresy";
 import { PRZYKLADOWY_RAPORT } from "./przykladowy-raport";
+import { LeadyLista } from "../app/leady/leady-lista";
+import { ImportLeadow } from "../app/leady/import-leadow";
+import { NowyLead } from "../app/leady/nowy-lead";
+import type { Lead } from "@/lib/types";
 
 
 const MOCK_AGENTS = [
@@ -77,6 +81,29 @@ const MOCK_THREAD: ThreadItem[] = [
     due_at: "2026-10-20T10:00:00Z", duration_s: null, call_direction: "wychodzaca",
     assigneeNames: ["Natan Sirak"], isRoot: false, isCurrent: false,
     description: "sprawdzić, czy ogłoszenie nadal wisi",
+  },
+];
+
+const bazaLeada = {
+  agency_id: "a1", phone_digits: null, address: null, ad_name: "Mieszkania Kraków - wideo",
+  form_name: "Wycena mieszkania", platform: "fb", external_id: null, next_action_at: null,
+  notes: null, raw: null, client_id: null, created_at: "", updated_at: "",
+};
+const MOCK_LEADY: Lead[] = [
+  {
+    ...bazaLeada, id: "L1", agent_id: null, name: "Nazar Stasyszyn", phone: "530313220",
+    email: "nstasys@example.com", city: "Kraków", message: "Proszę o wycenę mieszkania na Pękowickiej.",
+    source: "meta", campaign: "Pozysk Q3", status: "nowy", submitted_at: "2026-09-25T10:43:00Z",
+  },
+  {
+    ...bazaLeada, id: "L2", agent_id: "u2", name: "Marta Zielińska", phone: "666951570",
+    email: "marta@example.com", city: "Kraków", message: null,
+    source: "widget", campaign: null, status: "proba_kontaktu", submitted_at: "2026-09-18T08:03:00Z",
+  },
+  {
+    ...bazaLeada, id: "L3", agent_id: "u1", name: "Tomasz Bąk", phone: "734796325",
+    email: null, city: "Wieliczka", message: "Dzwonić po 17.",
+    source: "polecenie", campaign: null, status: "spotkanie", submitted_at: "2026-09-17T23:13:00Z",
   },
 ];
 
@@ -226,6 +253,18 @@ export function ThemePreview() {
           </div>
 
           <KontrastAudyt />
+
+          {/* Moduł Leady: lista, wczytywanie z pliku i ręczne dodawanie. */}
+          <Card>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Leady</h2>
+              <div className="flex gap-2">
+                <ImportLeadow agenci={MOCK_AGENTS} />
+                <NowyLead agenci={MOCK_AGENTS} />
+              </div>
+            </div>
+            <LeadyLista leady={MOCK_LEADY} agenci={MOCK_AGENTS} mozeUsuwac />
+          </Card>
 
           <PodgladDokumentow />
 

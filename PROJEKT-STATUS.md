@@ -598,6 +598,42 @@ okna na kilka stron.
 **Moduł „Asystent mailowy" usunięty.** Był zbudowany wokół naszej skrzynki, więc
 nie nadawał się do sprzedaży innym biurom.
 
+## Moduł Leady (październik 2026)
+
+Powstał z konkretnego zapytania: właścicielka biura napisała przez formularz, że
+pozyskuje leady z kilku źródeł, w dużej mierze z Meta Ads, i chce je
+kontrolować. Propertly ma coś takiego przy widżecie wyceny, ale płytko: lista,
+status i przypisanie, bez przejścia do CRM.
+
+**Dlaczego osobna tabela, a nie `clients`.** Większość leadów nigdy nie zostanie
+klientem, a baza klientów ma zostać czysta. Lead, z którym coś wyszło, przechodzi
+do `clients` jednym przyciskiem, a `leads.client_id` pamięta, skąd przyszedł.
+
+**Wczytywanie z pliku to sedno modułu** (`lib/leady-import.ts`). Meta pozwala
+pobrać kontakty, ale „CSV" z Business Suite bywa rozdzielony przecinkiem,
+średnikiem albo tabulatorem i raz jest w UTF-8, a raz w UTF-16. Nagłówki zależą
+od tego, jak biuro nazwało pytania w formularzu, więc po polsku bywa „Imię
+i nazwisko", a po angielsku „full_name". Dlatego nie zakładamy jednego formatu:
+rozpoznajemy kodowanie, separator i znaczenie kolumn, a wynik pokazujemy do
+poprawienia przed zapisem. Dzięki temu ten sam importer przyjmie plik z Otodom,
+z nieruchomosci-online albo listę z Excela.
+
+**Duplikaty** odsiewamy na dwa sposoby: po identyfikatorze z pliku (ten sam plik
+wgrany drugi raz) i po dziewięciu ostatnich cyfrach telefonu (ta sama osoba
+z dwóch kampanii). Drugi przypadek jest częstszy i to on ratuje agenta przed
+dzwonieniem dwa razy do tej samej osoby.
+
+**Kontrola:** `npm run test:leady` sprawdza parser na trzech kształtach plików,
+w jakich faktycznie przychodzą: eksport Meta po angielsku, polski ze średnikiem
+oraz tabulatory w UTF-16. Plus przecinki w cudzysłowach i odsiewanie wierszy bez
+telefonu i maila.
+
+**Czego świadomie nie ma:** wczytywania plików .xlsx. Wymagałoby to biblioteki,
+a Meta i tak pozwala pobrać CSV. Kreator rozpoznaje plik Excela i mówi wprost,
+co zrobić.
+
+**Migracja:** `lib/SETUP-v33-leady.sql`.
+
 **Świadomie NIE zaglądaliśmy do ASARI.** To płatny produkt konkurencji i
 systematyczne przeglądanie jego formularzy pod odtworzenie w produkcie, który z
 nim konkuruje, łamie regulamin i psuje pozycję AgentSpace przy sprzedaży innym

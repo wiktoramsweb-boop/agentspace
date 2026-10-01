@@ -232,6 +232,76 @@ export type Deal = {
   created_at: string;
 };
 
+// ---------- LEADY ----------
+
+/**
+ * Lead to kontakt przed decyzją: zgłoszenie z reklamy, z widżetu albo
+ * z rozmowy. Trzymamy je osobno od klientów, bo większość nigdy klientem
+ * nie zostanie, a baza klientów ma zostać czysta.
+ */
+export type Lead = {
+  id: string;
+  agency_id: string;
+  agent_id: string | null;
+  name: string | null;
+  phone: string | null;
+  phone_digits: string | null;
+  email: string | null;
+  city: string | null;
+  address: string | null;
+  message: string | null;
+  source: string;
+  campaign: string | null;
+  ad_name: string | null;
+  form_name: string | null;
+  platform: string | null;
+  external_id: string | null;
+  submitted_at: string | null;
+  status: LeadStatus;
+  next_action_at: string | null;
+  notes: string | null;
+  raw: Record<string, string> | null;
+  client_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type LeadStatus =
+  | "nowy"
+  | "proba_kontaktu"
+  | "kontakt"
+  | "spotkanie"
+  | "klient"
+  | "odrzucony";
+
+/** Etapy leada. Kolejność ma znaczenie: po niej liczymy lejek. */
+export const LEAD_STATUSES: {
+  value: LeadStatus;
+  label: string;
+  color: string;
+  opis: string;
+}[] = [
+  { value: "nowy", label: "Nowy", color: "bg-blue-100 text-blue-700", opis: "Jeszcze nikt nie dzwonił" },
+  { value: "proba_kontaktu", label: "Próba kontaktu", color: "bg-amber-100 text-amber-700", opis: "Dzwoniliśmy, nie odebrał" },
+  { value: "kontakt", label: "Kontakt nawiązany", color: "bg-cyan-100 text-cyan-700", opis: "Rozmowa odbyta" },
+  { value: "spotkanie", label: "Umówione spotkanie", color: "bg-violet-100 text-violet-700", opis: "Jest termin" },
+  { value: "klient", label: "Przeszedł do klientów", color: "bg-emerald-100 text-emerald-700", opis: "Trafił do CRM" },
+  { value: "odrzucony", label: "Odrzucony", color: "bg-red-100 text-red-700", opis: "Nie jest zainteresowany albo to spam" },
+];
+
+export const LEAD_SOURCES: { value: string; label: string }[] = [
+  { value: "meta", label: "Meta Ads" },
+  { value: "google", label: "Google Ads" },
+  { value: "widget", label: "Widżet wyceny" },
+  { value: "strona", label: "Strona biura" },
+  { value: "portal", label: "Portal ogłoszeniowy" },
+  { value: "polecenie", label: "Polecenie" },
+  { value: "telefon", label: "Telefon przychodzący" },
+  { value: "reczny", label: "Dodany ręcznie" },
+  { value: "import", label: "Z pliku" },
+  { value: "inne", label: "Inne" },
+];
+
 // ---------- NIERUCHOMOŚCI (oferty) ----------
 
 export type PropertyDealKind = "sprzedaz" | "wynajem";
