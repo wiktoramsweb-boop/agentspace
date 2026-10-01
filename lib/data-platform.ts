@@ -7,6 +7,7 @@ import { createSupabaseAdmin } from "./supabase/admin";
  */
 const LIST_LIMIT = 1000;
 import type {
+  Activity,
   Task,
   Client,
   ClientNote,
@@ -344,15 +345,36 @@ export async function getPropertiesClientInterestedIn(clientId: string): Promise
   return ((data ?? []).map((r) => r.property).filter(Boolean) as unknown) as Property[];
 }
 
-/** Transakcje powiązane z ofertą. */
-export async function getDealsForProperty(propertyId: string): Promise<Deal[]> {
+/** Transakcje powiązane z ofertą, razem z kartą transakcji. */
+export async function getDealsForProperty(propertyId: string): Promise<DealWithCard[]> {
   const admin = createSupabaseAdmin();
   const { data } = await admin
     .from("deals")
     .select("*")
     .eq("property_id", propertyId)
     .order("created_at", { ascending: false });
-  return (data ?? []) as Deal[];
+  return (data ?? []) as DealWithCard[];
+}
+
+/**
+ * Działania powiązane z ofertą: telefony, prezentacje, zadania.
+ * Bierzemy całe wątki razem z dopiskami, bo na karcie oferty liczy się
+ * chronologia kontaktu, a nie to, co było pierwszą rozmową.
+ */
+export async function getActivitiesForProperty(
+  propertyId: string,
+  agencyId: string | null,
+): Promise<Activity[]> {
+  if (!agencyId) return [];
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("activities")
+    .select("*")
+    .eq("agency_id", agencyId)
+    .eq("property_id", propertyId)
+    .order("due_at", { ascending: false, nullsFirst: false })
+    .limit(100);
+  return (data ?? []) as Activity[];
 }
 
 /** Lekka lista klientów (id + nazwa + typ) do selectów w formularzach. */

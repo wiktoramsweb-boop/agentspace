@@ -13,7 +13,6 @@ import {
   PROPERTY_TYPES,
   PROPERTY_DEAL_KINDS,
   CLIENT_TYPE_LABELS,
-  DEAL_STATUSES,
 } from "@/lib/types";
 import { Card } from "../../components/ui";
 import { MiniMap } from "../../components/mini-map";
@@ -31,22 +30,32 @@ import { getActiveSearches } from "@/lib/data-searches";
 import { NearbyCard } from "./nearby-card";
 import { DetailsCard } from "./details-card";
 import { getDocuments } from "@/lib/data-documents";
+import { getActivitiesForProperty } from "@/lib/data-platform";
+import { PropertyTabs, TABS, type TabKey } from "./property-tabs";
+import { TransactionTab } from "./transaction-tab";
+import { ActivitiesTab } from "./activities-tab";
 import { DocumentsCard } from "../../dokumenty/documents-card";
 import { PhotoManager } from "../photo-manager";
 import { getAgencySettings, matchTolerance, photoConfigFrom } from "@/lib/agency-settings";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ z?: string; t?: string }>;
+};
 
-export default async function PropertyDetailPage({ params }: Props) {
+export default async function PropertyDetailPage({ params, searchParams }: Props) {
   const user = await requireUser();
   const { id } = await params;
+  const { z, t } = await searchParams;
+  // Zakładka z adresu; cokolwiek nieznanego traktujemy jak wejście na Ofertę.
+  const tab: TabKey = (TABS.find((x) => x.key === z)?.key ?? "oferta") as TabKey;
 
   const property = await getProperty(id);
   if (!property) notFound();
   // Baza ofert jest wspólna dla biura - dostęp mają wszyscy z tej agencji.
   if (property.agency_id !== user.agency_id) redirect("/app/nieruchomosci");
 
-  const [owner, interested, deals, allClients, activeSearches, settings, documents] = await Promise.all([
+  const [owner, interested, deals, allClients, activeSearches, settings, documents, activities] = await Promise.all([
     property.owner_client_id ? getClient(property.owner_client_id) : Promise.resolve(null),
     getPropertyInterestedClients(id),
     getDealsForProperty(id),
@@ -54,6 +63,7 @@ export default async function PropertyDetailPage({ params }: Props) {
     user.agency_id ? getActiveSearches(user.agency_id) : Promise.resolve([]),
     getAgencySettings(user.agency_id, user.agency?.name),
     getDocuments(user.agency_id, "property", id),
+    getActivitiesForProperty(id, user.agency_id),
   ]);
 
   const status = PROPERTY_STATUSES.find((s) => s.value === property.status);
@@ -91,6 +101,13 @@ export default async function PropertyDetailPage({ params }: Props) {
     property.status === "aktywna" &&
     property.energy_cert_status !== "posiada" &&
     property.energy_cert_status !== "zwolniona";
+
+  const liczniki = {
+    poszukiwania: interested.length,
+    dzialania: activities.length,
+    dokumenty: documents.docs.length,
+    transakcja: deals.length,
+  };
 
   return (
     <>
@@ -131,95 +148,96 @@ export default async function PropertyDetailPage({ params }: Props) {
         <StatusBar propertyId={property.id} status={property.status} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        {/* Lewa: zdjęcia, parametry, opis, mapa */}
-        <div className="space-y-6">
-          <Card>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Zdjęcia ({property.photos?.length ?? 0})
-            </h2>
-            <PhotoManager
-              propertyId={property.id}
-              initial={property.photos ?? []}
-              config={photoConfigFrom(settings)}
-              canEditSettings={user.role === "owner"}
-            />
-          </Card>
+      <PropertyTabs propertyId={property.id} active={tab} liczniki={liczniki} />
 
-          <Card>
-            {energyMissing && (
-              <p className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                Brak świadectwa energetycznego. Ogłoszenie musi podawać wskaźnik EP: uzupełnij go w edycji
-                oferty albo wgraj skan w Dokumentach.
-              </p>
-            )}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-              {specs.map((s) => (
-                <div key={s.label}>
-                  <p className="text-xs uppercase tracking-wider text-slate-500">{s.label}</p>
-                  <p className="mt-0.5 font-semibold text-slate-900">{s.value}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <DetailsCard property={property} />
-
-          {property.description && (
+      {tab === "oferta" && (
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          {/* Lewa: zdjęcia, parametry, opis, mapa */}
+          <div className="space-y-6">
             <Card>
-              <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">
-                Opis
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+                Zdjęcia ({property.photos?.length ?? 0})
               </h2>
-              <p className="whitespace-pre-wrap text-sm text-slate-700">
-                {property.description}
-              </p>
+              <PhotoManager
+                propertyId={property.id}
+                initial={property.photos ?? []}
+                config={photoConfigFrom(settings)}
+                canEditSettings={user.role === "owner"}
+              />
             </Card>
-          )}
 
-          {property.lat != null && property.lng != null ? (
-            <Card className="!p-0 !overflow-hidden">
-              <MiniMap lat={property.lat} lng={property.lng} title={property.title} />
-            </Card>
-          ) : (
-            (property.address || property.city) && (
-              <Card>
-                <p className="text-sm text-slate-500">
-                  Brak dokładnej lokalizacji na mapie. Edytuj adres i wybierz podpowiedź
-                  z listy, żeby ustawić pinezkę.
+            <Card>
+              {energyMissing && (
+                <p className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                  Brak świadectwa energetycznego. Ogłoszenie musi podawać wskaźnik EP: uzupełnij go w edycji
+                  oferty albo wgraj skan w Dokumentach.
                 </p>
+              )}
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {specs.map((sp) => (
+                  <div key={sp.label}>
+                    <p className="text-xs uppercase tracking-wider text-slate-500">{sp.label}</p>
+                    <p className="mt-0.5 font-semibold text-slate-900">{sp.value}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <DetailsCard property={property} />
+
+            {property.description && (
+              <Card>
+                <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">Opis</h2>
+                <p className="whitespace-pre-wrap text-sm text-slate-700">{property.description}</p>
               </Card>
-            )
-          )}
+            )}
 
-          {property.lat != null && property.lng != null && (
-            <NearbyCard lat={property.lat} lng={property.lng} />
-          )}
+            {property.lat != null && property.lng != null ? (
+              <Card className="!p-0 !overflow-hidden">
+                <MiniMap lat={property.lat} lng={property.lng} title={property.title} />
+              </Card>
+            ) : (
+              (property.address || property.city) && (
+                <Card>
+                  <p className="text-sm text-slate-500">
+                    Brak dokładnej lokalizacji na mapie. Edytuj adres i wybierz podpowiedź
+                    z listy, żeby ustawić pinezkę.
+                  </p>
+                </Card>
+              )
+            )}
+
+            {property.lat != null && property.lng != null && (
+              <NearbyCard lat={property.lat} lng={property.lng} />
+            )}
+          </div>
+
+          {/* Prawa: właściciel i usuwanie oferty */}
+          <div className="space-y-6">
+            <Card>
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+                {property.deal_kind === "wynajem" ? "Wynajmujący" : "Właściciel"}
+              </h2>
+              <OwnerCard
+                propertyId={property.id}
+                ownerId={property.owner_client_id}
+                ownerRole={property.owner_role ?? null}
+                ownerName={owner?.name ?? null}
+                ownerPhone={owner?.phone ?? null}
+                dealKind={property.deal_kind}
+                clients={allClients}
+              />
+            </Card>
+
+            <div className="pt-2">
+              <DeletePropertyButton propertyId={property.id} />
+            </div>
+          </div>
         </div>
+      )}
 
-        {/* Prawa: dokumenty, właściciel, zainteresowani, transakcje */}
-        <div className="space-y-6">
-          <Card>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Dokumenty ({documents.docs.length})
-            </h2>
-            <DocumentsCard entity="property" entityId={property.id} initial={documents.docs} ready={documents.ready} />
-          </Card>
-
-          <Card>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
-              {property.deal_kind === "wynajem" ? "Wynajmujący" : "Właściciel"}
-            </h2>
-            <OwnerCard
-              propertyId={property.id}
-              ownerId={property.owner_client_id}
-              ownerRole={property.owner_role ?? null}
-              ownerName={owner?.name ?? null}
-              ownerPhone={owner?.phone ?? null}
-              dealKind={property.deal_kind}
-              clients={allClients}
-            />
-          </Card>
-
+      {tab === "poszukiwania" && (
+        <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <h2 className="mb-1 text-sm font-medium uppercase tracking-wider text-slate-500">
               Pasujące poszukiwania
@@ -258,45 +276,30 @@ export default async function PropertyDetailPage({ params }: Props) {
             )}
             <InterestAdder propertyId={property.id} clients={addableClients} />
           </Card>
-
-          <Card>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Transakcje ({deals.length})
-            </h2>
-            {deals.length === 0 ? (
-              <p className="text-sm text-slate-400">
-                Brak transakcji. Dodaj ją w zakładce Prowizje i powiąż z tą ofertą.
-              </p>
-            ) : (
-              <ul className="space-y-2">
-                {deals.map((d) => {
-                  const ds = DEAL_STATUSES.find((s) => s.value === d.status);
-                  return (
-                    <li
-                      key={d.id}
-                      className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-2"
-                    >
-                      <span className="min-w-0 truncate text-sm text-slate-800">
-                        {d.title}
-                        <span className="text-slate-500"> · {formatPln(d.commission_pln)}</span>
-                      </span>
-                      {ds && (
-                        <span className={`flex-shrink-0 rounded px-2 py-0.5 text-xs ${ds.color}`}>
-                          {ds.label}
-                        </span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </Card>
-
-          <div className="pt-2">
-            <DeletePropertyButton propertyId={property.id} />
-          </div>
         </div>
-      </div>
+      )}
+
+      {tab === "dzialania" && <ActivitiesTab activities={activities} />}
+
+      {tab === "dokumenty" && (
+        <Card>
+          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+            Dokumenty ({documents.docs.length})
+          </h2>
+          <DocumentsCard entity="property" entityId={property.id} initial={documents.docs} ready={documents.ready} />
+        </Card>
+      )}
+
+      {tab === "transakcja" && (
+        <TransactionTab
+          propertyId={property.id}
+          propertyTitle={property.title}
+          propertyPrice={property.price_pln}
+          deals={deals}
+          wybranaId={t}
+          defaultSplit={user.default_split_pct ?? 50}
+        />
+      )}
     </>
   );
 }

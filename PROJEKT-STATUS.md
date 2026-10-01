@@ -522,6 +522,43 @@ nawiasami - inaczej `onChange={(e) => ...}` urywa tag na strzałce.
 Strona marketingowa i wzory stron dla biur (`app/components/wzory`) celowo
 zostają na natywnym `<select>`: mają własny wygląd i nie są częścią aplikacji.
 
+**Zakładki na karcie nieruchomości.** Wszystko leżało na jednej długiej stronie,
+a karta transakcji mieszkała w Prowizjach - żeby do niej dojść, trzeba było wyjść
+z oferty, odszukać transakcję na liście i dopiero w nią wejść. Teraz karta oferty
+ma pasek zakładek: **Oferta · Poszukiwania · Działania · Dokumenty · Karta
+transakcji**, każda z licznikiem pozycji. Zakładkę trzymamy w adresie (`?z=`),
+a nie w stanie komponentu: dzięki temu da się wysłać komuś link prosto do
+dokumentów, a strzałka wstecz wraca tam, gdzie agent był.
+
+Karta transakcji przy ofercie to ten sam `TransactionCardEditor` co w Prowizjach,
+nie kopia. Gdy oferta ma kilka transakcji, wybraną trzymamy w `?t=`. Strona
+`/app/prowizje/[id]` zostaje, bo transakcja nie musi być powiązana z ofertą,
+i obie strony linkują do siebie nawzajem.
+
+**Kontrast: narzędzie zamiast kolejnej łatki.** `/podglad-motywu` ma przycisk
+„Zmierz kontrast". Chodzi po każdym widocznym napisie, w obu motywach, liczy tło
+przez złożenie przezroczystości wszystkich rodziców i porównuje z progiem WCAG.
+Trzy rzeczy, bez których to nie działało:
+
+1. **Przeliczanie `oklch()` i `lab()` wprost.** Tailwind podaje kolory w tych
+   zapisach, a ani regex, ani `canvas.fillStyle` ich nie czytają. Wcześniejsze
+   pomiary pokazywały 1,0:1 tam, gdzie naprawdę było 17:1, i goniłem błędy,
+   których nie było.
+2. **Wyłączenie animacji na czas pomiaru.** Inaczej mierzyliśmy kolory w połowie
+   przejścia między motywami i wychodziło „biały tekst na białym".
+3. **Pomijanie teł z gradientem.** Nie da się ich sprowadzić do jednego koloru,
+   więc zamiast zgadywać, liczymy je osobno.
+
+Komponenty, które złapały błąd, dopisujemy do `/podglad-motywu` - tak trafiły tam
+oś czasu wątku rozmów i pasek zakładek.
+
+**Co z tego wyszło i czego świadomie nie zmieniamy.** Po poprawkach zostaje
+15 napisów poniżej 4,5:1 na motyw i są to prawie wyłącznie **białe napisy na
+zielonych przyciskach marki (2,47:1)**. To jest decyzja do podjęcia, nie błąd do
+cichego naprawienia: żeby biel przeszła, zielone tło musiałoby zejść mniej
+więcej do `emerald-700`, czyli marka wyraźnie ciemnieje. Do czasu decyzji
+zostawiamy jak jest.
+
 **Świadomie NIE zaglądaliśmy do ASARI.** To płatny produkt konkurencji i
 systematyczne przeglądanie jego formularzy pod odtworzenie w produkcie, który z
 nim konkuruje, łamie regulamin i psuje pozycję AgentSpace przy sprzedaży innym

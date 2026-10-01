@@ -29,7 +29,24 @@ export default async function DealDetailPage({ params }: Props) {
 
       <PageHeader
         title={deal.title}
-        subtitle="Karta transakcji - pilnuj etapów i dokumentów. Zmiany zapisują się same."
+        subtitle={
+          <>
+            Karta transakcji - pilnuj etapów i dokumentów. Zmiany zapisują się same.
+            {deal.property_id && (
+              <>
+                {" "}
+                Tę samą kartę masz przy ofercie:{" "}
+                <Link
+                  href={`/app/nieruchomosci/${deal.property_id}?z=transakcja&t=${deal.id}`}
+                  className="text-emerald-700 underline decoration-emerald-400 underline-offset-2"
+                >
+                  otwórz nieruchomość
+                </Link>
+                .
+              </>
+            )}
+          </>
+        }
         action={
           status && <span className={`rounded-md px-2.5 py-1 text-xs font-medium ${status.color}`}>{status.label}</span>
         }

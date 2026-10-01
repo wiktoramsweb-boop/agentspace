@@ -19,6 +19,7 @@ import { CalendarDemo } from "./calendar-demo";
 import { DocsDemo } from "./docs-demo";
 import { KontrastAudyt } from "./kontrast";
 import { ThreadPanel, type ThreadItem } from "../app/dzialania/[id]/thread-panel";
+import { PropertyTabs } from "../app/nieruchomosci/[id]/property-tabs";
 
 
 const MOCK_AGENTS = [
@@ -220,6 +221,13 @@ export function ThemePreview() {
           </div>
 
           <KontrastAudyt />
+
+          {/* Zakładki na karcie nieruchomości. */}
+          <PropertyTabs
+            propertyId="podglad"
+            active="oferta"
+            liczniki={{ poszukiwania: 3, dzialania: 12, dokumenty: 2, transakcja: 1 }}
+          />
 
           {/* Oś czasu wątku rozmów. Trafiła tu po tym, jak wyróżniona rozmowa
               okazała się nieczytelna w ciemnym motywie - teraz pilnuje jej
