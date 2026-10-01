@@ -1,5 +1,23 @@
 # Analiza całej aplikacji AgentSpace (1 października 2026)
 
+## ✅ Status poprawek (stan na koniec 1 października 2026)
+
+**Naprawione w kodzie:** punkty 1, 2, 3, 4, 5, 6, 7, 8, 9 (bez licznika odsłon), 10, 11, 12, 13, 15, 16 (limity i błędy), 18, 22, 23 i 26 (dokumentacja). Przy okazji znalazłem i naprawiłem jeszcze jeden wyciek: listy klientów do wyboru w formularzach wysyłały do przeglądarki telefony wszystkich klientów biura, nawet przy włączonym ukrywaniu kontaktów. Doszedł też test uprawnień (`npm run test:uprawnienia`).
+
+**Wymaga Twojego działania:**
+- Uruchomić w Supabase `lib/SETUP-v34-limity.sql`. Bez tego limity nie działają, ale nic się nie psuje.
+- Sprawdzić w Vercel, czy jest `CRON_SECRET`. Bez niego raport miesięczny i poranna odprawa będą teraz odmawiać.
+- Zrotować klucze API (pkt 25) i potwierdzić, które migracje są uruchomione.
+
+**Do Twojej decyzji (świadomie nie ruszałem):**
+- Pkt 14: harmonogram przypomnień (Vercel Pro albo cron-job.org).
+- Pkt 17: zmiana modelu AI. Wymaga przeróbki pięciu wywołań i testu z prawdziwym kluczem.
+- Pkt 24: adres e-mail w domenie zamiast gmaila.
+- Pkt 21 (waga stron) i brakujące funkcje (płatności, dziennik zmian, eksport danych) to osobne większe zadania.
+- Polityka prywatności jest zaktualizowana, ale warto, żeby przejrzał ją prawnik.
+
+---
+
 ## Jak sprawdzałem
 
 - **Kod:** cały projekt (527 plików): 20 endpointów API, 26 plików akcji serwera, 33 migracje SQL, strony aplikacji i marketingu.

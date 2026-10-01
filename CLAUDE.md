@@ -12,7 +12,7 @@
 
 **⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić w Supabase SQL Editor pliki `lib/SETUP-*.sql` po kolei - v1 ✅ uruchomione; **v2 (platforma), v3 (kategorie+cele), v4 (łatwe scenariusze) prawdopodobnie do uruchomienia - POTWIERDZIĆ Z USEREM**. Kod odporny na brak tabel (puste, nie crashuje).
 
-**Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa - portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`.
+**Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa - portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`. **`CRON_SECRET` jest WYMAGANY** - bez niego crony odmawiają (`lib/cron-auth.ts`). Limity AI: `AI_DAILY_LIMIT_USER` (domyślnie 200), `AI_DAILY_LIMIT_AGENCY` (1500).
 
 **Następne (omówione, NIE zbudowane):** PWA+powiadomienia (rekomendowane następne - pętla nawyku dla terenu), moduł Nieruchomości (oferty+zdjęcia), OtoDom eksport (bariera=dostęp/umowa nie kod), głos AI w Coach (ElevenLabs=koszty), płatności, Google Calendar.
 
@@ -36,15 +36,22 @@ z wybranego wzoru. Klient edytuje wszystko w `/app/ustawienia/strona`. Wymaga mi
   - Supabase SSR: `lib/supabase/{server,client,admin,middleware}.ts`, root `middleware.ts` chroni `/app`.
 - **Platforma codziennej pracy** (v2): `/app/klienci` (CRM: karty, notatki, pipeline), `/app/prowizje` (deals + cel miesięczny), zadania inline na pulpicie, **AI Asystent Dnia** (`/api/assistant/daily` - 3 priorytety z klientów/pipeline/tasków). Data: `lib/data-platform.ts`, `lib/format.ts`, akcje w `app/app/{klienci,prowizje}/actions.ts` + `app/app/tasks-actions.ts`.
 - **Panel właściciela rozbudowany:** mocne/słabe obszary per kategoria, prowizje per agent, drill-down `/app/zespol/[agentId]`. **Raport miesięczny email** (`lib/report.ts`) - przycisk manualny + cron `/api/cron/monthly-report` (vercel.json, 1. dnia mc).
-- **SETUP wymaga (user):** uruchomić `lib/SETUP-uruchom-w-supabase.sql` ORAZ `lib/SETUP-v2-platforma.sql` w Supabase SQL Editor + dodać env `ANTHROPIC_API_KEY` w Vercel (reszta publicznych ma defaulty w `lib/supabase/config.ts`). Opcjonalnie `CRON_SECRET` dla crona raportu.
+- **SETUP wymaga (user):** uruchomić `lib/SETUP-uruchom-w-supabase.sql` ORAZ `lib/SETUP-v2-platforma.sql` w Supabase SQL Editor + dodać env `ANTHROPIC_API_KEY` w Vercel (reszta publicznych ma defaulty w `lib/supabase/config.ts`). `CRON_SECRET` wymagany dla cronów.
 
 **Wzorzec dostępu do danych:** cały dostęp przez server-side kod z service_role (`createSupabaseAdmin`), autoryzacja egzekwowana w kodzie na bazie sesji (`requireUser`/`requireOwner`). RLS włączone jako backstop. Anon key tylko do auth (login/signup/getUser).
+
+**Zasady przy nowym kodzie (po audycie z października 2026):**
+- Reguły „kto może co” trzymamy w `lib/uprawnienia.ts` i pilnujemy testem `npm run test:uprawnienia`. Agent usuwa i przepisuje tylko swoje rekordy, menedżer nie widzi kwot cudzych transakcji, ukrywanie kontaktów obowiązuje także na kartach i w listach do wyboru.
+- ID klienta/oferty/osoby przychodzące z formularza sprawdzamy przez `lib/agency-ids.ts` (tylko z własnego biura).
+- Każdy nowy endpoint AI: `aiLimitReached` z `lib/rate-limit.ts` + limit długości tekstu. Publiczny formularz: pułapka `website` + `hitLimit` po skrócie IP.
+- Tekst od użytkownika w mailu HTML zawsze przez `escapeHtml` (`lib/html.ts`).
+- „Dzisiaj” zawsze `todayPL()` / `dateKeyPL()` z `lib/datetime.ts`, nigdy `toISOString().slice(0, 10)`.
 
 ## Co to jest
 
 Platforma operacyjna SaaS dla agentów nieruchomości w Polsce. Codzienne miejsce pracy agenta z dashboardem, notatkami, planem dnia, integracją kalendarza Google, rankingiem agentów (KPI/umowy), i flagowym modułem **AI Coach** (trening cold calli z AI klientem, scoring, feedback po polsku).
 
-**Decyzja zakupu:** właściciel biura. **Użytkownicy:** agenci. **Cena startowa:** 299 zł/mc/biuro do 10 agentów. **Klient zero:** biuro nieruchomości Spectra w Krakowie (biuro ownera).
+**Decyzja zakupu:** właściciel biura. **Użytkownicy:** agenci. **Cennik:** aktualne pakiety na `/cennik` (Start 499 zł/mc, Pro 899 zł/mc). **Klient zero:** biuro nieruchomości Spectra w Krakowie (biuro ownera).
 
 Pełny kontekst i plan w `~/spectra-research/` (pliki 01-07).
 
@@ -56,7 +63,7 @@ Pełny kontekst i plan w `~/spectra-research/` (pliki 01-07).
 - **UI komponenty:** docelowo shadcn/ui (dodamy gdy potrzeba)
 - **Ikony:** docelowo Lucide React
 - **Hosting:** Vercel (auto-deploy z main branch)
-- **DB / Auth / Storage:** Supabase (jeszcze nie podłączone, będzie w Fazie 2)
+- **DB / Auth / Storage:** Supabase (region Frankfurt), podłączone i działa na produkcji
 - **AI (przyszłość):** Anthropic Claude (logika), OpenAI Whisper (STT PL), ElevenLabs (TTS PL), Vapi (real-time voice)
 - **Płatności (przyszłość):** Stripe lub Tpay
 
@@ -90,7 +97,7 @@ Wiktor jest właścicielem biura nieruchomości Spectra w Krakowie. **Początkuj
 3. **AI Coach text** (Faza 3 sprint 2) - 5 scenariuszy, chat z AI klientem (tekstowo)
 4. **AI Coach voice** (Faza 3 sprint 3) - Whisper + ElevenLabs + Vapi
 5. **Scoring + dashboardy** (Faza 3 sprint 4) - feedback per sesja, ranking agentów, statystyki biura
-6. **Płatności** (Faza 3 końcówka) - Stripe/Tpay, plan 299 zł/mc
+6. **Płatności** (Faza 3 końcówka) - Stripe/Tpay, pakiety z `/cennik`
 7. **Notatki i plan dnia** (post-launch) - codzienne use case
 8. **Integracja kalendarza Google** (post-launch)
 9. **Tracking umów + KPI** (post-launch)

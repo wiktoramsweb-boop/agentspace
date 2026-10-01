@@ -3,6 +3,24 @@
 > Ten dokument to kompletny zapis projektu do przekazania nowej sesji Claude.
 > Czytaj razem z `CLAUDE.md` (architektura + zasady).
 
+## 🛡️ AUDYT I POPRAWKI (1 października 2026) - czytaj najpierw
+
+Pełny audyt: `ANALIZA-APLIKACJI-2026-10.md`. Naprawione w kodzie:
+- **Next.js 16.3.8** (krytyczne luki w 16.2.9). Mapa strony biura to teraz route `app/strona/[slug]/sitemap.xml/route.ts` (16.3 nie przekazuje parametrów do `sitemap.ts`).
+- **Crony bez `CRON_SECRET` odmawiają** (`lib/cron-auth.ts`). ⚠️ `CRON_SECRET` MUSI być w Vercel, inaczej raport miesięczny i poranna odprawa przestaną chodzić.
+- **Limity** (`lib/rate-limit.ts`, tabela `rate_events`, migracja **`lib/SETUP-v34-limity.sql`**): AI 200/dobę na osobę i 1500 na biuro (env `AI_DAILY_LIMIT_USER`, `AI_DAILY_LIMIT_AGENCY`), rejestracja 3/dobę z adresu, logowanie 20/h na e-mail, zgłoszenia ze stron biur 5/h, kontakt i waitlist 5/h. Bez migracji wszystko działa jak dawniej, tylko bez limitów.
+- `/api/geocode` i `/api/nearby` tylko dla zalogowanych. AI Coach: max 2000 znaków na wiadomość, 60 tur, czytelny błąd zamiast 500.
+- **Uprawnienia** (`lib/uprawnienia.ts`, test `npm run test:uprawnienia`): ukrywanie kontaktów działa na karcie klienta, karcie oferty i w listach wyboru; agent usuwa/przepisuje tylko swoje; karta transakcji przy ofercie pokazuje kwoty tylko opiekunowi i CEO, cudza jest tylko do podglądu, CEO może edytować; Raporty tylko dla CEO; ID z formularzy sprawdzane w `lib/agency-ids.ts`.
+- Maile: `escapeHtml` (`lib/html.ts`). Nagłówki bezpieczeństwa w `next.config.ts`.
+- Polskie strony błędu (`app/app/error.tsx`, `app/error.tsx`, `app/global-error.tsx`).
+- „Dzisiaj” liczone wg Europe/Warsaw w całej aplikacji (wcześniej po północy odczyt trafiał we wczoraj).
+- Przełącznik PL/EN nie prowadzi już na `/pl/...`; logowanie/rejestracja `noindex`.
+- ESLint 0 błędów, Leaflet z `public/vendor/leaflet`, polityka prywatności zaktualizowana (do przejrzenia przez prawnika).
+
+**Do zrobienia przez Wiktora:** uruchomić `SETUP-v34-limity.sql`, sprawdzić `CRON_SECRET` w Vercel, zrotować klucze (sekcja 9), zdecydować o cronie przypomnień (sekcja 10d).
+
+---
+
 ## 🟢 SESJA LIPIEC 2026 - co dodaliśmy w tym czacie (najświeższe)
 
 Wszystko live na `main`/Vercel. W tej sesji doszło:
