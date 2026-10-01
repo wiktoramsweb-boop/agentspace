@@ -70,7 +70,10 @@ export const config = {
   // /oferta/fonts/*.ttf, a bez tego wyjątku middleware brał je za adres
   // marketingowy zaczynający się od „oferta" i oddawał 404. Objaw był mylący,
   // bo pliki są na dysku, a mimo to generator umowy nie mógł ich pobrać.
+  //
+  // xml celowo NIE jest na liście: na własnej domenie biura /sitemap.xml
+  // musi trafić do mapy strony biura, a nie do mapy agentspace.pl.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|xml|pdf|woff2?|ttf|otf)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|pdf|woff2?|ttf|otf)$).*)",
   ],
 };
