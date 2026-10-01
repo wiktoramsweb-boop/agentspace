@@ -65,5 +65,12 @@ export async function middleware(request: NextRequest) {
 export const config = {
   // Pomijamy pliki statyczne i obrazy, żeby middleware nie dotykał każdego
   // zdjęcia oferty. Reszta przechodzi, bo tylko tak rozpoznamy własną domenę.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|xml|woff2?)$).*)"],
+  //
+  // Na liście musi być też ttf: czcionki generatorów PDF leżą pod
+  // /oferta/fonts/*.ttf, a bez tego wyjątku middleware brał je za adres
+  // marketingowy zaczynający się od „oferta" i oddawał 404. Objaw był mylący,
+  // bo pliki są na dysku, a mimo to generator umowy nie mógł ich pobrać.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|xml|pdf|woff2?|ttf|otf)$).*)",
+  ],
 };

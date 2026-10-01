@@ -20,6 +20,7 @@ import { DocsDemo } from "./docs-demo";
 import { KontrastAudyt } from "./kontrast";
 import { ThreadPanel, type ThreadItem } from "../app/dzialania/[id]/thread-panel";
 import { PropertyTabs } from "../app/nieruchomosci/[id]/property-tabs";
+import { PodgladDokumentow } from "./podglad-dokumentow";
 import { Lejek } from "../app/raporty/lejek";
 import { Tempo } from "../app/raporty/tempo";
 
@@ -223,6 +224,8 @@ export function ThemePreview() {
           </div>
 
           <KontrastAudyt />
+
+          <PodgladDokumentow />
 
           {/* Lejek i tempo z Raportów dla właściciela. */}
           <div className="grid gap-4 lg:grid-cols-2">
