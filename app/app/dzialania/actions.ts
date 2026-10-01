@@ -1,5 +1,7 @@
 "use server";
 
+import { idZBiura, idsZBiura } from "@/lib/agency-ids";
+import { mozeUsunacDzialanie } from "@/lib/uprawnienia";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -29,12 +31,15 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
   const subject = String(formData.get("subject") ?? "").trim();
   if (!subject) return { ok: false, error: "Podaj temat działania." };
 
-  // Przypisani agenci: gdy nikogo nie wskazano, działanie jest moje.
-  const assignees = formData.getAll("assignee_ids").map(String).filter(Boolean);
   const status = txt(formData, "status") ?? "wykonane";
-  const clientId = txt(formData, "client_id");
-
   const admin = createSupabaseAdmin();
+
+  // Przypisani agenci: gdy nikogo nie wskazano, działanie jest moje.
+  // Tylko osoby, klienci i oferty z tego biura (patrz lib/agency-ids.ts).
+  const wBiurze = await idsZBiura(admin, "profiles", formData.getAll("assignee_ids").map(String), user.agency_id);
+  const assignees = formData.getAll("assignee_ids").map(String).filter((id) => wBiurze.has(id));
+  const clientId = await idZBiura(admin, "clients", txt(formData, "client_id"), user.agency_id);
+  const propertyId = await idZBiura(admin, "properties", txt(formData, "property_id"), user.agency_id);
 
   // Numer zapisujemy ZAWSZE - to on pozwala potem sprawdzić, czy ktoś już
   // dzwonił. Gdy agent wybrał klienta, a numeru nie wpisał, bierzemy z bazy.
@@ -45,6 +50,7 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
       .from("clients")
       .select("name, phone")
       .eq("id", clientId)
+      .eq("agency_id", user.agency_id)
       .maybeSingle();
     if (c) {
       contactPhone = contactPhone ?? c.phone ?? null;
@@ -126,7 +132,7 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
     contact_name: contactName,
     contact_phone: contactPhone,
     contact_email: txt(formData, "contact_email"),
-    property_id: txt(formData, "property_id") ?? inherited?.property_id ?? null,
+    property_id: propertyId ?? inherited?.property_id ?? null,
     assignee_ids: assigneeIds,
     ...(parentId ? { parent_id: parentId } : {}),
     include_in_report: formData.get("include_in_report") === "1",
@@ -252,6 +258,7 @@ export async function deleteActivity(id: string): Promise<void> {
     .eq("id", id)
     .eq("agency_id", user.agency_id)
     .maybeSingle();
+  if (!before || !mozeUsunacDzialanie(user, before)) return;
 
   await admin.from("activities").delete().eq("id", id).eq("agency_id", user.agency_id);
   if (before) await applyActivityToGoals(admin, before, -1);

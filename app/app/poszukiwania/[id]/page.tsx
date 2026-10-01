@@ -1,3 +1,4 @@
+import { mozeUsunac } from "@/lib/uprawnienia";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -87,7 +88,7 @@ export default async function SearchDetailPage({ params }: Props) {
             </a>
           )}
         </div>
-        <SearchActions id={search.id} status={search.status} />
+        <SearchActions id={search.id} status={search.status} canDelete={mozeUsunac(user, search)} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.6fr]">

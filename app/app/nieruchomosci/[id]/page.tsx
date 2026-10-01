@@ -1,3 +1,5 @@
+import { maskPhone } from "@/lib/format";
+import { mozeUsunac, ukryjKontakt } from "@/lib/uprawnienia";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -223,14 +225,16 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
                 ownerId={property.owner_client_id}
                 ownerRole={property.owner_role ?? null}
                 ownerName={owner?.name ?? null}
-                ownerPhone={owner?.phone ?? null}
+                ownerPhone={
+                  owner && ukryjKontakt(user, settings.options.hide_contacts, owner) ? maskPhone(owner.phone) : (owner?.phone ?? null)
+                }
                 dealKind={property.deal_kind}
                 clients={allClients}
               />
             </Card>
 
             <div className="pt-2">
-              <DeletePropertyButton propertyId={property.id} />
+              {mozeUsunac(user, property) && <DeletePropertyButton propertyId={property.id} />}
             </div>
           </div>
         </div>
@@ -298,6 +302,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
           deals={deals}
           wybranaId={t}
           defaultSplit={user.default_split_pct ?? 50}
+          viewer={user}
         />
       )}
     </>

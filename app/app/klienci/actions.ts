@@ -1,5 +1,6 @@
 "use server";
 
+import { mozeUsunac } from "@/lib/uprawnienia";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -174,6 +175,14 @@ export async function markClientContacted(clientId: string): Promise<void> {
 export async function deleteClient(clientId: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
+  const { data: rekord } = await admin
+    .from("clients")
+    .select("agent_id")
+    .eq("id", clientId)
+    .eq("agency_id", user.agency_id)
+    .maybeSingle();
+  // Agent usuwa tylko swoich klientów; cudzych CEO albo menedżer.
+  if (!rekord || !mozeUsunac(user, rekord)) redirect(`/app/klienci/${clientId}`);
   await admin.from("clients").delete().eq("id", clientId).eq("agency_id", user.agency_id);
   revalidatePath("/app/klienci");
   redirect("/app/klienci");

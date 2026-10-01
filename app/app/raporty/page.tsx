@@ -1,3 +1,4 @@
+import { widziRaportyBiura } from "@/lib/uprawnienia";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -22,7 +23,9 @@ type Props = { searchParams: Promise<{ okres?: string }> };
  */
 export default async function RaportyPage({ searchParams }: Props) {
   const user = await requireUser();
-  if (user.role === "agent") redirect("/app");
+  // Raporty pokazują przychody i prowizje całego biura, więc tylko dla CEO.
+  // Menedżer z założenia nie widzi pieniędzy (swoich ludzi ma w Zespole).
+  if (!widziRaportyBiura(user)) redirect("/app");
   if (!user.agency_id) redirect("/app");
 
   const { okres: param } = await searchParams;

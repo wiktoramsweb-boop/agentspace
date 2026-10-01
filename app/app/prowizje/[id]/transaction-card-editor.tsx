@@ -12,7 +12,16 @@ import { updateTransactionCard } from "../actions";
 
 type Save = "idle" | "saving" | "saved" | "error";
 
-export function TransactionCardEditor({ dealId, initial }: { dealId: string; initial: TransactionCard }) {
+export function TransactionCardEditor({
+  dealId,
+  initial,
+  readOnly = false,
+}: {
+  dealId: string;
+  initial: TransactionCard;
+  /** Podgląd bez edycji, np. cudza transakcja oglądana z karty oferty. */
+  readOnly?: boolean;
+}) {
   const [card, setCard] = useState<TransactionCard>(initial);
   const [save, setSave] = useState<Save>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -20,7 +29,7 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
 
   // Autozapis (debounce).
   useEffect(() => {
-    if (first.current) {
+    if (first.current || readOnly) {
       first.current = false;
       return;
     }
@@ -36,7 +45,7 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
       }
     }, 700);
     return () => clearTimeout(t);
-  }, [card, dealId]);
+  }, [card, dealId, readOnly]);
 
   function set<K extends keyof TransactionCard>(k: K, v: TransactionCard[K]) {
     setCard((c) => ({ ...c, [k]: v }));
@@ -47,7 +56,8 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
   const dp = docsProgress(card);
 
   return (
-    <div className="space-y-6">
+    // Fieldset z disabled blokuje naraz wszystkie pola i przyciski karty w trybie podglądu.
+    <fieldset disabled={readOnly} className="m-0 min-w-0 space-y-6 border-0 p-0">
       {/* Pasek zapisu + postęp dokumentów */}
       <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 backdrop-blur">
         <div className="min-w-0 flex-1">
@@ -248,7 +258,7 @@ export function TransactionCardEditor({ dealId, initial }: { dealId: string; ini
           className={inp}
         />
       </Stage>
-    </div>
+    </fieldset>
   );
 }
 

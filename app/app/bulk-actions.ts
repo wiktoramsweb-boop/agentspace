@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
+import { mozePrzepisac, mozeUsunacDzialanie } from "@/lib/uprawnienia";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { applyActivityToGoals } from "@/lib/goal-sync";
 import { PHOTO_BUCKET } from "@/lib/storage";
@@ -104,6 +105,32 @@ export async function bulkAssignAgent(entity: BulkEntity, ids: string[], agentId
     .maybeSingle();
   if (!agent) return { ok: false, error: "Nie znaleziono agenta w tym biurze." };
 
+  // Agent może oddać swoje rekordy albo wziąć coś z puli biura, ale nie
+  // przepisać na siebie klienta kolegi. CEO i menedżer przepisują wszystko.
+  let allowed = list;
+  if (user.role === "agent") {
+    if (entity === "activities") {
+      const { data: rows } = await admin
+        .from("activities")
+        .select("id, created_by, assignee_ids")
+        .eq("agency_id", user.agency_id)
+        .in("id", list);
+      allowed = ((rows ?? []) as { id: string; created_by: string | null; assignee_ids: string[] | null }[])
+        .filter((r) => mozeUsunacDzialanie(user, r) || (r.assignee_ids ?? []).length === 0)
+        .map((r) => r.id);
+    } else {
+      const { data: rows } = await admin
+        .from(TABLE[entity])
+        .select("id, agent_id")
+        .eq("agency_id", user.agency_id)
+        .in("id", list);
+      allowed = ((rows ?? []) as { id: string; agent_id: string | null }[])
+        .filter((r) => mozePrzepisac(user, r))
+        .map((r) => r.id);
+    }
+    if (!allowed.length) return { ok: false, error: "Możesz przepisywać tylko swoje pozycje albo te z puli biura." };
+  }
+
   const patch =
     entity === "activities"
       ? { assignee_ids: [agentId], updated_at: new Date().toISOString() }
@@ -113,9 +140,9 @@ export async function bulkAssignAgent(entity: BulkEntity, ids: string[], agentId
     .from(TABLE[entity])
     .update(patch, { count: "exact" })
     .eq("agency_id", user.agency_id)
-    .in("id", list);
+    .in("id", allowed);
   if (error) return { ok: false, error: `Nie udało się zapisać: ${error.message}` };
-  return done(entity, count ?? list.length);
+  return done(entity, count ?? allowed.length);
 }
 
 /** Etap obsługi oferty (pasek na karcie) dla wielu ofert naraz. */

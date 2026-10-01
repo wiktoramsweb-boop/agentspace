@@ -5,7 +5,7 @@ import { deleteSearch, setSearchStatus } from "../actions";
 import { SEARCH_STATUSES } from "@/lib/types";
 import { Select } from "@/app/app/components/select";
 
-export function SearchActions({ id, status }: { id: string; status: string }) {
+export function SearchActions({ id, status, canDelete = true }: { id: string; status: string; canDelete?: boolean }) {
   const [pending, start] = useTransition();
 
   return (
@@ -17,15 +17,17 @@ export function SearchActions({ id, status }: { id: string; status: string }) {
           </option>
         ))}
       </Select>
-      <button
-        onClick={() => {
-          if (confirm("Usunąć to poszukiwanie?")) start(() => deleteSearch(id));
-        }}
-        disabled={pending}
-        className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-600 transition hover:border-red-300 hover:text-red-600 disabled:opacity-50"
-      >
-        Usuń
-      </button>
+      {canDelete && (
+        <button
+          onClick={() => {
+            if (confirm("Usunąć to poszukiwanie?")) start(() => deleteSearch(id));
+          }}
+          disabled={pending}
+          className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-600 transition hover:border-red-300 hover:text-red-600 disabled:opacity-50"
+        >
+          Usuń
+        </button>
+      )}
     </div>
   );
 }

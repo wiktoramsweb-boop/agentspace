@@ -1,5 +1,7 @@
 "use server";
 
+import { idZBiura } from "@/lib/agency-ids";
+import { mozeUsunac } from "@/lib/uprawnienia";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -225,6 +227,7 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
   }
 
   const admin = createSupabaseAdmin();
+  fields.owner_client_id = await idZBiura(admin, "clients", fields.owner_client_id, user.agency_id);
   const extra = extraFromForm(formData);
 
   // Numer oferty per biuro i rok, np. SP/2026/001. Prefiks z ustawień biura,
@@ -305,6 +308,7 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
   }
 
   const admin = createSupabaseAdmin();
+  fields.owner_client_id = await idZBiura(admin, "clients", fields.owner_client_id, user.agency_id);
   const { data: before } = await admin
     .from("properties")
     .select("photos, export_to_web, web_published_at")
@@ -379,10 +383,12 @@ export async function deleteProperty(id: string): Promise<void> {
   // Zdjęcia oferty kasujemy razem z nią, inaczej zostałyby w magazynie na zawsze.
   const { data: prop } = await admin
     .from("properties")
-    .select("photos")
+    .select("photos, agent_id")
     .eq("id", id)
     .eq("agency_id", user.agency_id)
     .maybeSingle();
+  // Agent usuwa tylko swoje oferty; cudze CEO albo menedżer.
+  if (!prop || !mozeUsunac(user, prop)) redirect(`/app/nieruchomosci/${id}`);
 
   const { error } = await admin.from("properties").delete().eq("id", id).eq("agency_id", user.agency_id);
   if (!error && prop && user.agency_id) {
@@ -402,6 +408,7 @@ export async function setPropertyOwner(
 ): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
+  if (clientId && !(await idZBiura(admin, "clients", clientId, user.agency_id))) return;
   await admin
     .from("properties")
     .update({ owner_client_id: clientId, updated_at: new Date().toISOString() })
@@ -439,6 +446,7 @@ export async function addPropertyInterest(
   if (!clientId) return;
   const admin = createSupabaseAdmin();
   if (!(await ownsProperty(admin, propertyId, user.agency_id))) return;
+  if (!(await idZBiura(admin, "clients", clientId, user.agency_id))) return;
   await admin
     .from("property_interests")
     .upsert(

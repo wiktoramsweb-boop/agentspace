@@ -111,11 +111,15 @@ export function OwnerCard({
       {ownerId && ownerName && (
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
           <p className="font-medium text-slate-900">{ownerName}</p>
-          {ownerPhone && (
-            <a href={`tel:${ownerPhone}`} className="text-sm text-blue-600 hover:underline">
-              {ownerPhone}
-            </a>
-          )}
+          {ownerPhone &&
+            (ownerPhone.startsWith("•") ? (
+              // Numer ukryty przez ustawienie biura: bez linku do dzwonienia.
+              <span className="text-sm text-slate-500">{ownerPhone}</span>
+            ) : (
+              <a href={`tel:${ownerPhone}`} className="text-sm text-blue-600 hover:underline">
+                {ownerPhone}
+              </a>
+            ))}
           <a
             href={`/app/klienci/${ownerId}`}
             className="mt-1 block text-xs text-emerald-600 hover:underline"

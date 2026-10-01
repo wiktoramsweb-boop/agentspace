@@ -92,7 +92,7 @@ export const SECTIONS: NavSection[] = [
     title: "Więcej",
     items: [
       { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate" },
-      { href: "/app/raporty", label: "Raporty", icon: <ChartIcon />, color: "violet", roles: ["owner", "manager"] },
+      { href: "/app/raporty", label: "Raporty", icon: <ChartIcon />, color: "violet", roles: ["owner"] },
       { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, color: "fuchsia", roles: ["owner", "manager"] },
       { href: "/app/ustawienia", label: "Ustawienia", icon: <CogIcon />, color: "slate" },
     ],

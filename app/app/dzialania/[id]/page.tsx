@@ -1,3 +1,4 @@
+import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
 import { formatPhone } from "@/lib/format";
 import Link from "next/link";
@@ -211,7 +212,7 @@ export default async function ActivityDetailPage({ params }: Props) {
             parent={threadParent}
             items={threadItems}
             agents={agents}
-            clients={clients.map((c) => ({ id: c.id, name: c.name, phone: c.phone }))}
+            clients={bezCudzychTelefonow(clients, user, settings.options.hide_contacts).map((c) => ({ id: c.id, name: c.name, phone: c.phone }))}
             properties={properties.map((p) => ({ id: p.id, name: p.title }))}
             reportDefault={settings.options.report_default}
           />

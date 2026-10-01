@@ -1,5 +1,7 @@
 "use server";
 
+import { idZBiura } from "@/lib/agency-ids";
+import { mozeEdytowacTransakcje } from "@/lib/uprawnienia";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
@@ -35,12 +37,16 @@ export async function createDeal(formData: FormData): Promise<SaveResult> {
   const agentEarnings = Math.round((netto * split) / 100) + extras;
 
   const admin = createSupabaseAdmin();
+  const [propertyId, clientId] = await Promise.all([
+    idZBiura(admin, "properties", String(formData.get("property_id") ?? ""), user.agency_id),
+    idZBiura(admin, "clients", String(formData.get("client_id") ?? ""), user.agency_id),
+  ]);
   const { error: insertError } = await admin.from("deals").insert({
     agent_id: user.id,
     agency_id: user.agency_id,
     title,
-    property_id: String(formData.get("property_id") ?? "") || null,
-    client_id: String(formData.get("client_id") ?? "") || null,
+    property_id: propertyId,
+    client_id: clientId,
     transaction_value_pln: num(formData.get("transaction_value")) || null,
     commission_seller_pln: seller,
     commission_buyer_pln: buyer,
@@ -93,14 +99,27 @@ export async function updateTransactionCard(
 ): Promise<{ error?: string } | undefined> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  const { error } = await admin
+
+  const { data: deal } = await admin
     .from("deals")
-    .update({ transaction_card: card })
+    .select("agent_id")
     .eq("id", dealId)
-    .eq("agent_id", user.id);
+    .eq("agency_id", user.agency_id)
+    .maybeSingle();
+  if (!deal || !mozeEdytowacTransakcje(user, deal)) {
+    return { error: "Tę kartę prowadzi opiekun transakcji. Nie masz uprawnień do zmian." };
+  }
+
+  // count: bez niego zapis, który nie trafił w żaden wiersz, wyglądał jak udany.
+  const { error, count } = await admin
+    .from("deals")
+    .update({ transaction_card: card }, { count: "exact" })
+    .eq("id", dealId)
+    .eq("agency_id", user.agency_id);
   if (error) {
     return { error: "Nie zapisano. Uruchom w Supabase migrację SETUP-v15 (kolumna transaction_card)." };
   }
+  if (!count) return { error: "Nie zapisano: nie znaleziono transakcji." };
   revalidatePath(`/app/prowizje/${dealId}`);
   return {};
 }

@@ -1,5 +1,7 @@
 "use server";
 
+import { idZBiura } from "@/lib/agency-ids";
+import { mozeUsunac } from "@/lib/uprawnienia";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -46,7 +48,7 @@ export async function createSearch(formData: FormData): Promise<SaveResult> {
     mustHave = {};
   }
 
-  const clientId = txt("client_id");
+  const clientId = await idZBiura(createSupabaseAdmin(), "clients", txt("client_id"), user.agency_id);
   const row = {
     agency_id: user.agency_id,
     agent_id: user.id,
@@ -97,6 +99,13 @@ export async function setSearchStatus(id: string, status: string): Promise<void>
 export async function deleteSearch(id: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
+  const { data: rekord } = await admin
+    .from("searches")
+    .select("agent_id")
+    .eq("id", id)
+    .eq("agency_id", user.agency_id)
+    .maybeSingle();
+  if (!rekord || !mozeUsunac(user, rekord)) redirect(`/app/poszukiwania/${id}`);
   await admin.from("searches").delete().eq("id", id).eq("agency_id", user.agency_id);
   revalidatePath("/app/poszukiwania");
   redirect("/app/poszukiwania");

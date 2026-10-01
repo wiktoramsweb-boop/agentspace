@@ -1,3 +1,4 @@
+import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireUser } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { maskPhone } from "@/lib/format";
@@ -40,7 +41,11 @@ export default async function DzialaniaPage({
   const callsLeft = Math.max(0, callTarget - stats.callsToday);
 
   const propsLite = properties.map((p) => ({ id: p.id, name: p.title }));
-  const clientsLite = clients.map((c) => ({ id: c.id, name: c.name, phone: c.phone }));
+  const clientsLite = bezCudzychTelefonow(clients, user, settings.options.hide_contacts).map((c) => ({
+    id: c.id,
+    name: c.name,
+    phone: c.phone,
+  }));
 
   // Ukrywanie kontaktów (Ustawienia → Pozostałe): agent widzi pełny numer
   // tylko przy swoich działaniach. Maskujemy przed wysłaniem do przeglądarki.

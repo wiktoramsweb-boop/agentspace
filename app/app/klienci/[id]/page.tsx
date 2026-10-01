@@ -1,3 +1,5 @@
+import { mozeUsunac } from "@/lib/uprawnienia";
+import { maskPhone } from "@/lib/format";
 import Link from "next/link";
 import { BellIcon } from "../../components/icons";
 import { notFound, redirect } from "next/navigation";
@@ -75,6 +77,14 @@ export default async function ClientDetailPage({ params }: Props) {
     getClientMessages(agencyId, client.id),
   ]);
 
+  // Ukrywanie kontaktów (Ustawienia → Pozostałe) działa tu tak samo jak na
+  // liście: agent nie dostaje pełnych danych cudzego klienta. Bez tego wystarczyło
+  // kliknąć w klienta, żeby spisać numer, i ustawienie niczego nie chroniło.
+  const masked = settings.options.hide_contacts && user.role === "agent" && client.agent_id !== user.id;
+  const contact = masked
+    ? { ...client, phone: null, email: null, phones: null, emails: null, pesel: null, id_document: null }
+    : client;
+
   // Ile ofert pasuje do każdego poszukiwania tego klienta - agent widzi od razu,
   // czy ma o czym z nim rozmawiać.
   const searchMatchCounts: Record<string, number> = {};
@@ -121,7 +131,7 @@ export default async function ClientDetailPage({ params }: Props) {
             presetContext={`Klient: ${client.name}, ${type?.label ?? ""}${client.property ? `, szuka/sprzedaje: ${client.property}` : ""}${client.budget_pln ? `, budżet ${client.budget_pln} zł` : ""}. Status: ${client.status}.${client.notes ? ` Notatka: ${client.notes}` : ""}`}
             buttonLabel="Napisz follow-up"
             title="Wiadomość follow-up do klienta"
-            client={{ id: client.id, name: client.name, email: client.email ?? null, phone: client.phone ?? null }}
+            client={{ id: client.id, name: client.name, email: contact.email ?? null, phone: contact.phone ?? null }}
             placeholder="O czym była ostatnia rozmowa? Co chcesz przekazać?"
           />
           <AiWriter
@@ -135,7 +145,7 @@ export default async function ClientDetailPage({ params }: Props) {
               title: `Spotkanie: ${client.name}`,
               details: `Klient: ${client.name}${type?.label ? ` (${type.label})` : ""}${
                 client.property ? ` · ${client.property}` : ""
-              }${client.phone ? ` · tel. ${formatPhone(client.phone)}` : ""}`,
+              }${contact.phone ? ` · tel. ${formatPhone(contact.phone)}` : ""}`,
             })}
             target="_blank"
             rel="noopener noreferrer"
@@ -159,29 +169,37 @@ export default async function ClientDetailPage({ params }: Props) {
             <StatusChanger clientId={client.id} current={client.status} />
           </Card>
 
-          <ClientDetails client={client} />
+          <ClientDetails client={contact} />
 
           <Card>
             <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
               Kontakt
             </h2>
             <dl className="space-y-3 text-sm">
-              {client.phone && (
+              {masked && client.phone && (
+                <div className="flex justify-between">
+                  <dt className="text-slate-500">Telefon</dt>
+                  <dd className="text-slate-500" title="Biuro ukrywa kontakty cudzych klientów">
+                    {maskPhone(client.phone)}
+                  </dd>
+                </div>
+              )}
+              {contact.phone && (
                 <div className="flex justify-between">
                   <dt className="text-slate-500">Telefon</dt>
                   <dd>
-                    <a href={`tel:${client.phone}`} className="text-emerald-600 hover:text-emerald-700">
-                      {formatPhone(client.phone)}
+                    <a href={`tel:${contact.phone}`} className="text-emerald-600 hover:text-emerald-700">
+                      {formatPhone(contact.phone)}
                     </a>
                   </dd>
                 </div>
               )}
-              {client.email && (
+              {contact.email && (
                 <div className="flex justify-between">
                   <dt className="text-slate-500">Email</dt>
                   <dd>
-                    <a href={`mailto:${client.email}`} className="text-emerald-600 hover:text-emerald-700">
-                      {client.email}
+                    <a href={`mailto:${contact.email}`} className="text-emerald-600 hover:text-emerald-700">
+                      {contact.email}
                     </a>
                   </dd>
                 </div>
@@ -218,11 +236,13 @@ export default async function ClientDetailPage({ params }: Props) {
             </Card>
           )}
 
-          <form action={deleteClient.bind(null, client.id)}>
-            <button className="text-xs text-slate-400 transition hover:text-red-600">
-              Usuń klienta
-            </button>
-          </form>
+          {mozeUsunac(user, client) && (
+            <form action={deleteClient.bind(null, client.id)}>
+              <button className="text-xs text-slate-400 transition hover:text-red-600">
+                Usuń klienta
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Prawa: nieruchomości + notatki */}
@@ -249,7 +269,7 @@ export default async function ClientDetailPage({ params }: Props) {
                 Poszukiwania ({clientSearches.length})
               </h2>
               <SearchWizard
-                clients={[{ id: client.id, name: client.name, phone: client.phone }]}
+                clients={[{ id: client.id, name: client.name, phone: contact.phone }]}
                 presetClientId={client.id}
                 trigger="plus"
               />
@@ -264,7 +284,7 @@ export default async function ClientDetailPage({ params }: Props) {
               </h2>
               <ActivityModal
                 agents={agents}
-                clients={[{ id: client.id, name: client.name, phone: client.phone }]}
+                clients={[{ id: client.id, name: client.name, phone: contact.phone }]}
                 properties={agencyProps.map((p) => ({ id: p.id, name: p.title }))}
                 presetClientId={client.id}
                 trigger="plus"
@@ -280,8 +300,8 @@ export default async function ClientDetailPage({ params }: Props) {
             </h2>
             <ClientCorrespondence
               clientId={client.id}
-              clientEmail={client.email ?? null}
-              clientPhone={client.phone ?? null}
+              clientEmail={contact.email ?? null}
+              clientPhone={contact.phone ?? null}
               initial={correspondence.messages}
               ready={correspondence.ready}
             />

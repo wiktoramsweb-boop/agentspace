@@ -1,3 +1,4 @@
+import { mozeEdytowacTransakcje } from "@/lib/uprawnienia";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -16,7 +17,8 @@ export default async function DealDetailPage({ params }: Props) {
 
   const deal = await getDeal(id);
   if (!deal) notFound();
-  if (deal.agent_id !== user.id) redirect("/app/prowizje");
+  // Kartę prowadzi opiekun transakcji; CEO może do niej zajrzeć i pomóc.
+  if (deal.agency_id !== user.agency_id || !mozeEdytowacTransakcje(user, deal)) redirect("/app/prowizje");
 
   const card = mergeCard(deal.transaction_card);
   const status = DEAL_STATUSES.find((s) => s.value === deal.status);

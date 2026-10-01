@@ -1,3 +1,4 @@
+import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireUser } from "@/lib/auth";
 import { queryProperties } from "@/lib/data-lists";
 import { getAgencyAgents } from "@/lib/data-activities";
@@ -84,7 +85,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
         subtitle={`${map.activeCount} aktywnych · ${map.allCount} w biurze`}
         action={
           <PropertyWizard
-            clients={clients}
+            clients={bezCudzychTelefonow(clients, user, settings.options.hide_contacts)}
             photoConfig={photoConfigFrom(settings)}
             offerPrefix={settings.options.offer_prefix}
             canEditSettings={user.role === "owner"}

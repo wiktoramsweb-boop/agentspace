@@ -6,6 +6,7 @@ import { DEAL_STATUSES } from "@/lib/types";
 import type { DealWithCard } from "@/lib/data-platform";
 import { TransactionCardEditor } from "../../prowizje/[id]/transaction-card-editor";
 import { NewDealButton } from "../../prowizje/deal-controls";
+import { mozeEdytowacTransakcje, widziPieniadzeTransakcji, type Kto } from "@/lib/uprawnienia";
 
 /**
  * Karta transakcji przy ofercie.
@@ -24,6 +25,7 @@ export function TransactionTab({
   deals,
   wybranaId,
   defaultSplit,
+  viewer,
 }: {
   propertyId: string;
   propertyTitle: string;
@@ -31,6 +33,8 @@ export function TransactionTab({
   deals: DealWithCard[];
   wybranaId?: string;
   defaultSplit: number;
+  /** Kto ogląda: od tego zależy, czy widzi kwoty i czy może edytować kartę. */
+  viewer: Kto;
 }) {
   if (!deals.length) {
     return (
@@ -59,6 +63,9 @@ export function TransactionTab({
 
   const deal = deals.find((d) => d.id === wybranaId) ?? deals[0];
   const status = DEAL_STATUSES.find((s) => s.value === deal.status);
+  const own = deal.agent_id === viewer.id;
+  const canMoney = widziPieniadzeTransakcji(viewer, deal);
+  const canEdit = mozeEdytowacTransakcje(viewer, deal);
 
   return (
     <div className="space-y-6">
@@ -89,25 +96,36 @@ export function TransactionTab({
           <div>
             <h2 className="font-semibold text-slate-900">{deal.title}</h2>
             <p className="mt-0.5 text-xs text-slate-500">
-              Zmiany na karcie zapisują się same.{" "}
-              <Link href={`/app/prowizje/${deal.id}`} className="text-emerald-700 underline decoration-emerald-400 underline-offset-2">
-                Otwórz w Prowizjach
-              </Link>
+              {canEdit ? (
+                <>
+                  Zmiany na karcie zapisują się same.{" "}
+                  <Link href={`/app/prowizje/${deal.id}`} className="text-emerald-700 underline decoration-emerald-400 underline-offset-2">
+                    Otwórz w Prowizjach
+                  </Link>
+                </>
+              ) : (
+                "Podgląd. Kartę prowadzi opiekun transakcji."
+              )}
             </p>
           </div>
           {status && (
             <span className={`rounded-md px-2.5 py-1 text-xs font-medium ${status.color}`}>{status.label}</span>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <Fin label="Wartość transakcji" value={deal.transaction_value_pln != null ? formatPln(deal.transaction_value_pln) : "-"} />
-          <Fin label="Prowizja biura (brutto)" value={formatPln(deal.commission_pln)} />
-          <Fin label="Twój udział" value={deal.agent_split_pct ? `${deal.agent_split_pct}%` : "-"} />
-          <Fin label="Twój zarobek" value={formatPln(deal.agent_earnings_pln)} accent />
-        </div>
+        {/* Kwoty widzi tylko opiekun transakcji i CEO, tak jak w Prowizjach. */}
+        {canMoney ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Fin label="Wartość transakcji" value={deal.transaction_value_pln != null ? formatPln(deal.transaction_value_pln) : "-"} />
+            <Fin label="Prowizja biura (brutto)" value={formatPln(deal.commission_pln)} />
+            <Fin label={own ? "Twój udział" : "Udział agenta"} value={deal.agent_split_pct ? `${deal.agent_split_pct}%` : "-"} />
+            <Fin label={own ? "Twój zarobek" : "Zarobek agenta"} value={formatPln(deal.agent_earnings_pln)} accent />
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500">Kwoty tej transakcji widzi jej opiekun i CEO.</p>
+        )}
       </Card>
 
-      <TransactionCardEditor dealId={deal.id} initial={mergeCard(deal.transaction_card)} />
+      <TransactionCardEditor key={deal.id} dealId={deal.id} initial={mergeCard(deal.transaction_card)} readOnly={!canEdit} />
     </div>
   );
 }

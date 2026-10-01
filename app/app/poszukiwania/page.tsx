@@ -1,3 +1,4 @@
+import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireUser } from "@/lib/auth";
 import { getSearches, getActiveProperties } from "@/lib/data-searches";
 import { getAgencyClientsLite } from "@/lib/data-platform";
@@ -11,7 +12,8 @@ import { SearchWizard } from "./search-wizard";
 export default async function PoszukiwaniaPage() {
   const user = await requireUser();
   const agencyId = user.agency_id;
-  const tol = matchTolerance(await getAgencySettings(agencyId, user.agency?.name));
+  const settings = await getAgencySettings(agencyId, user.agency?.name);
+  const tol = matchTolerance(settings);
 
   const [searches, properties, clients, agents] = await Promise.all([
     agencyId ? getSearches(agencyId, { limit: 300 }) : Promise.resolve([]),
@@ -42,7 +44,7 @@ export default async function PoszukiwaniaPage() {
       <PageHeader
         title="Poszukiwania"
         subtitle="Czego szukają Twoi klienci. System sam kojarzy ich z ofertami biura."
-        action={<SearchWizard clients={clients} />}
+        action={<SearchWizard clients={bezCudzychTelefonow(clients, user, settings.options.hide_contacts)} />}
       />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

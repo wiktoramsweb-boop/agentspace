@@ -1,3 +1,4 @@
+import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireUser } from "@/lib/auth";
 import { getAgencyAgents } from "@/lib/data-activities";
 import { getAgencyClientsLite, getAgencyProperties } from "@/lib/data-platform";
@@ -87,7 +88,7 @@ export default async function KalendarzPage({ searchParams }: Props) {
         insightsWho={insightsWho}
         insightsSelf={scope === "moje"}
         agents={agents}
-        clients={clients.map((c) => ({ id: c.id, name: c.name, phone: mask ? null : c.phone }))}
+        clients={bezCudzychTelefonow(clients, user, settings.options.hide_contacts).map((c) => ({ id: c.id, name: c.name, phone: c.phone }))}
         properties={properties.map((p) => ({ id: p.id, name: p.title }))}
         reportDefault={settings.options.report_default}
       />
