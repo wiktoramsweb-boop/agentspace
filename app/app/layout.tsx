@@ -7,6 +7,9 @@ import { ToastProvider } from "./components/toast";
 import { PageTransition } from "./components/page-transition";
 import { PwaInstall } from "./components/pwa-install";
 import { odswiezDemoJesliTrzeba } from "@/lib/demo/zasiew";
+import { redirect } from "next/navigation";
+import { stanDostepu } from "@/lib/abonament-cennik";
+import { PasekAbonamentu } from "./pasek-abonamentu";
 
 export const metadata: Metadata = {
   title: "Panel AgentSpace",
@@ -19,6 +22,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // User bez agencji (przerwana rejestracja) - obsłuż łagodnie
   if (!user.agency_id) {
     return <OnboardingRedirect />;
+  }
+
+  // Po okresie próbnym i po wygaśnięciu abonamentu biuro trafia na ekran
+  // płatności. Konto demo zostaje otwarte: służy do pokazów, nie do pracy.
+  const dostep = stanDostepu(user.agency ?? null);
+  if (!dostep.aktywne && !user.agency?.is_demo) {
+    redirect("/abonament");
   }
 
   // Konto demo odświeża się samo. Pokaz może się odbyć za tydzień albo za dwa
@@ -49,6 +59,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         />
         <main className="flex-1 px-5 py-8 md:px-10 md:py-10">
           <div className="mx-auto max-w-6xl">
+            {dostep.ostrzegaj && (
+              <PasekAbonamentu
+                probny={dostep.probny}
+                dni={dostep.dniDoKonca ?? 0}
+                czyCeo={user.role === "owner"}
+              />
+            )}
             <PageTransition>{children}</PageTransition>
           </div>
         </main>

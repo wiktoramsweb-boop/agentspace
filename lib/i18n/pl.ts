@@ -550,7 +550,7 @@ export const pl = {
           },
           {
             q: "Czy mogę zapłacić za rok z góry?",
-            a: "Tak, przy rozliczeniu rocznym dwa miesiące są gratis, a cena jest zamrożona na 24 miesiące.",
+            a: "Tak. Przy rozliczeniu co pół roku jest 10% taniej, a przy rocznym 20% taniej, z ceną zamrożoną na 24 miesiące.",
           },
           {
             q: "Czy są koszty wdrożenia?",

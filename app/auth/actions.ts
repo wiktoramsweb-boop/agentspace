@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { DNI_PROBNE } from "@/lib/abonament-cennik";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { hitLimit, visitorKey } from "@/lib/rate-limit";
 
@@ -55,11 +56,27 @@ export async function signUpOwner(
   const userId = created.user.id;
 
   // 2. Agencja
-  const { data: agency, error: agencyErr } = await admin
+  //
+  // Nowe biuro dostaje okres próbny (migracja v37). Gdy migracji jeszcze nie
+  // ma, PostgREST odrzuca nieznane kolumny, więc powtarzamy zapis bez nich:
+  // rejestracja nie może się wywalić tylko dlatego, że ktoś nie odpalił SQL.
+  const trial = {
+    trial_ends_at: new Date(Date.now() + DNI_PROBNE * 86_400_000).toISOString(),
+    subscription_status: "trial",
+  };
+  let { data: agency, error: agencyErr } = await admin
     .from("agencies")
-    .insert({ name: agencyName, owner_id: userId })
+    .insert({ name: agencyName, owner_id: userId, ...trial })
     .select()
     .single();
+
+  if (agencyErr) {
+    ({ data: agency, error: agencyErr } = await admin
+      .from("agencies")
+      .insert({ name: agencyName, owner_id: userId })
+      .select()
+      .single());
+  }
 
   if (agencyErr || !agency) {
     await admin.auth.admin.deleteUser(userId); // rollback

@@ -12,7 +12,8 @@
     "test:warianty": "node lib/sprawdz-warianty.mjs",
     "test:leady": "node --experimental-strip-types --no-warnings lib/sprawdz-leady.ts",
     "test:uprawnienia": "node --experimental-strip-types --no-warnings lib/sprawdz-uprawnienia.ts",
-    "test:kredyty": "node --experimental-strip-types --no-warnings lib/sprawdz-kredyty.ts"
+    "test:kredyty": "node --experimental-strip-types --no-warnings lib/sprawdz-kredyty.ts",
+    "test:abonament": "node --experimental-strip-types --no-warnings lib/sprawdz-abonament.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",

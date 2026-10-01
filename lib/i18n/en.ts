@@ -549,7 +549,7 @@ export const en: Dict = {
           },
           {
             q: "Can I pay annually?",
-            a: "Yes. On annual billing two months are free and the price is frozen for 24 months.",
+            a: "Yes. Half-yearly billing is 10% cheaper and annual billing is 20% cheaper, with the price frozen for 24 months.",
           },
           {
             q: "Are there onboarding costs?",
