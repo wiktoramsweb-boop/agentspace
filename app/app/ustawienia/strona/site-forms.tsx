@@ -152,7 +152,7 @@ export function BasicsForm({ site, appUrl }: { site: SiteConfig; appUrl: string 
         <span>
           <span className="block font-medium text-slate-900">Strona widoczna publicznie</span>
           <span className="block text-sm text-slate-500">
-            Dopóki nie zaznaczysz, adres pokazuje stronę „nie znaleziono", a formularze nie przyjmują zgłoszeń.
+            Dopóki nie zaznaczysz, adres pokazuje stronę „nie znaleziono”, a formularze nie przyjmują zgłoszeń.
           </span>
         </span>
       </label>

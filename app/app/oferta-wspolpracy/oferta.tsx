@@ -99,7 +99,7 @@ export function OfertaWspolpracy({
           <div>
             <p className="text-sm font-medium text-slate-900">Podyktuj warunki (opcjonalnie)</p>
             <p className="text-xs text-slate-500">
-              np. „adres Prądnicka 48, czas 3 miesiące, prowizja 2%"
+              np. „adres Prądnicka 48, czas 3 miesiące, prowizja 2%”
             </p>
           </div>
           <button
@@ -163,7 +163,7 @@ export function OfertaWspolpracy({
       {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>}
       {done && !error && (
         <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-          PDF pobrany. Sprawdź folder „Pobrane" i wyślij klientowi.
+          PDF pobrany. Sprawdź folder „Pobrane” i wyślij klientowi.
         </p>
       )}
 

@@ -38,8 +38,8 @@ declare global {
   }
 }
 
-const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+const LEAFLET_CSS = "/vendor/leaflet/leaflet.css";
+const LEAFLET_JS = "/vendor/leaflet/leaflet.js";
 
 function loadLeaflet(): Promise<any> {
   return new Promise((resolve) => {

@@ -101,11 +101,15 @@ export function toPolishPath(enPath: string): string {
 
 /** Ta sama strona w drugim języku - dla przełącznika w nawigacji. */
 export function switchLocaleHref(current: string, to: Locale): string {
-  const plPath = current.startsWith("/en/")
-    ? toPolishPath(current.slice(3))
-    : current === "/en"
+  // Podczas renderu na serwerze usePathname() widzi ścieżkę po przepisaniu
+  // w middleware (`/pl/cennik`), a nie adres z paska. Bez zdjęcia tego
+  // przedrostka w HTML-u przycisk EN prowadził na `/pl/cennik`.
+  const bare = current === "/pl" ? "/" : current.startsWith("/pl/") ? current.slice(3) : current;
+  const plPath = bare.startsWith("/en/")
+    ? toPolishPath(bare.slice(3))
+    : bare === "/en"
       ? "/"
-      : current;
+      : bare;
 
   return localeHref(to, plPath);
 }

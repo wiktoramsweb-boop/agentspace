@@ -1,4 +1,4 @@
-import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
+import { formatDateTimePL } from "@/lib/datetime";
 import Link from "next/link";
 import type { ActivityRich } from "@/lib/data-activities";
 import { ACTIVITY_ICONS } from "../../components/icons";

@@ -263,7 +263,7 @@ function ActivityForm({
             <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
               <span className="font-semibold">Dopisujesz do istniejącego kontaktu.</span>
               <span>
-                Rozmowa trafi do wątku „{parent?.subject ?? thread?.subject}"
+                Rozmowa trafi do wątku „{parent?.subject ?? thread?.subject}”
                 {(parent?.count ?? thread?.count) ? ` (${parent?.count ?? thread?.count} rozmów)` : ""}, bez tworzenia
                 drugiego takiego samego wpisu. Do celów liczy się normalnie.
               </span>

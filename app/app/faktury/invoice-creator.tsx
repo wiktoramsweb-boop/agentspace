@@ -182,8 +182,6 @@ export function InvoiceCreator({
 
 const inp =
   "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
-const sel =
-  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

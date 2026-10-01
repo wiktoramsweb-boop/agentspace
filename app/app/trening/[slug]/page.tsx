@@ -124,7 +124,7 @@ export default async function ScenarioSetupPage({ params }: Props) {
           {limitReached ? "Limit wyczerpany na ten tydzień" : "Rozpocznij rozmowę z AI klientem →"}
         </SubmitButton>
         <p className="mt-2 text-sm text-slate-500">
-          AI odezwie się pierwszy. Pisz jak do prawdziwego klienta. Na końcu kliknij „Zakończ i oceń".
+          AI odezwie się pierwszy. Pisz jak do prawdziwego klienta. Na końcu kliknij „Zakończ i oceń”.
         </p>
       </form>
     </>

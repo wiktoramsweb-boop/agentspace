@@ -9,7 +9,7 @@ import {
 } from "@/lib/agency-settings-shared";
 import { saveMarks } from "../company-actions";
 import { AssetUploader } from "../asset-uploader";
-import { FieldLabel, ResultForm, inputCls } from "../result-form";
+import { FieldLabel, ResultForm } from "../result-form";
 import { Select } from "@/app/app/components/select";
 
 /** Położenie znaku na podglądzie. Margines jak przy nakładaniu (ok. 3,5%). */

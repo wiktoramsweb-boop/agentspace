@@ -7,7 +7,7 @@ import { getDict, toLocale } from "@/lib/i18n";
 export const metadata: Metadata = {
   title: "Polityka prywatności | AgentSpace",
   description:
-    "Polityka prywatności AgentSpace - administrator danych, podstawy prawne przetwarzania, prawa użytkowników, ciasteczka, RODO.",
+    "Polityka prywatności AgentSpace - administrator danych, dane w aplikacji, AI, odbiorcy danych, prawa użytkowników, cookies, RODO.",
   alternates: {
     canonical: "https://agentspace.pl/polityka-prywatnosci",
   },
@@ -26,7 +26,7 @@ export default async function PolitykaPrywatnosci({ params }: { params: Promise<
         <PageHero
           eyebrow="Prawne"
           title="Polityka prywatności"
-          description={<span className="text-[var(--color-mk-muted)]">Ostatnia aktualizacja: 15 maja 2026</span>}
+          description={<span className="text-[var(--color-mk-muted)]">Ostatnia aktualizacja: 1 października 2026</span>}
           compact
         />
 
@@ -65,15 +65,28 @@ export default async function PolitykaPrywatnosci({ params }: { params: Promise<
             <p>Administrator przetwarza następujące kategorie danych osobowych:</p>
             <ul>
               <li>
-                <strong>Dane podane w formularzu listy oczekujących:</strong> adres e-mail, nazwa
-                biura nieruchomości, wielkość zespołu, numer telefonu (opcjonalnie).
+                <strong>Formularz listy oczekujących:</strong> adres e-mail, nazwa biura
+                nieruchomości, wielkość zespołu, numer telefonu (opcjonalnie).
+              </li>
+              <li>
+                <strong>Formularz kontaktowy:</strong> imię i nazwisko, adres e-mail, nazwa biura,
+                temat i treść wiadomości oraz informacja, skąd przyszła wizyta (strona odsyłająca,
+                parametry kampanii).
+              </li>
+              <li>
+                <strong>Konto w aplikacji AgentSpace:</strong> imię i nazwisko, adres e-mail,
+                telefon, rola w biurze, opcjonalnie stanowisko, opis i zdjęcie, a także dane
+                o korzystaniu z aplikacji (np. rozmowy treningowe z AI Coachem i ich oceny, cele
+                i wyniki, zadania). Hasło przechowujemy wyłącznie w postaci zaszyfrowanego skrótu.
               </li>
               <li>
                 <strong>Dane techniczne:</strong> adres IP, dane przeglądarki, system operacyjny,
-                strona odsyłająca, czas wizyty (zbierane automatycznie w celach statystycznych).
+                strona odsyłająca, czas wizyty. Na potrzeby ochrony przed nadużyciami (limity
+                rejestracji, logowania i formularzy) zapisujemy jedynie skrót (hash) adresu IP,
+                z którego nie da się odtworzyć samego adresu.
               </li>
               <li>
-                <strong>Dane z plików cookies</strong> opisane w sekcji 7.
+                <strong>Dane z plików cookies i pamięci przeglądarki</strong> opisane w sekcji 8.
               </li>
             </ul>
 
@@ -81,41 +94,65 @@ export default async function PolitykaPrywatnosci({ params }: { params: Promise<
             <p>Dane osobowe są przetwarzane w następujących celach:</p>
             <ul>
               <li>
-                <strong>Lista oczekujących</strong> - kontakt w sprawie wczesnego dostępu do
-                AgentSpace, podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda osoby, której dane
-                dotyczą).
+                <strong>Lista oczekujących</strong> - kontakt w sprawie dostępu do AgentSpace,
+                podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda).
               </li>
               <li>
-                <strong>Marketing własny</strong> - informacje o starcie produktu, nowych
-                funkcjach, ofertach specjalnych dla biur nieruchomości, podstawa prawna: art. 6
-                ust. 1 lit. f) RODO (prawnie uzasadniony interes administratora).
+                <strong>Odpowiedź na wiadomość z formularza kontaktowego</strong> - podstawa
+                prawna: art. 6 ust. 1 lit. f) RODO (prawnie uzasadniony interes administratora,
+                jakim jest prowadzenie korespondencji).
               </li>
               <li>
-                <strong>Cele analityczne</strong> - pomiar ruchu, optymalizacja strony, podstawa
-                prawna: art. 6 ust. 1 lit. f) RODO.
+                <strong>Świadczenie usługi AgentSpace</strong> (założenie i obsługa konta,
+                funkcje aplikacji) - podstawa prawna: art. 6 ust. 1 lit. b) RODO (umowa).
               </li>
               <li>
-                <strong>Wypełnienie obowiązków prawnych</strong> - np. rozliczenia podatkowe po
-                zawarciu umowy, podstawa prawna: art. 6 ust. 1 lit. c) RODO.
+                <strong>Marketing własny</strong> - informacje o nowych funkcjach i ofertach dla
+                biur nieruchomości, podstawa prawna: art. 6 ust. 1 lit. f) RODO.
+              </li>
+              <li>
+                <strong>Bezpieczeństwo i ochrona przed nadużyciami</strong> oraz{" "}
+                <strong>cele analityczne</strong> - podstawa prawna: art. 6 ust. 1 lit. f) RODO.
+              </li>
+              <li>
+                <strong>Wypełnienie obowiązków prawnych</strong> - np. rozliczenia podatkowe,
+                podstawa prawna: art. 6 ust. 1 lit. c) RODO.
               </li>
             </ul>
 
-            <h2>4. Okres przechowywania danych</h2>
+            <h2>4. Dane klientów biur (AgentSpace jako podmiot przetwarzający)</h2>
+            <p>
+              Dane, które biuro nieruchomości wprowadza do aplikacji o swoich klientach (np.
+              kontakty w CRM, oferty, dokumenty, zgłoszenia ze strony internetowej biura), są
+              danymi, których <strong>administratorem jest biuro</strong>. AgentSpace przetwarza
+              je wyłącznie w imieniu biura, na podstawie{" "}
+              <a href="/umowa-powierzenia">umowy powierzenia przetwarzania danych</a>. W sprawach
+              tych danych (np. ich usunięcia) właściwy jest kontakt z biurem, z którym dana osoba
+              współpracuje. Dotyczy to także formularzy na stronach internetowych biur
+              prowadzonych w AgentSpace.
+            </p>
+
+            <h2>5. Okres przechowywania danych</h2>
             <ul>
               <li>
                 Dane z formularza listy oczekujących: do momentu wycofania zgody lub przez okres
                 12 miesięcy od ostatniego kontaktu.
               </li>
+              <li>Wiadomości z formularza kontaktowego: do 24 miesięcy od zakończenia korespondencji.</li>
               <li>
-                Dane analityczne i techniczne: do 26 miesięcy od ostatniej wizyty.
+                Dane konta w aplikacji: przez czas korzystania z usługi; po jej zakończeniu
+                usuwamy je lub anonimizujemy, z wyjątkiem danych, które musimy przechowywać na
+                podstawie przepisów.
               </li>
+              <li>Skróty adresów IP używane do limitów: do 3 dni.</li>
+              <li>Dane analityczne i techniczne: do 26 miesięcy od ostatniej wizyty.</li>
               <li>
                 Dane związane z zawartą umową: przez okres jej trwania oraz przez okres wymagany
                 przepisami prawa (zwykle 5 lat od końca roku rozliczeniowego).
               </li>
             </ul>
 
-            <h2>5. Prawa użytkownika</h2>
+            <h2>6. Prawa użytkownika</h2>
             <p>Zgodnie z RODO przysługują Ci następujące prawa:</p>
             <ul>
               <li>prawo dostępu do swoich danych osobowych (art. 15 RODO),</li>
@@ -135,61 +172,74 @@ export default async function PolitykaPrywatnosci({ params }: { params: Promise<
               adresem podanym w punkcie 1.
             </p>
 
-            <h2>6. Odbiorcy danych</h2>
+            <h2>7. Odbiorcy danych</h2>
             <p>Dane mogą być udostępnione następującym kategoriom odbiorców:</p>
             <ul>
+              <li>Hosting i baza danych: Vercel Inc. (USA), Supabase Inc. (serwery we Frankfurcie).</li>
+              <li>Wysyłka wiadomości e-mail: Resend Inc. (USA).</li>
               <li>
-                Dostawcom usług IT (hosting: Vercel Inc.; baza danych: Supabase Inc.; analityka:
-                opisana w punkcie 7),
+                Funkcje sztucznej inteligencji (AI Coach, generowanie opisów i wiadomości,
+                przetwarzanie dyktowanych notatek): Anthropic PBC (USA). Do modelu trafia wyłącznie
+                tekst, który użytkownik wpisze lub podyktuje w danej funkcji.
               </li>
               <li>
-                Dostawcom usług komunikacyjnych (e-mail transactional: Resend Inc.),
+                Rozpoznawanie mowy przy dyktowaniu: wbudowana funkcja przeglądarki; w zależności
+                od przeglądarki nagranie może być przetwarzane przez jej producenta (np. Google
+                w przeglądarce Chrome).
               </li>
               <li>
-                Organom państwowym, jeżeli wymagają tego przepisy prawa.
+                Mapy i wyszukiwanie adresów: OpenStreetMap Foundation (podpowiadanie adresów,
+                informacje o okolicy) oraz CARTO (podkłady map). Do tych usług trafia wpisany
+                adres lub współrzędne, a przy wyświetlaniu mapy także adres IP przeglądarki.
               </li>
+              <li>
+                Powiadomienia push: usługi powiadomień producenta przeglądarki lub systemu
+                (np. Google, Apple, Mozilla), jeśli użytkownik je włączy.
+              </li>
+              <li>Organom państwowym, jeżeli wymagają tego przepisy prawa.</li>
             </ul>
             <p>
-              Część dostawców usług ma siedzibę poza Europejskim Obszarem Gospodarczym (głównie
-              USA). W takich przypadkach administrator zapewnia odpowiednie zabezpieczenia
-              transferu danych zgodnie z RODO (standardowe klauzule umowne lub decyzje
-              o adekwatnym poziomie ochrony danych).
+              Część dostawców ma siedzibę poza Europejskim Obszarem Gospodarczym (głównie USA).
+              W takich przypadkach transfer danych odbywa się na podstawie decyzji Komisji
+              Europejskiej stwierdzającej odpowiedni stopień ochrony (EU-US Data Privacy
+              Framework) lub standardowych klauzul umownych.
             </p>
 
-            <h2>7. Pliki cookies (ciasteczka)</h2>
+            <h2>8. Pliki cookies i pamięć przeglądarki</h2>
             <p>
-              Serwis wykorzystuje pliki cookies oraz podobne technologie w celu zapewnienia
-              prawidłowego działania, analizy ruchu i optymalizacji doświadczenia użytkownika.
+              Strona agentspace.pl i aplikacja nie używają reklamowych plików cookies ani
+              narzędzi śledzących reklamodawców.
             </p>
-            <p>Stosujemy następujące kategorie cookies:</p>
             <ul>
               <li>
-                <strong>Niezbędne</strong> - konieczne do działania strony (np. zapamiętanie
-                wyboru języka, sesje), nie wymagają zgody.
+                <strong>Niezbędne</strong> - cookies sesji logowania w aplikacji. Bez nich nie da
+                się zalogować, nie wymagają zgody.
               </li>
               <li>
-                <strong>Analityczne</strong> - pomiar ruchu (np. Google Analytics, Vercel
-                Analytics) - wymagają zgody.
+                <strong>Pamięć przeglądarki</strong> - zapamiętanie wyboru motywu (jasny/ciemny)
+                i podobnych ustawień wyglądu. Te dane nie opuszczają urządzenia.
               </li>
               <li>
-                <strong>Marketingowe</strong> - śledzenie konwersji reklam (np. Google Ads
-                Conversion Tag, Meta Pixel) - wymagają zgody.
+                <strong>Statystyki</strong> - Vercel Web Analytics i Speed Insights, które mierzą
+                ruch i szybkość strony bez plików cookies i bez identyfikowania osób.
               </li>
             </ul>
             <p>
-              Można w każdej chwili zmienić ustawienia cookies w przeglądarce lub odwołać zgodę
-              przez panel ustawień prywatności na stronie.
+              Strony internetowe biur prowadzone w AgentSpace liczą odsłony bez cookies i bez
+              zapisywania adresów IP. Ustawienia cookies można w każdej chwili zmienić
+              w przeglądarce.
             </p>
 
-            <h2>8. Bezpieczeństwo danych</h2>
+            <h2>9. Bezpieczeństwo danych</h2>
             <p>
               Administrator stosuje środki techniczne i organizacyjne odpowiednie do ryzyka
               naruszenia praw lub wolności osób fizycznych: szyfrowanie połączeń (HTTPS),
-              hashowanie haseł, kopie zapasowe, ograniczony dostęp do danych, regularne audyty
+              hashowanie haseł, kopie zapasowe, ograniczony dostęp do danych, kontrolę uprawnień
+              w aplikacji, limity chroniące przed nadużyciami oraz regularne przeglądy
               bezpieczeństwa.
             </p>
 
-            <h2>9. Postanowienia końcowe</h2>
+            <h2>10. Postanowienia końcowe</h2>
             <p>
               Niniejsza polityka prywatności może być aktualizowana w związku ze zmianami w
               prawie lub funkcjonalności Serwisu. O wszelkich istotnych zmianach poinformujemy

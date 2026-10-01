@@ -119,7 +119,7 @@ export function DocumentsCard({
       return;
     }
     if (w) w.location.href = res.url;
-    else window.location.href = res.url;
+    else window.location.assign(res.url);
   }
 
   async function changeKind(doc: DocumentItem, kind: string) {

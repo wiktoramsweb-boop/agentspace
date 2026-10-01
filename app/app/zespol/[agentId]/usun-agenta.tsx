@@ -91,7 +91,7 @@ export function UsunAgenta({
         </Select>
         <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-slate-500">
           Pula biura oznacza, że klienci, oferty i działania zostają w systemie
-          bez opiekuna. Znajdziesz je na listach filtrem „bez opiekuna" i przypiszesz
+          bez opiekuna. Znajdziesz je na listach filtrem „bez opiekuna” i przypiszesz
           komu zechcesz, pojedynczo albo zaznaczając wiele naraz.
         </p>
 

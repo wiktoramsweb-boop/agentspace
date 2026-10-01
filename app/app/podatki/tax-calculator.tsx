@@ -145,7 +145,7 @@ function FormaTab({ c }: { c: TaxConstants }) {
         </div>
         <BreakdownTable results={results} bestForm={best.form} />
         <p className="text-xs text-slate-500">
-          „Do kieszeni" = dochód − PIT/ryczałt − zdrowotna − ZUS społeczny − danina. Ryczałt liczony od
+          „Do kieszeni” = dochód − PIT/ryczałt − zdrowotna − ZUS społeczny − danina. Ryczałt liczony od
           przychodu (koszty NIE obniżają podatku) - opłaca się przy wysokiej marży, ale gdy masz realne
           koszty szybko przegrywa. Przy niskim dochodzie wygrywa skala (kwota wolna + 12%), przy wysokim -
           liniowy lub ryczałt.
@@ -213,7 +213,7 @@ function BreakdownTable({ results, bestForm }: { results: FormResult[]; bestForm
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
+          {rows.map((row) => (
             <tr
               key={row.label}
               className={`border-b border-slate-200 last:border-0 ${
@@ -451,7 +451,7 @@ function VatTab({ c }: { c: TaxConstants }) {
         <div className="rounded-2xl border border-red-500/25 bg-red-500/[0.05] p-5 text-sm text-red-700">
           <p className="mb-1 font-semibold text-red-700">⚠ Ryzyko: sztuczne dzielenie działalności</p>
           <p className="text-slate-700">
-            „Walenie na JDG, żeby zmieścić się pod limitem" fiskus może uznać za obejście limitu VAT - zsumować
+            „Walenie na JDG, żeby zmieścić się pod limitem” fiskus może uznać za obejście limitu VAT - zsumować
             obroty 3 podmiotów, naliczyć VAT wstecz + odsetki + KKS. Obrona = realna odrębność (osobni klienci,
             umowy, koszty), nie samo przełączanie faktur.
           </p>
@@ -640,7 +640,7 @@ function SpzooTab({ c }: { c: TaxConstants }) {
         </div>
 
         <p className="text-xs text-slate-500">
-          Strategia „powołanie do 120k/os. + reszta w spółce" daje najniższy podatek dziś: 12% od powołania i
+          Strategia „powołanie do 120k/os. + reszta w spółce” daje najniższy podatek dziś: 12% od powołania i
           tylko 9% CIT od reszty, bez ZUS i bez 19% dywidendy. Minus: część pieniędzy zostaje w firmie (nie w
           prywatnej kieszeni), dochodzi pełna księgowość (~800-1500 zł/mc) i brak ubezpieczenia ZUS wspólników
           (dokupujesz prywatnie). Estoński CIT pominięto (wymaga min. 3 osób na UoP - agenci na B2B się nie

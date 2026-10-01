@@ -5,8 +5,8 @@
 import { useEffect, useRef } from "react";
 import { shortPrice, type DemoOffer } from "@/lib/wzory/data";
 
-const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+const LEAFLET_CSS = "/vendor/leaflet/leaflet.css";
+const LEAFLET_JS = "/vendor/leaflet/leaflet.js";
 
 declare global {
   interface Window {

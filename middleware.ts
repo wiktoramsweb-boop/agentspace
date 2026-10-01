@@ -71,9 +71,12 @@ export const config = {
   // marketingowy zaczynający się od „oferta" i oddawał 404. Objaw był mylący,
   // bo pliki są na dysku, a mimo to generator umowy nie mógł ich pobrać.
   //
+  // js i css z public/ (np. Leaflet w /vendor) też omijamy, inaczej na własnej
+  // domenie biura zostałyby przepisane na /strona/... i mapa by nie wstała.
+  //
   // xml celowo NIE jest na liście: na własnej domenie biura /sitemap.xml
   // musi trafić do mapy strony biura, a nie do mapy agentspace.pl.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|pdf|woff2?|ttf|otf)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|pdf|woff2?|ttf|otf|js|css)$).*)",
   ],
 };

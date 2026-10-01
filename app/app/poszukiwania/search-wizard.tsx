@@ -228,7 +228,7 @@ export function SearchWizard({
                 ))}
               </div>
               <p className="mt-1.5 text-xs text-slate-400">
-                Brak udogodnienia nie ukrywa oferty - trafi do „prawie pasuje" z adnotacją.
+                Brak udogodnienia nie ukrywa oferty - trafi do „prawie pasuje” z adnotacją.
               </p>
             </div>
 

@@ -137,7 +137,7 @@ export default async function AgentDetailPage({ params }: Props) {
 
         {!hasGoal && (
           <p className="mt-3 text-xs text-slate-400">
-            Agent nie ustawił jeszcze celu w zakładce „Cele" - pokazujemy same wykonania.
+            Agent nie ustawił jeszcze celu w zakładce „Cele” - pokazujemy same wykonania.
           </p>
         )}
       </Card>

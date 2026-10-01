@@ -153,7 +153,7 @@ export function GlobalSearch() {
                 <p className="p-6 text-center text-sm text-slate-400">Szukam…</p>
               ) : hits.length === 0 ? (
                 <p className="p-6 text-center text-sm text-slate-400">
-                  Nic nie znaleziono dla „{q}".
+                  Nic nie znaleziono dla „{q}”.
                 </p>
               ) : (
                 grouped.map((g) => {

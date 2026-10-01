@@ -1,5 +1,5 @@
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
-import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
+import { formatDateTimePL } from "@/lib/datetime";
 import { formatPhone } from "@/lib/format";
 import Link from "next/link";
 import { notFound } from "next/navigation";

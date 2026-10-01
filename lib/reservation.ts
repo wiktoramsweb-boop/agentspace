@@ -107,7 +107,6 @@ export function buildReservation(d: ReservationData): ResDoc {
   const fNom = isZad ? "Zadatek" : "Opłata rezerwacyjna"; // początek zdania
   const fLow = isZad ? "zadatek" : "opłata rezerwacyjna"; // w środku zdania
   const fGen = isZad ? "zadatku" : "opłaty rezerwacyjnej"; // „do zapłaty ..."
-  const fPast = isZad ? "zaliczony" : "zaliczona"; // „zostanie ..."
 
   const feeS = `${money(d.fee)} zł (słownie: ${slownie(d.fee)})`;
   const account = d.account.trim() || "[numer rachunku bankowego]";

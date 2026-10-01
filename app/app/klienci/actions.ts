@@ -76,11 +76,13 @@ export async function createClient(formData: FormData): Promise<SaveResult> {
     marketing_consent_at: consent ? new Date().toISOString() : null,
   };
 
-  let { data, error } = await admin
+  const inserted = await admin
     .from("clients")
     .insert({ ...core, ...extra })
     .select("id")
     .single();
+  let data = inserted.data;
+  const error = inserted.error;
 
   let lastError = error;
   if (error) {

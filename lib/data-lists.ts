@@ -28,7 +28,7 @@ function dateBounds(q: ListQuery): { gte?: string; lt?: string } {
   return out;
 }
 
-function empty<T>(per: number): Page<T> {
+function empty<T>(_per: number): Page<T> {
   return { rows: [], total: 0, pages: 1 };
 }
 
@@ -207,7 +207,7 @@ export async function queryActivities(
   if (bounds.gte) sel = sel.gte("due_at", bounds.gte);
   if (bounds.lt) sel = sel.lt("due_at", bounds.lt);
 
-  let res = await sel.order(sort.column, { ascending: sort.asc, nullsFirst: false }).range(from, to);
+  const res = await sel.order(sort.column, { ascending: sort.asc, nullsFirst: false }).range(from, to);
   // Brak kolumny parent_id (nieuruchomiona migracja v24): lista działa dalej,
   // tylko bez zwijania kolejnych rozmów w wątki.
   if (res.error && opts.threads) {

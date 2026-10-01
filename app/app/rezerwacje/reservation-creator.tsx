@@ -328,7 +328,7 @@ export function ReservationCreator({ city }: { city: string }) {
           Podgląd i PDF dla klienta →
         </button>
         <p className="text-xs text-slate-400">
-          Gotowy, prawnie kompletny wzór. Przy „Zadatek" kwota jest bezzwrotna w razie rezygnacji Kupującego/Najemcy (art. 394 KC). Przy nietypowych transakcjach warto dać wzór do wglądu prawnikowi.
+          Gotowy, prawnie kompletny wzór. Przy „Zadatek” kwota jest bezzwrotna w razie rezygnacji Kupującego/Najemcy (art. 394 KC). Przy nietypowych transakcjach warto dać wzór do wglądu prawnikowi.
         </p>
       </div>
 

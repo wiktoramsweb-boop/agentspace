@@ -15,7 +15,6 @@ import {
 } from "@/app/components/mockups/light-shots";
 import { CoachLive } from "@/app/components/mk/coach-live";
 import { WZORY } from "@/lib/wzory/themes";
-import { SITE_ADDON } from "@/lib/site/addon";
 import { SiteFooter } from "@/app/components/site-footer";
 import { AuroraBackground } from "@/app/components/aurora-background";
 import { Spotlight } from "@/app/components/effects/spotlight";
