@@ -9,6 +9,7 @@ import {
   cyfryTelefonu, dopasujKolumny, odczytajTekst, parsujCsv,
   wierszeNaLeady, zgadnijSeparator,
 } from "./leady-import.ts";
+import { arkuszNaWiersze, parsujArkuszXml } from "./xlsx-czytnik.ts";
 
 const bledy: string[] = [];
 function sprawdz(nazwa: string, warunek: boolean, szczegol = "") {
@@ -85,6 +86,36 @@ const polski = [
   const leady = wierszeNaLeady(w, dopasujKolumny(["Imię", "Telefon", "Wiadomość"]));
   sprawdz("Przecinek w cudzysłowie", leady[0]?.name === "Nowak, Anna", String(leady[0]?.name));
   sprawdz("Przecinek w wiadomości", leady[0]?.message === "Mieszkanie 2 pok., Kraków", String(leady[0]?.message));
+}
+
+// ── 6. Arkusz Excela ───────────────────────────────────────────────────
+{
+  const wspolne = ["Imię i nazwisko", "Numer telefonu", "Miasto", "Anna Nowak", "530313220", "Kraków", "Ewa Bąk", "Zabierzów"];
+  // Druga osoba nie podała telefonu: Excel zapisuje taką komórkę jako <c r="B3"/>.
+  const xml =
+    '<sheetData>' +
+    '<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c><c r="C1" t="s"><v>2</v></c></row>' +
+    '<row r="2"><c r="A2" t="s"><v>3</v></c><c r="B2" t="s"><v>4</v></c><c r="C2" t="s"><v>5</v></c></row>' +
+    '<row r="3"><c r="A3" t="s"><v>6</v></c><c r="B3"/><c r="C3" t="s"><v>7</v></c></row>' +
+    '<row r="4"><c r="A4" t="inlineStr"><is><t>Jan Test</t></is></c><c r="B4"><v>601950652</v></c><c r="C4" t="s"><v>5</v></c></row>' +
+    '</sheetData>';
+  const w = parsujArkuszXml(xml, wspolne);
+  sprawdz("Excel: cztery wiersze", w.length === 4, String(w.length));
+  sprawdz("Excel: pusta komórka nie rozjeżdża kolumn", w[2][2] === "Zabierzów", JSON.stringify(w[2]));
+  sprawdz("Excel: pusty telefon zostaje pusty", w[2][1] === "", JSON.stringify(w[2][1]));
+  sprawdz("Excel: tekst w komórce", w[3][0] === "Jan Test", String(w[3][0]));
+
+  const obiekty = arkuszNaWiersze(w);
+  const leady = wierszeNaLeady(obiekty, dopasujKolumny(Object.keys(obiekty[0])));
+  sprawdz("Excel: bez telefonu odpada", leady.length === 2, String(leady.length));
+  sprawdz("Excel: miasto trafia na miejsce", leady[0].city === "Kraków", String(leady[0].city));
+}
+
+// ── 7. Data z Excela (liczba dni od 1899) ──────────────────────────────
+{
+  const w = parsujCsv("Telefon;Data utworzenia\n530313220;46296");
+  const leady = wierszeNaLeady(w, dopasujKolumny(["Telefon", "Data utworzenia"]));
+  sprawdz("Excel: numer seryjny daty", (leady[0].submitted_at ?? "").startsWith("2026-"), String(leady[0].submitted_at));
 }
 
 if (bledy.length) {

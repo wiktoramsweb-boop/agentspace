@@ -811,16 +811,29 @@ button:not(:disabled):active,
   }
 }
 
-/* Pasek przewijania w aplikacji: jasny (globalny jest ciemny pod marketing). */
-.app-shell ::-webkit-scrollbar-track {
+/* Pasek przewijania w aplikacji: jasny (globalny jest ciemny pod marketing).
+   Musi obejmować też `.portal-dark`, bo rozwinięte listy wyboru lecą przez
+   portal do <body>, czyli poza `.app-shell`. Bez tego przy jasnym motywie
+   wyskakiwał przy nich czarny pasek z marketingu. */
+:is(.app-shell, .portal-dark) ::-webkit-scrollbar-track {
   background: #f1f4f9;
 }
-.app-shell ::-webkit-scrollbar-thumb {
+:is(.app-shell, .portal-dark) ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border: 3px solid #f1f4f9;
 }
-.app-shell ::-webkit-scrollbar-thumb:hover {
+:is(.app-shell, .portal-dark) ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* W małej liście wyboru pasek 12 px zabierałby jedną piątą szerokości. */
+:is(.app-shell, .portal-dark) [role="listbox"] ::-webkit-scrollbar,
+:is(.app-shell, .portal-dark) [role="listbox"]::-webkit-scrollbar {
+  width: 8px;
+}
+:is(.app-shell, .portal-dark) [role="listbox"] ::-webkit-scrollbar-thumb,
+:is(.app-shell, .portal-dark) [role="listbox"]::-webkit-scrollbar-thumb {
+  border-width: 2px;
 }
 
 /* Sidebar aplikacji: głęboki grafit z turkusowym podtonem i zieloną poświatą

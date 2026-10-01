@@ -7,6 +7,7 @@ import {
   dopasujKolumny, odczytajTekst, parsujCsv, wierszeNaLeady, zgadnijSeparator,
   type LeadZPliku, type PoleLeada, type WierszPliku,
 } from "@/lib/leady-import";
+import { arkuszNaWiersze, czytajXlsx } from "@/lib/xlsx-czytnik";
 import { importujLeady } from "./actions";
 import { LEAD_SOURCES } from "@/lib/types";
 
@@ -59,14 +60,20 @@ export function ImportLeadow({ agenci }: { agenci: { id: string; name: string }[
   async function wczytajPlik(file: File) {
     setBlad(null);
     try {
-      if (/\.(xlsx|xls)$/i.test(file.name)) {
+      const bufor = await file.arrayBuffer();
+      let w: WierszPliku[];
+      if (/\.xlsx$/i.test(file.name)) {
+        w = arkuszNaWiersze(await czytajXlsx(bufor));
+      } else if (/\.xls$/i.test(file.name)) {
+        // Stary format .xls to zupełnie inna struktura binarna, nie xlsx.
         setBlad(
-          "To jest plik Excela. W Meta Ads przy pobieraniu wybierz format CSV, albo otwórz plik w Excelu i zapisz jako CSV.",
+          "To stary format .xls. Otwórz plik w Excelu i zapisz jako .xlsx albo CSV, wtedy go wczytamy.",
         );
         return;
+      } else {
+        const tekst = odczytajTekst(bufor);
+        w = parsujCsv(tekst, zgadnijSeparator(tekst));
       }
-      const tekst = odczytajTekst(await file.arrayBuffer());
-      const w = parsujCsv(tekst, zgadnijSeparator(tekst));
       if (!w.length) {
         setBlad("Nie znalazłem w pliku żadnych wierszy z danymi.");
         return;
@@ -134,11 +141,11 @@ export function ImportLeadow({ agenci }: { agenci: { id: string; name: string }[
               <ol className="mt-2 list-decimal space-y-1 pl-5">
                 <li>Menedżer reklam albo Meta Business Suite, zakładka <strong>Centrum potencjalnych klientów</strong>.</li>
                 <li>Wybierz formularz i okres, potem <strong>Pobierz</strong>.</li>
-                <li>Zaznacz format <strong>CSV</strong>, nie Excel.</li>
+                <li>Format <strong>CSV albo Excel</strong>, przyjmiemy oba.</li>
               </ol>
               <p className="mt-2 text-xs text-slate-500">
                 Przyjmiemy też plik z innego źródła: wystarczy, że ma kolumnę z telefonem albo e-mailem.
-                Rozpoznajemy przecinki, średniki i tabulatory.
+                Czytamy .csv i .xlsx, rozpoznajemy przecinki, średniki i tabulatory.
               </p>
             </div>
 
@@ -152,13 +159,13 @@ export function ImportLeadow({ agenci }: { agenci: { id: string; name: string }[
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                 </svg>
               </span>
-              <span className="font-semibold text-slate-900">Wybierz plik CSV</span>
+              <span className="font-semibold text-slate-900">Wybierz plik CSV albo Excel</span>
               <span className="text-sm text-slate-500">albo przeciągnij go tutaj</span>
             </button>
             <input
               ref={plikRef}
               type="file"
-              accept=".csv,.tsv,.txt,text/csv"
+              accept=".csv,.tsv,.txt,.xlsx,text/csv"
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];

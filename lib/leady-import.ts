@@ -186,6 +186,14 @@ function data(v: string | undefined): string | null {
   // Meta oddaje czas uniksowy albo ISO; w polskich eksportach bywa 25.09.2026 12:43
   if (/^\d{10}$/.test(t)) return new Date(Number(t) * 1000).toISOString();
   if (/^\d{13}$/.test(t)) return new Date(Number(t)).toISOString();
+  // Excel trzyma daty jako liczbę dni od 30.12.1899. Zakres 20000-80000 to
+  // mniej więcej lata 1954-2119, więc nie pomylimy go z niczym sensownym.
+  if (/^\d{4,5}(\.\d+)?$/.test(t)) {
+    const dni = Number(t);
+    if (dni > 20000 && dni < 80000) {
+      return new Date(Math.round((dni - 25569) * 86400 * 1000)).toISOString();
+    }
+  }
   const pl = t.match(/^(\d{2})[.\-/](\d{2})[.\-/](\d{4})[ T]?(\d{2})?:?(\d{2})?/);
   if (pl) {
     const [, d, m, r, g = "00", min = "00"] = pl;
