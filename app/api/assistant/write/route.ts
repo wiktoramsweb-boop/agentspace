@@ -1,4 +1,4 @@
-import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
+import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { getCurrentUser } from "@/lib/auth";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 
@@ -22,7 +22,7 @@ const SYSTEMS: Record<string, string> = {
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
-  if (await aiLimitReached(user)) return aiLimitResponse();
+  if (await brakKredytow(user, "asystent_pisze")) return brakKredytowResponse();
 
   let body: { kind?: string; context?: string; clientName?: string };
   try {

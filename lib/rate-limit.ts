@@ -31,33 +31,9 @@ export async function hitLimit(key: string, max: number, windowSec: number): Pro
   return false;
 }
 
-function envInt(name: string, fallback: number): number {
-  const v = Number(process.env[name]);
-  return Number.isFinite(v) && v > 0 ? v : fallback;
-}
 
-const DAY = 24 * 3600;
 
-/**
- * Limit AI na osobę i na biuro w ciągu doby. Każde biuro korzysta z AI na
- * jednym kluczu Anthropic, więc jedno konto nie może przepalić całego portfela.
- * Wartości można zmienić w Vercel: AI_DAILY_LIMIT_USER, AI_DAILY_LIMIT_AGENCY.
- */
-export async function aiLimitReached(user: { id: string; agency_id: string | null }): Promise<boolean> {
-  if (await hitLimit(`ai:user:${user.id}`, envInt("AI_DAILY_LIMIT_USER", 300), DAY)) return true;
-  if (user.agency_id && (await hitLimit(`ai:agency:${user.agency_id}`, envInt("AI_DAILY_LIMIT_AGENCY", 2000), DAY))) {
-    return true;
-  }
-  return false;
-}
 
-/** Gotowa odpowiedź 429 dla endpointów AI. */
-export function aiLimitResponse(): Response {
-  return Response.json(
-    { error: "Dzisiejszy limit zapytań do AI został wykorzystany. Spróbuj jutro albo napisz do nas, jeśli potrzebujesz więcej." },
-    { status: 429 },
-  );
-}
 
 /** Skrót adresu IP odwiedzającego (bez zapisywania samego IP). */
 export async function visitorKey(): Promise<string> {

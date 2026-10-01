@@ -1,4 +1,4 @@
-import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
+import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { getCurrentUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   if (!user) {
     return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
   }
-  if (await aiLimitReached(user)) return aiLimitResponse();
+  if (await brakKredytow(user, "coach_tura")) return brakKredytowResponse();
 
   let body: { sessionId?: string; agentMessage?: string };
   try {

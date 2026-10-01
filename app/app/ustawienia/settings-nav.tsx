@@ -10,6 +10,7 @@ const PERSONAL: Item[] = [{ href: "/app/ustawienia", label: "Mój profil" }];
 const COMPANY: Item[] = [
   { href: "/app/ustawienia/firma", label: "Dane firmy" },
   { href: "/app/ustawienia/znak-wodny", label: "Znak wodny i stemple" },
+  { href: "/app/ustawienia/kredyty", label: "Zużycie AI" },
   { href: "/app/ustawienia/pozostale", label: "Pozostałe ustawienia" },
 ];
 

@@ -11,7 +11,8 @@
     "test:pola": "node --experimental-strip-types --no-warnings lib/sprawdz-pola.ts",
     "test:warianty": "node lib/sprawdz-warianty.mjs",
     "test:leady": "node --experimental-strip-types --no-warnings lib/sprawdz-leady.ts",
-    "test:uprawnienia": "node --experimental-strip-types --no-warnings lib/sprawdz-uprawnienia.ts"
+    "test:uprawnienia": "node --experimental-strip-types --no-warnings lib/sprawdz-uprawnienia.ts",
+    "test:kredyty": "node --experimental-strip-types --no-warnings lib/sprawdz-kredyty.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",

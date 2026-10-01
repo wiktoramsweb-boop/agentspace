@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { aiLimitReached } from "@/lib/rate-limit";
+import { brakKredytow } from "@/lib/kredyty";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { getScenarioById, getWeeklySessionCount } from "@/lib/data";
 import { scoreSession } from "@/lib/ai/coach";
@@ -103,7 +103,7 @@ export async function endSession(sessionId: string, _formData?: FormData): Promi
  */
 export async function rescoreSession(sessionId: string, _formData?: FormData): Promise<void> {
   const user = await requireUser();
-  if (await aiLimitReached(user)) redirect(`/app/sesja/${sessionId}`);
+  if (await brakKredytow(user, "coach_ocena")) redirect(`/app/sesja/${sessionId}`);
   const admin = createSupabaseAdmin();
 
   const { data: session } = await admin

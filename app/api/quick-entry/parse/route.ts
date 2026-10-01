@@ -1,4 +1,4 @@
-import { aiLimitReached, aiLimitResponse } from "@/lib/rate-limit";
+import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { getCurrentUser } from "@/lib/auth";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 
@@ -21,7 +21,7 @@ Zawsze wywołaj narzędzie zapisz_wpis z wszystkimi polami.`;
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response(JSON.stringify({ error: "Nie zalogowano" }), { status: 401 });
-  if (await aiLimitReached(user)) return aiLimitResponse();
+  if (await brakKredytow(user, "szybki_wpis")) return brakKredytowResponse();
 
   let body: { transcript?: string };
   try {
