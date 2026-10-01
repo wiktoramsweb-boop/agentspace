@@ -1,3 +1,4 @@
+import { dateKeyPL, todayPL } from "./datetime";
 import { createSupabaseAdmin } from "./supabase/admin";
 import type { Activity } from "./types";
 
@@ -91,21 +92,22 @@ export async function getActivityStats(agencyId: string, userId: string) {
     "status" | "kind" | "due_at" | "assignee_ids" | "completed_at"
   >[];
   const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  // Dni liczymy po polsku: po północy UTC wciąż trwa wczorajszy dzień.
+  const todayStr = todayPL();
   const weekAgo = new Date(now.getTime() - 7 * 864e5).toISOString();
 
   const mine = rows.filter((r) => (r.assignee_ids ?? []).includes(userId));
 
   // Telefony wykonane dzisiaj - to je porównujemy z celem dziennym z Celów.
   const isToday = (r: { due_at: string | null; completed_at: string | null }) =>
-    (r.completed_at ?? r.due_at ?? "").slice(0, 10) === todayStr;
+    dateKeyPL(r.completed_at ?? r.due_at) === todayStr;
 
   return {
     planned: mine.filter((r) => r.status === "zaplanowane").length,
     callsToday: mine.filter((r) => r.kind === "polaczenie" && r.status === "wykonane" && isToday(r))
       .length,
     doneToday: mine.filter((r) => r.status === "wykonane" && isToday(r)).length,
-    today: mine.filter((r) => r.status === "zaplanowane" && (r.due_at ?? "").slice(0, 10) === todayStr)
+    today: mine.filter((r) => r.status === "zaplanowane" && dateKeyPL(r.due_at) === todayStr)
       .length,
     overdue: mine.filter(
       (r) => r.status === "zaplanowane" && r.due_at && r.due_at < now.toISOString(),

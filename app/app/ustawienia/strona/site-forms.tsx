@@ -1,5 +1,6 @@
 "use client";
 
+import { todayPL } from "@/lib/datetime";
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -557,7 +558,7 @@ export function PostsEditor({ posts }: { posts: PostRow[] }) {
     author: "",
     read_min: 4,
     published: false,
-    published_at: new Date().toISOString().slice(0, 10),
+    published_at: todayPL(),
   };
   const current = editing === "new" ? blank : editing;
 

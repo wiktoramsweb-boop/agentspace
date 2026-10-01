@@ -1,5 +1,6 @@
 "use client";
 
+import { todayPL } from "@/lib/datetime";
 import { useState } from "react";
 import { SparkIcon } from "../components/icons";
 import { buildReservation, type Party, type ReservationData, type ResMode, type PropType, type DepositType, type DocType } from "@/lib/reservation";
@@ -19,7 +20,7 @@ const emptyParty = (): Party => ({ name: "", pesel: "", docType: "dowod", docNum
 export function ReservationCreator({ city }: { city: string }) {
   const [d, setD] = useState<ReservationData>({
     city,
-    date: new Date().toISOString().slice(0, 10),
+    date: todayPL(),
     mode: "sprzedaz",
     propType: "mieszkanie",
     propAddress: "",

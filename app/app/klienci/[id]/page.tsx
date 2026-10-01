@@ -1,3 +1,4 @@
+import { todayPL } from "@/lib/datetime";
 import { mozeUsunac } from "@/lib/uprawnienia";
 import { maskPhone } from "@/lib/format";
 import Link from "next/link";
@@ -39,7 +40,7 @@ type Props = { params: Promise<{ id: string }> };
 
 function reminderState(next: string | null): { due: boolean; label: string } | null {
   if (!next) return null;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayPL();
   const overdue = next < today;
   const isToday = next === today;
   return {

@@ -1,6 +1,9 @@
+import { todayDatePL, todayPL } from "./datetime";
+
 // Miesięczny kalendarz wykonania celu telefonów (cold calls) per dzień.
-// UWAGA: cała apka kluczuje dni po dacie UTC (daily_logs.log_date = new Date().toISOString().slice(0,10)),
-// więc tu też liczymy w UTC (Date.UTC z godziną 12, żeby uniknąć przesunięć DST).
+// Dni w dziennikach (daily_logs.log_date) to polskie daty (todayPL/dateKeyPL).
+// Tu liczymy siatkę w UTC od polskiego „dziś” (Date.UTC z godziną 12, żeby
+// uniknąć przesunięć przy zmianie czasu).
 
 export type CalDay = {
   date: string; // yyyy-mm-dd (UTC)
@@ -33,14 +36,14 @@ function mondayIdx(d: Date): number {
 export function buildMonthCalendar(
   logs: { log_date: string; cold_calls: number }[],
   dailyTarget: number,
-  ref: Date = new Date(),
+  ref: Date = todayDatePL(),
 ): MonthCalendar {
   const callsByDate = new Map<string, number>();
   for (const l of logs) callsByDate.set(l.log_date, l.cold_calls ?? 0);
 
   const year = ref.getUTCFullYear();
   const month = ref.getUTCMonth();
-  const todayStr = ymdUTC(new Date());
+  const todayStr = todayPL();
 
   const first = new Date(Date.UTC(year, month, 1, 12));
   const last = new Date(Date.UTC(year, month + 1, 0, 12)); // ostatni dzień miesiąca

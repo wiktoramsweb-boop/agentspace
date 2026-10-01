@@ -1,5 +1,6 @@
 "use server";
 
+import { todayPL } from "@/lib/datetime";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
@@ -14,7 +15,7 @@ export async function addTask(formData: FormData): Promise<void> {
     agent_id: user.id,
     agency_id: user.agency_id,
     title,
-    due_date: new Date().toISOString().slice(0, 10),
+    due_date: todayPL(),
   });
   revalidatePath("/app");
 }

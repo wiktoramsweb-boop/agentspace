@@ -1,5 +1,5 @@
 import { createSupabaseAdmin } from "./supabase/admin";
-import { warsawToIso, addDaysKey } from "./datetime";
+import { warsawToIso, addDaysKey, todayPL } from "./datetime";
 import type { ListQuery } from "./list-params";
 import type { Client, Property, Activity } from "./types";
 
@@ -73,7 +73,7 @@ export async function queryClients(agencyId: string, q: ListQuery, userId: strin
 
   // „Do kontaktu": zaplanowany kontakt wypada dziś albo już minął.
   if (q.extra === "do_kontaktu") {
-    sel = sel.not("next_contact_at", "is", null).lte("next_contact_at", new Date().toISOString().slice(0, 10));
+    sel = sel.not("next_contact_at", "is", null).lte("next_contact_at", todayPL());
   }
   if (q.extra === "bez_kontaktu") sel = sel.is("last_contact_at", null);
 

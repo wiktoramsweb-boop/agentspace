@@ -1,13 +1,12 @@
 "use client";
 
+import { addDaysKey, todayPL } from "@/lib/datetime";
 import { useState } from "react";
 import { setNextContact, markClientContacted } from "../actions";
 import { useToast } from "../../components/toast";
 
 function isoInDays(days: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  return addDaysKey(todayPL(), days);
 }
 
 export function NextContactControl({

@@ -1,3 +1,4 @@
+import { todayPL } from "./datetime";
 /**
  * Aneks do umowy pośrednictwa.
  *
@@ -56,7 +57,7 @@ export function pustyZleceniodawca(): Zleceniodawca {
 }
 
 export function domyslnyAneks(city: string): AneksData {
-  const dzis = new Date().toISOString().slice(0, 10);
+  const dzis = todayPL();
   return {
     rodzaj: "termin",
     przedsiebiorca: "",

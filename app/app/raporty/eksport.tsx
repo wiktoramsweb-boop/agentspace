@@ -1,5 +1,6 @@
 "use client";
 
+import { todayPL } from "@/lib/datetime";
 import { useState } from "react";
 import { generujRaportPdf } from "@/lib/raport-pdf";
 import { pobierzPdf, drukujPdf } from "@/lib/pdf-kit";
@@ -28,7 +29,7 @@ export function EksportRaportu({
     try {
       const bytes = await generujRaportPdf(raport, nazwaBiura, stopka);
       if (tryb === "zapis") {
-        const dzis = new Date().toISOString().slice(0, 10);
+        const dzis = todayPL();
         pobierzPdf(bytes, `Raport ${nazwaBiura} ${dzis}`.replace(/[\\/:*?"<>|]/g, "-"));
       } else {
         drukujPdf(bytes);

@@ -1,3 +1,4 @@
+import { addDaysKey, todayPL } from "@/lib/datetime";
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
 import { getInvoiceNumberSuggestion } from "@/lib/data-invoices";
@@ -8,10 +9,9 @@ export default async function NowaFakturaPage() {
   const owner = await requireOwner();
   const number = owner.agency_id ? await getInvoiceNumberSuggestion(owner.agency_id) : "";
 
-  const iso = (d: Date) => d.toISOString().slice(0, 10);
-  const today = new Date();
-  const pay = new Date(today);
-  pay.setDate(pay.getDate() + 7);
+  // Daty po polsku: o 0:30 w nocy UTC wskazywałby jeszcze wczoraj.
+  const today = todayPL();
+  const pay = addDaysKey(today, 7);
 
   return (
     <>
@@ -38,9 +38,9 @@ export default async function NowaFakturaPage() {
           buyerNip: "",
           buyerPesel: "",
           place: "Kraków",
-          issueDate: iso(today),
-          saleDate: iso(today),
-          paymentDate: iso(pay),
+          issueDate: today,
+          saleDate: today,
+          paymentDate: pay,
           paymentMethod: "Przelew",
           items: [{ name: "Pośrednictwo w kupnie nieruchomości", qty: 1, unitPrice: 0 }],
           description: "",

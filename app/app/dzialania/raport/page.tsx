@@ -1,4 +1,4 @@
-import { formatDateTimePL, formatDatePL, formatTimePL } from "@/lib/datetime";
+import { formatDateTimePL, formatDatePL, formatTimePL, todayDatePL } from "@/lib/datetime";
 import { formatPhone } from "@/lib/format";
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
@@ -23,14 +23,18 @@ function fmt(iso: string | null): string {
 
 /** Zakresy dat dla szybkich skrótów („ten miesiąc" itd.). */
 function presets() {
-  const now = new Date();
+  // Liczone od polskiej daty, w UTC: serwer działa w UTC i o 0:30 w nocy
+  // „dziś” wskazywałoby jeszcze wczoraj.
+  const now = todayDatePL();
   const iso = (d: Date) => d.toISOString().slice(0, 10);
+  const y = now.getUTCFullYear();
+  const m = now.getUTCMonth();
   const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const endOfPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  startOfWeek.setUTCDate(now.getUTCDate() - ((now.getUTCDay() + 6) % 7));
+  const startOfMonth = new Date(Date.UTC(y, m, 1));
+  const startOfPrevMonth = new Date(Date.UTC(y, m - 1, 1));
+  const endOfPrevMonth = new Date(Date.UTC(y, m, 0));
+  const startOfYear = new Date(Date.UTC(y, 0, 1));
 
   return [
     { label: "Dziś", from: iso(now), to: iso(now) },

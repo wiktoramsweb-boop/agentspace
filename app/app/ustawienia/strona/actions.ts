@@ -1,5 +1,6 @@
 "use server";
 
+import { todayPL } from "@/lib/datetime";
 import { escapeHtml } from "@/lib/html";
 import { revalidatePath } from "next/cache";
 import { requireOwner, requireUser } from "@/lib/auth";
@@ -251,7 +252,7 @@ export async function savePost(formData: FormData): Promise<SiteResult> {
     author: String(formData.get("author") ?? "").trim().slice(0, 80) || user.full_name || null,
     read_min: Math.max(1, Math.min(60, parseInt(String(formData.get("read_min") ?? "4"), 10) || 4)),
     published: formData.get("published") === "1",
-    published_at: String(formData.get("published_at") ?? "").trim() || new Date().toISOString().slice(0, 10),
+    published_at: String(formData.get("published_at") ?? "").trim() || todayPL(),
     updated_at: new Date().toISOString(),
   };
 

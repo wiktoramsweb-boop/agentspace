@@ -1,3 +1,4 @@
+import { addDaysKey, todayPL } from "./datetime";
 import { createSupabaseAdmin } from "./supabase/admin";
 import type { Scenario, TrainingSession, SessionScore, Profile, Goal, DailyLog } from "./types";
 import { computeFunnel } from "./funnel";
@@ -285,7 +286,7 @@ export async function getTeamInsights(
   if (ids.length === 0) return { alerts: [], trends: {}, weeklyActivity: [] };
   const admin = createSupabaseAdmin();
 
-  const since35 = new Date(Date.now() - 35 * 86400000).toISOString().slice(0, 10);
+  const since35 = addDaysKey(todayPL(), -35);
   const since28 = new Date(Date.now() - 28 * 86400000).toISOString();
 
   const [{ data: logs }, { data: scores }, { data: sess }] = await Promise.all([
@@ -298,7 +299,7 @@ export async function getTeamInsights(
     admin.from("training_sessions").select("agent_id, started_at").in("agent_id", ids).gte("started_at", since28),
   ]);
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = todayPL();
   const monday = mondayOfThisWeek();
 
   const trends: Record<string, AgentTrend> = {};
@@ -540,7 +541,7 @@ export async function getAgentDetail(
     .gte("log_date", monthStartYmd)
     .order("log_date");
   const monthLogs = (logRows ?? []) as DailyLog[];
-  const todayYmd = new Date().toISOString().slice(0, 10);
+  const todayYmd = todayPL();
   const todayLog = monthLogs.find((l) => l.log_date === todayYmd) ?? null;
 
   const targets = goal ? computeFunnel(goal) : null;

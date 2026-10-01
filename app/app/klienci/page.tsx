@@ -1,3 +1,4 @@
+import { todayPL } from "@/lib/datetime";
 import { requireUser } from "@/lib/auth";
 import { queryClients } from "@/lib/data-lists";
 import { getAgencyAgents } from "@/lib/data-activities";
@@ -14,7 +15,7 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 /** Liczniki nad listą liczy baza, żeby nie ściągać wszystkich kontaktów. */
 async function counts(agencyId: string) {
   const admin = createSupabaseAdmin();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayPL();
   const [all, active, due] = await Promise.all([
     admin.from("clients").select("id", { count: "exact", head: true }).eq("agency_id", agencyId),
     admin

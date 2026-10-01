@@ -1,3 +1,4 @@
+import { addDaysKey, todayPL } from "./datetime";
 import { createSupabaseAdmin } from "./supabase/admin";
 
 /**
@@ -27,7 +28,7 @@ export async function getGoal(agentId: string): Promise<Goal | null> {
 
 export async function getTodayLog(agentId: string): Promise<DailyLog | null> {
   const admin = createSupabaseAdmin();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayPL();
   const { data } = await admin
     .from("daily_logs")
     .select("*")
@@ -68,7 +69,7 @@ export async function getYearClosedCommission(agentId: string): Promise<number> 
 
 export async function getRecentLogs(agentId: string, days = 30): Promise<DailyLog[]> {
   const admin = createSupabaseAdmin();
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const since = addDaysKey(todayPL(), -days);
   const { data } = await admin
     .from("daily_logs")
     .select("*")
@@ -96,7 +97,7 @@ export async function getTasks(agentId: string, onlyOpen = false): Promise<Task[
 
 export async function getTodayTasks(agentId: string): Promise<Task[]> {
   const admin = createSupabaseAdmin();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayPL();
   const { data } = await admin
     .from("tasks")
     .select("*")
@@ -430,7 +431,7 @@ export async function getContactReminders(
   limit = 20,
 ): Promise<Client[]> {
   const admin = createSupabaseAdmin();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayPL();
   const { data } = await admin
     .from("clients")
     .select("*")

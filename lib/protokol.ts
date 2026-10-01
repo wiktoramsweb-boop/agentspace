@@ -1,3 +1,4 @@
+import { todayPL } from "./datetime";
 /**
  * Protokół zdawczo-odbiorczy lokalu.
  *
@@ -95,7 +96,7 @@ export function domyslneDane(city: string): ProtokolData {
   return {
     kierunek: "wydanie",
     city,
-    date: new Date().toISOString().slice(0, 10),
+    date: todayPL(),
     lokalAdres: "",
     umowaData: "",
     umowaRodzaj: "najmu okazjonalnego",
