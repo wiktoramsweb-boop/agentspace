@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { PageHeader } from "../components/ui";
 import { WycenaForm } from "./wycena-form";
 
 export const metadata = { title: "Wycena | AgentSpace" };
 
 export default async function WycenaPage() {
-  const user = await requireUser();
+  const user = await requireModul("nieruchomosci");
 
   return (
     <>

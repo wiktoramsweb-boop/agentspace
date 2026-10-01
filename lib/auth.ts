@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "./supabase/server";
 import { createSupabaseAdmin } from "./supabase/admin";
 import type { ProfileWithAgency } from "./types";
+import { maModul, zakresDanych, type Modul, type Zakres } from "./role";
 
 /**
  * Zwraca zalogowanego użytkownika z profilem i agencją, albo null.
@@ -71,4 +72,25 @@ export async function requireManagerOrOwner(): Promise<ProfileWithAgency> {
   const user = await requireUser();
   if (user.role !== "owner" && user.role !== "manager") redirect("/app");
   return user;
+}
+
+/**
+ * Wymusza dostęp do modułu (v38).
+ *
+ * Ukrycie pozycji w menu to tylko wygoda: adres i tak da się wpisać ręcznie,
+ * więc każda strona modułu musi sprawdzić uprawnienie u siebie. Odsyłamy na
+ * pulpit, a nie na 403, bo dla użytkownika to nie jest błąd, tylko zakres
+ * obowiązków ustawiony przez CEO.
+ */
+export async function requireModul(modul: Modul): Promise<ProfileWithAgency> {
+  const user = await requireUser();
+  if (!maModul({ id: user.id, role: user.role, permissions: user.permissions }, modul)) {
+    redirect("/app");
+  }
+  return user;
+}
+
+/** Zakres danych zalogowanej osoby: tylko swoje, zespół albo całe biuro. */
+export function zakresUzytkownika(user: ProfileWithAgency): Zakres {
+  return zakresDanych({ id: user.id, role: user.role, permissions: user.permissions });
 }

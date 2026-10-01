@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/auth";
 import { APP_TZ } from "@/lib/datetime";
-import { ROLE_LABELS } from "@/lib/types";
+import { ROLE_LABELS } from "@/lib/role";
 import { Card } from "../components/ui";
 import { SettingsForm } from "./settings-form";
 import { AvatarUploader } from "./avatar-uploader";

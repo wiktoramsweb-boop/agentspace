@@ -3,21 +3,25 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ROLE_LABELS, type UserRole } from "@/lib/types";
+import { type UserRole } from "@/lib/types";
+import { ROLE_LABELS } from "@/lib/role";
 import { ThemeToggle } from "./theme-toggle";
 import { GlobalSearch } from "./global-search";
 import { signOut } from "@/app/auth/actions";
 import { SECTIONS, TILE } from "./nav-meta";
+import { maModul, type Uprawnienia } from "@/lib/role";
 
 const COLLAPSE_KEY = "as_nav_collapsed";
 
 export function Sidebar({
   role,
+  permissions,
   fullName,
   agencyName,
   avatarUrl,
 }: {
   role: UserRole;
+  permissions?: Uprawnienia | null;
   fullName: string;
   agencyName: string;
   avatarUrl?: string | null;
@@ -57,7 +61,7 @@ export function Sidebar({
       <GlobalSearch />
       <div className="flex flex-col gap-4 pb-2">
       {SECTIONS.map((section) => {
-        const items = section.items.filter((i) => !i.roles || i.roles.includes(role));
+        const items = section.items.filter((i) => !i.modul || maModul({ id: "", role, permissions }, i.modul));
         if (items.length === 0) return null;
         // Sekcja z aktywną pozycją zostaje otwarta, żeby agent widział, gdzie jest.
         const hasActive = items.some((i) => isActive(i.href));

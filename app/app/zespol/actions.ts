@@ -6,11 +6,13 @@ import { redirect } from "next/navigation";
 import { Resend } from "resend";
 import { requireOwner } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { ROLE, oczyscUprawnienia, type Uprawnienia } from "@/lib/role";
 import { APP_URL } from "@/lib/supabase/config";
 import { sendAgencyMonthlyReport } from "@/lib/report";
-import { ROLE_LABELS, type UserRole } from "@/lib/types";
+import { type UserRole } from "@/lib/types";
+import { ROLE_LABELS } from "@/lib/role";
 
-const VALID_ROLES: UserRole[] = ["owner", "manager", "agent"];
+const VALID_ROLES = ROLE.map((r) => r.id);
 
 export type ZespolResult =
   | { error?: string; success?: string; link?: string; emailSent?: boolean }
@@ -307,7 +309,8 @@ export async function setMemberRole(memberId: string, role: UserRole): Promise<R
     .update({
       role,
       // CEO i Menedżer nie mają przełożonego.
-      ...(role !== "agent" ? { manager_id: null } : {}),
+      // Przełożonego mają tylko stanowiska pracujące pod menedżerem.
+      ...(role !== "agent" && role !== "trainee" ? { manager_id: null } : {}),
     })
     .eq("id", memberId);
 
@@ -406,5 +409,46 @@ export async function updateMemberProfile(
 
   revalidatePath("/app/zespol");
   revalidatePath(`/app/zespol/${memberId}`);
+  return {};
+}
+
+/**
+ * Indywidualne uprawnienia osoby (v38).
+ *
+ * Rola daje zestaw domyślny, a tutaj CEO dokłada albo odbiera pojedynczy
+ * moduł. Zapisujemy tylko faktyczne odstępstwa, żeby po zmianie roli
+ * uprawnienia poszły za nową rolą, a nie zostały zamrożone na starej.
+ */
+export async function setMemberPermissions(
+  memberId: string,
+  uprawnienia: Uprawnienia | null,
+): Promise<RoleActionResult> {
+  const owner = await requireOwner();
+  const admin = createSupabaseAdmin();
+
+  const { data: member } = await admin
+    .from("profiles")
+    .select("id, agency_id, role")
+    .eq("id", memberId)
+    .maybeSingle();
+  if (!member || member.agency_id !== owner.agency_id) return { error: "Nie znaleziono osoby." };
+
+  // CEO zawsze ma pełny dostęp. Gdyby dało się go obciąć, biuro mogłoby
+  // zostać bez nikogo, kto wejdzie w ustawienia i to odkręci.
+  if (member.role === "owner") {
+    return { error: "CEO ma pełny dostęp i nie da się go ograniczyć." };
+  }
+
+  const { error } = await admin
+    .from("profiles")
+    .update({ permissions: oczyscUprawnienia(member.role, uprawnienia) })
+    .eq("id", memberId);
+  if (error) {
+    return { error: "Nie udało się zapisać. Uruchom migrację v38 (lib/SETUP-v38-role.sql)." };
+  }
+
+  revalidatePath("/app/zespol");
+  revalidatePath(`/app/zespol/${memberId}`);
+  revalidatePath("/app", "layout");
   return {};
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { requireModul } from "@/lib/auth";
 import { getDeals, getCommissionStats, getPropertiesLite } from "@/lib/data-platform";
 import { DEAL_STATUSES } from "@/lib/types";
 import { PageHeader, StatCard, Card, EmptyState } from "../components/ui";
@@ -7,7 +7,7 @@ import { formatPln, formatDateShort } from "@/lib/format";
 import { NewDealButton, DealActions } from "./deal-controls";
 
 export default async function ProwizjePage() {
-  const user = await requireUser();
+  const user = await requireModul("prowizje");
   const [deals, stats, properties] = await Promise.all([
     getDeals(user.id),
     getCommissionStats(user.id),

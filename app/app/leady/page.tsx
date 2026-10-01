@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getLeady, getStatystykiLeadow } from "@/lib/data-leads";
 import { getAgencyAgents } from "@/lib/data-activities";
 import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/types";
@@ -18,7 +18,7 @@ type Props = {
  * klientem. Ekran jest ustawiony pod jedną czynność: obdzwonić to, co nowe.
  */
 export default async function LeadyPage({ searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("klienci");
   const agencyId = user.agency_id;
   const f = await searchParams;
 

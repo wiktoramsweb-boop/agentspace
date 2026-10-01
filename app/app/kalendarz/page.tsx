@@ -1,5 +1,5 @@
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getAgencyAgents } from "@/lib/data-activities";
 import { getAgencyClientsLite, getAgencyProperties } from "@/lib/data-platform";
 import { emptyInsights, getCalendarEvents, getCallInsights } from "@/lib/data-calendar";
@@ -13,7 +13,7 @@ import type { CalView } from "./shared";
 type Props = { searchParams: Promise<{ widok?: string; data?: string; kto?: string }> };
 
 export default async function KalendarzPage({ searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("klienci");
   const agencyId = user.agency_id;
   const sp = await searchParams;
 

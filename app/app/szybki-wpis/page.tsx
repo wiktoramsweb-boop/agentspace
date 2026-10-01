@@ -1,9 +1,9 @@
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { PageHeader } from "../components/ui";
 import { QuickEntry } from "./quick-entry";
 
 export default async function SzybkiWpisPage() {
-  await requireUser();
+  await requireModul("klienci");
   return (
     <>
       <PageHeader

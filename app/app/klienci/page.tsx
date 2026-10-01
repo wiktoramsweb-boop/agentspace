@@ -1,5 +1,5 @@
 import { todayPL } from "@/lib/datetime";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { queryClients } from "@/lib/data-lists";
 import { getAgencyAgents } from "@/lib/data-activities";
 import { getAgencySettings } from "@/lib/agency-settings";
@@ -34,7 +34,7 @@ async function counts(agencyId: string) {
 }
 
 export default async function KlienciPage({ searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("klienci");
   const agencyId = user.agency_id;
   const query = parseListQuery(await searchParams, { sort: "zmiana", dateField: "zmiana" });
 

@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { requireOwner } from "@/lib/auth";
+import { requireModul } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { invoiceTotal, type InvoiceItem } from "@/lib/invoice";
 
@@ -27,7 +27,7 @@ export type InvoicePayload = {
 };
 
 export async function createInvoice(p: InvoicePayload): Promise<void> {
-  const owner = await requireOwner();
+  const owner = await requireModul("faktury");
   const admin = createSupabaseAdmin();
   const items = (p.items ?? [])
     .filter((i) => (i.name ?? "").trim())
@@ -66,7 +66,7 @@ export async function createInvoice(p: InvoicePayload): Promise<void> {
 }
 
 export async function updateInvoice(id: string, p: InvoicePayload): Promise<void> {
-  const owner = await requireOwner();
+  const owner = await requireModul("faktury");
   const admin = createSupabaseAdmin();
   const items = (p.items ?? [])
     .filter((i) => (i.name ?? "").trim())
@@ -104,7 +104,7 @@ export async function updateInvoice(id: string, p: InvoicePayload): Promise<void
 }
 
 export async function deleteInvoice(id: string): Promise<void> {
-  const owner = await requireOwner();
+  const owner = await requireModul("faktury");
   const admin = createSupabaseAdmin();
   await admin.from("invoices").delete().eq("id", id).eq("agency_id", owner.agency_id);
   revalidatePath("/app/faktury");

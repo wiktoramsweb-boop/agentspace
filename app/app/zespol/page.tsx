@@ -15,7 +15,8 @@ import {
 import { getAgencyCommissionByAgent } from "@/lib/data-platform";
 import { PageHeader, StatCard, Card, scoreColor } from "../components/ui";
 import { formatPln } from "@/lib/format";
-import { ROLE_LABELS, FUNNEL_STAGES, type UserRole } from "@/lib/types";
+import { FUNNEL_STAGES, type UserRole } from "@/lib/types";
+import { ROLE_LABELS } from "@/lib/role";
 import { InviteForm, type ManagerOption } from "./invite-form";
 import { cancelInvitation } from "./actions";
 import { ReportButton } from "./report-button";

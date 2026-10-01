@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getScenarios, getWeeklySessionCount } from "@/lib/data";
 import { SCENARIO_CATEGORIES, type ScenarioCategory } from "@/lib/types";
 import { PageHeader, EmptyState } from "../components/ui";
@@ -39,7 +39,7 @@ export default async function TreningPage({
 }: {
   searchParams: Promise<{ limit?: string }>;
 }) {
-  const user = await requireUser();
+  const user = await requireModul("coach");
   const { limit: limitParam } = await searchParams;
   const scenarios = await getScenarios();
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { requireOwner } from "@/lib/auth";
+import { requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { sprzedawcy } from "@/lib/invoice";
 import { getInvoice } from "@/lib/data-invoices";
@@ -11,7 +11,7 @@ import { deleteInvoice } from "../actions";
 type Props = { params: Promise<{ id: string }> };
 
 export default async function InvoiceViewPage({ params }: Props) {
-  const owner = await requireOwner();
+  const owner = await requireModul("faktury");
   const ustawienia = await getAgencySettings(owner.agency_id, owner.agency?.name);
   const listaSprzedawcow = sprzedawcy(ustawienia.sellers, ustawienia.company);
   const nazwaBiura = ustawienia.company.name ?? owner.agency?.name ?? "";

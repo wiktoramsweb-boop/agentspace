@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getRecentSessions, getAgentStats } from "@/lib/data";
 import { PageHeader, StatCard, ScoreBadge, EmptyState, Card } from "../components/ui";
 import { formatDate } from "@/lib/blog";
 
 export default async function HistoriaPage() {
-  const user = await requireUser();
+  const user = await requireModul("coach");
   const [sessions, stats] = await Promise.all([
     getRecentSessions(user.id, 50),
     getAgentStats(user.id),

@@ -1,5 +1,5 @@
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { queryProperties } from "@/lib/data-lists";
 import { getAgencyAgents } from "@/lib/data-activities";
 import { getAgencyClientsLite } from "@/lib/data-platform";
@@ -64,7 +64,7 @@ async function mapData(agencyId: string) {
 }
 
 export default async function NieruchomosciPage({ searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("nieruchomosci");
   const agencyId = user.agency_id;
   const query = parseListQuery(await searchParams, { sort: "nowe", dateField: "zmiana" });
 

@@ -5,12 +5,14 @@ import { getAgencyMembers, getAgentDetail } from "@/lib/data";
 import { PageHeader, StatCard, Card, ScoreBadge, scoreColor } from "../../components/ui";
 import { formatPln } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
-import { ROLE_LABELS, FUNNEL_STAGES } from "@/lib/types";
+import { FUNNEL_STAGES } from "@/lib/types";
+import { ROLE_LABELS } from "@/lib/role";
 import { computeFunnel } from "@/lib/funnel";
 import { buildMonthCalendar } from "@/lib/goal-calendar";
 import { MonthCalendarView } from "../../cele/month-calendar";
 import { policzDorobek } from "../actions";
 import { UsunAgenta } from "./usun-agenta";
+import { UprawnieniaOsoby } from "../uprawnienia-osoby";
 
 const STAGE_SHORT: Record<string, string> = Object.fromEntries(
   FUNNEL_STAGES.map((s) => [s.key, s.short]),
@@ -232,6 +234,18 @@ export default async function AgentDetailPage({ params }: Props) {
             })}
           </div>
         </Card>
+      )}
+
+      {isOwner && (
+        <div className="mt-6">
+          <UprawnieniaOsoby
+            memberId={profile.id}
+            imie={(profile.full_name ?? profile.email ?? "Ta osoba").split(" ")[0]}
+            rola={profile.role}
+            uprawnienia={profile.permissions ?? null}
+            czyCeo={profile.role === "owner"}
+          />
+        </div>
       )}
 
       {isOwner && profile.role !== "owner" && (

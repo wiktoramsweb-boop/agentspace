@@ -1,4 +1,4 @@
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getGoal, getTodayLog, getRecentLogs, getYearClosedCommission } from "@/lib/data-platform";
 import { computeFunnel } from "@/lib/funnel";
 import { FUNNEL_STAGES } from "@/lib/types";
@@ -28,7 +28,7 @@ function mondayOf(d: Date): Date {
 }
 
 export default async function CelePage() {
-  const user = await requireUser();
+  const user = await requireModul("coach");
   const goal = await getGoal(user.id);
 
   // Brak celu - pokaż setup

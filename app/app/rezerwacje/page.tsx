@@ -1,10 +1,10 @@
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { PageHeader } from "../components/ui";
 import { ReservationCreator } from "./reservation-creator";
 
 export default async function RezerwacjePage() {
-  const user = await requireUser();
+  const user = await requireModul("dokumenty");
   const { company } = await getAgencySettings(user.agency_id, user.agency?.name);
   return (
     <>

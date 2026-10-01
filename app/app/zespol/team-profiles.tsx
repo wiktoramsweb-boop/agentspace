@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ROLE_LABELS, type UserRole } from "@/lib/types";
+import { type UserRole } from "@/lib/types";
+import { ROLE_LABELS } from "@/lib/role";
 import { formatPhone } from "@/lib/format";
 import { updateMemberProfile } from "./actions";
 
@@ -24,8 +25,13 @@ export type TeamProfile = {
 
 const ROLE_BADGE: Record<UserRole, string> = {
   owner: "bg-amber-100 text-amber-700",
+  director: "bg-orange-100 text-orange-700",
   manager: "bg-violet-100 text-violet-700",
   agent: "bg-slate-100 text-slate-600",
+  assistant: "bg-sky-100 text-sky-700",
+  accountant: "bg-emerald-100 text-emerald-700",
+  coordinator: "bg-teal-100 text-teal-700",
+  trainee: "bg-zinc-100 text-zinc-600",
 };
 
 /**

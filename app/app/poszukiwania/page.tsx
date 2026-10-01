@@ -1,5 +1,5 @@
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getSearches, getActiveProperties } from "@/lib/data-searches";
 import { getAgencyClientsLite } from "@/lib/data-platform";
 import { getAgencyAgents } from "@/lib/data-activities";
@@ -10,7 +10,7 @@ import { SearchesBrowser } from "./searches-browser";
 import { SearchWizard } from "./search-wizard";
 
 export default async function PoszukiwaniaPage() {
-  const user = await requireUser();
+  const user = await requireModul("klienci");
   const agencyId = user.agency_id;
   const settings = await getAgencySettings(agencyId, user.agency?.name);
   const tol = matchTolerance(settings);

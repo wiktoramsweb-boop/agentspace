@@ -1,6 +1,6 @@
 import { addDaysKey, todayPL } from "@/lib/datetime";
 import Link from "next/link";
-import { requireOwner } from "@/lib/auth";
+import { requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { sprzedawcy } from "@/lib/invoice";
 import { getInvoiceNumberSuggestion } from "@/lib/data-invoices";
@@ -8,7 +8,7 @@ import { PageHeader } from "../../components/ui";
 import { InvoiceCreator } from "../invoice-creator";
 
 export default async function NowaFakturaPage() {
-  const owner = await requireOwner();
+  const owner = await requireModul("faktury");
   const ustawienia = await getAgencySettings(owner.agency_id, owner.agency?.name);
   const listaSprzedawcow = sprzedawcy(ustawienia.sellers, ustawienia.company);
   const nazwaBiura = ustawienia.company.name ?? owner.agency?.name ?? "";

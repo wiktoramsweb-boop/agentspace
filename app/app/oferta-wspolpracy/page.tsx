@@ -1,9 +1,9 @@
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { PageHeader } from "../components/ui";
 import { OfertaWspolpracy } from "./oferta";
 
 export default async function OfertaWspolpracyPage() {
-  const user = await requireUser();
+  const user = await requireModul("dokumenty");
   return (
     <>
       <PageHeader

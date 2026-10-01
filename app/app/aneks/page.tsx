@@ -1,11 +1,11 @@
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { getAgencyAgents } from "@/lib/data-activities";
 import { PageHeader } from "../components/ui";
 import { AneksCreator } from "./aneks-creator";
 
 export default async function AneksPage() {
-  const user = await requireUser();
+  const user = await requireModul("dokumenty");
   const [settings, agenci] = await Promise.all([
     getAgencySettings(user.agency_id, user.agency?.name),
     user.agency_id ? getAgencyAgents(user.agency_id) : Promise.resolve([]),

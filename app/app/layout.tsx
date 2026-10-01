@@ -53,6 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="app-shell min-h-screen text-slate-900 md:flex">
         <Sidebar
           role={user.role}
+          permissions={user.permissions}
           fullName={user.full_name ?? "Użytkownik"}
           agencyName={user.agency?.name ?? "Biuro"}
           avatarUrl={avatarUrl(user.avatar_path)}

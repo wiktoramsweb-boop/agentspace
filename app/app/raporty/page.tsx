@@ -1,7 +1,7 @@
 import { widziRaportyBiura } from "@/lib/uprawnienia";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { requireModul } from "@/lib/auth";
 import { getRaportWlasciciela, OKRESY, SZANSA_ETAPU, type Okres } from "@/lib/data-raporty";
 import { PageHeader, Card } from "../components/ui";
 import { formatPln } from "@/lib/format";
@@ -22,7 +22,7 @@ type Props = { searchParams: Promise<{ okres?: string }> };
  * zdanie mówiące, co z liczbą zrobić, bo sam wskaźnik niczego nie zmienia.
  */
 export default async function RaportyPage({ searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("raporty");
   // Raporty pokazują przychody i prowizje całego biura, więc tylko dla CEO.
   // Menedżer z założenia nie widzi pieniędzy (swoich ludzi ma w Zespole).
   if (!widziRaportyBiura(user)) redirect("/app");

@@ -1,10 +1,10 @@
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { PageHeader } from "../components/ui";
 import { ProtokolCreator } from "./protokol-creator";
 
 export default async function ProtokolPage() {
-  const user = await requireUser();
+  const user = await requireModul("dokumenty");
   const settings = await getAgencySettings(user.agency_id, user.agency?.name);
   const c = settings.company;
 

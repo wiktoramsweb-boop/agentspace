@@ -1,6 +1,6 @@
 "use client";
 
-import type { UserRole } from "@/lib/types";
+import type { Modul } from "@/lib/role";
 
 /**
  * Jedna definicja modułów aplikacji: adres, nazwa, ikona i kolor.
@@ -16,7 +16,12 @@ export type NavItem = {
   label: string;
   icon: React.ReactNode;
   color: NavColor;
-  roles?: UserRole[];
+  /**
+   * Moduł uprawnień, do którego należy ta pozycja. Brak oznacza „dla każdego",
+   * np. pulpit albo własne ustawienia konta. Menu i strony czytają to samo
+   * pole, więc nie da się ukryć pozycji, zostawiając stronę otwartą.
+   */
+  modul?: Modul;
 };
 export type NavSection = { title: string; items: NavItem[] };
 
@@ -57,42 +62,42 @@ export const SECTIONS: NavSection[] = [
     items: [
       { href: "/app", label: "Pulpit", icon: <HomeIcon />, color: "emerald" },
       { href: "/app/dzialania", label: "Działania", icon: <BoltIcon />, color: "amber" },
-      { href: "/app/kalendarz", label: "Kalendarz", icon: <CalendarNavIcon />, color: "sky" },
-      { href: "/app/szybki-wpis", label: "Szybki wpis", icon: <VoiceIcon />, color: "teal" },
-      { href: "/app/cele", label: "Cele", icon: <TargetIcon />, color: "violet" },
-      { href: "/app/trening", label: "AI Coach", icon: <MicIcon />, color: "cyan" },
+      { href: "/app/kalendarz", label: "Kalendarz", icon: <CalendarNavIcon />, color: "sky", modul: "klienci" },
+      { href: "/app/szybki-wpis", label: "Szybki wpis", icon: <VoiceIcon />, color: "teal", modul: "klienci" },
+      { href: "/app/cele", label: "Cele", icon: <TargetIcon />, color: "violet", modul: "coach" },
+      { href: "/app/trening", label: "AI Coach", icon: <MicIcon />, color: "cyan", modul: "coach" },
     ],
   },
   {
     title: "Sprzedaż",
     items: [
-      { href: "/app/leady", label: "Leady", icon: <LeadIcon />, color: "fuchsia" },
-      { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon />, color: "rose" },
-      { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue" },
-      { href: "/app/wycena", label: "Analiza cenowa", icon: <ScaleIcon />, color: "violet" },
-      { href: "/app/poszukiwania", label: "Poszukiwania", icon: <SearchIcon />, color: "sky" },
-      { href: "/app/ofertowka", label: "Ofertówka", icon: <PhotoIcon />, color: "fuchsia" },
-      { href: "/app/oferta-wspolpracy", label: "Oferta współpracy", icon: <HandshakeIcon />, color: "teal" },
-      { href: "/app/rezerwacje", label: "Umowa rezerwacyjna", icon: <KeyIcon />, color: "amber" },
-      { href: "/app/protokol", label: "Protokół zdawczo-odbiorczy", icon: <ClipboardIcon />, color: "sky" },
-      { href: "/app/aneks", label: "Aneks do umowy", icon: <AnnexIcon />, color: "violet" },
-      { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green" },
-      { href: "/app/kalkulatory", label: "Kalkulatory", icon: <CalcIcon />, color: "sky" },
+      { href: "/app/leady", label: "Leady", icon: <LeadIcon />, color: "fuchsia", modul: "klienci" },
+      { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon />, color: "rose", modul: "klienci" },
+      { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue", modul: "nieruchomosci" },
+      { href: "/app/wycena", label: "Analiza cenowa", icon: <ScaleIcon />, color: "violet", modul: "nieruchomosci" },
+      { href: "/app/poszukiwania", label: "Poszukiwania", icon: <SearchIcon />, color: "sky", modul: "klienci" },
+      { href: "/app/ofertowka", label: "Ofertówka", icon: <PhotoIcon />, color: "fuchsia", modul: "nieruchomosci" },
+      { href: "/app/oferta-wspolpracy", label: "Oferta współpracy", icon: <HandshakeIcon />, color: "teal", modul: "dokumenty" },
+      { href: "/app/rezerwacje", label: "Umowa rezerwacyjna", icon: <KeyIcon />, color: "amber", modul: "dokumenty" },
+      { href: "/app/protokol", label: "Protokół zdawczo-odbiorczy", icon: <ClipboardIcon />, color: "sky", modul: "dokumenty" },
+      { href: "/app/aneks", label: "Aneks do umowy", icon: <AnnexIcon />, color: "violet", modul: "dokumenty" },
+      { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green", modul: "prowizje" },
+      { href: "/app/kalkulatory", label: "Kalkulatory", icon: <CalcIcon />, color: "sky", modul: "nieruchomosci" },
     ],
   },
   {
     title: "Finanse",
     items: [
-      { href: "/app/faktury", label: "Faktury", icon: <InvoiceIcon />, color: "amber", roles: ["owner"] },
-      { href: "/app/podatki", label: "Kalkulator podatkowy", icon: <TaxIcon />, color: "green", roles: ["owner"] },
+      { href: "/app/faktury", label: "Faktury", icon: <InvoiceIcon />, color: "amber", modul: "faktury" },
+      { href: "/app/podatki", label: "Kalkulator podatkowy", icon: <TaxIcon />, color: "green", modul: "faktury" },
     ],
   },
   {
     title: "Więcej",
     items: [
-      { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate" },
-      { href: "/app/raporty", label: "Raporty", icon: <ChartIcon />, color: "violet", roles: ["owner"] },
-      { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, color: "fuchsia", roles: ["owner", "manager"] },
+      { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate", modul: "coach" },
+      { href: "/app/raporty", label: "Raporty", icon: <ChartIcon />, color: "violet", modul: "raporty" },
+      { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, color: "fuchsia", modul: "zespol" },
       { href: "/app/ustawienia", label: "Ustawienia", icon: <CogIcon />, color: "slate" },
     ],
   },

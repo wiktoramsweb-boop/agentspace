@@ -1,11 +1,10 @@
-export type UserRole = "owner" | "manager" | "agent";
-
-/** Etykiety ról w UI. Wartość 'owner' w bazie = CEO (nie zmieniamy wartości, tylko etykietę). */
-export const ROLE_LABELS: Record<UserRole, string> = {
-  owner: "CEO",
-  manager: "Menedżer",
-  agent: "Agent",
-};
+// Role i uprawnienia mieszkają w lib/role.ts. Przenosimy stąd tylko typy,
+// bo re-eksport wartości zmusiłby każdy moduł importujący `types` do
+// rozwiązania ścieżki do `role`, a testy puszczane przez node (bez bundlera)
+// nie radzą sobie z importem bez rozszerzenia. Wartości (ROLE, ROLE_LABELS,
+// MODULY, maModul...) bierz wprost z `@/lib/role`.
+export type { UserRole, Modul, Zakres, Uprawnienia, OpisRoli } from "./role";
+import type { Uprawnienia, UserRole } from "./role";
 
 export type Agency = {
   id: string;
@@ -25,6 +24,8 @@ export type Profile = {
   full_name: string | null;
   email: string | null;
   role: UserRole;
+  /** Odstępstwa od roli ustawione przez CEO (v38). NULL = zestaw z roli. */
+  permissions?: Uprawnienia | null;
   monthly_goal_pln: number;
   default_split_pct: number;
   phone: string | null;
