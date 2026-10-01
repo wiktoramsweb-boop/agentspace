@@ -44,8 +44,8 @@ const DAY = 24 * 3600;
  * Wartości można zmienić w Vercel: AI_DAILY_LIMIT_USER, AI_DAILY_LIMIT_AGENCY.
  */
 export async function aiLimitReached(user: { id: string; agency_id: string | null }): Promise<boolean> {
-  if (await hitLimit(`ai:user:${user.id}`, envInt("AI_DAILY_LIMIT_USER", 200), DAY)) return true;
-  if (user.agency_id && (await hitLimit(`ai:agency:${user.agency_id}`, envInt("AI_DAILY_LIMIT_AGENCY", 1500), DAY))) {
+  if (await hitLimit(`ai:user:${user.id}`, envInt("AI_DAILY_LIMIT_USER", 300), DAY)) return true;
+  if (user.agency_id && (await hitLimit(`ai:agency:${user.agency_id}`, envInt("AI_DAILY_LIMIT_AGENCY", 2000), DAY))) {
     return true;
   }
   return false;
