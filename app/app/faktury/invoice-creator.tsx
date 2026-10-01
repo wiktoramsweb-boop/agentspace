@@ -5,6 +5,7 @@ import { SELLERS, type InvoiceItem } from "@/lib/invoice";
 import { InvoiceSheet, type SheetData } from "./invoice-sheet";
 import { createInvoice, updateInvoice } from "./actions";
 import { printInvoice } from "./print-button";
+import { Select } from "@/app/app/components/select";
 
 export function InvoiceCreator({
   initial,
@@ -41,17 +42,13 @@ export function InvoiceCreator({
       {/* FORMULARZ */}
       <div className="print-hide space-y-5">
         <Section title="Sprzedawca">
-          <select
-            value={d.sellerKey}
-            onChange={(e) => set("sellerKey", e.target.value)}
-            className={sel}
-          >
+          <Select value={d.sellerKey} onChange={(e) => set("sellerKey", e.target.value)}>
             {SELLERS.map((s) => (
               <option key={s.key} value={s.key}>
                 {s.name}
               </option>
             ))}
-          </select>
+          </Select>
           <p className="mt-2 text-xs text-slate-500">
             Konto i dane podstawią się automatycznie na fakturze.
           </p>

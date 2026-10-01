@@ -8,6 +8,7 @@ import {
   ACTIVITY_PURPOSES,
   ACTIVITY_STATUSES,
 } from "@/lib/types";
+import { Select } from "@/app/app/components/select";
 
 /**
  * Panel filtrów raportu. Stan trzymamy w adresie strony, więc wynik da się
@@ -44,14 +45,14 @@ export function ReportFilterForm({
       </Field>
 
       <Field label="Agent">
-        <select name="agent" defaultValue={current.agent ?? ""} className={inp}>
+        <Select name="agent" defaultValue={current.agent ?? ""}>
           <option value="">wszyscy</option>
           {agents.map((a) => (
             <option key={a.id} value={a.id}>
               {a.name}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
 
       <div className="grid grid-cols-2 gap-2">
@@ -64,47 +65,47 @@ export function ReportFilterForm({
       </div>
 
       <Field label="Rodzaj">
-        <select name="kind" defaultValue={current.kind ?? ""} className={inp}>
+        <Select name="kind" defaultValue={current.kind ?? ""}>
           <option value="">wszystkie</option>
           {ACTIVITY_KINDS.map((k) => (
             <option key={k.value} value={k.value}>
               {k.label}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
 
       <Field label="Status">
-        <select name="status" defaultValue={current.status ?? ""} className={inp}>
+        <Select name="status" defaultValue={current.status ?? ""}>
           <option value="">wszystkie</option>
           {ACTIVITY_STATUSES.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
 
       <Field label="Cel">
-        <select name="purpose" defaultValue={current.purpose ?? ""} className={inp}>
+        <Select name="purpose" defaultValue={current.purpose ?? ""}>
           <option value="">wszystkie</option>
           {ACTIVITY_PURPOSES.map((p) => (
             <option key={p.value} value={p.value}>
               {p.label}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
 
       <Field label="Priorytet">
-        <select name="priority" defaultValue={current.priority ?? ""} className={inp}>
+        <Select name="priority" defaultValue={current.priority ?? ""}>
           <option value="">wszystkie</option>
           {ACTIVITY_PRIORITIES.map((p) => (
             <option key={p.value} value={p.value}>
               {p.label}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
 
       <div className="flex gap-2 pt-1">

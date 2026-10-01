@@ -8,6 +8,7 @@ import { AddressInput } from "../components/address-input";
 import { Modal } from "../components/modal";
 import { WizardNav, WizardSteps } from "../components/wizard-steps";
 import { CLIENT_TYPE_ICONS } from "../components/icons";
+import { Select as SelectBox } from "@/app/app/components/select";
 
 type ExistingPhone = { phone: string | null; owner: string | null };
 
@@ -247,13 +248,13 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
                 </div>
                 <div className="w-40">
                   <label className={lbl}>Opis</label>
-                  <select name="extra_phone_label" className={inp} defaultValue="komórka">
+                  <SelectBox name="extra_phone_label" defaultValue="komórka">
                     {PHONE_LABELS.map((l) => (
                       <option key={l} value={l}>
                         {l}
                       </option>
                     ))}
-                  </select>
+                  </SelectBox>
                 </div>
                 <button
                   type="button"
@@ -434,14 +435,14 @@ function Select({
   return (
     <div>
       <label className={lbl}>{label}</label>
-      <select name={name} className={inp} defaultValue={empty ? "" : undefined}>
+      <SelectBox name={name} defaultValue={empty ? "" : undefined}>
         {empty && <option value="">nie podano</option>}
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}
           </option>
         ))}
-      </select>
+      </SelectBox>
     </div>
   );
 }

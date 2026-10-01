@@ -3,6 +3,7 @@
 import { ChatIcon, MailIcon2, SparkIcon } from "../components/icons";
 import { SaveToClient, type ClientContact } from "../components/save-to-client";
 import { useMemo, useState } from "react";
+import { Select } from "@/app/app/components/select";
 
 type Cat = "wlasciciel" | "kupujacy" | "negocjacje" | "formalnosci" | "relacja" | "inne";
 
@@ -168,11 +169,11 @@ export function MailGenerator({ defaultSignature, clients = [] }: { defaultSigna
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={lbl}>Długość</label>
-                <select value={length} onChange={(e) => setLength(e.target.value)} className={inp}>
+                <Select value={length} onChange={(e) => setLength(e.target.value)}>
                   <option value="krotki">Krótki</option>
                   <option value="standard">Standardowy</option>
                   <option value="szczegolowy">Szczegółowy</option>
-                </select>
+                </Select>
               </div>
               <Field label="Podpis" value={signature} onChange={setSignature} placeholder="Imię i nazwisko" />
             </div>

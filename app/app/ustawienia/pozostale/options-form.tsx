@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PHOTO_SIZES, type AgencyOptions } from "@/lib/agency-settings-shared";
 import { saveOptions } from "../company-actions";
 import { FieldLabel, Fieldset, ResultForm, inputCls } from "../result-form";
+import { Select } from "@/app/app/components/select";
 
 export function OptionsForm({ options, disabled }: { options: AgencyOptions; disabled: boolean }) {
   const [prefix, setPrefix] = useState(options.offer_prefix);
@@ -16,13 +17,13 @@ export function OptionsForm({ options, disabled }: { options: AgencyOptions; dis
         <Fieldset title="Zdjęcia">
           <label className="block">
             <FieldLabel>Maksymalny rozmiar zdjęć dodawanych w programie</FieldLabel>
-            <select name="photo_max" defaultValue={options.photo_max} className={inputCls}>
+            <Select name="photo_max" defaultValue={options.photo_max}>
               {PHOTO_SIZES.map((s) => (
                 <option key={s.value} value={s.value}>
                   {s.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <p className="text-xs text-slate-500">
             Większe zdjęcia zmniejszamy przed wysłaniem. Agent w terenie wysyła wtedy

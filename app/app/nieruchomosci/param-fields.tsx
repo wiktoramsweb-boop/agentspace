@@ -7,6 +7,7 @@ import {
   type PropertySection,
 } from "@/lib/property-fields";
 import type { Property, PropertyDealKind, PropertyType } from "@/lib/types";
+import { Select } from "../components/select";
 import { SectionIcon, SECTION_TONE } from "./section-icon";
 
 /**
@@ -161,14 +162,12 @@ function FieldBox({ field: f, value }: { field: PropertyField; value: unknown })
     return (
       <div className={span}>
         <Label field={f} />
-        <select name={name} className={inp} defaultValue={value != null ? String(value) : ""}>
-          <option value="">nie podano</option>
-          {f.options?.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
+        <Select
+          name={name}
+          aria-label={f.label}
+          options={f.options ?? []}
+          defaultValue={value != null ? String(value) : ""}
+        />
         {f.hint && <p className="mt-1.5 text-xs text-slate-400">{f.hint}</p>}
       </div>
     );

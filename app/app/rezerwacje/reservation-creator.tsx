@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SparkIcon } from "../components/icons";
 import { buildReservation, type Party, type ReservationData, type ResMode, type PropType, type DepositType, type DocType } from "@/lib/reservation";
 import { generateReservationPdf } from "@/lib/reservation-pdf";
+import { Select } from "@/app/app/components/select";
 
 const PROP_OPTIONS: { value: PropType; label: string }[] = [
   { value: "mieszkanie", label: "Mieszkanie" },
@@ -197,11 +198,11 @@ export function ReservationCreator({ city }: { city: string }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={lbl}>Typ</label>
-              <select value={d.propType} onChange={(e) => set("propType", e.target.value as PropType)} className={inp}>
+              <Select value={d.propType} onChange={(e) => set("propType", e.target.value as PropType)}>
                 {PROP_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
-              </select>
+              </Select>
             </div>
             <Field label="Miejscowość zawarcia" value={d.city} onChange={(v) => set("city", v)} />
           </div>
@@ -228,10 +229,10 @@ export function ReservationCreator({ city }: { city: string }) {
         <Section title="Warunki rezerwacji">
           <div>
             <label className={lbl}>Rodzaj wpłaty</label>
-            <select value={d.depositType} onChange={(e) => set("depositType", e.target.value as DepositType)} className={inp}>
+            <Select value={d.depositType} onChange={(e) => set("depositType", e.target.value as DepositType)}>
               <option value="zadatek">Zadatek (bezzwrotny - art. 394 KC)</option>
               <option value="oplata">Opłata rezerwacyjna</option>
-            </select>
+            </Select>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Field label={d.depositType === "zadatek" ? "Kwota zadatku (zł)" : "Opłata rezerwacyjna (zł)"} type="number" value={String(d.fee || "")} onChange={(v) => set("fee", Math.max(0, parseInt(v || "0", 10)))} />
@@ -254,17 +255,17 @@ export function ReservationCreator({ city }: { city: string }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={lbl}>Umowa docelowa</label>
-                <select value={d.targetForm} onChange={(e) => set("targetForm", e.target.value as "sprzedaz" | "przedwstepna")} className={inp}>
+                <Select value={d.targetForm} onChange={(e) => set("targetForm", e.target.value as "sprzedaz" | "przedwstepna")}>
                   <option value="sprzedaz">Umowa sprzedaży (akt not.)</option>
                   <option value="przedwstepna">Umowa przedwstępna</option>
-                </select>
+                </Select>
               </div>
               <div>
                 <label className={lbl}>Koszty notarialne</label>
-                <select value={d.notaryCost} onChange={(e) => set("notaryCost", e.target.value as "kupujacy" | "strony")} className={inp}>
+                <Select value={d.notaryCost} onChange={(e) => set("notaryCost", e.target.value as "kupujacy" | "strony")}>
                   <option value="kupujacy">Kupujący</option>
                   <option value="strony">Po połowie</option>
-                </select>
+                </Select>
               </div>
             </div>
           </Section>
@@ -273,10 +274,10 @@ export function ReservationCreator({ city }: { city: string }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={lbl}>Rodzaj najmu</label>
-                <select value={d.rentType} onChange={(e) => set("rentType", e.target.value as "okazjonalny" | "zwykly")} className={inp}>
+                <Select value={d.rentType} onChange={(e) => set("rentType", e.target.value as "okazjonalny" | "zwykly")}>
                   <option value="okazjonalny">Najem okazjonalny</option>
                   <option value="zwykly">Najem zwykły</option>
-                </select>
+                </Select>
               </div>
               <Field label="Okres najmu (mies.)" type="number" value={String(d.rentMonths)} onChange={(v) => set("rentMonths", Math.max(1, parseInt(v || "1", 10)))} />
             </div>
@@ -427,14 +428,10 @@ function PartyEditor({
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className={lbl}>Dokument</label>
-              <select
-                value={p.docType}
-                onChange={(e) => onChange(i, { docType: e.target.value as DocType })}
-                className={inp}
-              >
+              <Select value={p.docType} onChange={(e) => onChange(i, { docType: e.target.value as DocType })}>
                 <option value="dowod">Dowód osobisty</option>
                 <option value="paszport">Paszport</option>
-              </select>
+              </Select>
             </div>
             <Field
               label={p.docType === "paszport" ? "Nr paszportu" : "Seria i nr dowodu"}

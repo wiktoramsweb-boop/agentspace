@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { removeAgent, type DorobekAgenta, type UsuniecieResult } from "../actions";
+import { Select } from "@/app/app/components/select";
 
 /**
  * Usunięcie osoby z zespołu.
@@ -80,19 +81,14 @@ export function UsunAgenta({
         <label className="mb-1.5 block text-sm font-medium text-slate-700" htmlFor="przejmujacy">
           Co zrobić z klientami i ofertami
         </label>
-        <select
-          id="przejmujacy"
-          name="przejmujacy"
-          defaultValue=""
-          className="w-full max-w-sm rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-200"
-        >
+        <Select id="przejmujacy" name="przejmujacy" defaultValue="">
           <option value="">Zostaw w puli biura (przypiszesz później)</option>
           {kandydaci.map((k) => (
             <option key={k.id} value={k.id}>
               Przekaż od razu: {k.name}
             </option>
           ))}
-        </select>
+        </Select>
         <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-slate-500">
           Pula biura oznacza, że klienci, oferty i działania zostają w systemie
           bez opiekuna. Znajdziesz je na listach filtrem „bez opiekuna" i przypiszesz

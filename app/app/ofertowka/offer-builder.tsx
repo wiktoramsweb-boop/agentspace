@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Select as SelectBox } from "@/app/app/components/select";
 
 type Agent = { name: string; email: string; phone?: string; agency: string; logoUrl?: string | null };
 type Photo = { id: string; url: string };
@@ -339,14 +340,14 @@ function Select({
   return (
     <div>
       <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className={inp}>
+      <SelectBox value={value} onChange={(e) => onChange(e.target.value)}>
         <option value="">- wybierz -</option>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
           </option>
         ))}
-      </select>
+      </SelectBox>
     </div>
   );
 }

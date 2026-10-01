@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addPriceLevel, importFromGus, importRcnFile, type ActionResult } from "./actions";
+import { Select } from "@/app/app/components/select";
 
 const field =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25";
@@ -131,11 +132,11 @@ export function ManualLevel() {
       </div>
       <div>
         <label className={label} htmlFor="rynek">Rynek</label>
-        <select id="rynek" name="rynek" defaultValue="" className={field}>
+        <Select id="rynek" name="rynek" defaultValue="">
           <option value="">Bez rozróżnienia</option>
           <option value="wtorny">Wtórny</option>
           <option value="pierwotny">Pierwotny</option>
-        </select>
+        </Select>
       </div>
       <div className="sm:col-span-2">
         <button

@@ -14,6 +14,7 @@ import {
   type PropertyDealKind,
   type PropertyType,
 } from "@/lib/types";
+import { Select } from "@/app/app/components/select";
 
 type ClientLite = { id: string; name: string; phone?: string | null };
 
@@ -141,7 +142,7 @@ export function SearchWizard({
           <div hidden={step !== 1} className="space-y-4">
             <div>
               <Label>Klient</Label>
-              <select name="client_id" className={inp} defaultValue={presetClientId ?? ""}>
+              <Select name="client_id" defaultValue={presetClientId ?? ""}>
                 <option value="">nie wybrano</option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -149,7 +150,7 @@ export function SearchWizard({
                     {c.phone ? ` (${formatPhone(c.phone)})` : ""}
                   </option>
                 ))}
-              </select>
+              </Select>
               <p className="mt-1.5 text-xs text-slate-400">
                 Poszukiwanie bez klienta też ma sens - np. gdy zbierasz zapytania z portalu.
               </p>
@@ -162,13 +163,13 @@ export function SearchWizard({
             />
             <div>
               <Label>Status</Label>
-              <select name="status" className={inp} defaultValue="aktualne">
+              <Select name="status" defaultValue="aktualne">
                 {SEARCH_STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>
                     {s.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
 

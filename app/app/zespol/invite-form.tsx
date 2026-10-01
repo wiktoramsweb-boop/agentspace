@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { inviteAgent } from "./actions";
 import { CopyLink } from "./copy-link";
+import { Select } from "@/app/app/components/select";
 
 export type ManagerOption = { id: string; label: string };
 
@@ -35,21 +36,21 @@ export function InviteForm({ managers }: { managers: ManagerOption[] }) {
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="flex-1">
             <label className={lbl}>Rola</label>
-            <select name="role" value={role} onChange={(e) => setRole(e.target.value)} className={inp}>
+            <Select name="role" value={role} onChange={(e) => setRole(e.target.value)}>
               <option value="agent">Agent</option>
               <option value="manager">Menedżer</option>
               <option value="owner">CEO (pełny dostęp)</option>
-            </select>
+            </Select>
           </div>
           {role === "agent" && (
             <div className="flex-1">
               <label className={lbl}>Menedżer (opcjonalnie)</label>
-              <select name="managerId" className={inp} defaultValue="">
+              <Select name="managerId" defaultValue="">
                 <option value="">- bez menedżera -</option>
                 {managers.map((m) => (
                   <option key={m.id} value={m.id}>{m.label}</option>
                 ))}
-              </select>
+              </Select>
             </div>
           )}
         </div>

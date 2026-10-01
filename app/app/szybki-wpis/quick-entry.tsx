@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useSpeechRecognition } from "@/lib/use-speech-recognition";
 import { CLIENT_TYPES, type ClientType } from "@/lib/types";
 import { createQuickEntry, type QuickEntryPayload } from "./actions";
+import { Select } from "@/app/app/components/select";
 
 type Parsed = {
   client_name?: string;
@@ -78,15 +79,11 @@ export function QuickEntry() {
             <Field label="Telefon" value={form.phone} onChange={(v) => set("phone", v)} placeholder="opcjonalnie" />
             <div>
               <label className={lbl}>Typ</label>
-              <select
-                value={form.clientType}
-                onChange={(e) => set("clientType", e.target.value as ClientType)}
-                className={inp}
-              >
+              <Select value={form.clientType} onChange={(e) => set("clientType", e.target.value as ClientType)}>
                 {CLIENT_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>{t.label}</option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">

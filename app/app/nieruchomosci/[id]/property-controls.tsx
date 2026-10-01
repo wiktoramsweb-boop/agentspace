@@ -10,6 +10,7 @@ import {
 } from "../actions";
 import { PROPERTY_STATUSES, type PropertyStatus } from "@/lib/types";
 import { useToast } from "../../components/toast";
+import { Select } from "@/app/app/components/select";
 
 type ClientLite = { id: string; name: string };
 
@@ -54,21 +55,14 @@ export function OwnerPicker({
 }) {
   const toast = useToast();
   return (
-    <select
-      value={ownerId ?? ""}
-      onChange={(e) => {
-        setPropertyOwner(propertyId, e.target.value || null);
-        toast(e.target.value ? "Przypisano właściciela" : "Odłączono właściciela");
-      }}
-      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
-    >
+    <Select value={ownerId ?? ""} onChange={(e) => { setPropertyOwner(propertyId, e.target.value || null); toast(e.target.value ? "Przypisano właściciela" : "Odłączono właściciela"); }}>
       <option value="">- brak właściciela -</option>
       {clients.map((c) => (
         <option key={c.id} value={c.id}>
           {c.name}
         </option>
       ))}
-    </select>
+    </Select>
   );
 }
 
@@ -92,18 +86,14 @@ export function InterestAdder({
 
   return (
     <div className="flex gap-2">
-      <select
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
-      >
+      <Select value={value} onChange={(e) => setValue(e.target.value)}>
         <option value="">- wybierz klienta -</option>
         {clients.map((c) => (
           <option key={c.id} value={c.id}>
             {c.name}
           </option>
         ))}
-      </select>
+      </Select>
       <button
         onClick={() => {
           if (value) {

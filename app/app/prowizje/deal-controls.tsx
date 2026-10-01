@@ -8,6 +8,7 @@ import type { DealStatus } from "@/lib/types";
 import { formatPln } from "@/lib/format";
 import { Modal } from "../components/modal";
 import { useToast } from "../components/toast";
+import { Select } from "@/app/app/components/select";
 
 type PropertyLite = { id: string; title: string; price_pln: number | null };
 
@@ -110,19 +111,14 @@ export function NewDealButton({
 
           {properties.length > 0 && (
             <Labeled label="Nieruchomość (opcjonalnie - podstawi cenę)">
-              <select
-                name="property_id"
-                value={propertyId}
-                onChange={(e) => onPickProperty(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
-              >
+              <Select name="property_id" value={propertyId} onChange={(e) => onPickProperty(e.target.value)}>
                 <option value="">- brak -</option>
                 {properties.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.title}
                   </option>
                 ))}
-              </select>
+              </Select>
             </Labeled>
           )}
 
@@ -156,15 +152,10 @@ export function NewDealButton({
                     placeholder="0"
                     className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
                   />
-                  <select
-                    value={parties[d.key].mode}
-                    onChange={(e) => setParty(d.key, { mode: e.target.value as Mode })}
-                    className="flex-shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-900 focus:border-emerald-500 focus:outline-none"
-                    aria-label={`Jednostka prowizji ${d.label}`}
-                  >
+                  <Select value={parties[d.key].mode} onChange={(e) => setParty(d.key, { mode: e.target.value as Mode })} aria-label={`Jednostka prowizji ${d.label}`}>
                     <option value="pln">zł</option>
                     <option value="pct">%</option>
-                  </select>
+                  </Select>
                 </div>
                 <input type="hidden" name={d.name} value={resolved[d.key]} />
               </div>

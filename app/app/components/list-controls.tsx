@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { PER_PAGE_OPTIONS, activeFilterCount, listHref, type ListQuery } from "@/lib/list-params";
 import { addDaysKey, todayPL } from "@/lib/datetime";
+import { Select } from "@/app/app/components/select";
 
 export type FilterOption = { value: string; label: string };
 
@@ -136,18 +137,13 @@ export function ListToolbar({
           )}
         </button>
 
-        <select
-          value={query.sort || sorts[0]?.value}
-          onChange={(e) => go({ sort: e.target.value })}
-          aria-label="Sortowanie"
-          className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-emerald-500 focus:outline-none"
-        >
+        <Select value={query.sort || sorts[0]?.value} onChange={(e) => go({ sort: e.target.value })} aria-label="Sortowanie">
           {sorts.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
             </option>
           ))}
-        </select>
+        </Select>
 
         {children}
       </div>
@@ -163,7 +159,7 @@ export function ListToolbar({
           >
             <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-3">
               <Field label="Osoba odpowiedzialna">
-                <select value={query.agent} onChange={(e) => go({ agent: e.target.value })} className={input}>
+                <Select value={query.agent} onChange={(e) => go({ agent: e.target.value })}>
                   <option value="">wszyscy</option>
                   <option value="ja">tylko moje</option>
                   <option value="bez">bez opiekuna (pula biura)</option>
@@ -172,45 +168,45 @@ export function ListToolbar({
                       {a.name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Field>
 
               {filters.statuses && (
                 <Field label="Status">
-                  <select value={query.status} onChange={(e) => go({ status: e.target.value })} className={input}>
+                  <Select value={query.status} onChange={(e) => go({ status: e.target.value })}>
                     <option value="">wszystkie</option>
                     {filters.statuses.map((s) => (
                       <option key={s.value} value={s.value}>
                         {s.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </Field>
               )}
 
               {filters.types && (
                 <Field label={filters.types.label}>
-                  <select value={query.type} onChange={(e) => go({ type: e.target.value })} className={input}>
+                  <Select value={query.type} onChange={(e) => go({ type: e.target.value })}>
                     <option value="">wszystkie</option>
                     {filters.types.options.map((s) => (
                       <option key={s.value} value={s.value}>
                         {s.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </Field>
               )}
 
               {filters.extra && (
                 <Field label={filters.extra.label}>
-                  <select value={query.extra} onChange={(e) => go({ extra: e.target.value })} className={input}>
+                  <Select value={query.extra} onChange={(e) => go({ extra: e.target.value })}>
                     <option value="">bez filtra</option>
                     {filters.extra.options.map((s) => (
                       <option key={s.value} value={s.value}>
                         {s.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </Field>
               )}
 
@@ -252,13 +248,13 @@ export function ListToolbar({
                 <div className="sm:col-span-2 lg:col-span-3">
                   <div className="flex flex-wrap items-end gap-3">
                     <Field label="Okres">
-                      <select value={query.dateField} onChange={(e) => go({ dateField: e.target.value })} className={input}>
+                      <Select value={query.dateField} onChange={(e) => go({ dateField: e.target.value })}>
                         {filters.dateFields.map((d) => (
                           <option key={d.value} value={d.value}>
                             {d.label}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     </Field>
                     <Field label="Od">
                       <input type="date" value={query.from} onChange={(e) => go({ from: e.target.value })} className={input} />
@@ -350,18 +346,13 @@ export function ServerPagination({
         {pending && <span className="ml-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent align-middle" />}
       </p>
       <div className="flex flex-wrap items-center gap-1.5">
-        <select
-          value={query.per}
-          onChange={(e) => go({ per: Number(e.target.value), page: 1 })}
-          aria-label="Pozycji na stronie"
-          className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-700"
-        >
+        <Select value={query.per} onChange={(e) => go({ per: Number(e.target.value), page: 1 })} aria-label="Pozycji na stronie">
           {PER_PAGE_OPTIONS.map((n) => (
             <option key={n} value={n}>
               {n} na stronie
             </option>
           ))}
-        </select>
+        </Select>
         {pages > 1 && (
           <>
             <button type="button" disabled={page <= 1} onClick={() => go({ page: page - 1 })} className={`${btn} border-slate-300 bg-white text-slate-700 hover:bg-slate-100`}>

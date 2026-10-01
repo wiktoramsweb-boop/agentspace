@@ -10,6 +10,7 @@ import {
   bulkSetStatus,
   type BulkEntity,
 } from "../bulk-actions";
+import { Select } from "@/app/app/components/select";
 
 export type BulkOption = { value: string; label: string };
 
@@ -142,61 +143,34 @@ export function BulkBar({
                   {n} {word}
                 </span>
 
-                <select
-                  disabled={busy}
-                  defaultValue=""
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    e.target.value = "";
-                    if (v) void run(() => bulkSetStatus(entity, ids(), v), "Zmieniono status");
-                  }}
-                  className={select}
-                >
+                <Select tone="onDark" disabled={busy} defaultValue="" onChange={(e) => { const v = e.target.value; e.target.value = ""; if (v) void run(() => bulkSetStatus(entity, ids(), v), "Zmieniono status"); }}>
                   <option value="">Zmień status…</option>
                   {statuses.map((s) => (
                     <option key={s.value} value={s.value}>
                       {s.label}
                     </option>
                   ))}
-                </select>
+                </Select>
 
                 {stages && stages.length > 0 && (
-                  <select
-                    disabled={busy}
-                    defaultValue=""
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      e.target.value = "";
-                      if (v) void run(() => bulkSetStage(ids(), v), "Zmieniono etap");
-                    }}
-                    className={select}
-                  >
+                  <Select tone="onDark" disabled={busy} defaultValue="" onChange={(e) => { const v = e.target.value; e.target.value = ""; if (v) void run(() => bulkSetStage(ids(), v), "Zmieniono etap"); }}>
                     <option value="">Zmień etap…</option>
                     {stages.map((s) => (
                       <option key={s.value} value={s.value}>
                         {s.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 )}
 
-                <select
-                  disabled={busy}
-                  defaultValue=""
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    e.target.value = "";
-                    if (v) void run(() => bulkAssignAgent(entity, ids(), v), "Zmieniono opiekuna");
-                  }}
-                  className={select}
-                >
+                <Select tone="onDark" disabled={busy} defaultValue="" onChange={(e) => { const v = e.target.value; e.target.value = ""; if (v) void run(() => bulkAssignAgent(entity, ids(), v), "Zmieniono opiekuna"); }}>
                   <option value="">Przypisz agenta…</option>
                   {agents.map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.name}
                     </option>
                   ))}
-                </select>
+                </Select>
 
                 {canDelete &&
                   (confirm ? (
@@ -244,5 +218,3 @@ export function BulkBar({
   );
 }
 
-const select =
-  "rounded-lg border border-white/15 bg-white/10 px-2.5 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:opacity-50 [&>option]:text-slate-900";

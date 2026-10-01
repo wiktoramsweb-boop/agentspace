@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { assignManager } from "./actions";
+import { Select } from "@/app/app/components/select";
 
 export type MTAgent = { id: string; name: string; manager_id: string | null };
 export type MTManager = { id: string; name: string };
@@ -66,15 +67,7 @@ export function ManagerTeams({ managers, agents }: { managers: MTManager[]; agen
               </div>
             )}
 
-            <select
-              value=""
-              disabled={pending || available.length === 0}
-              onChange={(e) => {
-                const id = e.target.value;
-                if (id) run(() => assignManager(id, m.id));
-              }}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none disabled:opacity-60 sm:w-auto"
-            >
+            <Select value="" disabled={pending || available.length === 0} onChange={(e) => { const id = e.target.value; if (id) run(() => assignManager(id, m.id)); }}>
               <option value="">
                 {available.length === 0 ? "Brak agentów do dodania" : `+ dodaj osobę do zespołu: ${m.name}`}
               </option>
@@ -84,7 +77,7 @@ export function ManagerTeams({ managers, agents }: { managers: MTManager[]; agen
                   {a.manager_id ? " (przeniesie od innego menedżera)" : ""}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         );
       })}

@@ -7,6 +7,7 @@ import { formatPln } from "@/lib/format";
 import type { Estimate } from "@/lib/wycena/model";
 import Link from "next/link";
 import { runValuation } from "./actions";
+import { Select } from "@/app/app/components/select";
 
 /**
  * Formularz analizy porównawczej.
@@ -59,11 +60,11 @@ export function WycenaForm() {
         <div className="grid gap-4">
           <div>
             <label className={label} htmlFor="property_type">Rodzaj</label>
-            <select id="property_type" name="property_type" defaultValue="mieszkanie" className={field}>
+            <Select id="property_type" name="property_type" defaultValue="mieszkanie">
               {TYPES.map((t) => (
                 <option key={t.value} value={t.value}>{t.label}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <AddressInput
@@ -100,20 +101,20 @@ export function WycenaForm() {
             </div>
             <div>
               <label className={label} htmlFor="market">Rynek</label>
-              <select id="market" name="market" defaultValue="wtorny" className={field}>
+              <Select id="market" name="market" defaultValue="wtorny">
                 <option value="wtorny">Wtórny</option>
                 <option value="pierwotny">Pierwotny</option>
-              </select>
+              </Select>
             </div>
           </div>
 
           <div>
             <label className={label} htmlFor="condition_std">Stan</label>
-            <select id="condition_std" name="condition_std" defaultValue="do_wprowadzenia" className={field}>
+            <Select id="condition_std" name="condition_std" defaultValue="do_wprowadzenia">
               {CONDITIONS.map((c) => (
                 <option key={c.value} value={c.value}>{c.label}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
 

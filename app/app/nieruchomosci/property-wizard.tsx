@@ -10,6 +10,7 @@ import { PROPERTY_ICONS } from "../components/icons";
 import { WizardNav, WizardSteps } from "../components/wizard-steps";
 import { PhotoManager } from "./photo-manager";
 import { ParamFields } from "./param-fields";
+import { Select as SelectBox } from "../components/select";
 import { discardPhotoUploads } from "./photo-actions";
 import type { PhotoConfig } from "@/lib/agency-settings-shared";
 import { hasFeatureChips } from "@/lib/property-fields";
@@ -299,14 +300,13 @@ export function PropertyWizard({
               <Label>
                 Właściciel <span className="text-slate-400">(klient sprzedający lub wynajmujący)</span>
               </Label>
-              <select name="owner_client_id" className={inp} defaultValue={p?.owner_client_id ?? ""}>
-                <option value="">brak, dodam później</option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <SelectBox
+                name="owner_client_id"
+                aria-label="Właściciel"
+                options={clients.map((c) => ({ value: c.id, label: c.name }))}
+                defaultValue={p?.owner_client_id ?? ""}
+                placeholder="brak, dodam później"
+              />
             </div>
           </div>
 
@@ -503,14 +503,13 @@ function Select({
   return (
     <div>
       <Label>{label}</Label>
-      <select name={name} className={inp} defaultValue={value ?? (empty ? "" : undefined)}>
-        {empty && <option value="">nie podano</option>}
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
+      <SelectBox
+        name={name}
+        aria-label={label}
+        options={options as { value: string; label: string }[]}
+        defaultValue={value ?? (empty ? "" : options[0]?.value ?? "")}
+        placeholder={empty ? "nie podano" : ""}
+      />
     </div>
   );
 }

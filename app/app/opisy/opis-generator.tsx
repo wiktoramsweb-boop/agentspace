@@ -9,6 +9,7 @@ import {
   type Transakcja,
 } from "@/lib/opis";
 import { useToast } from "../components/toast";
+import { Select } from "@/app/app/components/select";
 
 type PropertyPrefill = {
   id: string;
@@ -173,18 +174,14 @@ export function OpisGenerator({ properties }: { properties: PropertyPrefill[] })
 
           {properties.length > 0 && (
             <Labeled label="Wczytaj z nieruchomości (podstawi dane)">
-              <select
-                onChange={(e) => prefill(e.target.value)}
-                defaultValue=""
-                className={selectCls}
-              >
+              <Select onChange={(e) => prefill(e.target.value)} defaultValue="">
                 <option value="">- wybierz ofertę -</option>
                 {properties.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.title}
                   </option>
                 ))}
-              </select>
+              </Select>
             </Labeled>
           )}
 

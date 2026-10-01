@@ -16,6 +16,7 @@ import {
   type ZusStage,
   type FormResult,
 } from "@/lib/tax";
+import { Select as SelectBox } from "@/app/app/components/select";
 
 // ── formatowanie ────────────────────────────────────────────────────────────
 const zl0 = (n: number) =>
@@ -815,9 +816,9 @@ function Select({
   children: React.ReactNode;
 }) {
   return (
-    <select value={value} onChange={(e) => onChange(e.target.value)} className={inpCls}>
+    <SelectBox value={value} onChange={(e) => onChange(e.target.value)}>
       {children}
-    </select>
+    </SelectBox>
   );
 }
 

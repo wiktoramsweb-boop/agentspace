@@ -10,6 +10,7 @@ import {
 import { saveMarks } from "../company-actions";
 import { AssetUploader } from "../asset-uploader";
 import { FieldLabel, ResultForm, inputCls } from "../result-form";
+import { Select } from "@/app/app/components/select";
 
 /** Położenie znaku na podglądzie. Margines jak przy nakładaniu (ok. 3,5%). */
 const POS_CLASS: Record<MarkPosition, string> = {
@@ -272,13 +273,13 @@ function PositionSelect({
   return (
     <label className="block">
       <FieldLabel>Położenie</FieldLabel>
-      <select name={name} value={value} onChange={(e) => onChange(e.target.value as MarkPosition)} className={inputCls}>
+      <Select name={name} value={value} onChange={(e) => onChange(e.target.value as MarkPosition)}>
         {MARK_POSITIONS.map((p) => (
           <option key={p.value} value={p.value}>
             {p.label}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

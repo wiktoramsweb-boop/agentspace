@@ -494,6 +494,34 @@ plikom CSS stałe nazwy. Zanim uznasz regułę za niedziałającą, pobierz arku
 prosto z serwera (`curl` na adres z `<link>`) i sprawdź, czy w ogóle się
 skompilowała. Na tym straciłem kilka podejść przy tej poprawce.
 
+**Listy wyboru: własny komponent zamiast natywnego `<select>`.**
+Rozwiniętą listę natywnego `<select>` rysuje system operacyjny, nie przeglądarka
+- żaden CSS jej nie dosięgnie, więc na Macu wyglądała jak Mac, a na Windowsie
+inaczej, zawsze obok reszty aplikacji. `app/app/components/select.tsx` rysuje ją
+sam. Trzy rzeczy, które trzeba było w nim rozwiązać:
+
+1. **Formularze.** Wartość oddaje ukryty `<input name=...>`, więc wszystkie
+   `formData.get("status")` działają bez zmian.
+2. **Przycinanie.** Lista leci przez portal do `<body>` i jest pozycjonowana na
+   sztywno pod polem. Gdyby wisiała w drzewie, ucinałby ją każdy przewijany
+   kontener, a kreator oferty jest właśnie takim kontenerem.
+3. **Telefon.** Poniżej 640 px lista wjeżdża od dołu jak arkusz, bo kciukiem
+   łatwiej trafić w szeroki wiersz.
+
+Dochodzi szukanie przy listach od 10 pozycji (słowniki typu „Rodzaj budynku"
+mają ich 20), obsługa klawiatury i znacznik przy wybranej pozycji.
+
+**Komponent jest zamiennikiem natywnego `<select>`**, i to była decyzja, która
+pozwoliła przerobić 61 list w 29 plikach jednym skryptem zamiast ręcznie:
+przyjmuje te same `<option>` jako children, a `onChange` dostaje obiekt
+w kształcie zdarzenia, więc `e.target.value` w istniejącym kodzie działa dalej.
+Przy pisaniu skryptu trzeba było pamiętać, że koniec tagu to pierwszy `>` poza
+nawiasami - inaczej `onChange={(e) => ...}` urywa tag na strzałce.
+
+`tone="onDark"` jest dla pola na ciemnym pasku zaznaczania wielu pozycji.
+Strona marketingowa i wzory stron dla biur (`app/components/wzory`) celowo
+zostają na natywnym `<select>`: mają własny wygląd i nie są częścią aplikacji.
+
 **Świadomie NIE zaglądaliśmy do ASARI.** To płatny produkt konkurencji i
 systematyczne przeglądanie jego formularzy pod odtworzenie w produkcie, który z
 nim konkuruje, łamie regulamin i psuje pozycję AgentSpace przy sprzedaży innym

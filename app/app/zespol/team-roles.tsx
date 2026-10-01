@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import type { UserRole } from "@/lib/types";
 import { setMemberRole, setWeeklyLimit } from "./actions";
+import { Select } from "@/app/app/components/select";
 
 export type TeamMember = {
   id: string;
@@ -46,17 +47,11 @@ export function TeamRoles({
             </div>
 
             <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
-              <select
-                aria-label="Rola"
-                value={m.role}
-                disabled={pending}
-                onChange={(e) => run(() => setMemberRole(m.id, e.target.value as UserRole))}
-                className={sel}
-              >
+              <Select aria-label="Rola" value={m.role} disabled={pending} onChange={(e) => run(() => setMemberRole(m.id, e.target.value as UserRole))}>
                 <option value="agent">Agent</option>
                 <option value="manager">Menedżer</option>
                 <option value="owner">CEO</option>
-              </select>
+              </Select>
 
               <div className="flex items-center gap-1.5" title="Tygodniowy limit rozmów z AI Coach (puste = bez limitu)">
                 <span className="text-xs text-slate-500">Limit AI/tydz.</span>

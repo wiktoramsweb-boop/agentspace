@@ -4,6 +4,7 @@ import { useRef } from "react";
 import type { CompanyData } from "@/lib/agency-settings";
 import { saveCompany } from "../company-actions";
 import { FieldLabel, Fieldset, ResultForm, inputCls } from "../result-form";
+import { Select } from "@/app/app/components/select";
 
 const VOIVODESHIPS = [
   "Dolnośląskie", "Kujawsko-pomorskie", "Lubelskie", "Lubuskie", "Łódzkie", "Małopolskie",
@@ -56,20 +57,20 @@ export function CompanyForm({ company, disabled }: { company: CompanyData; disab
             </div>
             <label>
               <FieldLabel>Państwo</FieldLabel>
-              <select name="country" defaultValue={company.country ?? "Polska"} className={inputCls}>
+              <Select name="country" defaultValue={company.country ?? "Polska"}>
                 {["Polska", "Niemcy", "Czechy", "Słowacja", "Wielka Brytania", "Inne"].map((c) => (
                   <option key={c}>{c}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               <FieldLabel>Województwo</FieldLabel>
-              <select name="voivodeship" defaultValue={company.voivodeship ?? ""} className={inputCls}>
+              <Select name="voivodeship" defaultValue={company.voivodeship ?? ""}>
                 <option value="">wybierz…</option>
                 {VOIVODESHIPS.map((v) => (
                   <option key={v}>{v}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               <FieldLabel required>Telefon</FieldLabel>

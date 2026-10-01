@@ -14,6 +14,7 @@ import { TimeGrid } from "./time-grid";
 import { MonthGrid } from "./month-grid";
 import { CallInsightsPanel } from "./call-insights";
 import { KIND_ORDER, KIND_STYLE, WEEKDAYS_LONG, dayMonth, hhmm, monthTitle, type CalView } from "./shared";
+import { Select } from "@/app/app/components/select";
 
 type Lite = { id: string; name: string };
 
@@ -226,18 +227,13 @@ export function CalendarApp({
             ))}
           </div>
 
-          <select
-            value={scope}
-            onChange={(e) => go({ scope: e.target.value })}
-            aria-label="Czyj kalendarz"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-emerald-500 focus:outline-none"
-          >
+          <Select value={scope} onChange={(e) => go({ scope: e.target.value })} aria-label="Czyj kalendarz">
             {scopeOptions.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
             ))}
-          </select>
+          </Select>
 
           <button
             type="button"

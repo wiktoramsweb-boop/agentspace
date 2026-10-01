@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { setProcessStage, setPropertyOwner, setPropertyOwnerRole, attachNewOwner } from "../actions";
 import { OWNER_ROLES, PROCESS_STAGES, type PropertyDealKind } from "@/lib/types";
+import { Select } from "@/app/app/components/select";
 
 type ClientLite = { id: string; name: string; phone?: string | null };
 
@@ -85,28 +86,18 @@ export function OwnerCard({
     <div className="space-y-3">
       <div>
         <label className={lbl}>Rola</label>
-        <select
-          value={role}
-          onChange={(e) => start(() => setPropertyOwnerRole(propertyId, e.target.value))}
-          disabled={pending}
-          className={inp}
-        >
+        <Select value={role} onChange={(e) => start(() => setPropertyOwnerRole(propertyId, e.target.value))} disabled={pending}>
           {OWNER_ROLES.map((r) => (
             <option key={r.value} value={r.value}>
               {r.label}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div>
         <label className={lbl}>{roleLabel} (klient z bazy)</label>
-        <select
-          value={ownerId ?? ""}
-          onChange={(e) => start(() => setPropertyOwner(propertyId, e.target.value || null))}
-          disabled={pending}
-          className={inp}
-        >
+        <Select value={ownerId ?? ""} onChange={(e) => start(() => setPropertyOwner(propertyId, e.target.value || null))} disabled={pending}>
           <option value="">nie przypisano</option>
           {clients.map((c) => (
             <option key={c.id} value={c.id}>
@@ -114,7 +105,7 @@ export function OwnerCard({
               {c.phone ? ` (${c.phone})` : ""}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       {ownerId && ownerName && (

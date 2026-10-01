@@ -16,6 +16,7 @@ import {
   CALL_DIRECTIONS,
   type ActivityKind,
 } from "@/lib/types";
+import { Select } from "@/app/app/components/select";
 
 type ClientLite = { id: string; name: string; phone?: string | null };
 
@@ -321,14 +322,14 @@ function ActivityForm({
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <Label>Cel</Label>
-              <select name="purpose" className={inp} defaultValue={purposes[0]?.value ?? ""}>
+              <Select name="purpose" defaultValue={purposes[0]?.value ?? ""}>
                 <option value="">nie podano</option>
                 {purposes.map((p) => (
                   <option key={p.value} value={p.value}>
                     {p.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div>
               <Label>
@@ -376,12 +377,7 @@ function ActivityForm({
             </div>
             <div>
               <Label>Klient z bazy (opcjonalnie)</Label>
-              <select
-                name="client_id"
-                value={clientId}
-                onChange={(e) => pickClient(e.target.value)}
-                className={inp}
-              >
+              <Select name="client_id" value={clientId} onChange={(e) => pickClient(e.target.value)}>
                 <option value="">nie wybrano</option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -389,7 +385,7 @@ function ActivityForm({
                     {c.phone ? ` (${formatPhone(c.phone)})` : ""}
                   </option>
                 ))}
-              </select>
+              </Select>
               <p className="mt-1.5 text-xs text-slate-400">
                 Wybór klienta uzupełni imię i telefon. Numer zapisujemy zawsze, żeby dało się później
                 wyszukać, czy ktoś już pod niego dzwonił.
@@ -420,34 +416,34 @@ function ActivityForm({
               {isCall && (
                 <div>
                   <Label>Rodzaj rozmowy</Label>
-                  <select name="call_direction" className={inp} defaultValue="wychodzaca">
+                  <Select name="call_direction" defaultValue="wychodzaca">
                     {CALL_DIRECTIONS.map((c) => (
                       <option key={c.value} value={c.value}>
                         {c.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
               )}
               <div>
                 <Label>Status</Label>
-                <select name="status" className={inp} defaultValue={isFuture ? "zaplanowane" : "wykonane"}>
+                <Select name="status" defaultValue={isFuture ? "zaplanowane" : "wykonane"}>
                   {ACTIVITY_STATUSES.map((s) => (
                     <option key={s.value} value={s.value}>
                       {s.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
                 <Label>Priorytet</Label>
-                <select name="priority" className={inp} defaultValue="normalny">
+                <Select name="priority" defaultValue="normalny">
                   {ACTIVITY_PRIORITIES.map((p) => (
                     <option key={p.value} value={p.value}>
                       {p.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -479,14 +475,14 @@ function ActivityForm({
           <Section title="Powiązania">
             <div>
               <Label>Nieruchomość (opcjonalnie)</Label>
-              <select name="property_id" className={inp} defaultValue={presetPropertyId ?? ""}>
+              <Select name="property_id" defaultValue={presetPropertyId ?? ""}>
                 <option value="">brak</option>
                 {properties.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div>
               <Label>Przypisane do</Label>
@@ -511,14 +507,7 @@ function ActivityForm({
                   );
                 })}
               </div>
-              <select
-                value=""
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (v && !assignees.includes(v)) setAssignees((p) => [...p, v]);
-                }}
-                className={inp}
-              >
+              <Select value="" onChange={(e) => { const v = e.target.value; if (v && !assignees.includes(v)) setAssignees((p) => [...p, v]); }}>
                 <option value="">Dodaj agenta…</option>
                 {agents
                   .filter((a) => !assignees.includes(a.id))
@@ -527,7 +516,7 @@ function ActivityForm({
                       {a.name}
                     </option>
                   ))}
-              </select>
+              </Select>
               <p className="mt-1.5 text-xs text-slate-400">Puste = działanie przypisane do Ciebie.</p>
             </div>
           </Section>

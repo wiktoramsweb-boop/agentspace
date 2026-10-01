@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { formatMoney, getSeller } from "@/lib/invoice";
 import { formatDateShort } from "@/lib/format";
+import { Select } from "@/app/app/components/select";
 
 type InvoiceRow = {
   id: string;
@@ -51,18 +52,14 @@ export function InvoicesBrowser({ invoices }: { invoices: InvoiceRow[] }) {
           placeholder="Szukaj po numerze faktury albo nabywcy..."
           className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
         />
-        <select
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
-        >
+        <Select value={year} onChange={(e) => setYear(e.target.value)}>
           <option value="all">Wszystkie lata</option>
           {years.map((y) => (
             <option key={y} value={y}>
               {y}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       {/* Suma z aktualnego filtra: najczęstsze pytanie księgowej. */}

@@ -14,6 +14,7 @@ import {
 } from "@/lib/documents-shared";
 import { formatDatePL } from "@/lib/datetime";
 import { deleteDocument, getDocumentUrl, registerDocuments, signDocumentUploads, updateDocumentKind } from "./actions";
+import { Select } from "@/app/app/components/select";
 
 type Pending = { id: string; name: string; progress: number; failed?: boolean };
 
@@ -258,18 +259,13 @@ export function DocumentsCard({
                       {d.name}
                     </button>
                     <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-                      <select
-                        value={d.kind}
-                        onChange={(e) => void changeKind(d, e.target.value)}
-                        aria-label="Rodzaj dokumentu"
-                        className="w-auto max-w-[13rem] truncate rounded-full border-0 bg-slate-100 py-0.5 pl-2 pr-6 text-xs font-medium text-slate-700 focus:ring-2 focus:ring-emerald-400"
-                      >
+                      <Select value={d.kind} onChange={(e) => void changeKind(d, e.target.value)} aria-label="Rodzaj dokumentu">
                         {kinds.map((k) => (
                           <option key={k.value} value={k.value}>
                             {k.label}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                       <span>{formatBytes(d.size_bytes)}</span>
                       <span>· {formatDatePL(d.created_at)}</span>
                       {d.uploaderName && <span className="hidden sm:inline">· {d.uploaderName}</span>}
