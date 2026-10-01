@@ -106,6 +106,8 @@ export type RaportWlasciciela = {
   zrodla: ZrodloWiersz[];
   zespol: AgentWiersz[];
   tempo: { tydzien: string; dzialania: number }[];
+  /** Prowizja zamknięta miesiąc po miesiącu, ostatnie 12 miesięcy. */
+  przychodMiesiacami: { miesiac: string; pln: number; szt: number }[];
 };
 
 const ZRODLA_MAP = Object.fromEntries(CLIENT_SOURCES.map((z) => [z.value, z.label]));
@@ -290,9 +292,31 @@ export async function getRaportWlasciciela(
     });
   }
 
+  // ── 7. Przychód miesiąc po miesiącu, zawsze 12 miesięcy wstecz ─────────
+  // Niezależnie od wybranego okresu: właściciel patrzy na trend, a trend
+  // widać dopiero na dłuższym kawałku niż jeden kwartał.
+  const MIESIACE = ["sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"];
+  const przychodMiesiacami: { miesiac: string; pln: number; szt: number }[] = [];
+  const teraz = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const m = new Date(teraz.getFullYear(), teraz.getMonth() - i, 1);
+    const nast = new Date(m.getFullYear(), m.getMonth() + 1, 1);
+    const wMiesiacu = wszystkieDeals.filter((d) => {
+      if (d.status !== "zamkniety") return false;
+      const kiedy = new Date(d.closed_at ?? d.created_at);
+      return kiedy >= m && kiedy < nast;
+    });
+    przychodMiesiacami.push({
+      miesiac: `${MIESIACE[m.getMonth()]} ${String(m.getFullYear()).slice(2)}`,
+      pln: wMiesiacu.reduce((su, d) => su + pln(d.commission_pln), 0),
+      szt: wMiesiacu.length,
+    });
+  }
+
   return {
     okres,
     od: odIso,
+    przychodMiesiacami,
     pieniadze,
     lejekOfert,
     lejekKlientow,

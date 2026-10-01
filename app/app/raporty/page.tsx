@@ -7,6 +7,8 @@ import { formatPln } from "@/lib/format";
 import { PROCESS_STAGES } from "@/lib/types";
 import { Lejek } from "./lejek";
 import { Tempo } from "./tempo";
+import { PrzychodMiesiacami, UdzialZrodel } from "./wykresy";
+import { EksportRaportu } from "./eksport";
 
 type Props = { searchParams: Promise<{ okres?: string }> };
 
@@ -35,7 +37,7 @@ export default async function RaportyPage({ searchParams }: Props) {
         title="Raporty"
         subtitle="Cztery pytania właściciela: ile zarobimy, gdzie sypie się lejek, skąd przychodzą pieniądze i kto pracuje."
         action={
-          <nav className="flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1">
+          <nav className="flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1" aria-label="Okres raportu">
             {OKRESY.map((o) => (
               <Link
                 key={o.value}
@@ -52,6 +54,18 @@ export default async function RaportyPage({ searchParams }: Props) {
           </nav>
         }
       />
+
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
+        <p className="text-sm text-slate-500">
+          Raport na spotkanie zespołu albo dla wspólnika. Plik zapisuje się na dysk, druk otwiera
+          gotowy PDF, więc na papier idzie raport, a nie okno aplikacji.
+        </p>
+        <EksportRaportu
+          raport={r}
+          nazwaBiura={user.agency?.name ?? "Biuro nieruchomości"}
+          stopka={`${user.agency?.name ?? ""} · raport wygenerowany w AgentSpace`}
+        />
+      </div>
 
       {/* ── 1. Ile zarobimy ─────────────────────────────────────────────── */}
       <section className="mb-8">
@@ -105,6 +119,19 @@ export default async function RaportyPage({ searchParams }: Props) {
         </p>
       </section>
 
+      <section className="mb-8">
+        <Card>
+          <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-slate-500">
+            Prowizja miesiąc po miesiącu
+          </h2>
+          <p className="mb-5 text-xs text-slate-400">
+            Zawsze ostatnie 12 miesięcy, niezależnie od wybranego okresu. Trend widać dopiero
+            na dłuższym kawałku niż jeden kwartał.
+          </p>
+          <PrzychodMiesiacami dane={r.przychodMiesiacami} />
+        </Card>
+      </section>
+
       {/* ── 2. Gdzie sypie się lejek ────────────────────────────────────── */}
       <section className="mb-8 grid gap-6 lg:grid-cols-2">
         <Card>
@@ -137,6 +164,7 @@ export default async function RaportyPage({ searchParams }: Props) {
           <p className="mb-4 text-xs text-slate-400">
             Nie liczba kontaktów decyduje, tylko ile z nich zrobiło się pieniędzy.
           </p>
+          <UdzialZrodel zrodla={r.zrodla} />
           {r.zrodla.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">
               Brak danych. Źródło ustawia się na karcie kontaktu w polu „Skąd mamy klienta”.

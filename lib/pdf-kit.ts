@@ -255,6 +255,60 @@ export async function nowyDokument(opts: { tytulPliku: string; stopka?: string }
     }
   }
 
+  /** Poziomy pasek z etykietą i wartością. Używany w lejku raportu. */
+  function pasek(etykieta: string, wartosc: string, udzial: number, kolor = AKCENT) {
+    const h = 26;
+    zmiesc(h);
+    const etykW = CONTENT_W * 0.34;
+    const barW = CONTENT_W * 0.48;
+    tekst(etykieta, { size: 9.5, x: MARGIN, szer: etykW });
+    y += 9.5 * 1.45;
+    page.drawRectangle({ x: MARGIN + etykW, y: y - 13, width: barW, height: 8, color: rgb(0.94, 0.95, 0.96) });
+    const w = Math.max(2, barW * Math.min(1, Math.max(0, udzial)));
+    page.drawRectangle({ x: MARGIN + etykW, y: y - 13, width: w, height: 8, color: kolor });
+    const vw = bold.widthOfTextAtSize(wartosc, 9.5);
+    page.drawText(wartosc, { x: MARGIN + CONTENT_W - vw, y: y - 13, size: 9.5, font: bold, color: INK });
+    y -= h;
+  }
+
+  /** Pionowe słupki, np. przychód miesiąc po miesiącu. */
+  function slupki(dane: { etykieta: string; wartosc: number; opis?: string }[], o: { wysokosc?: number; gapAfter?: number } = {}) {
+    const hMax = o.wysokosc ?? 110;
+    zmiesc(hMax + 34);
+    const max = Math.max(...dane.map((d) => d.wartosc), 1);
+    const przerwa = 4;
+    const szer = (CONTENT_W - przerwa * (dane.length - 1)) / dane.length;
+    const baza = y - hMax;
+    dane.forEach((d, i) => {
+      const x = MARGIN + i * (szer + przerwa);
+      const h = d.wartosc > 0 ? Math.max(2, (d.wartosc / max) * hMax) : 1;
+      page.drawRectangle({ x, y: baza, width: szer, height: h, color: d.wartosc > 0 ? AKCENT : rgb(0.9, 0.91, 0.92) });
+      if (d.opis) {
+        const w = reg.widthOfTextAtSize(d.opis, 7);
+        page.drawText(d.opis, { x: x + (szer - w) / 2, y: baza + h + 3, size: 7, font: reg, color: SZARY });
+      }
+      const w = reg.widthOfTextAtSize(d.etykieta, 7);
+      page.drawText(d.etykieta, { x: x + (szer - w) / 2, y: baza - 11, size: 7, font: reg, color: SZARY });
+    });
+    y = baza - 16 - (o.gapAfter ?? 0);
+  }
+
+  /** Rząd kafelków z liczbą i podpisem. */
+  function kafelki(pozycje: { label: string; value: string; sub?: string }[], o: { gapAfter?: number } = {}) {
+    const h = 54;
+    zmiesc(h + 8);
+    const przerwa = 8;
+    const szer = (CONTENT_W - przerwa * (pozycje.length - 1)) / pozycje.length;
+    pozycje.forEach((p, i) => {
+      const x = MARGIN + i * (szer + przerwa);
+      page.drawRectangle({ x, y: y - h, width: szer, height: h, borderColor: LINIA, borderWidth: 0.8, color: rgb(0.988, 0.992, 0.996) });
+      page.drawText(p.label.toUpperCase(), { x: x + 9, y: y - 17, size: 6.8, font: reg, color: SZARY });
+      page.drawText(p.value, { x: x + 9, y: y - 34, size: 13, font: bold, color: INK });
+      if (p.sub) page.drawText(p.sub, { x: x + 9, y: y - 46, size: 7, font: reg, color: SZARY });
+    });
+    y -= h + (o.gapAfter ?? 0);
+  }
+
   /** Dwie kolumny podpisów na dole. */
   function podpisy(lewa: { rola: string; osoby: string[] }, prawa: { rola: string; osoby: string[] }) {
     zmiesc(96);
@@ -297,7 +351,7 @@ export async function nowyDokument(opts: { tytulPliku: string; stopka?: string }
   return {
     get y() { return y; },
     set y(v: number) { y = v; },
-    tekst, tytul, paragraf, ramka, tabela, liniePuste, podpisy, zapisz,
+    tekst, tytul, paragraf, ramka, tabela, liniePuste, podpisy, pasek, slupki, kafelki, zapisz,
     odstep: (n: number) => { y -= n; },
   };
 }
