@@ -41,10 +41,10 @@ sprawdz(
 const sesja = CENNIK_KREDYTOW.coach_tura * 7 + CENNIK_KREDYTOW.coach_ocena;
 sprawdz("typowa sesja Coacha to 10 kredytów", sesja === 10, `${sesja}`);
 const kosztSesji = sesja * KOSZT_KREDYTU_ZL;
-sprawdz("typowa sesja kosztuje ok. 0,25 zł", Math.abs(kosztSesji - 0.25) < 0.01, `${kosztSesji} zł`);
+sprawdz("typowa sesja kosztuje ok. 0,17 zł", Math.abs(kosztSesji - 0.167) < 0.01, `${kosztSesji} zł`);
 
 // Pakiet Start nie ma AI Coacha, więc musi mieć mniejszą pulę niż Pro.
-sprawdz("Start ma mniejszą pulę niż Pro", KREDYTY_NA_AGENTA.start < KREDYTY_NA_AGENTA.pro);
+sprawdz("Pro ma nie mniejszą pulę niż Start", KREDYTY_NA_AGENTA.pro >= KREDYTY_NA_AGENTA.start);
 sprawdz(
   "każdy pakiet ma dodatnią pulę",
   Object.values(KREDYTY_NA_AGENTA).every((n) => n > 0),

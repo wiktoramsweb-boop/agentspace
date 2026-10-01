@@ -1,4 +1,5 @@
 import { createAnthropic, COACH_MODEL, SCORING_MODEL } from "./client";
+import { odpowiedzJson } from "./struktura";
 import { PERSONALITIES, type ChatMessage } from "../types";
 
 /**
@@ -143,62 +144,48 @@ export async function scoreSession(
   scenarioTitle: string,
   transcript: ChatMessage[],
 ): Promise<ScoringResult> {
-  const anthropic = createAnthropic();
-
   const dialogue = transcript
     .map((m) => `${m.role === "agent" ? "AGENT" : "KLIENT"}: ${m.content}`)
     .join("\n");
 
-  const response = await anthropic.messages.create({
+  const parsed = await odpowiedzJson<ScoringResult>({
     model: SCORING_MODEL,
-    max_tokens: 1500,
+    maxTokens: 1500,
     system: SCORING_SYSTEM,
-    tools: [
-      {
-        name: "zapisz_ocene",
-        description: "Zapisuje ocenę sesji treningowej agenta nieruchomości.",
-        input_schema: {
-          type: "object",
-          properties: {
-            overall: { type: "integer", description: "Ogólna ocena 1-10" },
-            opening: { type: "integer", description: "Otwarcie rozmowy 1-10" },
-            qualification: { type: "integer", description: "Kwalifikacja klienta 1-10" },
-            objection_handling: { type: "integer", description: "Obsługa obiekcji 1-10" },
-            closing: { type: "integer", description: "Zamknięcie 1-10" },
-            summary: { type: "string", description: "2-3 zdania podsumowania po polsku" },
-            suggestions: {
-              type: "array",
-              items: { type: "string" },
-              description: "2-4 konkretne wskazówki po polsku",
-            },
-          },
-          required: [
-            "overall",
-            "opening",
-            "qualification",
-            "objection_handling",
-            "closing",
-            "summary",
-            "suggestions",
-          ],
+    schemat: {
+      type: "object",
+      properties: {
+        overall: { type: "integer", description: "Ogólna ocena 1-10" },
+        opening: { type: "integer", description: "Otwarcie rozmowy 1-10" },
+        qualification: { type: "integer", description: "Kwalifikacja klienta 1-10" },
+        objection_handling: { type: "integer", description: "Obsługa obiekcji 1-10" },
+        closing: { type: "integer", description: "Zamknięcie 1-10" },
+        summary: { type: "string", description: "2-3 zdania podsumowania po polsku" },
+        suggestions: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-4 konkretne wskazówki po polsku",
         },
       },
-    ],
-    tool_choice: { type: "tool", name: "zapisz_ocene" },
+      required: [
+        "overall",
+        "opening",
+        "qualification",
+        "objection_handling",
+        "closing",
+        "summary",
+        "suggestions",
+      ],
+      additionalProperties: false,
+    },
     messages: [
       {
         role: "user",
-        content: `Scenariusz: ${scenarioTitle}\n\nTranskrypt rozmowy:\n\n${dialogue}\n\nOceń wypowiedzi agenta i wywołaj narzędzie zapisz_ocene.`,
+        content: `Scenariusz: ${scenarioTitle}\n\nTranskrypt rozmowy:\n\n${dialogue}\n\nOceń wypowiedzi agenta.`,
       },
     ],
   });
 
-  const toolUse = response.content.find((b) => b.type === "tool_use");
-  if (!toolUse || toolUse.type !== "tool_use") {
-    throw new Error("Scoring nie zwrócił oceny");
-  }
-
-  const parsed = toolUse.input as ScoringResult;
   const clamp = (n: number) => Math.max(1, Math.min(10, Math.round(Number(n) || 1)));
 
   return {

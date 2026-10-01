@@ -6,11 +6,14 @@
  * dokłada do tego Supabase i strefę czasową aplikacji.
  *
  * Wagi wyliczone z mediany 63 prawdziwych sesji: 7 tur agenta, 4619 znaków
- * transkryptu. Przy takiej sesji wychodzi 10 kredytów, czyli równo 0,25 zł.
+ * transkryptu. Przy takiej sesji wychodzi 10 kredytów, czyli 0,17 zł przy Sonnet 5.5.
  */
 
-/** Ile nas kosztuje jeden kredyt. Służy do wyceny pakietów i raportów. */
-export const KOSZT_KREDYTU_ZL = 0.025;
+/**
+ * Ile nas kosztuje jeden kredyt. Służy do wyceny pakietów i raportów.
+ * Przy Sonnet 5.5 ($2/$10 za milion tokenów, kurs 4 zł/USD).
+ */
+export const KOSZT_KREDYTU_ZL = 0.0167;
 
 export type Operacja =
   | "coach_tura"
@@ -45,15 +48,16 @@ export const NAZWY_OPERACJI: Record<Operacja, string> = {
 /**
  * Miesięczna pula na agenta, zależna od pakietu.
  *
- * Start nie ma AI Coacha, więc potrzebuje tylko tyle, co asystent i follow-upy.
- * 600 kredytów to około 15 zł kosztu i wystarcza na dwie sesje Coacha dziennie
- * przez cały miesiąc roboczy, czyli znacznie więcej niż realne zużycie.
+ * Dobrane tak, żeby koszt AI nie przekroczył 15% abonamentu przy pełnym
+ * wykorzystaniu puli. Typowy agent zużywa około 250 kredytów miesięcznie,
+ * więc 350 zostawia zapas, a pula jest wspólna dla biura: ktoś, kto trenuje
+ * codziennie, korzysta z tego, że inni trenują rzadziej.
  */
 export const KREDYTY_NA_AGENTA: Record<string, number> = {
-  trial: 400,
-  start: 150,
-  pro: 600,
-  biuro: 600,
+  trial: 300,
+  start: 300,
+  pro: 350,
+  biuro: 300,
 };
 
 const DOMYSLNE_NA_AGENTA = 400;

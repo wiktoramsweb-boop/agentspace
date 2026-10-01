@@ -1,6 +1,7 @@
 import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { getCurrentUser } from "@/lib/auth";
-import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
+import { COACH_MODEL } from "@/lib/ai/client";
+import { odpowiedzJson } from "@/lib/ai/struktura";
 
 export const maxDuration = 45;
 
@@ -32,23 +33,16 @@ export async function POST(request: Request) {
   const transcript = (body.transcript ?? "").trim().slice(0, 6000);
   if (!transcript) return new Response(JSON.stringify({ error: "Brak tekstu" }), { status: 400 });
 
-  let anthropic;
-  try {
-    anthropic = createAnthropic();
-  } catch {
+  if (!process.env.ANTHROPIC_API_KEY) {
     return new Response(JSON.stringify({ error: "AI niedostępne (brak ANTHROPIC_API_KEY)." }), { status: 503 });
   }
 
   try {
-    const response = await anthropic.messages.create({
+        const wynik = await odpowiedzJson<Record<string, unknown>>({
       model: COACH_MODEL,
-      max_tokens: 700,
+      maxTokens: 700,
       system: SYSTEM,
-      tools: [
-        {
-          name: "zapisz_wpis",
-          description: "Zapisuje uporządkowane dane spotkania do CRM.",
-          input_schema: {
+      schemat: {
             type: "object",
             properties: {
               client_name: { type: "string" },
@@ -61,18 +55,11 @@ export async function POST(request: Request) {
               note: { type: "string" },
             },
             required: ["client_name", "client_type", "create_property", "note"],
-          },
-        },
-      ],
-      tool_choice: { type: "tool", name: "zapisz_wpis" },
+        additionalProperties: false,
+      },
       messages: [{ role: "user", content: transcript }],
     });
-
-    const toolUse = response.content.find((b) => b.type === "tool_use");
-    if (!toolUse || toolUse.type !== "tool_use") {
-      return new Response(JSON.stringify({ error: "Nie udało się rozpoznać danych." }), { status: 502 });
-    }
-    return Response.json({ data: toolUse.input });
+    return Response.json({ data: wynik });
   } catch (err) {
     console.error("quick-entry parse error:", err);
     return new Response(JSON.stringify({ error: "Nie udało się przetworzyć (sprawdź kredyty API)." }), { status: 503 });

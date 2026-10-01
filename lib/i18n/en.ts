@@ -512,7 +512,7 @@ export const en: Dict = {
       meta: {
         title: "Pricing | AgentSpace for real estate agencies",
         description:
-          "Three plans: Start 499 PLN, Pro 899 PLN, Agency from 1490 PLN per month. The price depends on how many agents you have, not on how many modules you switch on. No fixed-term contract.",
+          "Three plans: Start 299 PLN, Pro 599 PLN, Agency from 999 PLN per month. The price depends on how many agents you have, not on how many modules you switch on. No fixed-term contract.",
       },
       eyebrow: "Pricing",
       title: "You pay for the size of the agency, not per module",
@@ -693,7 +693,7 @@ export const en: Dict = {
     wlasciciele: {
       meta: {
         title: "For real estate agency owners | AgentSpace",
-        description: "AgentSpace for agency owners. Lower agent churn, faster onboarding, decisions based on data. Plans from 499 PLN per month.",
+        description: "AgentSpace for agency owners. Lower agent churn, faster onboarding, decisions based on data. Plans from 299 PLN per month.",
       },
       hero: {
         eyebrow: "For agency owners",
@@ -717,7 +717,7 @@ export const en: Dict = {
       ],
       roiTitle: "Simple arithmetic",
       roi: [
-        { label: "Cost of AgentSpace", value: "from 499 PLN", suffix: "/ mo", accent: false },
+        { label: "Cost of AgentSpace", value: "from 299 PLN", suffix: "/ mo", accent: false },
         { label: "Average commission per deal", value: "~8,000 PLN", suffix: "", accent: false },
         { label: "Break-even", value: "+1 deal", suffix: "/ mo", accent: true },
         { label: "An 8-person team typically adds (after 30 days)", value: "+3-5 deals", suffix: "/ mo", accent: true },

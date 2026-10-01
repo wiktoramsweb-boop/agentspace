@@ -14,6 +14,13 @@ export function createAnthropic() {
 }
 
 // Model konfigurowalny przez env (gdyby ID modelu się zmieniło).
-// Domyślnie Sonnet - dobry balans jakości polskiego dialogu i kosztu.
-export const COACH_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5-20250929";
-export const SCORING_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5-20250929";
+//
+// Sonnet 5.5 jest lepszy i tańszy od 4.5 ($2/$10 za milion tokenów zamiast
+// $3/$15), co obniża koszt kredytu z 0,025 zł na 0,0167 zł.
+//
+// Uwaga przy zmianie modelu: Sonnet 5.5 i nowsze zwracają błąd 400 na
+// `tool_choice: {type: "tool"}`, dlatego odpowiedzi w zadanym kształcie
+// bierzemy przez structured outputs (lib/ai/struktura.ts), a nie przez
+// wymuszone narzędzie.
+export const COACH_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
+export const SCORING_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";

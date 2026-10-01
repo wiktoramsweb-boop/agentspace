@@ -23,7 +23,7 @@ export const PLANS: Plan[] = [
   {
     id: "start",
     name: "Start",
-    price: 499,
+    price: 299,
     maxAgents: 5,
     tagline: "Dla biur, które porządkują podstawy",
     features: [
@@ -38,7 +38,7 @@ export const PLANS: Plan[] = [
   {
     id: "pro",
     name: "Pro",
-    price: 899,
+    price: 599,
     maxAgents: 15,
     tagline: "Dla biur, które chcą rozwijać zespół",
     features: [
@@ -54,7 +54,7 @@ export const PLANS: Plan[] = [
   {
     id: "biuro",
     name: "Biuro",
-    price: 1490,
+    price: 999,
     priceFrom: true,
     maxAgents: 999,
     tagline: "Dla sieci i biur wielooddziałowych",

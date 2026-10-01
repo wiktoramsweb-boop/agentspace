@@ -61,9 +61,9 @@ Zadania i pulpit dnia z poranną odprawą, AI Asystent Dnia wskazujący trzy pri
 
 | Pakiet | Cena netto / mc | Limit agentów | Zakres |
 |---|---|---|---|
-| Start | 499 zł | do 5 | CRM, baza nieruchomości, zadania, cele, prowizje |
-| Pro | 899 zł | do 15 | Start + AI Coach, panel właściciela, AI Asystent Dnia, raporty, karta transakcji |
-| Biuro | od 1490 zł | bez limitu | Pro + role, wielooddziałowość, wdrożenie 1:1, priorytetowe wsparcie |
+| Start | 299 zł | do 5 | CRM, baza nieruchomości, zadania, cele, prowizje |
+| Pro | 599 zł | do 15 | Start + AI Coach, panel właściciela, AI Asystent Dnia, raporty, karta transakcji |
+| Biuro | od 999 zł | bez limitu | Pro + role, wielooddziałowość, wdrożenie 1:1, priorytetowe wsparcie |
 
 Rozliczenie miesięczne, bez umowy na czas określony. Przy rozliczeniu rocznym dwa miesiące gratis. Brak dopłat za użytkownika dodanego w trakcie miesiąca. Przy rezygnacji biuro otrzymuje eksport całej bazy do plików.
 

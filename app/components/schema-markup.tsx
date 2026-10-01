@@ -53,12 +53,12 @@ const softwareApplicationSchema = {
     {
       "@type": "Offer",
       name: "Start",
-      price: "499",
+      price: "299",
       priceCurrency: "PLN",
       availability: "https://schema.org/InStock",
       priceSpecification: {
         "@type": "UnitPriceSpecification",
-        price: "499",
+        price: "299",
         priceCurrency: "PLN",
         unitText: "MONTH",
         referenceQuantity: {
@@ -73,12 +73,12 @@ const softwareApplicationSchema = {
     {
       "@type": "Offer",
       name: "Pro",
-      price: "899",
+      price: "599",
       priceCurrency: "PLN",
       availability: "https://schema.org/InStock",
       priceSpecification: {
         "@type": "UnitPriceSpecification",
-        price: "899",
+        price: "599",
         priceCurrency: "PLN",
         unitText: "MONTH",
         referenceQuantity: {
@@ -93,7 +93,7 @@ const softwareApplicationSchema = {
     {
       "@type": "Offer",
       name: "Biuro",
-      price: "1490",
+      price: "999",
       priceCurrency: "PLN",
       availability: "https://schema.org/InStock",
       eligibleRegion: { "@type": "Country", name: "Poland" },

@@ -513,7 +513,7 @@ export const pl = {
       meta: {
         title: "Cennik | AgentSpace dla biur nieruchomości",
         description:
-          "Trzy pakiety: Start 499 zł, Pro 899 zł, Biuro od 1490 zł miesięcznie. Cena zależy od liczby agentów, nie od liczby modułów. Bez umowy na czas określony.",
+          "Trzy pakiety: Start 299 zł, Pro 599 zł, Biuro od 999 zł miesięcznie. Cena zależy od liczby agentów, nie od liczby modułów. Bez umowy na czas określony.",
       },
       eyebrow: "Cennik",
       title: "Płacisz za wielkość biura, nie za moduły",
@@ -694,7 +694,7 @@ export const pl = {
     wlasciciele: {
       meta: {
         title: "Dla właścicieli biur nieruchomości | AgentSpace",
-        description: "AgentSpace dla właścicieli biur nieruchomości. Niższa rotacja agentów, szybszy onboarding, decyzje oparte o dane. Pakiety od 499 zł/mc.",
+        description: "AgentSpace dla właścicieli biur nieruchomości. Niższa rotacja agentów, szybszy onboarding, decyzje oparte o dane. Pakiety od 299 zł/mc.",
       },
       hero: {
         eyebrow: "Dla właścicieli biur nieruchomości",
@@ -718,7 +718,7 @@ export const pl = {
       ],
       roiTitle: "Prosta matematyka",
       roi: [
-        { label: "Koszt AgentSpace", value: "od 499 zł", suffix: "/ mc", accent: false },
+        { label: "Koszt AgentSpace", value: "od 299 zł", suffix: "/ mc", accent: false },
         { label: "Średnia prowizja z transakcji", value: "~8 000 zł", suffix: "", accent: false },
         { label: "Próg opłacalności", value: "+1 transakcja", suffix: "/ mc", accent: true },
         { label: "Średnio zespół 8-osobowy daje (po 30 dniach)", value: "+3-5 transakcji", suffix: "/ mc", accent: true },

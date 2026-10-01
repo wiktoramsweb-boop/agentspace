@@ -1,4 +1,5 @@
-import { createAnthropic, COACH_MODEL } from "./client";
+import { COACH_MODEL } from "./client";
+import { odpowiedzJson } from "./struktura";
 
 export type DailySuggestion = {
   title: string;
@@ -29,7 +30,6 @@ Zasady:
 export async function getDailySuggestions(
   ctx: AssistantContext,
 ): Promise<DailySuggestion[]> {
-  const anthropic = createAnthropic();
 
   const contextText = `
 Agent: ${ctx.agentName}
@@ -48,15 +48,11 @@ Cel prowizji miesięcznej: ${ctx.monthProgress ? `${ctx.monthProgress.closed} / 
 Najsłabszy obszar treningowy: ${ctx.weakestTrainingArea ?? "brak danych"}
 `.trim();
 
-  const response = await anthropic.messages.create({
+  const wynik = await odpowiedzJson<{ priorytety?: DailySuggestion[] }>({
     model: COACH_MODEL,
-    max_tokens: 800,
+    maxTokens: 800,
     system: SYSTEM,
-    tools: [
-      {
-        name: "zaproponuj_priorytety",
-        description: "Zwraca 3 priorytety na dziś dla agenta.",
-        input_schema: {
+    schemat: {
           type: "object",
           properties: {
             priorytety: {
@@ -76,16 +72,10 @@ Najsłabszy obszar treningowy: ${ctx.weakestTrainingArea ?? "brak danych"}
             },
           },
           required: ["priorytety"],
-        },
+        additionalProperties: false,
       },
-    ],
-    tool_choice: { type: "tool", name: "zaproponuj_priorytety" },
     messages: [{ role: "user", content: contextText }],
   });
 
-  const toolUse = response.content.find((b) => b.type === "tool_use");
-  if (!toolUse || toolUse.type !== "tool_use") return [];
-
-  const input = toolUse.input as { priorytety?: DailySuggestion[] };
-  return (input.priorytety ?? []).slice(0, 3);
+  return (wynik.priorytety ?? []).slice(0, 3);
 }

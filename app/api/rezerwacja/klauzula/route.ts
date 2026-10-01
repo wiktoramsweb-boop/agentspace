@@ -1,6 +1,7 @@
 import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { getCurrentUser } from "@/lib/auth";
-import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
+import { COACH_MODEL } from "@/lib/ai/client";
+import { odpowiedzJson } from "@/lib/ai/struktura";
 
 export const maxDuration = 45;
 
@@ -28,10 +29,7 @@ export async function POST(request: Request) {
   const prompt = (body.request ?? "").trim().slice(0, 2000);
   if (!prompt) return new Response(JSON.stringify({ error: "Napisz, co dopisać." }), { status: 400 });
 
-  let anthropic;
-  try {
-    anthropic = createAnthropic();
-  } catch {
+  if (!process.env.ANTHROPIC_API_KEY) {
     return new Response(JSON.stringify({ error: "AI niedostępne (brak ANTHROPIC_API_KEY)." }), { status: 503 });
   }
 
@@ -40,30 +38,19 @@ export async function POST(request: Request) {
   }.`;
 
   try {
-    const response = await anthropic.messages.create({
+        const wynik = await odpowiedzJson<{ clause: string }>({
       model: COACH_MODEL,
-      max_tokens: 500,
+      maxTokens: 500,
       system: SYSTEM,
-      tools: [
-        {
-          name: "dodaj_zapis",
-          description: "Zwraca jeden formalny zapis (ustęp) do umowy.",
-          input_schema: {
+      schemat: {
             type: "object",
             properties: { clause: { type: "string", description: "Treść ustępu, bez numeru i nagłówka." } },
             required: ["clause"],
-          },
-        },
-      ],
-      tool_choice: { type: "tool", name: "dodaj_zapis" },
+        additionalProperties: false,
+      },
       messages: [{ role: "user", content: `${ctx}\n\nProśba agenta: ${prompt}` }],
     });
-
-    const toolUse = response.content.find((b) => b.type === "tool_use");
-    if (!toolUse || toolUse.type !== "tool_use") {
-      return new Response(JSON.stringify({ error: "Nie udało się zredagować zapisu." }), { status: 502 });
-    }
-    return Response.json({ data: toolUse.input });
+    return Response.json({ data: wynik });
   } catch (err) {
     console.error("klauzula error:", err);
     return new Response(JSON.stringify({ error: "Nie udało się (sprawdź kredyty API)." }), { status: 503 });

@@ -17,7 +17,7 @@ Odbiorca decyzyjny: właściciel lub menedżer biura nieruchomości. Użytkownic
 
 ## Cennik
 
-- [Cennik](https://agentspace.pl/cennik): Start 499 zł/mc (do 5 agentów), Pro 899 zł/mc (do 15 agentów), Biuro od 1490 zł/mc (bez limitu). Ceny netto, rozliczenie miesięczne, brak umowy na czas określony. Przy rozliczeniu rocznym dwa miesiące gratis.
+- [Cennik](https://agentspace.pl/cennik): Start 299 zł/mc (do 5 agentów), Pro 599 zł/mc (do 15 agentów), Biuro od 999 zł/mc (bez limitu). Ceny netto, rozliczenie miesięczne, brak umowy na czas określony. Przy rozliczeniu rocznym dwa miesiące gratis.
 
 ## Integracje
 
