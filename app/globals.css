@@ -982,6 +982,28 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:bg-red-100:hover {
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:bg-red-50:hover { background-color: rgba(239, 68, 68, 0.1) !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:bg-violet-100:hover { background-color: rgba(139, 92, 246, 0.15) !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .peer-checked\:bg-white:is(.peer:checked ~ *) { background-color: #18181b !important; }
+
+/* Jasne odcienie z ułamkiem przezroczystości. Przez długi czas ich nie
+   nadpisywaliśmy w przekonaniu, że półprzezroczyste tło zleje się z ciemnym.
+   To nieprawda: emerald-50 jest prawie biały, więc nawet przy 60 procentach
+   daje jasną plamę - tak właśnie wyglądała wyróżniona rozmowa w Przebiegu
+   kontaktu, jasny prostokąt z jasnym tekstem. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-emerald-50\/60 { background-color: rgba(16, 185, 129, 0.12) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-emerald-50\/90 { background-color: rgba(16, 185, 129, 0.16) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:bg-emerald-50\/40:hover { background-color: rgba(16, 185, 129, 0.1) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-red-50\/60 { background-color: rgba(239, 68, 68, 0.12) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-slate-200\/70 { background-color: rgba(39, 39, 42, 0.8) !important; }
+
+/* Biały pierścień wokół awatara i kropki na osi czasu udawał tło karty.
+   W ciemnym motywie musi udawać ciemne tło, inaczej świeci jak obwódka. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .ring-white { --tw-ring-color: #18181b !important; }
+
+/* Jasne gradienty: ramka strefy zrzutu zdjęć i tło kafelka przed wczytaniem. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .from-emerald-200 { --tw-gradient-from: rgba(16, 185, 129, 0.35) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .to-teal-200 { --tw-gradient-to: rgba(20, 184, 166, 0.35) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .from-slate-100 { --tw-gradient-from: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .via-slate-200 { --tw-gradient-via: #3f3f46 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .to-slate-200 { --tw-gradient-to: #3f3f46 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:bg-slate-200:hover { background-color: #3f3f46 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:bg-slate-300:hover { background-color: #52525b !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-slate-900:hover { color: #fafafa !important; }
@@ -1575,7 +1597,7 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-100 { border
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-slate-200:hover { border-color: #3f3f46 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .group-hover\:border-slate-300:hover { border-color: #3f3f46 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:text-slate-800:hover { color: #e4e4e7 !important; }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) .disabled\:text-slate-400:disabled { color: #52525b !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .disabled\:text-slate-400:disabled { color: #8b8b94 !important; }
 
 /* Odcienie 600 i 700 dla rodzin, których pierwotny blok nie obejmował. */
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-emerald-600 { color: #6ee7b7 !important; }
@@ -1651,6 +1673,10 @@ html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-cyan-600 { col
 
 /* slate-400 to kolor podpisów i etykiet, nie ozdoba. Na bieli dawał 2,6:1,
    w ciemnym 3,7:1, czyli w obu motywach za mało jak na tekst do czytania. */
+/* Wyłączone przyciski są celowo przygaszone (WCAG ich nie obejmuje), ale
+   przy slate-400 schodziły do 2,6:1 i znikały. Trzymamy około 3,2:1. */
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .disabled\:text-slate-400:disabled { color: #8a93a3 !important; }
+
 html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-slate-400,
 html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-slate-500 { color: #5a6473; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .text-slate-400 { color: #a1a1aa !important; }

@@ -17,6 +17,8 @@ import { Pagination } from "../app/components/pagination";
 import { PhotoPipelineTest } from "./photo-pipeline-test";
 import { CalendarDemo } from "./calendar-demo";
 import { DocsDemo } from "./docs-demo";
+import { KontrastAudyt } from "./kontrast";
+import { ThreadPanel, type ThreadItem } from "../app/dzialania/[id]/thread-panel";
 
 
 const MOCK_AGENTS = [
@@ -54,6 +56,22 @@ const MOCK_ACTIVITIES: ActivityRow[] = [
   { ...base, id: "3", kind: "zadanie", purpose: "sesja_foto", subject: "Zamówić sesję zdjęciową",
     status: "zaplanowane", priority: "normalny", due_at: "2026-09-01T10:30:00Z", client_id: null,
     clientName: null, assignee_ids: ["u3"], assigneeNames: ["Natalia Grygiel"] },
+];
+
+const MOCK_THREAD: ThreadItem[] = [
+  {
+    id: "t1", subject: "pozysk stańczyka", kind: "polaczenie", status: "wykonane",
+    due_at: "2026-09-28T16:32:00Z", duration_s: 212, call_direction: "wychodzaca",
+    assigneeNames: ["Natan Sirak"], isRoot: true, isCurrent: true,
+    description:
+      "pani twardo stoi przy swoim, nie jest zainteresowana współpracą z agencją i mówi, że nie ma sensu kontaktować się w późniejszych terminach, bo zdania nie zmieni",
+  },
+  {
+    id: "t2", subject: "telefon kontrolny", kind: "polaczenie", status: "zaplanowane",
+    due_at: "2026-10-20T10:00:00Z", duration_s: null, call_direction: "wychodzaca",
+    assigneeNames: ["Natan Sirak"], isRoot: false, isCurrent: false,
+    description: "sprawdzić, czy ogłoszenie nadal wisi",
+  },
 ];
 
 export function ThemePreview() {
@@ -200,6 +218,20 @@ export function ThemePreview() {
               reportDefault={false}
             />
           </div>
+
+          <KontrastAudyt />
+
+          {/* Oś czasu wątku rozmów. Trafiła tu po tym, jak wyróżniona rozmowa
+              okazała się nieczytelna w ciemnym motywie - teraz pilnuje jej
+              pomiar kontrastu powyżej. */}
+          <ThreadPanel
+            parent={{ id: "a1", subject: "pozysk stańczyka", kind: "polaczenie", contactName: "Anna Stańczyk", contactPhone: "791959591", count: 2 }}
+            items={MOCK_THREAD}
+            agents={MOCK_AGENTS}
+            clients={MOCK_CLIENTS}
+            properties={MOCK_PROPS}
+            reportDefault={false}
+          />
 
           <DocsDemo />
 

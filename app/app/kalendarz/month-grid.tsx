@@ -94,7 +94,9 @@ export function MonthGrid({
                         ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
                         : inMonth
                           ? "text-slate-800 hover:bg-slate-100"
-                          : "text-slate-300 hover:bg-slate-100"
+                          // slate-300 na bieli dawało 1,4:1 - dzień spoza
+                          // miesiąca ma być przygaszony, a nie niewidoczny
+                          : "text-slate-400 hover:bg-slate-100"
                     }`}
                     aria-label={`Otwórz dzień ${d}`}
                   >

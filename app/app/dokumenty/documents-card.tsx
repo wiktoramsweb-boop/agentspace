@@ -21,12 +21,14 @@ type Pending = { id: string; name: string; progress: number; failed?: boolean };
 /** Dokumenty, które powinny być przy każdej ofercie, zanim trafi do ogłoszenia. */
 const PROPERTY_ESSENTIALS = ["umowa_posrednictwa", "kw", "swiadectwo"];
 
+// Odcienie 600/700, bo na 500 biały napis „JPG" miał 2,7:1 i rozmywał się
+// na kafelku. Kolory zostają te same, tylko ciemniejsze o jeden stopień.
 const BADGE_COLOR: Record<string, string> = {
-  PDF: "bg-red-500",
-  JPG: "bg-sky-500",
-  PNG: "bg-sky-500",
-  DOC: "bg-indigo-500",
-  XLS: "bg-emerald-600",
+  PDF: "bg-red-600",
+  JPG: "bg-sky-700",
+  PNG: "bg-sky-700",
+  DOC: "bg-indigo-600",
+  XLS: "bg-emerald-700",
 };
 
 /**
