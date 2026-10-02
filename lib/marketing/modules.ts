@@ -300,6 +300,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla całego zespołu: im większe biuro, tym więcej transakcji wewnętrznych ta baza generuje.",
+    ilustracja: "/ilustracje/nieruchomosci.png",
     photo: "/wzory/kamienica.jpg",
     shot: "ShotOferty",
     faq: [
@@ -623,6 +624,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela i księgowości. Dostęp do tego modułu nadaje się osobno, bez wglądu w bazę klientów.",
+    ilustracja: "/ilustracje/faktury.png",
     photo: "/wzory/loft.jpg",
     shot: "ShotFaktury",
     faq: [
@@ -670,6 +672,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela biura i dyrektora. Menedżer widzi pracę swojego zespołu, bez kwot cudzych prowizji.",
+    ilustracja: "/ilustracje/raporty.png",
     photo: "/wzory/hala.jpg",
     shot: "ShotPanel",
     faq: [
