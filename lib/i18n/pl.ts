@@ -582,8 +582,8 @@ export const pl = {
         title: "Polski produkt dla polskich biur - bez kompromisów",
         description:
           "AgentSpace nie jest kolejnym SaaS-em „dla nieruchomości” tłumaczonym z angielskiego. Jest budowany w Krakowie, dla biur w Polsce, przez kogoś kto na co dzień prowadzi biuro nieruchomości i wie, co konkretnie boli.",
-        photoAlt: "Kraków nocą",
-        photoCaption: "Kraków, nasze podwórko",
+        photoAlt: "Brama budynku, w którym mieści się biuro Spectra Nieruchomości w Krakowie",
+        photoCaption: "Kraków, Zabłocie. Tutaj powstaje AgentSpace",
       },
       founderLabel: "Founder",
       founderName: "Wiktor Szostek",
@@ -624,8 +624,8 @@ export const pl = {
         eyebrow: "Kontakt",
         title: "Porozmawiajmy o Twoim biurze",
         description: "Pytanie o AgentSpace, prośba o demo, współpraca? Napisz - odpowiadamy w 24h w dni robocze.",
-        photoAlt: "Dziedziniec kamienicy",
-        photoCaption: "Odpowiadamy w 24 godziny",
+        photoAlt: "Witryna biura Spectra Nieruchomości przy ul. Zbożowej w Krakowie",
+        photoCaption: "Nasze biuro w Krakowie. Odpowiadamy w 24 godziny",
       },
       topics: [
         { title: "Wdrożenie", body: "Chcesz wiedzieć, jak wygląda uruchomienie systemu w Twoim biurze?", cta: "Wybierz w formularzu temat „Wdrożenie”" },

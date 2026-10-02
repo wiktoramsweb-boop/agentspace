@@ -32,7 +32,7 @@ export default async function Kontakt({ params }: { params: Promise<{ lang: stri
           title={t.hero.title}
           description={t.hero.description}
           compact
-          photo={{ src: "/wzory/dziedziniec.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
+          photo={{ src: "/biuro/wejscie.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
         />
 
         {/* Quick topics - co możesz napisać */}

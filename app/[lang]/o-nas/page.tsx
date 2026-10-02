@@ -33,7 +33,7 @@ export default async function ONas({ params }: { params: Promise<{ lang: string 
           eyebrow={t.hero.eyebrow}
           title={t.hero.title}
           description={t.hero.description}
-          photo={{ src: "/wzory/miasto-noc.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
+          photo={{ src: "/biuro/brama.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
         />
 
         {/* Founder story */}

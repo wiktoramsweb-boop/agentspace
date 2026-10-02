@@ -581,8 +581,8 @@ export const en: Dict = {
         title: "Built by an agency, for agencies - no compromises",
         description:
           "AgentSpace is not another generic real estate SaaS with a new coat of paint. It is built in Kraków by somebody who runs a real estate agency day to day and knows exactly what hurts.",
-        photoAlt: "Kraków at night",
-        photoCaption: "Kraków, our own backyard",
+        photoAlt: "The gateway of the building housing the Spectra Nieruchomości office in Kraków",
+        photoCaption: "Kraków, Zabłocie. This is where AgentSpace is built",
       },
       founderLabel: "Founder",
       founderName: "Wiktor Szostek",
@@ -623,8 +623,8 @@ export const en: Dict = {
         eyebrow: "Contact",
         title: "Let us talk about your agency",
         description: "A question about AgentSpace, a request for a demo, a partnership? Write to us - we reply within 24 hours on business days.",
-        photoAlt: "Townhouse courtyard",
-        photoCaption: "We reply within 24 hours",
+        photoAlt: "The Spectra Nieruchomości office front on Zbożowa street in Kraków",
+        photoCaption: "Our office in Kraków. We reply within 24 hours",
       },
       topics: [
         { title: "Onboarding", body: "Want to know what going live looks like in your agency?", cta: "Pick the topic “Onboarding” in the form" },
