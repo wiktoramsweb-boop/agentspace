@@ -17,7 +17,7 @@ import { pageMetadata } from "@/lib/i18n/metadata";
  * ceny wymagałaby zmiany regulaminu i powiadamiania klientów.
  */
 
-const UPDATED = "29 września 2026";
+const UPDATED = "2 października 2026";
 
 export async function generateMetadata({
   params,
@@ -136,7 +136,34 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               z wybranego pakietu.
             </p>
 
-            <h2>§5. Abonament i płatności</h2>
+            <h2>§5. Okres próbny</h2>
+            <p>
+              Każdemu Klientowi przysługuje jeden bezpłatny okres próbny trwający{" "}
+              <strong>7 dni</strong> od założenia Konta biura. W okresie próbnym Klient ma dostęp
+              do pełnej funkcjonalności wybranego pakietu.
+            </p>
+            <ul>
+              <li>
+                Okres próbny nie wymaga podania danych karty płatniczej ani żadnej innej formy
+                zabezpieczenia płatności.
+              </li>
+              <li>
+                Po upływie okresu próbnego dostęp do modułów Usługi zostaje{" "}
+                <strong>wstrzymany</strong>, a nie usunięty. Klient zachowuje dostęp do ustawień
+                konta oraz do ekranu płatności, aby móc wykupić abonament albo pobrać swoje dane.
+              </li>
+              <li>
+                <strong>Dane Klienta nie są kasowane</strong> wraz z końcem okresu próbnego.
+                Zasady ich usuwania określa §12.
+              </li>
+              <li>
+                Okres próbny przysługuje jednokrotnie. Operator może odmówić kolejnego okresu
+                próbnego temu samemu Klientowi, w szczególności przy zakładaniu kolejnych kont dla
+                tego samego biura.
+              </li>
+            </ul>
+
+            <h2>§6. Abonament i płatności</h2>
             <p>
               Wysokość opłat określa cennik dostępny pod adresem{" "}
               <Link href={localeHref(locale, "/cennik")}>agentspace.pl/cennik</Link>. Ceny są
@@ -145,25 +172,95 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
             </p>
             <p>
               Opłata jest naliczana z góry za Okres rozliczeniowy. Faktura jest wystawiana
-              w postaci elektronicznej, na co Klient wyraża zgodę.
+              w postaci elektronicznej i udostępniana w aplikacji oraz wysyłana na adres e-mail
+              Klienta, na co Klient wyraża zgodę.
+            </p>
+
+            <h3>Okresy rozliczeniowe i rabaty</h3>
+            <ul>
+              <li>
+                <strong>Miesięczny:</strong> opłata za jeden miesiąc, bez rabatu.
+              </li>
+              <li>
+                <strong>Półroczny:</strong> jedna płatność za sześć miesięcy, <strong>10%</strong>{" "}
+                taniej niż sześć opłat miesięcznych.
+              </li>
+              <li>
+                <strong>Roczny:</strong> jedna płatność za dwanaście miesięcy,{" "}
+                <strong>20%</strong> taniej niż dwanaście opłat miesięcznych. Cena pozostaje
+                niezmienna przez 24 miesiące od zawarcia Umowy, przy zachowaniu ciągłości
+                subskrypcji.
+              </li>
+            </ul>
+
+            <h3>Obsługa płatności</h3>
+            <p>
+              Płatności obsługuje <strong>PayPro S.A. (Przelewy24)</strong>, ul. Pastelowa 8,
+              60-198 Poznań, krajowa instytucja płatnicza wpisana do rejestru prowadzonego przez
+              Komisję Nadzoru Finansowego. Dokonując płatności, Klient akceptuje regulamin
+              operatora płatności w zakresie dotyczącym samej transakcji.
             </p>
             <ul>
               <li>
-                <strong>Rozliczenie roczne:</strong> dwa miesiące abonamentu gratis
-                w porównaniu z rozliczeniem miesięcznym, a cena pozostaje niezmienna przez
-                24 miesiące od zawarcia Umowy, przy zachowaniu ciągłości subskrypcji.
+                Operator <strong>nie ma dostępu do danych karty płatniczej</strong> ani do danych
+                logowania Klienta do bankowości i ich nie przechowuje.
               </li>
               <li>
-                <strong>Zmiana pakietu:</strong> podwyższenie pakietu następuje od kolejnego
-                Okresu rozliczeniowego. Jeżeli liczba Użytkowników trwale przekroczy limit
-                pakietu, Operator poinformuje o tym Klienta przed zmianą i zaproponuje wyższy
-                pakiet. Operator nie nalicza dopłat za Użytkownika w trakcie Okresu
-                rozliczeniowego.
+                Dostęp do Usługi jest uruchamiany po otrzymaniu od operatora płatności
+                potwierdzenia transakcji.
+              </li>
+              <li>
+                Przy płatnościach cyklicznych kolejna opłata jest pobierana automatycznie na
+                początku każdego Okresu rozliczeniowego, do czasu rezygnacji. Klient może wyłączyć
+                odnawianie w ustawieniach konta w dowolnym momencie, ze skutkiem na koniec
+                opłaconego Okresu.
+              </li>
+              <li>
+                O nieudanej płatności Operator informuje Klienta mailem i ponawia próbę obciążenia.
+                Po bezskutecznych próbach stosuje się zasady dotyczące opóźnienia w płatności.
+              </li>
+            </ul>
+
+            <h3>Kredyty AI i usługi dodatkowe</h3>
+            <ul>
+              <li>
+                Każdy pakiet obejmuje miesięczną pulę kredytów na funkcje oparte o sztuczną
+                inteligencję, wspólną dla całego biura. Aktualne wielkości puli podaje cennik,
+                a bieżące zużycie jest widoczne w ustawieniach konta.
+              </li>
+              <li>
+                Po wyczerpaniu puli funkcje AI są wstrzymywane do początku kolejnego Okresu
+                rozliczeniowego, chyba że Klient dokupi dodatkowy pakiet kredytów. Pozostałe
+                funkcje Usługi działają bez zmian.
+              </li>
+              <li>
+                <strong>Dokupione kredyty nie wygasają</strong> z końcem Okresu rozliczeniowego
+                i pozostają do wykorzystania przez czas trwania Umowy. Opłata za dokupione kredyty
+                nie podlega zwrotowi.
+              </li>
+              <li>
+                Strona internetowa biura jest usługą dodatkową, rozliczaną odrębnie od abonamentu
+                za Usługę, na zasadach i w cenach podanych w cenniku.
+              </li>
+            </ul>
+
+            <h3>Zmiana pakietu i opóźnienia</h3>
+            <ul>
+              <li>
+                <strong>Podwyższenie pakietu</strong> następuje od kolejnego Okresu rozliczeniowego.
+                Jeżeli liczba Użytkowników trwale przekroczy limit pakietu, Operator poinformuje
+                o tym Klienta przed zmianą i zaproponuje wyższy pakiet. Operator nie nalicza dopłat
+                za Użytkownika dodanego w trakcie Okresu rozliczeniowego.
+              </li>
+              <li>
+                <strong>Obniżenie pakietu</strong> obowiązuje od kolejnego Okresu rozliczeniowego.
+                Opłata już uiszczona za bieżący Okres nie podlega proporcjonalnemu zwrotowi.
               </li>
               <li>
                 <strong>Opóźnienie w płatności:</strong> po upływie 14 dni od terminu Operator
-                może zawiesić dostęp do Usługi, po uprzednim wezwaniu wysłanym na adres e-mail
-                Klienta. Zawieszenie nie powoduje usunięcia Danych Klienta.
+                może zawiesić dostęp do modułów Usługi, po uprzednim wezwaniu wysłanym na adres
+                e-mail Klienta. Zawieszenie nie powoduje usunięcia Danych Klienta, a dostęp do
+                ustawień i pobrania danych zostaje zachowany.
               </li>
             </ul>
             <p>
@@ -173,7 +270,43 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               bieżącego Okresu rozliczeniowego.
             </p>
 
-            <h2>§6. Obowiązki Klienta</h2>
+            <h2>§7. Funkcje oparte o sztuczną inteligencję</h2>
+            <p>
+              Usługa udostępnia funkcje korzystające z modeli językowych, w szczególności AI Coach,
+              asystenta dnia, generowanie wiadomości follow-up oraz odczyt dokumentów.
+            </p>
+            <ul>
+              <li>
+                Wyniki działania tych funkcji mają charakter <strong>pomocniczy</strong>. Nie są
+                poradą prawną, podatkową ani wyceną. Decyzję podejmuje zawsze człowiek.
+              </li>
+              <li>
+                Operator nie gwarantuje poprawności, kompletności ani aktualności treści
+                wygenerowanych przez model, w szczególności gdy wynikają one z danych dostarczonych
+                przez Klienta.
+              </li>
+              <li>
+                AI Coach jest symulacją rozmowy. Do treningu nie są używane dane prawdziwych
+                klientów biura.
+              </li>
+              <li>
+                Klient odpowiada za zgodność wykorzystania tych funkcji z prawem, w tym za
+                spełnienie obowiązków informacyjnych wobec osób, których dane są przetwarzane.
+              </li>
+              <li>
+                Operator może zmieniać model i sposób działania tych funkcji. Zmiana taka nie
+                stanowi zmiany Regulaminu, o ile nie ogranicza zakresu Usługi.
+              </li>
+              <li>
+                Szczegóły przetwarzania danych przez dostawcę modelu opisuje{" "}
+                <Link href={localeHref(locale, "/polityka-prywatnosci")}>
+                  polityka prywatności
+                </Link>
+                .
+              </li>
+            </ul>
+
+            <h2>§8. Obowiązki Klienta</h2>
             <p>Klient zobowiązuje się do:</p>
             <ul>
               <li>
@@ -193,7 +326,7 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               <li>nieudostępniania kont osobom spoza swojej organizacji.</li>
             </ul>
 
-            <h2>§7. Dostępność Usługi i wsparcie</h2>
+            <h2>§9. Dostępność Usługi i wsparcie</h2>
             <p>
               Operator dokłada starań, aby Usługa była dostępna nieprzerwanie, i zakłada
               dostępność na poziomie <strong>99% w skali miesiąca kalendarzowego</strong>,
@@ -211,7 +344,7 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               Operator odpowiada na zgłoszenia w terminie do 24 godzin w dni robocze.
             </p>
 
-            <h2>§8. Odpowiedzialność</h2>
+            <h2>§10. Odpowiedzialność</h2>
             <p>
               Operator odpowiada za niewykonanie lub nienależyte wykonanie Umowy na zasadach
               ogólnych, z zastrzeżeniem poniższych ograniczeń.
@@ -233,7 +366,7 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               w każdej chwili może wyeksportować swoje dane.
             </p>
 
-            <h2>§9. Dane osobowe</h2>
+            <h2>§11. Dane osobowe</h2>
             <p>
               W zakresie danych wprowadzanych do Usługi przez Klienta administratorem danych
               osobowych pozostaje Klient, a Operator działa jako podmiot przetwarzający.
@@ -252,7 +385,7 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               .
             </p>
 
-            <h2>§10. Czas trwania Umowy i jej rozwiązanie</h2>
+            <h2>§12. Czas trwania Umowy i jej rozwiązanie</h2>
             <p>
               Umowa jest zawierana na czas nieokreślony, z rozliczeniem w wybranych Okresach
               rozliczeniowych. Umowa nie jest zawierana na czas określony.
@@ -276,7 +409,7 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               Klienta jako zabezpieczenia roszczeń.
             </p>
 
-            <h2>§11. Reklamacje</h2>
+            <h2>§13. Reklamacje</h2>
             <p>
               Reklamacje dotyczące Usługi należy zgłaszać na adres
               nieruchomoscispectra@gmail.com. Zgłoszenie powinno zawierać opis
@@ -284,7 +417,7 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               rozpatruje reklamację w terminie 14 dni od otrzymania.
             </p>
 
-            <h2>§12. Zmiany Regulaminu</h2>
+            <h2>§14. Zmiany Regulaminu</h2>
             <p>
               Operator może zmienić Regulamin z ważnych przyczyn, w szczególności zmiany
               przepisów prawa, zmiany zakresu Usługi lub zmian technologicznych. O zmianie
@@ -297,7 +430,7 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
               nowego brzmienia Regulaminu.
             </p>
 
-            <h2>§13. Postanowienia końcowe</h2>
+            <h2>§15. Postanowienia końcowe</h2>
             <p>
               W sprawach nieuregulowanych Regulaminem zastosowanie mają przepisy prawa
               polskiego, w szczególności Kodeksu cywilnego oraz ustawy o świadczeniu usług
