@@ -47,7 +47,7 @@ export function NowyLead({ agenci }: { agenci: { id: string; name: string }[] })
             <Pole label="Imię i nazwisko" name="name" placeholder="imię i nazwisko" />
             <Pole label="Telefon" name="phone" placeholder="600 100 200" />
             <Pole label="E-mail" name="email" type="email" placeholder="adres@example.com" />
-            <Pole label="Miasto" name="city" placeholder="Kraków" />
+            <Pole label="Miasto" name="city" placeholder="Miasto" />
             <div className="sm:col-span-2">
               <Pole label="Adres nieruchomości" name="address" placeholder="ul. Piastów 69/24" />
             </div>

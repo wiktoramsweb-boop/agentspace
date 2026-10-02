@@ -54,7 +54,7 @@ z wybranego wzoru. Klient edytuje wszystko w `/app/ustawienia/strona`. Wymaga mi
 
 Platforma operacyjna SaaS dla agentów nieruchomości w Polsce. Codzienne miejsce pracy agenta z dashboardem, notatkami, planem dnia, integracją kalendarza Google, rankingiem agentów (KPI/umowy), i flagowym modułem **AI Coach** (trening cold calli z AI klientem, scoring, feedback po polsku).
 
-**Decyzja zakupu:** właściciel biura. **Użytkownicy:** agenci. **Cennik:** aktualne pakiety na `/cennik` (Start 499 zł/mc, Pro 899 zł/mc). **Klient zero:** biuro nieruchomości Spectra w Krakowie (biuro ownera).
+**Decyzja zakupu:** właściciel biura. **Użytkownicy:** agenci. **Cennik:** `lib/marketing/plans.ts` (Start 299, Pro 599, Biuro od 999 zł/mc). Zakupy biura w aplikacji: Ustawienia → Abonament i płatności (moduł `abonament`). **Klient zero:** biuro nieruchomości Spectra w Krakowie (biuro ownera).
 
 Pełny kontekst i plan w `~/spectra-research/` (pliki 01-07).
 

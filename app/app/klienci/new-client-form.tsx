@@ -330,7 +330,7 @@ export function NewClientForm({ existingPhones = [] }: { existingPhones?: Existi
           <Section title="Dane adresowe">
             <AddressInput label={meta.addressLabel} />
             <div className="grid gap-3 sm:grid-cols-3">
-              <Field label="Kod pocztowy" name="postal_code" placeholder="30-002" />
+              <Field label="Kod pocztowy" name="postal_code" placeholder="00-001" />
               <Field label="Województwo" name="voivodeship" placeholder="małopolskie" />
               <Field label="Państwo" name="country" placeholder="Polska" />
             </div>

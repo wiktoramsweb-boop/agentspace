@@ -48,19 +48,22 @@ export const NAZWY_OPERACJI: Record<Operacja, string> = {
 /**
  * Miesięczna pula na agenta, zależna od pakietu.
  *
- * Dobrane tak, żeby koszt AI nie przekroczył 15% abonamentu przy pełnym
- * wykorzystaniu puli. Typowy agent zużywa około 250 kredytów miesięcznie,
- * więc 350 zostawia zapas, a pula jest wspólna dla biura: ktoś, kto trenuje
- * codziennie, korzysta z tego, że inni trenują rzadziej.
+ * Pula jest wspólna dla całego biura, więc ktoś, kto trenuje codziennie,
+ * korzysta z tego, że inni trenują rzadziej. Dobrane tak, żeby przy pełnym
+ * wykorzystaniu koszt AI trzymał się w okolicy 10% abonamentu, a biura, które
+ * naprawdę intensywnie trenują, dokupywały pakiety.
+ *
+ * Start nie ma AI Coacha, więc potrzebuje tylko tyle, co asystent dnia
+ * i follow-upy.
  */
 export const KREDYTY_NA_AGENTA: Record<string, number> = {
-  trial: 300,
-  start: 300,
-  pro: 350,
-  biuro: 300,
+  trial: 200,
+  start: 120,
+  pro: 250,
+  biuro: 200,
 };
 
-const DOMYSLNE_NA_AGENTA = 400;
+const DOMYSLNE_NA_AGENTA = 200;
 
 export type PulaAgencji = {
   plan: string | null;

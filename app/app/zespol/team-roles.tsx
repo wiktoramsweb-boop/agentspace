@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import type { UserRole } from "@/lib/types";
-import { setMemberRole, setWeeklyLimit } from "./actions";
+import { ROLE, opisRoli } from "@/lib/role";
+import { setMemberRole } from "./actions";
 import { Select } from "@/app/app/components/select";
 
 export type TeamMember = {
@@ -11,7 +12,6 @@ export type TeamMember = {
   email: string | null;
   role: UserRole;
   manager_id: string | null;
-  weekly_ai_limit: number | null;
 };
 
 export function TeamRoles({
@@ -44,33 +44,18 @@ export function TeamRoles({
                 {m.id === currentUserId && <span className="ml-2 text-xs text-slate-500">(Ty)</span>}
               </p>
               {m.email && <p className="truncate text-xs text-slate-500">{m.email}</p>}
+              <p className="mt-0.5 text-xs text-slate-400">{opisRoli(m.role).opis}</p>
             </div>
 
             <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
               <Select aria-label="Rola" value={m.role} disabled={pending} onChange={(e) => run(() => setMemberRole(m.id, e.target.value as UserRole))}>
-                <option value="agent">Agent</option>
-                <option value="manager">Menedżer</option>
-                <option value="owner">CEO</option>
+                {ROLE.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.nazwa}
+                  </option>
+                ))}
               </Select>
 
-              <div className="flex items-center gap-1.5" title="Tygodniowy limit rozmów z AI Coach (puste = bez limitu)">
-                <span className="text-xs text-slate-500">Limit AI/tydz.</span>
-                <input
-                  type="number"
-                  min={0}
-                  aria-label="Tygodniowy limit rozmów AI"
-                  defaultValue={m.weekly_ai_limit ?? ""}
-                  placeholder="∞"
-                  disabled={pending}
-                  onBlur={(e) => {
-                    const raw = e.target.value.trim();
-                    const val = raw === "" ? null : parseInt(raw, 10);
-                    const current = m.weekly_ai_limit;
-                    if ((val ?? null) !== (current ?? null)) run(() => setWeeklyLimit(m.id, val));
-                  }}
-                  className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none disabled:opacity-60"
-                />
-              </div>
             </div>
           </div>
         ))}

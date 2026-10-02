@@ -88,7 +88,7 @@ export function QuickEntry() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Adres" value={form.address} onChange={(v) => set("address", v)} />
-            <Field label="Miasto" value={form.city} onChange={(v) => set("city", v)} placeholder="Kraków" />
+            <Field label="Miasto" value={form.city} onChange={(v) => set("city", v)} placeholder="Miasto" />
           </div>
           <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
             <input

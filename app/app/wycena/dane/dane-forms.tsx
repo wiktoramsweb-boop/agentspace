@@ -120,7 +120,7 @@ export function ManualLevel() {
     >
       <div>
         <label className={label} htmlFor="miasto">Miasto</label>
-        <input id="miasto" name="miasto" required className={field} placeholder="Kraków" />
+        <input id="miasto" name="miasto" required className={field} placeholder="Miasto" />
       </div>
       <div>
         <label className={label} htmlFor="cena">Cena za m² (zł)</label>

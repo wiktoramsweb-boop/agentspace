@@ -254,7 +254,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
           <Field label="Tytuł oferty" value={title} onChange={setTitle} placeholder="3-pok z tarasem, Krowodrza" />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Cena" value={price} onChange={setPrice} placeholder="799 000 zł" />
-            <Field label="Lokalizacja" value={location} onChange={setLocation} placeholder="Kraków, Krowodrza" />
+            <Field label="Lokalizacja" value={location} onChange={setLocation} placeholder="Miasto, dzielnica" />
           </div>
         </Section>
 

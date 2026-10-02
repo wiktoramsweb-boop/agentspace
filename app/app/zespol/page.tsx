@@ -107,7 +107,6 @@ export default async function ZespolPage() {
     email: m.email,
     role: m.role,
     manager_id: m.manager_id,
-    weekly_ai_limit: m.weekly_ai_limit,
   }));
 
   // Statystyki nagłówka - dla menedżera liczone z jego zakresu.
@@ -294,9 +293,10 @@ export default async function ZespolPage() {
           </div>
 
           <div className="mb-8">
-            <h2 className="mb-1 text-lg font-semibold text-slate-900">Role i limity</h2>
+            <h2 className="mb-1 text-lg font-semibold text-slate-900">Role</h2>
             <p className="mb-3 text-sm text-slate-500">
-              Nadaj rolę (CEO / Menedżer / Agent) i ustaw tygodniowy limit rozmów z AI Coach.
+              Stanowisko ustawia dostępy domyślne. Żeby dołożyć albo odebrać komuś pojedynczy
+              moduł, wejdź w jego kartę.
             </p>
             <TeamRoles members={teamMembers} currentUserId={user.id} />
           </div>

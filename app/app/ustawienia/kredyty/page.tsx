@@ -2,7 +2,6 @@ import { requireOwner } from "@/lib/auth";
 import { Card } from "../../components/ui";
 import {
   CENNIK_KREDYTOW,
-  KOSZT_KREDYTU_ZL,
   NAZWY_OPERACJI,
   type Operacja,
   stanKredytow,
@@ -47,9 +46,7 @@ export default async function KredytyPage() {
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             Kredyty AI w tym miesiącu
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400">
-            koszt {stan.kosztZl.toFixed(2).replace(".", ",")} zł
-          </span>
+
         </div>
 
         <div className="mt-4 flex items-baseline gap-2">
@@ -76,7 +73,8 @@ export default async function KredytyPage() {
         </p>
         {malo && (
           <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-500/15 dark:text-amber-200">
-            Pula na ten miesiąc jest na wyczerpaniu. Napisz do nas, żeby dokupić pakiet.
+            Pula na ten miesiąc jest na wyczerpaniu. Dokupcie pakiet w Ustawieniach, w zakładce
+            Abonament i płatności.
           </p>
         )}
       </Card>
@@ -89,10 +87,9 @@ export default async function KredytyPage() {
       )}
 
       <Card>
-        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Ile kosztuje co</h3>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Ile kredytów zużywa co</h3>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-          Jeden kredyt to około {KOSZT_KREDYTU_ZL.toFixed(3).replace(".", ",")} zł. Typowa sesja AI
-          Coacha (7 wypowiedzi plus ocena) to 10 kredytów.
+          Typowa sesja AI Coacha (7 wypowiedzi plus ocena) to 10 kredytów.
         </p>
         <ul className="mt-4 divide-y divide-slate-200 text-sm dark:divide-slate-700">
           {(Object.keys(CENNIK_KREDYTOW) as Operacja[]).map((op) => (

@@ -216,7 +216,7 @@ export function ListToolbar({
                     defaultValue={query.city}
                     onBlur={(e) => e.target.value !== query.city && go({ city: e.target.value })}
                     onKeyDown={(e) => e.key === "Enter" && go({ city: (e.target as HTMLInputElement).value })}
-                    placeholder="np. Kraków"
+                    placeholder="np. miasto"
                     className={input}
                   />
                 </Field>

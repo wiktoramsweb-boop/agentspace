@@ -26,7 +26,20 @@ const SITE: Item[] = [
  * Boczne menu ustawień (układ jak w ASARI). Na telefonie zamienia się
  * w poziomy pasek, żeby nie zajmować pół ekranu nad formularzem.
  */
-export function SettingsNav({ isOwner }: { isOwner: boolean }) {
+/**
+ * Zakupy biura są osobno od ustawień firmy, bo dostęp do nich daje moduł
+ * „abonament”, a nie rola. CEO może go nadać np. księgowej, nie oddając
+ * przy tym wglądu w konfigurację całego biura.
+ */
+const PLATNOSCI: Item[] = [{ href: "/app/ustawienia/abonament", label: "Abonament i płatności" }];
+
+export function SettingsNav({
+  isOwner,
+  maAbonament,
+}: {
+  isOwner: boolean;
+  maAbonament: boolean;
+}) {
   const pathname = usePathname();
 
   const link = (item: Item) => {
@@ -57,6 +70,14 @@ export function SettingsNav({ isOwner }: { isOwner: boolean }) {
         Moje konto
       </p>
       {PERSONAL.map(link)}
+      {maAbonament && (
+        <>
+          <p className="mt-5 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Płatności
+          </p>
+          {PLATNOSCI.map(link)}
+        </>
+      )}
       {isOwner && (
         <>
           <p className="hidden px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400 lg:block">

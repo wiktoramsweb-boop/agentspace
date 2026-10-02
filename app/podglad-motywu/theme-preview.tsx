@@ -113,7 +113,7 @@ export function ThemePreview() {
 
   return (
     <div className="app-shell min-h-screen text-slate-900 md:flex">
-      <Sidebar role="owner" fullName="Wiktor Szostek" agencyName="Spectra Nieruchomości" />
+      <Sidebar role="owner" fullName="Anna Kowalska" agencyName="Przykładowe Nieruchomości" />
       <main className="flex-1 px-5 py-8 md:px-10 md:py-10">
         <div className="mx-auto max-w-6xl space-y-8">
           {/* Podgląd nagłówka bez etykiety, do porównania obok wariantu z nią. */}

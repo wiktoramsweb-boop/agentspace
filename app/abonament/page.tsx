@@ -2,8 +2,15 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth";
 import { stanDostepu } from "@/lib/abonament-cennik";
-import { PLANS, planForAgents, liczbaAgentow, zamowienia, opisZamowienia } from "@/lib/data-abonament";
-import { WyborAbonamentu } from "./wybor";
+import {
+  PLANS,
+  SITE_ADDON,
+  liczbaAgentow,
+  opisZamowienia,
+  planForAgents,
+  zamowienia,
+} from "@/lib/data-abonament";
+import { Zakupy } from "../app/ustawienia/abonament/zakupy";
 
 export const metadata: Metadata = {
   title: "Abonament",
@@ -47,12 +54,20 @@ export default async function AbonamentPage() {
           </p>
         </header>
 
-        <WyborAbonamentu
-          plany={PLANS}
-          sugerowany={planForAgents(agentow).id}
-          agentow={agentow}
-          czyCeo={czyCeo}
-        />
+        {czyCeo ? (
+          <Zakupy
+            plany={PLANS}
+            sugerowany={planForAgents(agentow).id}
+            agentow={agentow}
+            stronaMiesiecznie={SITE_ADDON.monthly}
+            wdrozenieStrony={SITE_ADDON.setup}
+          />
+        ) : (
+          <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+            Abonament wykupuje właściciel biura. Przekaż mu, że dostęp wygasł, a wrócicie do pracy
+            z nietkniętymi danymi.
+          </p>
+        )}
 
         {historia.length > 0 && (
           <section className="mt-12">

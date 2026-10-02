@@ -64,7 +64,7 @@ export function PodgladDokumentow() {
       { nazwa: "", ilosc: "" },
     ];
     d.uwagi = ["Rysa na blacie kuchennym przy zlewie, zgłoszona i zaakceptowana przy wydaniu."];
-    return generujProtokolPdf(d, "Agencja Nieruchomości Spectra s.c. · NIP 6772516327 · Kraków");
+    return generujProtokolPdf(d, "Przykładowe Nieruchomości s.c. · NIP 1234567890 · Miasto");
   }
 
   function aneks() {
@@ -84,7 +84,7 @@ export function PodgladDokumentow() {
     return generujAneksPdf(
       d,
       { nazwa: "Przykładowe Nieruchomości s.c.", nip: "1234567890", adres: "00-001 Miasto, ul. Przykładowa 1/2" },
-      "Agencja Nieruchomości Spectra s.c. · NIP 6772516327 · Kraków",
+      "Przykładowe Nieruchomości s.c. · NIP 1234567890 · Miasto",
     );
   }
 
@@ -119,7 +119,7 @@ export function PodgladDokumentow() {
         <button
           type="button"
           onClick={() => pokaz("Raport biura", () =>
-            generujRaportPdf(PRZYKLADOWY_RAPORT, "Agencja Nieruchomości Spectra", "Spectra · raport wygenerowany w AgentSpace"),
+            generujRaportPdf(PRZYKLADOWY_RAPORT, "Przykładowe Nieruchomości", "Przykładowe Nieruchomości · raport wygenerowany w AgentSpace"),
           )}
           className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
         >

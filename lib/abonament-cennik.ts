@@ -128,3 +128,24 @@ export function koniecOkresu(okres: Okres, od: Date = new Date()): Date {
   koniec.setMonth(koniec.getMonth() + o.miesiecy);
   return koniec;
 }
+
+/**
+ * Pakiety dodatkowych kredytów AI.
+ *
+ * Kupowane jednorazowo, nie przepadają z końcem miesiąca. Biuro, które
+ * intensywnie trenuje, dokupuje zamiast upominać się o większą pulę.
+ */
+export type PakietKredytow = { id: string; kredyty: number; cena: number; opis: string };
+
+export const PAKIETY_KREDYTOW: PakietKredytow[] = [
+  { id: "kredyty-500", kredyty: 500, cena: 49, opis: "Około 50 sesji AI Coacha." },
+  { id: "kredyty-1000", kredyty: 1000, cena: 79, opis: "Około 100 sesji. Najczęściej wybierany." },
+  { id: "kredyty-3000", kredyty: 3000, cena: 199, opis: "Dla biura, które trenuje codziennie." },
+];
+
+export function pakietKredytow(id: string): PakietKredytow | undefined {
+  return PAKIETY_KREDYTOW.find((p) => p.id === id);
+}
+
+/** Rodzaje zakupów biura. Jedna lista zamówień, trzy produkty. */
+export type RodzajZakupu = "abonament" | "strona" | "kredyty";

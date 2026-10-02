@@ -38,9 +38,15 @@ create table if not exists public.subscription_orders (
   id uuid primary key default gen_random_uuid(),
   agency_id uuid not null references public.agencies(id) on delete cascade,
   created_by uuid references public.profiles(id) on delete set null,
+  -- abonament | strona | kredyty. Jedna tabela na wszystkie zakupy biura,
+  -- bo i tak rozliczamy je razem i pokazujemy na jednej liście.
+  kind text not null default 'abonament',
+  -- Identyfikator produktu: pakiet abonamentu, dodatek albo pakiet kredytów.
   plan text not null,
   period text not null,
   agents int not null default 1,
+  -- Ile kredytów dodaje zamówienie (tylko kind = 'kredyty').
+  credits int not null default 0,
   -- Kwota netto w groszach, żeby nie liczyć na liczbach zmiennoprzecinkowych.
   amount_grosz int not null,
   -- nowe | oplacone | anulowane

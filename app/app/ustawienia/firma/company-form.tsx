@@ -42,17 +42,17 @@ export function CompanyForm({ company, disabled }: { company: CompanyData; disab
             </label>
             <label>
               <FieldLabel>Ulica i numer</FieldLabel>
-              <input name="street" defaultValue={company.street ?? ""} className={inputCls} placeholder="Zbożowa 2/1" />
+              <input name="street" defaultValue={company.street ?? ""} className={inputCls} placeholder="ul. Przykładowa 1/2" />
             </label>
             <div className="grid grid-cols-[110px_1fr] gap-3">
               <label>
                 <FieldLabel>Kod pocztowy</FieldLabel>
                 <input name="postal_code" defaultValue={company.postal_code ?? ""} className={inputCls}
-                  placeholder="30-002" inputMode="numeric" pattern="\d{2}-?\d{3}" title="Format 00-000" />
+                  placeholder="00-001" inputMode="numeric" pattern="\d{2}-?\d{3}" title="Format 00-000" />
               </label>
               <label>
                 <FieldLabel>Miasto</FieldLabel>
-                <input name="city" defaultValue={company.city ?? ""} className={inputCls} placeholder="Kraków" />
+                <input name="city" defaultValue={company.city ?? ""} className={inputCls} placeholder="Miasto" />
               </label>
             </div>
             <label>
@@ -75,7 +75,7 @@ export function CompanyForm({ company, disabled }: { company: CompanyData; disab
             <label>
               <FieldLabel required>Telefon</FieldLabel>
               <input name="phone" required type="tel" defaultValue={company.phone ?? ""} className={inputCls}
-                placeholder="790 408 034" />
+                placeholder="+48 600 000 000" />
             </label>
             <label>
               <FieldLabel required>E-mail biura</FieldLabel>
@@ -85,7 +85,7 @@ export function CompanyForm({ company, disabled }: { company: CompanyData; disab
             <label>
               <FieldLabel required>NIP</FieldLabel>
               <input name="nip" required defaultValue={company.nip ?? ""} className={inputCls}
-                placeholder="6772516327" inputMode="numeric" />
+                placeholder="1234567890" inputMode="numeric" />
             </label>
             <label>
               <FieldLabel>WWW</FieldLabel>

@@ -12,7 +12,8 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
  */
 export const SITE_ADDON = {
   monthly: 199,
-  yearly: 1990,
+  // 20% taniej niz 12 x cena miesieczna, czyli ten sam rabat co przy abonamencie.
+  yearly: 1910,
   setup: 990,
   /** Ile stron ofert wchodzi w cenę bez dopłat. */
   offersLimit: "bez limitu ofert",

@@ -262,7 +262,7 @@ export function PropertyWizard({
               name="headline"
               value={p?.headline}
               maxLength={70}
-              placeholder="2 pokoje 47 m² | Kraków Czyżyny | Od zaraz"
+              placeholder="2 pokoje 47 m² | miasto, dzielnica | Od zaraz"
               hint="Maksymalnie 70 znaków - tyle przyjmują portale. To zdanie klient zobaczy jako pierwsze."
             />
             <OpisPola

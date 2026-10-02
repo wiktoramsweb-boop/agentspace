@@ -73,7 +73,7 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
             />
           </div>
           <Pole label="Data spisania" type="date" value={d.date} onChange={(v) => set("date", v)} />
-          <Pole label="Miejscowość" value={d.city} onChange={(v) => set("city", v)} placeholder="Kraków" />
+          <Pole label="Miejscowość" value={d.city} onChange={(v) => set("city", v)} placeholder="Miejscowość" />
           <Pole
             label="Adres lokalu"
             value={d.lokalAdres}
