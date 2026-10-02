@@ -31,7 +31,7 @@ z wybranego wzoru. Klient edytuje wszystko w `/app/ustawienia/strona`. Wymaga mi
 
 ## Struktura projektu
 
-- **Landing / marketing** (`/`, `/blog`, `/cennik`, `/o-nas`, `/kontakt`, `/demo`, `/dla-agentow`, `/dla-wlascicieli`, `/polityka-prywatnosci`, `/regulamin`) - gotowe, live.
+- **Landing / marketing** (`/`, `/blog`, `/cennik`, `/produkt/[slug]` - 16 podstron narzędzi generowanych z `lib/marketing/modules.ts`; siatka na stronie głównej i pasek pod nagłówkiem biorą dane z tego samego katalogu, więc nowe narzędzie dopisuje się w jednym miejscu, `/o-nas`, `/kontakt`, `/demo`, `/dla-agentow`, `/dla-wlascicieli`, `/polityka-prywatnosci`, `/regulamin`) - gotowe, live.
 - **Aplikacja** (`/app/*`) - produkt SaaS, chroniony auth. Zbudowane:
   - Auth: `/login`, `/signup` (owner zakłada biuro), `/zaproszenie/[token]` (agent dołącza). Server actions w `app/auth/actions.ts`.
   - `/app` - pulpit (role-aware), `/app/trening` - AI Coach (5 scenariuszy), `/app/sesja/[id]` - sesja + wyniki, `/app/historia`, `/app/zespol` (owner: ranking + zaproszenia), `/app/ustawienia`.

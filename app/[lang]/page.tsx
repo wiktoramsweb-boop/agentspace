@@ -15,6 +15,7 @@ import {
 } from "@/app/components/mockups/light-shots";
 import { CoachLive } from "@/app/components/mk/coach-live";
 import { WZORY } from "@/lib/wzory/themes";
+import { listModules } from "@/lib/marketing/modules";
 import { SiteFooter } from "@/app/components/site-footer";
 import { AuroraBackground } from "@/app/components/aurora-background";
 import { Spotlight } from "@/app/components/effects/spotlight";
@@ -65,6 +66,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const d = getDict(locale);
   const t = d.home;
   const href = (path: string) => localeHref(locale, path);
+  const modulyProduktu = listModules(locale);
   const STEPS = t.steps.items.map((step, i) => ({ ...step, photo: STEP_PHOTOS[i] }));
   const SHOTS = shots(locale);
 
@@ -148,7 +150,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       </section>
 
       <div className="py-6">
-        <MkMarquee items={t.marquee} />
+        <MkMarquee items={modulyProduktu.map((m) => m.name)} />
       </div>
 
       {/* ── WARTOŚCI ── */}
@@ -191,13 +193,13 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         />
 
         <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {t.modules.items.map((mod, i) => (
+          {modulyProduktu.map((mod, i) => (
             <StaggerItem key={mod.name} className={i === 0 ? "lg:col-span-2" : ""}>
               <SpotlightCard href={href(`/produkt/${mod.slug}`)} className="p-8">
                 <div className="flex h-full flex-col">
                   <h4 className="mb-3">{mod.name}</h4>
                   <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                    {mod.body}
+                    {mod.lead}
                   </p>
                   <p className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-mk-accent)]">
                     {d.common.seeModule}

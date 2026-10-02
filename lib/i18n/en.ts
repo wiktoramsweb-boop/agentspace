@@ -91,7 +91,6 @@ export const en: Dict = {
         { value: 30, suffix: " days", label: "to your first conclusions from data" },
       ],
     },
-    marquee: ["Clients", "Listings", "Goals", "Commissions", "Calendar", "Documents", "AI Coach", "Website"],
     values: {
       eyebrow: "Why an agency needs this",
       title: { a: "Three things that change ", b: "in the first month" },

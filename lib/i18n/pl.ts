@@ -92,7 +92,6 @@ export const pl = {
         { value: 30, suffix: " dni", label: "do pierwszych wniosków z danych" },
       ],
     },
-    marquee: ["Klienci", "Nieruchomości", "Cele", "Prowizje", "Kalendarz", "Dokumenty", "AI Coach", "Strona www"],
     values: {
       eyebrow: "Po co to biuru",
       title: { a: "Trzy rzeczy, które zmieniają się ", b: "od pierwszego miesiąca" },
