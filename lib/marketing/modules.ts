@@ -24,6 +24,8 @@ export type ProductModule = {
   forWhom: string;
   /** Makieta ekranu aplikacji pokazywana na stronie modułu. */
   shot: string;
+  /** Zdjęcie przy sekcji „Dlaczego to boli”, żeby długi tekst miał oddech. */
+  photo: string;
   /** Pytania, które padają przy tym module. */
   faq: { q: string; a: string }[];
 };
@@ -59,6 +61,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów jako codzienne miejsce pracy, dla właściciela jako gwarancja, że baza biura zostaje w biurze.",
+    photo: "/wzory/lounge.jpg",
     shot: "ShotKlient",
     faq: [
       {
@@ -105,6 +108,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agenta: jasność, co dziś robić. Dla właściciela: wczesny sygnał, że ktoś zaczyna odpadać.",
+    photo: "/wzory/wieza.jpg",
     shot: "ShotCele",
     faq: [
       {
@@ -151,6 +155,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela: kontrola nad rozliczeniami. Dla agenta: pewność, że prowizja jest policzona uczciwie.",
+    photo: "/wzory/szklo.jpg",
     shot: "ShotProwizje",
     faq: [
       {
@@ -197,6 +202,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla nowych agentów jako onboarding, dla doświadczonych jako rozgrzewka przed trudną rozmową.",
+    photo: "/wzory/lobby.jpg",
     shot: "AiCoach",
     faq: [
       {
@@ -243,6 +249,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela i menedżerów zespołów. Agenci nie widzą cudzych danych.",
+    photo: "/wzory/miasto-noc.jpg",
     shot: "ShotPanel",
     faq: [
       {
@@ -285,6 +292,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla całego zespołu: im większe biuro, tym więcej transakcji wewnętrznych ta baza generuje.",
+    photo: "/wzory/kamienica.jpg",
     shot: "ShotOferty",
     faq: [
       {
@@ -331,6 +339,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur, które wydają na reklamę. Pokazuje, która kampania przynosi transakcje, a nie tylko kliknięcia.",
+    photo: "/wzory/widok.jpg",
     shot: "ShotLeady",
     faq: [
       {
@@ -377,6 +386,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów w terenie i dla menedżerów, którzy chcą widzieć pracę zespołu bez proszenia o raporty.",
+    photo: "/wzory/schody.jpg",
     shot: "ShotKalendarz",
     faq: [
       {
@@ -423,6 +433,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur z kilkoma agentami, w których oferty i kupujący dotąd nie spotykali się na czas.",
+    photo: "/wzory/salon-widok.jpg",
     shot: "ShotPoszukiwania",
     faq: [
       {
@@ -469,6 +480,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów i asystentek biura, które dziś przepisują te same dokumenty ręcznie.",
+    photo: "/wzory/cegla.jpg",
     shot: "ShotDokumenty",
     faq: [
       {
@@ -511,6 +523,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów, którzy wysyłają oferty mailem i chcą, żeby wyglądały poważnie.",
+    photo: "/wzory/salon.jpg",
     shot: "ShotOfertowka",
     faq: [
       {
@@ -553,6 +566,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów przy stole z klientem i dla biur współpracujących z doradcami kredytowymi.",
+    photo: "/wzory/kuchnia.jpg",
     shot: "ShotKalkulatory",
     faq: [
       {
@@ -595,6 +609,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela i księgowości. Dostęp do tego modułu nadaje się osobno, bez wglądu w bazę klientów.",
+    photo: "/wzory/loft.jpg",
     shot: "ShotFaktury",
     faq: [
       {
@@ -641,6 +656,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela biura i dyrektora. Menedżer widzi pracę swojego zespołu, bez kwot cudzych prowizji.",
+    photo: "/wzory/hala.jpg",
     shot: "ShotPanel",
     faq: [
       {
@@ -687,6 +703,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur z rozbudowaną strukturą i dla tych, które zatrudniają księgowość albo asystentkę na część etatu.",
+    photo: "/wzory/dziedziniec.jpg",
     shot: "ShotRole",
     faq: [
       {
@@ -729,6 +746,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur bez strony i dla tych, których strona żyje osobno od bazy ofert. Osobna usługa, poza abonamentem za system.",
+    photo: "/wzory/taras.jpg",
     shot: "ShotOferty",
     faq: [
       {
@@ -758,7 +776,7 @@ export function getModule(slug: string, lang: string = "pl"): ProductModule | un
 
   const translated = MODULES_EN[slug];
   // Makieta ekranu jest wspólna dla obu języków, więc bierzemy ją z bazy.
-  return translated ? { slug, shot: base.shot, ...translated } : base;
+  return translated ? { slug, shot: base.shot, photo: base.photo, ...translated } : base;
 }
 
 /** Lista modułów w danym języku - do list i map strony. */

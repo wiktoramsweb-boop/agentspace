@@ -6,7 +6,7 @@ import type { ProductModule } from "./modules";
  * Keyed by the same slug as the Polish version, so the URL and the routing
  * stay identical and only the text changes.
  */
-export const MODULES_EN: Record<string, Omit<ProductModule, "slug" | "shot">> = {
+export const MODULES_EN: Record<string, Omit<ProductModule, "slug" | "shot" | "photo">> = {
   crm: {
     name: "Client CRM",
     headline: "A client database that stays with the agency",

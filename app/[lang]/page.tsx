@@ -1,5 +1,6 @@
 import { FadeIn, StaggerContainer, StaggerItem } from "@/app/components/fade-in";
 import Link from "next/link";
+import Image from "next/image";
 import { SiteNav } from "@/app/components/site-nav";
 import { BrowserShot, MkMarquee, PhotoTile, ShotTabs, TemplateTile } from "@/app/components/mk/showcase";
 import { Beams, RevealWords, SpotlightCard, StickySteps, Ticker, TiltPhoto } from "@/app/components/mk/motion-bits";
@@ -120,7 +121,11 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
             <FadeIn delay={0.4} className="mt-10">
               <div className="grid max-w-lg grid-cols-3 gap-0">
-                {t.hero.facts.map((fact, i) => (
+                {t.hero.facts
+                  .map((fact, i) =>
+                    i === 0 ? { ...fact, value: modulyProduktu.length } : fact,
+                  )
+                  .map((fact, i) => (
                   <div key={fact.label} className={`pr-5 ${i > 0 ? "border-l border-[var(--mk-hairline)] pl-5" : ""}`}>
                     <p className="mb-1 text-3xl font-semibold md:text-4xl">
                       <span className="grad">
@@ -197,11 +202,26 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             <StaggerItem key={mod.name} className={i === 0 ? "lg:col-span-2" : ""}>
               <SpotlightCard
                 href={href(mod.slug === "strona-www" ? "/wzory" : `/produkt/${mod.slug}`)}
-                className="p-8"
+                className="overflow-hidden p-0"
               >
-                <div className="flex h-full flex-col">
+                {/* Zdjęcie na kafelku: siatka samych akapitów wygląda na pustą
+                    i nie daje powodu, żeby w którykolwiek moduł wejść. */}
+                <div
+                  className={`relative overflow-hidden border-b border-[var(--mk-hairline)] ${
+                    i === 0 ? "h-56" : "h-44"
+                  }`}
+                >
+                  <Image
+                    src={mod.photo}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-700 group-hover/card:scale-105"
+                  />
+                </div>
+                <div className="flex h-full flex-col p-8">
                   <h4 className="mb-3">{mod.name}</h4>
-                  <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                  <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-text)] opacity-85">
                     {mod.lead}
                   </p>
                   <p className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-mk-accent)]">

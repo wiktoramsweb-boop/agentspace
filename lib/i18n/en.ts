@@ -111,7 +111,7 @@ export const en: Dict = {
     },
     modules: {
       eyebrow: "Modules",
-      title: { a: "Six modules, ", b: "one system" },
+      title: { a: "Every tool the agency needs, ", b: "one system" },
       lead: "You do not have to roll out everything at once. Most agencies start with the CRM and goals, then switch on the rest over the following weeks.",
       items: [
         {
@@ -582,7 +582,7 @@ export const en: Dict = {
         description:
           "AgentSpace is not another generic real estate SaaS with a new coat of paint. It is built in Kraków by somebody who runs a real estate agency day to day and knows exactly what hurts.",
         photoAlt: "The gateway of the building housing the Spectra Nieruchomości office in Kraków",
-        photoCaption: "Kraków, Zabłocie. This is where AgentSpace is built",
+        photoCaption: "Kraków, Krowodrza. This is where AgentSpace is built",
       },
       founderLabel: "Founder",
       founderName: "Wiktor Szostek",

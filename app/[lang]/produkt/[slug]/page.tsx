@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
@@ -73,11 +74,22 @@ export default async function ProduktPage({
 
       {/* Problem */}
       <Section>
-        <div className="mx-auto max-w-3xl">
-          <SectionHead align="left" eyebrow={t.problemEyebrow} title={t.problemTitle} />
-          <p className="mt-8 text-lg leading-relaxed text-[var(--color-mk-muted)]">
-            {mod.problem}
-          </p>
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-16">
+          <div>
+            <SectionHead align="left" eyebrow={t.problemEyebrow} title={t.problemTitle} />
+            <p className="mt-8 text-lg leading-relaxed text-[var(--color-mk-text)]">
+              {mod.problem}
+            </p>
+          </div>
+          <figure className="relative m-0 aspect-[4/3] overflow-hidden rounded-[24px] border border-[var(--mk-hairline)]">
+            <Image
+              src={mod.photo}
+              alt=""
+              fill
+              sizes="(max-width: 1024px) 100vw, 44vw"
+              className="object-cover"
+            />
+          </figure>
         </div>
       </Section>
 
@@ -169,10 +181,10 @@ export default async function ProduktPage({
                   </div>
                 </div>
                 <div className="p-6">
-                  <p className="mb-2 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
+                  <p className="mb-2 text-[1.1875rem] font-semibold tracking-tight text-[var(--color-mk-text)]">
                     {other.name}
                   </p>
-                  <p className="text-sm leading-snug text-[var(--color-mk-muted)]">
+                  <p className="text-[0.9375rem] leading-snug text-[var(--color-mk-text)] opacity-80">
                     {other.headline}
                   </p>
                 </div>

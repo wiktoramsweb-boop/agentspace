@@ -112,7 +112,7 @@ export const pl = {
     },
     modules: {
       eyebrow: "Moduły",
-      title: { a: "Sześć modułów, ", b: "jeden system" },
+      title: { a: "Wszystkie narzędzia biura, ", b: "jeden system" },
       lead: "Nie musisz wdrażać wszystkiego naraz. Większość biur zaczyna od CRM i celów, resztę włącza w kolejnych tygodniach.",
       items: [
         {
@@ -583,7 +583,7 @@ export const pl = {
         description:
           "AgentSpace nie jest kolejnym SaaS-em „dla nieruchomości” tłumaczonym z angielskiego. Jest budowany w Krakowie, dla biur w Polsce, przez kogoś kto na co dzień prowadzi biuro nieruchomości i wie, co konkretnie boli.",
         photoAlt: "Brama budynku, w którym mieści się biuro Spectra Nieruchomości w Krakowie",
-        photoCaption: "Kraków, Zabłocie. Tutaj powstaje AgentSpace",
+        photoCaption: "Kraków, Krowodrza. Tutaj powstaje AgentSpace",
       },
       founderLabel: "Founder",
       founderName: "Wiktor Szostek",
