@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BorderBeam } from "../effects/border-beam";
 import { Button, Card, Tick } from "./ui";
 import { PLANS, planForAgents } from "@/lib/marketing/plans";
+import { OKRESY, cenaOkresu, cenaZaMiesiac, type Okres } from "@/lib/abonament-cennik";
 import { getDict, toLocale } from "@/lib/i18n";
 
 /**
@@ -19,6 +20,16 @@ export function Pricing({ lang = "pl" }: { lang?: string }) {
   const dict = getDict(locale);
   const t = dict.pricingWidget;
   const [agents, setAgents] = useState(6);
+  // Rabat za dłuższy okres był wcześniej tylko w przypisie pod cennikiem.
+  // Właściciel biura podejmuje decyzję na podstawie kwoty, którą widzi, więc
+  // przełącznik przelicza ceny wszystkich pakietów na żywo.
+  const [okres, setOkres] = useState<Okres>("monthly");
+  // Oszczędność liczymy zawsze w skali roku, żeby pół roku i rok dało się
+  // porównać jedną liczbą. Dwanaście miesięcy w wybranym okresie kontra
+  // dwanaście miesięcy płaconych co miesiąc.
+  const miesiecyWOkresie = okres === "yearly" ? 12 : 6;
+  const oszczednoscRoczna = (cena: number) =>
+    cena * 12 - cenaOkresu(cena, okres) * (12 / miesiecyWOkresie);
   const recommended = planForAgents(agents);
   // Nazwy i listy funkcji biorą się ze słownika, ceny i limity z lib/marketing/plans.
   const copyFor = (id: string) => t.plans.find((plan) => plan.id === id) ?? t.plans[0];
@@ -63,6 +74,34 @@ export function Pricing({ lang = "pl" }: { lang?: string }) {
             />
           </svg>
         </button>
+      </div>
+
+      {/* Okres rozliczenia */}
+      <p className="mb-4 text-[0.9375rem] text-[var(--color-mk-muted)]">{t.billing.question}</p>
+      <div className="mb-12 inline-flex flex-wrap justify-center gap-1 rounded-full border border-[var(--mk-hairline-strong)] bg-[var(--mk-surface-2)] p-1 backdrop-blur-sm">
+        {OKRESY.map((o) => {
+          const aktywny = o.id === okres;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => setOkres(o.id)}
+              aria-pressed={aktywny}
+              className={`rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
+                aktywny
+                  ? "bg-gradient-to-r from-emerald-400 to-cyan-400 text-[var(--mk-on-accent)]"
+                  : "text-[var(--color-mk-muted)] hover:text-[var(--color-mk-text)]"
+              }`}
+            >
+              {t.billing[o.id]}
+              {o.rabat > 0 && (
+                <span className={`ml-2 text-xs ${aktywny ? "opacity-80" : "text-[var(--color-mk-accent)]"}`}>
+                  -{Math.round(o.rabat * 100)}%
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Pakiety */}
@@ -116,10 +155,27 @@ export function Pricing({ lang = "pl" }: { lang?: string }) {
                       isRecommended ? "grad" : "text-[var(--color-mk-text)]"
                     }`}
                   >
-                    {plan.price}
+                    {cenaZaMiesiac(plan.price, okres)}
                   </span>
                   <span className="text-lg text-[var(--color-mk-muted)]">{dict.common.priceSuffix}</span>
                 </p>
+                {okres !== "monthly" && (
+                  <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[0.8125rem]">
+                    <span className="text-[var(--color-mk-muted)] line-through">
+                      {plan.price} {dict.common.priceSuffix}
+                    </span>
+                    <span className="text-[var(--mk-accent-text)]">
+                      {t.billing.save.replace("{kwota}", String(oszczednoscRoczna(plan.price)))}
+                    </span>
+                  </p>
+                )}
+                {okres !== "monthly" && (
+                  <p className="mt-1 text-[0.8125rem] text-[var(--color-mk-muted)]">
+                    {t.billing.upfront
+                      .replace("{kwota}", String(cenaOkresu(plan.price, okres)))
+                      .replace("{miesiecy}", String(miesiecyWOkresie))}
+                  </p>
+                )}
               </div>
 
               <ul className="relative flex flex-1 flex-col gap-3">

@@ -896,6 +896,16 @@ export const pl = {
   },
 
   pricingWidget: {
+    billing: {
+      question: "Jak chcesz płacić?",
+      monthly: "Miesięcznie",
+      half_year: "Co pół roku",
+      yearly: "Co rok",
+      cheaper: "taniej",
+      perMonth: "zł / mc",
+      upfront: "Płatne z góry: {kwota} zł za {miesiecy} mies.",
+      save: "Oszczędzasz {kwota} zł rocznie",
+    },
     question: "Ilu agentów pracuje w Twoim biurze?",
     less: "Mniej agentów",
     more: "Więcej agentów",

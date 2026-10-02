@@ -896,6 +896,16 @@ export const en: Dict = {
   },
 
   pricingWidget: {
+    billing: {
+      question: "How would you like to pay?",
+      monthly: "Monthly",
+      half_year: "Every six months",
+      yearly: "Yearly",
+      cheaper: "cheaper",
+      perMonth: "PLN / mo",
+      upfront: "Paid upfront: {kwota} PLN for {miesiecy} months",
+      save: "You save {kwota} PLN a year",
+    },
     question: "How many agents work in your agency?",
     less: "Fewer agents",
     more: "More agents",
