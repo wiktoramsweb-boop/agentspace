@@ -386,7 +386,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów w terenie i dla menedżerów, którzy chcą widzieć pracę zespołu bez proszenia o raporty.",
-    photo: "/wzory/schody.jpg",
+    photo: "/zdjecia/plan-dnia.jpg",
     shot: "ShotKalendarz",
     faq: [
       {
@@ -703,7 +703,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur z rozbudowaną strukturą i dla tych, które zatrudniają księgowość albo asystentkę na część etatu.",
-    photo: "/wzory/dziedziniec.jpg",
+    photo: "/zdjecia/zespol.jpg",
     shot: "ShotRole",
     faq: [
       {
