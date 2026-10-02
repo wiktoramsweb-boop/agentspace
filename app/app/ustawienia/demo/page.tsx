@@ -17,11 +17,14 @@ async function stan(agencyId: string) {
     .eq("id", agencyId)
     .maybeSingle();
 
-  const [osoby, oferty, klienci, dzialania] = await Promise.all([
+  const [osoby, oferty, klienci, dzialania, leady, poszukiwania, faktury] = await Promise.all([
     licz("profiles"),
     licz("properties"),
     licz("clients"),
     licz("activities"),
+    licz("leads"),
+    licz("searches"),
+    licz("invoices"),
   ]);
 
   return {
@@ -31,6 +34,9 @@ async function stan(agencyId: string) {
     oferty,
     klienci,
     dzialania,
+    leady,
+    poszukiwania,
+    faktury,
   };
 }
 
@@ -38,13 +44,23 @@ export default async function DemoPage() {
   const user = await requireOwner();
   const s = user.agency_id
     ? await stan(user.agency_id)
-    : { jestDemo: false, odswiezone: null, osoby: 0, oferty: 0, klienci: 0, dzialania: 0 };
+    : {
+        jestDemo: false,
+        odswiezone: null,
+        osoby: 0,
+        oferty: 0,
+        klienci: 0,
+        dzialania: 0,
+        leady: 0,
+        poszukiwania: 0,
+        faktury: 0,
+      };
 
   return (
     <>
       <PageHeader
         title="Konto demo"
-        subtitle="Dane do pokazów u klienta. Odświeżają się same, żeby kalendarz nigdy nie był pusty."
+        subtitle="Dane do pokazów u klienta: klienci, oferty, transakcje, działania, leady, poszukiwania i faktury, plus dane firmy. Odświeżają się same, żeby kalendarz nigdy nie był pusty."
       />
 
       {!s.jestDemo && (
@@ -64,6 +80,9 @@ export default async function DemoPage() {
           ["Oferty", s.oferty],
           ["Klienci", s.klienci],
           ["Działania", s.dzialania],
+          ["Leady", s.leady],
+          ["Poszukiwania", s.poszukiwania],
+          ["Faktury", s.faktury],
         ].map(([label, value]) => (
           <Card key={String(label)}>
             <p className="text-xs uppercase tracking-wider text-slate-400">{label}</p>

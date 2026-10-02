@@ -54,6 +54,7 @@ function defaultOptions(agencyName: string | null | undefined): AgencyOptions {
     match_price_plus: 10,
     match_area_minus: 10,
     match_area_plus: 10,
+    onboarding_skipped: false,
   };
 }
 
@@ -134,6 +135,7 @@ export async function getAgencySettings(
       match_price_plus: num(op.match_price_plus, 10, 0, 100),
       match_area_minus: num(op.match_area_minus, 10, 0, 100),
       match_area_plus: num(op.match_area_plus, 10, 0, 100),
+      onboarding_skipped: Boolean(op.onboarding_skipped),
     },
   };
 }

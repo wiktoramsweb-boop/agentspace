@@ -61,7 +61,6 @@ export const SECTIONS: NavSection[] = [
     title: "Główne",
     items: [
       { href: "/app", label: "Pulpit", icon: <HomeIcon />, color: "emerald" },
-      { href: "/app/start", label: "Jak zacząć", icon: <CompassIcon />, color: "teal" },
       { href: "/app/dzialania", label: "Działania", icon: <BoltIcon />, color: "amber" },
       { href: "/app/kalendarz", label: "Kalendarz", icon: <CalendarNavIcon />, color: "sky", modul: "klienci" },
       { href: "/app/szybki-wpis", label: "Szybki wpis", icon: <VoiceIcon />, color: "teal", modul: "klienci" },

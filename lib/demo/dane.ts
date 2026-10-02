@@ -348,3 +348,134 @@ export function generujDziennik(los: Los, agencyId: string, agenci: string[], no
   }
   return out;
 }
+
+/* ── leady ────────────────────────────────────────────────── */
+
+const KAMPANIE = [
+  { campaign: "Mieszkania 2 pokoje", ad: "Karuzela, zdjęcia wnętrz", form: "Zostaw numer" },
+  { campaign: "Sprzedaj mieszkanie", ad: "Wideo, opinia klienta", form: "Bezpłatna wycena" },
+  { campaign: "Domy pod miastem", ad: "Zdjęcie ogrodu", form: "Umów oglądanie" },
+  { campaign: "Najem długoterminowy", ad: "Reels, spacer po mieszkaniu", form: "Zapytaj o ofertę" },
+];
+
+const WIADOMOSCI_LEADA = [
+  "Proszę o kontakt po 16, jestem w pracy.",
+  "Szukam czegoś do 600 tysięcy, najlepiej z balkonem.",
+  "Chcę sprzedać mieszkanie po babci, nie wiem od czego zacząć.",
+  "Interesuje mnie wynajem od września.",
+  "Czy ta oferta jest jeszcze aktualna?",
+];
+
+/**
+ * Leady z Meta Ads i z formularza na stronie.
+ *
+ * Część zostaje bez opiekuna (pula biura), żeby na pokazie było widać,
+ * po co jest przycisk przypisania agenta.
+ */
+export function generujLeady(los: Los, agencyId: string, agenci: string[], now: Date, ile = 18) {
+  const out: Record<string, unknown>[] = [];
+  for (let i = 0; i < ile; i++) {
+    const k = los.pick(KAMPANIE);
+    const zMety = los.rnd() < 0.7;
+    const telefon = `6${los.int(10, 99)}${los.int(100, 999)}${los.int(100, 999)}`;
+    const wPuli = los.rnd() < 0.3;
+    out.push({
+      agency_id: agencyId,
+      agent_id: wPuli ? null : los.pick(agenci),
+      name: `${los.pick(IMIONA)} ${los.pick(NAZWISKA)}`,
+      phone: `+48 ${telefon.slice(0, 3)} ${telefon.slice(3, 6)} ${telefon.slice(6)}`,
+      phone_digits: telefon,
+      email: `lead${i}@przyklad.pl`,
+      city: los.pick(DZIELNICE).nazwa,
+      message: los.pick(WIADOMOSCI_LEADA),
+      source: zMety ? "meta" : "strona",
+      campaign: zMety ? k.campaign : null,
+      ad_name: zMety ? k.ad : null,
+      form_name: zMety ? k.form : null,
+      platform: zMety ? los.pick(["facebook", "instagram"]) : null,
+      submitted_at: przesun(now, -los.int(0, 21), los.int(8, 19)).toISOString(),
+      status: wPuli ? "nowy" : los.pick(["nowy", "w_kontakcie", "w_kontakcie", "umowione", "odrzucony"]),
+      notes: null,
+    });
+  }
+  return out;
+}
+
+/* ── poszukiwania ─────────────────────────────────────────── */
+
+/**
+ * Zlecenia poszukiwania od kupujących. Dopasowania liczy sama aplikacja,
+ * więc wystarczy, że kryteria trafiają w istniejące oferty.
+ */
+export function generujPoszukiwania(
+  los: Los,
+  agencyId: string,
+  agenci: string[],
+  klienci: { id: string }[],
+  ile = 9,
+) {
+  const out: Record<string, unknown>[] = [];
+  for (let i = 0; i < ile; i++) {
+    const d = los.pick(DZIELNICE);
+    const najem = los.rnd() < 0.25;
+    const budzet = najem ? los.int(25, 60) * 100 : los.int(45, 120) * 10000;
+    out.push({
+      agency_id: agencyId,
+      agent_id: los.pick(agenci),
+      client_id: klienci[i % Math.max(1, klienci.length)]?.id ?? null,
+      search_no: `P/${String(i + 1).padStart(3, "0")}`,
+      title: `${najem ? "Najem" : "Kupno"}: ${los.int(2, 4)} pokoje, ${d.nazwa}`,
+      deal_kind: najem ? "wynajem" : "sprzedaz",
+      property_types: ["mieszkanie"],
+      price_min: Math.round(budzet * 0.8),
+      price_max: budzet,
+      area_min: los.int(35, 50),
+      area_max: los.int(60, 95),
+      rooms_min: los.int(2, 3),
+      rooms_max: los.int(3, 5),
+      locations: [d.nazwa],
+      status: los.pick(["aktualne", "aktualne", "aktualne", "wstrzymane"]),
+      notes: los.pick(NOTATKI),
+    });
+  }
+  return out;
+}
+
+/* ── faktury ──────────────────────────────────────────────── */
+
+/** Faktury za pośrednictwo, wystawione do zamkniętych transakcji. */
+export function generujFaktury(
+  los: Los,
+  agencyId: string,
+  autor: string,
+  transakcje: { commission_pln: number; title: string }[],
+  now: Date,
+  ile = 6,
+) {
+  const out: Record<string, unknown>[] = [];
+  for (let i = 0; i < Math.min(ile, transakcje.length); i++) {
+    const t = transakcje[i];
+    const wystawiona = przesun(now, -los.int(5, 70));
+    const data = (d: Date) => d.toISOString().slice(0, 10);
+    out.push({
+      agency_id: agencyId,
+      created_by: autor,
+      number: `${i + 1}/${wystawiona.getUTCMonth() + 1}/${wystawiona.getUTCFullYear()}`,
+      seller_key: "firma",
+      buyer_name: `${los.pick(IMIONA)} ${los.pick(NAZWISKA)}`,
+      buyer_address: `ul. ${los.pick(["Polna", "Ogrodowa", "Lipowa", "Słoneczna"])} ${los.int(1, 60)}`,
+      buyer_city: los.pick(DZIELNICE).nazwa,
+      buyer_postcode: `${los.int(10, 89)}-${los.int(100, 999)}`,
+      place: "",
+      issue_date: data(wystawiona),
+      sale_date: data(wystawiona),
+      payment_date: data(przesun(wystawiona, 14)),
+      payment_method: "Przelew",
+      items: [{ name: "Pośrednictwo w obrocie nieruchomościami", qty: 1, unitPrice: t.commission_pln }],
+      total_pln: t.commission_pln,
+      paid_pln: los.rnd() < 0.7 ? t.commission_pln : 0,
+      description: t.title.replace("[DEMO] ", ""),
+    });
+  }
+  return out;
+}

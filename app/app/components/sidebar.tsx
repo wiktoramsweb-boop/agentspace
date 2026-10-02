@@ -16,12 +16,15 @@ const COLLAPSE_KEY = "as_nav_collapsed";
 export function Sidebar({
   role,
   permissions,
+  przewodnik,
   fullName,
   agencyName,
   avatarUrl,
 }: {
   role: UserRole;
   permissions?: Uprawnienia | null;
+  /** Postęp przewodnika. Podany tylko, póki nie jest domknięty. */
+  przewodnik?: { zrobione: number; wszystkich: number } | null;
   fullName: string;
   agencyName: string;
   avatarUrl?: string | null;
@@ -59,6 +62,21 @@ export function Sidebar({
   const nav = (
     <nav className="sidebar-nav flex min-h-0 flex-1 flex-col overflow-y-auto">
       <GlobalSearch />
+      {/* Przewodnik nie jest stałą pozycją menu: znika, gdy biuro jest
+          ustawione, bo po roku pracy „Jak zacząć” tylko zajmuje miejsce. */}
+      {przewodnik && (
+        <Link
+          href="/app/start"
+          className={`mx-2 mb-3 flex items-center justify-between gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2.5 text-sm transition hover:bg-emerald-500/20 ${
+            isActive("/app/start") ? "ring-1 ring-emerald-400" : ""
+          }`}
+        >
+          <span className="font-medium text-emerald-300">Jak zacząć</span>
+          <span className="shrink-0 rounded-full bg-emerald-500/25 px-2 py-0.5 text-xs tabular-nums text-emerald-200">
+            {przewodnik.zrobione}/{przewodnik.wszystkich}
+          </span>
+        </Link>
+      )}
       <div className="flex flex-col gap-4 pb-2">
       {SECTIONS.map((section) => {
         const items = section.items.filter((i) => !i.modul || maModul({ id: "", role, permissions }, i.modul));

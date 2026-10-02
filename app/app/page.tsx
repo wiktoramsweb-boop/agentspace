@@ -25,13 +25,28 @@ import { TodayActivities } from "./components/today-activities";
 import { getActivities } from "@/lib/data-activities";
 import { GameStrip, BadgesCard } from "./components/game-strip";
 import { BanerPrzewodnika } from "./components/baner-przewodnika";
+import { redirect } from "next/navigation";
 import { getPrzewodnik } from "@/lib/data-przewodnik";
+import { getAgencySettings } from "@/lib/agency-settings";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   const firstName = (user.full_name ?? "").split(" ")[0] || "Cześć";
 
   const przewodnik = await getPrzewodnik(user);
+
+  // Zupełnie puste biuro kierujemy prosto do przewodnika. Nowa osoba widzi
+  // inaczej pusty pulpit i nie wie, od czego zacząć. Po zrobieniu czegokolwiek
+  // albo po pominięciu przewodnika zostaje już na pulpicie.
+  const { options } = await getAgencySettings(user.agency_id, user.agency?.name);
+  if (
+    !przewodnik.ukonczony &&
+    przewodnik.zrobione === 0 &&
+    !options.onboarding_skipped &&
+    !user.agency?.is_demo
+  ) {
+    redirect("/app/start");
+  }
   const [stats, recent, tasks, reminders, needContact, commission, goalRow] =
     await Promise.all([
       getAgentStats(user.id),

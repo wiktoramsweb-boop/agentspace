@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createSupabaseAdmin } from "./supabase/admin";
 import { getAgencySettings } from "./agency-settings";
 import { maModul, type Modul } from "./role";
@@ -49,7 +50,14 @@ async function ile(tabela: string, agencyId: string): Promise<number> {
   return error ? 0 : (count ?? 0);
 }
 
-export async function getPrzewodnik(user: ProfileWithAgency): Promise<Przewodnik> {
+/**
+ * Przewodnik liczy kilkanaście zapytań, a w jednym renderze pyta o niego
+ * i layout (menu), i pulpit (baner). Cache per żądanie robi z tego jedno
+ * zapytanie zamiast dwóch kompletów.
+ */
+export const getPrzewodnik = cache(async function getPrzewodnik(
+  user: ProfileWithAgency,
+): Promise<Przewodnik> {
   const agencyId = user.agency_id;
   const osoba = { id: user.id, role: user.role, permissions: user.permissions };
   const ma = (m: Modul) => maModul(osoba, m);
@@ -266,4 +274,4 @@ export async function getPrzewodnik(user: ProfileWithAgency): Promise<Przewodnik
     // które nie powinny wiecznie straszyć na pulpicie.
     ukonczony: wszystkie.filter((k) => k.wymagany).every((k) => k.zrobiony),
   };
-}
+});

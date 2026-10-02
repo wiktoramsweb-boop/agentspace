@@ -10,6 +10,7 @@ import { odswiezDemoJesliTrzeba } from "@/lib/demo/zasiew";
 import { redirect } from "next/navigation";
 import { stanDostepu } from "@/lib/abonament-cennik";
 import { PasekAbonamentu } from "./pasek-abonamentu";
+import { getPrzewodnik } from "@/lib/data-przewodnik";
 
 export const metadata: Metadata = {
   title: "Panel AgentSpace",
@@ -42,6 +43,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     });
   }
 
+  // Przewodnik liczy się sam ze stanu bazy i pokazuje się w menu tylko, póki
+  // kroki niezbędne nie są domknięte. Samo przekierowanie na niego robi pulpit,
+  // a nie ten layout: layout obejmuje też /app/start, więc zapętliłby się na
+  // stronie, na którą kieruje.
+  const przewodnik = await getPrzewodnik(user);
+
   return (
     <ToastProvider>
       {/* Motyw ustawiamy przed pierwszym malowaniem, żeby ciemny nie mrugał bielą. */}
@@ -54,6 +61,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Sidebar
           role={user.role}
           permissions={user.permissions}
+          przewodnik={przewodnik.ukonczony ? null : przewodnik}
           fullName={user.full_name ?? "Użytkownik"}
           agencyName={user.agency?.name ?? "Biuro"}
           avatarUrl={avatarUrl(user.avatar_path)}

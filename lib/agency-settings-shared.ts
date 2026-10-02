@@ -68,6 +68,8 @@ export type StampConfig = {
 };
 
 export type AgencyOptions = {
+  /** CEO pominął przewodnik pierwszych kroków. Wtedy nie kierujemy na niego po zalogowaniu. */
+  onboarding_skipped?: boolean;
   photo_max: PhotoSize;
   /** Agent nie widzi telefonów i e-maili cudzych klientów na listach. */
   hide_contacts: boolean;

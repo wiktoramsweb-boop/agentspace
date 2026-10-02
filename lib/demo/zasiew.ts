@@ -3,6 +3,9 @@ import { ZESPOL } from "./dane";
 import {
   generujCele,
   generujDziennik,
+  generujFaktury,
+  generujLeady,
+  generujPoszukiwania,
   generujDzialania,
   generujKlientow,
   generujOferty,
@@ -32,6 +35,9 @@ export type WynikZasiewu = {
   dzialania: number;
   cele: number;
   wpisyDziennika: number;
+  leady: number;
+  poszukiwania: number;
+  faktury: number;
 };
 
 /** Zapis w porcjach: tysiąc działań w jednym żądaniu potrafi się wywrócić. */
@@ -59,6 +65,9 @@ async function wstawPorcjami(
 async function wyczysc(agencyId: string): Promise<void> {
   const admin = createSupabaseAdmin();
   // Kolejność ma znaczenie przez klucze obce: najpierw to, co się odwołuje.
+  await admin.from("invoices").delete().eq("agency_id", agencyId);
+  await admin.from("leads").delete().eq("agency_id", agencyId);
+  await admin.from("searches").delete().eq("agency_id", agencyId);
   await admin.from("activities").delete().eq("agency_id", agencyId);
   await admin.from("deals").delete().eq("agency_id", agencyId);
   await admin.from("properties").delete().eq("agency_id", agencyId);
@@ -144,6 +153,52 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
   const dziennik = generujDziennik(los, agencyId, wszyscy, now);
   const iloscDziennika = await wstawPorcjami("daily_logs", dziennik);
 
+  // Nowsze moduły też muszą mieć co pokazać. Każdy zasiew osobno, bo brak
+  // migracji ma zabrać tylko ten jeden moduł, a nie wywrócić całe demo.
+  const iloscLeadow = await wstawPorcjami("leads", generujLeady(los, agencyId, wszyscy, now));
+  const iloscPoszukiwan = await wstawPorcjami(
+    "searches",
+    generujPoszukiwania(los, agencyId, wszyscy, listaKlientow),
+  );
+  const ceo = zespol.find((p) => p.role === "owner") ?? zespol[0];
+  const iloscFaktur = await wstawPorcjami(
+    "invoices",
+    generujFaktury(los, agencyId, ceo.id, transakcje, now),
+  );
+
+  // Dane firmy i sprzedawca na fakturach: bez nich demo wygląda jak konto,
+  // którego nikt nie skonfigurował, a to pierwsze, co widać na pokazie.
+  await admin.from("agency_settings").upsert(
+    {
+      agency_id: agencyId,
+      company: {
+        name: "Biuro Demo Nieruchomości",
+        street: "ul. Przykładowa 12/3",
+        postal_code: "00-001",
+        city: "Warszawa",
+        country: "Polska",
+        phone: "+48 600 100 200",
+        email: "kontakt@biurodemo.pl",
+        nip: "1234567890",
+        www: "https://biurodemo.pl",
+      },
+      sellers: [
+        {
+          key: "firma",
+          name: "Biuro Demo Nieruchomości sp. z o.o.",
+          address: "ul. Przykładowa 12/3",
+          city: "Warszawa",
+          postcode: "00-001",
+          nip: "1234567890",
+          bank: "Przykładowy Bank",
+          account: "00 0000 0000 0000 0000 0000 0000",
+          brand: true,
+        },
+      ],
+    },
+    { onConflict: "agency_id" },
+  );
+
   // Brak tych kolumn oznacza nieuruchomioną migrację v30. Dane i tak się
   // zapiszą, tylko automatyczne odświeżanie nie ruszy - mówimy o tym wprost.
   const { error: znacznikErr } = await admin
@@ -159,6 +214,9 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
     dzialania: iloscDzialan,
     cele: (zapisaneCele.data ?? []).length,
     wpisyDziennika: iloscDziennika,
+    leady: iloscLeadow,
+    poszukiwania: iloscPoszukiwan,
+    faktury: iloscFaktur,
   };
 }
 
