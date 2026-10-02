@@ -619,7 +619,7 @@ export const en: Dict = {
 
     kontakt: {
       meta: {
-        title: "Contact | AgentSpace",
+        title: "Contact - software for real estate agencies | AgentSpace",
         description: "Get in touch with the AgentSpace team. Questions about the system for real estate agencies, the AI Coach, onboarding. We reply within 24 hours.",
       },
       hero: {
@@ -879,7 +879,7 @@ export const en: Dict = {
 
     blog: {
       meta: {
-        title: "Blog | AgentSpace",
+        title: "Blog for real estate agencies - guides and know-how | AgentSpace",
         description: "Practical material for real estate agencies: client conversations, objections, training agents, AI tools.",
       },
       hero: {

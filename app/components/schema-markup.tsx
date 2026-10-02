@@ -200,7 +200,8 @@ const navigationSchema = {
   "@type": "ItemList",
   name: "Nawigacja główna",
   itemListElement: [
-    { name: "Produkt", url: "https://agentspace.pl/#moduly" },
+    { name: "Produkt", url: "https://agentspace.pl/produkt" },
+    { name: "Strony www", url: "https://agentspace.pl/wzory" },
     { name: "Integracje", url: "https://agentspace.pl/integracje" },
     { name: "Cennik", url: "https://agentspace.pl/cennik" },
     { name: "Blog", url: "https://agentspace.pl/blog" },

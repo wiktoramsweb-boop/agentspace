@@ -76,7 +76,7 @@ export const pl = {
     meta: {
       title: "AgentSpace | System operacyjny dla biura nieruchomości",
       description:
-        "Jedno miejsce pracy całego biura: CRM klientów, wspólna baza nieruchomości, cele i lejek sprzedaży, rozliczanie prowizji, AI Coach do treningu rozmów i panel właściciela. Polski produkt, działa od pierwszego dnia.",
+        "Szesnaście modułów w jednym systemie: CRM, baza ofert, leady, cele, prowizje, faktury, umowy i strona biura. Polski produkt, wdrożenie w jeden dzień.",
     },
     hero: {
       eyebrow: "Dla biur nieruchomości w Polsce",
@@ -620,7 +620,7 @@ export const pl = {
 
     kontakt: {
       meta: {
-        title: "Kontakt | AgentSpace",
+        title: "Kontakt - system dla biura nieruchomości | AgentSpace",
         description: "Skontaktuj się z zespołem AgentSpace. Pytania o system dla biura nieruchomości, AI Coach, wdrożenie. Odpowiadamy w 24h.",
       },
       hero: {
@@ -879,8 +879,8 @@ export const pl = {
 
     blog: {
       meta: {
-        title: "Blog | AgentSpace",
-        description: "Praktyczne materiały dla biur nieruchomości: rozmowy z klientem, obiekcje, szkolenie agentów, narzędzia AI.",
+        title: "Blog dla biur nieruchomości - poradniki i wiedza | AgentSpace",
+        description: "Prowizja, wyłączność, pozyskiwanie ofert, dokumenty do aktu, rekrutacja agentów i wybór CRM. Poradniki pisane przez właściciela biura nieruchomości."
       },
       hero: {
         eyebrow: "Blog",

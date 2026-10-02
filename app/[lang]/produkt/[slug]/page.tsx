@@ -153,7 +153,7 @@ export default async function ProduktPage({
           >
             <Image
               src={mod.ilustracja ?? mod.photo}
-              alt=""
+              alt={`${mod.name} - ${t.moduleLabel.toLowerCase()} w systemie AgentSpace`}
               fill
               sizes="(max-width: 1024px) 100vw, 44vw"
               className={mod.ilustracja ? "object-contain p-4 sm:p-6" : "object-cover"}

@@ -8,12 +8,24 @@ Odbiorca decyzyjny: właściciel lub menedżer biura nieruchomości. Użytkownic
 
 ## Produkt
 
-- [CRM klientów](https://agentspace.pl/produkt/crm): karty klientów z pipeline, notatkami i historią kontaktu; osobne typy: sprzedający, kupujący, wynajmujący, najemca
-- [Cele i lejek sprzedaży](https://agentspace.pl/produkt/cele): cel roczny przeliczany na dzienne działania, tracker dnia, plan tygodnia, historia realizacji
-- [Prowizje i transakcje](https://agentspace.pl/produkt/prowizje): karta transakcji z pięcioma etapami, automatyczne naliczanie prowizji, umowa rezerwacyjna generowana do PDF
-- [AI Coach](https://agentspace.pl/produkt/ai-coach): trening rozmów z klientem AI; 13 scenariuszy polskiego rynku, 9 osobowości klienta, rozmowa głosem, scoring i feedback po polsku
-- [Panel właściciela](https://agentspace.pl/produkt/panel-wlasciciela): ranking agentów, mocne i słabe obszary zespołu, prowizje per agent, raporty miesięczne, role CEO/menedżer/agent
-- [Baza nieruchomości](https://agentspace.pl/produkt/nieruchomosci): wspólne oferty biura ze zdjęciami, statusami i przypisaniem do agenta
+Szesnaście modułów w jednym systemie. Pełny spis: https://agentspace.pl/produkt
+
+- [CRM klientów](https://agentspace.pl/produkt/crm): Karty klientów z historią, notatkami i pipeline. Osobno sprzedający, kupujący, wynajmujący i najemcy - bo każdy z nich wymaga innej rozmowy.
+- [Cele i lejek](https://agentspace.pl/produkt/cele): Lejek od telefonu do sprzedaży, policzony wstecz. Agent wie, ile rozmów musi wykonać dziś, żeby dowieźć rok.
+- [Prowizje i transakcje](https://agentspace.pl/produkt/prowizje): Karta transakcji z pięcioma etapami i dokumentami. Cel miesięczny aktualizuje się przy każdym domknięciu - bez arkusza domykanego w niedzielę.
+- [AI Coach](https://agentspace.pl/produkt/ai-coach): 13 scenariuszy z polskiego rynku, 9 osobowości klienta, rozmowa głosem, scoring i feedback po polsku.
+- [Panel właściciela](https://agentspace.pl/produkt/panel-wlasciciela): Ranking, mocne i słabe obszary zespołu, prowizje per agent, drill-down do pojedynczej osoby. Raport miesięczny przychodzi sam.
+- [Baza nieruchomości](https://agentspace.pl/produkt/nieruchomosci): Oferty widoczne dla zespołu, ze zdjęciami i statusem. Agent od kupującego widzi, co ma kolega od sprzedającego.
+- [Leady z reklam](https://agentspace.pl/produkt/leady): Wgrywasz plik z Meta Ads albo dodajesz kontakt ręcznie, a system sam rozpoznaje powtórki, przypisuje opiekuna i pilnuje etapu.
+- [Plan dnia i działania](https://agentspace.pl/produkt/dzialania): Zadania, kalendarz i przypomnienia w jednym miejscu, a na górze trzy priorytety wybrane przez AI z Waszych danych.
+- [Poszukiwania kupujących](https://agentspace.pl/produkt/poszukiwania): Zapisujesz kryteria kupującego, a system sam pokazuje, które oferty z bazy biura do niego pasują, także te dodane jutro.
+- [Umowy i protokoły](https://agentspace.pl/produkt/dokumenty): Umowa rezerwacyjna, protokół zdawczo-odbiorczy, aneks i oferta współpracy. Generowane do pełnego PDF, nie drukowane z przeglądarki.
+- [Ofertówka](https://agentspace.pl/produkt/ofertowka): Z danych oferty w systemie składa się gotowy dokument dla klienta: zdjęcia, opis, parametry i Wasze logo.
+- [Kalkulatory dla klienta](https://agentspace.pl/produkt/kalkulatory): Rata kredytu, pełne koszty zakupu i rentowność najmu. Z Waszym logo, do wysłania jako PDF jeszcze z samochodu.
+- [Faktury i podatki](https://agentspace.pl/produkt/faktury): Wystawiasz fakturę z transakcji, którą już macie w bazie, a kalkulator podatkowy pokazuje, co z tego zostaje.
+- [Raporty dla właściciela](https://agentspace.pl/produkt/raporty): Przychód, lejek, źródła transakcji i wyniki zespołu liczone z codziennej pracy agentów, a nie z osobnego raportowania.
+- [Role i uprawnienia](https://agentspace.pl/produkt/role-i-uprawnienia): Osiem stanowisk z gotowymi zestawami dostępów i możliwość dołożenia albo odebrania pojedynczego modułu konkretnej osobie.
+- [Strona internetowa biura](https://agentspace.pl/wzory): Osiem wzorów do wyboru. Oferty, zespół i poradnik zaciągają się z systemu, a zapytania ze strony wracają do CRM.
 
 ## Cennik
 
@@ -26,6 +38,22 @@ Odbiorca decyzyjny: właściciel lub menedżer biura nieruchomości. Użytkownic
 - [Galactica](https://agentspace.pl/integracje/galactica): status: w przygotowaniu
 - [IMO](https://agentspace.pl/integracje/imo): status: planowana
 - [Estiman](https://agentspace.pl/integracje/estiman): status: planowana
+
+## Baza wiedzy
+
+Poradniki dla biur nieruchomości, pisane przez właściciela biura. Pełna lista: https://agentspace.pl/blog
+
+- [Jak założyć biuro nieruchomości - kompletny przewodnik krok po kroku](https://agentspace.pl/blog/jak-zalozyc-biuro-nieruchomosci-krok-po-kroku): Formalności, koszty, obowiązkowe OC, umowy i pierwszy zespół. Przewodnik dla agenta, który chce przejść na swoje, napisany przez właściciela biura w Krakowie.
+- [Prowizja biura nieruchomości - ile wynosi i jak jej nie oddawać w negocjacji](https://agentspace.pl/blog/prowizja-biura-nieruchomosci-ile-wynosi): Ile realnie wynosi prowizja w polskich biurach, od czego zależy, kto ją płaci i jak odpowiadać na 'a konkurencja weźmie mniej'. Z gotowymi zdaniami do rozmowy.
+- [Umowa na wyłączność czy otwarta - co się bardziej opłaca biuru i klientowi](https://agentspace.pl/blog/umowa-na-wylacznosc-czy-otwarta): Porównanie dwóch modeli umowy pośrednictwa: koszty, ryzyko, czas sprzedaży i argumenty, którymi przekonasz właściciela do wyłączności. Bez marketingowego lania wody.
+- [CRM dla biura nieruchomości - jak wybrać i na czym najczęściej się przejeżdża](https://agentspace.pl/blog/crm-dla-biura-nieruchomosci-jak-wybrac): Czym CRM dla biura RE różni się od zwykłego CRM, jakie funkcje są obowiązkowe, ile to kosztuje i dlaczego większość wdrożeń umiera w trzecim miesiącu.
+- [Pozyskiwanie ofert nieruchomości - 9 źródeł, które realnie działają w Polsce](https://agentspace.pl/blog/pozyskiwanie-ofert-nieruchomosci): Skąd biura biorą oferty: od ogłoszeń prywatnych, przez polecenia i deweloperów, po oferty wygasłe. Co ile kosztuje, ile zajmuje i jaka jest realna skuteczność.
+- [Leady z Facebooka dla biura nieruchomości - jak przestać przepalać budżet](https://agentspace.pl/blog/leady-z-facebooka-dla-biura-nieruchomosci): Dlaczego leady z Meta Ads są tanie i zimne, ile realnie kosztuje kontakt, jak liczyć opłacalność kampanii i co zrobić, żeby lead nie zginął między agentami.
+- [Rekrutacja agenta nieruchomości - jak zatrudnić i wdrożyć, żeby został dłużej niż kwartał](https://agentspace.pl/blog/rekrutacja-i-wdrozenie-agenta-nieruchomosci): Dlaczego rotacja w biurach RE jest tak wysoka, kogo naprawdę szukać, jak wygląda sensowne wdrożenie w 30 dni i jakie liczby obserwować w pierwszym kwartale.
+- [Dokumenty do sprzedaży mieszkania - kompletna lista dla agenta i klienta](https://agentspace.pl/blog/dokumenty-do-sprzedazy-mieszkania-lista): Co trzeba zebrać przed aktem notarialnym: księga wieczysta, podstawa nabycia, zaświadczenia ze spółdzielni i gminy, świadectwo energetyczne. Z terminami i pułapkami.
+- [Jak skutecznie szkolić agentów nieruchomości w 2026](https://agentspace.pl/blog/jak-skutecznie-szkolic-agentow-nieruchomosci): Tradycyjne szkolenia agentów RE są drogie i nieefektywne. Sprawdź jak biura w Polsce zmieniają podejście z pomocą AI - konkretne metody, statystyki, narzędzia.
+- [5 najczęstszych obiekcji klienta i jak na nie odpowiadać](https://agentspace.pl/blog/5-najczestszych-obiekcji-klienta-nieruchomosci): Polski klient nieruchomości ma swój zestaw obiekcji - od 'prowizja za wysoka' po 'nie ufam biurom'. Konkretne odpowiedzi które działają, ze skryptami.
+- [AI w nieruchomościach: 7 narzędzi, które warto znać w 2026](https://agentspace.pl/blog/ai-w-nieruchomosciach-7-narzedzi): Praktyczny przegląd narzędzi AI dla biur RE - od wyceny po marketing. Co działa w Polsce, co warto testować, czego unikać. Z konkretnymi cenami.
 
 ## Firma
 
