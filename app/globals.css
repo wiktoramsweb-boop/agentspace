@@ -1736,3 +1736,47 @@ html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-blue-600 { col
   color: #fff;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
 }
+
+/* Tabele we wpisach blogowych.
+   marked renderuje goły <table> bez żadnych klas, a domyślny HTML daje
+   zlepione komórki bez linii. Porównania w tekstach poradnikowych są
+   nieczytelne bez obramowania i naprzemiennych wierszy. */
+.prose-blog table {
+  width: 100%;
+  margin: 2rem 0;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  display: block;
+  overflow-x: auto;
+}
+.prose-blog thead th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-mk-text);
+  background: var(--mk-surface-3);
+  border-bottom: 1px solid var(--mk-hairline-strong);
+}
+.prose-blog th,
+.prose-blog td {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--mk-hairline);
+  vertical-align: top;
+  color: var(--color-mk-muted);
+}
+.prose-blog tbody tr:nth-child(even) {
+  background: var(--mk-surface-2);
+}
+.prose-blog td strong {
+  color: var(--color-mk-text);
+}
+
+/* Lista zadań z Markdowna (- [ ]). marked zostawia checkboxy wewnątrz <li>,
+   więc bez tego punktor i kwadracik stoją obok siebie. */
+.prose-blog li:has(> input[type="checkbox"]) {
+  list-style: none;
+  margin-left: -1.1rem;
+}
+.prose-blog li > input[type="checkbox"] {
+  margin-right: 0.6rem;
+  accent-color: var(--color-mk-accent);
+}

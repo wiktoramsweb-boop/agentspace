@@ -92,6 +92,28 @@ function getVariantsForCategory(category: string): Variant {
     };
   }
 
+  if (category.toLowerCase().includes("biur") || category.toLowerCase().includes("prawo")) {
+    return {
+      ...base,
+      background:
+        "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.05) 100%)",
+      blob1: "rgba(59, 130, 246, 0.35)",
+      blob2: "rgba(99, 102, 241, 0.25)",
+      icon: <BookIcon />,
+    };
+  }
+
+  if (category.toLowerCase().includes("marketing")) {
+    return {
+      ...base,
+      background:
+        "linear-gradient(135deg, rgba(244, 63, 94, 0.14) 0%, rgba(249, 115, 22, 0.05) 100%)",
+      blob1: "rgba(244, 63, 94, 0.32)",
+      blob2: "rgba(249, 115, 22, 0.22)",
+      icon: <SparklesIcon />,
+    };
+  }
+
   if (category.toLowerCase().includes("trend") || category.toLowerCase().includes("narzędzia")) {
     return {
       ...base,

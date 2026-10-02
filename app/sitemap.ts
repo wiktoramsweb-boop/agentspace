@@ -38,6 +38,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ["/o-nas", "monthly", 0.7],
     ["/kontakt", "monthly", 0.7],
     ["/blog", "weekly", 0.8],
+    ["/produkt", "monthly", 0.9],
+    ["/wzory", "monthly", 0.8],
     ["/integracje", "monthly", 0.8],
     ["/polityka-prywatnosci", "yearly", 0.3],
     ["/umowa-powierzenia", "yearly", 0.3],
@@ -47,7 +49,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticPages.flatMap(([path, freq, priority]) => bothLocales(path, now, freq, priority)),
     // Strony modułów - długi ogon fraz produktowych.
-    ...MODULES.flatMap((mod) => bothLocales(`/produkt/${mod.slug}`, now, "monthly", 0.8)),
+    // strona-www przekierowuje na /wzory, więc nie wrzucamy do mapy adresu,
+    // który i tak kończy się przekierowaniem.
+    ...MODULES.filter((m) => m.slug !== "strona-www").flatMap((mod) =>
+      bothLocales(`/produkt/${mod.slug}`, now, "monthly", 0.8),
+    ),
     // Strony integracji - łapią wyszukiwania „[system] + integracja".
     ...INTEGRATIONS.flatMap((item) => bothLocales(`/integracje/${item.slug}`, now, "monthly", 0.7)),
     // Wpisy blogowe powstają po polsku, więc do mapy trafia tylko polski adres.
