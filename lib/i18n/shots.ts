@@ -132,6 +132,100 @@ const EN: Record<string, string> = {
   Zdjęcia: "Photos",
   "Pliki leżą przy ofercie i przy kliencie naraz, a link do pobrania wygasa, więc nie krąży po WhatsAppie.":
     "Files sit with the listing and the client at the same time, and the download link expires, so it does not circulate on WhatsApp.",
+
+  // leady
+  Leady: "Leads",
+  "Wczytaj plik": "Upload file",
+  Nowe: "New",
+  "W kontakcie": "In contact",
+  Umówione: "Booked",
+  "Anna Kowalska": "Anna Kowalska",
+  "Meta · Mieszkania 2 pokoje": "Meta · Two-bed flats",
+  "Meta · Sprzedaj mieszkanie": "Meta · Sell your flat",
+  "Meta · Domy pod miastem": "Meta · Houses out of town",
+  "Formularz na stronie": "Website form",
+  "Marcin Nowak": "Marcin Nowak",
+  "Ewa Lewandowska": "Ewa Lewandowska",
+  "Paweł Zieliński": "Paweł Zieliński",
+  umówione: "booked",
+  "w kontakcie": "in contact",
+  nowy: "new",
+  "Lead bez inicjałów czeka w puli biura. Ten sam numer wgrany drugi raz nie zrobi duplikatu.":
+    "A lead with no initials waits in the agency pool. The same number uploaded twice will not create a duplicate.",
+
+  // poszukiwania
+  "Poszukiwanie P/014": "Buyer brief P/014",
+  "Rodzina Wiśniewskich · kupno": "The Wiśniewski family · buying",
+  Budżet: "Budget",
+  "do 750 000 zł": "up to 750,000 PLN",
+  Metraż: "Size",
+  "55 - 70 m²": "55 - 70 m²",
+  Pokoje: "Rooms",
+  "3 lub więcej": "3 or more",
+  Dzielnice: "Districts",
+  "Zabłocie, Podgórze": "Zabłocie, Podgórze",
+  "Pasujące oferty biura": "Matching agency listings",
+  "Zabłocie · 62 m² · 3 pok.": "Zabłocie · 62 m² · 3 rooms",
+  "Podgórze · 58 m² · 3 pok.": "Podgórze · 58 m² · 3 rooms",
+  "Kazimierz · 55 m² · 2 pok.": "Kazimierz · 55 m² · 2 rooms",
+  "720 000 zł": "720,000 PLN",
+  "690 000 zł": "690,000 PLN",
+  "745 000 zł": "745,000 PLN",
+  "Dopasowania liczą się same, także dla ofert dodanych jutro przez innego agenta.":
+    "Matches are calculated automatically, including listings another agent adds tomorrow.",
+
+  // ofertówka
+  "Biuro Demo Nieruchomości": "Demo Estate Agency",
+  "Oferta dla klienta": "Client presentation",
+  Piętro: "Floor",
+  "Dwupoziomowy apartament w zrewitalizowanej kamienicy, z tarasem od południa.":
+    "A split-level apartment in a restored townhouse, with a south-facing terrace.",
+
+  // kalkulatory
+  "Koszty zakupu": "Purchase costs",
+  Najem: "Rental",
+  "Cena nieruchomości": "Property price",
+  "PCC (2%)": "Transfer tax (2%)",
+  "Taksa notarialna": "Notary fee",
+  "Opłaty sądowe": "Court fees",
+  "Prowizja biura": "Agency commission",
+  "19 500 zł": "19,500 PLN",
+  "13 000 zł": "13,000 PLN",
+  "Razem koszty zakupu": "Total purchase costs",
+  "31 206 zł": "31,206 PLN",
+  "650 000 zł": "650,000 PLN",
+  "4 145 zł": "4,145 PLN",
+  "446 zł": "446 PLN",
+  "Jeden przycisk i klient dostaje to jako PDF z logo biura.":
+    "One click and the client gets this as a PDF carrying the agency logo.",
+
+  // faktury
+  Faktury: "Invoices",
+  "Nowa faktura": "New invoice",
+  "Wystawione w tym miesiącu": "Issued this month",
+  "Czeka na wpłatę": "Awaiting payment",
+  "22 800 zł": "22,800 PLN",
+  "16 400 zł": "16,400 PLN",
+  "9 800 zł": "9,800 PLN",
+  "Kowalscy · ul. Zbożowa": "The Kowalskis · Zbożowa St.",
+  "Nowak · os. Oświecenia": "Nowak · Oświecenia estate",
+  "Wiśniewska · ul. Lea": "Wiśniewska · Lea St.",
+  opłacona: "paid",
+  czeka: "pending",
+  "Sprzedawcą może być spółka albo działalność wspólnika, każdy z własnym rachunkiem.":
+    "The seller can be the partnership or a partner's own business, each with its own bank account.",
+
+  // role
+  "Katarzyna Zielińska": "Katarzyna Zielińska",
+  "Księgowość · widzi całe biuro": "Bookkeeping · sees the whole agency",
+  "Klienci i leady": "Clients and leads",
+  Nieruchomości: "Listings",
+  Prowizje: "Commissions",
+  "Faktury i podatki": "Invoices and tax",
+  "Ustawienia firmy": "Company settings",
+  "dodane ręcznie": "added manually",
+  "Księgowa rozlicza prowizje i faktury, a bazy klientów nie widzi wcale.":
+    "The bookkeeper settles commissions and invoices and never sees the client database.",
 };
 
 /** Funkcja tłumacząca napis makiety; po polsku zwraca oryginał. */

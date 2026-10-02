@@ -6,7 +6,7 @@ import type { ProductModule } from "./modules";
  * Keyed by the same slug as the Polish version, so the URL and the routing
  * stay identical and only the text changes.
  */
-export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
+export const MODULES_EN: Record<string, Omit<ProductModule, "slug" | "shot">> = {
   crm: {
     name: "Client CRM",
     headline: "A client database that stays with the agency",
@@ -36,6 +36,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
     ],
     forWhom:
       "For agents as their daily workspace, for the owner as a guarantee that the agency's database stays with the agency.",
+    faq: [
+      {
+        q: "Will you migrate our existing client database?",
+        a: "Yes, that is part of the rollout. We upload a spreadsheet or an export from your current system and map the columns onto AgentSpace fields. Contact history comes across.",
+      },
+      {
+        q: "What happens to clients when an agent leaves?",
+        a: "They stay in the agency database with their notes and history. When you remove an account the system asks who should take over their clients and listings, and shows how many there are.",
+      },
+      {
+        q: "Can agents see each other's clients?",
+        a: "That is your call. By default an agent sees their own, a manager sees their team and the CEO sees everything. You can also hide phone numbers from anyone who is not the record's owner.",
+      },
+    ],
   },
 
   cele: {
@@ -67,6 +81,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
     ],
     forWhom:
       "For the agent: clarity about what to do today. For the owner: an early signal that somebody is starting to slip.",
+    faq: [
+      {
+        q: "Where do the funnel numbers come from?",
+        a: "From the activities agents record anyway: calls, meetings and agreements. Nobody fills in a separate report.",
+      },
+      {
+        q: "What if an agent misses their target?",
+        a: "You see it straight away rather than at the end of the quarter. The system shows which stage of the funnel is short, so the conversation is about something specific.",
+      },
+      {
+        q: "Who sets the targets, the owner or the agent?",
+        a: "Both. The owner sets the agency target, the agent their own. The system breaks them down into weeks and days.",
+      },
+    ],
   },
 
   prowizje: {
@@ -98,6 +126,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
     ],
     forWhom:
       "For the owner: control over settlements. For the agent: certainty the commission was calculated fairly.",
+    faq: [
+      {
+        q: "Do you handle commission splits between agents?",
+        a: "Yes. Every deal carries the agent's percentage, and on in-house deals the commission can be split between two people.",
+      },
+      {
+        q: "Can a manager see the team's commission amounts?",
+        a: "No. A manager runs the team and sees its work, but only the CEO sees the amounts on other people's deals. That rule is built into the roles.",
+      },
+      {
+        q: "Can I raise an invoice from a deal?",
+        a: "Yes, through the Invoices module. The buyer details and the commission amount come from the deal, so nothing is retyped.",
+      },
+    ],
   },
 
   "ai-coach": {
@@ -129,6 +171,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
     ],
     forWhom:
       "For new agents as onboarding, for experienced ones as a warm-up before a hard call.",
+    faq: [
+      {
+        q: "Does the agent practise on real clients?",
+        a: "No. AI Coach is a simulation: the agent talks to a client played by the model. No real client data is used.",
+      },
+      {
+        q: "Does it work in Polish?",
+        a: "Yes, the whole session and the scoring are in Polish, with the objections that actually come up in Polish agencies. It is not a translated American script.",
+      },
+      {
+        q: "What does the agent get afterwards?",
+        a: "A score across five areas (opening, qualification, objections, closing and overall), a summary and two to four concrete pointers for next time.",
+      },
+    ],
   },
 
   "panel-wlasciciela": {
@@ -159,6 +215,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       },
     ],
     forWhom: "For the owner and team managers. Agents do not see each other's data.",
+    faq: [
+      {
+        q: "Do agents have to fill in anything extra?",
+        a: "No. The panel calculates everything from their daily work: deals, activities and targets. Reporting is a by-product, not a separate duty.",
+      },
+      {
+        q: "Can I see which agent is struggling and with what?",
+        a: "Yes. The panel shows strong and weak areas per person, including AI Coach sessions, so you can tell whether the problem is opening a call or closing it.",
+      },
+      {
+        q: "Can I drill into one person?",
+        a: "Yes, every agent has their own page with results, funnel, target calendar and training history.",
+      },
+    ],
   },
 
   nieruchomosci: {
@@ -186,6 +256,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
     ],
     forWhom:
       "For the whole team: the bigger the agency, the more in-house deals this database generates.",
+    faq: [
+      {
+        q: "Can I bring listings over from our current system?",
+        a: "Yes, photos included. During the rollout we upload your export and fill in the fields the old system did not have.",
+      },
+      {
+        q: "Are the fields tailored to the property type?",
+        a: "Yes. A flat has different fields from a plot, a house or a commercial unit, and a rental listing differs from a sale. The field dictionary follows what the portals require.",
+      },
+      {
+        q: "Can listings be exported to property portals?",
+        a: "Not yet. It is first on the list, but it needs an agreement with each portal rather than just code. Until then it is worth keeping your current system alongside.",
+      },
+    ],
   },
   leady: {
     name: "Leads from ads",
@@ -203,6 +287,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "Stage and handover", body: "From new contact to booked meeting. When a lead matures, one click turns it into a CRM client with the full history." },
     ],
     forWhom: "For agencies that spend on advertising. It shows which campaign brings deals, not just clicks.",
+    faq: [
+      {
+        q: "What file does Meta Ads produce?",
+        a: "A CSV or Excel file whose columns depend on what the form asked. The system recognises them on its own, including custom questions you added.",
+      },
+      {
+        q: "What happens if I upload the same file twice?",
+        a: "Nothing bad. Duplicates are caught by the last nine digits of the phone number, whatever format it was saved in, so nobody calls the same person twice.",
+      },
+      {
+        q: "Does a lead go straight into the client database?",
+        a: "No. Leads sit separately until somebody speaks to them. When a contact matures, one click turns it into a CRM client with the full history.",
+      },
+    ],
   },
   dzialania: {
     name: "Day plan and activities",
@@ -220,6 +318,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "Quick voice entry", body: "After a viewing you dictate two sentences and the system works out the client, the property and the note. No sitting down at a computer." },
     ],
     forWhom: "For agents in the field and for managers who want to see the team's work without asking for reports.",
+    faq: [
+      {
+        q: "How does the AI know what is a priority?",
+        a: "It reads the pipeline, next-contact dates, task deadlines and target progress. Each priority comes with a reason, so the agent can see why that one.",
+      },
+      {
+        q: "Does the calendar sync with Google?",
+        a: "Not yet, it is on the list. For now the calendar lives inside the system and covers the whole agency.",
+      },
+      {
+        q: "Do reminders reach the phone?",
+        a: "Yes, as push notifications once the app is added to the home screen. Nothing needs installing from an app store.",
+      },
+    ],
   },
   poszukiwania: {
     name: "Buyer requirements",
@@ -237,6 +349,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "More in-house deals", body: "The bigger the agency, the more often one agent's buyer meets another agent's listing. The commission stays in the business." },
     ],
     forWhom: "For agencies with several agents, where listings and buyers have not been meeting in time.",
+    faq: [
+      {
+        q: "How is this different from a note on the client record?",
+        a: "A note only works if somebody reads it. A brief compares itself against every new listing in the agency and raises its hand when something fits.",
+      },
+      {
+        q: "Do matches include other agents' listings?",
+        a: "Yes, and that is the point. The bigger the agency, the more often one agent's buyer meets another agent's listing, and the commission stays in the business.",
+      },
+      {
+        q: "Can I set how widely it searches?",
+        a: "Yes. You set the price and size tolerances in agency settings, because they mean different things in a big city and a smaller one.",
+      },
+    ],
   },
   dokumenty: {
     name: "Contracts and handover reports",
@@ -254,6 +380,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "A handover after the sale too", body: "A separate variant for handing over after completion: meter readings, keys, remarks and signatures on a single page." },
     ],
     forWhom: "For agents and office assistants who retype the same documents by hand today.",
+    faq: [
+      {
+        q: "Do the documents comply with Polish law?",
+        a: "The templates come from documents used daily in a working agency. Before rolling them out in your own office it is worth having your lawyer review them, as with any contract template.",
+      },
+      {
+        q: "Can I add my own clause to a contract?",
+        a: "Yes, the reservation agreement has room for extra clauses. You can write them yourself or ask the AI to phrase one and then edit it.",
+      },
+      {
+        q: "Does the document save as a real PDF?",
+        a: "Yes, it is not a browser printout. The file lands on disk first and you print from that, so the layout does not shift between browsers.",
+      },
+    ],
   },
   ofertowka: {
     name: "Listing presentation",
@@ -270,6 +410,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "Watermarked photos", body: "Photos travel further than anyone plans. A watermark keeps them pointing back to you." },
     ],
     forWhom: "For agents who send listings by email and want them to look serious.",
+    faq: [
+      {
+        q: "Can I choose which photos go into the presentation?",
+        a: "Yes, you pick the photos and their order. The rest of the data comes from the listing.",
+      },
+      {
+        q: "Does the document carry our logo?",
+        a: "Yes, the logo and agency details come from settings. If no logo has been uploaded yet, the agency initials appear in its place, never somebody else's brand.",
+      },
+      {
+        q: "Are the photos protected?",
+        a: "You can switch on a watermark that is applied when photos are uploaded. It also covers photos published to the agency website.",
+      },
+    ],
   },
   kalkulatory: {
     name: "Client calculators",
@@ -286,6 +440,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "Rental yield", body: "For buy-to-let clients: return, cash flow and a comparison against a deposit account." },
     ],
     forWhom: "For agents sitting at the table with a client, and for agencies working with mortgage advisers.",
+    faq: [
+      {
+        q: "Does the calculator handle both new-build and resale?",
+        a: "Yes. You choose the market and the transfer tax and other fees recalculate themselves. There is also a resale variant with no transfer tax.",
+      },
+      {
+        q: "Does the client get it in writing?",
+        a: "Yes, one click produces a PDF with the agency logo and the agent's details, ready to email from the car.",
+      },
+      {
+        q: "Can I show the client a commission discount?",
+        a: "Yes. You enter the standard rate and yours, and the document shows both, struck through, with the saving.",
+      },
+    ],
   },
   faktury: {
     name: "Invoices and tax",
@@ -302,6 +470,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "Tax calculator", body: "Progressive, flat and lump-sum, with social contributions and reliefs. It shows what is actually left of the commission." },
     ],
     forWhom: "For the owner and the bookkeeper. Access to this module is granted separately, without opening the client database.",
+    faq: [
+      {
+        q: "Can I invoice from several entities?",
+        a: "Yes. You add as many sellers as you need: the partnership and each partner's own business, every one with its own tax number and bank account.",
+      },
+      {
+        q: "Is the numbering automatic?",
+        a: "Yes, numbers are issued in order and the list filters by year. Payment status is visible on every invoice.",
+      },
+      {
+        q: "Who has access to invoices?",
+        a: "By default the CEO and bookkeeping. Access is granted separately from the rest of the system, so the bookkeeper does not need to see the client database.",
+      },
+    ],
   },
   raporty: {
     name: "Owner reports",
@@ -319,6 +501,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "By email and as a PDF", body: "The monthly summary arrives automatically on the first of the month, and downloads as a document for a partners' meeting." },
     ],
     forWhom: "For the owner and the director. A manager sees their own team's work, without the amounts on other people's commissions.",
+    faq: [
+      {
+        q: "Does the report arrive automatically?",
+        a: "Yes, the monthly summary goes out by email on the first of the month. You can also generate it at any time and download it as a PDF.",
+      },
+      {
+        q: "Can I see where the deals come from?",
+        a: "Yes, split by source and by commission rather than by number of contacts. A referral that produced one big deal does not disappear behind an ad campaign that produced twenty cold leads.",
+      },
+      {
+        q: "Can I show the report to business partners?",
+        a: "Yes, that is what the PDF export is for: a typeset document with charts, ready to print for a meeting.",
+      },
+    ],
   },
   "role-i-uprawnienia": {
     name: "Roles and permissions",
@@ -336,6 +532,20 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "Hidden contact details", body: "A client's number is visible to their own agent. It works on record pages and in pickers too, not only in lists." },
     ],
     forWhom: "For agencies with a real structure, and for those employing bookkeeping or an assistant part-time.",
+    faq: [
+      {
+        q: "Do I have to use all eight job titles?",
+        a: "No. A small agency is fine with a CEO and agents. The rest wait for the moment a bookkeeper or an assistant appears.",
+      },
+      {
+        q: "Can I make an exception for one person?",
+        a: "Yes, that is the heart of this module. You switch a single module on or off for one person without changing their job title. Exceptions are flagged, so six months later you can still tell what was changed by hand.",
+      },
+      {
+        q: "Can the CEO's access be restricted?",
+        a: "No, and that is deliberate. If it could be, an agency could end up with nobody able to get into settings and undo it.",
+      },
+    ],
   },
   "strona-www": {
     name: "Agency website",
@@ -352,5 +562,19 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug">> = {
       { title: "Your own domain and SEO", body: "We connect your domain, sitemap and structured data for Google. Certificate and backups are on us." },
     ],
     forWhom: "For agencies without a website, and for those whose site lives separately from the listing database. A separate service, outside the system subscription.",
+    faq: [
+      {
+        q: "Do I have to take the website with the system?",
+        a: "No. It is a separate service outside the subscription. The system works fine without it, and if you already have a website nothing has to change.",
+      },
+      {
+        q: "Does the site run on our own domain?",
+        a: "Yes, we connect your domain. The certificate, backups and hosting are on us.",
+      },
+      {
+        q: "What happens to an enquiry from the form?",
+        a: "It creates a contact in the CRM and a task for an agent, and the office gets a notification. It does not land in an inbox where it gets lost.",
+      },
+    ],
   },
 };

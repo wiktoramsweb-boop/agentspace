@@ -22,6 +22,10 @@ export type ProductModule = {
   capabilities: { title: string; body: string }[];
   /** Dla kogo w biurze. */
   forWhom: string;
+  /** Makieta ekranu aplikacji pokazywana na stronie modułu. */
+  shot: string;
+  /** Pytania, które padają przy tym module. */
+  faq: { q: string; a: string }[];
 };
 
 export const MODULES: ProductModule[] = [
@@ -55,6 +59,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów jako codzienne miejsce pracy, dla właściciela jako gwarancja, że baza biura zostaje w biurze.",
+    shot: "ShotKlient",
+    faq: [
+      {
+        q: "Czy przeniesiecie naszą obecną bazę klientów?",
+        a: "Tak, to część wdrożenia. Wgrywamy plik z Excela albo eksport z obecnego systemu i mapujemy kolumny na pola w AgentSpace. Historia kontaktu zostaje.",
+      },
+      {
+        q: "Co się dzieje z klientami, gdy agent odchodzi z biura?",
+        a: "Zostają w bazie biura razem z notatkami i historią. Przy usuwaniu konta system pyta, komu przepisać jego klientów i oferty, i pokazuje, ile ich jest.",
+      },
+      {
+        q: "Czy agent widzi klientów kolegów?",
+        a: "To Wasza decyzja. Domyślnie agent widzi swoich, menedżer swój zespół, a CEO całe biuro. Można też włączyć ukrywanie numerów telefonu przed osobami, które nie są opiekunem.",
+      },
+    ],
   },
   {
     slug: "cele",
@@ -86,6 +105,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agenta: jasność, co dziś robić. Dla właściciela: wczesny sygnał, że ktoś zaczyna odpadać.",
+    shot: "ShotCele",
+    faq: [
+      {
+        q: "Skąd biorą się liczby w lejku?",
+        a: "Z działań, które agent i tak wprowadza: telefonów, spotkań i umów. Nikt nie wypełnia osobnego raportu.",
+      },
+      {
+        q: "Co jeśli agent nie realizuje celu?",
+        a: "Widać to od razu, a nie na koniec kwartału. System pokazuje, na którym etapie lejka jest za mało, więc rozmowa dotyczy konkretu, a nie ogólnego „trzeba więcej dzwonić”.",
+      },
+      {
+        q: "Czy cele ustawia właściciel, czy agent?",
+        a: "Obaj. Właściciel ustawia cel biura, agent swój własny. System rozbija je na tygodnie i dni.",
+      },
+    ],
   },
   {
     slug: "prowizje",
@@ -117,6 +151,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela: kontrola nad rozliczeniami. Dla agenta: pewność, że prowizja jest policzona uczciwie.",
+    shot: "ShotProwizje",
+    faq: [
+      {
+        q: "Czy obsługujecie podział prowizji między agentów?",
+        a: "Tak. Każda transakcja ma udział procentowy agenta, a przy transakcjach wewnętrznych da się rozdzielić prowizję między dwie osoby.",
+      },
+      {
+        q: "Czy menedżer widzi kwoty prowizji zespołu?",
+        a: "Nie. Menedżer prowadzi zespół i widzi jego pracę, ale kwoty cudzych transakcji widzi tylko CEO. To ustawienie wbudowane w role.",
+      },
+      {
+        q: "Czy można z transakcji wystawić fakturę?",
+        a: "Tak, modułem Faktury. Dane nabywcy i kwota prowizji wchodzą z transakcji, więc nie trzeba ich przepisywać.",
+      },
+    ],
   },
   {
     slug: "ai-coach",
@@ -148,6 +197,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla nowych agentów jako onboarding, dla doświadczonych jako rozgrzewka przed trudną rozmową.",
+    shot: "AiCoach",
+    faq: [
+      {
+        q: "Czy agent ćwiczy na prawdziwych klientach?",
+        a: "Nie. AI Coach to symulacja: agent rozmawia z klientem granym przez model. Żadne dane prawdziwych klientów nie są do tego używane.",
+      },
+      {
+        q: "Czy to działa po polsku?",
+        a: "Tak, cały trening i ocena są po polsku, z realnymi obiekcjami, które padają w polskich biurach. To nie jest tłumaczony scenariusz amerykański.",
+      },
+      {
+        q: "Co dostaje agent po rozmowie?",
+        a: "Ocenę w pięciu obszarach (otwarcie, kwalifikacja, obiekcje, zamknięcie i ogólna), podsumowanie i dwie do czterech konkretnych wskazówek na następny raz.",
+      },
+    ],
   },
   {
     slug: "panel-wlasciciela",
@@ -179,6 +243,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela i menedżerów zespołów. Agenci nie widzą cudzych danych.",
+    shot: "ShotPanel",
+    faq: [
+      {
+        q: "Czy agenci muszą cokolwiek dodatkowo wypełniać?",
+        a: "Nie. Panel liczy wszystko z ich codziennej pracy: transakcji, działań i celów. Raportowanie jest efektem ubocznym, a nie osobnym obowiązkiem.",
+      },
+      {
+        q: "Czy widzę, który agent ma problem i z czym?",
+        a: "Tak. Panel pokazuje mocne i słabe obszary per osoba, także z treningów AI Coach, więc widać, czy problem jest w otwarciu rozmowy, czy w zamykaniu.",
+      },
+      {
+        q: "Czy mogę wejść w szczegóły jednej osoby?",
+        a: "Tak, każdy agent ma własną kartę z wynikami, lejkiem, kalendarzem celów i historią sesji treningowych.",
+      },
+    ],
   },
   {
     slug: "nieruchomosci",
@@ -206,6 +285,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla całego zespołu: im większe biuro, tym więcej transakcji wewnętrznych ta baza generuje.",
+    shot: "ShotOferty",
+    faq: [
+      {
+        q: "Czy mogę przenieść oferty z obecnego systemu?",
+        a: "Tak, razem ze zdjęciami. Przy wdrożeniu wgrywamy eksport i uzupełniamy pola, których stary system nie miał.",
+      },
+      {
+        q: "Czy pola są dopasowane do typu nieruchomości?",
+        a: "Tak. Mieszkanie ma inne pola niż działka, dom czy lokal użytkowy, a oferta na wynajem inne niż na sprzedaż. Słownik pól jest zgodny z tym, czego wymagają portale.",
+      },
+      {
+        q: "Czy da się wyeksportować oferty na portale?",
+        a: "Jeszcze nie. To pierwsza rzecz na liście, ale wymaga umowy z każdym portalem osobno, a nie samego kodu. Do tego czasu warto zostawić obecny system obok.",
+      },
+    ],
   },
   {
     slug: "leady",
@@ -237,6 +331,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur, które wydają na reklamę. Pokazuje, która kampania przynosi transakcje, a nie tylko kliknięcia.",
+    shot: "ShotLeady",
+    faq: [
+      {
+        q: "Jaki plik daje Meta Ads?",
+        a: "CSV albo Excel z kolumnami zależnymi od tego, o co pytał formularz. System rozpoznaje je sam, także gdy dodaliście własne pytania.",
+      },
+      {
+        q: "Co się stanie, gdy wgram ten sam plik dwa razy?",
+        a: "Nic złego. Duplikaty wyłapujemy po ostatnich dziewięciu cyfrach numeru, niezależnie od formatu zapisu, więc nikt nie zadzwoni do tej samej osoby drugi raz.",
+      },
+      {
+        q: "Czy lead od razu trafia do bazy klientów?",
+        a: "Nie. Leady są osobno, dopóki ktoś z nimi nie porozmawia. Gdy kontakt dojrzeje, jednym kliknięciem staje się klientem w CRM z całą historią.",
+      },
+    ],
   },
   {
     slug: "dzialania",
@@ -268,6 +377,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów w terenie i dla menedżerów, którzy chcą widzieć pracę zespołu bez proszenia o raporty.",
+    shot: "ShotKalendarz",
+    faq: [
+      {
+        q: "Skąd AI wie, co jest priorytetem?",
+        a: "Czyta pipeline, daty następnego kontaktu, terminy zadań i postęp celu. Priorytet dostaje uzasadnienie, więc agent widzi, dlaczego akurat ta rzecz.",
+      },
+      {
+        q: "Czy kalendarz łączy się z Google?",
+        a: "Jeszcze nie, to jest na liście. Na razie kalendarz działa wewnątrz systemu i obejmuje całe biuro.",
+      },
+      {
+        q: "Czy przypomnienia przychodzą na telefon?",
+        a: "Tak, jako powiadomienia push po dodaniu aplikacji do ekranu głównego. Nie trzeba instalować nic ze sklepu.",
+      },
+    ],
   },
   {
     slug: "poszukiwania",
@@ -299,6 +423,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur z kilkoma agentami, w których oferty i kupujący dotąd nie spotykali się na czas.",
+    shot: "ShotPoszukiwania",
+    faq: [
+      {
+        q: "Czym to się różni od notatki przy kliencie?",
+        a: "Notatkę trzeba przeczytać, żeby zadziałała. Poszukiwanie samo porównuje się z każdą nową ofertą biura i podnosi rękę, gdy coś pasuje.",
+      },
+      {
+        q: "Czy dopasowania obejmują oferty innych agentów?",
+        a: "Tak i w tym rzecz. Im większe biuro, tym częściej kupujący jednego agenta trafia na ofertę drugiego, a prowizja zostaje w biurze.",
+      },
+      {
+        q: "Czy mogę ustawić, jak szeroko system ma szukać?",
+        a: "Tak. Tolerancję ceny i metrażu ustawiacie w ustawieniach biura, bo w dużym mieście i w mniejszym znaczą co innego.",
+      },
+    ],
   },
   {
     slug: "dokumenty",
@@ -330,6 +469,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów i asystentek biura, które dziś przepisują te same dokumenty ręcznie.",
+    shot: "ShotDokumenty",
+    faq: [
+      {
+        q: "Czy dokumenty są zgodne z polskim prawem?",
+        a: "Wzory powstały na podstawie dokumentów używanych na co dzień w działającym biurze pośrednictwa. Przed wdrożeniem w swoim biurze warto dać je swojemu prawnikowi do przejrzenia, tak jak każdy wzór umowy.",
+      },
+      {
+        q: "Czy mogę dopisać własny zapis do umowy?",
+        a: "Tak, w umowie rezerwacyjnej jest miejsce na dodatkowe ustępy. Możesz je napisać sam albo poprosić AI o sformułowanie prawnicze i je poprawić.",
+      },
+      {
+        q: "Czy dokument zapisuje się jako prawdziwy PDF?",
+        a: "Tak, nie jest to druk z przeglądarki. Plik najpierw trafia na dysk, a dopiero z niego drukujesz, więc układ nie rozjeżdża się między przeglądarkami.",
+      },
+    ],
   },
   {
     slug: "ofertowka",
@@ -357,6 +511,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów, którzy wysyłają oferty mailem i chcą, żeby wyglądały poważnie.",
+    shot: "ShotOfertowka",
+    faq: [
+      {
+        q: "Czy mogę wybrać, które zdjęcia trafią do prezentacji?",
+        a: "Tak, wybierasz zdjęcia i kolejność. Reszta danych zaciąga się z oferty.",
+      },
+      {
+        q: "Czy na dokumencie jest nasze logo?",
+        a: "Tak, logo i dane biura wchodzą z ustawień. Jeśli logo nie jest jeszcze wgrane, w jego miejscu są inicjały biura, nigdy cudza marka.",
+      },
+      {
+        q: "Czy zdjęcia są chronione?",
+        a: "Możecie włączyć znak wodny, który nakłada się na zdjęcia przy wgrywaniu. Działa też na zdjęciach wysyłanych na stronę biura.",
+      },
+    ],
   },
   {
     slug: "kalkulatory",
@@ -384,6 +553,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów przy stole z klientem i dla biur współpracujących z doradcami kredytowymi.",
+    shot: "ShotKalkulatory",
+    faq: [
+      {
+        q: "Czy kalkulator uwzględnia rynek pierwotny i wtórny?",
+        a: "Tak. Wybierasz rynek, a PCC i pozostałe opłaty przeliczają się same. Jest też wariant rynku wtórnego bez PCC.",
+      },
+      {
+        q: "Czy klient dostaje to na piśmie?",
+        a: "Tak, jednym przyciskiem robi się PDF z logo biura i danymi agenta, do wysłania mailem jeszcze z samochodu.",
+      },
+      {
+        q: "Czy mogę pokazać klientowi rabat na prowizji?",
+        a: "Tak. Podajesz stawkę standardową i swoją, a dokument pokazuje obie z przekreśleniem i kwotą oszczędności.",
+      },
+    ],
   },
   {
     slug: "faktury",
@@ -411,6 +595,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela i księgowości. Dostęp do tego modułu nadaje się osobno, bez wglądu w bazę klientów.",
+    shot: "ShotFaktury",
+    faq: [
+      {
+        q: "Czy mogę wystawiać faktury z kilku podmiotów?",
+        a: "Tak. Dodajecie tylu sprzedawców, ilu potrzeba: spółkę i jednoosobowe działalności wspólników, każdy z własnym NIP-em i rachunkiem.",
+      },
+      {
+        q: "Czy numeracja jest automatyczna?",
+        a: "Tak, numery nadają się po kolei, a listę filtrujecie po roku. Status opłacenia widać przy każdej fakturze.",
+      },
+      {
+        q: "Kto ma dostęp do faktur?",
+        a: "Domyślnie CEO i księgowość. Dostęp nadaje się osobno od reszty systemu, więc księgowa nie musi widzieć bazy klientów.",
+      },
+    ],
   },
   {
     slug: "raporty",
@@ -442,6 +641,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela biura i dyrektora. Menedżer widzi pracę swojego zespołu, bez kwot cudzych prowizji.",
+    shot: "ShotPanel",
+    faq: [
+      {
+        q: "Czy raport przychodzi automatycznie?",
+        a: "Tak, podsumowanie miesiąca wychodzi mailem pierwszego dnia. Można też wygenerować go w dowolnym momencie i pobrać jako PDF.",
+      },
+      {
+        q: "Czy widzę, skąd biorą się transakcje?",
+        a: "Tak, z podziałem na źródła i według prowizji, a nie liczby kontaktów. Polecenie, które dało jedną dużą transakcję, nie ginie za reklamą, która dała dwadzieścia zimnych leadów.",
+      },
+      {
+        q: "Czy raport można pokazać wspólnikom?",
+        a: "Tak, po to jest eksport do PDF: złożony dokument z wykresami, do wydruku na spotkanie.",
+      },
+    ],
   },
   {
     slug: "role-i-uprawnienia",
@@ -473,6 +687,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur z rozbudowaną strukturą i dla tych, które zatrudniają księgowość albo asystentkę na część etatu.",
+    shot: "ShotRole",
+    faq: [
+      {
+        q: "Czy muszę używać wszystkich ośmiu stanowisk?",
+        a: "Nie. Małe biuro spokojnie wystarczy CEO i agentami. Reszta czeka na moment, w którym pojawi się księgowa albo asystentka.",
+      },
+      {
+        q: "Czy mogę zrobić wyjątek dla jednej osoby?",
+        a: "Tak, to sedno tego modułu. Włączasz albo wyłączasz pojedynczy moduł konkretnej osobie, bez zmieniania jej stanowiska. Wyjątki są oznaczone, więc po pół roku wiadomo, co było zmieniane ręcznie.",
+      },
+      {
+        q: "Czy da się ograniczyć dostęp CEO?",
+        a: "Nie i to celowo. Gdyby się dało, biuro mogłoby zostać bez nikogo, kto wejdzie w ustawienia i to odkręci.",
+      },
+    ],
   },
   {
     slug: "strona-www",
@@ -500,6 +729,21 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur bez strony i dla tych, których strona żyje osobno od bazy ofert. Osobna usługa, poza abonamentem za system.",
+    shot: "ShotOferty",
+    faq: [
+      {
+        q: "Czy muszę brać stronę razem z systemem?",
+        a: "Nie. To osobna usługa, poza abonamentem. System działa bez niej normalnie, a jeśli macie już własną stronę, nic nie musicie zmieniać.",
+      },
+      {
+        q: "Czy strona działa na naszej domenie?",
+        a: "Tak, podpinamy Waszą domenę. Certyfikat, kopie zapasowe i hosting są po naszej stronie.",
+      },
+      {
+        q: "Co się dzieje z zapytaniem z formularza?",
+        a: "Tworzy kontakt w CRM i zadanie dla agenta, a biuro dostaje powiadomienie. Nie ląduje w skrzynce, w której ginie.",
+      },
+    ],
   },
 ];
 
@@ -513,7 +757,8 @@ export function getModule(slug: string, lang: string = "pl"): ProductModule | un
   if (lang !== "en") return base;
 
   const translated = MODULES_EN[slug];
-  return translated ? { slug, ...translated } : base;
+  // Makieta ekranu jest wspólna dla obu języków, więc bierzemy ją z bazy.
+  return translated ? { slug, shot: base.shot, ...translated } : base;
 }
 
 /** Lista modułów w danym języku - do list i map strony. */

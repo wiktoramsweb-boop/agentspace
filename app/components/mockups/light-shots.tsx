@@ -451,3 +451,340 @@ export function ShotDokumenty({ lang = "pl" }: { lang?: string }) {
     </div>
   );
 }
+
+/** Leady z reklam: skąd przyszły, kto je wziął, na jakim są etapie. */
+export function ShotLeady({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
+  const leady: [string, string, string, string][] = [
+    [s("Anna Kowalska"), s("Meta · Mieszkania 2 pokoje"), s("umówione"), "AW"],
+    [s("Marcin Nowak"), s("Meta · Sprzedaj mieszkanie"), s("w kontakcie"), "KS"],
+    [s("Ewa Lewandowska"), s("Formularz na stronie"), s("nowy"), ""],
+    [s("Paweł Zieliński"), s("Meta · Domy pod miastem"), s("w kontakcie"), "AW"],
+  ];
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-base font-semibold text-slate-900">{s("Leady")}</p>
+        <span className="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">
+          {s("Wczytaj plik")}
+        </span>
+      </div>
+
+      <div className="mb-3 grid grid-cols-3 gap-2">
+        {[
+          [s("Nowe"), "6"],
+          [s("W kontakcie"), "11"],
+          [s("Umówione"), "4"],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-slate-400">{label}</p>
+            <p className="text-sm font-semibold text-slate-900">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white">
+        {leady.map(([imie, zrodlo, etap, agent], i) => (
+          <motion.div
+            key={imie}
+            className={`flex items-center gap-3 p-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}
+            initial={{ opacity: 0, y: 6 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.07, ease }}
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-medium text-slate-800">{imie}</span>
+              <span className="block truncate text-slate-400">{zrodlo}</span>
+            </span>
+            <span
+              className={`rounded-md px-2 py-0.5 text-[10px] font-medium ${
+                etap === s("nowy")
+                  ? "bg-amber-50 text-amber-700"
+                  : etap === s("umówione")
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "bg-sky-50 text-sky-700"
+              }`}
+            >
+              {etap}
+            </span>
+            <span
+              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[9px] font-bold ${
+                agent ? "bg-slate-900 text-white" : "border border-dashed border-slate-300 text-slate-400"
+              }`}
+            >
+              {agent || "?"}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+
+      <p className="mt-3 text-slate-500">
+        {s("Lead bez inicjałów czeka w puli biura. Ten sam numer wgrany drugi raz nie zrobi duplikatu.")}
+      </p>
+    </div>
+  );
+}
+
+/** Poszukiwanie kupującego i oferty, które do niego pasują. */
+export function ShotPoszukiwania({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
+  const dopasowania: [string, string, number][] = [
+    [s("Zabłocie · 62 m² · 3 pok."), s("720 000 zł"), 96],
+    [s("Podgórze · 58 m² · 3 pok."), s("690 000 zł"), 88],
+    [s("Kazimierz · 55 m² · 2 pok."), s("745 000 zł"), 74],
+  ];
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <p className="text-base font-semibold text-slate-900">{s("Poszukiwanie P/014")}</p>
+      <p className="mb-3 text-slate-400">{s("Rodzina Wiśniewskich · kupno")}</p>
+
+      <div className="mb-3 grid grid-cols-2 gap-2">
+        {[
+          [s("Budżet"), s("do 750 000 zł")],
+          [s("Metraż"), s("55 - 70 m²")],
+          [s("Pokoje"), s("3 lub więcej")],
+          [s("Dzielnice"), s("Zabłocie, Podgórze")],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-xl border border-slate-200 bg-white p-2.5">
+            <p className="text-slate-400">{label}</p>
+            <p className="font-medium text-slate-800">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <p className="mb-2 font-medium text-slate-800">{s("Pasujące oferty biura")}</p>
+      <div className="rounded-xl border border-slate-200 bg-white">
+        {dopasowania.map(([opis, cena, zgodnosc], i) => (
+          <div key={opis} className={`p-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}>
+            <div className="mb-1.5 flex items-center justify-between gap-2">
+              <span className="truncate text-slate-800">{opis}</span>
+              <span className="flex-shrink-0 font-semibold text-slate-900">{cena}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Bar value={zgodnosc} tone={zgodnosc > 90 ? "emerald" : "sky"} />
+              <span className="w-8 flex-shrink-0 text-right text-slate-400">{zgodnosc}%</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-3 text-slate-500">
+        {s("Dopasowania liczą się same, także dla ofert dodanych jutro przez innego agenta.")}
+      </p>
+    </div>
+  );
+}
+
+/** Ofertówka: prezentacja oferty złożona z bazy. */
+export function ShotOfertowka({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
+  return (
+    <div className="h-full w-full bg-slate-100 p-4 text-[11px] text-slate-700 sm:p-6">
+      <div className="mx-auto h-full max-w-[420px] rounded-xl bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center gap-2 border-b border-slate-200 pb-3">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-bold text-white">
+            BD
+          </span>
+          <span className="text-[10px] font-semibold text-slate-900">{s("Biuro Demo Nieruchomości")}</span>
+          <span className="ml-auto text-[10px] text-slate-400">{s("Oferta dla klienta")}</span>
+        </div>
+
+        <div className="relative mb-3 h-28 overflow-hidden rounded-lg">
+          <Image src="/wzory/salon-widok.jpg" alt="" fill sizes="420px" className="object-cover" />
+        </div>
+
+        <p className="text-sm font-semibold text-slate-900">{s("Apartament z widokiem na Wawel")}</p>
+        <p className="mb-3 text-slate-400">{s("Zabłocie · 84 m² · 3 pok.")}</p>
+
+        <div className="mb-3 grid grid-cols-3 gap-2">
+          {[
+            [s("Cena"), s("1 690 000 zł")],
+            [s("Metraż"), "84 m²"],
+            [s("Piętro"), "4 / 6"],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-lg bg-slate-50 p-2">
+              <p className="text-slate-400">{label}</p>
+              <p className="font-semibold text-slate-900">{value}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-slate-500">
+          {s("Dwupoziomowy apartament w zrewitalizowanej kamienicy, z tarasem od południa.")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Kalkulator kosztów zakupu liczony przy kliencie. */
+export function ShotKalkulatory({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
+  const pozycje: [string, string][] = [
+    [s("Cena nieruchomości"), s("650 000 zł")],
+    [s("PCC (2%)"), s("13 000 zł")],
+    [s("Taksa notarialna"), s("4 145 zł")],
+    [s("Opłaty sądowe"), s("446 zł")],
+  ];
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <div className="mb-3 flex gap-1.5">
+        {[s("Kredyt"), s("Koszty zakupu"), s("Najem")].map((tab, i) => (
+          <span
+            key={tab}
+            className={`rounded-lg px-2.5 py-1 text-[10px] font-medium ${
+              i === 1 ? "bg-emerald-600 text-white" : "bg-white text-slate-500"
+            }`}
+          >
+            {tab}
+          </span>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-3">
+        {pozycje.map(([label, value]) => (
+          <div key={label} className="flex items-center justify-between border-b border-slate-100 py-1.5 last:border-0">
+            <span className="text-slate-500">{label}</span>
+            <span className="font-medium text-slate-900">{value}</span>
+          </div>
+        ))}
+
+        <div className="flex items-center justify-between py-1.5">
+          <span className="text-slate-500">{s("Prowizja biura")}</span>
+          <span className="flex items-center gap-1.5">
+            <span className="text-slate-400 line-through">{s("19 500 zł")}</span>
+            <span className="font-medium text-slate-900">{s("13 000 zł")}</span>
+            <span className="rounded bg-emerald-50 px-1.5 text-[10px] font-medium text-emerald-700">
+              −6 500
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <motion.div
+        className="mt-3 flex items-center justify-between rounded-xl bg-emerald-50 p-3"
+        initial={{ opacity: 0, scale: 0.97 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.45, ease }}
+      >
+        <span className="font-medium text-emerald-900">{s("Razem koszty zakupu")}</span>
+        <span className="text-base font-semibold text-emerald-900">{s("31 206 zł")}</span>
+      </motion.div>
+
+      <p className="mt-3 text-slate-500">{s("Jeden przycisk i klient dostaje to jako PDF z logo biura.")}</p>
+    </div>
+  );
+}
+
+/** Faktura za pośrednictwo wystawiana z transakcji. */
+export function ShotFaktury({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
+  const faktury: [string, string, string, boolean][] = [
+    ["7/10/2026", s("Kowalscy · ul. Zbożowa"), s("13 000 zł"), true],
+    ["6/10/2026", s("Nowak · os. Oświecenia"), s("9 800 zł"), true],
+    ["5/09/2026", s("Wiśniewska · ul. Lea"), s("16 400 zł"), false],
+  ];
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-base font-semibold text-slate-900">{s("Faktury")}</p>
+        <span className="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">
+          {s("Nowa faktura")}
+        </span>
+      </div>
+
+      <div className="mb-3 grid grid-cols-2 gap-2">
+        {[
+          [s("Wystawione w tym miesiącu"), s("22 800 zł")],
+          [s("Czeka na wpłatę"), s("16 400 zł")],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-slate-400">{label}</p>
+            <p className="text-sm font-semibold text-slate-900">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white">
+        {faktury.map(([numer, nabywca, kwota, oplacona], i) => (
+          <div key={numer} className={`flex items-center gap-3 p-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}>
+            <span className="w-16 flex-shrink-0 font-medium text-slate-800">{numer}</span>
+            <span className="min-w-0 flex-1 truncate text-slate-500">{nabywca}</span>
+            <span className="flex-shrink-0 font-medium text-slate-900">{kwota}</span>
+            <span
+              className={`flex-shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium ${
+                oplacona ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+              }`}
+            >
+              {oplacona ? s("opłacona") : s("czeka")}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-3 text-slate-500">{s("Sprzedawcą może być spółka albo działalność wspólnika, każdy z własnym rachunkiem.")}</p>
+    </div>
+  );
+}
+
+/** Role i dostępy: co widzi konkretna osoba. */
+export function ShotRole({ lang = "pl" }: { lang?: string }) {
+  const s = shotText(lang);
+  const moduly: [string, boolean, boolean][] = [
+    [s("Klienci i leady"), false, false],
+    [s("Nieruchomości"), false, false],
+    [s("Prowizje"), true, true],
+    [s("Faktury i podatki"), true, true],
+    [s("Ustawienia firmy"), false, false],
+  ];
+
+  return (
+    <div className="h-full w-full bg-slate-50 p-4 text-[11px] text-slate-700 sm:p-5">
+      <p className="text-base font-semibold text-slate-900">{s("Katarzyna Zielińska")}</p>
+      <p className="mb-3 text-slate-400">{s("Księgowość · widzi całe biuro")}</p>
+
+      <div className="rounded-xl border border-slate-200 bg-white">
+        {moduly.map(([nazwa, wlaczony, recznie], i) => (
+          <motion.div
+            key={nazwa}
+            className={`flex items-center gap-3 p-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}
+            initial={{ opacity: 0, x: -6 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.35, delay: i * 0.06, ease }}
+          >
+            <span className="min-w-0 flex-1">
+              <span className="font-medium text-slate-800">{nazwa}</span>
+              {recznie && (
+                <span className="ml-1.5 rounded bg-amber-50 px-1.5 text-[9px] font-medium text-amber-700">
+                  {s("dodane ręcznie")}
+                </span>
+              )}
+            </span>
+            <span
+              className={`relative h-4 w-7 flex-shrink-0 rounded-full ${
+                wlaczony ? "bg-emerald-500" : "bg-slate-300"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition ${
+                  wlaczony ? "left-3.5" : "left-0.5"
+                }`}
+              />
+            </span>
+          </motion.div>
+        ))}
+      </div>
+
+      <p className="mt-3 text-slate-500">
+        {s("Księgowa rozlicza prowizje i faktury, a bazy klientów nie widzi wcale.")}
+      </p>
+    </div>
+  );
+}
