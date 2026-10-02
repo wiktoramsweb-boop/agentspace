@@ -159,7 +159,7 @@ export function UprawnieniaOsoby({
                   disabled={pracuje}
                   className="peer sr-only"
                 />
-                <span className="relative h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-emerald-600 peer-checked:[&>span]:translate-x-5 peer-disabled:opacity-50 dark:bg-slate-600">
+                <span className="relative h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-emerald-600 peer-checked:[&>span]:translate-x-5 peer-disabled:opacity-50 dark:bg-slate-600 dark:peer-checked:bg-emerald-500">
                   <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition" />
                 </span>
               </label>

@@ -7,7 +7,6 @@ import { ToastProvider } from "./components/toast";
 import { PageTransition } from "./components/page-transition";
 import { PwaInstall } from "./components/pwa-install";
 import { odswiezDemoJesliTrzeba } from "@/lib/demo/zasiew";
-import { redirect } from "next/navigation";
 import { stanDostepu } from "@/lib/abonament-cennik";
 import { PasekAbonamentu } from "./pasek-abonamentu";
 import { getPrzewodnik } from "@/lib/data-przewodnik";
@@ -25,12 +24,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     return <OnboardingRedirect />;
   }
 
-  // Po okresie próbnym i po wygaśnięciu abonamentu biuro trafia na ekran
-  // płatności. Konto demo zostaje otwarte: służy do pokazów, nie do pracy.
+  // Po okresie próbnym i po wygaśnięciu abonamentu zamykamy moduły, ale
+  // NIE wyrzucamy z aplikacji. Płatności online jeszcze nie ma, więc nikt nie
+  // kupi abonamentu w pięć minut, a wyrzucony użytkownik zostaje z niczym.
+  // Zostają otwarte ustawienia i ekran płatności. Konto demo służy do pokazów,
+  // więc zostaje otwarte w całości.
   const dostep = stanDostepu(user.agency ?? null);
-  if (!dostep.aktywne && !user.agency?.is_demo) {
-    redirect("/abonament");
-  }
+  const zablokowane = !dostep.aktywne && !user.agency?.is_demo;
 
   // Konto demo odświeża się samo. Pokaz może się odbyć za tydzień albo za dwa
   // miesiące, a kalendarz i statystyki mają wtedy wyglądać tak samo. Dotyczy
@@ -61,7 +61,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Sidebar
           role={user.role}
           permissions={user.permissions}
-          przewodnik={przewodnik.ukonczony ? null : przewodnik}
+          przewodnik={zablokowane || przewodnik.ukonczony ? null : przewodnik}
+          zablokowane={zablokowane}
           fullName={user.full_name ?? "Użytkownik"}
           agencyName={user.agency?.name ?? "Biuro"}
           avatarUrl={avatarUrl(user.avatar_path)}

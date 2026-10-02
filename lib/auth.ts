@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "./supabase/server";
 import { createSupabaseAdmin } from "./supabase/admin";
 import type { ProfileWithAgency } from "./types";
 import { maModul, zakresDanych, type Modul, type Zakres } from "./role";
+import { stanDostepu } from "./abonament-cennik";
 
 /**
  * Zwraca zalogowanego użytkownika z profilem i agencją, albo null.
@@ -86,6 +87,13 @@ export async function requireModul(modul: Modul): Promise<ProfileWithAgency> {
   const user = await requireUser();
   if (!maModul({ id: user.id, role: user.role, permissions: user.permissions }, modul)) {
     redirect("/app");
+  }
+  // Po okresie próbnym nie wyrzucamy z aplikacji, tylko zamykamy moduły.
+  // Ustawienia i abonament zostają otwarte, bo inaczej biuro nie miałoby
+  // jak zapłacić ani zabrać swoich danych.
+  if (modul !== "abonament" && !user.agency?.is_demo) {
+    const dostep = stanDostepu(user.agency ?? null);
+    if (!dostep.aktywne) redirect("/app");
   }
   return user;
 }

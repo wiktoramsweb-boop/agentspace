@@ -27,6 +27,8 @@ import { GameStrip, BadgesCard } from "./components/game-strip";
 import { BanerPrzewodnika } from "./components/baner-przewodnika";
 import { redirect } from "next/navigation";
 import { getPrzewodnik } from "@/lib/data-przewodnik";
+import { stanDostepu } from "@/lib/abonament-cennik";
+import { DostepWstrzymany } from "./dostep-wstrzymany";
 import { getAgencySettings } from "@/lib/agency-settings";
 
 export default async function DashboardPage() {
@@ -34,6 +36,14 @@ export default async function DashboardPage() {
   const firstName = (user.full_name ?? "").split(" ")[0] || "Cześć";
 
   const przewodnik = await getPrzewodnik(user);
+
+  // Po wygaśnięciu dostępu pulpit zamienia się w jedną kartę z wyjaśnieniem
+  // i drogą do płatności. Reszta modułów jest zamknięta, ale użytkownik
+  // zostaje w aplikacji i widzi swoje dane w ustawieniach.
+  const dostep = stanDostepu(user.agency ?? null);
+  if (!dostep.aktywne && !user.agency?.is_demo) {
+    return <DostepWstrzymany probny={dostep.probny} czyCeo={user.role === "owner"} />;
+  }
 
   // Zupełnie puste biuro kierujemy prosto do przewodnika. Nowa osoba widzi
   // inaczej pusty pulpit i nie wie, od czego zacząć. Po zrobieniu czegokolwiek

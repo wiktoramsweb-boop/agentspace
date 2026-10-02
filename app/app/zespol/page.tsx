@@ -107,6 +107,7 @@ export default async function ZespolPage() {
     email: m.email,
     role: m.role,
     manager_id: m.manager_id,
+    permissions: m.permissions,
   }));
 
   // Statystyki nagłówka - dla menedżera liczone z jego zakresu.
@@ -295,8 +296,7 @@ export default async function ZespolPage() {
           <div className="mb-8">
             <h2 className="mb-1 text-lg font-semibold text-slate-900">Role</h2>
             <p className="mb-3 text-sm text-slate-500">
-              Stanowisko ustawia dostępy domyślne. Żeby dołożyć albo odebrać komuś pojedynczy
-              moduł, wejdź w jego kartę.
+              Kliknij osobę, żeby ustawić jej stanowisko i dostęp do poszczególnych modułów.
             </p>
             <TeamRoles members={teamMembers} currentUserId={user.id} />
           </div>

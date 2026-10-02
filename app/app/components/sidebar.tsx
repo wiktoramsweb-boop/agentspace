@@ -17,6 +17,7 @@ export function Sidebar({
   role,
   permissions,
   przewodnik,
+  zablokowane,
   fullName,
   agencyName,
   avatarUrl,
@@ -25,6 +26,8 @@ export function Sidebar({
   permissions?: Uprawnienia | null;
   /** Postęp przewodnika. Podany tylko, póki nie jest domknięty. */
   przewodnik?: { zrobione: number; wszystkich: number } | null;
+  /** Po wygaśnięciu dostępu moduły są zamknięte, zostają ustawienia. */
+  zablokowane?: boolean;
   fullName: string;
   agencyName: string;
   avatarUrl?: string | null;
@@ -98,6 +101,26 @@ export function Sidebar({
             <div className={`flex flex-col gap-0.5 ${isCollapsed ? "hidden" : ""}`}>
               {items.map((item) => {
                 const active = isActive(item.href);
+                // Po wygaśnięciu dostępu pozycja zostaje widoczna, ale z kłódką
+                // i bez linku: biuro ma widzieć, co traci, a nie puste menu.
+                const zamkniete =
+                  Boolean(zablokowane) &&
+                  item.href !== "/app" &&
+                  !item.href.startsWith("/app/ustawienia");
+                if (zamkniete) {
+                  return (
+                    <span
+                      key={item.href}
+                      title="Niedostępne po zakończeniu okresu próbnego"
+                      className="group relative flex cursor-not-allowed items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium text-zinc-600"
+                    >
+                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-500">
+                        <KlodkaIcon />
+                      </span>
+                      {item.label}
+                    </span>
+                  );
+                }
                 return (
                   <Link
                     key={item.href}
@@ -230,4 +253,16 @@ function MenuIcon() {
 }
 function CloseIcon() {
   return <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>;
+}
+
+function KlodkaIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16.5 10.5V7.5a4.5 4.5 0 1 0-9 0v3m-1.5 0h12a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-1.5 1.5H6a1.5 1.5 0 0 1-1.5-1.5V12A1.5 1.5 0 0 1 6 10.5Z"
+      />
+    </svg>
+  );
 }

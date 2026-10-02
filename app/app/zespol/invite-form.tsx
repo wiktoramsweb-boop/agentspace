@@ -1,5 +1,7 @@
 "use client";
 
+import { ROLE } from "@/lib/role";
+
 import { useActionState, useEffect, useRef, useState } from "react";
 import { inviteAgent } from "./actions";
 import { CopyLink } from "./copy-link";
@@ -37,9 +39,11 @@ export function InviteForm({ managers }: { managers: ManagerOption[] }) {
           <div className="flex-1">
             <label className={lbl}>Rola</label>
             <Select name="role" value={role} onChange={(e) => setRole(e.target.value)}>
-              <option value="agent">Agent</option>
-              <option value="manager">Menedżer</option>
-              <option value="owner">CEO (pełny dostęp)</option>
+              {ROLE.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.id === "owner" ? "CEO (pełny dostęp)" : r.nazwa}
+                </option>
+              ))}
             </Select>
           </div>
           {role === "agent" && (

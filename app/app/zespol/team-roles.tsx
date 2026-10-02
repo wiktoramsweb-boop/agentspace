@@ -1,10 +1,6 @@
-"use client";
-
-import { useState, useTransition } from "react";
+import Link from "next/link";
 import type { UserRole } from "@/lib/types";
-import { ROLE, opisRoli } from "@/lib/role";
-import { setMemberRole } from "./actions";
-import { Select } from "@/app/app/components/select";
+import { moduly, opisRoli, type Uprawnienia } from "@/lib/role";
 
 export type TeamMember = {
   id: string;
@@ -12,8 +8,18 @@ export type TeamMember = {
   email: string | null;
   role: UserRole;
   manager_id: string | null;
+  permissions?: Uprawnienia | null;
 };
 
+/**
+ * Lista osób z ich stanowiskiem.
+ *
+ * Wcześniej rola zmieniała się tu rozwijaną listą, ale przy ośmiu
+ * stanowiskach lista nie mieściła się na ekranie i ucinała ostatnie pozycje.
+ * Poza tym rola to dopiero połowa sprawy: indywidualne dostępy i tak ustawia
+ * się na karcie osoby. Dlatego wiersz prowadzi w jedno miejsce, w którym
+ * ustawia się wszystko naraz.
+ */
 export function TeamRoles({
   members,
   currentUserId,
@@ -21,46 +27,46 @@ export function TeamRoles({
   members: TeamMember[];
   currentUserId: string;
 }) {
-  const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-
-  function run(fn: () => Promise<{ error?: string } | undefined | void>) {
-    setError(null);
-    startTransition(async () => {
-      const res = await fn();
-      if (res && "error" in res && res.error) setError(res.error);
-    });
-  }
-
   return (
-    <div className="space-y-3">
-      {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{error}</p>}
-      <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200">
-        {members.map((m) => (
-          <div key={m.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-slate-900">
-                {m.label}
-                {m.id === currentUserId && <span className="ml-2 text-xs text-slate-500">(Ty)</span>}
-              </p>
-              {m.email && <p className="truncate text-xs text-slate-500">{m.email}</p>}
-              <p className="mt-0.5 text-xs text-slate-400">{opisRoli(m.role).opis}</p>
-            </div>
+    <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200">
+      {members.map((m) => {
+        const rola = opisRoli(m.role);
+        const ile = moduly({ id: m.id, role: m.role, permissions: m.permissions }).length;
+        const wyjatki = Object.keys(m.permissions?.moduly ?? {}).length;
 
-            <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
-              <Select aria-label="Rola" value={m.role} disabled={pending} onChange={(e) => run(() => setMemberRole(m.id, e.target.value as UserRole))}>
-                {ROLE.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.nazwa}
-                  </option>
-                ))}
-              </Select>
+        return (
+          <li key={m.id}>
+            <Link
+              href={`/app/zespol/${m.id}`}
+              className="flex flex-col gap-3 p-4 transition hover:bg-slate-100 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-slate-900">
+                  {m.label}
+                  {m.id === currentUserId && (
+                    <span className="ml-2 text-xs text-slate-500">(Ty)</span>
+                  )}
+                </p>
+                {m.email && <p className="truncate text-xs text-slate-500">{m.email}</p>}
+                <p className="mt-0.5 text-xs text-slate-400">{rola.opis}</p>
+              </div>
 
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+              <div className="flex flex-shrink-0 items-center gap-3">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-slate-900">{rola.nazwa}</p>
+                  <p className="text-xs text-slate-500">
+                    {ile} {ile === 1 ? "moduł" : ile < 5 ? "moduły" : "modułów"}
+                    {wyjatki > 0 && " · zmieniane ręcznie"}
+                  </p>
+                </div>
+                <span aria-hidden="true" className="text-slate-400">
+                  →
+                </span>
+              </div>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
-
