@@ -16,6 +16,8 @@
 
 **Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa - portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`. **`CRON_SECRET` jest WYMAGANY** - bez niego crony odmawiają (`lib/cron-auth.ts`). Limity AI: system kredytów (v35, `lib/kredyty-cennik.ts`) - pula miesięczna biura z pakietu, plus dzienny bezpiecznik na osobę `AI_DAILY_CREDITS_USER` (domyślnie 120 kredytów).
 
+**Usunięte:** moduł Analiza cenowa (`/app/wycena`, `lib/wycena`) - model wyceniał zbyt niedokładnie, żeby pokazywać to klientowi. Migracje v28/v29 i tabele `market_*` zostają w bazie, nic nie kasujemy.
+
 **Następne (omówione, NIE zbudowane):** PWA+powiadomienia (rekomendowane następne - pętla nawyku dla terenu), moduł Nieruchomości (oferty+zdjęcia), OtoDom eksport (bariera=dostęp/umowa nie kod), głos AI w Coach (ElevenLabs=koszty), płatności, Google Calendar.
 
 **Współpraca:** user chce autonomii ("rób sam bez pytania"), commituj+pushuj incrementalnie, tłumacz prosto po polsku. Klucze API były w czacie - do rotacji po testach.

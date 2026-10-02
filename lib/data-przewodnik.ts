@@ -173,7 +173,7 @@ export const getPrzewodnik = cache(async function getPrzewodnik(
     kroki_praca.push({
       id: "oferta",
       tytul: "Dodaj pierwszą ofertę",
-      po_co: "Od oferty zaczyna się reszta: ofertówka, analiza cenowa, dopasowania do poszukiwań.",
+      po_co: "Od oferty zaczyna się reszta: ofertówka, dopasowania do poszukiwań, dokumenty.",
       jak: "Nieruchomości → Dodaj nieruchomość. Kreator poprowadzi przez pola.",
       href: "/app/nieruchomosci",
       cta: "Dodaj ofertę",

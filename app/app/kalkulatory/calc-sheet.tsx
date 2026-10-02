@@ -1,3 +1,4 @@
+import { Monogram } from "../components/monogram";
 import { CoinsIcon } from "../components/icons";
 
 export type SheetRow = {
@@ -31,7 +32,11 @@ export function CalcSheet({
       <div className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-5">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={agent.logoUrl ?? "/logo.png"} alt="Logo" width={48} height={48} className={agent.logoUrl ? "h-12 w-auto max-w-[130px] object-contain" : "rounded-full"} />
+          {agent.logoUrl ? (
+          <img src={agent.logoUrl} alt="Logo" className="h-12 w-auto max-w-[130px] object-contain" />
+        ) : (
+          <Monogram nazwa={agent.agency} rozmiar={48} />
+        )}
           <div>
             <p className="text-sm font-semibold">{agent.agency}</p>
             <p className="text-xs text-slate-500">Symulacja dla klienta · {today}</p>
