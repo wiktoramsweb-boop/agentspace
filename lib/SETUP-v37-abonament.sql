@@ -9,8 +9,9 @@
 -- zamknęła nikomu systemu.
 
 alter table public.agencies
-  -- Koniec okresu próbnego. NULL u biur założonych przed v37 oznacza
-  -- „bez limitu": nie odcinamy dostępu komuś, kto już pracuje.
+  -- Kolumna istnieje od v1 (domyślnie 14 dni), ale nigdy nic jej nie
+  -- pilnowało. Zostawiamy ją i dopiero teraz zaczynamy jej używać,
+  -- wyłącznie dla biur zakładanych od tej migracji w górę.
   add column if not exists trial_ends_at timestamptz,
 
   -- trial | active | expired | cancelled
@@ -54,7 +55,18 @@ create index if not exists subscription_orders_agency_idx
 
 alter table public.subscription_orders enable row level security;
 
--- Biura założone przed tą migracją zostają z otwartym dostępem.
+-- Biura istniejące w chwili tej migracji zostają z otwartym dostępem.
+--
+-- To jest jednorazowe i celowo obejmuje wszystkie wiersze: w momencie
+-- uruchomienia każde biuro w tabeli jest biurem sprzed abonamentu.
+-- Uwaga, bo to łatwo przeoczyć: kolumna `trial_ends_at` istnieje od v1
+-- z domyślnym terminem 14 dni, więc istniejące biura mają tam dawno
+-- minione daty. Gdyby backfill patrzył tylko na NULL, pierwsze
+-- uruchomienie tej migracji odcięłoby dostęp działającym biurom.
+--
+-- Pusty `subscription_ends_at` oznacza abonament bezterminowy, więc nic
+-- im nie wygaśnie, dopóki ktoś świadomie tego nie zmieni.
 update public.agencies
-set subscription_status = 'active'
-where subscription_status = 'trial' and trial_ends_at is null;
+set subscription_status = 'active',
+    subscription_ends_at = null
+where subscription_status is distinct from 'active';

@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import { stanDostepu } from "@/lib/abonament-cennik";
 import { APP_TZ } from "@/lib/datetime";
 import { ROLE_LABELS } from "@/lib/role";
 import { Card } from "../components/ui";
@@ -10,8 +12,10 @@ import { ChangeEmail } from "./change-email";
 
 export default async function UstawieniaPage() {
   const user = await requireUser();
-  const trialOver =
-    !!user.agency?.trial_ends_at && new Date(user.agency.trial_ends_at) < new Date();
+  // Od v37 o dostępie decyduje `subscription_status`, a nie stara kolumna
+  // `plan`. Pokazujemy stan z jednego źródła, żeby ustawienia nie twierdziły
+  // czegoś innego niż pasek nad treścią i ekran abonamentu.
+  const dostep = stanDostepu(user.agency ?? null);
 
   return (
     <>
@@ -47,21 +51,26 @@ export default async function UstawieniaPage() {
               <dt className="text-slate-500">Biuro</dt>
               <dd className="text-slate-800">{user.agency?.name ?? "-"}</dd>
             </div>
-            {user.agency?.trial_ends_at && user.agency.plan === "trial" && (
-              <div>
-                {/* Po terminie zmieniamy etykietę, żeby data z przeszłości
-                    nie wyglądała jak błąd aplikacji. */}
-                <dt className="text-slate-500">
-                  {trialOver ? "Okres próbny zakończony" : "Okres próbny do"}
-                </dt>
-                <dd className={trialOver ? "font-medium text-amber-600" : "text-slate-800"}>
-                  {new Intl.DateTimeFormat("pl-PL", {
-                    timeZone: APP_TZ,
-                    dateStyle: "long",
-                  }).format(new Date(user.agency.trial_ends_at))}
-                </dd>
-              </div>
-            )}
+            <div>
+              <dt className="text-slate-500">
+                {dostep.probny ? "Okres próbny" : "Abonament"}
+              </dt>
+              <dd className={dostep.ostrzegaj ? "font-medium text-amber-600" : "text-slate-800"}>
+                {dostep.dniDoKonca == null
+                  ? "Aktywny bezterminowo"
+                  : dostep.aktywne
+                    ? `Jeszcze ${dostep.dniDoKonca} dni`
+                    : "Zakończony"}
+                {user.role === "owner" && (
+                  <>
+                    {" · "}
+                    <Link href="/abonament" className="text-emerald-700 hover:text-emerald-600">
+                      {dostep.probny || !dostep.aktywne ? "wykup" : "przedłuż"}
+                    </Link>
+                  </>
+                )}
+              </dd>
+            </div>
           </dl>
         </Card>
       </div>
