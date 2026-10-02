@@ -81,13 +81,17 @@ export default async function ProduktPage({
               {mod.problem}
             </p>
           </div>
-          <figure className="relative m-0 aspect-[4/3] overflow-hidden rounded-[24px] border border-[var(--mk-hairline)]">
+          <figure
+            className={`relative m-0 aspect-[4/3] overflow-hidden ${
+              mod.ilustracja ? "" : "rounded-[24px] border border-[var(--mk-hairline)]"
+            }`}
+          >
             <Image
-              src={mod.photo}
+              src={mod.ilustracja ?? mod.photo}
               alt=""
               fill
               sizes="(max-width: 1024px) 100vw, 44vw"
-              className="object-cover"
+              className={mod.ilustracja ? "object-contain" : "object-cover"}
             />
           </figure>
         </div>

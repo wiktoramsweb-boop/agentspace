@@ -26,6 +26,12 @@ export type ProductModule = {
   shot: string;
   /** Zdjęcie przy sekcji „Dlaczego to boli”, żeby długi tekst miał oddech. */
   photo: string;
+  /**
+   * Ilustracja modułu, jeśli powstała. Ma pierwszeństwo przed zdjęciem, bo
+   * mówi o samym module, a nie buduje tylko nastroju. Przezroczyste PNG,
+   * więc działa też w ciemnym motywie.
+   */
+  ilustracja?: string;
   /** Pytania, które padają przy tym module. */
   faq: { q: string; a: string }[];
 };
@@ -61,6 +67,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów jako codzienne miejsce pracy, dla właściciela jako gwarancja, że baza biura zostaje w biurze.",
+    ilustracja: "/ilustracje/crm.png",
     photo: "/wzory/lounge.jpg",
     shot: "ShotKlient",
     faq: [
@@ -155,6 +162,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela: kontrola nad rozliczeniami. Dla agenta: pewność, że prowizja jest policzona uczciwie.",
+    ilustracja: "/ilustracje/prowizje.png",
     photo: "/wzory/szklo.jpg",
     shot: "ShotProwizje",
     faq: [
@@ -339,6 +347,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur, które wydają na reklamę. Pokazuje, która kampania przynosi transakcje, a nie tylko kliknięcia.",
+    ilustracja: "/ilustracje/leady.png",
     photo: "/wzory/widok.jpg",
     shot: "ShotLeady",
     faq: [
@@ -386,6 +395,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów w terenie i dla menedżerów, którzy chcą widzieć pracę zespołu bez proszenia o raporty.",
+    ilustracja: "/ilustracje/dzialania.png",
     photo: "/zdjecia/plan-dnia.jpg",
     shot: "ShotKalendarz",
     faq: [
@@ -433,6 +443,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur z kilkoma agentami, w których oferty i kupujący dotąd nie spotykali się na czas.",
+    ilustracja: "/ilustracje/poszukiwania.png",
     photo: "/wzory/salon-widok.jpg",
     shot: "ShotPoszukiwania",
     faq: [
@@ -480,6 +491,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów i asystentek biura, które dziś przepisują te same dokumenty ręcznie.",
+    ilustracja: "/ilustracje/dokumenty.png",
     photo: "/wzory/cegla.jpg",
     shot: "ShotDokumenty",
     faq: [
@@ -523,6 +535,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów, którzy wysyłają oferty mailem i chcą, żeby wyglądały poważnie.",
+    ilustracja: "/ilustracje/ofertowka.png",
     photo: "/wzory/salon.jpg",
     shot: "ShotOfertowka",
     faq: [
@@ -566,6 +579,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agentów przy stole z klientem i dla biur współpracujących z doradcami kredytowymi.",
+    ilustracja: "/ilustracje/kalkulatory.png",
     photo: "/wzory/kuchnia.jpg",
     shot: "ShotKalkulatory",
     faq: [
@@ -776,7 +790,9 @@ export function getModule(slug: string, lang: string = "pl"): ProductModule | un
 
   const translated = MODULES_EN[slug];
   // Makieta ekranu jest wspólna dla obu języków, więc bierzemy ją z bazy.
-  return translated ? { slug, shot: base.shot, photo: base.photo, ...translated } : base;
+  return translated
+    ? { slug, shot: base.shot, photo: base.photo, ilustracja: base.ilustracja, ...translated }
+    : base;
 }
 
 /** Lista modułów w danym języku - do list i map strony. */
