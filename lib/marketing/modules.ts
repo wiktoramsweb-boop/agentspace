@@ -807,3 +807,68 @@ export function getModule(slug: string, lang: string = "pl"): ProductModule | un
 export function listModules(lang: string = "pl"): ProductModule[] {
   return MODULES.map((m) => getModule(m.slug, lang) ?? m);
 }
+
+/**
+ * Podział modułów na cztery grupy.
+ *
+ * Szesnaście kafelków jeden pod drugim robiło ze strony głównej listę bez
+ * końca. Grupy pozwalają pokazać naraz cztery pozycje zamiast szesnastu, a
+ * ten sam podział obsługuje rozwijane menu „Produkt”, więc nazwy grup są
+ * w jednym miejscu.
+ *
+ * Kolejność slugów w grupie = kolejność na stronie.
+ */
+export type KategoriaModulow = {
+  id: string;
+  label: string;
+  labelEn: string;
+  /** Jedno zdanie, po co ta grupa istnieje. */
+  opis: string;
+  opisEn: string;
+  slugs: string[];
+};
+
+export const KATEGORIE_MODULOW: KategoriaModulow[] = [
+  {
+    id: "sprzedaz",
+    label: "Sprzedaż i klienci",
+    labelEn: "Sales and clients",
+    opis: "Wszystko, co dzieje się między pierwszym telefonem a podpisaną umową.",
+    opisEn: "Everything between the first phone call and a signed contract.",
+    slugs: ["crm", "leady", "poszukiwania", "dzialania"],
+  },
+  {
+    id: "oferty",
+    label: "Oferty i marketing",
+    labelEn: "Listings and marketing",
+    opis: "Oferta biura w jednym miejscu i wszędzie tam, gdzie widzi ją klient.",
+    opisEn: "Your listings in one place and everywhere the client sees them.",
+    slugs: ["nieruchomosci", "ofertowka", "strona-www", "kalkulatory"],
+  },
+  {
+    id: "rozliczenia",
+    label: "Rozliczenia i dokumenty",
+    labelEn: "Settlements and documents",
+    opis: "Prowizje, faktury i papiery, których nikt nie chce pisać ręcznie.",
+    opisEn: "Commissions, invoices and the paperwork nobody wants to retype.",
+    slugs: ["prowizje", "faktury", "dokumenty"],
+  },
+  {
+    id: "zespol",
+    label: "Zespół i wyniki",
+    labelEn: "Team and results",
+    opis: "Co robi zespół, ile dowozi i kto ma do czego dostęp.",
+    opisEn: "What the team does, what it delivers and who can see what.",
+    slugs: ["cele", "panel-wlasciciela", "raporty", "ai-coach", "role-i-uprawnienia"],
+  },
+];
+
+/** Kategorie z gotowymi modułami w danym języku. */
+export function kategorieZModulami(lang: string = "pl") {
+  return KATEGORIE_MODULOW.map((k) => ({
+    id: k.id,
+    label: lang === "en" ? k.labelEn : k.label,
+    opis: lang === "en" ? k.opisEn : k.opis,
+    moduly: k.slugs.map((s) => getModule(s, lang)).filter((m): m is ProductModule => Boolean(m)),
+  }));
+}

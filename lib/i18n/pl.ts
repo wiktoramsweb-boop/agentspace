@@ -12,7 +12,7 @@ import { SITE_ADDON } from "@/lib/site/addon";
 export const pl = {
   nav: {
     links: [
-      { href: "/#moduly", label: "Produkt" },
+      { href: "/produkt", label: "Produkt" },
       { href: "/wzory", label: "Strony www" },
       { href: "/integracje", label: "Integracje" },
       { href: "/cennik", label: "Cennik" },
@@ -25,6 +25,7 @@ export const pl = {
     menu: "Menu",
     closeMenu: "Zamknij menu",
     language: "Język",
+    allModules: "Wszystkie 16 modułów",
   },
 
   footer: {
@@ -65,6 +66,8 @@ export const pl = {
   common: {
     bookCall: "Umów rozmowę",
     seeModule: "Zobacz moduł",
+    allModules: "Zobacz wszystkie 16 modułów",
+    capabilitiesCount: "możliwości w module",
     priceSuffix: "zł / mc",
     from: "od",
   },

@@ -20,14 +20,41 @@ import type { Dict } from "@/lib/i18n/pl";
  * po prostu nie było: strona pokazywała samo logo i przycisk kontaktu, więc
  * z telefonu nie dało się wejść ani w cennik, ani w produkt.
  */
-export function NavClient({ lang, t }: { lang: Locale; t: Dict["nav"] }) {
+export type MenuProduktu = {
+  id: string;
+  label: string;
+  moduly: { slug: string; name: string }[];
+}[];
+
+export function NavClient({
+  lang,
+  t,
+  menuProduktu = [],
+}: {
+  lang: Locale;
+  t: Dict["nav"];
+  menuProduktu?: MenuProduktu;
+}) {
   const NAV_LINKS = t.links;
   const href = (path: string) => localeHref(lang, path);
   const [open, setOpen] = useState(false);
+  // Rozwinięte menu „Produkt”. Trzymamy je w stanie, a nie na :hover w CSS,
+  // bo panel musi dać się otworzyć też z klawiatury i zamknąć Escapem.
+  const [produktOpen, setProduktOpen] = useState(false);
   const pathname = usePathname();
   const reduce = useReducedMotion();
 
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    setOpen(false);
+    setProduktOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!produktOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setProduktOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [produktOpen]);
 
   useEffect(() => {
     if (!open) return;
@@ -61,15 +88,96 @@ export function NavClient({ lang, t }: { lang: Locale; t: Dict["nav"] }) {
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={href(link.href)}
-              className="rounded-full px-3 py-2 text-sm font-medium text-[var(--color-mk-muted)] transition-colors hover:bg-[var(--mk-surface-2)] hover:text-[var(--color-mk-text)]"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            // Pierwsza pozycja („Produkt”) rozwija listę modułów. Sam link
+            // dalej działa i prowadzi na spis, więc klik myszą nic nie traci.
+            const zRozwinieciem = link.href === "/produkt" && menuProduktu.length > 0;
+            if (!zRozwinieciem) {
+              return (
+                <Link
+                  key={link.href}
+                  href={href(link.href)}
+                  className="rounded-full px-3 py-2 text-sm font-medium text-[var(--color-mk-muted)] transition-colors hover:bg-[var(--mk-surface-2)] hover:text-[var(--color-mk-text)]"
+                >
+                  {link.label}
+                </Link>
+              );
+            }
+            return (
+              <div
+                key={link.href}
+                onMouseEnter={() => setProduktOpen(true)}
+                onMouseLeave={() => setProduktOpen(false)}
+                onFocusCapture={() => setProduktOpen(true)}
+                onBlurCapture={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setProduktOpen(false);
+                }}
+              >
+                <Link
+                  href={href(link.href)}
+                  aria-expanded={produktOpen}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-colors hover:bg-[var(--mk-surface-2)] ${
+                    produktOpen ? "text-[var(--color-mk-text)]" : "text-[var(--color-mk-muted)]"
+                  }`}
+                >
+                  {link.label}
+                  <svg
+                    aria-hidden="true"
+                    className={`h-3 w-3 transition-transform duration-300 ${produktOpen ? "rotate-180" : ""}`}
+                    viewBox="0 0 12 12"
+                    fill="none"
+                  >
+                    <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </Link>
+
+                <AnimatePresence>
+                  {produktOpen && (
+                    <motion.div
+                      initial={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18, ease: [0.22, 0.61, 0.36, 1] }}
+                      className="absolute inset-x-0 top-[46px] px-6 pt-4"
+                    >
+                      <div className="mx-auto max-w-[1080px] overflow-hidden rounded-[20px] border border-[var(--mk-hairline-strong)] bg-[var(--mk-nav-panel)] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+                        <div className="grid gap-x-6 gap-y-7 p-7 md:grid-cols-4">
+                          {menuProduktu.map((k) => (
+                            <div key={k.id}>
+                              <p className="mb-3 font-mono text-[11px] uppercase tracking-wider text-[var(--color-mk-muted)]">
+                                {k.label}
+                              </p>
+                              <ul className="space-y-0.5">
+                                {k.moduly.map((m) => (
+                                  <li key={m.slug}>
+                                    <Link
+                                      href={href(m.slug === "strona-www" ? "/wzory" : `/produkt/${m.slug}`)}
+                                      className="block rounded-lg px-2 py-1.5 text-[0.875rem] text-[var(--color-mk-text)] opacity-85 transition-colors hover:bg-[var(--mk-surface-3)] hover:opacity-100"
+                                    >
+                                      {m.name}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                        <Link
+                          href={href("/produkt")}
+                          className="flex items-center justify-between border-t border-[var(--mk-hairline)] px-7 py-4 text-sm font-medium text-[var(--mk-accent-text)] transition-colors hover:bg-[var(--mk-surface-3)]"
+                        >
+                          {t.allModules}
+                          <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 20 20" fill="none">
+                            <path d="M3 10h13m0 0-5-5m5 5-5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-2">

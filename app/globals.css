@@ -1724,3 +1724,15 @@ html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-blue-600 { col
   background:
     radial-gradient(120% 100% at 30% 15%, #ffffff 0%, #f1f4f7 55%, #e7ecf1 100%);
 }
+
+/* Napisy leżące na zdjęciu.
+   `.mk h4` maluje nagłówek gradientem przez background-clip, a w jasnym
+   motywie ten gradient jest ciemny - tytuł na ciemnym zdjęciu znikał.
+   Klasa Tailwinda tego nie nadpisze, bo `.mk h4` ma wyższą specyficzność,
+   więc kasujemy tu cały mechanizm gradientu, a nie sam kolor. */
+.mk .na-zdjeciu :is(h2, h3, h4) {
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+}

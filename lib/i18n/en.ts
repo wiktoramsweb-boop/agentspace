@@ -11,7 +11,7 @@ import type { Dict } from "./pl";
 export const en: Dict = {
   nav: {
     links: [
-      { href: "/#moduly", label: "Product" },
+      { href: "/produkt", label: "Product" },
       { href: "/wzory", label: "Websites" },
       { href: "/integracje", label: "Integrations" },
       { href: "/cennik", label: "Pricing" },
@@ -24,6 +24,7 @@ export const en: Dict = {
     menu: "Menu",
     closeMenu: "Close menu",
     language: "Language",
+    allModules: "All 16 modules",
   },
 
   footer: {
@@ -64,6 +65,8 @@ export const en: Dict = {
   common: {
     bookCall: "Book a call",
     seeModule: "See the module",
+    allModules: "See all 16 modules",
+    capabilitiesCount: "features in this module",
     priceSuffix: "PLN / mo",
     from: "from",
   },

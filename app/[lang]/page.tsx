@@ -16,7 +16,8 @@ import {
 } from "@/app/components/mockups/light-shots";
 import { CoachLive } from "@/app/components/mk/coach-live";
 import { WZORY } from "@/lib/wzory/themes";
-import { listModules } from "@/lib/marketing/modules";
+import { kategorieZModulami, listModules } from "@/lib/marketing/modules";
+import { ModulesExplorer } from "@/app/components/mk/modules-explorer";
 import { SiteFooter } from "@/app/components/site-footer";
 import { AuroraBackground } from "@/app/components/aurora-background";
 import { Spotlight } from "@/app/components/effects/spotlight";
@@ -197,59 +198,27 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           lead={t.modules.lead}
         />
 
-        <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {modulyProduktu.map((mod, i) => (
-            <StaggerItem key={mod.name} className={i === 0 ? "lg:col-span-2" : ""}>
-              <SpotlightCard
-                href={href(mod.slug === "strona-www" ? "/wzory" : `/produkt/${mod.slug}`)}
-                className="overflow-hidden p-0"
-              >
-                {/* Obrazek na kafelku: siatka samych akapitów wygląda na pustą
-                    i nie daje powodu, żeby w którykolwiek moduł wejść.
-                    Ilustracja mówi, co moduł robi, czego zdjęcie biura nie
-                    robiło. Jasny podkład jest celowy - patrz .bg-ilustracja. */}
-                <div
-                  className={`bg-ilustracja relative overflow-hidden border-b border-[var(--mk-hairline)] ${
-                    i === 0 ? "h-56" : "h-44"
-                  }`}
-                >
-                  <Image
-                    src={mod.ilustracja ?? mod.photo}
-                    alt=""
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className={`transition-transform duration-700 group-hover/card:scale-105 ${
-                      mod.ilustracja ? "object-contain p-3" : "object-cover"
-                    }`}
-                  />
-                </div>
-                <div className="flex h-full flex-col p-8">
-                  <h4 className="mb-3">{mod.name}</h4>
-                  <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-text)] opacity-85">
-                    {mod.lead}
-                  </p>
-                  <p className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-mk-accent)]">
-                    {d.common.seeModule}
-                    <svg
-                      aria-hidden="true"
-                      className="h-4 w-4 transition-transform duration-300 group-hover/card:translate-x-1"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M3 10h13m0 0-5-5m5 5-5 5"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </p>
-                </div>
-              </SpotlightCard>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+        <ModulesExplorer
+          kategorie={kategorieZModulami(locale).map((k) => ({
+            id: k.id,
+            label: k.label,
+            opis: k.opis,
+            moduly: k.moduly.map((m) => ({
+              slug: m.slug,
+              name: m.name,
+              lead: m.lead,
+              ilustracja: m.ilustracja,
+              photo: m.photo,
+              ile: m.capabilities.length,
+            })),
+          }))}
+          lang={locale}
+          t={{
+            seeModule: d.common.seeModule,
+            all: d.common.allModules,
+            capabilities: d.common.capabilitiesCount,
+          }}
+        />
       </Section>
 
       {/* ── W ŚRODKU: jasna przerwa z podglądem produktu ── */}
@@ -455,20 +424,17 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             <TiltPhoto
               src="/wzory/kuchnia.jpg"
               alt={t.manifest.photos[0].alt}
-              caption={t.manifest.photos[0].caption}
               className="aspect-[3/4]"
             />
             <div className="grid gap-4 pt-10">
               <TiltPhoto
                 src="/wzory/dom.jpg"
                 alt={t.manifest.photos[1].alt}
-                caption={t.manifest.photos[1].caption}
                 className="aspect-square"
               />
               <TiltPhoto
                 src="/wzory/taras.jpg"
                 alt={t.manifest.photos[2].alt}
-                caption={t.manifest.photos[2].caption}
                 className="aspect-square"
               />
             </div>
