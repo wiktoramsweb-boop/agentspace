@@ -11,7 +11,6 @@ import {
   getContactReminders,
   getCommissionStats,
   getGoal,
-  getOnboardingState,
 } from "@/lib/data-platform";
 import { getGameData, getWeeklyChallenge } from "@/lib/gamification";
 import { computeFunnel } from "@/lib/funnel";
@@ -25,13 +24,15 @@ import { DailyAssistant } from "./components/daily-assistant";
 import { TodayActivities } from "./components/today-activities";
 import { getActivities } from "@/lib/data-activities";
 import { GameStrip, BadgesCard } from "./components/game-strip";
-import { OnboardingChecklist } from "./components/onboarding-checklist";
+import { BanerPrzewodnika } from "./components/baner-przewodnika";
+import { getPrzewodnik } from "@/lib/data-przewodnik";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   const firstName = (user.full_name ?? "").split(" ")[0] || "Cześć";
 
-  const [stats, recent, tasks, reminders, needContact, commission, goalRow, onboarding] =
+  const przewodnik = await getPrzewodnik(user);
+  const [stats, recent, tasks, reminders, needContact, commission, goalRow] =
     await Promise.all([
       getAgentStats(user.id),
       getRecentSessions(user.id, 4),
@@ -40,7 +41,6 @@ export default async function DashboardPage() {
       getClientsNeedingContact(user.id, 6),
       getCommissionStats(user.id),
       getGoal(user.id),
-      getOnboardingState(user.id),
     ]);
 
   // Zaplanowane przypomnienia mają priorytet; klientów "zapomnianych" pokazujemy
@@ -79,8 +79,8 @@ export default async function DashboardPage() {
         }
       />
 
-      {/* Onboarding (znika po ukończeniu) */}
-      <OnboardingChecklist state={onboarding} />
+      {/* Przewodnik dla nowego biura (znika po domknięciu kroków niezbędnych) */}
+      <BanerPrzewodnika przewodnik={przewodnik} />
 
       {/* Gamifikacja: poziom, passa, następna odznaka */}
       <GameStrip game={game} />

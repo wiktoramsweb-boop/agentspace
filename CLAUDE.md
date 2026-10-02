@@ -12,6 +12,8 @@
 
 **⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić w Supabase SQL Editor pliki `lib/SETUP-*.sql` po kolei - v1 ✅ uruchomione; **v2 (platforma), v3 (kategorie+cele), v4 (łatwe scenariusze) prawdopodobnie do uruchomienia - POTWIERDZIĆ Z USEREM**. Kod odporny na brak tabel (puste, nie crashuje).
 
+**Migracje do uruchomienia (po v35):** v36 (sprzedawcy faktur per biuro), v37 (okres próbny i abonament), v38 (role i uprawnienia). Wszystkie idempotentne, kod działa bez nich.
+
 **Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa - portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`. **`CRON_SECRET` jest WYMAGANY** - bez niego crony odmawiają (`lib/cron-auth.ts`). Limity AI: system kredytów (v35, `lib/kredyty-cennik.ts`) - pula miesięczna biura z pakietu, plus dzienny bezpiecznik na osobę `AI_DAILY_CREDITS_USER` (domyślnie 120 kredytów).
 
 **Następne (omówione, NIE zbudowane):** PWA+powiadomienia (rekomendowane następne - pętla nawyku dla terenu), moduł Nieruchomości (oferty+zdjęcia), OtoDom eksport (bariera=dostęp/umowa nie kod), głos AI w Coach (ElevenLabs=koszty), płatności, Google Calendar.
@@ -41,6 +43,7 @@ z wybranego wzoru. Klient edytuje wszystko w `/app/ustawienia/strona`. Wymaga mi
 **Wzorzec dostępu do danych:** cały dostęp przez server-side kod z service_role (`createSupabaseAdmin`), autoryzacja egzekwowana w kodzie na bazie sesji (`requireUser`/`requireOwner`). RLS włączone jako backstop. Anon key tylko do auth (login/signup/getUser).
 
 **Zasady przy nowym kodzie (po audycie z października 2026):**
+- Role i moduły: `lib/role.ts` (bez importów, test `npm run test:role`). Menu i strony czytają to samo pole `modul`, więc ukrycie w menu zawsze idzie w parze z bramką `requireModul`.
 - Reguły „kto może co” trzymamy w `lib/uprawnienia.ts` i pilnujemy testem `npm run test:uprawnienia`. Agent usuwa i przepisuje tylko swoje rekordy, menedżer nie widzi kwot cudzych transakcji, ukrywanie kontaktów obowiązuje także na kartach i w listach do wyboru.
 - ID klienta/oferty/osoby przychodzące z formularza sprawdzamy przez `lib/agency-ids.ts` (tylko z własnego biura).
 - Każdy nowy endpoint AI: `brakKredytow` z `lib/kredyty.ts` z własną wyceną w `lib/kredyty-cennik.ts` + limit długości tekstu. Publiczny formularz: pułapka `website` + `hitLimit` po skrócie IP.

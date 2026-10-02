@@ -61,6 +61,7 @@ export const SECTIONS: NavSection[] = [
     title: "Główne",
     items: [
       { href: "/app", label: "Pulpit", icon: <HomeIcon />, color: "emerald" },
+      { href: "/app/start", label: "Jak zacząć", icon: <CompassIcon />, color: "teal" },
       { href: "/app/dzialania", label: "Działania", icon: <BoltIcon />, color: "amber" },
       { href: "/app/kalendarz", label: "Kalendarz", icon: <CalendarNavIcon />, color: "sky", modul: "klienci" },
       { href: "/app/szybki-wpis", label: "Szybki wpis", icon: <VoiceIcon />, color: "teal", modul: "klienci" },
@@ -212,4 +213,13 @@ function AnnexIcon() {
 }
 function LeadIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-4.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" /></svg>;
+}
+
+function CompassIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <circle cx="12" cy="12" r="9" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m15.5 8.5-2.2 5.3-5.3 2.2 2.2-5.3 5.3-2.2Z" />
+    </svg>
+  );
 }

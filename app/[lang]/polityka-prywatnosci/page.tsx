@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
@@ -126,7 +127,7 @@ export default async function PolitykaPrywatnosci({ params }: { params: Promise<
               kontakty w CRM, oferty, dokumenty, zgłoszenia ze strony internetowej biura), są
               danymi, których <strong>administratorem jest biuro</strong>. AgentSpace przetwarza
               je wyłącznie w imieniu biura, na podstawie{" "}
-              <a href="/umowa-powierzenia">umowy powierzenia przetwarzania danych</a>. W sprawach
+              <Link href="/umowa-powierzenia">umowy powierzenia przetwarzania danych</Link>. W sprawach
               tych danych (np. ich usunięcia) właściwy jest kontakt z biurem, z którym dana osoba
               współpracuje. Dotyczy to także formularzy na stronach internetowych biur
               prowadzonych w AgentSpace.
