@@ -1714,3 +1714,13 @@ html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-zinc-500 { col
    przyciemniamy. Jasny: blue-600 na blue-100 dawał 4,3:1. */
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-slate-200 { background-color: #2e2e34 !important; }
 html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-blue-600 { color: #1d4ed8; }
+
+/* Panel pod ilustracje modułów.
+   Ilustracje są rysowane prawie czarnym konturem na jasnym tle, a strona
+   marketingowa domyślnie jest ciemna. Bez własnego jasnego podkładu
+   w ciemnym motywie zostają z nich same kolorowe plamy, bez twarzy i linii.
+   Dlatego podkład jest celowo jasny w obu motywach. */
+.bg-ilustracja {
+  background:
+    radial-gradient(120% 100% at 30% 15%, #ffffff 0%, #f1f4f7 55%, #e7ecf1 100%);
+}

@@ -204,19 +204,23 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                 href={href(mod.slug === "strona-www" ? "/wzory" : `/produkt/${mod.slug}`)}
                 className="overflow-hidden p-0"
               >
-                {/* Zdjęcie na kafelku: siatka samych akapitów wygląda na pustą
-                    i nie daje powodu, żeby w którykolwiek moduł wejść. */}
+                {/* Obrazek na kafelku: siatka samych akapitów wygląda na pustą
+                    i nie daje powodu, żeby w którykolwiek moduł wejść.
+                    Ilustracja mówi, co moduł robi, czego zdjęcie biura nie
+                    robiło. Jasny podkład jest celowy - patrz .bg-ilustracja. */}
                 <div
-                  className={`relative overflow-hidden border-b border-[var(--mk-hairline)] ${
+                  className={`bg-ilustracja relative overflow-hidden border-b border-[var(--mk-hairline)] ${
                     i === 0 ? "h-56" : "h-44"
                   }`}
                 >
                   <Image
-                    src={mod.photo}
+                    src={mod.ilustracja ?? mod.photo}
                     alt=""
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition-transform duration-700 group-hover/card:scale-105"
+                    className={`transition-transform duration-700 group-hover/card:scale-105 ${
+                      mod.ilustracja ? "object-contain p-3" : "object-cover"
+                    }`}
                   />
                 </div>
                 <div className="flex h-full flex-col p-8">

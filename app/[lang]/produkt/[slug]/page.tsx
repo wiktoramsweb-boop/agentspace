@@ -81,9 +81,12 @@ export default async function ProduktPage({
               {mod.problem}
             </p>
           </div>
+          {/* Ilustracje mają prawie czarne kontury, a strona domyślnie jest
+              ciemna. Dlatego dostają własny jasny panel w obu motywach -
+              inaczej w ciemnym zostają z nich same kolorowe plamy. */}
           <figure
-            className={`relative m-0 aspect-[4/3] overflow-hidden ${
-              mod.ilustracja ? "" : "rounded-[24px] border border-[var(--mk-hairline)]"
+            className={`relative m-0 aspect-[4/3] overflow-hidden rounded-[24px] border border-[var(--mk-hairline)] ${
+              mod.ilustracja ? "bg-ilustracja" : ""
             }`}
           >
             <Image
@@ -91,7 +94,7 @@ export default async function ProduktPage({
               alt=""
               fill
               sizes="(max-width: 1024px) 100vw, 44vw"
-              className={mod.ilustracja ? "object-contain" : "object-cover"}
+              className={mod.ilustracja ? "object-contain p-4 sm:p-6" : "object-cover"}
             />
           </figure>
         </div>

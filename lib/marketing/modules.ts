@@ -115,6 +115,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla agenta: jasność, co dziś robić. Dla właściciela: wczesny sygnał, że ktoś zaczyna odpadać.",
+    ilustracja: "/ilustracje/cele.png",
     photo: "/wzory/wieza.jpg",
     shot: "ShotCele",
     faq: [
@@ -210,6 +211,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla nowych agentów jako onboarding, dla doświadczonych jako rozgrzewka przed trudną rozmową.",
+    ilustracja: "/ilustracje/ai-coach.png",
     photo: "/wzory/lobby.jpg",
     shot: "AiCoach",
     faq: [
@@ -257,6 +259,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla właściciela i menedżerów zespołów. Agenci nie widzą cudzych danych.",
+    ilustracja: "/ilustracje/panel-wlasciciela.png",
     photo: "/wzory/miasto-noc.jpg",
     shot: "ShotPanel",
     faq: [
@@ -720,6 +723,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur z rozbudowaną strukturą i dla tych, które zatrudniają księgowość albo asystentkę na część etatu.",
+    ilustracja: "/ilustracje/role-i-uprawnienia.png",
     photo: "/zdjecia/zespol.jpg",
     shot: "ShotRole",
     faq: [
@@ -763,6 +767,7 @@ export const MODULES: ProductModule[] = [
     ],
     forWhom:
       "Dla biur bez strony i dla tych, których strona żyje osobno od bazy ofert. Osobna usługa, poza abonamentem za system.",
+    ilustracja: "/ilustracje/strona-www.png",
     photo: "/wzory/taras.jpg",
     shot: "ShotOferty",
     faq: [

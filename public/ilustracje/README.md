@@ -21,3 +21,12 @@ Dwie rzeczy do sprawdzenia przy każdej nowej ilustracji, bo na oko umykają:
   z beżowymi i odstawała od reszty serii. Sprawdzenie: policzyć piksele
   w zakresie tonu skóry, wzorcowe ilustracje mają ich zero.
 - **Kolor włosów.** Czarne. Zielone włosy psują spójność postaci.
+
+## Jasne tło pod ilustracją (klasa `.bg-ilustracja`)
+
+Ilustracje są rysowane prawie czarnym konturem, a strona marketingowa domyślnie
+jest ciemna (`--color-mk-bg: #08090b`). Bez własnego jasnego podkładu w ciemnym
+motywie zostają z nich same kolorowe plamy: znikają kontury, włosy i twarze.
+Dlatego kafelek na stronie głównej i panel na podstronie modułu mają klasę
+`.bg-ilustracja` (jasny gradient w OBU motywach) i `object-contain` z paddingiem,
+a nie `object-cover`. Nie zastępuj tego kolorem zależnym od motywu.
