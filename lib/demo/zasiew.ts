@@ -168,36 +168,43 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
 
   // Dane firmy i sprzedawca na fakturach: bez nich demo wygląda jak konto,
   // którego nikt nie skonfigurował, a to pierwsze, co widać na pokazie.
-  await admin.from("agency_settings").upsert(
-    {
-      agency_id: agencyId,
-      company: {
-        name: "Biuro Demo Nieruchomości",
-        street: "ul. Przykładowa 12/3",
-        postal_code: "00-001",
-        city: "Warszawa",
-        country: "Polska",
-        phone: "+48 600 100 200",
-        email: "kontakt@biurodemo.pl",
-        nip: "1234567890",
-        www: "https://biurodemo.pl",
-      },
-      sellers: [
-        {
-          key: "firma",
-          name: "Biuro Demo Nieruchomości sp. z o.o.",
-          address: "ul. Przykładowa 12/3",
-          city: "Warszawa",
-          postcode: "00-001",
-          nip: "1234567890",
-          bank: "Przykładowy Bank",
-          account: "00 0000 0000 0000 0000 0000 0000",
-          brand: true,
-        },
-      ],
+  //
+  // Sprzedawców dokłada migracja v36. Gdy jej nie ma, PostgREST odrzuca cały
+  // zapis przez nieznaną kolumnę, więc powtarzamy go bez niej: brak jednej
+  // migracji nie może zabrać demu także danych firmy.
+  const daneFirmy = {
+    agency_id: agencyId,
+    company: {
+      name: "Biuro Demo Nieruchomości",
+      street: "ul. Przykładowa 12/3",
+      postal_code: "00-001",
+      city: "Warszawa",
+      country: "Polska",
+      phone: "+48 600 100 200",
+      email: "kontakt@biurodemo.pl",
+      nip: "1234567890",
+      www: "https://biurodemo.pl",
     },
-    { onConflict: "agency_id" },
-  );
+  };
+  const sprzedawcy = [
+    {
+      key: "firma",
+      name: "Biuro Demo Nieruchomości sp. z o.o.",
+      address: "ul. Przykładowa 12/3",
+      city: "Warszawa",
+      postcode: "00-001",
+      nip: "1234567890",
+      bank: "Przykładowy Bank",
+      account: "00 0000 0000 0000 0000 0000 0000",
+      brand: true,
+    },
+  ];
+  const { error: bladUstawien } = await admin
+    .from("agency_settings")
+    .upsert({ ...daneFirmy, sellers: sprzedawcy }, { onConflict: "agency_id" });
+  if (bladUstawien) {
+    await admin.from("agency_settings").upsert(daneFirmy, { onConflict: "agency_id" });
+  }
 
   // Brak tych kolumn oznacza nieuruchomioną migrację v30. Dane i tak się
   // zapiszą, tylko automatyczne odświeżanie nie ruszy - mówimy o tym wprost.
