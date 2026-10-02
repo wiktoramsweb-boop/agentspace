@@ -21,11 +21,17 @@ export function BrowserShot({
   label = "agentspace.pl/app",
   className = "",
   tilt = false,
+  fit = false,
 }: {
   children: React.ReactNode;
   label?: string;
   className?: string;
   tilt?: boolean;
+  /**
+   * Wysokość z treści zamiast stałych proporcji. Makiety modułów bywają
+   * krótsze niż 16:11 i wtedy pod ekranem zostawał pas pustego tła.
+   */
+  fit?: boolean;
 }) {
   const reduce = useReducedMotion();
   return (
@@ -44,7 +50,7 @@ export function BrowserShot({
         </span>
         <span className="mx-auto rounded-md bg-slate-100 px-3 py-1 text-[11px] text-slate-500">{label}</span>
       </div>
-      <div className="aspect-[4/3] w-full sm:aspect-[16/11]">{children}</div>
+      <div className={fit ? "w-full" : "aspect-[4/3] w-full sm:aspect-[16/11]"}>{children}</div>
     </motion.div>
   );
 }

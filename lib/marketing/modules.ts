@@ -872,3 +872,19 @@ export function kategorieZModulami(lang: string = "pl") {
     moduly: k.slugs.map((s) => getModule(s, lang)).filter((m): m is ProductModule => Boolean(m)),
   }));
 }
+
+/** Grupa, do której należy moduł - do okruszków i sekcji „podobne”. */
+export function kategoriaModulu(slug: string, lang: string = "pl") {
+  const k = KATEGORIE_MODULOW.find((x) => x.slugs.includes(slug));
+  if (!k) return undefined;
+  return {
+    id: k.id,
+    label: lang === "en" ? k.labelEn : k.label,
+    opis: lang === "en" ? k.opisEn : k.opis,
+    /** Pozostałe moduły z tej samej grupy. */
+    sasiedzi: k.slugs
+      .filter((s) => s !== slug)
+      .map((s) => getModule(s, lang))
+      .filter((m): m is ProductModule => Boolean(m)),
+  };
+}
