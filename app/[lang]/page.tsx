@@ -195,7 +195,10 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {modulyProduktu.map((mod, i) => (
             <StaggerItem key={mod.name} className={i === 0 ? "lg:col-span-2" : ""}>
-              <SpotlightCard href={href(`/produkt/${mod.slug}`)} className="p-8">
+              <SpotlightCard
+                href={href(mod.slug === "strona-www" ? "/wzory" : `/produkt/${mod.slug}`)}
+                className="p-8"
+              >
                 <div className="flex h-full flex-col">
                   <h4 className="mb-3">{mod.name}</h4>
                   <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">

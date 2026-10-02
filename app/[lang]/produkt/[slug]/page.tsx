@@ -7,11 +7,14 @@ import { PageHero } from "@/app/components/page-hero";
 import { FrameRule } from "@/app/components/mk/frame";
 import { Card, Button, Section, SectionHead } from "@/app/components/mk/ui";
 import { MODULES, getModule, listModules } from "@/lib/marketing/modules";
+import { BrowserShot } from "@/app/components/mk/showcase";
+import { ShotFor } from "@/app/components/mk/shot-for";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
 
 export function generateStaticParams() {
-  return MODULES.map((m) => ({ slug: m.slug }));
+  // strona-www ma wlasna trase z przekierowaniem na /wzory.
+  return MODULES.filter((m) => m.slug !== "strona-www").map((m) => ({ slug: m.slug }));
 }
 
 export async function generateMetadata({
@@ -40,6 +43,9 @@ export default async function ProduktPage({
   const t = getDict(locale).pages.produkt;
   const href = (path: string) => localeHref(locale, path);
   const others = listModules(locale).filter((m) => m.slug !== slug);
+  // Strona internetowa biura ma własną, bogatszą stronę z ośmioma wzorami,
+  // więc kafelek prowadzi tam, a nie na uboższy opis modułu.
+  const innyHref = (s: string) => (s === "strona-www" ? "/wzory" : `/produkt/${s}`);
 
   return (
     <div className="mk relative min-h-screen">
@@ -52,6 +58,16 @@ export default async function ProduktPage({
       >
         <Button href={href("/kontakt")}>{t.cta}</Button>
       </PageHero>
+
+      {/* Ekran z aplikacji. Opis modułu bez obrazka nie mówi nic o tym,
+          jak to wygląda w pracy, a to pierwsze pytanie właściciela biura. */}
+      <Section className="pt-0">
+        <div className="mx-auto max-w-4xl">
+          <BrowserShot tilt>
+            <ShotFor shot={mod.shot} lang={locale} />
+          </BrowserShot>
+        </div>
+      </Section>
 
       <FrameRule />
 
@@ -98,6 +114,43 @@ export default async function ProduktPage({
 
       <FrameRule />
 
+      {/* Pytania o ten moduł */}
+      {mod.faq.length > 0 && (
+        <Section>
+          <SectionHead eyebrow={t.faqEyebrow} title={t.faqTitle} />
+          <div className="mx-auto mt-12 max-w-3xl">
+            {mod.faq.map((item, i) => (
+              <Card key={item.q} className={i > 0 ? "border-t-0" : ""}>
+                <details className="group px-6 py-5 md:px-8">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
+                    {item.q}
+                    <svg
+                      aria-hidden="true"
+                      className="h-5 w-5 flex-shrink-0 text-[var(--color-mk-muted)] transition-transform duration-200 group-open:rotate-180"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                    >
+                      <path
+                        d="M5 7.5 10 12.5 15 7.5"
+                        stroke="currentColor"
+                        strokeWidth="1.3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </summary>
+                  <p className="mt-4 max-w-[62ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
+                    {item.a}
+                  </p>
+                </details>
+              </Card>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      <FrameRule />
+
       {/* Pozostałe moduły */}
       <Section>
         <SectionHead
@@ -108,14 +161,21 @@ export default async function ProduktPage({
 
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {others.map((other) => (
-            <Link key={other.slug} href={href(`/produkt/${other.slug}`)}>
-              <Card className="h-full p-6">
-                <p className="mb-2 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
-                  {other.name}
-                </p>
-                <p className="text-sm leading-snug text-[var(--color-mk-muted)]">
-                  {other.headline}
-                </p>
+            <Link key={other.slug} href={href(innyHref(other.slug))} className="group/kafel">
+              <Card className="h-full overflow-hidden p-0">
+                <div className="h-40 overflow-hidden border-b border-[var(--mk-hairline)] bg-slate-100">
+                  <div className="origin-top-left scale-[0.62] [width:161%]">
+                    <ShotFor shot={other.shot} lang={locale} />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="mb-2 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
+                    {other.name}
+                  </p>
+                  <p className="text-sm leading-snug text-[var(--color-mk-muted)]">
+                    {other.headline}
+                  </p>
+                </div>
               </Card>
             </Link>
           ))}

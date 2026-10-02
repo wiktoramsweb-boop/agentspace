@@ -783,6 +783,8 @@ export const pl = {
       capabilitiesEyebrow: "Możliwości",
       capabilitiesTitle: "Co robi {name}",
       forWhom: "Dla kogo",
+      faqEyebrow: "Pytania",
+      faqTitle: "Zanim zapytasz",
       restEyebrow: "Reszta systemu",
       restTitle: "Pozostałe moduły",
       restLead: "AgentSpace działa jako całość, ale wdrażasz go stopniowo - w tempie, które wytrzyma zespół.",

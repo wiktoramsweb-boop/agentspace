@@ -782,6 +782,8 @@ export const en: Dict = {
       capabilitiesEyebrow: "What it does",
       capabilitiesTitle: "What {name} does",
       forWhom: "Who it is for",
+      faqEyebrow: "Questions",
+      faqTitle: "Before you ask",
       restEyebrow: "The rest of the system",
       restTitle: "Other modules",
       restLead: "AgentSpace works as a whole, but you roll it out gradually, at a pace the team can absorb.",
