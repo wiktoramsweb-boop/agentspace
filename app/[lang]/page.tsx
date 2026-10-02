@@ -33,10 +33,18 @@ import type { Metadata } from "next";
 /* ── Strona ────────────────────────────────────────────────── */
 
 /** Zdjęcia kroków - nie tłumaczą się, więc zostają poza słownikiem. */
-const STEP_PHOTOS = ["/wzory/dziedziniec.jpg", "/wzory/schody.jpg", "/wzory/miasto-noc.jpg"];
+const STEP_PHOTOS = [
+  "/zdjecia/rozmowa-audyt.jpg",
+  "/zdjecia/wdrozenie.jpg",
+  "/zdjecia/pierwsze-wnioski.jpg",
+];
 
 /** Makiety ekranów - podpięte po kluczu zakładki ze słownika. */
-const FIELD_PHOTOS = ["/wzory/kamienica.jpg", "/wzory/salon.jpg", "/wzory/schody.jpg"];
+const FIELD_PHOTOS = [
+  "/zdjecia/pozyskanie.jpg",
+  "/zdjecia/prezentacja.jpg",
+  "/zdjecia/transakcja.jpg",
+];
 
 function shots(lang: string): Record<string, React.ReactNode> {
   return {
@@ -422,18 +430,18 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
           <div className="grid grid-cols-2 gap-4">
             <TiltPhoto
-              src="/wzory/kuchnia.jpg"
+              src="/zdjecia/odbior-kluczy.jpg"
               alt={t.manifest.photos[0].alt}
               className="aspect-[3/4]"
             />
             <div className="grid gap-4 pt-10">
               <TiltPhoto
-                src="/wzory/dom.jpg"
+                src="/zdjecia/poranek-przy-kawie.jpg"
                 alt={t.manifest.photos[1].alt}
                 className="aspect-square"
               />
               <TiltPhoto
-                src="/wzory/taras.jpg"
+                src="/zdjecia/miedzy-spotkaniami.jpg"
                 alt={t.manifest.photos[2].alt}
                 className="aspect-square"
               />

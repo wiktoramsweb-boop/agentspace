@@ -202,17 +202,17 @@ export const en: Dict = {
       lead: "The system should sit beside the work, not replace it. That is why everything an agent does during the day is one tap away on the phone.",
       tiles: [
         {
-          alt: "Townhouse in the city centre",
+          alt: "Real estate agent on the phone in front of a tenement building",
           title: "Prospecting",
           body: "A call to an owner is saved as a contact and counts towards the daily goal immediately. The next conversation with that number attaches to the same history.",
         },
         {
-          alt: "Living room",
+          alt: "Agent showing an empty apartment to a young couple",
           title: "Viewing",
           body: "You upload photos from your phone and the system adds the agency watermark and pushes the listing to the website and the portals.",
         },
         {
-          alt: "Staircase",
+          alt: "Signing a contract at a desk next to a set of keys",
           title: "Deal",
           body: "The agreement, certificates and commission in one place. The agent settlement calculates itself, including the split and the tax.",
         },
@@ -293,9 +293,9 @@ export const en: Dict = {
         { title: "No lock-in", body: "Export your data to a spreadsheet whenever you want, without asking." },
       ],
       photos: [
-        { alt: "Apartment interior", caption: "Viewing, Podgórze" },
-        { alt: "House", caption: "Handing over the keys" },
-        { alt: "Terrace", caption: "Photo session" },
+        { alt: "Agent handing keys to a couple at the door of an apartment", caption: "" },
+        { alt: "Coffee, notebook, keys and documents on a table before a meeting", caption: "" },
+        { alt: "Real estate agent walking down a street with a document folder", caption: "" },
       ],
     },
     origin: {

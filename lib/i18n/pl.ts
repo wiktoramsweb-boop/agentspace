@@ -203,17 +203,17 @@ export const pl = {
       lead: "System ma być z boku, a nie zamiast pracy. Dlatego wszystko, co agent robi w ciągu dnia, zapisuje się jednym kliknięciem z telefonu.",
       tiles: [
         {
-          alt: "Kamienica w centrum",
+          alt: "Agent nieruchomości rozmawia przez telefon przed kamienicą",
           title: "Pozyskanie",
           body: "Telefon do właściciela zapisuje się jako kontakt i od razu liczy do celu dziennego. Kolejna rozmowa z tym numerem dopina się do tej samej historii.",
         },
         {
-          alt: "Salon w mieszkaniu",
+          alt: "Agent pokazuje puste mieszkanie parze kupujących",
           title: "Prezentacja",
           body: "Zdjęcia z sesji wrzucasz z telefonu, a system sam dokłada znak wodny biura i wysyła ofertę na stronę oraz na portale.",
         },
         {
-          alt: "Klatka schodowa",
+          alt: "Podpisywanie umowy przy stole, obok klucze do mieszkania",
           title: "Transakcja",
           body: "Umowa, zaświadczenia i prowizja w jednym miejscu. Rozliczenie z agentem liczy się samo, razem z podziałem i podatkiem.",
         },
@@ -294,9 +294,9 @@ export const pl = {
         { title: "Zero lock-inu", body: "Twoje dane eksportujesz do Excela w każdej chwili, bez proszenia." },
       ],
       photos: [
-        { alt: "Wnętrze mieszkania", caption: "Prezentacja, Podgórze" },
-        { alt: "Dom", caption: "Odbiór kluczy" },
-        { alt: "Taras", caption: "Sesja zdjęciowa" },
+        { alt: "Agent przekazuje klucze parze przy drzwiach mieszkania", caption: "" },
+        { alt: "Kawa, notatnik, klucze i dokumenty na stole przed spotkaniem", caption: "" },
+        { alt: "Agent nieruchomości idzie ulicą z teczką dokumentów", caption: "" },
       ],
     },
     origin: {
