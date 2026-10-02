@@ -529,7 +529,7 @@ export const en: Dict = {
         ],
         subscription: "Subscription",
         perMonth: "/mo",
-        yearNote: "or {yearly} PLN per year, which is two months free",
+        yearNote: "or {yearly} PLN per year, which is 20% cheaper",
         setupNote:
           "A one-off setup fee of {setup} PLN: moving your content and photos, connecting your domain and configuring everything around the agency. Hosting, certificate and backups are in the subscription.",
         ctaTemplates: "See the eight templates",
@@ -545,7 +545,7 @@ export const en: Dict = {
           },
           {
             q: "Is there a trial period?",
-            a: "Instead of a classic trial we run a pilot rollout: for the first month we work together on your data. If you decide the system does not deliver value, we stop without invoicing the next period.",
+            a: "Yes. You create an account and get the whole system free for 7 days. Then you pick a plan, and your data stays either way. For larger agencies we add a pilot on top: for the first month we work together on your data.",
           },
           {
             q: "Can I pay annually?",
@@ -558,6 +558,10 @@ export const en: Dict = {
           {
             q: "Is the website included in the system price?",
             a: "No. The website is a separate service at {monthly} PLN per month plus a one-off setup fee of {setup} PLN. The system works fine without it, and if you already have a website, nothing has to change.",
+          },
+          {
+            q: "Are the AI features limited?",
+            a: "Yes, and we say so openly. Every plan comes with a monthly pool of AI credits shared across the agency, which comfortably covers day-to-day work. You can see usage live in Settings, and if you train unusually intensively you buy a top-up. Without that cap we could not hold these prices.",
           },
           {
             q: "What happens to my data if I leave?",
@@ -887,7 +891,7 @@ export const en: Dict = {
     less: "Fewer agents",
     more: "More agents",
     forYou: "Your fit",
-    note: "Net prices, billed monthly. No fixed-term contract - cancel whenever you want.",
+    note: "Net prices. Billed monthly, every six months (10% cheaper) or yearly (20% cheaper). No fixed-term contract - cancel whenever you want. New agencies get 7 days free.",
     plans: [
       {
         id: "start",
@@ -923,7 +927,7 @@ export const en: Dict = {
         features: [
           "Unlimited agents",
           "Everything in Pro",
-          "Roles: CEO, manager, agent",
+          "Roles and permissions: eight job titles, access granted per person",
           "Multiple branches and team splits",
           "1:1 rollout and team training",
           "Priority support",

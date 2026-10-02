@@ -30,11 +30,11 @@ const FAQ_ENTRIES = [
   },
   {
     q: "Gdzie są przechowywane dane biura?",
-    a: "Na serwerach w Unii Europejskiej (Frankfurt). Dane biura są odseparowane od danych innych biur, a dostęp mają wyłącznie zaproszeni użytkownicy zgodnie z rolą: CEO, menedżer, agent.",
+    a: "Na serwerach w Unii Europejskiej (Frankfurt). Dane biura są odseparowane od danych innych biur, a dostęp mają wyłącznie zaproszeni użytkownicy, zgodnie z rolą i uprawnieniami nadanymi przez właściciela biura.",
   },
   {
     q: "Czy jest umowa na czas określony?",
-    a: "Nie. Rozliczenie miesięczne, rezygnacja w dowolnym momencie.",
+    a: "Nie. Rozliczenie miesięczne, co pół roku albo co rok, z rezygnacją w dowolnym momencie. Nowe biuro ma 7 dni bez opłat.",
   },
 ];
 
@@ -107,7 +107,7 @@ const softwareApplicationSchema = {
     "Umowy rezerwacyjne generowane do PDF",
     "AI Coach - trening rozmów z klientem AI",
     "Panel właściciela z rankingiem i raportami",
-    "Role: CEO, menedżer, agent",
+    "Role i uprawnienia: osiem stanowisk, dostęp nadawany per osoba",
   ],
   publisher: {
     "@type": "Organization",

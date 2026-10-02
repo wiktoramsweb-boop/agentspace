@@ -61,7 +61,7 @@ export const PLANS: Plan[] = [
     features: [
       "Bez limitu agentów",
       "Wszystko z Pro",
-      "Role: CEO, menedżer, agent",
+      "Role i uprawnienia: osiem stanowisk, dostęp nadawany per osoba",
       "Wielooddziałowość i podział zespołów",
       "Wdrożenie 1:1 i szkolenie zespołu",
       "Priorytetowe wsparcie",

@@ -12,7 +12,7 @@
 
 **⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić w Supabase SQL Editor pliki `lib/SETUP-*.sql` po kolei - v1 ✅ uruchomione; **v2 (platforma), v3 (kategorie+cele), v4 (łatwe scenariusze) prawdopodobnie do uruchomienia - POTWIERDZIĆ Z USEREM**. Kod odporny na brak tabel (puste, nie crashuje).
 
-**Migracje do uruchomienia (po v35):** v36 (sprzedawcy faktur per biuro), v37 (okres próbny i abonament), v38 (role i uprawnienia). Wszystkie idempotentne, kod działa bez nich.
+**Migracje:** v36, v37, v38 ✅ uruchomione. **Do uruchomienia: v39** (kolumny `kind` i `credits` w `subscription_orders` - doszły do v37 już po tym, jak została uruchomiona, a `create table if not exists` ich nie dokłada).
 
 **Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa - portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`. **`CRON_SECRET` jest WYMAGANY** - bez niego crony odmawiają (`lib/cron-auth.ts`). Limity AI: system kredytów (v35, `lib/kredyty-cennik.ts`) - pula miesięczna biura z pakietu, plus dzienny bezpiecznik na osobę `AI_DAILY_CREDITS_USER` (domyślnie 120 kredytów).
 

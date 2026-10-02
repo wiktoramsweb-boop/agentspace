@@ -530,7 +530,7 @@ export const pl = {
         ],
         subscription: "Abonament",
         perMonth: "/mc",
-        yearNote: "albo {yearly} zł za rok, czyli dwa miesiące gratis",
+        yearNote: "albo {yearly} zł za rok, czyli 20% taniej",
         setupNote:
           "Wdrożenie {setup} zł jednorazowo: przeniesienie treści, zdjęcia, podpięcie Waszej domeny i ustawienie wszystkiego pod biuro. Hosting, certyfikat i kopie w abonamencie.",
         ctaTemplates: "Zobacz osiem wzorów",
@@ -546,7 +546,7 @@ export const pl = {
           },
           {
             q: "Czy jest okres próbny?",
-            a: "Zamiast klasycznego triala robimy wdrożenie pilotażowe: pierwszy miesiąc pracujemy razem na Twoich danych. Jeśli po nim uznasz, że system nie daje wartości - kończymy bez faktury za kolejny okres.",
+            a: "Tak. Zakładasz konto i przez 7 dni masz cały system bez płacenia. Potem wybierasz pakiet, a dane zostają w całości niezależnie od decyzji. Przy większych biurach robimy do tego wdrożenie pilotażowe: pierwszy miesiąc pracujemy razem na Waszych danych.",
           },
           {
             q: "Czy mogę zapłacić za rok z góry?",
@@ -559,6 +559,10 @@ export const pl = {
           {
             q: "Czy strona internetowa jest w cenie systemu?",
             a: "Nie. Strona www to osobna usługa za {monthly} zł miesięcznie plus jednorazowe wdrożenie {setup} zł. System działa bez niej normalnie, a jeśli macie już własną stronę, nic nie musicie zmieniać.",
+          },
+          {
+            q: "Czy funkcje AI mają limity?",
+            a: "Tak, i mówimy o tym wprost. Każdy pakiet ma miesięczną pulę kredytów AI wspólną dla całego biura, która spokojnie wystarcza na codzienną pracę. Zużycie widzicie na bieżąco w Ustawieniach, a jeśli trenujecie wyjątkowo intensywnie, dokupujecie pakiet. Bez tego limitu nie dalibyśmy rady trzymać tych cen.",
           },
           {
             q: "Co z danymi, jeśli zrezygnuję?",
@@ -887,7 +891,7 @@ export const pl = {
     less: "Mniej agentów",
     more: "Więcej agentów",
     forYou: "Dla Ciebie",
-    note: "Ceny netto, rozliczenie miesięczne. Bez umowy na czas określony - rezygnujesz kiedy chcesz.",
+    note: "Ceny netto. Rozliczenie miesięczne, co pół roku (10% taniej) albo co rok (20% taniej). Bez umowy na czas określony - rezygnujesz kiedy chcesz. Nowe biuro ma 7 dni bez opłat.",
     plans: [
       {
         id: "start",
@@ -923,7 +927,7 @@ export const pl = {
         features: [
           "Bez limitu agentów",
           "Wszystko z Pro",
-          "Role: CEO, menedżer, agent",
+          "Role i uprawnienia: osiem stanowisk, dostęp nadawany per osoba",
           "Wielooddziałowość i podział zespołów",
           "Wdrożenie 1:1 i szkolenie zespołu",
           "Priorytetowe wsparcie",
