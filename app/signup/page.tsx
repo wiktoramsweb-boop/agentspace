@@ -12,7 +12,7 @@ export default function SignupPage() {
   return (
     <AuthShell
       title="Załóż biuro w AgentSpace"
-      subtitle="Konto właściciela. Agentów dodasz po zalogowaniu."
+      subtitle="Konto właściciela, na zaproszenie. Agentów dodasz po zalogowaniu."
       footer={
         <>
           Masz już konto?{" "}
@@ -25,6 +25,12 @@ export default function SignupPage() {
       <form action={formAction} className="space-y-4">
         {/* Pułapka na boty: człowiek tego pola nie widzi i go nie wypełni. */}
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+        <FormField
+          label="Kod zaproszenia"
+          name="inviteCode"
+          placeholder="Kod od AgentSpace"
+          hint="Dostajesz go przy rozmowie wdrożeniowej."
+        />
         <FormField label="Imię i nazwisko" name="fullName" autoComplete="name" placeholder="Jan Kowalski" />
         <FormField label="Nazwa biura" name="agencyName" placeholder="Np. Nowak Nieruchomości" />
         <FormField label="Email" name="email" type="email" autoComplete="email" placeholder="ty@biuro.pl" />

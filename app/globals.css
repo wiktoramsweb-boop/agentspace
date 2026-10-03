@@ -1780,3 +1780,56 @@ html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) .text-blue-600 { col
   margin-right: 0.6rem;
   accent-color: var(--color-mk-accent);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   ARKUSZE DOKUMENTÓW W CIEMNYM MOTYWIE - OSTATNIE SŁOWO
+
+   Umowa, faktura, protokół i ofertówka to kartka papieru, a nie interfejs.
+   Mają zostać białe z ciemnym tekstem niezależnie od motywu aplikacji,
+   bo dokładnie tak wyjdą z drukarki i z PDF-a.
+
+   Wcześniejsza próba (blok „Dokumenty ZAWSZE zostają białe”) obejmowała
+   tylko skalę slate i stała w pliku WYŻEJ niż odwrócenia dla skali zinc.
+   Przy równej szczegółowości wygrywa reguła późniejsza, więc umowa
+   z klasą `text-zinc-900` dostawała biały tekst na białym tle i nie było
+   jej widać w ogóle. Ten blok musi zostać na końcu pliku.
+   ───────────────────────────────────────────────────────────── */
+
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) {
+  color: #18181b !important;
+}
+
+/* Tekst: wszystkie ciemne odcienie wracają do ciemnych. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.text-zinc-950, .text-zinc-900, .text-slate-900, .text-gray-900, .text-black) { color: #0f172a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.text-zinc-800, .text-slate-800, .text-gray-800) { color: #1e293b !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.text-zinc-700, .text-slate-700, .text-gray-700) { color: #334155 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.text-zinc-600, .text-zinc-500, .text-slate-600, .text-slate-500, .text-gray-600, .text-gray-500) { color: #64748b !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.text-zinc-400, .text-slate-400, .text-gray-400) { color: #94a3b8 !important; }
+
+/* Tła i obramowania wewnątrz arkusza. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) .bg-white { background-color: #ffffff !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.bg-zinc-50, .bg-slate-50, .bg-gray-50) { background-color: #f8fafc !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.bg-zinc-100, .bg-slate-100, .bg-gray-100) { background-color: #f1f5f9 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.border-zinc-100, .border-slate-100, .border-gray-100) { border-color: #f1f5f9 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.border-zinc-200, .border-slate-200, .border-gray-200) { border-color: #e2e8f0 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.border-zinc-300, .border-slate-300, .border-gray-300) { border-color: #cbd5e1 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(.divide-zinc-100, .divide-slate-100) > * + * { border-color: #f1f5f9 !important; }
+
+/* Pola edytowalne wpisane w arkusz (np. dane stron w umowie) też są na papierze. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
+  :is(input, select, textarea) {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}

@@ -56,7 +56,7 @@ export default async function ScenarioSetupPage({ params }: Props) {
           {PERSONALITIES.map((p, i) => (
             <label
               key={p.value}
-              className="group relative cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all has-[:checked]:border-emerald-500/50 has-[:checked]:bg-emerald-500/5 hover:border-slate-300"
+              className="group relative cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all hover:border-slate-300 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10 has-[:checked]:ring-2 has-[:checked]:ring-emerald-500/40"
             >
               <input
                 type="radio"
@@ -67,8 +67,8 @@ export default async function ScenarioSetupPage({ params }: Props) {
               />
               <div className="mb-2 flex items-center justify-between">
                 <span className="font-semibold text-slate-900">{p.label}</span>
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 peer-checked:border-emerald-400 peer-checked:bg-emerald-400">
-                  <span className="h-2 w-2 rounded-full bg-transparent peer-checked:bg-white" />
+                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 transition-colors group-has-[:checked]:border-emerald-500 group-has-[:checked]:bg-emerald-500">
+                  <span className="h-2 w-2 rounded-full bg-transparent transition-colors group-has-[:checked]:bg-white" />
                 </span>
               </div>
               <p className="text-sm text-slate-500">{p.description}</p>
@@ -91,7 +91,7 @@ export default async function ScenarioSetupPage({ params }: Props) {
           ].map((d) => (
             <label
               key={d.value}
-              className="group relative cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all has-[:checked]:border-emerald-500/50 has-[:checked]:bg-emerald-500/5 hover:border-slate-300"
+              className="group relative cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all hover:border-slate-300 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10 has-[:checked]:ring-2 has-[:checked]:ring-emerald-500/40"
             >
               <input
                 type="radio"
@@ -102,8 +102,8 @@ export default async function ScenarioSetupPage({ params }: Props) {
               />
               <div className="mb-2 flex items-center justify-between">
                 <span className="font-semibold text-slate-900">{d.label}</span>
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 peer-checked:border-emerald-400 peer-checked:bg-emerald-400">
-                  <span className="h-2 w-2 rounded-full bg-transparent peer-checked:bg-white" />
+                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 transition-colors group-has-[:checked]:border-emerald-500 group-has-[:checked]:bg-emerald-500">
+                  <span className="h-2 w-2 rounded-full bg-transparent transition-colors group-has-[:checked]:bg-white" />
                 </span>
               </div>
               <p className="text-sm text-slate-500">{d.desc}</p>

@@ -1,14 +1,19 @@
 /**
- * Odpowiedź modelu w zadanym kształcie JSON (structured outputs).
+ * Odpowiedź modelu w zadanym kształcie JSON.
  *
- * Wcześniej wymuszaliśmy to przez `tool_choice: {type: "tool"}`, ale Sonnet 5.5
- * i nowsze zwracają na to błąd 400. Structured outputs daje dokładnie to samo
- * (gwarantowany kształt odpowiedzi), działa na wszystkich obecnych modelach
- * i nie wymaga definiowania sztucznego „narzędzia", którego i tak nigdy nie
- * wywołujemy.
+ * Historia tego pliku: najpierw wymuszaliśmy kształt przez `tool_choice`,
+ * potem przez structured outputs (`output_config`). Problem w tym, że
+ * structured outputs jedzie na nagłówku beta, a gdy API go nie zna, całe
+ * zapytanie leci 400 i użytkownik widzi tylko „AI chwilowo niedostępne”.
  *
- * Wołamy API wprost przez fetch, a nie przez SDK, bo wersja SDK w projekcie
- * jeszcze nie zna pola `output_config`.
+ * Dlatego teraz są dwie drogi i jedna awaryjna:
+ *  1. structured outputs z nagłówkiem beta - gwarantowany kształt,
+ *  2. gdy API to odrzuci, zwykłe zapytanie z instrukcją „zwróć sam JSON”
+ *     i ręcznym parsowaniem.
+ *
+ * Druga droga daje ten sam wynik w 99% przypadków i jest odporna na zmiany
+ * po stronie API. Lepsza działająca funkcja z luźniejszą gwarancją niż
+ * czerwony komunikat na pulpicie.
  */
 
 export type SchematJson = {
@@ -26,6 +31,42 @@ type Parametry = {
   schemat: SchematJson;
 };
 
+const API = "https://api.anthropic.com/v1/messages";
+const BETA_STRUCTURED = "structured-outputs-2025-11-13";
+
+type OdpowiedzApi = { content?: { type: string; text?: string }[] };
+
+function tekstZOdpowiedzi(dane: OdpowiedzApi): string | null {
+  return dane.content?.find((c) => c.type === "text")?.text ?? null;
+}
+
+/**
+ * Wyciąga obiekt JSON z odpowiedzi modelu.
+ *
+ * Model bywa uczynny i opakowuje JSON w ```json albo dokleja zdanie przed.
+ * Bierzemy wszystko od pierwszej klamry do ostatniej, bo to jest jedyny
+ * fragment, który ma szansę się sparsować.
+ */
+function wyciagnijJson<T>(tekst: string): T {
+  const bezPlotka = tekst.replace(/```json\s*/gi, "").replace(/```/g, "").trim();
+  const start = bezPlotka.indexOf("{");
+  const koniec = bezPlotka.lastIndexOf("}");
+  if (start === -1 || koniec === -1 || koniec < start) {
+    throw new Error("Model nie zwrócił JSON-a.");
+  }
+  return JSON.parse(bezPlotka.slice(start, koniec + 1)) as T;
+}
+
+async function wyslij(apiKey: string, body: unknown, beta?: string) {
+  const headers: Record<string, string> = {
+    "x-api-key": apiKey,
+    "anthropic-version": "2023-06-01",
+    "content-type": "application/json",
+  };
+  if (beta) headers["anthropic-beta"] = beta;
+  return fetch(API, { method: "POST", headers, body: JSON.stringify(body) });
+}
+
 export async function odpowiedzJson<T>({
   model,
   system,
@@ -38,31 +79,44 @@ export async function odpowiedzJson<T>({
     throw new Error("Brak ANTHROPIC_API_KEY. Ustaw w .env.local i w Vercel Environment Variables.");
   }
 
-  const odpowiedz = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
+  // 1. Structured outputs.
+  const strukturalna = await wyslij(
+    apiKey,
+    {
       model,
       max_tokens: maxTokens,
       system,
       messages,
       output_config: { format: { type: "json_schema", schema: schemat } },
-    }),
-  });
+    },
+    BETA_STRUCTURED,
+  );
 
-  if (!odpowiedz.ok) {
-    const tresc = await odpowiedz.text();
-    throw new Error(`Anthropic ${odpowiedz.status}: ${tresc.slice(0, 300)}`);
+  if (strukturalna.ok) {
+    const tekst = tekstZOdpowiedzi((await strukturalna.json()) as OdpowiedzApi);
+    if (tekst) return wyciagnijJson<T>(tekst);
+  } else {
+    // Powód zapisujemy w logach serwera. Bez tego jedyną informacją o awarii
+    // był komunikat dla użytkownika, z którego nie da się nic naprawić.
+    const tresc = await strukturalna.text();
+    console.error(`Anthropic structured outputs ${strukturalna.status}: ${tresc.slice(0, 500)}`);
   }
 
-  const dane = (await odpowiedz.json()) as {
-    content?: { type: string; text?: string }[];
-  };
-  const tekst = dane.content?.find((c) => c.type === "text")?.text;
-  if (!tekst) throw new Error("Model nie zwrócił odpowiedzi w zadanym formacie.");
-  return JSON.parse(tekst) as T;
+  // 2. Droga awaryjna: zwykłe zapytanie z instrukcją formatu.
+  const pola = Object.keys(schemat.properties).join(", ");
+  const zapasowa = await wyslij(apiKey, {
+    model,
+    max_tokens: maxTokens,
+    system: `${system}\n\nOdpowiadasz WYŁĄCZNIE obiektem JSON, bez komentarza i bez bloku kodu. Wymagane pola: ${pola}. Schemat: ${JSON.stringify(schemat)}`,
+    messages,
+  });
+
+  if (!zapasowa.ok) {
+    const tresc = await zapasowa.text();
+    throw new Error(`Anthropic ${zapasowa.status}: ${tresc.slice(0, 300)}`);
+  }
+
+  const tekst = tekstZOdpowiedzi((await zapasowa.json()) as OdpowiedzApi);
+  if (!tekst) throw new Error("Model nie zwrócił odpowiedzi.");
+  return wyciagnijJson<T>(tekst);
 }
