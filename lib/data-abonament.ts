@@ -1,4 +1,5 @@
 import { createSupabaseAdmin } from "./supabase/admin";
+import { zapiszBlad } from "./blad";
 import { PLANS, planForAgents, type Plan } from "./marketing/plans";
 import {
   PAKIETY_KREDYTOW,
@@ -286,6 +287,6 @@ async function powiadomOZamowieniu(orderId: string, agencyId: string): Promise<v
       `,
     });
   } catch (err) {
-    console.error("Powiadomienie o zamowieniu:", err);
+    await zapiszBlad("abonament/powiadomienie", err, { agencyId });
   }
 }

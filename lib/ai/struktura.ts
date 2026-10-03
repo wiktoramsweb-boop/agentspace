@@ -16,6 +16,8 @@
  * czerwony komunikat na pulpicie.
  */
 
+import { zapiszBlad } from "../blad";
+
 export type SchematJson = {
   type: "object";
   properties: Record<string, unknown>;
@@ -99,7 +101,9 @@ export async function odpowiedzJson<T>({
     // Powód zapisujemy w logach serwera. Bez tego jedyną informacją o awarii
     // był komunikat dla użytkownika, z którego nie da się nic naprawić.
     const tresc = await strukturalna.text();
-    console.error(`Anthropic structured outputs ${strukturalna.status}: ${tresc.slice(0, 500)}`);
+    await zapiszBlad("ai/structured-outputs", `Anthropic ${strukturalna.status}`, {
+      szczegoly: tresc.slice(0, 1000),
+    });
   }
 
   // 2. Droga awaryjna: zwykłe zapytanie z instrukcją formatu.
@@ -113,6 +117,7 @@ export async function odpowiedzJson<T>({
 
   if (!zapasowa.ok) {
     const tresc = await zapasowa.text();
+    await zapiszBlad("ai/zapasowa", `Anthropic ${zapasowa.status}`, { szczegoly: tresc.slice(0, 1000) });
     throw new Error(`Anthropic ${zapasowa.status}: ${tresc.slice(0, 300)}`);
   }
 

@@ -6,6 +6,7 @@ import { DNI_PROBNE } from "@/lib/abonament-cennik";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { hitLimit, visitorKey } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/html";
+import { zapiszBlad } from "@/lib/blad";
 
 export type AuthResult = { error: string } | undefined;
 
@@ -42,7 +43,7 @@ async function powiadomONowymBiurze(dane: {
       `,
     });
   } catch (err) {
-    console.error("Powiadomienie o nowym biurze:", err);
+    await zapiszBlad("rejestracja/powiadomienie", err);
   }
 }
 
