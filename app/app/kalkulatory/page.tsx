@@ -1,10 +1,10 @@
-import { requireUser } from "@/lib/auth";
+import { requireAktywny } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { PageHeader } from "../components/ui";
 import { Calculators } from "./calculators";
 
 export default async function KalkulatoryPage() {
-  const user = await requireUser();
+  const user = await requireAktywny();
   const settings = await getAgencySettings(user.agency_id, user.agency?.name);
   return (
     <>

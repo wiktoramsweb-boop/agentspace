@@ -1,5 +1,5 @@
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
-import { requireUser } from "@/lib/auth";
+import { requireAktywny } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { maskPhone } from "@/lib/format";
 import { getActivityStats, getAgencyAgents } from "@/lib/data-activities";
@@ -17,7 +17,7 @@ export default async function DzialaniaPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const user = await requireUser();
+  const user = await requireAktywny();
   const agencyId = user.agency_id;
   const query = parseListQuery(await searchParams, { sort: "termin", per: 25 });
 

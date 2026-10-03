@@ -76,6 +76,25 @@ export async function requireManagerOrOwner(): Promise<ProfileWithAgency> {
 }
 
 /**
+ * Blokada po wygaśnięciu okresu próbnego dla stron, które nie należą do
+ * żadnego modułu z `lib/role.ts` (plan dnia, kalkulatory, zespół).
+ *
+ * Bez tego paywall był dziurawy: kłódki w menu i `requireModul` zamykały
+ * większość aplikacji, ale te trzy ekrany dalej działały po wpisaniu adresu.
+ */
+export function odetnijPoWygasnieciu(user: ProfileWithAgency): void {
+  if (user.agency?.is_demo) return;
+  if (!stanDostepu(user.agency ?? null).aktywne) redirect("/app");
+}
+
+/** Zalogowany użytkownik z aktywnym dostępem, bez sprawdzania modułu. */
+export async function requireAktywny(): Promise<ProfileWithAgency> {
+  const user = await requireUser();
+  odetnijPoWygasnieciu(user);
+  return user;
+}
+
+/**
  * Wymusza dostęp do modułu (v38).
  *
  * Ukrycie pozycji w menu to tylko wygoda: adres i tak da się wpisać ręcznie,

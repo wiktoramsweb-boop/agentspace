@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireManagerOrOwner } from "@/lib/auth";
+import { odetnijPoWygasnieciu, requireManagerOrOwner } from "@/lib/auth";
 import {
   getTeamRanking,
   getAgencyStats,
@@ -58,6 +58,7 @@ function TrendArrow({ trend }: { trend?: AgentTrend }) {
 
 export default async function ZespolPage() {
   const user = await requireManagerOrOwner();
+  odetnijPoWygasnieciu(user);
   const agencyId = user.agency_id!;
   const isOwner = user.role === "owner";
 

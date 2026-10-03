@@ -1,3 +1,4 @@
+import { stanDostepu } from "./abonament-cennik";
 import { createSupabaseAdmin } from "./supabase/admin";
 import { APP_TZ } from "./datetime";
 import {
@@ -120,6 +121,19 @@ export async function brakKredytow(
   if (!user.agency_id) return false;
   const koszt = CENNIK_KREDYTOW[operacja];
   const admin = createSupabaseAdmin();
+
+  // Po wygaśnięciu okresu próbnego albo abonamentu nie liczymy AI.
+  // Interfejs jest wtedy zamknięty, ale same endpointy odpowiadały dalej,
+  // więc otwarta karta w przeglądarce potrafiła palić budżet po terminie.
+  // Konto demo jest wyjątkiem, bo służy do pokazów.
+  const { data: dostepAgencji } = await admin
+    .from("agencies")
+    .select("is_demo, subscription_status, subscription_ends_at, trial_ends_at")
+    .eq("id", user.agency_id)
+    .maybeSingle();
+  if (dostepAgencji && !dostepAgencji.is_demo && !stanDostepu(dostepAgencji).aktywne) {
+    return true;
+  }
 
   // Dzienny bezpiecznik na osobę.
   const { data: dzisiaj, error: bladDnia } = await admin

@@ -10,6 +10,7 @@ import {
   type RodzajZakupu,
 } from "./abonament-cennik";
 import { SITE_ADDON } from "./site/addon";
+import { escapeHtml } from "./html";
 
 export { PLANS, planForAgents };
 export type { Plan };
@@ -96,6 +97,7 @@ export async function zlozZamowienie(params: {
       error: "Nie udało się złożyć zamówienia. Uruchom migrację v37 albo napisz do nas.",
     };
   }
+  await powiadomOZamowieniu(data.id as string, params.agencyId);
   return { ok: true, id: data.id as string };
 }
 
@@ -195,6 +197,7 @@ export async function zamowStrone(params: {
     .select("id")
     .single();
   if (error) return { ok: false, error: "Nie udało się złożyć zamówienia. Uruchom migrację v37." };
+  await powiadomOZamowieniu(data.id as string, params.agencyId);
   return { ok: true, id: data.id as string };
 }
 
@@ -222,6 +225,7 @@ export async function zamowKredyty(params: {
     .select("id")
     .single();
   if (error) return { ok: false, error: "Nie udało się złożyć zamówienia. Uruchom migrację v37." };
+  await powiadomOZamowieniu(data.id as string, params.agencyId);
   return { ok: true, id: data.id as string };
 }
 
@@ -239,3 +243,49 @@ export function opisZamowienia(z: Zamowienie): string {
 }
 
 export { PAKIETY_KREDYTOW, SITE_ADDON };
+
+/**
+ * Powiadomienie operatora o nowym zamówieniu.
+ *
+ * Płatności online jeszcze nie ma, więc zamówienie to po prostu wiersz
+ * w bazie. Bez tego maila nikt by się o nim nie dowiedział inaczej niż
+ * zaglądając do Supabase, a biuro czekałoby na fakturę w nieskończoność.
+ *
+ * Błąd wysyłki nie przerywa zamówienia: wiersz i tak jest zapisany.
+ */
+async function powiadomOZamowieniu(orderId: string, agencyId: string): Promise<void> {
+  const klucz = process.env.RESEND_API_KEY;
+  if (!klucz) return;
+
+  try {
+    const admin = createSupabaseAdmin();
+    const [{ data: zam }, { data: biuro }] = await Promise.all([
+      admin
+        .from("subscription_orders")
+        .select("id, kind, plan, credits, period, agents, amount_grosz, status, created_at, paid_at")
+        .eq("id", orderId)
+        .maybeSingle(),
+      admin.from("agencies").select("name").eq("id", agencyId).maybeSingle(),
+    ]);
+    if (!zam) return;
+
+    const { Resend } = await import("resend");
+    const resend = new Resend(klucz);
+    await resend.emails.send({
+      from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+      to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
+      subject: `Nowe zamówienie: ${biuro?.name ?? "biuro"}`,
+      html: `
+        <div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+          <h2 style="color:#10b981;margin:0 0 16px;">Nowe zamówienie w AgentSpace</h2>
+          <p style="font-size:15px;color:#3f3f46;margin:0 0 8px;"><strong>${escapeHtml(biuro?.name ?? "Biuro bez nazwy")}</strong></p>
+          <p style="font-size:15px;color:#3f3f46;margin:0 0 16px;">${escapeHtml(opisZamowienia(zam as Zamowienie))}</p>
+          <p style="font-size:13px;color:#71717a;">Numer zamówienia: ${escapeHtml(zam.id)}</p>
+          <p style="font-size:13px;color:#71717a;">Wystaw fakturę, a po zaksięgowaniu wpłaty potwierdź zamówienie, żeby biuro dostało dostęp.</p>
+        </div>
+      `,
+    });
+  } catch (err) {
+    console.error("Powiadomienie o zamowieniu:", err);
+  }
+}
