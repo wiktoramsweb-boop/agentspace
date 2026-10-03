@@ -133,4 +133,4 @@ Tradycyjnie to robi się przez:
 
 W AgentSpace agent ćwiczy każdy z tych pięciu scenariuszy z AI, które gra polskiego klienta. Po sesji dostaje scoring i konkretne wskazówki - po polsku, na temat realnych odpowiedzi które padły. Po 30 dniach treningu konwersja rozmów rośnie o 25-40%.
 
-[Dołącz do listy oczekujących](/#waitlist) - pierwsze 10 biur dostaje 3 miesiące za darmo i 30% rabatu.
+[Umów rozmowę](/kontakt) albo załóż konto biura z siedmiodniowym okresem próbnym, bez umowy na czas określony.

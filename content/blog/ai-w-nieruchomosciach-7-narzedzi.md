@@ -20,7 +20,7 @@ Nie ma rankingu "najlepsze". Każde z nich rozwiązuje inny problem. Pokazuję, 
 
 **Co robi:** symuluje rozmowę z klientem przez głos - agent ćwiczy cold calling, obiekcje, negocjację prowizji w prywatnej sesji. Po sesji dostaje scoring w 4 kategoriach i konkretny feedback po polsku.
 
-**Cena:** 299 zł/mc/biuro do 10 agentów (premiera Q1 2026).
+**Cena:** od 299 zł netto miesięcznie za biuro do 5 agentów, w pakiecie z resztą systemu.
 
 **Dla kogo:** biura, które chcą rozwijać zespół systematycznie, nie tylko raz na kwartał.
 
@@ -108,4 +108,4 @@ Po roku testów u nas (i u zaprzyjaźnionych biur w Krakowie) wyciągnąłem trz
 
 ---
 
-Jeśli interesuje Cię konkretnie **AI Coach do treningu agentów** - premiera AgentSpace w Q1 2026. [Dołącz do listy oczekujących](/#waitlist) - pierwsze 10 biur dostaje 3 miesiące za darmo i 30% rabatu na pierwszy rok.
+Jeśli interesuje Cię konkretnie **AI Coach do treningu agentów**, [zobacz, jak działa](/produkt/ai-coach). Nowe biuro zakłada konto z siedmiodniowym okresem próbnym, bez umowy na czas określony.

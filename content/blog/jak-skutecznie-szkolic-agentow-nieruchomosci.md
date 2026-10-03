@@ -93,4 +93,4 @@ Jeśli prowadzisz biuro RE, oto trzy ruchy, które możesz zrobić bez większyc
 
 ---
 
-W AgentSpace budujemy dokładnie to - **AI Coach do treningu cold calli dla polskich agentów nieruchomości**. Premiera Q1 2026. Pierwsze 10 biur z [listy oczekujących](/#waitlist) dostanie 3 miesiące za darmo i 30% rabatu na pierwszy rok.
+W AgentSpace działa dokładnie to: [AI Coach do treningu cold calli](/produkt/ai-coach) dla polskich agentów nieruchomości, z 13 scenariuszami z naszego rynku i scoringiem po polsku.
