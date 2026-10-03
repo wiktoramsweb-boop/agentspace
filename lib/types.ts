@@ -26,8 +26,6 @@ export type Profile = {
   role: UserRole;
   /** Odstępstwa od roli ustawione przez CEO (v38). NULL = zestaw z roli. */
   permissions?: Uprawnienia | null;
-  /** Dostęp do panelu operatora (v40). Przywilej ponad biurami, nie rola w biurze. */
-  is_operator?: boolean | null;
   monthly_goal_pln: number;
   default_split_pct: number;
   phone: string | null;

@@ -1,18 +1,14 @@
--- v40: konto operatora.
+-- v40: kolumna po pierwszym podejściu do panelu operatora. NIEPOTRZEBNA.
 --
--- Osoba prowadząca AgentSpace musi widzieć wszystkie biura: co mają wykupione,
--- czy coś się wywala i czy zamówienie czeka na fakturę. To NIE jest rola
--- w biurze (owner, manager, agent), tylko osobny przywilej ponad biurami,
--- dlatego osobna kolumna, a nie nowa wartość w `role`.
+-- Pierwotnie dostęp do /operator miała dawać flaga na profilu. W praktyce
+-- okazało się to niewygodne: operator bywa zalogowany w przeglądarce na różne
+-- konta i wiązanie panelu z sesją aplikacji oznaczało ciągłe przelogowywanie.
 --
--- Panel jest pod /operator i dla kogoś bez tej flagi zwraca 404, więc sam
--- adres nie zdradza, że coś takiego istnieje.
+-- Panel ma teraz własny login i hasło w zmiennych OPERATOR_LOGIN
+-- i OPERATOR_PASSWORD, a kod tej kolumny nie czyta.
+--
+-- Jeżeli uruchomiłeś już ten plik, nic nie trzeba cofać: kolumna jest pusta
+-- i nieużywana. Jeżeli jeszcze nie, możesz go w całości pominąć.
 
 alter table public.profiles
   add column if not exists is_operator boolean not null default false;
-
-comment on column public.profiles.is_operator is
-  'Dostęp do panelu operatora /operator. Nadawać wyłącznie kontom prowadzącym AgentSpace.';
-
--- Nadanie sobie dostępu (podmień adres na swój):
--- update public.profiles set is_operator = true where email = 'twoj@email.pl';

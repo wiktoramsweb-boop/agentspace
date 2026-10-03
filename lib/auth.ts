@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "./supabase/server";
 import { createSupabaseAdmin } from "./supabase/admin";
 import type { ProfileWithAgency } from "./types";
@@ -72,19 +72,6 @@ export async function requireOwner(): Promise<ProfileWithAgency> {
 export async function requireManagerOrOwner(): Promise<ProfileWithAgency> {
   const user = await requireUser();
   if (user.role !== "owner" && user.role !== "manager") redirect("/app");
-  return user;
-}
-
-/**
- * Konto operatora AgentSpace (v40).
- *
- * Zwracamy 404, a nie przekierowanie na pulpit, bo panel ma nie istnieć dla
- * nikogo poza operatorem. Przekierowanie potwierdzałoby, że pod tym adresem
- * coś jest i że po prostu brakuje uprawnień.
- */
-export async function requireOperator(): Promise<ProfileWithAgency> {
-  const user = await requireUser();
-  if (!user.is_operator) notFound();
   return user;
 }
 

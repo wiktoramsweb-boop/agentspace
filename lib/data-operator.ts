@@ -43,6 +43,15 @@ function poczatekMiesiacaPL(): string {
   return poczatekMiesiaca(APP_TZ);
 }
 
+/** Która data realnie opisuje koniec dostępu danego biura. */
+function koniecDostepu(a: Record<string, unknown>): string | null {
+  // `probny` zostaje true także po wygaśnięciu okresu próbnego, więc to ono,
+  // a nie `powod`, mówi, którą datę pokazać.
+  const stan = stanDostepu(a as Parameters<typeof stanDostepu>[0]);
+  if (stan.probny) return (a.trial_ends_at as string) ?? null;
+  return (a.subscription_ends_at as string) ?? null;
+}
+
 /** Lista wszystkich biur ze stanem konta. */
 export async function biuraWPanelu(): Promise<BiuroWPanelu[]> {
   const admin = createSupabaseAdmin();
@@ -98,7 +107,10 @@ export async function biuraWPanelu(): Promise<BiuroWPanelu[]> {
     dostep: stanDostepu(a),
     plan: (a.subscription_plan as string) ?? null,
     okres: (a.subscription_period as string) ?? null,
-    konczySie: (a.subscription_ends_at as string) ?? (a.trial_ends_at as string) ?? null,
+    // Data końca zależy od tego, CO się kończy. Przy abonamencie bez daty
+    // (biuro sprzed v37) pokazywanie starego triala sugerowało, że dostęp
+    // wygasł 59 dni temu, choć konto jest czynne.
+    konczySie: koniecDostepu(a),
     demo: Boolean(a.is_demo),
     osob: osobWBiurze.get(a.id as string) ?? 0,
     kredytyZuzyte: kredyty.get(a.id as string) ?? 0,

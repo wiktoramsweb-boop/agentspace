@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { potwierdzZamowienie } from "./actions";
+import { potwierdzZamowienie } from "../actions";
 
 /**
  * Przycisk „wpłata zaksięgowana”.

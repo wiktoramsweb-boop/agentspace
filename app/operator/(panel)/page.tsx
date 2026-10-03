@@ -1,17 +1,25 @@
-import { requireOperator } from "@/lib/auth";
 import { biuraWPanelu, zamowieniaDoRozliczenia } from "@/lib/data-operator";
 import { opisZamowienia } from "@/lib/data-abonament";
 import { PotwierdzWplate } from "./potwierdz";
 
 export const dynamic = "force-dynamic";
 
-const ETYKIETY_DOSTEPU: Record<string, { tekst: string; klasa: string }> = {
-  probny: { tekst: "Okres próbny", klasa: "bg-amber-500/15 text-amber-300 ring-amber-500/30" },
-  oplacony: { tekst: "Opłacony", klasa: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30" },
-  wygasl: { tekst: "Wygasł", klasa: "bg-red-500/15 text-red-300 ring-red-500/30" },
-  probny_wygasl: { tekst: "Trial wygasł", klasa: "bg-red-500/15 text-red-300 ring-red-500/30" },
-  brak_migracji: { tekst: "Bez ograniczeń", klasa: "bg-zinc-500/15 text-zinc-300 ring-zinc-500/30" },
-};
+const CZERWONA = "bg-red-500/15 text-red-300 ring-red-500/30";
+
+/**
+ * Etykieta stanu dostępu.
+ *
+ * Liczy się para (aktywne, probny), a nie sam `powod`: wygasły okres próbny
+ * i wygasły abonament mają ten sam powód, a dla operatora to dwie różne
+ * sytuacje - jedna znaczy „nie kupił”, druga „przestał płacić”.
+ */
+function etykieta(d: { aktywne: boolean; probny: boolean; powod: string }) {
+  if (!d.aktywne) return { tekst: d.probny ? "Trial wygasł" : "Wygasł", klasa: CZERWONA };
+  if (d.probny) return { tekst: "Okres próbny", klasa: "bg-amber-500/15 text-amber-300 ring-amber-500/30" };
+  if (d.powod === "brak_migracji")
+    return { tekst: "Bez ograniczeń", klasa: "bg-zinc-500/15 text-zinc-300 ring-zinc-500/30" };
+  return { tekst: "Opłacony", klasa: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30" };
+}
 
 function data(iso: string | null): string {
   if (!iso) return "-";
@@ -31,11 +39,10 @@ function dni(iso: string | null): string {
  * Panel operatora AgentSpace.
  *
  * Siedzi poza /app, więc nie ma menu biura i nie da się tu trafić przypadkiem.
- * Dla konta bez `is_operator` zwraca 404, nie przekierowanie, żeby sam adres
- * niczego nie zdradzał.
+ * Dostęp daje osobny login i hasło ze zmiennych środowiskowych, niezależny
+ * od kont w aplikacji - patrz lib/operator-auth.ts.
  */
 export default async function OperatorPage() {
-  await requireOperator();
   const [biura, zamowienia] = await Promise.all([biuraWPanelu(), zamowieniaDoRozliczenia()]);
 
   const aktywne = biura.filter((b) => b.dostep.aktywne && !b.demo).length;
@@ -122,7 +129,7 @@ export default async function OperatorPage() {
             </thead>
             <tbody className="divide-y divide-white/5">
               {biura.map((b) => {
-                const e = ETYKIETY_DOSTEPU[b.dostep.powod] ?? ETYKIETY_DOSTEPU.brak_migracji;
+                const e = etykieta(b.dostep);
                 return (
                   <tr key={b.id} className="text-zinc-300 transition-colors hover:bg-white/[0.02]">
                     <td className="px-4 py-3">
