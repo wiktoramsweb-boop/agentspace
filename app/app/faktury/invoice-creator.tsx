@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { STAWKI_VAT, type StawkaVat } from "@/lib/invoice";
 import { type InvoiceItem, type Seller } from "@/lib/invoice";
 import { InvoiceSheet, type SheetData } from "./invoice-sheet";
 import { createInvoice, updateInvoice } from "./actions";
@@ -33,7 +34,21 @@ export function InvoiceCreator({
     setD((prev) => ({ ...prev, items: prev.items.map((it, n) => (n === i ? { ...it, ...patch } : it)) }));
   }
   function addItem() {
-    setD((prev) => ({ ...prev, items: [...prev.items, { name: "", qty: 1, unitPrice: 0 }] }));
+    // Nowa pozycja dziedziczy stawkę po ostatniej. Przy fakturze z pięcioma
+    // wierszami w tej samej stawce ustawianie jej za każdym razem to udręka.
+    setD((prev) => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        {
+          name: "",
+          qty: 1,
+          unitPrice: 0,
+          vat: prev.items[prev.items.length - 1]?.vat ?? "zw",
+          unit: "szt.",
+        },
+      ],
+    }));
   }
   function removeItem(i: number) {
     setD((prev) => ({ ...prev, items: prev.items.filter((_, n) => n !== i) }));
@@ -109,6 +124,23 @@ export function InvoiceCreator({
         </Section>
 
         <Section title="Pozycje">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-xs text-slate-500">Ceny jednostkowe podaję jako:</span>
+            {(["netto", "brutto"] as const).map((tryb) => (
+              <button
+                key={tryb}
+                type="button"
+                onClick={() => set("pricesMode", tryb)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                  d.pricesMode === tryb
+                    ? "bg-emerald-600 text-white"
+                    : "border border-slate-200 text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                {tryb}
+              </button>
+            ))}
+          </div>
           <div className="space-y-3">
             {d.items.map((it, i) => (
               <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -133,7 +165,18 @@ export function InvoiceCreator({
                     placeholder="Kwota (zł)"
                     className={`${inp} flex-1`}
                   />
-                  <span className="w-8 text-center text-xs text-slate-500">zw</span>
+                  <select
+                    value={it.vat ?? "zw"}
+                    onChange={(e) => setItem(i, { vat: e.target.value as StawkaVat })}
+                    className={`${inp} w-24`}
+                    aria-label="Stawka VAT"
+                  >
+                    {STAWKI_VAT.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.etykieta}
+                      </option>
+                    ))}
+                  </select>
                   {d.items.length > 1 && (
                     <button onClick={() => removeItem(i)} className="px-1 text-slate-400 hover:text-red-600">
                       ✕

@@ -14,7 +14,8 @@
     "test:kredyty": "node --experimental-strip-types --no-warnings lib/sprawdz-kredyty.ts",
     "test:abonament": "node --experimental-strip-types --no-warnings lib/sprawdz-abonament.ts",
     "test:role": "node --experimental-strip-types --no-warnings lib/sprawdz-role.ts",
-    "diagnostyka": "node --env-file=.env.local -e \"const t=process.env.DIAG_TOKEN; if(!t){console.error('Brak DIAG_TOKEN w .env.local');process.exit(1)} const url=process.argv[1]||'https://agentspace.pl'; fetch(url+'/api/diagnostyka',{headers:{authorization:'Bearer '+t}}).then(async r=>{if(!r.ok){console.error(r.status, await r.text());process.exit(1)} console.log(JSON.stringify(await r.json(),null,2))})\""
+    "diagnostyka": "node --env-file=.env.local -e \"const t=process.env.DIAG_TOKEN; if(!t){console.error('Brak DIAG_TOKEN w .env.local');process.exit(1)} const url=process.argv[1]||'https://agentspace.pl'; fetch(url+'/api/diagnostyka',{headers:{authorization:'Bearer '+t}}).then(async r=>{if(!r.ok){console.error(r.status, await r.text());process.exit(1)} console.log(JSON.stringify(await r.json(),null,2))})\"",
+    "test:faktury": "node --experimental-strip-types lib/sprawdz-faktury.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",

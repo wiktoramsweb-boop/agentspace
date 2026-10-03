@@ -4,8 +4,14 @@ import {
   amountToWordsPL,
   formatMoney,
   invoiceTotal,
+  kwotyPozycji,
+  opisStawki,
+  podsumowanieVat,
+  sumyFaktury,
+  zVatem,
   VAT_NOTE,
   type InvoiceItem,
+  type TrybCen,
 } from "@/lib/invoice";
 
 export type SheetData = {
@@ -23,6 +29,8 @@ export type SheetData = {
   paymentDate: string;
   paymentMethod: string;
   items: InvoiceItem[];
+  /** Czy ceny jednostkowe podano netto, czy brutto. */
+  pricesMode: TrybCen;
   description: string;
   paid: number;
   issuer: string;
@@ -46,7 +54,13 @@ export function InvoiceSheet({
   agencyName: string;
 }) {
   const seller = getSeller(data.sellerKey, sellers);
-  const total = invoiceTotal(data.items);
+  const tryb: TrybCen = data.pricesMode === "brutto" ? "brutto" : "netto";
+  const sumy = sumyFaktury(data.items, tryb);
+  const total = sumy.brutto;
+  const wgStawek = podsumowanieVat(data.items, tryb);
+  // Zestawienie wg stawek jest wymagane tylko wtedy, gdy jest co zestawiać.
+  // Na fakturze zwolnionej z jedną stawką byłoby tylko szumem.
+  const pokazZestawienie = wgStawek.length > 1 || zVatem(data.items);
 
   return (
     <div className="invoice-sheet mx-auto w-full max-w-[820px] bg-white p-8 text-[13px] leading-relaxed text-zinc-900 shadow-xl md:p-10">
@@ -119,38 +133,74 @@ export function InvoiceSheet({
             <th className="py-2 pr-2 font-medium">Lp.</th>
             <th className="py-2 pr-2 font-medium">Nazwa towaru / usługi</th>
             <th className="py-2 pr-2 text-right font-medium">Ilość</th>
-            <th className="py-2 pr-2 text-right font-medium">Cena netto</th>
+            <th className="py-2 pr-2 font-medium">j.m.</th>
+            <th className="py-2 pr-2 text-right font-medium">Cena {tryb}</th>
+            <th className="py-2 pr-2 text-right font-medium">Wartość netto</th>
             <th className="py-2 pr-2 text-right font-medium">VAT</th>
+            <th className="py-2 pr-2 text-right font-medium">Kwota VAT</th>
             <th className="py-2 text-right font-medium">Wartość brutto</th>
           </tr>
         </thead>
         <tbody>
           {data.items.map((it, i) => {
-            const val = (Number(it.qty) || 0) * (Number(it.unitPrice) || 0);
+            const k = kwotyPozycji(it, tryb);
             return (
               <tr key={i} className="border-b border-zinc-100 align-top">
                 <td className="py-2 pr-2">{i + 1}</td>
                 <td className="py-2 pr-2">{it.name || "-"}</td>
                 <td className="py-2 pr-2 text-right">{it.qty || 0}</td>
+                <td className="py-2 pr-2">{it.unit || "szt."}</td>
                 <td className="py-2 pr-2 text-right">{formatMoney(Number(it.unitPrice) || 0)} zł</td>
-                <td className="py-2 pr-2 text-right">zw</td>
-                <td className="py-2 text-right">{formatMoney(val)} zł</td>
+                <td className="py-2 pr-2 text-right">{formatMoney(k.netto)} zł</td>
+                <td className="py-2 pr-2 text-right">{opisStawki(it.vat ?? "zw").etykieta}</td>
+                <td className="py-2 pr-2 text-right">{formatMoney(k.vat)} zł</td>
+                <td className="py-2 text-right">{formatMoney(k.brutto)} zł</td>
               </tr>
             );
           })}
         </tbody>
       </table>
 
+      {/* Zestawienie wg stawek - wymagany element faktury VAT */}
+      {pokazZestawienie && (
+        <table className="mt-4 w-full border-collapse text-xs">
+          <thead>
+            <tr className="border-b border-zinc-300 text-left text-slate-400">
+              <th className="py-1.5 pr-2 font-medium">Stawka VAT</th>
+              <th className="py-1.5 pr-2 text-right font-medium">Wartość netto</th>
+              <th className="py-1.5 pr-2 text-right font-medium">Kwota VAT</th>
+              <th className="py-1.5 text-right font-medium">Wartość brutto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {wgStawek.map((w) => (
+              <tr key={w.stawka} className="border-b border-zinc-100">
+                <td className="py-1.5 pr-2">{opisStawki(w.stawka).etykieta}</td>
+                <td className="py-1.5 pr-2 text-right">{formatMoney(w.netto)} zł</td>
+                <td className="py-1.5 pr-2 text-right">{formatMoney(w.vat)} zł</td>
+                <td className="py-1.5 text-right">{formatMoney(w.brutto)} zł</td>
+              </tr>
+            ))}
+            <tr className="font-semibold text-zinc-900">
+              <td className="py-1.5 pr-2">Razem</td>
+              <td className="py-1.5 pr-2 text-right">{formatMoney(sumy.netto)} zł</td>
+              <td className="py-1.5 pr-2 text-right">{formatMoney(sumy.vat)} zł</td>
+              <td className="py-1.5 text-right">{formatMoney(sumy.brutto)} zł</td>
+            </tr>
+          </tbody>
+        </table>
+      )}
+
       {/* Podsumowanie */}
       <div className="mt-4 flex justify-end">
         <div className="w-full max-w-xs space-y-1 text-sm">
           <div className="flex justify-between text-slate-400">
             <span>Razem netto</span>
-            <span>{formatMoney(total)} zł</span>
+            <span>{formatMoney(sumy.netto)} zł</span>
           </div>
           <div className="flex justify-between text-slate-400">
-            <span>VAT (zw)</span>
-            <span>0,00 zł</span>
+            <span>Razem VAT</span>
+            <span>{formatMoney(sumy.vat)} zł</span>
           </div>
           <div className="mt-1 flex justify-between border-t border-zinc-300 pt-2 text-base font-bold text-zinc-900">
             <span>Do zapłaty</span>
@@ -174,7 +224,7 @@ export function InvoiceSheet({
 
       {/* Uwagi */}
       <div className="mt-5 rounded-lg bg-zinc-50 p-3 text-xs text-slate-400">
-        <p>{VAT_NOTE}</p>
+        {!zVatem(data.items) && <p>{VAT_NOTE}</p>}
         {data.description && <p className="mt-1">{data.description}</p>}
       </div>
 

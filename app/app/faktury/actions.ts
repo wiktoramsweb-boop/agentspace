@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireModul } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
-import { invoiceTotal, type InvoiceItem } from "@/lib/invoice";
+import { sumyFaktury, type TrybCen, type InvoiceItem } from "@/lib/invoice";
 
 export type InvoicePayload = {
   number: string;
@@ -21,18 +21,39 @@ export type InvoicePayload = {
   paymentDate: string;
   paymentMethod: string;
   items: InvoiceItem[];
+  /** Czy ceny jednostkowe podano netto, czy brutto. */
+  pricesMode: TrybCen;
   description: string;
   paid: number;
   issuer: string;
 };
 
+/**
+ * Oczyszczenie pozycji i policzenie sum.
+ *
+ * Kwoty liczymy po stronie serwera, a nie przyjmujemy z formularza: inaczej
+ * wystarczyłoby podmienić wartość w przeglądarce, żeby zapisać fakturę
+ * z sumą niezgodną z pozycjami.
+ */
+function przygotuj(p: InvoicePayload) {
+  const items = (p.items ?? [])
+    .filter((i) => (i.name ?? "").trim())
+    .map((i) => ({
+      name: i.name,
+      qty: Number(i.qty) || 0,
+      unitPrice: Number(i.unitPrice) || 0,
+      vat: i.vat ?? "zw",
+      unit: (i.unit ?? "").trim() || "szt.",
+    }));
+  const tryb: TrybCen = p.pricesMode === "brutto" ? "brutto" : "netto";
+  return { items, tryb, sumy: sumyFaktury(items, tryb) };
+}
+
 export async function createInvoice(p: InvoicePayload): Promise<void> {
   const owner = await requireModul("faktury");
   const admin = createSupabaseAdmin();
-  const items = (p.items ?? [])
-    .filter((i) => (i.name ?? "").trim())
-    .map((i) => ({ name: i.name, qty: Number(i.qty) || 0, unitPrice: Number(i.unitPrice) || 0 }));
-  const total = invoiceTotal(items);
+  const { items, tryb, sumy } = przygotuj(p);
+  const total = sumy.brutto;
 
   const { data } = await admin
     .from("invoices")
@@ -54,6 +75,9 @@ export async function createInvoice(p: InvoicePayload): Promise<void> {
       payment_method: p.paymentMethod || "Przelew",
       items,
       total_pln: total,
+      prices_mode: tryb,
+      net_pln: sumy.netto,
+      vat_pln: sumy.vat,
       description: p.description || null,
       paid_pln: Number(p.paid) || 0,
       issuer: p.issuer || null,
@@ -68,10 +92,8 @@ export async function createInvoice(p: InvoicePayload): Promise<void> {
 export async function updateInvoice(id: string, p: InvoicePayload): Promise<void> {
   const owner = await requireModul("faktury");
   const admin = createSupabaseAdmin();
-  const items = (p.items ?? [])
-    .filter((i) => (i.name ?? "").trim())
-    .map((i) => ({ name: i.name, qty: Number(i.qty) || 0, unitPrice: Number(i.unitPrice) || 0 }));
-  const total = invoiceTotal(items);
+  const { items, tryb, sumy } = przygotuj(p);
+  const total = sumy.brutto;
 
   await admin
     .from("invoices")
@@ -91,6 +113,9 @@ export async function updateInvoice(id: string, p: InvoicePayload): Promise<void
       payment_method: p.paymentMethod || "Przelew",
       items,
       total_pln: total,
+      prices_mode: tryb,
+      net_pln: sumy.netto,
+      vat_pln: sumy.vat,
       description: p.description || null,
       paid_pln: Number(p.paid) || 0,
       issuer: p.issuer || null,

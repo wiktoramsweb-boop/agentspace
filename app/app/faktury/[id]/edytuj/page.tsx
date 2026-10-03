@@ -51,6 +51,7 @@ export default async function EdytujFakturaPage({ params }: Props) {
           paymentDate: inv.payment_date ?? "",
           paymentMethod: inv.payment_method ?? "Przelew",
           items: inv.items ?? [],
+          pricesMode: inv.prices_mode === "brutto" ? "brutto" : "netto",
           description: inv.description ?? "",
           paid: inv.paid_pln ?? 0,
           issuer: inv.issuer ?? "",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
-import { sprzedawcy } from "@/lib/invoice";
+import { sprzedawcy, type TrybCen } from "@/lib/invoice";
 import { getInvoice } from "@/lib/data-invoices";
 import { InvoiceSheet } from "../invoice-sheet";
 import { PrintButton } from "../print-button";
@@ -36,6 +36,7 @@ export default async function InvoiceViewPage({ params }: Props) {
     paymentDate: inv.payment_date ?? "",
     paymentMethod: inv.payment_method ?? "Przelew",
     items: inv.items ?? [],
+    pricesMode: (inv.prices_mode === "brutto" ? "brutto" : "netto") as TrybCen,
     description: inv.description ?? "",
     paid: inv.paid_pln ?? 0,
     issuer: inv.issuer ?? "",
