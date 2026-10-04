@@ -12,6 +12,9 @@ import {
   VAT_NOTE,
   type InvoiceItem,
   type TrybCen,
+  type RodzajDokumentu,
+  opisRodzaju,
+  NOTA_PROFORMA,
 } from "@/lib/invoice";
 
 export type SheetData = {
@@ -31,6 +34,11 @@ export type SheetData = {
   items: InvoiceItem[];
   /** Czy ceny jednostkowe podano netto, czy brutto. */
   pricesMode: TrybCen;
+  docType: RodzajDokumentu;
+  /** Numer dokumentu pierwotnego - tylko dla korekty. */
+  correctsNumber?: string | null;
+  correctsInvoiceId?: string | null;
+  correctionReason?: string;
   description: string;
   paid: number;
   issuer: string;
@@ -78,8 +86,13 @@ export function InvoiceSheet({
           <p className="max-w-[60%] text-sm font-semibold text-zinc-900">{seller.name}</p>
         )}
         <div className="text-right">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">FAKTURA</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
+            {opisRodzaju(data.docType).tytul.toUpperCase()}
+          </h1>
           <p className="text-sm font-medium text-slate-400">Nr {data.number || "-"}</p>
+          {data.docType === "korekta" && data.correctsNumber && (
+            <p className="text-xs text-slate-500">do faktury nr {data.correctsNumber}</p>
+          )}
           <p className="mt-1 text-xs text-slate-500">
             {data.place || "-"}, {data.issueDate || "-"}
           </p>
@@ -224,7 +237,14 @@ export function InvoiceSheet({
 
       {/* Uwagi */}
       <div className="mt-5 rounded-lg bg-zinc-50 p-3 text-xs text-slate-400">
-        {!zVatem(data.items) && <p>{VAT_NOTE}</p>}
+        {data.docType === "proforma" ? (
+          <p>{NOTA_PROFORMA}</p>
+        ) : (
+          !zVatem(data.items) && <p>{VAT_NOTE}</p>
+        )}
+        {data.docType === "korekta" && data.correctionReason && (
+          <p className="mt-1">Przyczyna korekty: {data.correctionReason}</p>
+        )}
         {data.description && <p className="mt-1">{data.description}</p>}
       </div>
 

@@ -38,6 +38,9 @@ export default async function InvoiceViewPage({ params }: Props) {
     paymentMethod: inv.payment_method ?? "Przelew",
     items: inv.items ?? [],
     pricesMode: (inv.prices_mode === "brutto" ? "brutto" : "netto") as TrybCen,
+    docType: (inv.doc_type ?? "faktura") as RodzajDokumentu,
+    correctsInvoiceId: inv.corrects_invoice_id ?? null,
+    correctionReason: inv.correction_reason ?? "",
     description: inv.description ?? "",
     paid: inv.paid_pln ?? 0,
     issuer: inv.issuer ?? "",
@@ -60,6 +63,16 @@ export default async function InvoiceViewPage({ params }: Props) {
             Edytuj
           </Link>
           <PrintButton number={inv.number} />
+          {/* Korektę wystawia się do konkretnej faktury, więc wejście jest
+              stąd, a nie z pustego formularza. Proformy się nie koryguje. */}
+          {(inv.doc_type ?? "faktura") === "faktura" && (
+            <Link
+              href={`/app/faktury/nowa?koryguje=${inv.id}`}
+              className="text-sm text-slate-500 transition hover:text-slate-900"
+            >
+              Wystaw korektę
+            </Link>
+          )}
           <form action={deleteInvoice.bind(null, inv.id)}>
             <button className="text-sm text-slate-500 transition hover:text-red-600">Usuń</button>
           </form>

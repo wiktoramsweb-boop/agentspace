@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireModul } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
-import { sumyFaktury, type TrybCen, type InvoiceItem } from "@/lib/invoice";
+import { sumyFaktury, type RodzajDokumentu, type TrybCen, type InvoiceItem } from "@/lib/invoice";
 
 export type InvoicePayload = {
   number: string;
@@ -23,6 +23,9 @@ export type InvoicePayload = {
   items: InvoiceItem[];
   /** Czy ceny jednostkowe podano netto, czy brutto. */
   pricesMode: TrybCen;
+  docType: RodzajDokumentu;
+  correctsInvoiceId?: string | null;
+  correctionReason?: string;
   description: string;
   paid: number;
   issuer: string;
@@ -76,6 +79,9 @@ export async function createInvoice(p: InvoicePayload): Promise<void> {
       items,
       total_pln: total,
       prices_mode: tryb,
+      doc_type: p.docType ?? "faktura",
+      corrects_invoice_id: p.docType === "korekta" ? (p.correctsInvoiceId ?? null) : null,
+      correction_reason: p.docType === "korekta" ? (p.correctionReason ?? null) : null,
       net_pln: sumy.netto,
       vat_pln: sumy.vat,
       description: p.description || null,
@@ -114,6 +120,9 @@ export async function updateInvoice(id: string, p: InvoicePayload): Promise<void
       items,
       total_pln: total,
       prices_mode: tryb,
+      doc_type: p.docType ?? "faktura",
+      corrects_invoice_id: p.docType === "korekta" ? (p.correctsInvoiceId ?? null) : null,
+      correction_reason: p.docType === "korekta" ? (p.correctionReason ?? null) : null,
       net_pln: sumy.netto,
       vat_pln: sumy.vat,
       description: p.description || null,

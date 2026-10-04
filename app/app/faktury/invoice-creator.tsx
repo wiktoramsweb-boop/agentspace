@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { STAWKI_VAT, type StawkaVat } from "@/lib/invoice";
+import { RODZAJE_DOKUMENTU, STAWKI_VAT, type RodzajDokumentu, type StawkaVat } from "@/lib/invoice";
 import { type InvoiceItem, type Seller } from "@/lib/invoice";
 import { InvoiceSheet, type SheetData } from "./invoice-sheet";
 import { createInvoice, updateInvoice } from "./actions";
@@ -121,6 +121,43 @@ export function InvoiceCreator({
             </div>
           </div>
           <Field label="Osoba wystawiająca (podpis)" value={d.issuer} onChange={(v) => set("issuer", v)} />
+        </Section>
+
+        <Section title="Rodzaj dokumentu">
+          <div className="flex flex-wrap gap-2">
+            {RODZAJE_DOKUMENTU.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                /* Korekty nie da się tu wybrać ręcznie: musi wskazywać fakturę
+                   pierwotną, a tę podaje się wchodząc przyciskiem z dokumentu. */
+                disabled={r.id === "korekta" && d.docType !== "korekta"}
+                onClick={() => set("docType", r.id as RodzajDokumentu)}
+                title={r.opis}
+                className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                  d.docType === r.id
+                    ? "bg-emerald-600 text-white"
+                    : "border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-40"
+                }`}
+              >
+                {r.nazwa}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-slate-500">
+            {RODZAJE_DOKUMENTU.find((r) => r.id === d.docType)?.opis}
+          </p>
+          {d.docType === "korekta" && (
+            <div className="mt-3">
+              <label className="mb-1 block text-xs font-medium text-slate-500">Przyczyna korekty</label>
+              <input
+                value={d.correctionReason ?? ""}
+                onChange={(e) => set("correctionReason", e.target.value)}
+                placeholder="Np. pomyłka w cenie jednostkowej"
+                className={inp}
+              />
+            </div>
+          )}
         </Section>
 
         <Section title="Pozycje">

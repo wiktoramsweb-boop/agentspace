@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
-import { sprzedawcy } from "@/lib/invoice";
+import { sprzedawcy, type RodzajDokumentu } from "@/lib/invoice";
 import { getInvoice } from "@/lib/data-invoices";
 import { PageHeader } from "../../../components/ui";
 import { InvoiceCreator } from "../../invoice-creator";
@@ -52,6 +52,9 @@ export default async function EdytujFakturaPage({ params }: Props) {
           paymentMethod: inv.payment_method ?? "Przelew",
           items: inv.items ?? [],
           pricesMode: inv.prices_mode === "brutto" ? "brutto" : "netto",
+          docType: (inv.doc_type ?? "faktura") as RodzajDokumentu,
+          correctsInvoiceId: inv.corrects_invoice_id ?? null,
+          correctionReason: inv.correction_reason ?? "",
           description: inv.description ?? "",
           paid: inv.paid_pln ?? 0,
           issuer: inv.issuer ?? "",
