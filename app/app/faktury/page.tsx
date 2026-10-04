@@ -5,6 +5,7 @@ import { sprzedawcy } from "@/lib/invoice";
 import { getInvoices } from "@/lib/data-invoices";
 import { PageHeader, EmptyState } from "../components/ui";
 import { InvoicesBrowser } from "./invoices-browser";
+import { EwidencjaSprzedazy } from "./ewidencja";
 
 export default async function FakturyPage() {
   const owner = await requireModul("faktury");
@@ -40,7 +41,10 @@ export default async function FakturyPage() {
           }
         />
       ) : (
-        <InvoicesBrowser invoices={invoices} sellers={listaSprzedawcow} />
+        <>
+          <InvoicesBrowser invoices={invoices} sellers={listaSprzedawcow} />
+          <EwidencjaSprzedazy />
+        </>
       )}
     </>
   );

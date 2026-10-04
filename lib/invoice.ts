@@ -212,6 +212,12 @@ export type Invoice = {
   items: InvoiceItem[];
   /** Tryb cen jednostkowych (v42). Brak = 'netto'. */
   prices_mode?: TrybCen | null;
+  /** Rodzaj dokumentu (v43). Brak = 'faktura'. */
+  doc_type?: RodzajDokumentu | null;
+  /** Faktura pierwotna, gdy to korekta (v43). */
+  corrects_invoice_id?: string | null;
+  /** Powód korekty (v43). */
+  correction_reason?: string | null;
   /** Kwota do zapłaty (brutto). */
   total_pln: number;
   net_pln?: number | null;
@@ -300,4 +306,86 @@ export function amountToWordsPL(amount: number): string {
 
 export function formatMoney(n: number): string {
   return new Intl.NumberFormat("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+}
+
+
+/* ───────────────────── RODZAJ DOKUMENTU ─────────────────────
+   Proforma nie jest fakturą: nie rodzi obowiązku podatkowego i nie trafia
+   do ewidencji sprzedaży. Korekta odwołuje się do faktury pierwotnej.
+   Rozróżnienie siedzi w danych, a nie tylko w nazwie pliku, bo od niego
+   zależy, co wchodzi do zestawienia dla księgowej.
+   ──────────────────────────────────────────────────────────── */
+
+export type RodzajDokumentu = "faktura" | "proforma" | "korekta";
+
+export const RODZAJE_DOKUMENTU: { id: RodzajDokumentu; nazwa: string; tytul: string; opis: string }[] = [
+  { id: "faktura", nazwa: "Faktura", tytul: "Faktura VAT", opis: "Dokument sprzedaży. Wchodzi do ewidencji." },
+  {
+    id: "proforma",
+    nazwa: "Proforma",
+    tytul: "Faktura proforma",
+    opis: "Dokument do zapłaty z góry. Nie jest fakturą i nie wchodzi do ewidencji.",
+  },
+  {
+    id: "korekta",
+    nazwa: "Korekta",
+    tytul: "Faktura korygująca",
+    opis: "Poprawia fakturę już wystawioną. Wymaga wskazania dokumentu pierwotnego.",
+  },
+];
+
+export function opisRodzaju(id: RodzajDokumentu | null | undefined) {
+  return RODZAJE_DOKUMENTU.find((r) => r.id === id) ?? RODZAJE_DOKUMENTU[0];
+}
+
+export const NOTA_PROFORMA =
+  "Dokument nie jest fakturą VAT i nie stanowi podstawy do odliczenia podatku.";
+
+/* ───────────────────── STATUS PŁATNOŚCI ─────────────────────
+   Liczony z danych, a nie trzymany jako osobne pole, które trzeba pamiętać
+   zaktualizować. Dzięki temu „po terminie” pojawia się samo następnego dnia
+   po terminie płatności, bez żadnego zadania w tle.
+   ──────────────────────────────────────────────────────────── */
+
+export type StatusPlatnosci = "zaplacona" | "czesciowa" | "po_terminie" | "nieoplacona";
+
+export const STATUSY_PLATNOSCI: { id: StatusPlatnosci; nazwa: string }[] = [
+  { id: "zaplacona", nazwa: "Zapłacona" },
+  { id: "czesciowa", nazwa: "Zapłacona częściowo" },
+  { id: "po_terminie", nazwa: "Po terminie" },
+  { id: "nieoplacona", nazwa: "Nieopłacona" },
+];
+
+/**
+ * @param dzis data w formacie RRRR-MM-DD, podawana z zewnątrz, żeby funkcja
+ *   była czysta i dała się przetestować bez udawania zegara.
+ */
+export function statusPlatnosci(
+  f: { total_pln: number; paid_pln?: number | null; payment_date?: string | null },
+  dzis: string,
+): StatusPlatnosci {
+  const doZaplaty = Math.round((Number(f.total_pln) || 0) * 100);
+  const zaplacone = Math.round((Number(f.paid_pln) || 0) * 100);
+
+  if (doZaplaty > 0 && zaplacone >= doZaplaty) return "zaplacona";
+  // Termin minął, gdy jest wcześniejszy niż dzisiaj. W dniu terminu jeszcze
+  // nie jest po terminie - klient ma czas do końca dnia.
+  const poTerminie = Boolean(f.payment_date) && String(f.payment_date) < dzis;
+  if (poTerminie) return "po_terminie";
+  if (zaplacone > 0) return "czesciowa";
+  return "nieoplacona";
+}
+
+/** Ile zostało do zapłaty. */
+export function pozostaloDoZaplaty(f: { total_pln: number; paid_pln?: number | null }): number {
+  return Math.max(0, Math.round(((Number(f.total_pln) || 0) - (Number(f.paid_pln) || 0)) * 100) / 100);
+}
+
+/** Ile dni po terminie. Zero albo mniej = termin jeszcze nie minął. */
+export function dniPoTerminie(payment_date: string | null | undefined, dzis: string): number {
+  if (!payment_date) return 0;
+  const t = Date.parse(`${payment_date}T00:00:00Z`);
+  const d = Date.parse(`${dzis}T00:00:00Z`);
+  if (Number.isNaN(t) || Number.isNaN(d)) return 0;
+  return Math.round((d - t) / 86_400_000);
 }
