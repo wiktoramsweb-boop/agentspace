@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { formatMoney, getSeller, type Seller } from "@/lib/invoice";
+import {
+  formatMoney,
+  getSeller,
+  opisRodzaju,
+  statusPlatnosci,
+  type RodzajDokumentu,
+  type Seller,
+} from "@/lib/invoice";
+import { todayPL } from "@/lib/datetime";
 import { formatDateShort } from "@/lib/format";
 import { Select } from "@/app/app/components/select";
 
@@ -12,7 +20,17 @@ type InvoiceRow = {
   buyer_name: string | null;
   seller_key: string;
   issue_date: string | null;
+  payment_date?: string | null;
   total_pln: number | null;
+  paid_pln?: number | null;
+  doc_type?: RodzajDokumentu | null;
+};
+
+const ODZNAKI: Record<string, { tekst: string; klasa: string }> = {
+  zaplacona: { tekst: "Zapłacona", klasa: "bg-emerald-100 text-emerald-700" },
+  czesciowa: { tekst: "Częściowo", klasa: "bg-amber-100 text-amber-700" },
+  po_terminie: { tekst: "Po terminie", klasa: "bg-red-100 text-red-700" },
+  nieoplacona: { tekst: "Nieopłacona", klasa: "bg-slate-100 text-slate-600" },
 };
 
 /** Rok wystawienia; faktury bez daty trafiają do „bez daty". */
@@ -28,6 +46,8 @@ export function InvoicesBrowser({
   sellers: Seller[];
 }) {
   const [q, setQ] = useState("");
+  // Liczone raz na render listy, a nie przy każdym wierszu.
+  const dzis = todayPL();
   const [year, setYear] = useState("all");
 
   const years = useMemo(() => {
@@ -98,7 +118,30 @@ export function InvoicesBrowser({
                   </svg>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-slate-900">Faktura {inv.number}</p>
+                  <p className="flex flex-wrap items-center gap-2 font-semibold text-slate-900">
+                    {opisRodzaju(inv.doc_type).nazwa} {inv.number}
+                    {/* Proforma nie jest fakturą, więc nie pokazujemy przy niej
+                        statusu płatności - nie ma czego rozliczać. */}
+                    {(inv.doc_type ?? "faktura") !== "proforma" &&
+                      (() => {
+                        const st =
+                          ODZNAKI[
+                            statusPlatnosci(
+                              {
+                                total_pln: inv.total_pln ?? 0,
+                                paid_pln: inv.paid_pln,
+                                payment_date: inv.payment_date,
+                              },
+                              dzis,
+                            )
+                          ];
+                        return (
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${st.klasa}`}>
+                            {st.tekst}
+                          </span>
+                        );
+                      })()}
+                  </p>
                   <p className="truncate text-sm text-slate-500">
                     {inv.buyer_name || "-"} · {seller.name.split(" ").slice(0, 2).join(" ")}…
                     {inv.issue_date && ` · ${formatDateShort(inv.issue_date)}`}
