@@ -7,11 +7,18 @@ import {
 } from "@/lib/data-platform";
 import { computeFunnel } from "@/lib/funnel";
 import { sendPushToAgent } from "@/lib/push";
+import { przypomnijOZaleglychFakturach } from "@/lib/przypomnienia-faktury";
+import { zapiszBlad } from "@/lib/blad";
 
 export const maxDuration = 300;
 
 /**
- * Poranna odprawa push. Dla każdego agenta z aktywną subskrypcją liczy:
+ * Poranna odprawa push i przypomnienia o fakturach.
+ *
+ * Przypomnienia doczepione tutaj, a nie w osobnym cronie, bo plan Hobby
+ * daje tylko dwa zadania i oba są już zajęte. Zadanie i tak chodzi raz
+ * dziennie, czyli dokładnie z taką częstotliwością, jaka jest potrzebna.
+ * Dla każdego agenta z aktywną subskrypcją liczy:
  * klientów do kontaktu dziś + dzienny cel telefonów, i wysyła powiadomienie.
  * Uruchamiany przez Vercel Cron (patrz vercel.json). Zabezpieczony CRON_SECRET.
  */
@@ -50,9 +57,17 @@ export async function GET(request: Request) {
       });
       if (sent > 0) notified += 1;
     } catch (err) {
-      console.error("morning-brief error for agent", agentId, err);
+      await zapiszBlad("cron/morning-brief", err);
     }
   }
 
-  return Response.json({ ok: true, agents: agentIds.length, notified });
+  // Błąd przypomnień nie może wywrócić porannej odprawy i odwrotnie.
+  let przypomnienia = 0;
+  try {
+    przypomnienia = await przypomnijOZaleglychFakturach();
+  } catch (err) {
+    await zapiszBlad("cron/przypomnienia-faktury", err);
+  }
+
+  return Response.json({ ok: true, agents: agentIds.length, notified, przypomnienia });
 }
