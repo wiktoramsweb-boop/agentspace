@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
-import { sprzedawcy, type TrybCen } from "@/lib/invoice";
+import { getSeller, sprzedawcy, type RodzajDokumentu, type TrybCen } from "@/lib/invoice";
+import { WyslijMailem } from "../wyslij-mailem";
 import { getInvoice } from "@/lib/data-invoices";
 import { InvoiceSheet } from "../invoice-sheet";
 import { PrintButton } from "../print-button";
@@ -64,6 +65,36 @@ export default async function InvoiceViewPage({ params }: Props) {
           </form>
         </div>
       </div>
+      <div className="print-hide mb-5">
+        <WyslijMailem
+          invoiceId={inv.id}
+          dane={{
+            number: inv.number,
+            docType: (inv.doc_type ?? "faktura") as RodzajDokumentu,
+            correctsNumber: null,
+            correctionReason: inv.correction_reason ?? null,
+            place: data.place,
+            issueDate: data.issueDate,
+            saleDate: data.saleDate,
+            paymentDate: data.paymentDate,
+            paymentMethod: data.paymentMethod,
+            buyerName: data.buyerName,
+            buyerAddress: data.buyerAddress,
+            buyerCity: data.buyerCity,
+            buyerPostcode: data.buyerPostcode,
+            buyerNip: data.buyerNip,
+            buyerPesel: data.buyerPesel,
+            items: data.items,
+            pricesMode: data.pricesMode,
+            paid: data.paid,
+            issuer: data.issuer,
+            description: data.description,
+          }}
+          sprzedawca={getSeller(inv.seller_key, listaSprzedawcow)}
+          stopka={nazwaBiura}
+        />
+      </div>
+
       <InvoiceSheet
         data={data}
         sellers={listaSprzedawcow}
