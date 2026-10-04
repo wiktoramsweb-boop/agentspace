@@ -24,6 +24,7 @@ type InvoiceRow = {
   total_pln: number | null;
   paid_pln?: number | null;
   doc_type?: RodzajDokumentu | null;
+  payment_status?: string | null;
 };
 
 const ODZNAKI: Record<string, { tekst: string; klasa: string }> = {
@@ -131,6 +132,7 @@ export function InvoicesBrowser({
                                 total_pln: inv.total_pln ?? 0,
                                 paid_pln: inv.paid_pln,
                                 payment_date: inv.payment_date,
+                                payment_status: inv.payment_status,
                               },
                               dzis,
                             )

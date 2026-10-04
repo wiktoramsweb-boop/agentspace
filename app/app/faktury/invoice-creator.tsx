@@ -76,14 +76,33 @@ export function InvoiceCreator({
 
         <Section title="Nabywca">
           <div className="mb-3 flex rounded-xl border border-slate-200 bg-white p-1">
-            <Toggle active={buyerType === "firma"} onClick={() => setBuyerType("firma")}>
+            <Toggle
+              active={buyerType === "firma"}
+              onClick={() => {
+                setBuyerType("firma");
+                // PESEL na fakturze dla firmy nie ma czego szukać.
+                set("buyerPesel", "");
+              }}
+            >
               Firma
             </Toggle>
-            <Toggle active={buyerType === "osoba"} onClick={() => setBuyerType("osoba")}>
+            <Toggle
+              active={buyerType === "osoba"}
+              onClick={() => {
+                setBuyerType("osoba");
+                set("buyerNip", "");
+              }}
+            >
               Osoba prywatna
             </Toggle>
           </div>
-          <Field label="Nazwa / imię i nazwisko" value={d.buyerName} onChange={(v) => set("buyerName", v)} />
+          {/* Osobna etykieta dla firmy i dla osoby: na fakturze dla firmy wpisuje
+              się nazwę podmiotu, a nie imię i nazwisko, i odwrotnie. */}
+          <Field
+            label={buyerType === "firma" ? "Nazwa firmy" : "Imię i nazwisko"}
+            value={d.buyerName}
+            onChange={(v) => set("buyerName", v)}
+          />
           <Field label="Ulica i numer" value={d.buyerAddress} onChange={(v) => set("buyerAddress", v)} />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Kod pocztowy" value={d.buyerPostcode} onChange={(v) => set("buyerPostcode", v)} />
@@ -118,6 +137,22 @@ export function InvoiceCreator({
                 className={inp}
               />
             </div>
+          </div>
+          <div className="mt-3">
+            <label className="mb-1 block text-xs font-medium text-slate-500">Status płatności</label>
+            <select
+              value={d.paymentStatus ?? ""}
+              onChange={(e) => set("paymentStatus", e.target.value || null)}
+              className={inp}
+            >
+              <option value="">Automatycznie (z kwoty i terminu)</option>
+              <option value="zaplacona">Zapłacona</option>
+              <option value="nieoplacona">Nieopłacona</option>
+            </select>
+            <p className="mt-1 text-xs text-slate-500">
+              Automatycznie: zapłacona, gdy kwota zapłacona pokrywa całość, a po terminie,
+              gdy minął termin płatności.
+            </p>
           </div>
           <Field label="Osoba wystawiająca (podpis)" value={d.issuer} onChange={(v) => set("issuer", v)} />
         </Section>

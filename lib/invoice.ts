@@ -214,6 +214,8 @@ export type Invoice = {
   prices_mode?: TrybCen | null;
   /** Rodzaj dokumentu (v43). Brak = 'faktura'. */
   doc_type?: RodzajDokumentu | null;
+  /** Ręczny status płatności (v45). Brak = licz automatycznie. */
+  payment_status?: string | null;
   /** Faktura pierwotna, gdy to korekta (v43). */
   corrects_invoice_id?: string | null;
   /** Powód korekty (v43). */
@@ -374,9 +376,21 @@ export const STATUSY_PLATNOSCI: { id: StatusPlatnosci; nazwa: string }[] = [
  *   była czysta i dała się przetestować bez udawania zegara.
  */
 export function statusPlatnosci(
-  f: { total_pln: number; paid_pln?: number | null; payment_date?: string | null },
+  f: {
+    total_pln: number;
+    paid_pln?: number | null;
+    payment_date?: string | null;
+    /** Ustawiony ręcznie ma pierwszeństwo nad wyliczeniem (v45). */
+    payment_status?: string | null;
+  },
   dzis: string,
 ): StatusPlatnosci {
+  if (f.payment_status === "zaplacona") return "zaplacona";
+  if (f.payment_status === "nieoplacona") {
+    // Nawet przy ręcznym „nieopłacona" po terminie pokazujemy, że termin minął:
+    // to ta informacja jest potrzebna, a nie sama etykieta.
+    return f.payment_date && String(f.payment_date) < dzis ? "po_terminie" : "nieoplacona";
+  }
   const doZaplaty = Math.round((Number(f.total_pln) || 0) * 100);
   const zaplacone = Math.round((Number(f.paid_pln) || 0) * 100);
 

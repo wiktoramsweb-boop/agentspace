@@ -24,6 +24,8 @@ export type InvoicePayload = {
   /** Czy ceny jednostkowe podano netto, czy brutto. */
   pricesMode: TrybCen;
   docType: RodzajDokumentu;
+  /** Pusty = licz automatycznie. */
+  paymentStatus?: string | null;
   correctsInvoiceId?: string | null;
   correctionReason?: string;
   description: string;
@@ -66,6 +68,7 @@ function poleOpcjonalne(p: InvoicePayload, tryb: TrybCen, sumy: { netto: number;
     net_pln: sumy.netto,
     vat_pln: sumy.vat,
     doc_type: p.docType ?? "faktura",
+    payment_status: p.paymentStatus || null,
     corrects_invoice_id: p.docType === "korekta" ? (p.correctsInvoiceId ?? null) : null,
     correction_reason: p.docType === "korekta" ? (p.correctionReason ?? null) : null,
   };

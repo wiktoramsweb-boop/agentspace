@@ -39,6 +39,7 @@ export default async function InvoiceViewPage({ params }: Props) {
     items: inv.items ?? [],
     pricesMode: (inv.prices_mode === "brutto" ? "brutto" : "netto") as TrybCen,
     docType: (inv.doc_type ?? "faktura") as RodzajDokumentu,
+    paymentStatus: inv.payment_status ?? null,
     correctsInvoiceId: inv.corrects_invoice_id ?? null,
     correctionReason: inv.correction_reason ?? "",
     description: inv.description ?? "",

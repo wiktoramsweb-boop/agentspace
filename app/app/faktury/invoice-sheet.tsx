@@ -36,6 +36,7 @@ export type SheetData = {
   /** Czy ceny jednostkowe podano netto, czy brutto. */
   pricesMode: TrybCen;
   docType: RodzajDokumentu;
+  paymentStatus?: string | null;
   /** Numer dokumentu pierwotnego - tylko dla korekty. */
   correctsNumber?: string | null;
   correctsInvoiceId?: string | null;
