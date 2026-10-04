@@ -14,6 +14,7 @@ import {
   type TrybCen,
   type RodzajDokumentu,
   opisRodzaju,
+  tytulDokumentu,
   NOTA_PROFORMA,
 } from "@/lib/invoice";
 
@@ -87,7 +88,7 @@ export function InvoiceSheet({
         )}
         <div className="text-right">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
-            {opisRodzaju(data.docType).tytul.toUpperCase()}
+            {tytulDokumentu(data.docType, data.items).toUpperCase()}
           </h1>
           <p className="text-sm font-medium text-slate-400">Nr {data.number || "-"}</p>
           {data.docType === "korekta" && data.correctsNumber && (

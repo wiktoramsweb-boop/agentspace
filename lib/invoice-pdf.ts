@@ -6,6 +6,7 @@ import {
   formatMoney,
   kwotyPozycji,
   opisRodzaju,
+  tytulDokumentu,
   opisStawki,
   podsumowanieVat,
   pozostaloDoZaplaty,
@@ -51,18 +52,19 @@ export type DaneFaktury = {
   description: string;
 };
 
-function adres(linie: (string | null | undefined)[]): string {
-  return linie.map((l) => (l ?? "").trim()).filter(Boolean).join("\n");
+function adres(linie: (string | null | undefined)[]): string[] {
+  return linie.map((l) => (l ?? "").trim()).filter(Boolean);
 }
 
 export async function generujFakturePdf(
   d: DaneFaktury,
   sprzedawca: Seller,
-  stopka?: string,
+  opcje: { stopka?: string; logoUrl?: string | null; nazwaBiura?: string } = {},
 ): Promise<Uint8Array> {
+  const { stopka, logoUrl, nazwaBiura } = opcje;
   const rodzaj = opisRodzaju(d.docType);
   const a = await nowyDokument({
-    tytulPliku: `${rodzaj.tytul} ${d.number}`,
+    tytulPliku: `${tytulDokumentu(d.docType, d.items)} ${d.number}`,
     stopka,
     // Tabela pozycji ma dziewięć kolumn, więc potrzebuje szerszej kolumny tekstu
     // niż domyślny margines dokumentów tekstowych.
@@ -73,57 +75,93 @@ export async function generujFakturePdf(
   const wgStawek = podsumowanieVat(d.items, d.pricesMode);
   const zostalo = pozostaloDoZaplaty({ total_pln: sumy.brutto, paid_pln: d.paid });
 
-  /* ── Nagłówek ── */
-  a.tekst(`**${rodzaj.tytul} nr ${d.number}**`, { size: 16, align: "center", gapAfter: 4 });
-  if (d.docType === "korekta" && d.correctsNumber) {
-    a.tekst(`do faktury nr ${d.correctsNumber}`, { size: 10, align: "center", kolor: SZARY, gapAfter: 2 });
+  /* ── Nagłówek: logo i nazwa po lewej, tytuł po prawej ── */
+  const yNaglowka = a.y;
+  let przesuniecieNazwy = 40;
+  if (logoUrl) {
+    const { szer } = await a.obrazek(logoUrl, { x: 40, y: yNaglowka, maxSzer: 44, maxWys: 44 });
+    if (szer > 0) przesuniecieNazwy = 40 + szer + 10;
   }
-  a.tekst(
-    `${d.place}, ${d.issueDate}` + (d.saleDate ? `  ·  data sprzedaży: ${d.saleDate}` : ""),
-    { size: 9.5, align: "center", kolor: SZARY, gapAfter: 14 },
-  );
+  if (nazwaBiura) {
+    a.y = yNaglowka - 16;
+    a.tekst(`**${nazwaBiura}**`, { size: 11, x: przesuniecieNazwy, szer: 220 });
+  }
+
+  a.y = yNaglowka;
+  const prawaKolumna = a.szerokosc / 2;
+  const xPrawej = 40 + prawaKolumna;
+  a.tekst(tytulDokumentu(d.docType, d.items).toUpperCase(), {
+    size: 19,
+    x: xPrawej,
+    szer: prawaKolumna,
+    align: "right",
+    gapAfter: 1,
+  });
+  a.tekst(`Nr ${d.number}`, { size: 10, x: xPrawej, szer: prawaKolumna, align: "right", kolor: SZARY });
+  if (d.docType === "korekta" && d.correctsNumber) {
+    a.tekst(`do faktury nr ${d.correctsNumber}`, {
+      size: 9,
+      x: xPrawej,
+      szer: prawaKolumna,
+      align: "right",
+      kolor: SZARY,
+    });
+  }
+  a.tekst(`${d.place ? `${d.place}, ` : ""}${d.issueDate}`, {
+    size: 9,
+    x: xPrawej,
+    szer: prawaKolumna,
+    align: "right",
+    kolor: SZARY,
+  });
+
+  // Nagłówek zajmuje tyle, ile wyższa z dwóch kolumn.
+  a.y = Math.min(a.y, yNaglowka - 52);
+  a.linia({ gapBefore: 8, gapAfter: 16 });
 
   /* ── Strony ── */
   const polowa = a.szerokosc / 2 - 8;
   const yPrzed = a.y;
   a.tekst("**SPRZEDAWCA**", { size: 9, x: 40, szer: polowa, kolor: SZARY, gapAfter: 3 });
-  a.tekst(
-    adres([
-      sprzedawca.name,
-      sprzedawca.address,
-      [sprzedawca.postcode, sprzedawca.city].filter(Boolean).join(" "),
-      sprzedawca.nip ? `NIP: ${sprzedawca.nip}` : "",
-    ]),
-    { size: 9.5, x: 40, szer: polowa },
-  );
+  // Każda linia osobno: `tekst` zawija akapit i znak końca linii nic mu nie
+  // mówi, więc adres zlewał się w jeden ciąg.
+  for (const l of adres([
+    `**${sprzedawca.name}**`,
+    sprzedawca.address,
+    [sprzedawca.postcode, sprzedawca.city].filter(Boolean).join(" "),
+    sprzedawca.nip ? `NIP: ${sprzedawca.nip}` : "",
+  ])) {
+    a.tekst(l, { size: 9.5, x: 40, szer: polowa, interlinia: 1.3 });
+  }
   const yPoLewej = a.y;
 
   a.y = yPrzed;
   a.tekst("**NABYWCA**", { size: 9, x: 40 + polowa + 16, szer: polowa, kolor: SZARY, gapAfter: 3 });
-  a.tekst(
-    adres([
-      d.buyerName,
-      d.buyerAddress,
-      [d.buyerPostcode, d.buyerCity].filter(Boolean).join(" "),
-      d.buyerNip ? `NIP: ${d.buyerNip}` : "",
-      d.buyerPesel ? `PESEL: ${d.buyerPesel}` : "",
-    ]),
-    { size: 9.5, x: 40 + polowa + 16, szer: polowa },
-  );
+  for (const l of adres([
+    `**${d.buyerName || "-"}**`,
+    d.buyerAddress,
+    [d.buyerPostcode, d.buyerCity].filter(Boolean).join(" "),
+    d.buyerNip ? `NIP: ${d.buyerNip}` : "",
+    d.buyerPesel ? `PESEL: ${d.buyerPesel}` : "",
+  ])) {
+    a.tekst(l, { size: 9.5, x: 40 + polowa + 16, szer: polowa, interlinia: 1.3 });
+  }
 
   a.y = Math.min(yPoLewej, a.y) - 16;
 
   /* ── Pozycje ── */
   const kol = [
-    { naglowek: "Lp.", szer: 22 },
-    { naglowek: "Nazwa", szer: 150 },
-    { naglowek: "Ilość", szer: 32, align: "right" as const },
-    { naglowek: "j.m.", szer: 30 },
-    { naglowek: `Cena ${d.pricesMode}`, szer: 60, align: "right" as const },
-    { naglowek: "Netto", szer: 62, align: "right" as const },
-    { naglowek: "VAT", szer: 34, align: "right" as const },
-    { naglowek: "Kwota VAT", szer: 60, align: "right" as const },
-    { naglowek: "Brutto", szer: 65, align: "right" as const },
+    // Suma musi dać 515 pkt (szerokość kolumny tekstu przy marginesie 40).
+    // Kolumny kwotowe są szerokie, bo "33 400,00 zł" łamało się na dwie linie.
+    { naglowek: "Lp.", szer: 20 },
+    { naglowek: "Nazwa", szer: 126 },
+    { naglowek: "Ilość", szer: 28, align: "right" as const },
+    { naglowek: "j.m.", szer: 26 },
+    { naglowek: `Cena ${d.pricesMode}`, szer: 68, align: "right" as const },
+    { naglowek: "Netto", szer: 68, align: "right" as const },
+    { naglowek: "VAT", szer: 30, align: "right" as const },
+    { naglowek: "Kwota VAT", szer: 70, align: "right" as const },
+    { naglowek: "Brutto", szer: 79, align: "right" as const },
   ];
 
   a.tabela(
@@ -135,11 +173,11 @@ export async function generujFakturePdf(
         it.name || "-",
         String(it.qty ?? 0),
         it.unit || "szt.",
-        `${formatMoney(Number(it.unitPrice) || 0)}`,
-        formatMoney(k.netto),
+        `${formatMoney(Number(it.unitPrice) || 0)} zł`,
+        `${formatMoney(k.netto)} zł`,
         opisStawki(it.vat ?? "zw").etykieta,
-        formatMoney(k.vat),
-        formatMoney(k.brutto),
+        `${formatMoney(k.vat)} zł`,
+        `${formatMoney(k.brutto)} zł`,
       ];
     }),
     { gapAfter: 10 },
@@ -159,11 +197,11 @@ export async function generujFakturePdf(
       [
         ...wgStawek.map((w) => [
           opisStawki(w.stawka).etykieta,
-          formatMoney(w.netto),
-          formatMoney(w.vat),
-          formatMoney(w.brutto),
+          `${formatMoney(w.netto)} zł`,
+          `${formatMoney(w.vat)} zł`,
+          `${formatMoney(w.brutto)} zł`,
         ]),
-        ["RAZEM", formatMoney(sumy.netto), formatMoney(sumy.vat), formatMoney(sumy.brutto)],
+        ["**RAZEM**", `**${formatMoney(sumy.netto)} zł**`, `**${formatMoney(sumy.vat)} zł**`, `**${formatMoney(sumy.brutto)} zł**`],
       ],
       { gapAfter: 10 },
     );
@@ -196,7 +234,7 @@ export async function generujFakturePdf(
     sprzedawca.account ? `Nr konta: ${sprzedawca.account}` : "",
     sprzedawca.bank ? `Bank: ${sprzedawca.bank}` : "",
   ].filter(Boolean);
-  if (platnosc.length > 0) a.ramka(platnosc, { gapAfter: 10 });
+  if (platnosc.length > 0) a.ramka(platnosc, { gapAfter: 10, ciasno: true });
 
   /* ── Uwagi ── */
   const uwagi: string[] = [];
@@ -210,7 +248,8 @@ export async function generujFakturePdf(
   a.podpisy(
     { rola: "Osoba upoważniona do wystawienia", osoby: [d.issuer || sprzedawca.name] },
     { rola: "Osoba upoważniona do odbioru", osoby: [d.buyerName] },
-    { ciasno: true },
+    // Bez `ciasno`: na fakturze podpisuje się ręcznie, więc nad kreską musi
+    // zostać miejsce na podpis, a nie sama linia.
   );
 
   return a.zapisz();

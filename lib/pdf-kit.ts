@@ -346,6 +346,44 @@ export async function nowyDokument(opts: {
     y = lineY - (o.ciasno ? 34 : 40);
   }
 
+  /**
+   * Obrazek (logo biura) w zadanym miejscu, bez przesuwania kursora tekstu.
+   *
+   * Format rozpoznajemy po zawartości, a nie po rozszerzeniu: logo bywa
+   * wgrane jako .png, a w środku jest JPEG, i wtedy pdf-lib odmawia.
+   * Błąd wczytania pomijamy - brak logo nie może zablokować faktury.
+   */
+  async function obrazek(url: string, o: { x: number; y: number; maxSzer: number; maxWys: number }) {
+    try {
+      const bytes = await loadBytes(url);
+      const png = bytes[0] === 0x89 && bytes[1] === 0x50;
+      const img = png ? await pdf.embedPng(bytes) : await pdf.embedJpg(bytes);
+      const skala = Math.min(o.maxSzer / img.width, o.maxWys / img.height, 1);
+      strony[0].drawImage(img, {
+        x: o.x,
+        y: o.y - img.height * skala,
+        width: img.width * skala,
+        height: img.height * skala,
+      });
+      return { szer: img.width * skala, wys: img.height * skala };
+    } catch {
+      return { szer: 0, wys: 0 };
+    }
+  }
+
+  /** Pozioma linia na całą szerokość kolumny tekstu. */
+  function linia(o: { gapBefore?: number; gapAfter?: number } = {}) {
+    y -= o.gapBefore ?? 0;
+    zmiesc(2);
+    page.drawLine({
+      start: { x: MARGIN, y },
+      end: { x: MARGIN + CONTENT_W, y },
+      color: LINIA,
+      thickness: 0.8,
+    });
+    y -= o.gapAfter ?? 0;
+  }
+
   /** Numeracja stron i stopka. Dopisywana na końcu, gdy znamy liczbę stron. */
   async function zapisz(): Promise<Uint8Array> {
     strony.forEach((p, i) => {
@@ -367,6 +405,7 @@ export async function nowyDokument(opts: {
     get y() { return y; },
     set y(v: number) { y = v; },
     tekst, tytul, paragraf, ramka, tabela, liniePuste, podpisy, pasek, slupki, kafelki, zapisz,
+    obrazek, linia,
     /** Łamie stronę, jeśli nie zostało tyle miejsca. Chroni nagłówek sekcji
      *  przed zostaniem samemu na dole strony. */
     zarezerwuj: (ile: number) => zmiesc(ile),

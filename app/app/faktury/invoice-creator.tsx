@@ -5,7 +5,6 @@ import { RODZAJE_DOKUMENTU, STAWKI_VAT, type RodzajDokumentu, type StawkaVat } f
 import { type InvoiceItem, type Seller } from "@/lib/invoice";
 import { InvoiceSheet, type SheetData } from "./invoice-sheet";
 import { createInvoice, updateInvoice } from "./actions";
-import { printInvoice } from "./print-button";
 import { Select } from "@/app/app/components/select";
 
 export function InvoiceCreator({
@@ -187,35 +186,62 @@ export function InvoiceCreator({
                   placeholder="Nazwa usługi (np. Pośrednictwo w kupnie nieruchomości)"
                   className={`${inp} mb-2`}
                 />
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={it.qty}
-                    onChange={(e) => setItem(i, { qty: Number(e.target.value) })}
-                    placeholder="Ilość"
-                    className={`${inp} w-20`}
-                  />
-                  <input
-                    type="number"
-                    value={it.unitPrice || ""}
-                    onChange={(e) => setItem(i, { unitPrice: Number(e.target.value) })}
-                    placeholder="Kwota (zł)"
-                    className={`${inp} flex-1`}
-                  />
-                  <select
-                    value={it.vat ?? "zw"}
-                    onChange={(e) => setItem(i, { vat: e.target.value as StawkaVat })}
-                    className={`${inp} w-24`}
-                    aria-label="Stawka VAT"
-                  >
-                    {STAWKI_VAT.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.etykieta}
-                      </option>
-                    ))}
-                  </select>
+                {/* Każde pole w osobnym opakowaniu z własną szerokością.
+                    Klasa `inp` ma w sobie `w-full`, więc szerokość nakładana
+                    wprost na input kolidowała z nią i pole ceny zapadało się
+                    do zera - nie było widać, gdzie wpisuje się kwotę. */}
+                <div className="flex flex-wrap items-end gap-2">
+                  <div className="w-20">
+                    <label className="mb-1 block text-[11px] font-medium text-slate-500">Ilość</label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={it.qty}
+                      onChange={(e) => setItem(i, { qty: Number(e.target.value) })}
+                      className={inp}
+                    />
+                  </div>
+                  <div className="w-20">
+                    <label className="mb-1 block text-[11px] font-medium text-slate-500">j.m.</label>
+                    <input
+                      value={it.unit ?? "szt."}
+                      onChange={(e) => setItem(i, { unit: e.target.value })}
+                      className={inp}
+                    />
+                  </div>
+                  <div className="min-w-[8rem] flex-1">
+                    <label className="mb-1 block text-[11px] font-medium text-slate-500">
+                      Cena {d.pricesMode} (zł)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={it.unitPrice || ""}
+                      onChange={(e) => setItem(i, { unitPrice: Number(e.target.value) })}
+                      placeholder="0,00"
+                      className={inp}
+                    />
+                  </div>
+                  <div className="w-24">
+                    <label className="mb-1 block text-[11px] font-medium text-slate-500">VAT</label>
+                    <select
+                      value={it.vat ?? "zw"}
+                      onChange={(e) => setItem(i, { vat: e.target.value as StawkaVat })}
+                      className={inp}
+                    >
+                      {STAWKI_VAT.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.etykieta}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   {d.items.length > 1 && (
-                    <button onClick={() => removeItem(i)} className="px-1 text-slate-400 hover:text-red-600">
+                    <button
+                      onClick={() => removeItem(i)}
+                      className="pb-2.5 text-slate-400 transition hover:text-red-600"
+                      aria-label="Usuń pozycję"
+                    >
                       ✕
                     </button>
                   )}
@@ -235,7 +261,7 @@ export function InvoiceCreator({
               value={d.description}
               onChange={(e) => set("description", e.target.value)}
               rows={2}
-              placeholder="Zwolnienie z VAT (art. 113) dodaje się automatycznie."
+              placeholder="Np. numer umowy albo zakres usługi."
               className={inp}
             />
           </div>
@@ -249,12 +275,8 @@ export function InvoiceCreator({
           >
             {pending ? "Zapisuję…" : editId ? "Zapisz zmiany" : "Zapisz fakturę"}
           </button>
-          <button
-            onClick={() => printInvoice(d.number)}
-            className="rounded-xl border border-slate-300 px-5 py-3 font-medium text-slate-800 transition hover:bg-slate-100"
-          >
-            Drukuj / PDF
-          </button>
+          {/* Zapis do PDF dopiero po zapisaniu faktury: plik ma nosić numer
+              i dane, które faktycznie trafiły do bazy, a nie wersję roboczą. */}
         </div>
       </div>
 

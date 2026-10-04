@@ -7,7 +7,6 @@ import { WyslijMailem } from "../wyslij-mailem";
 import { UstawCykliczna } from "../cykliczne";
 import { getInvoice } from "@/lib/data-invoices";
 import { InvoiceSheet } from "../invoice-sheet";
-import { PrintButton } from "../print-button";
 import { deleteInvoice } from "../actions";
 
 type Props = { params: Promise<{ id: string }> };
@@ -63,7 +62,6 @@ export default async function InvoiceViewPage({ params }: Props) {
           >
             Edytuj
           </Link>
-          <PrintButton number={inv.number} />
           {/* Korektę wystawia się do konkretnej faktury, więc wejście jest
               stąd, a nie z pustego formularza. Proformy się nie koryguje. */}
           {(inv.doc_type ?? "faktura") === "faktura" && (
@@ -107,6 +105,8 @@ export default async function InvoiceViewPage({ params }: Props) {
           }}
           sprzedawca={getSeller(inv.seller_key, listaSprzedawcow)}
           stopka={nazwaBiura}
+          logoUrl={ustawienia.logoUrl}
+          nazwaBiura={nazwaBiura}
         />
       </div>
 

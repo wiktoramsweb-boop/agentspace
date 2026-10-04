@@ -3,7 +3,12 @@
 import { useState } from "react";
 import { generujFakturePdf, type DaneFaktury } from "@/lib/invoice-pdf";
 import { pobierzPdf } from "@/lib/pdf-kit";
-import type { Seller } from "@/lib/invoice";
+import { opisRodzaju, type Seller } from "@/lib/invoice";
+
+/** Nazwa pliku: rodzaj dokumentu i numer bez ukośników. */
+function nazwaPlikuFaktury(d: DaneFaktury): string {
+  return `${opisRodzaju(d.docType).nazwa}-${d.number.replaceAll("/", "-")}`;
+}
 
 /**
  * Wysyłka faktury mailem do nabywcy.
@@ -28,12 +33,16 @@ export function WyslijMailem({
   dane,
   sprzedawca,
   stopka,
+  logoUrl,
+  nazwaBiura,
   domyslnyEmail,
 }: {
   invoiceId: string;
   dane: DaneFaktury;
   sprzedawca: Seller;
   stopka?: string;
+  logoUrl?: string | null;
+  nazwaBiura?: string;
   domyslnyEmail?: string | null;
 }) {
   const [otwarte, setOtwarte] = useState(false);
@@ -43,15 +52,15 @@ export function WyslijMailem({
   const [blad, setBlad] = useState<string | null>(null);
 
   async function pobierz() {
-    const bytes = await generujFakturePdf(dane, sprzedawca, stopka);
-    pobierzPdf(bytes, `Faktura-${dane.number.replaceAll("/", "-")}.pdf`);
+    const bytes = await generujFakturePdf(dane, sprzedawca, { stopka, logoUrl, nazwaBiura });
+    pobierzPdf(bytes, `${nazwaPlikuFaktury(dane)}.pdf`);
   }
 
   async function wyslij() {
     setBlad(null);
     setStan("pracuje");
     try {
-      const bytes = await generujFakturePdf(dane, sprzedawca, stopka);
+      const bytes = await generujFakturePdf(dane, sprzedawca, { stopka, logoUrl, nazwaBiura });
       const res = await fetch("/api/faktury/wyslij", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -73,7 +82,7 @@ export function WyslijMailem({
           onClick={pobierz}
           className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300"
         >
-          Pobierz PDF
+          Zapisz PDF
         </button>
         <button
           onClick={() => setOtwarte((v) => !v)}
@@ -127,7 +136,7 @@ export function WyslijMailem({
                 {stan === "pracuje" ? "Wysyłam..." : "Wyślij fakturę"}
               </button>
               <p className="mt-2 text-xs text-slate-400">
-                Załącznikiem idzie ten sam plik, który pobierasz przyciskiem obok.
+                Załącznikiem idzie ten sam plik, który zapisujesz przyciskiem obok.
               </p>
             </>
           )}

@@ -338,6 +338,19 @@ export function opisRodzaju(id: RodzajDokumentu | null | undefined) {
   return RODZAJE_DOKUMENTU.find((r) => r.id === id) ?? RODZAJE_DOKUMENTU[0];
 }
 
+/**
+ * Tytuł na dokumencie.
+ *
+ * „Faktura VAT" przy sprzedaży zwolnionej wprowadza w błąd: nie ma tam
+ * żadnego podatku, a nazwa sugeruje coś przeciwnego. Przy zwolnieniu
+ * i przy stawce zero zostaje samo „Faktura".
+ */
+export function tytulDokumentu(rodzaj: RodzajDokumentu | null | undefined, items: InvoiceItem[]): string {
+  const r = opisRodzaju(rodzaj);
+  if (r.id === "faktura") return zVatem(items) ? "Faktura VAT" : "Faktura";
+  return r.tytul;
+}
+
 export const NOTA_PROFORMA =
   "Dokument nie jest fakturą VAT i nie stanowi podstawy do odliczenia podatku.";
 

@@ -474,7 +474,9 @@ export function generujFaktury(
       items: [{ name: "Pośrednictwo w obrocie nieruchomościami", qty: 1, unitPrice: t.commission_pln }],
       total_pln: t.commission_pln,
       paid_pln: los.rnd() < 0.7 ? t.commission_pln : 0,
-      description: t.title.replace("[DEMO] ", ""),
+      // Na fakturze nie ma po co powtarzać opisu mieszkania z transakcji:
+      // „3 pok., 70 m², Bronowice" w uwagach wygląda jak pomyłka.
+      description: null,
     });
   }
   return out;
