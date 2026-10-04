@@ -8,6 +8,7 @@ import {
 import { computeFunnel } from "@/lib/funnel";
 import { sendPushToAgent } from "@/lib/push";
 import { przypomnijOZaleglychFakturach } from "@/lib/przypomnienia-faktury";
+import { wystawZaplanowaneFaktury } from "@/lib/faktury-cykliczne";
 import { zapiszBlad } from "@/lib/blad";
 
 export const maxDuration = 300;
@@ -61,7 +62,19 @@ export async function GET(request: Request) {
     }
   }
 
-  // Błąd przypomnień nie może wywrócić porannej odprawy i odwrotnie.
+  // Każdy z tych trzech kroków leci osobno: awaria jednego nie może
+  // zabrać dwóch pozostałych.
+  //
+  // Faktury cykliczne PRZED przypomnieniami, żeby dokument wystawiony dziś
+  // trafił od razu do dzisiejszego zestawienia zaległości, jeśli ma termin
+  // wsteczny.
+  let cykliczne = 0;
+  try {
+    cykliczne = await wystawZaplanowaneFaktury();
+  } catch (err) {
+    await zapiszBlad("cron/faktury-cykliczne", err);
+  }
+
   let przypomnienia = 0;
   try {
     przypomnienia = await przypomnijOZaleglychFakturach();
@@ -69,5 +82,5 @@ export async function GET(request: Request) {
     await zapiszBlad("cron/przypomnienia-faktury", err);
   }
 
-  return Response.json({ ok: true, agents: agentIds.length, notified, przypomnienia });
+  return Response.json({ ok: true, agents: agentIds.length, notified, cykliczne, przypomnienia });
 }

@@ -6,12 +6,16 @@ import { getInvoices } from "@/lib/data-invoices";
 import { PageHeader, EmptyState } from "../components/ui";
 import { InvoicesBrowser } from "./invoices-browser";
 import { EwidencjaSprzedazy } from "./ewidencja";
+import { ListaHarmonogramow } from "./cykliczne";
+import { harmonogramy } from "@/lib/faktury-cykliczne";
 
 export default async function FakturyPage() {
   const owner = await requireModul("faktury");
   const ustawienia = await getAgencySettings(owner.agency_id, owner.agency?.name);
   const listaSprzedawcow = sprzedawcy(ustawienia.sellers, ustawienia.company);
   const invoices = owner.agency_id ? await getInvoices(owner.agency_id) : [];
+  // Brak tabeli (migracja v44 nieuruchomiona) daje pustą listę, nie błąd.
+  const cykliczne = owner.agency_id ? await harmonogramy(owner.agency_id).catch(() => []) : [];
 
   return (
     <>
@@ -43,6 +47,7 @@ export default async function FakturyPage() {
       ) : (
         <>
           <InvoicesBrowser invoices={invoices} sellers={listaSprzedawcow} />
+          <ListaHarmonogramow lista={cykliczne} />
           <EwidencjaSprzedazy />
         </>
       )}

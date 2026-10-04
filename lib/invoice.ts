@@ -389,3 +389,20 @@ export function dniPoTerminie(payment_date: string | null | undefined, dzis: str
   if (Number.isNaN(t) || Number.isNaN(d)) return 0;
   return Math.round((d - t) / 86_400_000);
 }
+
+/**
+ * Data wystawienia przesunięta o zadaną liczbę miesięcy.
+ *
+ * Dzień miesiąca cofamy do ostatniego istniejącego: harmonogram na 31. dzień
+ * w lutym wystawiłby się inaczej 3 marca, czyli nie w tym miesiącu, o który
+ * chodziło.
+ */
+export function kolejnaData(od: string, coMiesiecy: number, dzienMiesiaca: number): string {
+  const [rok, mies] = od.split("-").map(Number);
+  const docelowyMiesiac = mies - 1 + coMiesiecy;
+  const r = rok + Math.floor(docelowyMiesiac / 12);
+  const m = ((docelowyMiesiac % 12) + 12) % 12;
+  const ostatniDzien = new Date(Date.UTC(r, m + 1, 0)).getUTCDate();
+  const d = Math.min(dzienMiesiaca, ostatniDzien);
+  return `${r}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}

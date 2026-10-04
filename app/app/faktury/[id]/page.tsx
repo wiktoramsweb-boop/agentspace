@@ -4,6 +4,7 @@ import { requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { getSeller, sprzedawcy, type RodzajDokumentu, type TrybCen } from "@/lib/invoice";
 import { WyslijMailem } from "../wyslij-mailem";
+import { UstawCykliczna } from "../cykliczne";
 import { getInvoice } from "@/lib/data-invoices";
 import { InvoiceSheet } from "../invoice-sheet";
 import { PrintButton } from "../print-button";
@@ -73,6 +74,7 @@ export default async function InvoiceViewPage({ params }: Props) {
               Wystaw korektę
             </Link>
           )}
+          {(inv.doc_type ?? "faktura") === "faktura" && <UstawCykliczna invoiceId={inv.id} />}
           <form action={deleteInvoice.bind(null, inv.id)}>
             <button className="text-sm text-slate-500 transition hover:text-red-600">Usuń</button>
           </form>
