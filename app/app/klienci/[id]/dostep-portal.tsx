@@ -24,14 +24,18 @@ export function DostepPortal({
   clientId,
   appUrl,
   istniejace,
+  qr,
 }: {
   clientId: string;
   appUrl: string;
   istniejace: DostepWiersz[];
+  /** Kod QR na dostęp, składany po stronie serwera. */
+  qr: Record<string, string>;
 }) {
   const [rodzaj, setRodzaj] = useState<RodzajDostepu>("sprzedajacy");
   const [blad, setBlad] = useState<string | null>(null);
   const [skopiowany, setSkopiowany] = useState<string | null>(null);
+  const [pokazQr, setPokazQr] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   const aktywne = istniejace.filter((d) => !d.revoked_at);
@@ -74,6 +78,13 @@ export function DostepPortal({
                 </a>
                 <button
                   type="button"
+                  onClick={() => setPokazQr(pokazQr === d.id ? null : d.id)}
+                  className="text-slate-600"
+                >
+                  {pokazQr === d.id ? "Ukryj kod QR" : "Pokaż kod QR"}
+                </button>
+                <button
+                  type="button"
                   disabled={pending}
                   onClick={() => {
                     if (!confirm("Odwołać ten dostęp? Link przestanie działać natychmiast.")) return;
@@ -84,6 +95,19 @@ export function DostepPortal({
                   Odwołaj
                 </button>
               </div>
+
+              {pokazQr === d.id && qr[d.id] && (
+                <div className="mt-3 flex flex-col items-center rounded-xl bg-white p-4">
+                  {/* SVG pochodzi z naszego generatora na serwerze, nie od użytkownika. */}
+                  <div
+                    className="w-[220px]"
+                    dangerouslySetInnerHTML={{ __html: qr[d.id] }}
+                  />
+                  <p className="mt-2 text-center text-xs text-slate-500">
+                    Pokaż klientowi przy podpisaniu umowy albo wydrukuj na egzemplarzu.
+                  </p>
+                </div>
+              )}
             </div>
           ))}
         </div>

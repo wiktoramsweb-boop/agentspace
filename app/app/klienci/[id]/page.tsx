@@ -28,6 +28,7 @@ import { ActivityModal } from "../../dzialania/activity-modal";
 import { ClientActivities } from "./client-activities";
 import { ClientDetails } from "./client-details";
 import { DostepPortal, type DostepWiersz } from "./dostep-portal";
+import { kodQrSvg } from "@/lib/qr";
 import { APP_URL } from "@/lib/supabase/config";
 import { SearchWizard } from "../../poszukiwania/search-wizard";
 import { ClientSearches } from "./client-searches";
@@ -95,6 +96,16 @@ export default async function ClientDetailPage({ params }: Props) {
       .eq("agency_id", user.agency_id ?? "")
       .order("created_at", { ascending: false })
   ).data ?? []) as DostepWiersz[];
+
+  // Kod QR składamy po stronie serwera, żeby token nie trafił do żadnego
+  // zewnętrznego generatora.
+  const qrDostepow = Object.fromEntries(
+    await Promise.all(
+      dostepyPortalu
+        .filter((d) => !d.revoked_at)
+        .map(async (d) => [d.id, await kodQrSvg(`${APP_URL}/klient/${d.token}`)] as const),
+    ),
+  );
 
   const contact = masked
     ? { ...client, phone: null, email: null, phones: null, emails: null, pesel: null, id_document: null }
@@ -186,7 +197,12 @@ export default async function ClientDetailPage({ params }: Props) {
 
           <ClientDetails client={contact} />
 
-          <DostepPortal clientId={client.id} appUrl={APP_URL} istniejace={dostepyPortalu} />
+          <DostepPortal
+            clientId={client.id}
+            appUrl={APP_URL}
+            istniejace={dostepyPortalu}
+            qr={qrDostepow}
+          />
 
           <Card>
             <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">

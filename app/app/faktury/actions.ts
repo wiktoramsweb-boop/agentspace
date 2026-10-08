@@ -103,13 +103,14 @@ export async function createInvoice(p: InvoicePayload): Promise<void> {
       issuer: p.issuer || null,
   };
 
-  let { data, error } = await admin
+  const pierwszaProba = await admin
     .from("invoices")
     .insert({ ...baza, ...poleOpcjonalne(p, tryb, sumy) })
     .select("id")
     .single();
 
-  if (error) {
+  let data = pierwszaProba.data;
+  if (pierwszaProba.error) {
     ({ data } = await admin.from("invoices").insert(baza).select("id").single());
   }
 
