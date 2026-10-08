@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BellIcon } from "../../components/icons";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import {
   getClient,
   getClientNotes,
@@ -26,6 +27,8 @@ import { getAgencyProperties } from "@/lib/data-platform";
 import { ActivityModal } from "../../dzialania/activity-modal";
 import { ClientActivities } from "./client-activities";
 import { ClientDetails } from "./client-details";
+import { DostepPortal, type DostepWiersz } from "./dostep-portal";
+import { APP_URL } from "@/lib/supabase/config";
 import { SearchWizard } from "../../poszukiwania/search-wizard";
 import { ClientSearches } from "./client-searches";
 import { getSearches, getActiveProperties } from "@/lib/data-searches";
@@ -82,6 +85,17 @@ export default async function ClientDetailPage({ params }: Props) {
   // liście: agent nie dostaje pełnych danych cudzego klienta. Bez tego wystarczyło
   // kliknąć w klienta, żeby spisać numer, i ustawienie niczego nie chroniło.
   const masked = settings.options.hide_contacts && user.role === "agent" && client.agent_id !== user.id;
+  // Dostępy do portalu. Brak tabeli (migracja v46 nieuruchomiona) daje pustą
+  // listę, a nie błąd całej karty klienta.
+  const dostepyPortalu = ((
+    await createSupabaseAdmin()
+      .from("client_portal_access")
+      .select("id, token, rodzaj, created_at, revoked_at, last_seen_at")
+      .eq("client_id", id)
+      .eq("agency_id", user.agency_id ?? "")
+      .order("created_at", { ascending: false })
+  ).data ?? []) as DostepWiersz[];
+
   const contact = masked
     ? { ...client, phone: null, email: null, phones: null, emails: null, pesel: null, id_document: null }
     : client;
@@ -171,6 +185,8 @@ export default async function ClientDetailPage({ params }: Props) {
           </Card>
 
           <ClientDetails client={contact} />
+
+          <DostepPortal clientId={client.id} appUrl={APP_URL} istniejace={dostepyPortalu} />
 
           <Card>
             <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">

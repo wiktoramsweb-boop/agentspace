@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ActivityRich } from "@/lib/data-activities";
 import { ACTIVITY_ICONS } from "../../components/icons";
 import { ACTIVITY_KIND_MAP, ACTIVITY_STATUSES } from "@/lib/types";
+import { UdostepnijZdarzenie } from "./udostepnij-zdarzenie";
 
 const STATUS_MAP = Object.fromEntries(ACTIVITY_STATUSES.map((s) => [s.value, s]));
 
@@ -23,8 +24,8 @@ export function ClientActivities({ activities }: { activities: ActivityRich[] })
         const sm = STATUS_MAP[a.status] ?? STATUS_MAP.zaplanowane;
         const Icon = ACTIVITY_ICONS[a.kind] ?? ACTIVITY_ICONS.polaczenie;
         return (
+          <div key={a.id}>
           <Link
-            key={a.id}
             href={`/app/dzialania/${a.id}`}
             className="block rounded-xl border border-slate-200 p-3 transition hover:border-slate-300 hover:bg-slate-50"
           >
@@ -47,6 +48,12 @@ export function ClientActivities({ activities }: { activities: ActivityRich[] })
               <p className="mt-1 line-clamp-2 text-xs text-slate-500">{a.description}</p>
             )}
           </Link>
+          <UdostepnijZdarzenie
+            activityId={a.id}
+            widoczne={Boolean((a as { client_visible?: boolean }).client_visible)}
+            opis={(a as { client_note?: string | null }).client_note ?? null}
+          />
+          </div>
         );
       })}
     </div>

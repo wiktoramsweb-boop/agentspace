@@ -1,0 +1,262 @@
+/*
+ * Wygląd portalu klienta.
+ *
+ * Osobny arkusz, a nie klasy Tailwinda z aplikacji, bo ten widok ma być
+ * niezależny od motywów agenta: zawsze jasny, zawsze ten sam, także gdy
+ * klient ma w systemie włączony tryb ciemny. Zmiana wyglądu aplikacji
+ * nie może przypadkiem przestawić czegoś u klienta.
+ */
+
+.portal {
+  --t: #111418;
+  --t2: #5b6571;
+  --t3: #8b95a1;
+  --linia: #e8ebef;
+  --tlo: #ffffff;
+  --tlo2: #f6f7f9;
+  --akcent: #1a73e8;
+  --zielen: #0f9d58;
+  --czerwien: #d93025;
+
+  min-height: 100dvh;
+  background: var(--tlo);
+  color: var(--t);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Spokojna typografia: nic nie krzyczy, odstępy robią robotę. */
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.portal-main {
+  max-width: 560px;
+  margin: 0 auto;
+  /* Zapas na dolny pasek zakładek plus bezpieczny obszar iPhone'a. */
+  padding: 0 16px calc(84px + env(safe-area-inset-bottom)) 16px;
+}
+
+/* ── Nagłówek ── */
+.portal-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 0 14px;
+}
+.portal-top h1 {
+  font-size: 22px;
+  font-weight: 650;
+  margin: 0;
+}
+.portal-sub {
+  color: var(--t2);
+  font-size: 14px;
+  margin: 2px 0 0;
+}
+
+/* ── Karta oferty ── */
+.portal-karta {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  margin: 0 0 26px;
+}
+.portal-foto {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--tlo2);
+}
+.portal-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.portal-foto-pusta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--t3);
+  font-size: 13px;
+}
+.portal-karta h2 {
+  font-size: 19px;
+  font-weight: 620;
+  margin: 12px 0 2px;
+}
+.portal-meta {
+  color: var(--t2);
+  font-size: 14px;
+  margin: 0 0 4px;
+}
+.portal-cena {
+  font-size: 19px;
+  font-weight: 680;
+  margin: 6px 0 0;
+}
+
+/* ── Kafelki z liczbami ── */
+.portal-liczby {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0 8px;
+}
+.portal-liczba {
+  background: var(--tlo2);
+  border-radius: 12px;
+  padding: 14px 12px;
+}
+.portal-liczba b {
+  display: block;
+  font-size: 22px;
+  font-weight: 660;
+  line-height: 1.1;
+}
+.portal-liczba span {
+  display: block;
+  color: var(--t2);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ── Oś czasu ── */
+.portal-sekcja {
+  margin: 26px 0 0;
+}
+.portal-sekcja > h3 {
+  font-size: 16px;
+  font-weight: 640;
+  margin: 0 0 12px;
+}
+.portal-zdarzenie {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--linia);
+}
+.portal-kropka {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex: none;
+  background: var(--akcent);
+}
+.portal-kropka.zrobione {
+  background: var(--zielen);
+}
+.portal-zdarzenie b {
+  display: block;
+  font-size: 15px;
+  font-weight: 580;
+}
+.portal-zdarzenie p {
+  margin: 2px 0 0;
+  color: var(--t2);
+  font-size: 14px;
+}
+.portal-kiedy {
+  color: var(--t3);
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+/* ── Wyróżniony najbliższy termin ── */
+.portal-alert {
+  background: #eef4fe;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 16px 0 0;
+}
+.portal-alert b {
+  display: block;
+  font-size: 15px;
+}
+.portal-alert span {
+  color: var(--t2);
+  font-size: 14px;
+}
+
+/* ── Przyciski reakcji ── */
+.portal-reakcje {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.portal-reakcja {
+  flex: 1;
+  border: 1px solid var(--linia);
+  background: var(--tlo);
+  border-radius: 12px;
+  padding: 11px 10px;
+  font-size: 15px;
+  font-weight: 560;
+  color: var(--t);
+  cursor: pointer;
+}
+.portal-reakcja[data-wybrane="lubi"] {
+  border-color: var(--zielen);
+  background: #eaf6ef;
+  color: #0b6b3c;
+}
+.portal-reakcja[data-wybrane="nie_lubi"] {
+  border-color: var(--czerwien);
+  background: #fdeeec;
+  color: #a3180f;
+}
+
+/* ── Pusty stan ── */
+.portal-pusto {
+  text-align: center;
+  color: var(--t2);
+  padding: 48px 16px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ── Dolny pasek ── */
+.portal-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--linia);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 20;
+}
+.portal-nav > div {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+}
+.portal-nav a {
+  flex: 1;
+  text-align: center;
+  padding: 10px 4px 12px;
+  color: var(--t3);
+  text-decoration: none;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.portal-nav a[aria-current="page"] {
+  color: var(--akcent);
+}
+.portal-nav svg {
+  width: 23px;
+  height: 23px;
+}
+
+/* Portal jest zawsze jasny, także przy ciemnym motywie systemu. */
+@media (prefers-color-scheme: dark) {
+  .portal {
+    background: #ffffff;
+    color: #111418;
+  }
+}
