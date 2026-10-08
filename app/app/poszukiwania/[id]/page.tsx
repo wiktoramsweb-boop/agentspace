@@ -10,6 +10,10 @@ import { PROPERTY_ICONS } from "../../components/icons";
 import { MatchList } from "./match-list";
 import { SearchActions } from "./search-actions";
 import { PROPERTY_TYPES, SEARCH_STATUSES, PROPERTY_FEATURES } from "@/lib/types";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { kodQrSvg } from "@/lib/qr";
+import { APP_URL } from "@/lib/supabase/config";
+import { DostepPortal, type DostepWiersz } from "../../klienci/[id]/dostep-portal";
 
 const STATUS_MAP = Object.fromEntries(SEARCH_STATUSES.map((s) => [s.value, s]));
 const TYPE_MAP = Object.fromEntries(PROPERTY_TYPES.map((t) => [t.value, t.label]));
@@ -56,6 +60,27 @@ export default async function SearchDetailPage({ params }: Props) {
     const [sid, pid] = k.split(":");
     if (sid === id) statuses[pid] = v;
   }
+
+  // Dostęp do aplikacji z ofertami dla tego kupującego. Agent generuje kod QR
+  // tutaj, przy poszukiwaniu, a nie dopiero po wejściu w kartę klienta.
+  const dostepyPortalu = search.client_id
+    ? (((
+        await createSupabaseAdmin()
+          .from("client_portal_access")
+          .select("id, token, rodzaj, created_at, revoked_at, last_seen_at")
+          .eq("client_id", search.client_id)
+          .eq("agency_id", agencyId)
+          .order("created_at", { ascending: false })
+      ).data ?? []) as DostepWiersz[])
+    : [];
+
+  const qrDostepow = Object.fromEntries(
+    await Promise.all(
+      dostepyPortalu
+        .filter((d) => !d.revoked_at)
+        .map(async (d) => [d.id, await kodQrSvg(`${APP_URL}/klient/${d.token}`)] as const),
+    ),
+  );
 
   const sm = STATUS_MAP[search.status] ?? STATUS_MAP.aktualne;
   const isRent = search.deal_kind === "wynajem";
@@ -181,6 +206,27 @@ export default async function SearchDetailPage({ params }: Props) {
           )}
         </div>
       </div>
+
+      {search.client_id && (
+        <section className="mt-8">
+          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+            Aplikacja z ofertami dla klienta
+          </h2>
+          <p className="mb-4 max-w-2xl text-sm text-slate-600">
+            Klient dostaje kod QR i ogląda w telefonie oferty, które mu wysłałeś. Zaznacza, co mu
+            się podoba, i podaje godziny, w których może oglądać. Do portalu trafiają wyłącznie
+            dopasowania ze statusem wysłanym, czyli to, co świadomie wypuściłeś.
+          </p>
+          <DostepPortal
+            clientId={search.client_id}
+            clientName={search.clientName ?? undefined}
+            appUrl={APP_URL}
+            istniejace={dostepyPortalu}
+            qr={qrDostepow}
+            presetRodzaj="kupujacy"
+          />
+        </section>
+      )}
     </>
   );
 }

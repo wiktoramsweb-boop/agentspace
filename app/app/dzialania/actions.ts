@@ -116,7 +116,7 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
     if (!linkedClientId) linkedClientId = inherited.client_id;
   }
 
-  const { error: insertError } = await admin.from("activities").insert({
+  const { data: zapisane, error: insertError } = await admin.from("activities").insert({
     agency_id: user.agency_id,
     created_by: user.id,
     kind: txt(formData, "kind") ?? "polaczenie",
@@ -136,7 +136,7 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
     assignee_ids: assigneeIds,
     ...(parentId ? { parent_id: parentId } : {}),
     include_in_report: formData.get("include_in_report") === "1",
-  });
+  }).select("id").maybeSingle();
 
   // Bez tego nieudany zapis wyglądał jak udany: modal się zamykał, a działania
   // nie było. Agent musi zobaczyć powód i mieć wpisane dane nadal w formularzu.
@@ -145,6 +145,19 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
       ok: false,
       error: `Nie udało się zapisać działania: ${insertError.message}`,
     };
+  }
+
+  // Prezentacja przy nieruchomości od razu idzie do portalu właściciela.
+  //
+  // Klient widzi wyłącznie rodzaj zdarzenia i godzinę - nigdy tematu ani
+  // notatki - więc nie ma tu czego wycinać, a sprzedający po to dostał dostęp,
+  // żeby wiedzieć, kiedy ktoś ogląda. Agent może to wyłączyć w zakładce
+  // „Portal klienta" przy ofercie. Osobnym zapytaniem, bo bez migracji v46
+  // kolumna nie istnieje, a wtedy samo działanie ma się i tak zapisać.
+  const widocznaPrezentacja =
+    (txt(formData, "kind") ?? "polaczenie") === "spotkanie" && Boolean(propertyId ?? inherited?.property_id);
+  if (widocznaPrezentacja && zapisane?.id) {
+    await admin.from("activities").update({ client_visible: true }).eq("id", zapisane.id);
   }
 
   // Wykonany telefon albo spotkanie od razu podbija licznik w Celach,

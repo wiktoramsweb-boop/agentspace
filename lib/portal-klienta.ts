@@ -71,9 +71,36 @@ const NAZWY_DLA_KLIENTA: Record<ActivityKindLike, string> = {
   zadanie: "Działanie biura",
 };
 
+/**
+ * Nazwy po celu działania. Biała lista, nie tłumaczenie czegokolwiek:
+ * cel jest polem słownikowym (agent wybiera z listy), więc nie da się w nim
+ * schować numeru telefonu. Cele spoza listy spadają na nazwę rodzaju.
+ *
+ * Świadomie nie ma tu celów pozyskowych ani wewnętrznych - sprzedający nie
+ * musi czytać, że biuro „przedłuża umowę" albo prowadzi „rozmowę pozyskową".
+ */
+const NAZWY_PO_CELU: Record<string, string> = {
+  prezentacja: "Prezentacja nieruchomości",
+  sesja_foto: "Sesja zdjęciowa",
+  home_staging: "Przygotowanie nieruchomości",
+  obnizka_ceny: "Spotkanie w sprawie ceny",
+};
+
+/** Ikona obok zdarzenia w portalu. Czysto wizualna podpowiedź. */
+export type IkonaZdarzenia = "klucz" | "aparat" | "telefon" | "gwiazdka";
+
+function ikonaZdarzenia(kind: ActivityKindLike, purpose?: string | null): IkonaZdarzenia {
+  if (purpose === "sesja_foto") return "aparat";
+  if (kind === "spotkanie") return "klucz";
+  if (kind === "polaczenie") return "telefon";
+  return "gwiazdka";
+}
+
 export type ZdarzenieAgenta = {
   id: string;
   kind: ActivityKindLike;
+  /** Cel ze słownika (lista wyboru, nie pole tekstowe). */
+  purpose?: string | null;
   /** Tekst agenta. NIE trafia do klienta. */
   subject?: string | null;
   /** Opis napisany świadomie dla klienta. */
@@ -90,6 +117,7 @@ export type ZdarzenieKlienta = {
   opis: string | null;
   kiedy: string | null;
   zrobione: boolean;
+  ikona: IkonaZdarzenia;
 };
 
 /**
@@ -104,11 +132,15 @@ export function zdarzenieDlaKlienta(a: ZdarzenieAgenta): ZdarzenieKlienta | null
 
   return {
     id: a.id,
-    tytul: NAZWY_DLA_KLIENTA[a.kind] ?? "Działanie biura",
+    tytul:
+      (a.purpose ? NAZWY_PO_CELU[a.purpose] : undefined) ??
+      NAZWY_DLA_KLIENTA[a.kind] ??
+      "Działanie biura",
     // Wyłącznie pole pisane dla klienta. `subject` nie jest nawet czytane.
     opis: (a.client_note ?? "").trim() || null,
     kiedy: a.due_at ?? a.completed_at ?? null,
     zrobione: a.status === "wykonane" || Boolean(a.completed_at),
+    ikona: ikonaZdarzenia(a.kind, a.purpose),
   };
 }
 
@@ -173,5 +205,95 @@ export function powiadomienieOPrezentacji(
   return {
     tytul: "Dziś prezentacja",
     tresc: `${nazwaNieruchomosci} · godz. ${godzina}`,
+  };
+}
+
+/* ─────────────── Kalendarz ─────────────── */
+
+export type DzienKalendarza = {
+  /** Data w formacie YYYY-MM-DD. */
+  klucz: string;
+  dzien: number;
+  /** Czy należy do pokazywanego miesiąca, czy tylko dopełnia siatkę. */
+  wTymMiesiacu: boolean;
+  dzisiaj: boolean;
+  /** Ile udostępnionych zdarzeń wypada tego dnia. */
+  ile: number;
+};
+
+function iso(rok: number, miesiac: number, dzien: number): string {
+  return `${rok}-${String(miesiac).padStart(2, "0")}-${String(dzien).padStart(2, "0")}`;
+}
+
+/** Ile dni ma miesiąc (1-12). */
+export function dniWMiesiacu(rok: number, miesiac: number): number {
+  return new Date(Date.UTC(rok, miesiac, 0)).getUTCDate();
+}
+
+/**
+ * Siatka miesiąca zaczynająca się od poniedziałku.
+ *
+ * Czysta funkcja bez stref czasowych: dni liczymy na kluczach tekstowych,
+ * a nie na obiektach Date z lokalną godziną. Dzięki temu kalendarz wygląda
+ * tak samo na telefonie klienta i na serwerze w innej strefie.
+ */
+export function siatkaMiesiaca(
+  rok: number,
+  miesiac: number,
+  liczbyDni: Record<string, number>,
+  dzis: string,
+): DzienKalendarza[] {
+  const ile = dniWMiesiacu(rok, miesiac);
+  // getUTCDay(): 0 = niedziela. Chcemy tydzień od poniedziałku.
+  const pierwszy = (new Date(Date.UTC(rok, miesiac - 1, 1)).getUTCDay() + 6) % 7;
+
+  const poprzedni = miesiac === 1 ? { r: rok - 1, m: 12 } : { r: rok, m: miesiac - 1 };
+  const nastepny = miesiac === 12 ? { r: rok + 1, m: 1 } : { r: rok, m: miesiac + 1 };
+  const ilePoprzedni = dniWMiesiacu(poprzedni.r, poprzedni.m);
+
+  const pole = (r: number, m: number, d: number, wTym: boolean): DzienKalendarza => {
+    const klucz = iso(r, m, d);
+    return { klucz, dzien: d, wTymMiesiacu: wTym, dzisiaj: klucz === dzis, ile: liczbyDni[klucz] ?? 0 };
+  };
+
+  const dni: DzienKalendarza[] = [];
+  for (let i = pierwszy; i > 0; i--) {
+    dni.push(pole(poprzedni.r, poprzedni.m, ilePoprzedni - i + 1, false));
+  }
+  for (let d = 1; d <= ile; d++) dni.push(pole(rok, miesiac, d, true));
+  // Dopełniamy do pełnych tygodni, żeby siatka nie miała poszarpanego dołu.
+  let d = 1;
+  while (dni.length % 7 !== 0) dni.push(pole(nastepny.r, nastepny.m, d++, false));
+
+  return dni;
+}
+
+/** Przesunięcie o miesiąc, z przejściem przez rok. */
+export function sasiedniMiesiac(rok: number, miesiac: number, o: number): { rok: number; miesiac: number } {
+  const suma = miesiac - 1 + o;
+  return { rok: rok + Math.floor(suma / 12), miesiac: ((suma % 12) + 12) % 12 + 1 };
+}
+
+/* ─────────────── Propozycja zmiany ceny ─────────────── */
+
+export type StatusPropozycji = "oczekuje" | "zaakceptowana" | "odrzucona";
+
+/**
+ * Opis propozycji zmiany ceny dla właściciela.
+ *
+ * Obniżka ceny ofertowej jest decyzją właściciela. Biuro może ją tylko
+ * zaproponować, a klient musi mieć to czarno na białym: ile jest teraz,
+ * ile ma być, o ile mniej i dlaczego.
+ */
+export function opisPropozycjiCeny(obecna: number | null, proponowana: number): {
+  kierunek: "obnizka" | "podwyzka";
+  roznica: number;
+  procent: number | null;
+} {
+  const roznica = obecna == null ? 0 : proponowana - obecna;
+  return {
+    kierunek: roznica > 0 ? "podwyzka" : "obnizka",
+    roznica: Math.abs(roznica),
+    procent: obecna && obecna > 0 ? Math.round((Math.abs(roznica) / obecna) * 1000) / 10 : null,
   };
 }

@@ -99,3 +99,71 @@ export async function usunTermin(token: string, id: string): Promise<WynikAkcji>
   revalidatePath(`/klient/${token}/terminy`);
   return { ok: true };
 }
+
+/** Wiadomość od klienta do agenta. */
+export async function wyslijWiadomosc(token: string, tresc: string): Promise<WynikAkcji> {
+  const dostep = await dostepPoTokenie(token);
+  if (!dostep) return { ok: false, error: "Brak dostępu." };
+
+  const czysta = tresc.trim().slice(0, 2000);
+  if (czysta.length < 2) return { ok: false, error: "Napisz treść wiadomości." };
+
+  const admin = createSupabaseAdmin();
+  const { error } = await admin
+    .from("client_portal_messages")
+    .insert({ access_id: dostep.id, autor: "klient", tresc: czysta });
+
+  if (error) return { ok: false, error: "Nie udało się wysłać. Spróbuj za chwilę." };
+
+  revalidatePath(`/klient/${token}/wiadomosci`);
+  return { ok: true };
+}
+
+/**
+ * Decyzja właściciela o zmianie ceny ofertowej.
+ *
+ * To jest zgoda albo jej brak, a nie informacja: dopóki klient nie kliknie,
+ * cena w ofercie zostaje stara. Zapis z godziną decyzji jest po to, żeby
+ * biuro miało dowód, że właściciel się zgodził.
+ */
+export async function decyzjaOCenie(
+  token: string,
+  propozycjaId: string,
+  zgoda: boolean,
+): Promise<WynikAkcji> {
+  const dostep = await dostepPoTokenie(token);
+  if (!dostep || dostep.rodzaj !== "sprzedajacy") return { ok: false, error: "Brak dostępu." };
+
+  const admin = createSupabaseAdmin();
+  // Warunek na dostęp w samym zapytaniu: nie da się zatwierdzić cudzej propozycji.
+  const { data: prop } = await admin
+    .from("client_price_proposals")
+    .select("id, property_id, cena_proponowana, status")
+    .eq("id", propozycjaId)
+    .eq("access_id", dostep.id)
+    .maybeSingle();
+  if (!prop) return { ok: false, error: "Nie ma takiej propozycji." };
+  if (prop.status !== "oczekuje") return { ok: false, error: "Ta propozycja była już rozpatrzona." };
+
+  await admin
+    .from("client_price_proposals")
+    .update({
+      status: zgoda ? "zaakceptowana" : "odrzucona",
+      decided_at: new Date().toISOString(),
+    })
+    .eq("id", propozycjaId)
+    .eq("access_id", dostep.id);
+
+  // Zgoda od razu zmienia cenę w ofercie - inaczej agent musiałby pilnować
+  // tego ręcznie i portal byłby tylko ankietą.
+  if (zgoda) {
+    await admin
+      .from("properties")
+      .update({ price_pln: prop.cena_proponowana })
+      .eq("id", prop.property_id)
+      .eq("agency_id", dostep.agency_id);
+  }
+
+  revalidatePath(`/klient/${token}/n/${prop.property_id}`);
+  return { ok: true };
+}

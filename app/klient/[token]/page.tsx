@@ -1,65 +1,98 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { dostepPoTokenie, nieruchomosciKlienta, ofertyKupujacego } from "@/lib/data-portal";
+import {
+  dostepPoTokenie,
+  nieruchomosciKlienta,
+  ofertyKupujacego,
+  procesNieruchomosci,
+} from "@/lib/data-portal";
 import { formatMoney } from "@/lib/invoice";
 import { ReakcjaOferty } from "./reakcja";
+import { PanelNieruchomosci } from "./nieruchomosc";
+import { Foto, opisNieruchomosci } from "./wspolne";
 
 export const dynamic = "force-dynamic";
 
-function Opis({ n }: { n: { area_m2: number | null; rooms: number | null; city: string | null } }) {
-  const czesci = [
-    n.rooms ? `${n.rooms} ${n.rooms === 1 ? "pokój" : "pokoje"}` : null,
-    n.area_m2 ? `${n.area_m2} m²` : null,
-    n.city,
-  ].filter(Boolean);
-  return <p className="portal-meta">{czesci.join(" · ") || "-"}</p>;
-}
+const FILTRY = [
+  { key: "", label: "Wszystkie" },
+  { key: "nowe", label: "Nowe" },
+  { key: "lubi", label: "Podobają się" },
+  { key: "nie", label: "Odrzucone" },
+] as const;
 
-function Foto({ url, alt }: { url: string | null; alt: string }) {
-  return (
-    <div className="portal-foto">
-      {url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt={alt} loading="lazy" />
-      ) : (
-        <div className="portal-foto-pusta">Brak zdjęcia</div>
-      )}
-    </div>
-  );
-}
-
-export default async function PortalStart({ params }: { params: Promise<{ token: string }> }) {
+export default async function PortalStart({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ token: string }>;
+  searchParams: Promise<{ f?: string }>;
+}) {
   const { token } = await params;
+  const { f } = await searchParams;
   const dostep = await dostepPoTokenie(token);
   if (!dostep) notFound();
 
   /* ── Kupujący: oferty dobrane przez agenta ── */
   if (dostep.rodzaj === "kupujacy") {
-    const oferty = await ofertyKupujacego(dostep);
+    const wszystkie = await ofertyKupujacego(dostep);
+    const filtr = FILTRY.some((x) => x.key === f) ? (f ?? "") : "";
+    const oferty = wszystkie.filter((o) =>
+      filtr === "nowe" ? o.reakcja === null
+      : filtr === "lubi" ? o.reakcja === "lubi"
+      : filtr === "nie" ? o.reakcja === "nie_lubi"
+      : true,
+    );
+
     return (
       <>
         <div className="portal-top">
           <h1>Oferty dla Ciebie</h1>
         </div>
-        <p className="portal-sub" style={{ marginBottom: 22 }}>
-          {oferty.length > 0
+        <p className="portal-sub">
+          {wszystkie.length > 0
             ? "Zaznacz, które Ci się podobają. Agent zobaczy to od razu."
             : "Gdy agent podeśle pierwszą ofertę, pojawi się tutaj."}
         </p>
 
+        {wszystkie.length > 0 && (
+          <nav className="portal-filtry">
+            {FILTRY.map((x) => (
+              <Link
+                key={x.key}
+                href={x.key ? `/klient/${token}?f=${x.key}` : `/klient/${token}`}
+                aria-current={filtr === x.key ? "page" : undefined}
+              >
+                {x.label}
+              </Link>
+            ))}
+          </nav>
+        )}
+
         {oferty.length === 0 ? (
           <div className="portal-pusto">
-            Jeszcze nic tu nie ma.
-            <br />
-            Dostaniesz powiadomienie, gdy pojawi się pierwsza propozycja.
+            {wszystkie.length === 0 ? (
+              <>
+                Jeszcze nic tu nie ma.
+                <br />
+                Dostaniesz powiadomienie, gdy pojawi się pierwsza propozycja.
+              </>
+            ) : (
+              "Nic w tej grupie."
+            )}
           </div>
         ) : (
           oferty.map((o) => (
             <div key={o.id} className="portal-karta">
-              <Foto url={o.zdjecie} alt={o.title} />
-              <h2>{o.title}</h2>
-              <Opis n={o} />
-              {o.price_pln != null && <p className="portal-cena">{formatMoney(o.price_pln)} zł</p>}
+              <Link href={`/klient/${token}/o/${o.id}`} style={{ display: "block", color: "inherit", textDecoration: "none" }}>
+                <div style={{ position: "relative" }}>
+                  <Foto url={o.zdjecie} alt={o.title} />
+                  {o.reakcja === "lubi" && <span className="portal-znacznik lubi">Podoba Ci się</span>}
+                  {o.reakcja === "nie_lubi" && <span className="portal-znacznik nie-lubi">Odrzucona</span>}
+                </div>
+                <h2>{o.title}</h2>
+                <p className="portal-meta">{opisNieruchomosci(o)}</p>
+                {o.price_pln != null && <p className="portal-cena">{formatMoney(o.price_pln)} zł</p>}
+              </Link>
               <ReakcjaOferty token={token} propertyId={o.id} reakcja={o.reakcja} />
             </div>
           ))
@@ -70,31 +103,52 @@ export default async function PortalStart({ params }: { params: Promise<{ token:
 
   /* ── Sprzedający: jego nieruchomości ── */
   const lista = await nieruchomosciKlienta(dostep);
-  return (
-    <>
-      <div className="portal-top">
-        <h1>{lista.length === 1 ? "Twoja nieruchomość" : "Twoje nieruchomości"}</h1>
-      </div>
-      <p className="portal-sub" style={{ marginBottom: 22 }}>
-        Tu zobaczysz, co dzieje się w sprawie sprzedaży.
-      </p>
 
-      {lista.length === 0 ? (
+  if (lista.length === 0) {
+    return (
+      <>
+        <div className="portal-top">
+          <h1>Twoja sprawa</h1>
+        </div>
         <div className="portal-pusto">
           Nie ma jeszcze przypisanej nieruchomości.
           <br />
           Odezwij się do swojego agenta.
         </div>
-      ) : (
-        lista.map((n) => (
-          <Link key={n.id} href={`/klient/${token}/n/${n.id}`} className="portal-karta">
-            <Foto url={n.zdjecie} alt={n.title} />
-            <h2>{n.title}</h2>
-            <Opis n={n} />
-            {n.price_pln != null && <p className="portal-cena">{formatMoney(n.price_pln)} zł</p>}
-          </Link>
-        ))
-      )}
+      </>
+    );
+  }
+
+  // Jedna nieruchomość = pokazujemy ją od razu. Kafelek, w który trzeba kliknąć,
+  // żeby zobaczyć jedyną rzecz w aplikacji, jest tylko dodatkowym krokiem.
+  if (lista.length === 1) {
+    const dane = await procesNieruchomosci(dostep, lista[0].id);
+    if (!dane) notFound();
+    return (
+      <>
+        <div className="portal-top">
+          <h1>Twoja nieruchomość</h1>
+        </div>
+        <PanelNieruchomosci token={token} dane={dane} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="portal-top">
+        <h1>Twoje nieruchomości</h1>
+      </div>
+      <p className="portal-sub">Tu zobaczysz, co dzieje się w każdej ze spraw.</p>
+
+      {lista.map((n) => (
+        <Link key={n.id} href={`/klient/${token}/n/${n.id}`} className="portal-karta">
+          <Foto url={n.zdjecie} alt={n.title} />
+          <h2>{n.title}</h2>
+          <p className="portal-meta">{opisNieruchomosci(n)}</p>
+          {n.price_pln != null && <p className="portal-cena">{formatMoney(n.price_pln)} zł</p>}
+        </Link>
+      ))}
     </>
   );
 }

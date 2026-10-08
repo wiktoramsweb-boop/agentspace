@@ -14,6 +14,7 @@ import {
 } from "@/lib/data-platform";
 import { CLIENT_TYPE_LABELS, PROPERTY_STATUSES, type Property } from "@/lib/types";
 import { Card } from "../../components/ui";
+import { Zakladki, type Zakladka } from "../../components/zakladki";
 import { MiniMap } from "../../components/mini-map";
 import { formatPln, daysAgo, formatDateShort, formatPhone } from "@/lib/format";
 import { StatusChanger } from "./status-changer";
@@ -40,7 +41,23 @@ import { getClientMessages } from "@/lib/data-messages";
 import { DocumentsCard } from "../../dokumenty/documents-card";
 import { ClientCorrespondence } from "./client-correspondence";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ z?: string }> };
+
+/**
+ * Karta klienta w zakładkach.
+ *
+ * Wcześniej wszystko leżało na jednej długiej stronie i agent musiał przewijać
+ * trzy ekrany, żeby znaleźć kod QR do portalu. Każda rzecz ma teraz swoje
+ * miejsce, a licznik przy nazwie mówi, gdzie w ogóle coś jest.
+ */
+const ZAKLADKI: readonly Zakladka[] = [
+  { key: "przeglad", label: "Przegląd", ikona: "osoba" },
+  { key: "dzialania", label: "Działania", ikona: "blyskawica" },
+  { key: "poszukiwania", label: "Poszukiwania", ikona: "lupa" },
+  { key: "portal", label: "Portal i kod QR", ikona: "telefon" },
+  { key: "korespondencja", label: "Korespondencja", ikona: "koperta" },
+  { key: "dokumenty", label: "Dokumenty", ikona: "teczka" },
+];
 
 function reminderState(next: string | null): { due: boolean; label: string } | null {
   if (!next) return null;
@@ -53,9 +70,11 @@ function reminderState(next: string | null): { due: boolean; label: string } | n
   };
 }
 
-export default async function ClientDetailPage({ params }: Props) {
+export default async function ClientDetailPage({ params, searchParams }: Props) {
   const user = await requireUser();
   const { id } = await params;
+  const { z } = await searchParams;
+  const tab = ZAKLADKI.find((x) => x.key === z)?.key ?? "przeglad";
 
   const client = await getClient(id);
   if (!client) notFound();
@@ -117,6 +136,14 @@ export default async function ClientDetailPage({ params }: Props) {
   for (const s of clientSearches) {
     searchMatchCounts[s.id] = findMatches(s, activeProps).filter((m) => m.fits).length;
   }
+
+  const liczniki = {
+    dzialania: clientActivities.length,
+    poszukiwania: clientSearches.length,
+    portal: dostepyPortalu.filter((d) => !d.revoked_at).length,
+    korespondencja: correspondence.messages.length,
+    dokumenty: documents.docs.length,
+  };
 
   return (
     <>
@@ -185,203 +212,214 @@ export default async function ClientDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
-        {/* Lewa: dane + status */}
-        <div className="space-y-6">
-          <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Status
-            </h2>
-            <StatusChanger clientId={client.id} current={client.status} />
-          </Card>
+      <Zakladki
+        zakladki={ZAKLADKI}
+        active={tab}
+        liczniki={liczniki}
+        etykieta="Sekcje karty klienta"
+        adres={(k) => (k === "przeglad" ? `/app/klienci/${client.id}` : `/app/klienci/${client.id}?z=${k}`)}
+      />
 
-          <ClientDetails client={contact} />
-
-          <DostepPortal
-            clientId={client.id}
-            appUrl={APP_URL}
-            istniejace={dostepyPortalu}
-            qr={qrDostepow}
-          />
-
-          <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Kontakt
-            </h2>
-            <dl className="space-y-3 text-sm">
-              {masked && client.phone && (
-                <div className="flex justify-between">
-                  <dt className="text-slate-500">Telefon</dt>
-                  <dd className="text-slate-500" title="Biuro ukrywa kontakty cudzych klientów">
-                    {maskPhone(client.phone)}
-                  </dd>
-                </div>
-              )}
-              {contact.phone && (
-                <div className="flex justify-between">
-                  <dt className="text-slate-500">Telefon</dt>
-                  <dd>
-                    <a href={`tel:${contact.phone}`} className="text-emerald-600 hover:text-emerald-700">
-                      {formatPhone(contact.phone)}
-                    </a>
-                  </dd>
-                </div>
-              )}
-              {contact.email && (
-                <div className="flex justify-between">
-                  <dt className="text-slate-500">Email</dt>
-                  <dd>
-                    <a href={`mailto:${contact.email}`} className="text-emerald-600 hover:text-emerald-700">
-                      {contact.email}
-                    </a>
-                  </dd>
-                </div>
-              )}
-              {client.budget_pln != null && (
-                <div className="flex justify-between">
-                  <dt className="text-slate-500">Budżet</dt>
-                  <dd className="text-slate-800">{formatPln(client.budget_pln)}</dd>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <dt className="text-slate-500">Ostatni kontakt</dt>
-                <dd className="text-slate-800">{daysAgo(client.last_contact_at)}</dd>
-              </div>
-            </dl>
-          </Card>
-
-          <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Następny kontakt
-            </h2>
-            <NextContactControl clientId={client.id} current={client.next_contact_at} />
-          </Card>
-
-          {client.address && (
+      {tab === "przeglad" && (
+        <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
+          <div className="space-y-6">
             <Card>
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
-                Lokalizacja
-              </h2>
-              <p className="mb-3 text-sm text-slate-700">{client.address}</p>
-              {client.lat != null && client.lng != null && (
-                <MiniMap lat={client.lat} lng={client.lng} title={client.name} />
-              )}
+              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">Status</h2>
+              <StatusChanger clientId={client.id} current={client.status} />
             </Card>
-          )}
 
-          {mozeUsunac(user, client) && (
-            <form action={deleteClient.bind(null, client.id)}>
-              <button className="text-xs text-slate-400 transition hover:text-red-600">
-                Usuń klienta
-              </button>
-            </form>
-          )}
-        </div>
+            <ClientDetails client={contact} />
 
-        {/* Prawa: nieruchomości + notatki */}
-        <div className="space-y-6">
-          {(owned.length > 0 || interested.length > 0) && (
+            <Card>
+              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">Kontakt</h2>
+              <dl className="space-y-3 text-sm">
+                {masked && client.phone && (
+                  <div className="flex justify-between">
+                    <dt className="text-slate-500">Telefon</dt>
+                    <dd className="text-slate-500" title="Biuro ukrywa kontakty cudzych klientów">
+                      {maskPhone(client.phone)}
+                    </dd>
+                  </div>
+                )}
+                {contact.phone && (
+                  <div className="flex justify-between">
+                    <dt className="text-slate-500">Telefon</dt>
+                    <dd>
+                      <a href={`tel:${contact.phone}`} className="text-emerald-600 hover:text-emerald-700">
+                        {formatPhone(contact.phone)}
+                      </a>
+                    </dd>
+                  </div>
+                )}
+                {contact.email && (
+                  <div className="flex justify-between">
+                    <dt className="text-slate-500">Email</dt>
+                    <dd>
+                      <a href={`mailto:${contact.email}`} className="text-emerald-600 hover:text-emerald-700">
+                        {contact.email}
+                      </a>
+                    </dd>
+                  </div>
+                )}
+                {client.budget_pln != null && (
+                  <div className="flex justify-between">
+                    <dt className="text-slate-500">Budżet</dt>
+                    <dd className="text-slate-800">{formatPln(client.budget_pln)}</dd>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <dt className="text-slate-500">Ostatni kontakt</dt>
+                  <dd className="text-slate-800">{daysAgo(client.last_contact_at)}</dd>
+                </div>
+              </dl>
+            </Card>
+
             <Card>
               <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-                Powiązane nieruchomości
+                Następny kontakt
               </h2>
-              <div className="space-y-4">
-                {owned.length > 0 && (
-                  <PropertyGroup label="Sprzedaje / wynajmuje" items={owned} />
-                )}
-                {interested.length > 0 && (
-                  <PropertyGroup label="Zainteresowany" items={interested} />
-                )}
-              </div>
+              <NextContactControl clientId={client.id} current={client.next_contact_at} />
             </Card>
-          )}
 
-          <Card>
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
-                Poszukiwania ({clientSearches.length})
-              </h2>
-              <SearchWizard
-                clients={[{ id: client.id, name: client.name, phone: contact.phone }]}
-                presetClientId={client.id}
-                trigger="plus"
-              />
-            </div>
-            <ClientSearches searches={clientSearches} matchCounts={searchMatchCounts} />
-          </Card>
+            {client.address && (
+              <Card>
+                <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+                  Lokalizacja
+                </h2>
+                <p className="mb-3 text-sm text-slate-700">{client.address}</p>
+                {client.lat != null && client.lng != null && (
+                  <MiniMap lat={client.lat} lng={client.lng} title={client.name} />
+                )}
+              </Card>
+            )}
 
-          <Card>
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
-                Działania ({clientActivities.length})
-              </h2>
-              <ActivityModal
-                agents={agents}
-                clients={[{ id: client.id, name: client.name, phone: contact.phone }]}
-                properties={agencyProps.map((p) => ({ id: p.id, name: p.title }))}
-                presetClientId={client.id}
-                trigger="plus"
-                reportDefault={settings.options.report_default}
-              />
-            </div>
-            <ClientActivities activities={clientActivities} />
-          </Card>
-
-          <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Korespondencja ({correspondence.messages.length})
-            </h2>
-            <ClientCorrespondence
-              clientId={client.id}
-              clientEmail={contact.email ?? null}
-              clientPhone={contact.phone ?? null}
-              initial={correspondence.messages}
-              ready={correspondence.ready}
-            />
-          </Card>
-
-          <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Dokumenty ({documents.docs.length})
-            </h2>
-            <DocumentsCard entity="client" entityId={client.id} initial={documents.docs} ready={documents.ready} />
-          </Card>
-
-          <Card>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Nowa notatka
-            </h2>
-            <NoteForm clientId={client.id} />
-          </Card>
-
-          <div>
-            <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-              Historia kontaktu ({notes.length})
-            </h2>
-            {notes.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-500">
-                Brak notatek. Dodaj pierwszą po rozmowie z klientem.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {notes.map((n) => (
-                  <div key={n.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
-                      {n.content}
-                    </p>
-                    <p className="mt-2 text-xs text-slate-400">
-                      {new Intl.DateTimeFormat("pl-PL", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      }).format(new Date(n.created_at))}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            {mozeUsunac(user, client) && (
+              <form action={deleteClient.bind(null, client.id)}>
+                <button className="text-xs text-slate-400 transition hover:text-red-600">
+                  Usuń klienta
+                </button>
+              </form>
             )}
           </div>
+
+          <div className="space-y-6">
+            {(owned.length > 0 || interested.length > 0) && (
+              <Card>
+                <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
+                  Powiązane nieruchomości
+                </h2>
+                <div className="space-y-4">
+                  {owned.length > 0 && <PropertyGroup label="Sprzedaje / wynajmuje" items={owned} />}
+                  {interested.length > 0 && <PropertyGroup label="Zainteresowany" items={interested} />}
+                </div>
+              </Card>
+            )}
+
+            <Card>
+              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
+                Nowa notatka
+              </h2>
+              <NoteForm clientId={client.id} />
+            </Card>
+
+            <div>
+              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
+                Historia kontaktu ({notes.length})
+              </h2>
+              {notes.length === 0 ? (
+                <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-500">
+                  Brak notatek. Dodaj pierwszą po rozmowie z klientem.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {notes.map((n) => (
+                    <div key={n.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
+                        {n.content}
+                      </p>
+                      <p className="mt-2 text-xs text-slate-400">
+                        {new Intl.DateTimeFormat("pl-PL", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        }).format(new Date(n.created_at))}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {tab === "dzialania" && (
+        <Card>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+              Działania ({clientActivities.length})
+            </h2>
+            <ActivityModal
+              agents={agents}
+              clients={[{ id: client.id, name: client.name, phone: contact.phone }]}
+              properties={agencyProps.map((p) => ({ id: p.id, name: p.title }))}
+              presetClientId={client.id}
+              trigger="plus"
+              reportDefault={settings.options.report_default}
+            />
+          </div>
+          <ClientActivities activities={clientActivities} />
+        </Card>
+      )}
+
+      {tab === "poszukiwania" && (
+        <Card>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+              Poszukiwania ({clientSearches.length})
+            </h2>
+            <SearchWizard
+              clients={[{ id: client.id, name: client.name, phone: contact.phone }]}
+              presetClientId={client.id}
+              trigger="plus"
+            />
+          </div>
+          <ClientSearches searches={clientSearches} matchCounts={searchMatchCounts} />
+        </Card>
+      )}
+
+      {tab === "portal" && (
+        <DostepPortal
+          clientId={client.id}
+          clientName={client.name}
+          appUrl={APP_URL}
+          istniejace={dostepyPortalu}
+          qr={qrDostepow}
+        />
+      )}
+
+      {tab === "korespondencja" && (
+        <Card>
+          <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
+            Korespondencja ({correspondence.messages.length})
+          </h2>
+          <ClientCorrespondence
+            clientId={client.id}
+            clientEmail={contact.email ?? null}
+            clientPhone={contact.phone ?? null}
+            initial={correspondence.messages}
+            ready={correspondence.ready}
+          />
+        </Card>
+      )}
+
+      {tab === "dokumenty" && (
+        <Card>
+          <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
+            Dokumenty ({documents.docs.length})
+          </h2>
+          <DocumentsCard entity="client" entityId={client.id} initial={documents.docs} ready={documents.ready} />
+        </Card>
+      )}
     </>
   );
 }

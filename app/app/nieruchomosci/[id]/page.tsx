@@ -36,6 +36,11 @@ import { getActivitiesForProperty } from "@/lib/data-platform";
 import { PropertyTabs, TABS, type TabKey } from "./property-tabs";
 import { TransactionTab } from "./transaction-tab";
 import { ActivitiesTab } from "./activities-tab";
+import { PortalTab } from "./portal-tab";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { kodQrSvg } from "@/lib/qr";
+import { APP_URL } from "@/lib/supabase/config";
+import type { DostepWiersz } from "../../klienci/[id]/dostep-portal";
 import { DocumentsCard } from "../../dokumenty/documents-card";
 import { PhotoManager } from "../photo-manager";
 import { getAgencySettings, matchTolerance, photoConfigFrom } from "@/lib/agency-settings";
@@ -104,9 +109,31 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
     property.energy_cert_status !== "posiada" &&
     property.energy_cert_status !== "zwolniona";
 
+  // Dostępy do portalu właściciela tej oferty. Brak tabeli (migracja v46
+  // nieuruchomiona) daje pustą listę, a nie błąd całej karty.
+  const dostepyPortalu = property.owner_client_id
+    ? (((
+        await createSupabaseAdmin()
+          .from("client_portal_access")
+          .select("id, token, rodzaj, created_at, revoked_at, last_seen_at")
+          .eq("client_id", property.owner_client_id)
+          .eq("agency_id", user.agency_id ?? "")
+          .order("created_at", { ascending: false })
+      ).data ?? []) as DostepWiersz[])
+    : [];
+
+  const qrDostepow = Object.fromEntries(
+    await Promise.all(
+      dostepyPortalu
+        .filter((d) => !d.revoked_at)
+        .map(async (d) => [d.id, await kodQrSvg(`${APP_URL}/klient/${d.token}`)] as const),
+    ),
+  );
+
   const liczniki = {
     poszukiwania: interested.length,
     dzialania: activities.length,
+    portal: dostepyPortalu.filter((d) => !d.revoked_at).length,
     dokumenty: documents.docs.length,
     transakcja: deals.length,
   };
@@ -284,6 +311,19 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
       )}
 
       {tab === "dzialania" && <ActivitiesTab activities={activities} />}
+
+      {tab === "portal" && (
+        <PortalTab
+          propertyId={property.id}
+          propertyTitle={property.title}
+          cenaObecna={property.price_pln ?? null}
+          owner={owner ? { id: owner.id, name: owner.name } : null}
+          dostepy={dostepyPortalu}
+          qr={qrDostepow}
+          appUrl={APP_URL}
+          activities={activities}
+        />
+      )}
 
       {tab === "dokumenty" && (
         <Card>

@@ -8,15 +8,20 @@
  */
 
 .portal {
-  --t: #111418;
+  --t: #0f1419;
   --t2: #5b6571;
   --t3: #8b95a1;
-  --linia: #e8ebef;
+  --linia: #e7eaef;
   --tlo: #ffffff;
-  --tlo2: #f6f7f9;
-  --akcent: #1a73e8;
-  --zielen: #0f9d58;
-  --czerwien: #d93025;
+  --tlo2: #f5f7f9;
+  --akcent: #1b64da;
+  --akcent-tlo: #eef3fd;
+  --zielen: #0b8a4b;
+  --zielen-tlo: #e9f6ef;
+  --czerwien: #c6382c;
+  --czerwien-tlo: #fcefed;
+  --bursztyn: #9a6400;
+  --bursztyn-tlo: #fdf3e2;
 
   min-height: 100dvh;
   background: var(--tlo);
@@ -27,42 +32,110 @@
   -webkit-font-smoothing: antialiased;
 }
 
+.portal * {
+  box-sizing: border-box;
+}
+
 .portal-main {
   max-width: 560px;
   margin: 0 auto;
   /* Zapas na dolny pasek zakładek plus bezpieczny obszar iPhone'a. */
-  padding: 0 16px calc(84px + env(safe-area-inset-bottom)) 16px;
+  padding: 0 16px calc(92px + env(safe-area-inset-bottom)) 16px;
 }
 
-/* ── Nagłówek ── */
+/* ── Pasek z marką biura ───────────────────────────────────────────── */
+.portal-marka {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--linia);
+  padding-top: env(safe-area-inset-top);
+}
+.portal-marka > div {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+}
+.portal-marka img,
+.portal-marka .portal-inicjal {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  flex: none;
+  object-fit: contain;
+}
+.portal-inicjal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--t);
+  color: #fff;
+  font-weight: 650;
+  font-size: 14px;
+}
+.portal-marka b {
+  font-size: 15px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+.portal-marka small {
+  display: block;
+  color: var(--t3);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* ── Nagłówek strony ───────────────────────────────────────────────── */
 .portal-top {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 18px 0 14px;
+  padding: 20px 0 6px;
 }
 .portal-top h1 {
-  font-size: 22px;
-  font-weight: 650;
+  font-size: 23px;
+  font-weight: 660;
   margin: 0;
+  letter-spacing: -0.02em;
+}
+.portal-wstecz {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--tlo2);
+  color: var(--t);
+  text-decoration: none;
+  font-size: 17px;
 }
 .portal-sub {
   color: var(--t2);
   font-size: 14px;
-  margin: 2px 0 0;
+  margin: 2px 0 18px;
+  line-height: 1.5;
 }
 
-/* ── Karta oferty ── */
+/* ── Karta oferty ──────────────────────────────────────────────────── */
 .portal-karta {
   display: block;
   color: inherit;
   text-decoration: none;
-  margin: 0 0 26px;
+  margin: 0 0 24px;
 }
 .portal-foto {
   position: relative;
   aspect-ratio: 4 / 3;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
   background: var(--tlo2);
 }
@@ -81,9 +154,10 @@
   font-size: 13px;
 }
 .portal-karta h2 {
-  font-size: 19px;
-  font-weight: 620;
+  font-size: 18px;
+  font-weight: 630;
   margin: 12px 0 2px;
+  letter-spacing: -0.015em;
 }
 .portal-meta {
   color: var(--t2);
@@ -91,12 +165,71 @@
   margin: 0 0 4px;
 }
 .portal-cena {
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 680;
   margin: 6px 0 0;
+  letter-spacing: -0.02em;
 }
 
-/* ── Kafelki z liczbami ── */
+/* Plakietka na zdjęciu (np. „Nowa oferta", „Podoba mi się"). */
+.portal-znacznik {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(15, 20, 25, 0.78);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 560;
+  padding: 5px 10px;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+.portal-znacznik.lubi {
+  background: var(--zielen);
+}
+.portal-znacznik.nie-lubi {
+  background: rgba(15, 20, 25, 0.6);
+}
+.portal-licznik-zdjec {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(15, 20, 25, 0.68);
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+
+/* ── Galeria ───────────────────────────────────────────────────────── */
+.portal-galeria {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+.portal-galeria::-webkit-scrollbar {
+  display: none;
+}
+.portal-galeria > div {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--tlo2);
+}
+.portal-galeria img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Kafelki z liczbami ────────────────────────────────────────────── */
 .portal-liczby {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -105,7 +238,7 @@
 }
 .portal-liczba {
   background: var(--tlo2);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 14px 12px;
 }
 .portal-liczba b {
@@ -121,31 +254,89 @@
   margin-top: 4px;
 }
 
-/* ── Oś czasu ── */
+/* ── Parametry oferty ──────────────────────────────────────────────── */
+.portal-parametry {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--linia);
+  border: 1px solid var(--linia);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 16px 0 0;
+}
+.portal-parametry > div {
+  background: var(--tlo);
+  padding: 12px 14px;
+}
+.portal-parametry dt {
+  color: var(--t3);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.portal-parametry dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 560;
+}
+
+/* ── Etapy sprawy ──────────────────────────────────────────────────── */
+.portal-etapy {
+  display: flex;
+  gap: 4px;
+  margin: 16px 0 6px;
+}
+.portal-etapy span {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--linia);
+}
+.portal-etapy span.za-nami {
+  background: var(--zielen);
+}
+.portal-etap-nazwa {
+  color: var(--t2);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ── Sekcje i oś czasu ─────────────────────────────────────────────── */
 .portal-sekcja {
-  margin: 26px 0 0;
+  margin: 28px 0 0;
 }
 .portal-sekcja > h3 {
   font-size: 16px;
   font-weight: 640;
   margin: 0 0 12px;
+  letter-spacing: -0.01em;
 }
 .portal-zdarzenie {
   display: flex;
   gap: 12px;
-  padding: 14px 0;
+  padding: 13px 0;
   border-top: 1px solid var(--linia);
+  align-items: flex-start;
 }
-.portal-kropka {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  margin-top: 6px;
+.portal-ikonka {
+  width: 34px;
+  height: 34px;
   flex: none;
-  background: var(--akcent);
+  border-radius: 10px;
+  background: var(--akcent-tlo);
+  color: var(--akcent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.portal-kropka.zrobione {
-  background: var(--zielen);
+.portal-ikonka svg {
+  width: 18px;
+  height: 18px;
+}
+.portal-ikonka.zrobione {
+  background: var(--zielen-tlo);
+  color: var(--zielen);
 }
 .portal-zdarzenie b {
   display: block;
@@ -156,6 +347,7 @@
   margin: 2px 0 0;
   color: var(--t2);
   font-size: 14px;
+  line-height: 1.45;
 }
 .portal-kiedy {
   color: var(--t3);
@@ -163,10 +355,10 @@
   margin-top: 3px;
 }
 
-/* ── Wyróżniony najbliższy termin ── */
+/* ── Wyróżniony najbliższy termin ──────────────────────────────────── */
 .portal-alert {
-  background: #eef4fe;
-  border-radius: 14px;
+  background: var(--akcent-tlo);
+  border-radius: 16px;
   padding: 14px 16px;
   margin: 16px 0 0;
 }
@@ -179,7 +371,83 @@
   font-size: 14px;
 }
 
-/* ── Przyciski reakcji ── */
+/* ── Kalendarz ─────────────────────────────────────────────────────── */
+.portal-kal-pasek {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 12px;
+}
+.portal-kal-pasek b {
+  font-size: 17px;
+  font-weight: 620;
+  text-transform: capitalize;
+}
+.portal-kal-pasek a {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--tlo2);
+  color: var(--t);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 16px;
+}
+.portal-kal-naglowki,
+.portal-kal-siatka {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.portal-kal-naglowki span {
+  text-align: center;
+  color: var(--t3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 6px;
+}
+.portal-kal-dzien {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--t);
+  text-decoration: none;
+}
+.portal-kal-dzien.obcy {
+  color: var(--t3);
+  opacity: 0.45;
+}
+.portal-kal-dzien.dzisiaj {
+  background: var(--tlo2);
+  font-weight: 650;
+}
+.portal-kal-dzien.ma-wpisy {
+  background: var(--akcent-tlo);
+  color: var(--akcent);
+  font-weight: 620;
+}
+.portal-kal-kropki {
+  display: flex;
+  gap: 2px;
+  height: 4px;
+}
+.portal-kal-kropki i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--akcent);
+  display: block;
+}
+
+/* ── Przyciski ─────────────────────────────────────────────────────── */
 .portal-reakcje {
   display: flex;
   gap: 10px;
@@ -195,35 +463,279 @@
   font-weight: 560;
   color: var(--t);
   cursor: pointer;
+  font-family: inherit;
 }
 .portal-reakcja[data-wybrane="lubi"] {
   border-color: var(--zielen);
-  background: #eaf6ef;
-  color: #0b6b3c;
+  background: var(--zielen-tlo);
+  color: var(--zielen);
 }
 .portal-reakcja[data-wybrane="nie_lubi"] {
   border-color: var(--czerwien);
-  background: #fdeeec;
-  color: #a3180f;
+  background: var(--czerwien-tlo);
+  color: var(--czerwien);
 }
 
-/* ── Pusty stan ── */
+.portal-przycisk {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  background: var(--akcent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 13px 16px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+.portal-przycisk:disabled {
+  opacity: 0.5;
+}
+.portal-przycisk.obrys {
+  background: var(--tlo);
+  color: var(--t);
+  border: 1px solid var(--linia);
+}
+.portal-pole {
+  width: 100%;
+  border: 1px solid var(--linia);
+  border-radius: 12px;
+  padding: 12px 13px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--t);
+  background: var(--tlo);
+}
+.portal-pole:focus {
+  outline: 2px solid var(--akcent);
+  outline-offset: -1px;
+}
+
+/* ── Filtry ────────────────────────────────────────────────────────── */
+.portal-filtry {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 -16px 18px;
+  padding: 0 16px;
+}
+.portal-filtry::-webkit-scrollbar {
+  display: none;
+}
+.portal-filtry a {
+  white-space: nowrap;
+  border: 1px solid var(--linia);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 14px;
+  color: var(--t2);
+  text-decoration: none;
+}
+.portal-filtry a[aria-current="page"] {
+  background: var(--t);
+  border-color: var(--t);
+  color: #fff;
+  font-weight: 560;
+}
+
+/* ── Propozycja ceny ───────────────────────────────────────────────── */
+.portal-propozycja {
+  border: 1px solid var(--bursztyn-tlo);
+  background: var(--bursztyn-tlo);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 18px 0 0;
+}
+.portal-propozycja h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 640;
+  color: var(--bursztyn);
+}
+.portal-propozycja .kwoty {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 10px 0 4px;
+}
+.portal-propozycja .stara {
+  color: var(--t3);
+  text-decoration: line-through;
+  font-size: 15px;
+}
+.portal-propozycja .nowa {
+  font-size: 21px;
+  font-weight: 680;
+}
+.portal-propozycja p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+.portal-decyzja {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.portal-decyzja button {
+  flex: 1;
+  border-radius: 12px;
+  padding: 11px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--linia);
+  background: var(--tlo);
+  color: var(--t);
+}
+.portal-decyzja button.tak {
+  background: var(--zielen);
+  border-color: var(--zielen);
+  color: #fff;
+}
+
+/* ── Wiadomości ────────────────────────────────────────────────────── */
+.portal-czat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.portal-dymek {
+  max-width: 82%;
+  border-radius: 16px;
+  padding: 11px 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.portal-dymek.od-klienta {
+  align-self: flex-end;
+  background: var(--akcent);
+  color: #fff;
+  border-bottom-right-radius: 5px;
+}
+.portal-dymek.od-agenta {
+  align-self: flex-start;
+  background: var(--tlo2);
+  border-bottom-left-radius: 5px;
+}
+.portal-dymek time {
+  display: block;
+  font-size: 11px;
+  opacity: 0.65;
+  margin-top: 4px;
+}
+
+/* ── Karta informacyjna ────────────────────────────────────────────── */
+.portal-info {
+  border: 1px solid var(--linia);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 0 0 14px;
+}
+.portal-info h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 620;
+}
+.portal-info p {
+  margin: 0;
+  color: var(--t2);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.portal-info ol {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  color: var(--t2);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.portal-info ol strong {
+  color: var(--t);
+}
+.portal-kontakt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--linia);
+  color: inherit;
+  text-decoration: none;
+  font-size: 15px;
+}
+.portal-kontakt span {
+  color: var(--t3);
+  margin-left: auto;
+  font-size: 13px;
+}
+
+/* ── Zachęta do instalacji ─────────────────────────────────────────── */
+.portal-instalacja {
+  border: 1px solid var(--linia);
+  background: var(--tlo2);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin: 16px 0 0;
+}
+.portal-instalacja > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.portal-instalacja b {
+  font-size: 15px;
+  font-weight: 620;
+  display: block;
+}
+.portal-instalacja small {
+  color: var(--t2);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.portal-instalacja button {
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--akcent);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0;
+}
+.portal-instalacja .zamknij {
+  color: var(--t3);
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ── Pusty stan ────────────────────────────────────────────────────── */
 .portal-pusto {
   text-align: center;
   color: var(--t2);
-  padding: 48px 16px;
+  padding: 44px 16px;
   font-size: 15px;
   line-height: 1.6;
+  background: var(--tlo2);
+  border-radius: 16px;
 }
 
-/* ── Dolny pasek ── */
+/* ── Dolny pasek ───────────────────────────────────────────────────── */
 .portal-nav {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
   border-top: 1px solid var(--linia);
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 20;
@@ -236,27 +748,88 @@
 .portal-nav a {
   flex: 1;
   text-align: center;
-  padding: 10px 4px 12px;
+  padding: 9px 2px 11px;
   color: var(--t3);
   text-decoration: none;
-  font-size: 11px;
+  font-size: 10.5px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+  position: relative;
 }
 .portal-nav a[aria-current="page"] {
   color: var(--akcent);
 }
 .portal-nav svg {
-  width: 23px;
-  height: 23px;
+  width: 22px;
+  height: 22px;
+}
+.portal-nav .kropka {
+  position: absolute;
+  top: 7px;
+  right: calc(50% - 15px);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--czerwien);
 }
 
 /* Portal jest zawsze jasny, także przy ciemnym motywie systemu. */
 @media (prefers-color-scheme: dark) {
   .portal {
     background: #ffffff;
-    color: #111418;
+    color: #0f1419;
   }
+}
+
+/* ── Kroki instrukcji ──────────────────────────────────────────────── */
+.portal-kroki {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--t2);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.portal-kroki strong {
+  color: var(--t);
+  font-weight: 600;
+}
+
+/* ── Kropki pod galerią ────────────────────────────────────────────── */
+.portal-kropki-galerii {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 10px;
+}
+.portal-kropki-galerii i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--linia);
+  display: block;
+  transition: background 0.15s;
+}
+.portal-kropki-galerii i.na {
+  background: var(--t2);
+}
+
+/* ── Szybki wybór godzin ───────────────────────────────────────────── */
+.portal-chip {
+  white-space: nowrap;
+  border: 1px solid var(--linia);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--t2);
+  background: var(--tlo);
+  cursor: pointer;
+}
+.portal-chip[aria-pressed="true"] {
+  background: var(--t);
+  border-color: var(--t);
+  color: #fff;
+  font-weight: 560;
 }
