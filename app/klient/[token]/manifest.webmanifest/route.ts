@@ -11,6 +11,21 @@ import { dostepPoTokenie, brandingBiura } from "@/lib/data-portal";
  * `start_url` wskazuje wprost na adres z tokenem, więc stuknięcie w ikonę
  * otwiera właśnie tę sprawę, bez logowania i bez wklejania linku.
  */
+/**
+ * Podpis pod ikoną mieści ok. 12 znaków. Ucinamy na granicy słowa, bo
+ * „Biuro Demo N" wygląda jak błąd, a „Biuro Demo" jak nazwa.
+ */
+function krotkaNazwa(nazwa: string): string {
+  if (nazwa.length <= 12) return nazwa;
+  const slowa = nazwa.split(/\s+/);
+  let out = slowa[0].slice(0, 12);
+  for (const s of slowa.slice(1)) {
+    if (`${out} ${s}`.length > 12) break;
+    out += ` ${s}`;
+  }
+  return out;
+}
+
 export async function GET(_req: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const dostep = await dostepPoTokenie(token);
@@ -22,7 +37,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ token: 
   return Response.json(
     {
       name: biuro.nazwa,
-      short_name: biuro.nazwa.slice(0, 12),
+      short_name: krotkaNazwa(biuro.nazwa),
       description:
         dostep.rodzaj === "kupujacy"
           ? `Oferty dobrane przez ${biuro.nazwa}.`

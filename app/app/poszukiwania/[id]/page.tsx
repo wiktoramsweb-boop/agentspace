@@ -224,6 +224,7 @@ export default async function SearchDetailPage({ params }: Props) {
             istniejace={dostepyPortalu}
             qr={qrDostepow}
             presetRodzaj="kupujacy"
+            tylkoRodzaj="kupujacy"
           />
         </section>
       )}

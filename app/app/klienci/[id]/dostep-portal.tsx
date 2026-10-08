@@ -29,6 +29,7 @@ export function DostepPortal({
   istniejace,
   qr,
   presetRodzaj,
+  tylkoRodzaj,
 }: {
   clientId: string;
   clientName?: string;
@@ -37,17 +38,20 @@ export function DostepPortal({
   /** Kod QR na dostęp, składany po stronie serwera. */
   qr: Record<string, string>;
   presetRodzaj?: RodzajDostepu;
+  /** Pokaż tylko dostępy tego rodzaju. Na karcie poszukiwania nie ma co
+   *  wyświetlać dostępu sprzedającego - dotyczy zupełnie innej sprawy. */
+  tylkoRodzaj?: RodzajDostepu;
 }) {
   const [rodzaj, setRodzaj] = useState<RodzajDostepu>(presetRodzaj ?? "sprzedajacy");
   const [blad, setBlad] = useState<string | null>(null);
   const [skopiowany, setSkopiowany] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
-  const aktywne = istniejace.filter((d) => !d.revoked_at);
+  const aktywne = istniejace.filter((d) => !d.revoked_at && (!tylkoRodzaj || d.rodzaj === tylkoRodzaj));
   const link = (t: string) => `${appUrl}/klient/${t}`;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+    <div className="grid items-start gap-6 lg:grid-cols-[1.1fr_1fr]">
       <Card>
         <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
           Dostęp dla klienta

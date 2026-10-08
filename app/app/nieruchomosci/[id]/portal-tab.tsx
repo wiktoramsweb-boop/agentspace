@@ -53,7 +53,7 @@ export function PortalTab({
     );
   }
 
-  const aktywny = dostepy.find((d) => !d.revoked_at);
+  const aktywny = dostepy.find((d) => !d.revoked_at && d.rodzaj === "sprzedajacy");
 
   return (
     <div className="space-y-6">
@@ -69,6 +69,7 @@ export function PortalTab({
         istniejace={dostepy}
         qr={qr}
         presetRodzaj="sprzedajacy"
+        tylkoRodzaj="sprzedajacy"
       />
 
       <Card>
