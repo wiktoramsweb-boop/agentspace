@@ -31,6 +31,7 @@ export function PortalTab({
   qr,
   appUrl,
   activities,
+  dodaj,
 }: {
   propertyId: string;
   propertyTitle: string;
@@ -40,6 +41,8 @@ export function PortalTab({
   qr: Record<string, string>;
   appUrl: string;
   activities: Activity[];
+  /** Przycisk dodawania działania, wstrzykiwany ze strony. */
+  dodaj?: React.ReactNode;
 }) {
   if (!owner) {
     return (
@@ -54,6 +57,7 @@ export function PortalTab({
   }
 
   const aktywny = dostepy.find((d) => !d.revoked_at && d.rodzaj === "sprzedajacy");
+  const widocznych = activities.filter((a) => (a as { client_visible?: boolean }).client_visible).length;
 
   return (
     <div className="space-y-6">
@@ -101,9 +105,12 @@ export function PortalTab({
       </Card>
 
       <Card>
-        <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
-          Co klient widzi w kalendarzu ({activities.length})
-        </h2>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+            Co klient widzi w kalendarzu ({widocznych} z {activities.length})
+          </h2>
+          {dodaj}
+        </div>
         <p className="mt-2 mb-4 text-sm text-slate-600">
           Prezentacje włączają się same. Reszta działań jest domyślnie ukryta, bo w temacie bywają
           dane innych osób. Zaznacz to, co klient ma zobaczyć, i napisz mu własny opis.
@@ -111,7 +118,7 @@ export function PortalTab({
 
         {activities.length === 0 ? (
           <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-5 text-center text-sm text-slate-500">
-            Brak działań przy tej ofercie. Dodaj je w zakładce Działania.
+            Brak działań przy tej ofercie. Dodaj pierwsze przyciskiem powyżej.
           </p>
         ) : (
           <ul className="space-y-3">

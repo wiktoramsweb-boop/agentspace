@@ -154,10 +154,23 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
   // żeby wiedzieć, kiedy ktoś ogląda. Agent może to wyłączyć w zakładce
   // „Portal klienta" przy ofercie. Osobnym zapytaniem, bo bez migracji v46
   // kolumna nie istnieje, a wtedy samo działanie ma się i tak zapisać.
-  const widocznaPrezentacja =
-    (txt(formData, "kind") ?? "polaczenie") === "spotkanie" && Boolean(propertyId ?? inherited?.property_id);
-  if (widocznaPrezentacja && zapisane?.id) {
-    await admin.from("activities").update({ client_visible: true }).eq("id", zapisane.id);
+  const zOferta = Boolean(propertyId ?? inherited?.property_id);
+  const decyzjaAgenta = formData.get("portal_decyzja") === "1";
+  const widoczne = zOferta
+    ? decyzjaAgenta
+      ? formData.get("client_visible") === "1"
+      : (txt(formData, "kind") ?? "polaczenie") === "spotkanie"
+    : false;
+
+  if (widoczne && zapisane?.id) {
+    await admin
+      .from("activities")
+      .update({
+        client_visible: true,
+        // Opis przycinamy, bo to ma być jedno zdanie, a nie notatka.
+        client_note: (txt(formData, "client_note") ?? "").slice(0, 300) || null,
+      })
+      .eq("id", zapisane.id);
   }
 
   // Wykonany telefon albo spotkanie od razu podbija licznik w Celach,

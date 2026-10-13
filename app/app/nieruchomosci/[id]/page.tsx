@@ -33,6 +33,8 @@ import { NearbyCard } from "./nearby-card";
 import { DetailsCard } from "./details-card";
 import { getDocuments } from "@/lib/data-documents";
 import { getActivitiesForProperty } from "@/lib/data-platform";
+import { getAgencyAgents } from "@/lib/data-activities";
+import { ActivityModal } from "../../dzialania/activity-modal";
 import { PropertyTabs, TABS, type TabKey } from "./property-tabs";
 import { TransactionTab } from "./transaction-tab";
 import { ActivitiesTab } from "./activities-tab";
@@ -72,6 +74,19 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
     getDocuments(user.agency_id, "property", id),
     getActivitiesForProperty(id, user.agency_id),
   ]);
+
+  const agents = user.agency_id ? await getAgencyAgents(user.agency_id) : [];
+  // Okno działania wywoływane z karty oferty ma tę ofertę już wybraną - agent
+  // nie szuka jej na liście wszystkich nieruchomości biura.
+  const dodajDzialanie = (
+    <ActivityModal
+      agents={agents}
+      clients={allClients}
+      properties={[{ id: property.id, name: property.title }]}
+      presetPropertyId={property.id}
+      reportDefault={settings.options.report_default}
+    />
+  );
 
   const status = PROPERTY_STATUSES.find((s) => s.value === property.status);
   const type = PROPERTY_TYPES.find((t) => t.value === property.property_type);
@@ -310,7 +325,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
         </div>
       )}
 
-      {tab === "dzialania" && <ActivitiesTab activities={activities} />}
+      {tab === "dzialania" && <ActivitiesTab activities={activities} dodaj={dodajDzialanie} />}
 
       {tab === "portal" && (
         <PortalTab
@@ -322,6 +337,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
           qr={qrDostepow}
           appUrl={APP_URL}
           activities={activities}
+          dodaj={dodajDzialanie}
         />
       )}
 

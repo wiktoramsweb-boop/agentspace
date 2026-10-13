@@ -7,20 +7,35 @@ import { ACTIVITY_KIND_MAP, ACTIVITY_STATUSES, type Activity } from "@/lib/types
 const STATUS_MAP = Object.fromEntries(ACTIVITY_STATUSES.map((s) => [s.value, s]));
 
 /** Telefony, prezentacje i zadania przypięte do tej oferty, od najnowszych. */
-export function ActivitiesTab({ activities }: { activities: Activity[] }) {
+export function ActivitiesTab({
+  activities,
+  dodaj,
+}: {
+  activities: Activity[];
+  /** Przycisk dodawania, wstrzykiwany ze strony - okno działania jest klienckie. */
+  dodaj?: React.ReactNode;
+}) {
   if (!activities.length) {
     return (
       <Card>
         <p className="py-8 text-center text-sm text-slate-500">
-          Do tej oferty nie jest przypięte żadne działanie. Dodając telefon albo prezentację,
-          wskaż tę nieruchomość - wtedy cała historia kontaktu będzie w jednym miejscu.
+          Do tej oferty nie jest przypięte żadne działanie.
         </p>
+        {dodaj && <div className="flex justify-center pb-4">{dodaj}</div>}
       </Card>
     );
   }
 
   return (
     <Card>
+      {dodaj && (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">
+            Działania przy tej ofercie ({activities.length})
+          </h2>
+          {dodaj}
+        </div>
+      )}
       <ol className="space-y-2">
         {activities.map((a) => {
           const km = ACTIVITY_KIND_MAP[a.kind];

@@ -174,6 +174,10 @@ function ActivityForm({
   const purposes = ACTIVITY_PURPOSES.filter((p) => p.kinds.includes(kind));
 
   const [assignees, setAssignees] = useState<string[]>([]);
+  const [propertyId, setPropertyId] = useState(presetPropertyId ?? "");
+  // Prezentacja idzie do portalu domyślnie - to samo robi zapis działania po
+  // stronie serwera, więc okno pokazuje prawdę, a nie własną interpretację.
+  const [widoczne, setWidoczne] = useState(kind === "spotkanie");
   const [clientId, setClientId] = useState(presetClientId ?? parent?.clientId ?? "");
   const [contactName, setContactName] = useState(parent?.contactName ?? "");
   const [contactPhone, setContactPhone] = useState(parent?.contactPhone ?? "");
@@ -475,7 +479,7 @@ function ActivityForm({
           <Section title="Powiązania">
             <div>
               <Label>Nieruchomość (opcjonalnie)</Label>
-              <Select name="property_id" defaultValue={presetPropertyId ?? ""}>
+              <Select name="property_id" value={propertyId} onChange={(e) => setPropertyId(e.target.value)}>
                 <option value="">brak</option>
                 {properties.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -484,6 +488,44 @@ function ActivityForm({
                 ))}
               </Select>
             </div>
+
+            {/* Widoczność w portalu klienta.
+                Pokazujemy tylko przy działaniu przypiętym do oferty, bo portal
+                jest zawsze o konkretnej nieruchomości. Opis dla klienta jest
+                OSOBNYM polem, nie kopią tematu: w temacie bywa „Prezka
+                mazowiecka, Bogdan 792 847 892", czyli numer obcej osoby. */}
+            {propertyId && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                {/* Znacznik, że agent widział ten przełącznik. Odznaczony
+                    checkbox nie wysyła nic, więc bez tego serwer nie odróżniłby
+                    świadomego „nie pokazuj" od formularza bez tego pola. */}
+                <input type="hidden" name="portal_decyzja" value="1" />
+                <label className="flex cursor-pointer items-start gap-2.5 text-sm font-medium text-slate-800">
+                  <input
+                    type="checkbox"
+                    name="client_visible"
+                    value="1"
+                    checked={widoczne}
+                    onChange={(e) => setWidoczne(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-emerald-500"
+                  />
+                  <span>
+                    Pokaż to klientowi w jego aplikacji
+                    <span className="mt-0.5 block text-xs font-normal text-slate-500">
+                      Zobaczy rodzaj zdarzenia i godzinę. Nigdy tematu ani opisu powyżej.
+                    </span>
+                  </span>
+                </label>
+                {widoczne && (
+                  <input
+                    name="client_note"
+                    maxLength={300}
+                    placeholder="Opis dla klienta, np. Prezentacja dla zainteresowanego (opcjonalnie)"
+                    className="mt-2.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
+                  />
+                )}
+              </div>
+            )}
             <div>
               <Label>Przypisane do</Label>
               <div className="mb-2 flex flex-wrap gap-2">
