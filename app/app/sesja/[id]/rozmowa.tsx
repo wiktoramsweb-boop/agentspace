@@ -56,6 +56,7 @@ function PanelRozmowy({
   const [sekundy, setSekundy] = useState(0);
   const [limit, setLimit] = useState(5);
   const [wyciszony, setWyciszony] = useState(false);
+  const [etap, setEtap] = useState("Zapisuję rozmowę...");
 
   // Refy, a nie stan: wypowiedzi lecą w trakcie rozmowy i nie chcemy
   // przerysowywać ekranu przy każdym zdaniu.
@@ -141,8 +142,9 @@ function PanelRozmowy({
    * czekałem i gdy zwrotka nie przyszła, przycisk „Rozłącz" nie robił nic.
    */
   const zakoncz = useCallback(async () => {
-    if (fazaRef.current === "stop") return;
+    if (fazaRef.current === "stop" || fazaRef.current === "konczenie") return;
     ciszej();
+    setEtap("Zapisuję rozmowę...");
     ustawFaze("konczenie");
     try {
       rozmowa.endSession();
@@ -150,12 +152,24 @@ function PanelRozmowy({
       /* już rozłączone */
     }
     const ile = await rozlicz(true);
-    ustawFaze("stop");
 
     // Odłożenie słuchawki kończy całą sesję i uruchamia ocenę, tak jak
     // przycisk „Zakończ i oceń". Pustej rozmowy nie ma po co oceniać.
-    if (ile > 0) await endSession(sessionId);
-    else router.refresh();
+    if (ile === 0) {
+      ustawFaze("stop");
+      router.refresh();
+      return;
+    }
+
+    // Ocena to wywołanie modelu i trwa kilka sekund. Ekran zostaje na wierzchu
+    // aż do przejścia na wyniki: wcześniej gasł od razu i agent przez te kilka
+    // sekund patrzył na pustą rozmowę, nie wiedząc, czy odświeżać.
+    setEtap("Oceniam rozmowę...");
+    try {
+      await endSession(sessionId);
+    } catch {
+      // Przekierowanie z akcji serwerowej leci tędy i to jest normalne.
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rozmowa, rozlicz, router, sessionId]);
 
@@ -203,6 +217,18 @@ function PanelRozmowy({
 
   // Sygnał zgłoszenia nie może zostać grający, gdy ktoś zamknie kartę.
   useEffect(() => () => ciszej(), []);
+
+  // Gdyby ocena nie wróciła, nie zostawiamy agenta z zasłoniętym ekranem.
+  useEffect(() => {
+    if (faza !== "konczenie") return;
+    const t = setTimeout(() => {
+      if (fazaRef.current !== "konczenie") return;
+      ustawFaze("stop");
+      setBlad("Ocena trwa dłużej niż zwykle. Odśwież stronę za chwilę.");
+      router.refresh();
+    }, 45_000);
+    return () => clearTimeout(t);
+  }, [faza, router]);
 
   /**
    * Jedna próba połączenia.
@@ -311,13 +337,8 @@ function PanelRozmowy({
         <EkranRozmowy
           tytul={tytul}
           osobowosc={osobowosc}
-          stan={
-            faza === "rozmowa"
-              ? `${minuty}:${reszta}`
-              : faza === "konczenie"
-                ? "Kończę..."
-                : (blad ?? "Dzwonię...")
-          }
+          konczenie={faza === "konczenie" ? etap : null}
+          stan={faza === "rozmowa" ? `${minuty}:${reszta}` : (blad ?? "Dzwonię...")}
           mowi={faza === "rozmowa" && rozmowa.isSpeaking}
           polaczono={faza === "rozmowa"}
           wyciszony={wyciszony}
@@ -334,6 +355,7 @@ function EkranRozmowy({
   tytul,
   osobowosc,
   stan,
+  konczenie,
   mowi,
   polaczono,
   wyciszony,
@@ -343,12 +365,31 @@ function EkranRozmowy({
   tytul: string;
   osobowosc: string;
   stan: string;
+  /** Tekst etapu po rozłączeniu. Gdy jest, zamiast telefonu pokazujemy ocenianie. */
+  konczenie: string | null;
   mowi: boolean;
   polaczono: boolean;
   wyciszony: boolean;
   naMikrofon: () => void;
   naRozlacz: () => void;
 }) {
+  // Ocena to wywołanie modelu i trwa kilka sekund. Przez ten czas ekran musi
+  // mówić, co się dzieje, inaczej wygląda jak zawieszona aplikacja.
+  if (konczenie) {
+    return (
+      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-slate-800 via-slate-900 to-black px-6 text-white">
+        <span className="flex h-16 w-16 animate-spin items-center justify-center rounded-full border-4 border-white/15 border-t-emerald-400" />
+        <div className="text-center">
+          <p className="text-xl font-semibold tracking-tight">Rozłączono</p>
+          <p className="mt-2 text-white/60">{konczenie}</p>
+          <p className="mt-6 max-w-xs text-sm text-white/35">
+            To zajmuje kilka sekund. Nie odświeżaj, za chwilę pokażę ocenę rozmowy.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-between bg-gradient-to-b from-slate-800 via-slate-900 to-black px-6 py-16 text-white">
       <div className="flex flex-col items-center gap-5 pt-10">
