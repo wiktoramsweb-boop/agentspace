@@ -7,6 +7,8 @@
  * Google karze za schema, która nie zgadza się z widoczną treścią.
  */
 
+import { PLANS } from "@/lib/marketing/plans";
+
 const FAQ_ENTRIES = [
   {
     q: "Czy AgentSpace działa już dziś?",
@@ -49,56 +51,33 @@ const softwareApplicationSchema = {
   applicationSubCategory: "Real Estate Agency Management Software",
   operatingSystem: "Web",
   inLanguage: "pl-PL",
-  offers: [
-    {
-      "@type": "Offer",
-      name: "Start",
-      price: "299",
+  // Ceny i limity bierzemy z lib/marketing/plans, żeby dane dla Google nie
+  // rozjechały się z cennikiem na stronie i kwotą w aplikacji.
+  offers: PLANS.map((plan) => ({
+    "@type": "Offer",
+    name: plan.name,
+    price: String(plan.price),
+    priceCurrency: "PLN",
+    availability: "https://schema.org/InStock",
+    priceSpecification: {
+      "@type": "UnitPriceSpecification",
+      price: String(plan.price),
       priceCurrency: "PLN",
-      availability: "https://schema.org/InStock",
-      priceSpecification: {
-        "@type": "UnitPriceSpecification",
-        price: "299",
-        priceCurrency: "PLN",
-        unitText: "MONTH",
-        referenceQuantity: {
-          "@type": "QuantitativeValue",
-          value: 5,
-          unitCode: "C62",
-          unitText: "agentów",
-        },
+      unitText: "MONTH",
+      referenceQuantity: {
+        "@type": "QuantitativeValue",
+        value: plan.includedAgents ?? plan.maxAgents,
+        unitCode: "C62",
+        unitText: "agentów",
       },
-      eligibleRegion: { "@type": "Country", name: "Poland" },
+      ...(plan.extraAgentPrice
+        ? {
+            description: `Każda osoba powyżej ${plan.includedAgents}: ${plan.extraAgentPrice} zł/mc`,
+          }
+        : {}),
     },
-    {
-      "@type": "Offer",
-      name: "Pro",
-      price: "599",
-      priceCurrency: "PLN",
-      availability: "https://schema.org/InStock",
-      priceSpecification: {
-        "@type": "UnitPriceSpecification",
-        price: "599",
-        priceCurrency: "PLN",
-        unitText: "MONTH",
-        referenceQuantity: {
-          "@type": "QuantitativeValue",
-          value: 15,
-          unitCode: "C62",
-          unitText: "agentów",
-        },
-      },
-      eligibleRegion: { "@type": "Country", name: "Poland" },
-    },
-    {
-      "@type": "Offer",
-      name: "Biuro",
-      price: "999",
-      priceCurrency: "PLN",
-      availability: "https://schema.org/InStock",
-      eligibleRegion: { "@type": "Country", name: "Poland" },
-    },
-  ],
+    eligibleRegion: { "@type": "Country", name: "Poland" },
+  })),
   featureList: [
     "CRM klientów z pipeline i notatkami",
     "Wspólna baza nieruchomości dla biura",

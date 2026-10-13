@@ -19,7 +19,8 @@
     "tokeny": "node lib/ustaw-tokeny.mjs",
     "test:portal": "node --experimental-strip-types lib/sprawdz-portal.mjs",
     "test:karta": "node --experimental-strip-types lib/sprawdz-karta.mjs",
-    "test:glos": "node --experimental-strip-types lib/sprawdz-glos.mjs"
+    "test:glos": "node --experimental-strip-types lib/sprawdz-glos.mjs",
+    "test:import": "node --experimental-strip-types lib/sprawdz-import.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",
