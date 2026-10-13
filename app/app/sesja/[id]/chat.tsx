@@ -14,6 +14,7 @@ export function SessionChat({
   brief,
   personality,
   glos,
+  trybGlosu,
 }: {
   sessionId: string;
   initialTranscript: ChatMessage[];
@@ -22,11 +23,16 @@ export function SessionChat({
   personality: string;
   /** Czy biuro ma włączoną rozmowę głosową (klucz dostawcy w środowisku). */
   glos: boolean;
+  /** Agent wybrał trening przez telefon. Pisanie zostaje pod przyciskiem. */
+  trybGlosu: boolean;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialTranscript);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [streamText, setStreamText] = useState("");
+  // W trybie telefonicznym pisanie jest schowane, ale nie odebrane: agent może
+  // w każdej chwili dopisać coś na klawiaturze, choćby po rozmowie.
+  const [pokazPisanie, setPokazPisanie] = useState(!trybGlosu);
   const scrollRef = useRef<HTMLDivElement>(null);
   const openerTriggered = useRef(false);
 
@@ -37,7 +43,7 @@ export function SessionChat({
 
   // AI otwiera rozmowę, jeśli transkrypt pusty
   useEffect(() => {
-    if (messages.length === 0 && !openerTriggered.current) {
+    if (messages.length === 0 && !openerTriggered.current && !trybGlosu) {
       openerTriggered.current = true;
       void runTurn(null);
     }
@@ -149,8 +155,21 @@ export function SessionChat({
 
       {/* Input */}
       <div className="mt-4 border-t border-slate-200 pt-4">
-        {glos && <RozmowaGlosowa sessionId={sessionId} brief={brief} osobowosc={personality} />}
-        {listening && (
+        {glos && (
+          <div className={trybGlosu ? "mb-2" : undefined}>
+            <RozmowaGlosowa sessionId={sessionId} brief={brief} osobowosc={personality} />
+            {trybGlosu && !pokazPisanie && (
+              <button
+                type="button"
+                onClick={() => setPokazPisanie(true)}
+                className="text-sm text-slate-500 underline-offset-2 transition hover:text-slate-900 hover:underline"
+              >
+                Wolę jednak pisać
+              </button>
+            )}
+          </div>
+        )}
+        {pokazPisanie && listening && (
           <p className="mb-2 flex items-center gap-2 text-sm text-emerald-600">
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
@@ -159,9 +178,10 @@ export function SessionChat({
             Słucham... mów, a tekst pojawi się w polu. Kliknij mikrofon by zakończyć.
           </p>
         )}
-        {voiceError && (
+        {pokazPisanie && voiceError && (
           <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{voiceError}</p>
         )}
+        {pokazPisanie && (
         <form onSubmit={handleSend} className="flex gap-2">
           {voiceSupported && (
             <button
@@ -196,12 +216,13 @@ export function SessionChat({
             Wyślij
           </button>
         </form>
-        {voiceSupported && !listening && (
+        )}
+        {pokazPisanie && voiceSupported && !listening && (
           <p className="mt-2 text-xs text-slate-500">
             Możesz mówić zamiast pisać - kliknij mikrofon. Działa najlepiej w Chrome.
           </p>
         )}
-        {!voiceSupported && (
+        {pokazPisanie && !voiceSupported && (
           <p className="mt-2 text-xs text-amber-400/80">
             Ta przeglądarka nie ma wbudowanego dyktowania. Na iPhone dotknij pola tekstowego i użyj
             ikony mikrofonu na klawiaturze iOS. Na komputerze użyj Chrome.

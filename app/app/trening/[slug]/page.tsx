@@ -6,14 +6,46 @@ import { PERSONALITIES } from "@/lib/types";
 import { startSession } from "../actions";
 import { Card } from "../../components/ui";
 import { SubmitButton } from "../../components/submit-button";
+import { glosWlaczony } from "@/lib/glos";
 
 type Props = { params: Promise<{ slug: string }> };
+
+/** Karta wyboru trybu. Ta sama stylizacja, co przy osobowości i trudności. */
+function TrybKarty({
+  wartosc,
+  tytul,
+  opis,
+  stopka,
+  domyslny,
+}: {
+  wartosc: string;
+  tytul: string;
+  opis: string;
+  stopka: string;
+  domyslny?: boolean;
+}) {
+  return (
+    <label className="group relative cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all hover:border-slate-300 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10 has-[:checked]:ring-2 has-[:checked]:ring-emerald-500/40">
+      <input type="radio" name="tryb" value={wartosc} defaultChecked={domyslny} className="peer sr-only" />
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <span className="font-semibold text-slate-900">{tytul}</span>
+        <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 transition-colors group-has-[:checked]:border-emerald-500 group-has-[:checked]:bg-emerald-500">
+          <span className="h-2 w-2 rounded-full bg-transparent transition-colors group-has-[:checked]:bg-white" />
+        </span>
+      </div>
+      <p className="text-sm text-slate-500">{opis}</p>
+      <p className="mt-2 text-xs text-slate-400">{stopka}</p>
+    </label>
+  );
+}
 
 export default async function ScenarioSetupPage({ params }: Props) {
   const user = await requireUser();
   const { slug } = await params;
   const scenario = await getScenarioBySlug(slug);
   if (!scenario) notFound();
+
+  const glos = glosWlaczony();
 
   // Tygodniowy limit rozmów AI - jeśli wyczerpany, nie pozwól zacząć.
   const limitReached =
@@ -48,8 +80,36 @@ export default async function ScenarioSetupPage({ params }: Props) {
       <form action={startSession}>
         <input type="hidden" name="scenarioId" value={scenario!.id} />
 
+        {glos && (
+          <>
+            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
+              Krok 2 · Jak chcesz trenować?
+            </p>
+            <h2 className="mb-1 text-lg font-semibold text-slate-900">Rozmowa czy pisanie?</h2>
+            <p className="mb-4 text-sm text-slate-500">
+              Jedno i drugie uczy czego innego. Przez telefon ćwiczysz tempo, przerywanie i to, co
+              robisz z ciszą. Pisząc masz czas dobrać słowa.
+            </p>
+            <div className="mb-8 grid gap-3 sm:grid-cols-2">
+              <TrybKarty
+                wartosc="glos"
+                domyslny
+                tytul="Rozmowa przez telefon"
+                opis="Dzwonisz, klient odbiera i rozmawiacie na głos. Najbliżej prawdziwego telefonu."
+                stopka="Potrzebny mikrofon · 22 kredyty za minutę"
+              />
+              <TrybKarty
+                wartosc="pisanie"
+                tytul="Pisanie"
+                opis="Piszesz na klawiaturze albo dyktujesz mikrofonem, a klient odpisuje."
+                stopka="Bez słuchawek · 1 kredyt za wypowiedź"
+              />
+            </div>
+          </>
+        )}
+
         <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
-          Krok 2 · Wybierz typ klienta
+          Krok {glos ? 3 : 2} · Wybierz typ klienta
         </p>
         <h2 className="mb-4 text-lg font-semibold text-slate-900">Jak ma zachowywać się AI?</h2>
         <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -77,7 +137,7 @@ export default async function ScenarioSetupPage({ params }: Props) {
         </div>
 
         <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
-          Krok 3 · Poziom trudności
+          Krok {glos ? 4 : 3} · Poziom trudności
         </p>
         <h2 className="mb-1 text-lg font-semibold text-slate-900">Jak trudny ma być klient?</h2>
         <p className="mb-4 text-sm text-slate-500">
@@ -112,7 +172,7 @@ export default async function ScenarioSetupPage({ params }: Props) {
         </div>
 
         <p className="mb-3 text-xs font-medium uppercase tracking-wider text-emerald-600">
-          Krok 4 · Zaczynamy
+          Krok {glos ? 5 : 4} · Zaczynamy
         </p>
         <SubmitButton
           overlay
@@ -124,7 +184,9 @@ export default async function ScenarioSetupPage({ params }: Props) {
           {limitReached ? "Limit wyczerpany na ten tydzień" : "Rozpocznij rozmowę z AI klientem →"}
         </SubmitButton>
         <p className="mt-2 text-sm text-slate-500">
-          AI odezwie się pierwszy. Pisz jak do prawdziwego klienta. Na końcu kliknij „Zakończ i oceń”.
+          {glos
+            ? "Przy rozmowie telefonicznej klient odezwie się, gdy odbierze. Przy pisaniu zacznie pierwszy. Na końcu rozłącz się albo kliknij „Zakończ i oceń”, a dostaniesz ocenę."
+            : "AI odezwie się pierwszy. Pisz jak do prawdziwego klienta. Na końcu kliknij „Zakończ i oceń”."}
         </p>
       </form>
     </>

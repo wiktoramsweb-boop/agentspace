@@ -93,7 +93,7 @@
 .nok-intl p { color: var(--d-muted-strong); font-weight: 300; }
 .nok-intl ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; font-size: 15.5px; }
 .nok-intl li { display: flex; gap: 12px; }
-.nok-intl li::before { content: "—"; color: var(--d-accent); }
+.nok-intl li::before { content: "·"; color: var(--d-accent); }
 @media (max-width: 860px) { .nok-intl { grid-template-columns: 1fr; } }
 
 /* kontakt */

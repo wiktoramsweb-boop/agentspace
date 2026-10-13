@@ -16,6 +16,9 @@ export async function startSession(formData: FormData): Promise<void> {
   const scenarioId = String(formData.get("scenarioId") ?? "");
   const personality = String(formData.get("personality") ?? "biznesowy");
   const difficulty = String(formData.get("difficulty") ?? "sredni");
+  // Tryb nie idzie do bazy, tylko do adresu sesji: to wybór na jedno wejście,
+  // a nie cecha sesji, i nie ma po co trzymać go w kolumnie.
+  const tryb = formData.get("tryb") === "glos" ? "glos" : "pisanie";
 
   const scenario = await getScenarioById(scenarioId);
   if (!scenario || !user.agency_id) redirect("/app/trening");
@@ -43,7 +46,7 @@ export async function startSession(formData: FormData): Promise<void> {
     .single();
 
   if (!session) redirect("/app/trening");
-  redirect(`/app/sesja/${session!.id}`);
+  redirect(`/app/sesja/${session!.id}${tryb === "glos" ? "?tryb=glos" : ""}`);
 }
 
 /**
