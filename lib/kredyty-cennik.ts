@@ -82,7 +82,8 @@ export type Operacja =
   | "szybki_wpis"
   | "klauzula"
   | "parsowanie_dokumentu"
-  | "coach_glos";
+  | "coach_glos"
+  | "czat_strony";
 
 export const CENNIK_KREDYTOW: Record<Operacja, number> = {
   coach_tura: 1,
@@ -93,6 +94,7 @@ export const CENNIK_KREDYTOW: Record<Operacja, number> = {
   klauzula: 1,
   parsowanie_dokumentu: 1,
   coach_glos: KREDYTY_ZA_MINUTE_GLOSU,
+  czat_strony: 1,
 };
 
 /** Nazwy po polsku na ekran zużycia. */
@@ -105,6 +107,7 @@ export const NAZWY_OPERACJI: Record<Operacja, string> = {
   klauzula: "Klauzula do rezerwacji",
   parsowanie_dokumentu: "Odczyt dokumentu",
   coach_glos: "AI Coach - rozmowa głosowa",
+  czat_strony: "Czat na stronie biura",
 };
 
 /**

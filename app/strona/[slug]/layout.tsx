@@ -15,6 +15,7 @@ import "../../wzory/motywy/strategia.css";
 import "../../wzory/motywy/beton.css";
 import "../../wzory/motywy/ogrod.css";
 import "../../wzory/motywy/horyzont.css";
+import { CzatStrony } from "./czat";
 
 /**
  * Rama strony internetowej biura. Ten sam układ co we wzorach, ale nazwa,
@@ -80,6 +81,7 @@ export default async function SiteLayout({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <WzMotion />
       <ViewPing agencyId={site.agencyId} />
+      <CzatStrony slug={site.slug} nazwaBiura={site.brand.officeName} />
       <WzNav
         base={base}
         office={site.brand.officeName}
