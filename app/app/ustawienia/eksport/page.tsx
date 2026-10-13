@@ -29,6 +29,29 @@ export default async function EksportPage() {
         </p>
       </div>
 
+      {/* Całość osobno i na wierzchu: to jest procedura wyjścia i ma być
+          jednym kliknięciem, a nie zbieraniem pięciu plików po kolei. */}
+      {/* Zwykły <a>, nie <Link>: to jest pobranie pliku, a nawigacja klienta
+          przerwałaby je i zostawiła pustą stronę zamiast archiwum. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a
+        href="/api/eksport/wszystko"
+        className="group flex items-start justify-between gap-4 rounded-2xl border border-emerald-300 bg-emerald-50 p-5 transition-colors hover:border-emerald-500"
+      >
+        <span className="min-w-0">
+          <span className="block font-semibold text-emerald-900">Pobierz wszystko (ZIP)</span>
+          <span className="mt-1 block text-sm leading-snug text-emerald-800">
+            Komplet danych biura w jednym archiwum: klienci, oferty, transakcje, leady
+            i działania. Przy większej bazie pobranie może potrwać kilkanaście sekund.
+          </span>
+        </span>
+        <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+          </svg>
+        </span>
+      </a>
+
       <div className="grid gap-3 sm:grid-cols-2">
         {ZBIORY.map((zbior) => (
           <a
