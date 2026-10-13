@@ -1,4 +1,5 @@
 import { createSupabaseAdmin } from "./supabase/admin";
+import { escapeHtml } from "./html";
 
 /**
  * Zapis błędu do dziennika (v41).
@@ -33,6 +34,54 @@ function opis(err: unknown): { wiadomosc: string; szczegoly: string | null } {
   }
 }
 
+/**
+ * Powiadomienie o nowym rodzaju awarii.
+ *
+ * Dziennik działał, ale nikt do niego nie zaglądał: cron faktur wywalał się
+ * dwa razy dziennie przez dwa tygodnie, zanim ktokolwiek to zobaczył. Mail
+ * idzie tylko przy PIERWSZYM wystąpieniu danego miejsca w ciągu doby, bo
+ * powiadomienie przy każdym powtórzeniu to spam, którego nikt nie czyta,
+ * czyli ten sam problem co teraz.
+ */
+async function powiadomOAwarii(gdzie: string, wiadomosc: string): Promise<void> {
+  const klucz = process.env.RESEND_API_KEY;
+  if (!klucz) return;
+
+  // Alert o błędzie nie może sam wywracać aplikacji ani wołać zapiszBlad,
+  // bo przy awarii poczty zrobiłby pętlę.
+  try {
+    const admin = createSupabaseAdmin();
+    const doba = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    const { data, error } = await admin
+      .from("app_errors")
+      .select("id")
+      .eq("gdzie", gdzie)
+      .gte("created_at", doba)
+      .limit(2);
+
+    // Jeden wpis to ten, który właśnie zapisaliśmy. Więcej znaczy, że
+    // o tym miejscu już dziś pisaliśmy.
+    if (error || (data?.length ?? 0) > 1) return;
+
+    const { Resend } = await import("resend");
+    await new Resend(klucz).emails.send({
+      from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+      to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
+      subject: `AgentSpace: awaria w ${gdzie}`,
+      html: `
+        <div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+          <h2 style="color:#dc2626;margin:0 0 16px;">Nowy błąd na produkcji</h2>
+          <p style="font-size:15px;color:#3f3f46;margin:0 0 8px;"><strong>${escapeHtml(gdzie)}</strong></p>
+          <p style="font-size:15px;color:#3f3f46;margin:0 0 16px;">${escapeHtml(wiadomosc)}</p>
+          <p style="font-size:13px;color:#71717a;">To pierwsze wystąpienie w ciągu doby. Kolejne powtórzenia nie wywołają maila. Pełny dziennik jest w panelu operatora.</p>
+        </div>
+      `,
+    });
+  } catch {
+    // Poczta nie działa. Trudno: błąd jest już w dzienniku i w konsoli.
+  }
+}
+
 export async function zapiszBlad(
   gdzie: string,
   err: unknown,
@@ -43,15 +92,17 @@ export async function zapiszBlad(
   // Log w konsoli zostaje: przy awarii bazy to jedyne, co się uchowa.
   console.error(`[${gdzie}] ${wiadomosc}`);
 
+  const miejsce = gdzie.slice(0, 120);
   try {
     await createSupabaseAdmin()
       .from("app_errors")
       .insert({
-        gdzie: gdzie.slice(0, 120),
+        gdzie: miejsce,
         wiadomosc,
         szczegoly: (opcje?.szczegoly ?? szczegoly)?.slice(0, LIMIT_SZCZEGOLOW) ?? null,
         agency_id: opcje?.agencyId ?? null,
       });
+    await powiadomOAwarii(miejsce, wiadomosc);
   } catch {
     // Brak tabeli (migracja nieuruchomiona) albo awaria bazy. Nic nie robimy:
     // komunikat jest już w konsoli, a zapis błędu nie może psuć aplikacji.
