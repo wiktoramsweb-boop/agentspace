@@ -17,6 +17,10 @@ export {
   KREDYTY_NA_AGENTA,
   NAZWY_OPERACJI,
   pulaMiesieczna,
+  kredytyZaRozmowe,
+  kredytyZGory,
+  KREDYTY_ZA_MINUTE_GLOSU,
+  MAX_MINUT_ROZMOWY,
   type Operacja,
 } from "./kredyty-cennik";
 
@@ -117,9 +121,11 @@ export async function stanKredytow(agencyId: string): Promise<StanKredytow | nul
 export async function brakKredytow(
   user: { id: string; agency_id: string | null },
   operacja: Operacja,
+  /** Koszt inny niż cennikowy. Rozmowa głosowa płaci za minuty, nie za sztukę. */
+  kredyty?: number,
 ): Promise<boolean> {
   if (!user.agency_id) return false;
-  const koszt = CENNIK_KREDYTOW[operacja];
+  const koszt = kredyty ?? CENNIK_KREDYTOW[operacja];
   const admin = createSupabaseAdmin();
 
   // Po wygaśnięciu okresu próbnego albo abonamentu nie liczymy AI.
@@ -179,6 +185,29 @@ export async function brakKredytow(
     await admin.from("rate_events").delete().lt("created_at", stare);
   }
   return false;
+}
+
+/**
+ * Zwrot niewykorzystanych kredytów.
+ *
+ * Rozmowę głosową pobieramy z góry za maksymalną długość, bo przeglądarka
+ * potrafi się zamknąć w połowie i wtedy nikt nam nie powie, ile trwała.
+ * Po normalnym rozłączeniu oddajemy różnicę ujemnym wpisem - dzięki temu
+ * awaria działa na niekorzyść nikogo poza nami, a nie klienta.
+ */
+export async function zwrocKredyty(
+  user: { id: string; agency_id: string | null },
+  operacja: Operacja,
+  ile: number,
+): Promise<void> {
+  if (!user.agency_id || ile <= 0) return;
+  const admin = createSupabaseAdmin();
+  await admin.from("rate_events").insert({
+    key: `ai:${operacja}`,
+    credits: -ile,
+    agency_id: user.agency_id,
+    user_id: user.id,
+  });
 }
 
 /** Gotowa odpowiedź 429 dla endpointów AI. */

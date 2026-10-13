@@ -14,6 +14,10 @@ import {
   type Operacja,
   poczatekMiesiaca,
   pulaMiesieczna,
+  kredytyZaRozmowe,
+  kredytyZGory,
+  KREDYTY_ZA_MINUTE_GLOSU,
+  MAX_MINUT_ROZMOWY,
 } from "./kredyty-cennik.ts";
 
 let bledy = 0;
@@ -75,6 +79,31 @@ const start = new Date(poczatekMiesiaca("Europe/Warsaw"));
 const dni = (Date.now() - start.getTime()) / 86_400_000;
 sprawdz("początek miesiąca nie jest w przyszłości", start.getTime() <= Date.now());
 sprawdz("początek miesiąca nie jest dalej niż 32 dni wstecz", dni <= 32, `${dni.toFixed(1)} dni`);
+
+/* ── Rozmowa głosowa ──
+   Najdroższa operacja w aplikacji: minuta kosztuje tyle, co 22 tury pisane.
+   Dlatego pilnujemy, żeby nie dało się jej rozliczyć poniżej realnego kosztu
+   ani żeby pobranie z góry nie było mniejsze niż najdłuższa możliwa rozmowa. */
+sprawdz("sekundy rozmowy zaokrąglamy w górę do minuty", kredytyZaRozmowe(61) === 2 * KREDYTY_ZA_MINUTE_GLOSU);
+sprawdz("równa minuta to jedna minuta", kredytyZaRozmowe(60) === KREDYTY_ZA_MINUTE_GLOSU);
+sprawdz("krótkie rozłączenie płaci za minutę", kredytyZaRozmowe(4) === KREDYTY_ZA_MINUTE_GLOSU);
+sprawdz("zero sekund też płaci za minutę", kredytyZaRozmowe(0) === KREDYTY_ZA_MINUTE_GLOSU);
+sprawdz(
+  "dłuższa rozmowa niż limit nie liczy się ponad limit",
+  kredytyZaRozmowe(60 * 60) === MAX_MINUT_ROZMOWY * KREDYTY_ZA_MINUTE_GLOSU,
+);
+sprawdz(
+  "pobranie z góry pokrywa najdłuższą rozmowę",
+  kredytyZGory() >= kredytyZaRozmowe(MAX_MINUT_ROZMOWY * 60),
+);
+sprawdz(
+  "zwrot nigdy nie jest ujemny",
+  kredytyZGory() - kredytyZaRozmowe(MAX_MINUT_ROZMOWY * 60) >= 0,
+);
+sprawdz(
+  "minuta głosu kosztuje więcej niż tura pisana",
+  CENNIK_KREDYTOW.coach_glos > CENNIK_KREDYTOW.coach_tura,
+);
 
 if (bledy) {
   console.error(`\nWycena kredytów: ${bledy} błędów.`);

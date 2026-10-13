@@ -4,6 +4,7 @@ import { getSessionWithScore, getScenarioById } from "@/lib/data";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { SessionChat } from "./chat";
 import { SessionResults } from "./results";
+import { glosWlaczony } from "@/lib/glos";
 
 // Scoring (endSession) potrafi trwać kilka-kilkanaście sekund - daj mu czas.
 export const maxDuration = 60;
@@ -56,6 +57,7 @@ export default async function SessionPage({ params }: Props) {
       scenarioTitle={session.scenario_title ?? scenario?.title ?? "Sesja"}
       brief={scenario?.brief ?? ""}
       personality={session.personality ?? "biznesowy"}
+      glos={glosWlaczony()}
     />
   );
 }

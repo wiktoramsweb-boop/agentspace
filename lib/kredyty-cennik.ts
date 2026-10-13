@@ -15,6 +15,38 @@
  */
 export const KOSZT_KREDYTU_ZL = 0.0167;
 
+/**
+ * Minuta rozmowy głosowej w kredytach.
+ *
+ * ElevenLabs liczy 0,08 USD za minutę rozmowy, do tego dochodzi model językowy,
+ * który prowadzi dialog. Przy kursie 4 zł i zapasie na model wychodzi około
+ * 0,37 zł za minutę, czyli 22 kredyty (kredyt = 0,0167 zł).
+ *
+ * To jest 22 razy drożej niż tura rozmowy tekstowej, więc głos musi mieć
+ * własny limit, a nie jechać po tej samej puli bez ograniczeń.
+ */
+export const KREDYTY_ZA_MINUTE_GLOSU = 22;
+
+/** Ile minut maksymalnie trwa jedna rozmowa głosowa. */
+export const MAX_MINUT_ROZMOWY = 5;
+
+/**
+ * Kredyty za rozmowę o danej długości.
+ *
+ * Zaokrąglamy w górę do pełnej minuty, bo tak samo liczy dostawca, i nigdy
+ * nie schodzimy poniżej jednej minuty: połączenie kosztuje nas nawet wtedy,
+ * gdy ktoś rozłączył się po dziesięciu sekundach.
+ */
+export function kredytyZaRozmowe(sekundy: number): number {
+  const minuty = Math.min(MAX_MINUT_ROZMOWY, Math.max(1, Math.ceil(sekundy / 60)));
+  return minuty * KREDYTY_ZA_MINUTE_GLOSU;
+}
+
+/** Ile pobieramy z góry przy starcie rozmowy. Resztę zwracamy po rozłączeniu. */
+export function kredytyZGory(): number {
+  return MAX_MINUT_ROZMOWY * KREDYTY_ZA_MINUTE_GLOSU;
+}
+
 export type Operacja =
   | "coach_tura"
   | "coach_ocena"
@@ -22,7 +54,8 @@ export type Operacja =
   | "asystent_pisze"
   | "szybki_wpis"
   | "klauzula"
-  | "parsowanie_dokumentu";
+  | "parsowanie_dokumentu"
+  | "coach_glos";
 
 export const CENNIK_KREDYTOW: Record<Operacja, number> = {
   coach_tura: 1,
@@ -32,6 +65,7 @@ export const CENNIK_KREDYTOW: Record<Operacja, number> = {
   szybki_wpis: 1,
   klauzula: 1,
   parsowanie_dokumentu: 1,
+  coach_glos: KREDYTY_ZA_MINUTE_GLOSU,
 };
 
 /** Nazwy po polsku na ekran zużycia. */
@@ -43,6 +77,7 @@ export const NAZWY_OPERACJI: Record<Operacja, string> = {
   szybki_wpis: "Szybki wpis",
   klauzula: "Klauzula do rezerwacji",
   parsowanie_dokumentu: "Odczyt dokumentu",
+  coach_glos: "AI Coach - rozmowa głosowa",
 };
 
 /**

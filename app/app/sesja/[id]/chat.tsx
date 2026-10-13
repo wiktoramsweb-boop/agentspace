@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { endSession } from "../../trening/actions";
 import type { ChatMessage } from "@/lib/types";
 import { useSpeechRecognition } from "@/lib/use-speech-recognition";
+import { RozmowaGlosowa } from "./rozmowa";
 
 export function SessionChat({
   sessionId,
@@ -12,12 +13,15 @@ export function SessionChat({
   scenarioTitle,
   brief,
   personality,
+  glos,
 }: {
   sessionId: string;
   initialTranscript: ChatMessage[];
   scenarioTitle: string;
   brief: string;
   personality: string;
+  /** Czy biuro ma włączoną rozmowę głosową (klucz dostawcy w środowisku). */
+  glos: boolean;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialTranscript);
   const [input, setInput] = useState("");
@@ -145,6 +149,7 @@ export function SessionChat({
 
       {/* Input */}
       <div className="mt-4 border-t border-slate-200 pt-4">
+        {glos && <RozmowaGlosowa sessionId={sessionId} />}
         {listening && (
           <p className="mb-2 flex items-center gap-2 text-sm text-emerald-600">
             <span className="relative flex h-2.5 w-2.5">
