@@ -1,51 +1,72 @@
 # Znak AgentSpace
 
-Jeden znak zamiast dwóch niespójnych: dotychczas ikona aplikacji była domkiem
-na gradiencie, a `public/logo.png` zupełnie innym rysunkiem.
-
 Znak to **dach i kropka pod nim**. Dach, bo nieruchomości. Kropka, bo tak
 AgentSpace podpisuje się od początku, w pasku bocznym i na obrazkach do
-mediów społecznościowych: „● AgentSpace". Zamiast rysować kolejny domek
-z zestawu ikon, znak rozwija to, co już było rozpoznawalne.
+mediów społecznościowych: „● AgentSpace".
+
+Napis składa krój **Sora SemiBold** (licencja SIL OFL, Google Fonts).
+
+## Napis jest krzywymi, nie tekstem
+
+W plikach SVG nazwa jest zamieniona na kontury. Bez tego logo wysłane
+drukarni albo wklejone do Figmy renderowałoby się domyślną czcionką systemu
+i przestawałoby być logo. Kosztem jest to, że nazwy nie da się poprawić
+w edytorze tekstu: zmiana wymaga wygenerowania plików od nowa.
 
 ## Kolory
 
 | | |
 |---|---|
-| Gradient znaku | `#10b981` → `#06b6d4` (zieleń do morskiego, 135°) |
+| Gradient kafelka | `#10b981` → `#06b6d4`, 135° |
+| Zieleń marki | `#10b981` |
 | Tekst na jasnym | `#0b1220` |
 | Tekst na ciemnym | `#ffffff` |
-| Tło ciemnych materiałów | `#07090c` |
+| Ciemne tło materiałów | `#07090c` |
 
-## Pliki
+## Co wybrać
 
-**Do ekranu i druku, skalowalne bez utraty jakości:**
+**Sam znak, bez nazwy.** Awatary, ikony, favikona, media społecznościowe,
+wszędzie poniżej 32 px.
 
-- `znak.svg` – pełnokolorowy kafelek. Awatar, ikona, media społecznościowe.
-- `znak-na-ciemnym.svg` – sam biały glif bez kafelka, na ciemne tła.
-- `znak-zielony.svg` – sam glif w zieleni marki, na białe tła.
-- `znak-mono.svg` – jednobarwny, dziedziczy kolor po rodzicu (`currentColor`).
-  Do pieczątek, faksymile na umowach i druku jednobarwnego.
-- `logo-poziome.svg` – znak plus nazwa, ciemny tekst.
-- `logo-poziome-jasne.svg` – znak plus nazwa, biały tekst.
+- `znak-gradient` – podstawowy, kafelek z gradientem. Domyślny wybór.
+- `znak-kafelek-ciemny` – kafelek w kolorze tła ciemnych materiałów.
+- `znak-kafelek-bialy` – kafelek biały, glif zielony. Na kolorowe tła.
+- `znak-zielony`, `znak-bialy`, `znak-czarny` – sam glif, bez kafelka,
+  przezroczyste tło.
+- `znak-mono.svg` – jednobarwny, dziedziczy kolor po rodzicu
+  (`currentColor`). Pieczątki, faksymile na umowach, druk jednobarwny.
 
-**Gotowe PNG, gdy ktoś prosi o „logo w pliku":**
+**Logo poziome.** Nagłówki stron, stopki maili, prezentacje, papier firmowy.
 
-- `znak-1024/512/256/192/128/64/32.png`
-- `logo-poziome-1200.png` – na białym
-- `logo-poziome-jasne-1200.png` – na ciemnym
-- `logo-poziome-przezroczyste-1200.png` – bez tła
+- `poziome-gradient-tekst-ciemny` – na jasnych tłach.
+- `poziome-gradient-tekst-bialy` – na ciemnych tłach.
+- `poziome-bialy`, `poziome-czarny`, `poziome-zielony` – całość jednym
+  kolorem, gdy gradient przeszkadza: na zdjęciu, w druku jednobarwnym,
+  na materiale partnera.
+- `poziome-na-bialym-tle`, `poziome-na-ciemnym-tle` – z wypełnionym tłem,
+  gdy przezroczystość sprawia kłopot.
 
-## Jak używać
+**Logo pionowe.** Kwadratowe miejsca: wizytówka, roll-up, naklejka, slajd
+tytułowy.
 
-- **Nie rozciągaj** znaku. Skaluj proporcjonalnie.
-- **Zostaw powietrze** wokół: co najmniej tyle, ile wynosi promień kropki.
-- Na zdjęciach i niejednolitych tłach używaj wersji z kafelkiem (`znak.svg`),
-  nie samego glifu.
-- Poniżej 32 px używaj samego znaku, bez nazwy. Napis przestaje być czytelny.
+- `pionowe-gradient-tekst-ciemny`, `pionowe-gradient-tekst-bialy`,
+  `pionowe-na-bialym-tle`, `pionowe-na-ciemnym-tle`.
 
-## Skąd się biorą pliki
+## Formaty
 
-Wszystkie powstają z jednej definicji geometrii, żeby wersja kolorowa
-i jednobarwna nie mogły się rozjechać. Przy zmianie znaku trzeba poprawić
-tylko stałą `GLIF` w skrypcie generującym i wygenerować komplet od nowa.
+Każdy wariant ma SVG. Znaki mają dodatkowo PNG w rozmiarach 1024, 512, 256,
+128 i 64 px. Logo poziome i pionowe mają PNG w rozmiarze podstawowym
+i `@2x` na ekrany o dużej gęstości.
+
+Gdy ktoś prosi o „logo w pliku", wyślij `poziome-na-bialym-tle@2x.png`.
+Gdy ktoś prosi o logo do druku, wyślij SVG.
+
+## Zasady
+
+- **Nie rozciągaj.** Skaluj proporcjonalnie.
+- **Zostaw powietrze** wokół logo: co najmniej tyle, ile wynosi średnica
+  kropki pod dachem.
+- Na zdjęciach i niejednolitych tłach używaj wersji z kafelkiem albo
+  jednobarwnej, nie samego glifu w gradiencie.
+- Poniżej 32 px używaj samego znaku. Napis przestaje być czytelny.
+- Nie zmieniaj kolorów gradientu ani proporcji między znakiem a napisem.
