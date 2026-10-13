@@ -3,6 +3,18 @@
 > Ten dokument to kompletny zapis projektu do przekazania nowej sesji Claude.
 > Czytaj razem z `CLAUDE.md` (architektura + zasady).
 
+
+## ⏳ DO ZROBIENIA TUŻ PRZED PIERWSZYM PŁATNYM KLIENTEM
+
+Wiktor świadomie odkłada te dwie opłaty, żeby nie płacić miesiąca za nic.
+**Przypomnieć, gdy pojawi się termin startu z pierwszym biurem:**
+
+- **Vercel Pro** (~78 zł/mc) - plan Hobby jest wg regulaminu do zastosowań
+  niekomercyjnych, a AgentSpace jest sprzedawany.
+- **Supabase Pro** (~98 zł/mc) - dla codziennych kopii zapasowych. Nie bierzemy
+  cudzej bazy klientów bez backupu.
+
+
 ## 🛡️ AUDYT I POPRAWKI (1 października 2026) - czytaj najpierw
 
 Pełny audyt: `ANALIZA-APLIKACJI-2026-10.md`. Naprawione w kodzie:
