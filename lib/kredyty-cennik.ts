@@ -31,6 +31,27 @@ export const KREDYTY_ZA_MINUTE_GLOSU = 22;
 export const MAX_MINUT_ROZMOWY = 5;
 
 /**
+ * Ile minut rezerwujemy w chwili startu rozmowy.
+ *
+ * Nie całą długość, tylko początek. Rezerwacja na pięć minut była większa niż
+ * dzienny limit osoby, więc rozmowa odbijała się od własnego zabezpieczenia
+ * i nie dało się jej w ogóle zacząć. Resztę dopisujemy po rozłączeniu, według
+ * faktycznego czasu.
+ */
+export const MINUT_REZERWACJI = 2;
+
+/**
+ * Dzienny bezpiecznik na osobę.
+ *
+ * 120 kredytów wystarczało, póki najdroższą operacją była tura pisana za jeden
+ * kredyt. Minuta głosu kosztuje 22, więc przy starym limicie mieściło się pięć
+ * minut rozmowy na dobę razem z całą resztą pracy. 400 to około osiemnastu
+ * minut głosu albo czterdziestu sesji pisanych i nadal chroni pulę biura przed
+ * jedną osobą, która wyczerpie ją w popołudnie.
+ */
+export const DZIENNY_LIMIT_OSOBY = 400;
+
+/**
  * Kredyty za rozmowę o danej długości.
  *
  * Zaokrąglamy w górę do pełnej minuty, bo tak samo liczy dostawca, i nigdy
@@ -42,9 +63,15 @@ export function kredytyZaRozmowe(sekundy: number): number {
   return minuty * KREDYTY_ZA_MINUTE_GLOSU;
 }
 
-/** Ile pobieramy z góry przy starcie rozmowy. Resztę zwracamy po rozłączeniu. */
+/**
+ * Ile pobieramy z góry przy starcie rozmowy.
+ *
+ * Po rozłączeniu różnicę rozliczamy w obie strony: krótsza rozmowa dostaje
+ * zwrot, dłuższa dopłatę. Gdy przeglądarka zniknie w połowie, zostaje przy nas
+ * tyle, ile zarezerwowaliśmy, i tyle wynosi nasza strata.
+ */
 export function kredytyZGory(): number {
-  return MAX_MINUT_ROZMOWY * KREDYTY_ZA_MINUTE_GLOSU;
+  return MINUT_REZERWACJI * KREDYTY_ZA_MINUTE_GLOSU;
 }
 
 export type Operacja =

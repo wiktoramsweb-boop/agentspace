@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
-import { zwrocKredyty } from "@/lib/kredyty";
+import { dopiszKredyty, zwrocKredyty } from "@/lib/kredyty";
 import { kredytyZaRozmowe, kredytyZGory } from "@/lib/kredyty-cennik";
 import type { ChatMessage } from "@/lib/types";
 
@@ -46,11 +46,12 @@ export async function zapiszRozmoweGlosowa(
       .eq("id", sessionId);
   }
 
-  // Nieudane połączenie to zwrot całości. Klient nie ma płacić za to, że
-  // dostawca nie odebrał, a zamknięta w połowie przeglądarka i tak zapłaci
-  // za maksimum, bo wtedy nikt tu nie zajrzy.
-  const zwrot = polaczono ? kredytyZGory() - kredytyZaRozmowe(sekundy) : kredytyZGory();
-  await zwrocKredyty(user, "coach_glos", zwrot);
+  // Rozliczenie w obie strony. Nieudane połączenie nic nie kosztuje, krótsza
+  // rozmowa dostaje zwrot, dłuższa dopłatę według faktycznych minut.
+  const pobrane = kredytyZGory();
+  const naleznosc = polaczono ? kredytyZaRozmowe(sekundy) : 0;
+  if (naleznosc > pobrane) await dopiszKredyty(user, "coach_glos", naleznosc - pobrane);
+  else await zwrocKredyty(user, "coach_glos", pobrane - naleznosc);
 
   revalidatePath(`/app/sesja/${sessionId}`);
   return { ok: true };

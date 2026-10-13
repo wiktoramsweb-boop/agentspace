@@ -7,6 +7,7 @@ import {
   NAZWY_OPERACJI,
   poczatekMiesiaca,
   pulaMiesieczna,
+  DZIENNY_LIMIT_OSOBY,
   type Operacja,
   type PulaAgencji,
 } from "./kredyty-cennik";
@@ -40,11 +41,11 @@ export function poczatekMiesiacaPL(): string {
 /**
  * Dzienny bezpiecznik na osobę. Niezależny od puli biura: chroni przed tym,
  * żeby jeden agent wyczerpał miesięczny limit całego zespołu w jedno popołudnie.
- * 120 kredytów to 12 sesji AI Coacha dziennie, czyli grubo ponad realne użycie.
+ * Wysokość i uzasadnienie przy `DZIENNY_LIMIT_OSOBY` w cenniku.
  */
 function dziennyLimitOsoby(): number {
   const v = Number(process.env.AI_DAILY_CREDITS_USER);
-  return Number.isFinite(v) && v > 0 ? v : 120;
+  return Number.isFinite(v) && v > 0 ? v : DZIENNY_LIMIT_OSOBY;
 }
 
 function poczatekDniaPL(): string {
@@ -195,6 +196,21 @@ export async function brakKredytow(
  * Po normalnym rozłączeniu oddajemy różnicę ujemnym wpisem - dzięki temu
  * awaria działa na niekorzyść nikogo poza nami, a nie klienta.
  */
+export async function dopiszKredyty(
+  user: { id: string; agency_id: string | null },
+  operacja: Operacja,
+  ile: number,
+): Promise<void> {
+  if (!user.agency_id || ile <= 0) return;
+  const admin = createSupabaseAdmin();
+  await admin.from("rate_events").insert({
+    key: `ai:${operacja}`,
+    credits: ile,
+    agency_id: user.agency_id,
+    user_id: user.id,
+  });
+}
+
 export async function zwrocKredyty(
   user: { id: string; agency_id: string | null },
   operacja: Operacja,

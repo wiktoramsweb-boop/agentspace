@@ -18,6 +18,7 @@ import {
   kredytyZGory,
   KREDYTY_ZA_MINUTE_GLOSU,
   MAX_MINUT_ROZMOWY,
+  DZIENNY_LIMIT_OSOBY,
 } from "./kredyty-cennik.ts";
 
 let bledy = 0;
@@ -92,13 +93,18 @@ sprawdz(
   "dłuższa rozmowa niż limit nie liczy się ponad limit",
   kredytyZaRozmowe(60 * 60) === MAX_MINUT_ROZMOWY * KREDYTY_ZA_MINUTE_GLOSU,
 );
+sprawdz("rezerwacja pokrywa co najmniej jedną minutę", kredytyZGory() >= kredytyZaRozmowe(1));
+/* To jest dokładnie ten błąd, który wyszedł na produkcji: rezerwacja większa
+   niż dzienny limit osoby sprawiała, że rozmowy nie dało się w ogóle zacząć.
+   Cała rozmowa też musi się mieścić w dobie, inaczej nikt jej nie dokończy. */
 sprawdz(
-  "pobranie z góry pokrywa najdłuższą rozmowę",
-  kredytyZGory() >= kredytyZaRozmowe(MAX_MINUT_ROZMOWY * 60),
+  "rezerwacja mieści się w dziennym limicie osoby",
+  kredytyZGory() < DZIENNY_LIMIT_OSOBY,
+  `${kredytyZGory()} z ${DZIENNY_LIMIT_OSOBY}`,
 );
 sprawdz(
-  "zwrot nigdy nie jest ujemny",
-  kredytyZGory() - kredytyZaRozmowe(MAX_MINUT_ROZMOWY * 60) >= 0,
+  "najdłuższa rozmowa mieści się w dziennym limicie osoby",
+  kredytyZaRozmowe(MAX_MINUT_ROZMOWY * 60) < DZIENNY_LIMIT_OSOBY,
 );
 sprawdz(
   "minuta głosu kosztuje więcej niż tura pisana",
