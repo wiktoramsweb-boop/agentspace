@@ -8,8 +8,11 @@ import { zapiszRozmoweGlosowa } from "./glos-actions";
 type Wypowiedz = { role: "agent" | "client"; content: string };
 type Faza = "stop" | "laczenie" | "rozmowa";
 
-/** Ile czekamy na zestawienie połączenia, zanim uznamy je za nieudane. */
-const LIMIT_LACZENIA_MS = 20_000;
+/** Ile czekamy na jedną próbę połączenia, zanim spróbujemy drugą drogą. */
+const LIMIT_PROBY_MS = 10_000;
+
+type Sposob = "webrtc" | "websocket";
+type Dostep = { token: string | null; adres: string | null; prompt: string; pierwsze: string };
 
 /**
  * Rozmowa głosowa z klientem AI.
@@ -42,6 +45,8 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
   const start = useRef<number>(0);
   const rozliczone = useRef(true);
   const fazaRef = useRef<Faza>("stop");
+  const dostep = useRef<Dostep | null>(null);
+  const sposob = useRef<Sposob>("webrtc");
 
   function ustawFaze(f: Faza) {
     fazaRef.current = f;
@@ -82,11 +87,20 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
     },
     onDisconnect: (szczegoly) => {
       const bylaRozmowa = fazaRef.current === "rozmowa";
+      const powod = szczegoly?.reason === "error" ? szczegoly.message : null;
+
+      // Zerwanie przed połączeniem: zanim się poddamy, druga droga.
+      if (!bylaRozmowa && sposob.current === "webrtc" && dostep.current?.adres) {
+        setBlad(powod ? `Szybkie połączenie odmówiło (${powod}), próbuję drugą drogą...` : "Próbuję drugą drogą...");
+        polacz("websocket");
+        return;
+      }
+
       ustawFaze("stop");
       if (!bylaRozmowa) {
         setBlad(
-          szczegoly?.reason === "error" && szczegoly.message
-            ? `Nie udało się połączyć: ${szczegoly.message}`
+          powod
+            ? `Nie udało się połączyć: ${powod}`
             : "Nie udało się połączyć. Spróbuj jeszcze raz.",
         );
       }
@@ -97,8 +111,8 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
     },
   });
 
-  // Nie czekamy w nieskończoność. Bez tego nieudane łączenie wisiało na ekranie,
-  // a pobrane z góry kredyty nie wracały do puli.
+  // Nie czekamy w nieskończoność. Po pierwszej nieudanej próbie przechodzimy
+  // na drugą drogę, a dopiero potem oddajemy kredyty i mówimy, co nie wyszło.
   useEffect(() => {
     if (faza !== "laczenie") return;
     const t = setTimeout(() => {
@@ -108,12 +122,23 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
       } catch {
         /* nie było czego zamykać */
       }
+
+      if (sposob.current === "webrtc" && dostep.current?.adres) {
+        setBlad("Szybkie połączenie nie wstało, próbuję drugą drogą...");
+        polacz("websocket");
+        return;
+      }
+
       ustawFaze("stop");
-      setBlad("Nie udało się połączyć w 20 sekund. Kredyty wróciły, spróbuj jeszcze raz.");
+      setBlad(
+        `Nie udało się połączyć (${sposob.current}). Kredyty wróciły. ` +
+          "Jeśli to się powtarza, sprawdź status ElevenLabs.",
+      );
       void rozlicz(false);
-    }, LIMIT_LACZENIA_MS);
+    }, LIMIT_PROBY_MS);
     return () => clearTimeout(t);
-  }, [faza, rozmowa, rozlicz]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [faza, blad, rozmowa, rozlicz]);
 
   // Licznik i twarde zamknięcie po limicie. Rozmowa jest najdroższą operacją
   // w aplikacji, więc nie może zostać otwarta przez przypadek.
@@ -132,6 +157,33 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
     }, 1000);
     return () => clearInterval(t);
   }, [faza, limit, rozmowa]);
+
+  /**
+   * Jedna próba połączenia.
+   *
+   * WebRTC jest szybsze, ale chodzi po UDP i w części sieci nie wstaje.
+   * Gdy nie zdąży, przechodzimy na WebSocket, który idzie zwykłym portem 443.
+   */
+  function polacz(jak: Sposob) {
+    const d = dostep.current;
+    if (!d) return;
+    sposob.current = jak;
+    const wspolne = {
+      overrides: {
+        agent: {
+          prompt: { prompt: d.prompt },
+          firstMessage: d.pierwsze,
+          language: "pl",
+        },
+      },
+    } as const;
+
+    if (jak === "webrtc" && d.token) {
+      rozmowa.startSession({ conversationToken: d.token, connectionType: "webrtc", ...wspolne });
+    } else if (d.adres) {
+      rozmowa.startSession({ signedUrl: d.adres, connectionType: "websocket", ...wspolne });
+    }
+  }
 
   async function zadzwon() {
     setBlad(null);
@@ -158,17 +210,13 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
       // Od tej chwili kredyty są pobrane i ktoś musi je rozliczyć.
       rozliczone.current = false;
 
-      rozmowa.startSession({
-        conversationToken: dane.token,
-        connectionType: "webrtc",
-        overrides: {
-          agent: {
-            prompt: { prompt: dane.prompt },
-            firstMessage: dane.pierwsze,
-            language: "pl",
-          },
-        },
-      });
+      dostep.current = {
+        token: dane.token ?? null,
+        adres: dane.adres ?? null,
+        prompt: dane.prompt,
+        pierwsze: dane.pierwsze,
+      };
+      polacz(dane.token ? "webrtc" : "websocket");
     } catch (e) {
       ustawFaze("stop");
       setBlad(

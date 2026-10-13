@@ -33,28 +33,59 @@ export function glosWlaczony(): boolean {
 }
 
 /**
- * Jednorazowy token do połączenia.
+ * Dwie drogi do tej samej rozmowy.
  *
- * Połączenie idzie przez WebRTC, bo ma niższe opóźnienie i lepiej znosi słabą
- * sieć niż WebSocket. Przy WebRTC dostawca wymaga tokenu rozmowy, a nie
- * podpisanego adresu - ten drugi działa wyłącznie z WebSocketem.
- *
- * Token jest ważny krótko i tylko na jedną rozmowę, więc nawet podejrzany
- * w narzędziach przeglądarki nie daje dostępu do konta.
+ * WebRTC ma niższe opóźnienie, ale chodzi po UDP i potrafi nie wstać w sieci
+ * firmowej albo gdy dostawcy miga infrastruktura. WebSocket idzie zwykłym
+ * portem 443 i przechodzi wszędzie, tylko wolniej. Bierzemy oba naraz, bo
+ * zapytanie o drugi kosztuje ułamek sekundy, a oszczędza całą rozmowę.
  */
-export async function tokenRozmowy(plec: "k" | "m"): Promise<string | null> {
+export type DostepDoRozmowy = {
+  /** Token do połączenia WebRTC. */
+  token: string | null;
+  /** Podpisany adres do połączenia WebSocket. */
+  adres: string | null;
+  /** Komunikat dostawcy, gdy nie udało się nic zdobyć. */
+  blad: string | null;
+};
+
+async function pobierz(sciezka: string, pole: "token" | "signed_url"): Promise<{ wartosc: string | null; blad: string | null }> {
   const klucz = kluczGlosu();
+  if (!klucz) return { wartosc: null, blad: "Brak klucza dostawcy." };
+
+  try {
+    const r = await fetch(`${API}${sciezka}`, {
+      headers: { "xi-api-key": klucz },
+      cache: "no-store",
+    });
+    const tresc = await r.text();
+    if (!r.ok) {
+      // Komunikat dostawcy idzie dalej w całości. Bez niego każdy problem
+      // wyglądał tak samo i nie dało się odróżnić awarii od złej konfiguracji.
+      return { wartosc: null, blad: `${r.status}: ${tresc.slice(0, 300)}` };
+    }
+    const dane = JSON.parse(tresc) as Record<string, string | undefined>;
+    return { wartosc: dane[pole] ?? null, blad: dane[pole] ? null : "Dostawca nie zwrócił tokenu." };
+  } catch (e) {
+    return { wartosc: null, blad: e instanceof Error ? e.message : "Brak odpowiedzi." };
+  }
+}
+
+export async function dostepDoRozmowy(plec: "k" | "m"): Promise<DostepDoRozmowy> {
   const agent = agentGlosu(plec);
-  if (!klucz || !agent) return null;
+  if (!agent) return { token: null, adres: null, blad: "Brak identyfikatora agenta." };
+  const id = encodeURIComponent(agent);
 
-  const r = await fetch(`${API}/convai/conversation/token?agent_id=${encodeURIComponent(agent)}`, {
-    headers: { "xi-api-key": klucz },
-    cache: "no-store",
-  });
-  if (!r.ok) return null;
+  const [webrtc, websocket] = await Promise.all([
+    pobierz(`/convai/conversation/token?agent_id=${id}`, "token"),
+    pobierz(`/convai/conversation/get-signed-url?agent_id=${id}`, "signed_url"),
+  ]);
 
-  const dane = (await r.json()) as { token?: string };
-  return dane.token ?? null;
+  return {
+    token: webrtc.wartosc,
+    adres: websocket.wartosc,
+    blad: webrtc.wartosc || websocket.wartosc ? null : (webrtc.blad ?? websocket.blad),
+  };
 }
 
 /**
