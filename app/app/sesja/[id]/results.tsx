@@ -149,7 +149,7 @@ export function SessionResults({
               <div
                 className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                   m.role === "agent"
-                    ? "rounded-tr-sm bg-emerald-50 text-emerald-50"
+                    ? "rounded-tr-sm bg-emerald-100 text-emerald-900"
                     : "rounded-tl-sm bg-slate-100 text-slate-800"
                 }`}
               >
