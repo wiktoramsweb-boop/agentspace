@@ -15,6 +15,7 @@ export function SessionChat({
   personality,
   glos,
   trybGlosu,
+  plec,
 }: {
   sessionId: string;
   initialTranscript: ChatMessage[];
@@ -25,6 +26,8 @@ export function SessionChat({
   glos: boolean;
   /** Agent wybrał trening przez telefon. Pisanie zostaje pod przyciskiem. */
   trybGlosu: boolean;
+  /** Wymuszony głos klienta. Bez tego dobieramy go po opisie scenariusza. */
+  plec: "k" | "m" | null;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialTranscript);
   const [input, setInput] = useState("");
@@ -157,7 +160,7 @@ export function SessionChat({
       <div className="mt-4 border-t border-slate-200 pt-4">
         {glos && (
           <div className={trybGlosu ? "mb-2" : undefined}>
-            <RozmowaGlosowa sessionId={sessionId} brief={brief} osobowosc={personality} />
+            <RozmowaGlosowa sessionId={sessionId} brief={brief} osobowosc={personality} plec={plec} />
             {trybGlosu && !pokazPisanie && (
               <button
                 type="button"

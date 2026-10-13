@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { dopiszKredyty, zwrocKredyty } from "@/lib/kredyty";
 import { kredytyZaRozmowe, kredytyZGory } from "@/lib/kredyty-cennik";
+import { bezZnacznikowMowy } from "@/lib/glos";
 import type { ChatMessage } from "@/lib/types";
 
 /**
@@ -34,9 +35,11 @@ export async function zapiszRozmoweGlosowa(
   // Treść przycinamy, bo to jest tekst z rozpoznawania mowy, a nie pole,
   // które ktoś wypełnia świadomie.
   const czyste: ChatMessage[] = wypowiedzi
-    .filter((w) => w.content.trim().length > 0)
     .slice(0, 200)
-    .map((w) => ({ role: w.role, content: w.content.trim().slice(0, 2000) }));
+    .map((w) => ({ role: w.role, content: bezZnacznikowMowy(w.content).slice(0, 2000) }))
+    // Filtr po oczyszczeniu: wypowiedź złożona z samego znacznika emocji
+    // zostaje pusta i nie ma czego zapisywać.
+    .filter((w) => w.content.length > 0);
 
   if (czyste.length > 0 && sesja.status === "in_progress") {
     const stary = (sesja.transcript ?? []) as ChatMessage[];

@@ -10,6 +10,32 @@ import { glosWlaczony } from "@/lib/glos";
 
 type Props = { params: Promise<{ slug: string }> };
 
+/** Karta wyboru głosu. Węższa niż karta trybu, bo opis jest jednozdaniowy. */
+function GlosKarty({
+  wartosc,
+  tytul,
+  opis,
+  domyslny,
+}: {
+  wartosc: string;
+  tytul: string;
+  opis: string;
+  domyslny?: boolean;
+}) {
+  return (
+    <label className="group relative cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:border-slate-300 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10 has-[:checked]:ring-2 has-[:checked]:ring-emerald-500/40">
+      <input type="radio" name="plec" value={wartosc} defaultChecked={domyslny} className="peer sr-only" />
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-semibold text-slate-900">{tytul}</span>
+        <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 transition-colors group-has-[:checked]:border-emerald-500 group-has-[:checked]:bg-emerald-500">
+          <span className="h-2 w-2 rounded-full bg-transparent transition-colors group-has-[:checked]:bg-white" />
+        </span>
+      </div>
+      <p className="mt-1 text-sm text-slate-500">{opis}</p>
+    </label>
+  );
+}
+
 /** Karta wyboru trybu. Ta sama stylizacja, co przy osobowości i trudności. */
 function TrybKarty({
   wartosc,
@@ -104,6 +130,19 @@ export default async function ScenarioSetupPage({ params }: Props) {
                 opis="Piszesz na klawiaturze albo dyktujesz mikrofonem, a klient odpisuje."
                 stopka="Bez słuchawek · 1 kredyt za wypowiedź"
               />
+            </div>
+
+            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
+              Głos klienta
+            </p>
+            <p className="mb-4 text-sm text-slate-500">
+              Domyślnie dobieramy go po scenariuszu, bo w opisie stoi Pan Krzysztof albo
+              Pani Anna. Możesz to nadpisać, jeśli chcesz poćwiczyć rozmowę z inną osobą.
+            </p>
+            <div className="mb-8 grid gap-3 sm:grid-cols-3">
+              <GlosKarty wartosc="auto" domyslny tytul="Jak w scenariuszu" opis="Zgodnie z opisem zadania" />
+              <GlosKarty wartosc="k" tytul="Kobiecy" opis="Zawsze kobiecy głos" />
+              <GlosKarty wartosc="m" tytul="Męski" opis="Zawsze męski głos" />
             </div>
           </>
         )}

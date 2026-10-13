@@ -9,12 +9,12 @@ import { glosWlaczony } from "@/lib/glos";
 // Scoring (endSession) potrafi trwać kilka-kilkanaście sekund - daj mu czas.
 export const maxDuration = 60;
 
-type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ tryb?: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ tryb?: string; plec?: string }> };
 
 export default async function SessionPage({ params, searchParams }: Props) {
   const user = await requireUser();
   const { id } = await params;
-  const { tryb } = await searchParams;
+  const { tryb, plec } = await searchParams;
 
   const session = await getSessionWithScore(id);
   if (!session) notFound();
@@ -60,6 +60,7 @@ export default async function SessionPage({ params, searchParams }: Props) {
       personality={session.personality ?? "biznesowy"}
       glos={glosWlaczony()}
       trybGlosu={tryb === "glos" && glosWlaczony()}
+      plec={plec === "k" || plec === "m" ? plec : null}
     />
   );
 }

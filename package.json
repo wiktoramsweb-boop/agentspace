@@ -18,7 +18,8 @@
     "test:faktury": "node --experimental-strip-types lib/sprawdz-faktury.mjs",
     "tokeny": "node lib/ustaw-tokeny.mjs",
     "test:portal": "node --experimental-strip-types lib/sprawdz-portal.mjs",
-    "test:karta": "node --experimental-strip-types lib/sprawdz-karta.mjs"
+    "test:karta": "node --experimental-strip-types lib/sprawdz-karta.mjs",
+    "test:glos": "node --experimental-strip-types lib/sprawdz-glos.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",

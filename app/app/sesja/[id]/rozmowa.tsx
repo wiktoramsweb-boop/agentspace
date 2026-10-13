@@ -30,15 +30,18 @@ export function RozmowaGlosowa({
   sessionId,
   brief,
   osobowosc,
+  plec,
 }: {
   sessionId: string;
   /** Opis zadania ze scenariusza. Wyciągamy z niego kartę kontaktu. */
   brief: string;
   osobowosc: string;
+  /** Wymuszony głos klienta albo null, gdy ma go dobrać scenariusz. */
+  plec: "k" | "m" | null;
 }) {
   return (
     <ConversationProvider>
-      <PanelRozmowy sessionId={sessionId} brief={brief} osobowosc={osobowosc} />
+      <PanelRozmowy sessionId={sessionId} brief={brief} osobowosc={osobowosc} plec={plec} />
     </ConversationProvider>
   );
 }
@@ -47,10 +50,12 @@ function PanelRozmowy({
   sessionId,
   brief,
   osobowosc,
+  plec,
 }: {
   sessionId: string;
   brief: string;
   osobowosc: string;
+  plec: "k" | "m" | null;
 }) {
   const karta = useMemo(() => kartaRozmowy(brief), [brief]);
   const router = useRouter();
@@ -276,7 +281,7 @@ function PanelRozmowy({
       const r = await fetch("/api/coach/glos", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId, plec }),
       });
       const dane = await r.json();
       if (!r.ok) {

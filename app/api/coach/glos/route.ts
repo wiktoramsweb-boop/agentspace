@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   }
 
   const user = await requireUser();
-  const { sessionId } = (await req.json()) as { sessionId?: string };
+  const { sessionId, plec: wymuszona } = (await req.json()) as { sessionId?: string; plec?: string };
   if (!sessionId) return Response.json({ error: "Brak sesji." }, { status: 400 });
 
   const admin = createSupabaseAdmin();
@@ -55,7 +55,9 @@ export async function POST(req: Request) {
   // Głos ustawia się na agencie u dostawcy, nie na pojedynczej rozmowie, więc
   // kobiece scenariusze kierujemy na drugiego agenta. Płeć bierzemy z opisu
   // scenariusza, bo to ona stoi na ekranie telefonu i musi się zgadzać.
-  const plec = plecRozmowcy(scenariusz.brief ?? "");
+  // Wybór agenta ma pierwszeństwo nad tym, co wynika z opisu scenariusza.
+  const plec =
+    wymuszona === "k" || wymuszona === "m" ? wymuszona : plecRozmowcy(scenariusz.brief ?? "");
   let dostep = await dostepDoRozmowy(plec);
 
   // Drugi agent bywa nieskonfigurowany albo nieopublikowany. Lepiej, żeby

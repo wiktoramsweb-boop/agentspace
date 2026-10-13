@@ -19,6 +19,8 @@ export async function startSession(formData: FormData): Promise<void> {
   // Tryb nie idzie do bazy, tylko do adresu sesji: to wybór na jedno wejście,
   // a nie cecha sesji, i nie ma po co trzymać go w kolumnie.
   const tryb = formData.get("tryb") === "glos" ? "glos" : "pisanie";
+  const plecWybrana = String(formData.get("plec") ?? "auto");
+  const plec = plecWybrana === "k" || plecWybrana === "m" ? plecWybrana : "";
 
   const scenario = await getScenarioById(scenarioId);
   if (!scenario || !user.agency_id) redirect("/app/trening");
@@ -46,7 +48,8 @@ export async function startSession(formData: FormData): Promise<void> {
     .single();
 
   if (!session) redirect("/app/trening");
-  redirect(`/app/sesja/${session!.id}${tryb === "glos" ? "?tryb=glos" : ""}`);
+  const parametry = [tryb === "glos" ? "tryb=glos" : "", plec ? `plec=${plec}` : ""].filter(Boolean);
+  redirect(`/app/sesja/${session!.id}${parametry.length ? `?${parametry.join("&")}` : ""}`);
 }
 
 /**
