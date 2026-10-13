@@ -9,6 +9,8 @@ import { PwaInstall } from "./components/pwa-install";
 import { odswiezDemoJesliTrzeba } from "@/lib/demo/zasiew";
 import { stanDostepu } from "@/lib/abonament-cennik";
 import { PasekAbonamentu } from "./pasek-abonamentu";
+import { BanerPowierzenia } from "./components/baner-powierzenia";
+import { stanPowierzenia } from "@/lib/powierzenie";
 import { getPrzewodnik } from "@/lib/data-przewodnik";
 
 export const metadata: Metadata = {
@@ -30,6 +32,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Zostają otwarte ustawienia i ekran płatności. Konto demo służy do pokazów,
   // więc zostaje otwarte w całości.
   const dostep = stanDostepu(user.agency ?? null);
+  const powierzenie = stanPowierzenia(user.agency ?? null);
   const zablokowane = !dostep.aktywne && !user.agency?.is_demo;
 
   // Konto demo odświeża się samo. Pokaz może się odbyć za tydzień albo za dwa
@@ -69,6 +72,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         />
         <main className="flex-1 px-5 py-8 md:px-10 md:py-10">
           <div className="mx-auto max-w-6xl">
+            {user.role === "owner" && !powierzenie.zaakceptowana && (
+              <BanerPowierzenia nieaktualna={powierzenie.nieaktualna} />
+            )}
             {dostep.ostrzegaj && (
               <PasekAbonamentu
                 probny={dostep.probny}

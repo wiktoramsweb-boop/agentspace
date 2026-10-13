@@ -7,6 +7,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { hitLimit, visitorKey } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/html";
 import { zapiszBlad } from "@/lib/blad";
+import { WERSJA_POWIERZENIA } from "@/lib/powierzenie";
 
 export type AuthResult = { error: string } | undefined;
 
@@ -135,6 +136,19 @@ export async function signUpOwner(
     await admin.auth.admin.deleteUser(userId); // rollback
     return { error: "Nie udało się utworzyć biura. Spróbuj ponownie." };
   }
+
+  // Akceptacja umowy powierzenia. Osobnym zapytaniem, bo bez migracji v48
+  // kolumny nie istnieją, a rejestracja nie może się przez to wywalić.
+  // Zakładając konto, właściciel akceptuje regulamin i powierzenie naraz,
+  // i to jest moment, w którym mamy to zapisać.
+  await admin
+    .from("agencies")
+    .update({
+      dpa_accepted_at: new Date().toISOString(),
+      dpa_version: WERSJA_POWIERZENIA,
+      dpa_accepted_by: userId,
+    })
+    .eq("id", agency.id);
 
   // 3. Profil owner
   const { error: profileErr } = await admin.from("profiles").insert({

@@ -16,6 +16,9 @@ export type Agency = {
   /** Biuro do pokazów: aplikacja odświeża mu dane, żeby kalendarz nie był pusty. */
   is_demo?: boolean | null;
   demo_refreshed_at?: string | null;
+  /** Akceptacja umowy powierzenia przetwarzania danych (v48). */
+  dpa_accepted_at?: string | null;
+  dpa_version?: string | null;
 };
 
 export type Profile = {
