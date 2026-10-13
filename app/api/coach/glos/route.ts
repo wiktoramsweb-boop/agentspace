@@ -4,6 +4,7 @@ import { buildClientSystemPrompt } from "@/lib/ai/coach";
 import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { kredytyZGory, MAX_MINUT_ROZMOWY } from "@/lib/kredyty-cennik";
 import { glosWlaczony, dostepDoRozmowy, pierwszeZdanie } from "@/lib/glos";
+import { plecRozmowcy } from "@/lib/karta-rozmowy";
 
 /**
  * Start rozmowy głosowej z klientem AI.
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
   const admin = createSupabaseAdmin();
   const { data: sesja } = await admin
     .from("training_sessions")
-    .select("id, agent_id, personality, difficulty, status, scenario:scenarios(system_prompt, category)")
+    .select("id, agent_id, personality, difficulty, status, scenario:scenarios(system_prompt, category, brief)")
     .eq("id", sessionId)
     .maybeSingle();
 
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
     return brakKredytowResponse();
   }
 
-  const scenariusz = sesja.scenario as unknown as { system_prompt: string; category: string } | null;
+  const scenariusz = sesja.scenario as unknown as { system_prompt: string; category: string; brief: string } | null;
   if (!scenariusz) return Response.json({ error: "Nie ma takiego scenariusza." }, { status: 404 });
 
   // Ta sama instrukcja, którą dostaje klient AI w trybie tekstowym. Dzięki temu
@@ -51,10 +52,18 @@ export async function POST(req: Request) {
     (sesja.difficulty as string) ?? "sredni",
   );
 
-  // Głos ustawia się na agencie u dostawcy, nie na rozmowie, więc osobowości
-  // kobiece kierujemy na drugiego agenta. Bez niego obie idą na ten sam.
-  const plec = ["emocjonalny", "wahający"].includes(String(sesja.personality)) ? "k" : "m";
-  const dostep = await dostepDoRozmowy(plec);
+  // Głos ustawia się na agencie u dostawcy, nie na pojedynczej rozmowie, więc
+  // kobiece scenariusze kierujemy na drugiego agenta. Płeć bierzemy z opisu
+  // scenariusza, bo to ona stoi na ekranie telefonu i musi się zgadzać.
+  const plec = plecRozmowcy(scenariusz.brief ?? "");
+  let dostep = await dostepDoRozmowy(plec);
+
+  // Drugi agent bywa nieskonfigurowany albo nieopublikowany. Lepiej, żeby
+  // rozmowa odbyła się nie tym głosem, niż żeby nie odbyła się wcale.
+  if (!dostep.token && !dostep.adres && plec === "k") {
+    dostep = await dostepDoRozmowy("m");
+  }
+
   if (!dostep.token && !dostep.adres) {
     return Response.json(
       { error: `Dostawca głosu odmówił. ${dostep.blad ?? ""}`.trim() },

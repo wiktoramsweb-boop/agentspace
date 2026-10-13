@@ -77,6 +77,21 @@ function trzebaOdmienic(tytulSlowo: string, imie: string): boolean {
   return true;
 }
 
+/**
+ * Płeć rozmówcy, do wyboru głosu.
+ *
+ * Bierzemy ją ze scenariusza, a nie z osobowości klienta. Na ekranie telefonu
+ * stoi „Pani Anna" i głos musi się z tym zgadzać, bo inaczej pierwsza rozmowa
+ * na pokazie handlowym kompromituje całą funkcję.
+ */
+export function plecRozmowcy(brief: string): "k" | "m" {
+  const { kto } = kartaRozmowy(brief);
+  if (kto.startsWith("Pani")) return "k";
+  if (kto.startsWith("Pan")) return "m";
+  // Role bez imienia (Właściciel, Najemca, Kupujący) idą na głos męski.
+  return "m";
+}
+
 export function kartaRozmowy(brief: string, zapasowyTytul = "Klient"): KartaRozmowy {
   const tekst = brief ?? "";
 

@@ -23,7 +23,11 @@ export function kluczGlosu(): string | null {
  */
 export function agentGlosu(plec: "k" | "m"): string | null {
   const m = process.env.ELEVENLABS_AGENT_ID?.trim() || null;
-  const k = process.env.ELEVENLABS_AGENT_ID_K?.trim() || m;
+  // Dwie nazwy, bo tak stoi na produkcji, a druga była w instrukcji wdrożenia.
+  const k =
+    process.env.ELEVENLABS_AGENT_ID2?.trim() ||
+    process.env.ELEVENLABS_AGENT_ID_K?.trim() ||
+    m;
   return plec === "k" ? k : m;
 }
 
