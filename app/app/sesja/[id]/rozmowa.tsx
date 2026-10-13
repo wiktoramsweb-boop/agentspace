@@ -4,40 +4,58 @@ import { ConversationProvider, useConversation } from "@elevenlabs/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zapiszRozmoweGlosowa } from "./glos-actions";
+import { endSession } from "../../trening/actions";
+import { Dzwonek } from "@/lib/dzwonek";
 
 type Wypowiedz = { role: "agent" | "client"; content: string };
-type Faza = "stop" | "laczenie" | "rozmowa";
+type Faza = "stop" | "laczenie" | "rozmowa" | "konczenie";
+type Sposob = "webrtc" | "websocket";
+type Dostep = { token: string | null; adres: string | null; prompt: string; pierwsze: string };
 
 /** Ile czekamy na jedną próbę połączenia, zanim spróbujemy drugą drogą. */
 const LIMIT_PROBY_MS = 10_000;
 
-type Sposob = "webrtc" | "websocket";
-type Dostep = { token: string | null; adres: string | null; prompt: string; pierwsze: string };
-
 /**
  * Rozmowa głosowa z klientem AI.
  *
- * Agent naciska zieloną słuchawkę i po prostu mówi, tak jak przy prawdziwym
- * telefonie: klient AI odpowiada głosem, da się mu wejść w słowo i da się go
- * przerwać. To jest ta część treningu, której nie zastąpi pisanie.
+ * Wygląda i brzmi jak telefon, bo tym ma być: agent naciska słuchawkę, słyszy
+ * sygnał zgłoszenia, rozmawia na pełnym ekranie i odkłada słuchawkę. Trening
+ * zimnych telefonów ma być nie do odróżnienia od zimnego telefonu.
  *
  * `useConversation` czyta stan z kontekstu i bez `ConversationProvider`
  * wywala render całej strony.
  */
-export function RozmowaGlosowa({ sessionId }: { sessionId: string }) {
+export function RozmowaGlosowa({
+  sessionId,
+  tytul,
+  osobowosc,
+}: {
+  sessionId: string;
+  tytul: string;
+  osobowosc: string;
+}) {
   return (
     <ConversationProvider>
-      <PanelRozmowy sessionId={sessionId} />
+      <PanelRozmowy sessionId={sessionId} tytul={tytul} osobowosc={osobowosc} />
     </ConversationProvider>
   );
 }
 
-function PanelRozmowy({ sessionId }: { sessionId: string }) {
+function PanelRozmowy({
+  sessionId,
+  tytul,
+  osobowosc,
+}: {
+  sessionId: string;
+  tytul: string;
+  osobowosc: string;
+}) {
   const router = useRouter();
   const [blad, setBlad] = useState<string | null>(null);
   const [faza, setFaza] = useState<Faza>("stop");
   const [sekundy, setSekundy] = useState(0);
   const [limit, setLimit] = useState(5);
+  const [wyciszony, setWyciszony] = useState(false);
 
   // Refy, a nie stan: wypowiedzi lecą w trakcie rozmowy i nie chcemy
   // przerysowywać ekranu przy każdym zdaniu.
@@ -47,35 +65,42 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
   const fazaRef = useRef<Faza>("stop");
   const dostep = useRef<Dostep | null>(null);
   const sposob = useRef<Sposob>("webrtc");
+  const dzwonek = useRef<Dzwonek | null>(null);
 
   function ustawFaze(f: Faza) {
     fazaRef.current = f;
     setFaza(f);
   }
 
+  function ciszej() {
+    dzwonek.current?.stop();
+    dzwonek.current = null;
+  }
+
   /**
    * Rozliczenie rozmowy.
    *
-   * Kredyty pobieramy z góry za maksymalną długość, więc KAŻDE wyjście z tego
-   * ekranu musi tu trafić - inaczej nieudane połączenie zabiera pięć minut
-   * z puli biura i nikt ich nie oddaje. Dokładnie to zdarzyło się przy
-   * pierwszym uruchomieniu na produkcji.
+   * Kredyty pobieramy z góry, więc KAŻDE wyjście z tego ekranu musi tu trafić.
+   * Inaczej nieudane połączenie zabiera minuty z puli biura i nikt ich nie
+   * oddaje - dokładnie to zdarzyło się przy pierwszym uruchomieniu.
    */
   const rozlicz = useCallback(
-    async (polaczono: boolean) => {
-      if (rozliczone.current) return;
+    async (polaczono: boolean): Promise<number> => {
+      if (rozliczone.current) return 0;
       rozliczone.current = true;
       const czas = polaczono && start.current ? Math.round((Date.now() - start.current) / 1000) : 0;
+      const ile = wypowiedzi.current.length;
       await zapiszRozmoweGlosowa(sessionId, wypowiedzi.current, czas, polaczono);
       wypowiedzi.current = [];
       setSekundy(0);
-      router.refresh();
+      return ile;
     },
-    [router, sessionId],
+    [sessionId],
   );
 
   const rozmowa = useConversation({
     onConnect: () => {
+      ciszej();
       start.current = Date.now();
       ustawFaze("rozmowa");
     },
@@ -86,30 +111,53 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
       wypowiedzi.current.push({ role: odCzlowieka ? "agent" : "client", content: m.message });
     },
     onDisconnect: (szczegoly) => {
-      const bylaRozmowa = fazaRef.current === "rozmowa";
+      if (fazaRef.current === "rozmowa" || fazaRef.current === "konczenie") {
+        void zakoncz();
+        return;
+      }
       const powod = szczegoly?.reason === "error" ? szczegoly.message : null;
 
       // Zerwanie przed połączeniem: zanim się poddamy, druga droga.
-      if (!bylaRozmowa && sposob.current === "webrtc" && dostep.current?.adres) {
+      if (sposob.current === "webrtc" && dostep.current?.adres) {
         setBlad(powod ? `Szybkie połączenie odmówiło (${powod}), próbuję drugą drogą...` : "Próbuję drugą drogą...");
         polacz("websocket");
         return;
       }
 
+      ciszej();
       ustawFaze("stop");
-      if (!bylaRozmowa) {
-        setBlad(
-          powod
-            ? `Nie udało się połączyć: ${powod}`
-            : "Nie udało się połączyć. Spróbuj jeszcze raz.",
-        );
-      }
-      void rozlicz(bylaRozmowa);
+      setBlad(powod ? `Nie udało się połączyć: ${powod}` : "Nie udało się połączyć. Spróbuj jeszcze raz.");
+      void rozlicz(false);
     },
     onError: (wiadomosc) => {
       setBlad(wiadomosc ? `Błąd połączenia: ${wiadomosc}` : "Błąd połączenia.");
     },
   });
+
+  /**
+   * Odłożenie słuchawki.
+   *
+   * Ekran gaśnie od razu, nie czekamy na potwierdzenie od dostawcy. Wcześniej
+   * czekałem i gdy zwrotka nie przyszła, przycisk „Rozłącz" nie robił nic.
+   */
+  const zakoncz = useCallback(async () => {
+    if (fazaRef.current === "stop") return;
+    ciszej();
+    ustawFaze("konczenie");
+    try {
+      rozmowa.endSession();
+    } catch {
+      /* już rozłączone */
+    }
+    const ile = await rozlicz(true);
+    ustawFaze("stop");
+
+    // Odłożenie słuchawki kończy całą sesję i uruchamia ocenę, tak jak
+    // przycisk „Zakończ i oceń". Pustej rozmowy nie ma po co oceniać.
+    if (ile > 0) await endSession(sessionId);
+    else router.refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rozmowa, rozlicz, router, sessionId]);
 
   // Nie czekamy w nieskończoność. Po pierwszej nieudanej próbie przechodzimy
   // na drugą drogę, a dopiero potem oddajemy kredyty i mówimy, co nie wyszło.
@@ -129,6 +177,7 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
         return;
       }
 
+      ciszej();
       ustawFaze("stop");
       setBlad(
         `Nie udało się połączyć (${sposob.current}). Kredyty wróciły. ` +
@@ -147,16 +196,13 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
     const t = setInterval(() => {
       const ile = Math.round((Date.now() - start.current) / 1000);
       setSekundy(ile);
-      if (ile >= limit * 60) {
-        try {
-          rozmowa.endSession();
-        } catch {
-          /* już rozłączone */
-        }
-      }
+      if (ile >= limit * 60) void zakoncz();
     }, 1000);
     return () => clearInterval(t);
-  }, [faza, limit, rozmowa]);
+  }, [faza, limit, zakoncz]);
+
+  // Sygnał zgłoszenia nie może zostać grający, gdy ktoś zamknie kartę.
+  useEffect(() => () => ciszej(), []);
 
   /**
    * Jedna próba połączenia.
@@ -193,6 +239,11 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
       // kredyty za połączenie, którego przeglądarka i tak nie zestawi.
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
+      // Sygnał odpalamy tu, bo jesteśmy jeszcze w obsłudze kliknięcia.
+      // Uruchomiony później zostałby zablokowany przez przeglądarkę.
+      dzwonek.current = new Dzwonek();
+      dzwonek.current.start();
+
       const r = await fetch("/api/coach/glos", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -200,6 +251,7 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
       });
       const dane = await r.json();
       if (!r.ok) {
+        ciszej();
         ustawFaze("stop");
         setBlad(dane.error ?? "Nie udało się połączyć.");
         return;
@@ -209,7 +261,6 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
       wypowiedzi.current = [];
       // Od tej chwili kredyty są pobrane i ktoś musi je rozliczyć.
       rozliczone.current = false;
-
       dostep.current = {
         token: dane.token ?? null,
         adres: dane.adres ?? null,
@@ -218,6 +269,7 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
       };
       polacz(dane.token ? "webrtc" : "websocket");
     } catch (e) {
+      ciszej();
       ustawFaze("stop");
       setBlad(
         e instanceof DOMException && e.name === "NotAllowedError"
@@ -228,68 +280,151 @@ function PanelRozmowy({ sessionId }: { sessionId: string }) {
     }
   }
 
-  function rozlacz() {
-    try {
-      rozmowa.endSession();
-    } catch {
-      /* już rozłączone */
-    }
-    // Gdyby rozłączenie nie wywołało zwrotki od dostawcy, rozliczamy sami.
-    setTimeout(() => void rozlicz(fazaRef.current === "rozmowa"), 1500);
+  function przelaczMikrofon() {
+    const nowy = !wyciszony;
+    setWyciszony(nowy);
+    rozmowa.setMuted(nowy);
   }
 
   const minuty = String(Math.floor(sekundy / 60)).padStart(2, "0");
   const reszta = String(sekundy % 60).padStart(2, "0");
+  const naEkranie = faza === "laczenie" || faza === "rozmowa" || faza === "konczenie";
 
   return (
-    <div className="mb-3">
-      {blad && (
-        <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{blad}</p>
-      )}
-
-      {faza === "rozmowa" ? (
-        <div className="flex items-center gap-3 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3">
-          <span className="relative flex h-3 w-3 flex-shrink-0">
-            <span
-              className={`absolute inline-flex h-full w-full rounded-full bg-emerald-400 ${
-                rozmowa.isSpeaking ? "animate-ping" : ""
-              }`}
-            />
-            <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-emerald-900">
-              {rozmowa.isSpeaking ? "Klient mówi..." : "Słucha Cię"}
-            </p>
-            <p className="text-xs text-emerald-700">
-              {minuty}:{reszta} z {limit}:00 · mów normalnie, możesz wejść w słowo
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={rozlacz}
-            className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500"
-          >
-            Rozłącz
-          </button>
-        </div>
-      ) : (
+    <>
+      <div className="mb-3">
+        {blad && !naEkranie && (
+          <p className="mb-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-700">{blad}</p>
+        )}
         <button
           type="button"
           onClick={() => void zadzwon()}
-          disabled={faza === "laczenie"}
+          disabled={naEkranie}
           className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 6.75c0 8.28 6.72 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.37c0-.52-.35-.97-.85-1.1l-4.43-1.1c-.44-.11-.9.05-1.17.42l-.97 1.29c-.28.38-.77.54-1.21.38a12.04 12.04 0 0 1-7.14-7.14c-.16-.44 0-.93.38-1.21l1.29-.97c.36-.27.53-.74.42-1.17L6.96 3.1a1.13 1.13 0 0 0-1.09-.85H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
-            />
-          </svg>
-          {faza === "laczenie" ? "Łączę..." : "Zadzwoń i rozmawiaj głosem"}
+          <IkonaSluchawki className="h-4 w-4" />
+          Zadzwoń i rozmawiaj głosem
         </button>
+      </div>
+
+      {naEkranie && (
+        <EkranRozmowy
+          tytul={tytul}
+          osobowosc={osobowosc}
+          stan={
+            faza === "rozmowa"
+              ? `${minuty}:${reszta}`
+              : faza === "konczenie"
+                ? "Kończę..."
+                : (blad ?? "Dzwonię...")
+          }
+          mowi={faza === "rozmowa" && rozmowa.isSpeaking}
+          polaczono={faza === "rozmowa"}
+          wyciszony={wyciszony}
+          naMikrofon={przelaczMikrofon}
+          naRozlacz={() => void zakoncz()}
+        />
       )}
+    </>
+  );
+}
+
+/** Pełnoekranowy widok połączenia. Celowo wygląda jak telefon, nie jak strona. */
+function EkranRozmowy({
+  tytul,
+  osobowosc,
+  stan,
+  mowi,
+  polaczono,
+  wyciszony,
+  naMikrofon,
+  naRozlacz,
+}: {
+  tytul: string;
+  osobowosc: string;
+  stan: string;
+  mowi: boolean;
+  polaczono: boolean;
+  wyciszony: boolean;
+  naMikrofon: () => void;
+  naRozlacz: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-between bg-gradient-to-b from-slate-800 via-slate-900 to-black px-6 py-16 text-white">
+      <div className="flex flex-col items-center gap-5 pt-10">
+        <div className="relative">
+          {/* Fala rozchodzi się, gdy mówi klient. Widać, kto ma teraz głos. */}
+          {mowi && (
+            <span className="absolute inset-0 animate-ping rounded-full bg-white/20" aria-hidden="true" />
+          )}
+          <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-white/10 text-4xl font-semibold backdrop-blur">
+            {tytul.charAt(0).toUpperCase()}
+          </div>
+        </div>
+
+        <div className="text-center">
+          <p className="text-2xl font-semibold tracking-tight">{tytul}</p>
+          <p className="mt-1 text-sm text-white/50">Klient: {osobowosc}</p>
+        </div>
+
+        <p className="font-mono text-lg tabular-nums text-white/70">{stan}</p>
+
+        {polaczono && (
+          <p className="max-w-xs text-center text-sm text-white/40">
+            Mów normalnie. Możesz wejść mu w słowo, tak jak przez telefon.
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center gap-10">
+        <button
+          type="button"
+          onClick={naMikrofon}
+          disabled={!polaczono}
+          className={`flex h-14 w-14 items-center justify-center rounded-full transition disabled:opacity-30 ${
+            wyciszony ? "bg-white text-slate-900" : "bg-white/15 text-white hover:bg-white/25"
+          }`}
+          aria-label={wyciszony ? "Włącz mikrofon" : "Wycisz mikrofon"}
+        >
+          <IkonaMikrofonu className="h-6 w-6" przekreslony={wyciszony} />
+        </button>
+
+        <button
+          type="button"
+          onClick={naRozlacz}
+          className="flex h-20 w-20 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition hover:bg-red-500"
+          aria-label="Rozłącz"
+        >
+          <IkonaSluchawki className="h-8 w-8 rotate-[135deg]" />
+        </button>
+
+        <span className="h-14 w-14" aria-hidden="true" />
+      </div>
     </div>
+  );
+}
+
+function IkonaSluchawki({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2.25 6.75c0 8.28 6.72 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.37c0-.52-.35-.97-.85-1.1l-4.43-1.1c-.44-.11-.9.05-1.17.42l-.97 1.29c-.28.38-.77.54-1.21.38a12.04 12.04 0 0 1-7.14-7.14c-.16-.44 0-.93.38-1.21l1.29-.97c.36-.27.53-.74.42-1.17L6.96 3.1a1.13 1.13 0 0 0-1.09-.85H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
+      />
+    </svg>
+  );
+}
+
+function IkonaMikrofonu({ className, przekreslony }: { className?: string; przekreslony: boolean }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Zm7 9a7 7 0 0 1-14 0m7 7v3"
+      />
+      {przekreslony && <path strokeLinecap="round" d="m4 4 16 16" />}
+    </svg>
   );
 }
