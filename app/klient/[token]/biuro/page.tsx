@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { brandingBiura, dostepPoTokenie, opiekunKlienta } from "@/lib/data-portal";
 import { ObieInstrukcje } from "../instalacja";
+import { PrzelacznikPowiadomien } from "../powiadomienia";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +58,17 @@ export default async function BiuroKlienta({ params }: { params: Promise<{ token
           powiadomienia o nowych terminach.
         </p>
         <ObieInstrukcje />
+      </div>
+
+      <div className="portal-info">
+        <h3>Powiadomienia</h3>
+        <p>
+          Damy znać, gdy pojawi się nowa prezentacja albo coś się zmieni w sprawie. Bez
+          reklam i bez pytania o zgodę po raz drugi.
+        </p>
+        <div style={{ marginTop: 12 }}>
+          <PrzelacznikPowiadomien token={token} />
+        </div>
       </div>
 
       <div className="portal-info">

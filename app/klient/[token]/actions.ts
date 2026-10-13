@@ -167,3 +167,28 @@ export async function decyzjaOCenie(
   revalidatePath(`/klient/${token}/n/${prop.property_id}`);
   return { ok: true };
 }
+
+/** Włączenie powiadomień na telefonie klienta. */
+export async function wlaczPowiadomienia(
+  token: string,
+  sub: { endpoint: string; keys: { p256dh: string; auth: string } },
+): Promise<WynikAkcji> {
+  const dostep = await dostepPoTokenie(token);
+  if (!dostep) return { ok: false, error: "Brak dostępu." };
+  if (!sub?.endpoint || !sub.keys?.p256dh || !sub.keys?.auth) {
+    return { ok: false, error: "Przeglądarka nie podała kompletu danych." };
+  }
+
+  const { zapiszSubskrypcjeKlienta } = await import("@/lib/push");
+  const ok = await zapiszSubskrypcjeKlienta(dostep.id, sub);
+  return ok ? { ok: true } : { ok: false, error: "Nie udało się zapisać. Spróbuj jeszcze raz." };
+}
+
+export async function wylaczPowiadomienia(token: string, endpoint: string): Promise<WynikAkcji> {
+  const dostep = await dostepPoTokenie(token);
+  if (!dostep) return { ok: false, error: "Brak dostępu." };
+
+  const { usunSubskrypcjeKlienta } = await import("@/lib/push");
+  await usunSubskrypcjeKlienta(endpoint);
+  return { ok: true };
+}

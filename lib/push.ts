@@ -113,3 +113,97 @@ export async function sendPushToAgency(
 export function isPushConfigured(): boolean {
   return Boolean(PUB && PRIV);
 }
+
+/* ─────────────── Powiadomienia dla klientów biura ─────────────── */
+
+/**
+ * Klienci mają własną tabelę subskrypcji, kluczowaną dostępem do portalu,
+ * a nie kontem w aplikacji. Powód jest prosty: klient nie ma konta, a jego
+ * dostęp da się odwołać jednym kliknięciem i wtedy powiadomienia też mają
+ * przestać chodzić.
+ */
+export async function zapiszSubskrypcjeKlienta(
+  accessId: string,
+  sub: WebPushSubscription,
+): Promise<boolean> {
+  const admin = createSupabaseAdmin();
+  const { error } = await admin.from("client_push_subscriptions").upsert(
+    {
+      access_id: accessId,
+      endpoint: sub.endpoint,
+      p256dh: sub.keys.p256dh,
+      auth: sub.keys.auth,
+    },
+    { onConflict: "endpoint" },
+  );
+  return !error;
+}
+
+export async function usunSubskrypcjeKlienta(endpoint: string): Promise<void> {
+  const admin = createSupabaseAdmin();
+  await admin.from("client_push_subscriptions").delete().eq("endpoint", endpoint);
+}
+
+/**
+ * Powiadomienie do klienta.
+ *
+ * Treść przychodzi gotowa z warstwy, która już przycięła dane: tutaj nie ma
+ * żadnej logiki o tym, co klient może zobaczyć, bo dublowanie tej decyzji
+ * w drugim miejscu to najprostsza droga do wycieku.
+ */
+export async function wyslijPushDoKlienta(accessId: string, payload: PushPayload): Promise<number> {
+  if (!ensureConfigured()) return 0;
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("client_push_subscriptions")
+    .select("id, endpoint, p256dh, auth")
+    .eq("access_id", accessId);
+
+  let wyslane = 0;
+  for (const s of (data ?? []) as SubRow[]) {
+    try {
+      await webpush.sendNotification(
+        { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+        JSON.stringify(payload),
+      );
+      wyslane += 1;
+    } catch (err) {
+      const kod = (err as { statusCode?: number })?.statusCode;
+      if (kod === 404 || kod === 410) {
+        await admin.from("client_push_subscriptions").delete().eq("id", s.id);
+      }
+    }
+  }
+  return wyslane;
+}
+
+/**
+ * Powiadomienie o nowym zdarzeniu w sprawie klienta.
+ *
+ * Szuka aktywnych dostępów przypiętych do tej nieruchomości i wysyła im
+ * krótką informację. Treść nie zawiera nazwisk ani numerów, tylko to,
+ * co i tak stoi w portalu.
+ */
+export async function powiadomKlientowONieruchomosci(
+  propertyId: string,
+  payload: PushPayload,
+): Promise<void> {
+  const admin = createSupabaseAdmin();
+  const { data: przypisania } = await admin
+    .from("client_portal_properties")
+    .select("access_id")
+    .eq("property_id", propertyId);
+
+  const idy = [...new Set((przypisania ?? []).map((p) => p.access_id as string))];
+  if (idy.length === 0) return;
+
+  const { data: dostepy } = await admin
+    .from("client_portal_access")
+    .select("id, token")
+    .in("id", idy)
+    .is("revoked_at", null);
+
+  for (const d of (dostepy ?? []) as { id: string; token: string }[]) {
+    await wyslijPushDoKlienta(d.id, { ...payload, url: `/klient/${d.token}` });
+  }
+}

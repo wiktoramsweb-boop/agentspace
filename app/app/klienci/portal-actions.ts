@@ -161,6 +161,15 @@ export async function wpisDlaKlienta(
     .eq("id", data.id);
   if (blad) return { ok: false, error: "Wpis zapisany, ale portal wymaga migracji v46." };
 
+  // Klient dowiaduje się od razu, a nie przy następnym wejściu do portalu.
+  // Treść to dokładnie to, co i tak zobaczy, więc nie ma tu czego przycinać.
+  const { powiadomKlientowONieruchomosci } = await import("@/lib/push");
+  await powiadomKlientowONieruchomosci(propertyId, {
+    title: "Nowa informacja w Twojej sprawie",
+    body: czysta,
+    tag: `oferta-${propertyId}`,
+  });
+
   revalidatePath(`/app/nieruchomosci/${propertyId}`);
   return { ok: true };
 }
