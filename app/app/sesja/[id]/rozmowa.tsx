@@ -1,11 +1,12 @@
 "use client";
 
 import { ConversationProvider, useConversation } from "@elevenlabs/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zapiszRozmoweGlosowa } from "./glos-actions";
 import { endSession } from "../../trening/actions";
 import { Dzwonek } from "@/lib/dzwonek";
+import { kartaRozmowy } from "@/lib/karta-rozmowy";
 
 type Wypowiedz = { role: "agent" | "client"; content: string };
 type Faza = "stop" | "laczenie" | "rozmowa" | "konczenie";
@@ -27,29 +28,31 @@ const LIMIT_PROBY_MS = 10_000;
  */
 export function RozmowaGlosowa({
   sessionId,
-  tytul,
+  brief,
   osobowosc,
 }: {
   sessionId: string;
-  tytul: string;
+  /** Opis zadania ze scenariusza. Wyciągamy z niego kartę kontaktu. */
+  brief: string;
   osobowosc: string;
 }) {
   return (
     <ConversationProvider>
-      <PanelRozmowy sessionId={sessionId} tytul={tytul} osobowosc={osobowosc} />
+      <PanelRozmowy sessionId={sessionId} brief={brief} osobowosc={osobowosc} />
     </ConversationProvider>
   );
 }
 
 function PanelRozmowy({
   sessionId,
-  tytul,
+  brief,
   osobowosc,
 }: {
   sessionId: string;
-  tytul: string;
+  brief: string;
   osobowosc: string;
 }) {
+  const karta = useMemo(() => kartaRozmowy(brief), [brief]);
   const router = useRouter();
   const [blad, setBlad] = useState<string | null>(null);
   const [faza, setFaza] = useState<Faza>("stop");
@@ -335,7 +338,8 @@ function PanelRozmowy({
 
       {naEkranie && (
         <EkranRozmowy
-          tytul={tytul}
+          kto={karta.kto}
+          szczegoly={karta.szczegoly}
           osobowosc={osobowosc}
           konczenie={faza === "konczenie" ? etap : null}
           stan={faza === "rozmowa" ? `${minuty}:${reszta}` : (blad ?? "Dzwonię...")}
@@ -350,9 +354,18 @@ function PanelRozmowy({
   );
 }
 
-/** Pełnoekranowy widok połączenia. Celowo wygląda jak telefon, nie jak strona. */
+/**
+ * Pełnoekranowy widok połączenia, narysowany jako telefon.
+ *
+ * Obrys aparatu nie jest ozdobą: trening ma być nie do odróżnienia od zimnego
+ * telefonu, a agent patrzący na ekran przeglądarki cały czas pamięta, że to
+ * ćwiczenie. Dlatego jest ramka, wysepka, pasek stanu i karta kontaktu z tym,
+ * co realnie widać na telefonie przed rozmową: do kogo dzwonisz i czego
+ * dotyczy sprawa.
+ */
 function EkranRozmowy({
-  tytul,
+  kto,
+  szczegoly,
   osobowosc,
   stan,
   konczenie,
@@ -362,7 +375,8 @@ function EkranRozmowy({
   naMikrofon,
   naRozlacz,
 }: {
-  tytul: string;
+  kto: string;
+  szczegoly: string[];
   osobowosc: string;
   stan: string;
   /** Tekst etapu po rozłączeniu. Gdy jest, zamiast telefonu pokazujemy ocenianie. */
@@ -373,11 +387,25 @@ function EkranRozmowy({
   naMikrofon: () => void;
   naRozlacz: () => void;
 }) {
+  const [zegar, setZegar] = useState("");
+
+  // Godzina na pasku stanu. Liczona po stronie przeglądarki, więc nie rozjedzie
+  // się z serwerem - ten ekran i tak pojawia się dopiero po kliknięciu.
+  useEffect(() => {
+    const ustaw = () =>
+      setZegar(
+        new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit" }).format(new Date()),
+      );
+    ustaw();
+    const t = setInterval(ustaw, 20_000);
+    return () => clearInterval(t);
+  }, []);
+
   // Ocena to wywołanie modelu i trwa kilka sekund. Przez ten czas ekran musi
   // mówić, co się dzieje, inaczej wygląda jak zawieszona aplikacja.
   if (konczenie) {
     return (
-      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-slate-800 via-slate-900 to-black px-6 text-white">
+      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-slate-950/90 px-6 text-white backdrop-blur">
         <span className="flex h-16 w-16 animate-spin items-center justify-center rounded-full border-4 border-white/15 border-t-emerald-400" />
         <div className="text-center">
           <p className="text-xl font-semibold tracking-tight">Rozłączono</p>
@@ -391,57 +419,140 @@ function EkranRozmowy({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-between bg-gradient-to-b from-slate-800 via-slate-900 to-black px-6 py-16 text-white">
-      <div className="flex flex-col items-center gap-5 pt-10">
-        <div className="relative">
-          {/* Fala rozchodzi się, gdy mówi klient. Widać, kto ma teraz głos. */}
-          {mowi && (
-            <span className="absolute inset-0 animate-ping rounded-full bg-white/20" aria-hidden="true" />
-          )}
-          <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-white/10 text-4xl font-semibold backdrop-blur">
-            {tytul.charAt(0).toUpperCase()}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm">
+      <div
+        className="relative rounded-[3rem] border-[10px] border-slate-800 bg-slate-800 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10"
+        style={{ height: "min(86vh, 760px)", aspectRatio: "9 / 19.5" }}
+      >
+        {/* Przyciski na krawędziach. Czysta dekoracja, ale bez nich to nie jest telefon. */}
+        <span className="absolute -left-[13px] top-[108px] h-8 w-[3px] rounded-l bg-slate-700" aria-hidden="true" />
+        <span className="absolute -left-[13px] top-[156px] h-12 w-[3px] rounded-l bg-slate-700" aria-hidden="true" />
+        <span className="absolute -left-[13px] top-[216px] h-12 w-[3px] rounded-l bg-slate-700" aria-hidden="true" />
+        <span className="absolute -right-[13px] top-[180px] h-20 w-[3px] rounded-r bg-slate-700" aria-hidden="true" />
+
+        <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[2.3rem] bg-gradient-to-b from-slate-700 via-slate-900 to-black text-white">
+          {/* Wysepka */}
+          <span
+            className="absolute left-1/2 top-2.5 z-10 h-[26px] w-[92px] -translate-x-1/2 rounded-full bg-black"
+            aria-hidden="true"
+          />
+
+          {/* Pasek stanu */}
+          <div className="flex items-center justify-between px-6 pt-[14px] text-[11px] font-medium tabular-nums">
+            <span>{zegar}</span>
+            <span className="flex items-center gap-1.5 opacity-80" aria-hidden="true">
+              <IkonaZasiegu />
+              <IkonaWifi />
+              <IkonaBaterii />
+            </span>
           </div>
+
+          <div className="flex flex-1 flex-col items-center justify-between px-6 pb-8 pt-10">
+            <div className="flex w-full flex-col items-center gap-4">
+              <p className="text-[13px] uppercase tracking-[0.18em] text-white/35">
+                {polaczono ? "Połączenie trwa" : "Łączenie"}
+              </p>
+
+              <div className="relative mt-1">
+                {mowi && (
+                  <span className="absolute inset-0 animate-ping rounded-full bg-white/20" aria-hidden="true" />
+                )}
+                <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-white/10 text-3xl font-semibold backdrop-blur">
+                  {kto.replace(/^Pan[i]?\s+/, "").charAt(0).toUpperCase()}
+                </div>
+              </div>
+
+              <div className="text-center">
+                <p className="text-[26px] font-semibold leading-tight tracking-tight">{kto}</p>
+                <p className="mt-1 font-mono text-base tabular-nums text-white/55">{stan}</p>
+              </div>
+
+              {szczegoly.length > 0 && (
+                <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+                  {szczegoly.map((x) => (
+                    <span
+                      key={x}
+                      className="rounded-full bg-white/10 px-2.5 py-1 text-[12px] text-white/75"
+                    >
+                      {x}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <p className="text-[12px] text-white/30">Nastawienie: {osobowosc}</p>
+            </div>
+
+            {polaczono && (
+              <p className="max-w-[220px] text-center text-[12px] leading-relaxed text-white/30">
+                Mów normalnie. Możesz wejść mu w słowo, tak jak przez telefon.
+              </p>
+            )}
+
+            <div className="flex w-full items-center justify-center gap-8">
+              <button
+                type="button"
+                onClick={naMikrofon}
+                disabled={!polaczono}
+                className={`flex h-14 w-14 items-center justify-center rounded-full transition disabled:opacity-30 ${
+                  wyciszony ? "bg-white text-slate-900" : "bg-white/15 text-white hover:bg-white/25"
+                }`}
+                aria-label={wyciszony ? "Włącz mikrofon" : "Wycisz mikrofon"}
+              >
+                <IkonaMikrofonu className="h-6 w-6" przekreslony={wyciszony} />
+              </button>
+
+              <button
+                type="button"
+                onClick={naRozlacz}
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition hover:bg-red-500"
+                aria-label="Rozłącz"
+              >
+                <IkonaSluchawki className="h-7 w-7 rotate-[135deg]" />
+              </button>
+
+              <span className="h-14 w-14" aria-hidden="true" />
+            </div>
+          </div>
+
+          {/* Belka gestu */}
+          <span
+            className="absolute bottom-2 left-1/2 h-1 w-32 -translate-x-1/2 rounded-full bg-white/35"
+            aria-hidden="true"
+          />
         </div>
-
-        <div className="text-center">
-          <p className="text-2xl font-semibold tracking-tight">{tytul}</p>
-          <p className="mt-1 text-sm text-white/50">Klient: {osobowosc}</p>
-        </div>
-
-        <p className="font-mono text-lg tabular-nums text-white/70">{stan}</p>
-
-        {polaczono && (
-          <p className="max-w-xs text-center text-sm text-white/40">
-            Mów normalnie. Możesz wejść mu w słowo, tak jak przez telefon.
-          </p>
-        )}
-      </div>
-
-      <div className="flex items-center gap-10">
-        <button
-          type="button"
-          onClick={naMikrofon}
-          disabled={!polaczono}
-          className={`flex h-14 w-14 items-center justify-center rounded-full transition disabled:opacity-30 ${
-            wyciszony ? "bg-white text-slate-900" : "bg-white/15 text-white hover:bg-white/25"
-          }`}
-          aria-label={wyciszony ? "Włącz mikrofon" : "Wycisz mikrofon"}
-        >
-          <IkonaMikrofonu className="h-6 w-6" przekreslony={wyciszony} />
-        </button>
-
-        <button
-          type="button"
-          onClick={naRozlacz}
-          className="flex h-20 w-20 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition hover:bg-red-500"
-          aria-label="Rozłącz"
-        >
-          <IkonaSluchawki className="h-8 w-8 rotate-[135deg]" />
-        </button>
-
-        <span className="h-14 w-14" aria-hidden="true" />
       </div>
     </div>
+  );
+}
+
+function IkonaZasiegu() {
+  return (
+    <svg className="h-3 w-3.5" viewBox="0 0 16 12" fill="currentColor">
+      <rect x="0" y="8" width="2.5" height="4" rx="0.6" />
+      <rect x="4" y="5.5" width="2.5" height="6.5" rx="0.6" />
+      <rect x="8" y="3" width="2.5" height="9" rx="0.6" />
+      <rect x="12" y="0" width="2.5" height="12" rx="0.6" opacity="0.4" />
+    </svg>
+  );
+}
+
+function IkonaWifi() {
+  return (
+    <svg className="h-3 w-3.5" viewBox="0 0 16 12" fill="none" stroke="currentColor" strokeWidth={1.4}>
+      <path strokeLinecap="round" d="M1.5 4.2a9.5 9.5 0 0 1 13 0M4 6.9a6 6 0 0 1 8 0" />
+      <circle cx="8" cy="9.8" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function IkonaBaterii() {
+  return (
+    <svg className="h-3 w-6" viewBox="0 0 26 12" fill="none">
+      <rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.5" />
+      <rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor" />
+      <path d="M23.5 4.2v3.6a2 2 0 0 0 0-3.6Z" fill="currentColor" opacity="0.5" />
+    </svg>
   );
 }
 

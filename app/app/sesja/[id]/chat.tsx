@@ -149,7 +149,7 @@ export function SessionChat({
 
       {/* Input */}
       <div className="mt-4 border-t border-slate-200 pt-4">
-        {glos && <RozmowaGlosowa sessionId={sessionId} tytul={scenarioTitle} osobowosc={personality} />}
+        {glos && <RozmowaGlosowa sessionId={sessionId} brief={brief} osobowosc={personality} />}
         {listening && (
           <p className="mb-2 flex items-center gap-2 text-sm text-emerald-600">
             <span className="relative flex h-2.5 w-2.5">
