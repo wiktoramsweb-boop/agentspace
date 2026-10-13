@@ -6,6 +6,7 @@
  * więc pilnujemy obu skrajności.
  */
 
+import { PLANS, cenaPakietu } from "./marketing/plans.ts";
 import {
   DNI_PROBNE,
   OKRESY,
@@ -105,6 +106,27 @@ const rok = koniecOkresu("yearly", teraz);
 sprawdz("rok kończy się za 12 miesięcy", rok.getUTCFullYear() === 2027 && rok.getUTCMonth() === 5);
 const pol = koniecOkresu("half_year", teraz);
 sprawdz("pół roku kończy się w grudniu", pol.getUTCMonth() === 11);
+
+/* ── Dopłata za osobę powyżej limitu ──
+   To jest liczba na fakturze dla największych klientów, więc pilnujemy jej
+   wprost: biuro w cenie, każda kolejna głowa osobno, i żadnych dopłat tam,
+   gdzie pakiet ma twardy limit. */
+const biuro = PLANS.find((p) => p.id === "biuro");
+const pro = PLANS.find((p) => p.id === "pro");
+sprawdz("pakiet Biuro ma zdefiniowaną dopłatę", Boolean(biuro?.extraAgentPrice));
+sprawdz("piętnaście osób to cena podstawowa", cenaPakietu(biuro, 15) === biuro.price);
+sprawdz("mniej niż piętnaście nie daje zniżki", cenaPakietu(biuro, 8) === biuro.price);
+sprawdz(
+  "szesnasta osoba to jedna dopłata",
+  cenaPakietu(biuro, 16) === biuro.price + biuro.extraAgentPrice,
+);
+sprawdz(
+  "dwadzieścia pięć osób to dziesięć dopłat",
+  cenaPakietu(biuro, 25) === biuro.price + 10 * biuro.extraAgentPrice,
+  `${cenaPakietu(biuro, 25)} zł`,
+);
+sprawdz("pakiet bez dopłaty liczy się po staremu", cenaPakietu(pro, 15) === pro.price);
+sprawdz("rabat roczny liczy się od ceny z dopłatami", cenaOkresu(cenaPakietu(biuro, 25), "yearly") < 12 * cenaPakietu(biuro, 25));
 
 if (bledy) {
   console.error(`\nAbonament: ${bledy} błędów.`);

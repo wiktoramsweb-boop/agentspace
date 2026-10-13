@@ -944,7 +944,7 @@ export const en: Dict = {
         name: "Agency",
         tagline: "For networks and multi-branch agencies",
         features: [
-          "Unlimited agents",
+          "15 users included, 49 PLN/mo for each extra",
           "Everything in Pro",
           "Roles and permissions: eight job titles, access granted per person",
           "Multiple branches and team splits",

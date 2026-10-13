@@ -944,7 +944,7 @@ export const pl = {
         name: "Biuro",
         tagline: "Dla sieci i biur wielooddziałowych",
         features: [
-          "Bez limitu agentów",
+          "15 osób w cenie, każda kolejna 49 zł/mc",
           "Wszystko z Pro",
           "Role i uprawnienia: osiem stanowisk, dostęp nadawany per osoba",
           "Wielooddziałowość i podział zespołów",

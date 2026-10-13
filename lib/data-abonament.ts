@@ -1,6 +1,6 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import { zapiszBlad } from "./blad";
-import { PLANS, planForAgents, type Plan } from "./marketing/plans";
+import { PLANS, planForAgents, cenaPakietu, type Plan } from "./marketing/plans";
 import {
   PAKIETY_KREDYTOW,
   cenaOkresu,
@@ -13,7 +13,7 @@ import {
 import { SITE_ADDON } from "./site/addon";
 import { escapeHtml } from "./html";
 
-export { PLANS, planForAgents };
+export { PLANS, planForAgents, cenaPakietu };
 export type { Plan };
 
 export type Zamowienie = {
@@ -77,7 +77,8 @@ export async function zlozZamowienie(params: {
     };
   }
 
-  const kwota = cenaOkresu(plan.price, params.okres);
+  // Cena liczona od liczby osób: powyżej piętnastu dochodzi dopłata od głowy.
+  const kwota = cenaOkresu(cenaPakietu(plan, agentow), params.okres);
   const { data, error } = await admin
     .from("subscription_orders")
     .insert({

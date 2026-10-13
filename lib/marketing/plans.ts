@@ -15,6 +15,10 @@ export type Plan = {
   price: number;
   priceFrom?: boolean;
   maxAgents: number;
+  /** Ile osób wchodzi w cenę podstawową. Bez tego pola to po prostu maxAgents. */
+  includedAgents?: number;
+  /** Dopłata miesięczna za każdą osobę ponad to, co wchodzi w cenę. */
+  extraAgentPrice?: number;
   tagline: string;
   features: string[];
 };
@@ -57,9 +61,11 @@ export const PLANS: Plan[] = [
     price: 999,
     priceFrom: true,
     maxAgents: 999,
+    includedAgents: 15,
+    extraAgentPrice: 49,
     tagline: "Dla sieci i biur wielooddziałowych",
     features: [
-      "Bez limitu agentów",
+      "15 osób w cenie, każda kolejna 49 zł/mc",
       "Wszystko z Pro",
       "Role i uprawnienia: osiem stanowisk, dostęp nadawany per osoba",
       "Wielooddziałowość i podział zespołów",
@@ -68,6 +74,19 @@ export const PLANS: Plan[] = [
     ],
   },
 ];
+
+/**
+ * Miesięczna cena pakietu dla konkretnej liczby osób.
+ *
+ * Do piętnastu osób płaci się za biuro, powyżej dochodzi dopłata od głowy.
+ * Bez tego dwudziestoosobowa sieć płaciła tyle samo co ośmioosobowe biuro,
+ * a to ona zużywa najwięcej wsparcia i najwięcej AI.
+ */
+export function cenaPakietu(plan: Plan, agentow: number): number {
+  const wCenie = plan.includedAgents ?? plan.maxAgents;
+  const ponad = Math.max(0, agentow - wCenie);
+  return plan.price + ponad * (plan.extraAgentPrice ?? 0);
+}
 
 /** Pakiet rekomendowany dla podanej liczby agentów. */
 export function planForAgents(agents: number): Plan {

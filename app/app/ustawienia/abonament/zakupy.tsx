@@ -9,7 +9,7 @@ import {
   oszczednosc,
   type Okres,
 } from "@/lib/abonament-cennik";
-import type { Plan } from "@/lib/marketing/plans";
+import { cenaPakietu, type Plan } from "@/lib/marketing/plans";
 import { zamowAbonament, zamowPakietKredytow, zamowStroneWww } from "./actions";
 
 /**
@@ -98,6 +98,11 @@ export function Zakupy({
           {plany.map((p) => {
             const wybrany = p.id === plan;
             const zaDuzy = agentow > p.maxAgents;
+            // Cena dla LICZBY OSÓB W BIURZE, nie sama cena z cennika: przy
+            // pakiecie Biuro powyżej piętnastu osób dochodzi dopłata od głowy
+            // i agent ma zobaczyć kwotę, którą naprawdę zapłaci.
+            const cena = cenaPakietu(p, agentow);
+            const doplata = cena - p.price;
             return (
               <button
                 key={p.id}
@@ -123,13 +128,19 @@ export function Zakupy({
                 </div>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{p.tagline}</p>
                 <p className="mt-4 text-3xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">
-                  {cenaZaMiesiac(p.price, okres)} zł
+                  {cenaZaMiesiac(cena, okres)} zł
                   <span className="ml-1 text-sm font-normal text-slate-500">/ mc netto</span>
                 </p>
+                {doplata > 0 && (
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    {p.price} zł za biuro do {p.includedAgents} osób plus {doplata} zł za{" "}
+                    {agentow - (p.includedAgents ?? 0)} dodatkowych.
+                  </p>
+                )}
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   {okres === "monthly"
                     ? "Płatne co miesiąc."
-                    : `Jedna płatność ${cenaOkresu(p.price, okres)} zł, oszczędzacie ${oszczednosc(p.price, okres)} zł.`}
+                    : `Jedna płatność ${cenaOkresu(cena, okres)} zł, oszczędzacie ${oszczednosc(cena, okres)} zł.`}
                 </p>
                 {zaDuzy && (
                   <p className="mt-3 text-sm font-medium text-amber-700 dark:text-amber-300">
