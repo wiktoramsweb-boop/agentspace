@@ -18,6 +18,8 @@ export async function zapiszRozmoweGlosowa(
   sessionId: string,
   wypowiedzi: { role: "agent" | "client"; content: string }[],
   sekundy: number,
+  /** Czy połączenie w ogóle doszło do skutku. Jeśli nie, oddajemy całość. */
+  polaczono = true,
 ): Promise<{ ok: boolean }> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
@@ -44,7 +46,10 @@ export async function zapiszRozmoweGlosowa(
       .eq("id", sessionId);
   }
 
-  const zwrot = kredytyZGory() - kredytyZaRozmowe(sekundy);
+  // Nieudane połączenie to zwrot całości. Klient nie ma płacić za to, że
+  // dostawca nie odebrał, a zamknięta w połowie przeglądarka i tak zapłaci
+  // za maksimum, bo wtedy nikt tu nie zajrzy.
+  const zwrot = polaczono ? kredytyZGory() - kredytyZaRozmowe(sekundy) : kredytyZGory();
   await zwrocKredyty(user, "coach_glos", zwrot);
 
   revalidatePath(`/app/sesja/${sessionId}`);
