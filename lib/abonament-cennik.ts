@@ -138,9 +138,9 @@ export function koniecOkresu(okres: Okres, od: Date = new Date()): Date {
 export type PakietKredytow = { id: string; kredyty: number; cena: number; opis: string };
 
 export const PAKIETY_KREDYTOW: PakietKredytow[] = [
-  { id: "kredyty-500", kredyty: 500, cena: 49, opis: "Około 50 sesji AI Coacha." },
-  { id: "kredyty-1000", kredyty: 1000, cena: 79, opis: "Około 100 sesji. Najczęściej wybierany." },
-  { id: "kredyty-3000", kredyty: 3000, cena: 199, opis: "Dla biura, które trenuje codziennie." },
+  { id: "kredyty-500", kredyty: 500, cena: 49, opis: "Około 50 sesji pisanych albo 22 minuty rozmowy głosowej." },
+  { id: "kredyty-1000", kredyty: 1000, cena: 79, opis: "Około 100 sesji albo 45 minut głosu. Najczęściej wybierany." },
+  { id: "kredyty-3000", kredyty: 3000, cena: 199, opis: "Dla biura, które trenuje codziennie: 136 minut głosu." },
 ];
 
 export function pakietKredytow(id: string): PakietKredytow | undefined {
