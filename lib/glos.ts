@@ -8,7 +8,7 @@
  * miesiąc dłubania w nim samemu.
  *
  * Klucz API nigdy nie trafia do przeglądarki. Serwer prosi dostawcę
- * o jednorazowy podpisany adres i to on idzie do klienta.
+ * o jednorazowy token rozmowy i to on idzie do klienta.
  */
 
 const API = "https://api.elevenlabs.io/v1";
@@ -33,24 +33,28 @@ export function glosWlaczony(): boolean {
 }
 
 /**
- * Jednorazowy adres do połączenia.
+ * Jednorazowy token do połączenia.
  *
- * Ważny kilkanaście minut i tylko na jedną rozmowę, więc nawet podejrzany
+ * Połączenie idzie przez WebRTC, bo ma niższe opóźnienie i lepiej znosi słabą
+ * sieć niż WebSocket. Przy WebRTC dostawca wymaga tokenu rozmowy, a nie
+ * podpisanego adresu - ten drugi działa wyłącznie z WebSocketem.
+ *
+ * Token jest ważny krótko i tylko na jedną rozmowę, więc nawet podejrzany
  * w narzędziach przeglądarki nie daje dostępu do konta.
  */
-export async function podpisanyAdres(plec: "k" | "m"): Promise<string | null> {
+export async function tokenRozmowy(plec: "k" | "m"): Promise<string | null> {
   const klucz = kluczGlosu();
   const agent = agentGlosu(plec);
   if (!klucz || !agent) return null;
 
-  const r = await fetch(`${API}/convai/conversation/get-signed-url?agent_id=${encodeURIComponent(agent)}`, {
+  const r = await fetch(`${API}/convai/conversation/token?agent_id=${encodeURIComponent(agent)}`, {
     headers: { "xi-api-key": klucz },
     cache: "no-store",
   });
   if (!r.ok) return null;
 
-  const dane = (await r.json()) as { signed_url?: string };
-  return dane.signed_url ?? null;
+  const dane = (await r.json()) as { token?: string };
+  return dane.token ?? null;
 }
 
 /**

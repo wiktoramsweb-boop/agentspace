@@ -1,6 +1,6 @@
 "use client";
 
-import { useConversation } from "@elevenlabs/react";
+import { ConversationProvider, useConversation } from "@elevenlabs/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zapiszRozmoweGlosowa } from "./glos-actions";
@@ -17,7 +17,19 @@ type Wypowiedz = { role: "agent" | "client"; content: string };
  * Wypowiedzi zbieramy po drodze i po rozłączeniu dopisujemy do transkryptu
  * sesji, więc ocena liczy się dokładnie tak samo jak dla rozmowy pisanej.
  */
+/**
+ * `useConversation` wymaga opakowania w `ConversationProvider` - hook czyta
+ * stan z kontekstu i bez niego wywala render całej strony.
+ */
 export function RozmowaGlosowa({ sessionId }: { sessionId: string }) {
+  return (
+    <ConversationProvider>
+      <PanelRozmowy sessionId={sessionId} />
+    </ConversationProvider>
+  );
+}
+
+function PanelRozmowy({ sessionId }: { sessionId: string }) {
   const router = useRouter();
   const [blad, setBlad] = useState<string | null>(null);
   const [laczenie, setLaczenie] = useState(false);
@@ -45,7 +57,7 @@ export function RozmowaGlosowa({ sessionId }: { sessionId: string }) {
     zapisane.current = true;
     const czas = start.current ? Math.round((Date.now() - start.current) / 1000) : 0;
     try {
-      await rozmowa.endSession();
+      rozmowa.endSession();
     } catch {
       /* już rozłączone */
     }
@@ -91,8 +103,8 @@ export function RozmowaGlosowa({ sessionId }: { sessionId: string }) {
       zapisane.current = false;
       start.current = Date.now();
 
-      await rozmowa.startSession({
-        signedUrl: dane.adres,
+      rozmowa.startSession({
+        conversationToken: dane.token,
         connectionType: "webrtc",
         overrides: {
           agent: {

@@ -3,7 +3,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { buildClientSystemPrompt } from "@/lib/ai/coach";
 import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { kredytyZGory, MAX_MINUT_ROZMOWY } from "@/lib/kredyty-cennik";
-import { glosWlaczony, podpisanyAdres, pierwszeZdanie } from "@/lib/glos";
+import { glosWlaczony, tokenRozmowy, pierwszeZdanie } from "@/lib/glos";
 
 /**
  * Start rozmowy głosowej z klientem AI.
@@ -54,13 +54,13 @@ export async function POST(req: Request) {
   // Głos ustawia się na agencie u dostawcy, nie na rozmowie, więc osobowości
   // kobiece kierujemy na drugiego agenta. Bez niego obie idą na ten sam.
   const plec = ["emocjonalny", "wahający"].includes(String(sesja.personality)) ? "k" : "m";
-  const adres = await podpisanyAdres(plec);
-  if (!adres) {
+  const token = await tokenRozmowy(plec);
+  if (!token) {
     return Response.json({ error: "Dostawca głosu nie odpowiada." }, { status: 502 });
   }
 
   return Response.json({
-    adres,
+    token,
     prompt,
     pierwsze: pierwszeZdanie(scenariusz.category),
     maxMinut: MAX_MINUT_ROZMOWY,
