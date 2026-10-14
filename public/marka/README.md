@@ -1,10 +1,23 @@
 # Znak AgentSpace
 
-Znak to **dach i kropka pod nim**. Dach, bo nieruchomości. Kropka, bo tak
+Znak to **dom z kropką na kalenicy**. Dom, bo nieruchomości. Kropka, bo tak
 AgentSpace podpisuje się od początku, w pasku bocznym i na obrazkach do
 mediów społecznościowych: „● AgentSpace".
 
+Bryła jest pełna, nie konturowa, a wszystkie narożniki są zaokrąglone. To
+właśnie zaokrąglenia odróżniają znak od domyślnej ikony domu z klawiatury,
+więc nie wolno ich zdejmować.
+
 Napis składa krój **Sora SemiBold** (licencja SIL OFL, Google Fonts).
+
+## Pliki powstają ze skryptu, nie z ręki
+
+Cały komplet generuje `node scripts/marka/generuj.mjs`. Geometria znaku,
+kolory i układy siedzą w tym jednym pliku. Zmiana znaku to zmiana skryptu
+i jedno uruchomienie, nigdy ręczna poprawka w 71 plikach.
+
+Skrypt nadpisuje też `public/icon-192.png`, `public/icon-512.png`
+i `public/logo.png`, żeby ikona aplikacji nie rozjechała się z marką.
 
 ## Napis jest krzywymi, nie tekstem
 
@@ -19,19 +32,29 @@ w edytorze tekstu: zmiana wymaga wygenerowania plików od nowa.
 |---|---|
 | Gradient kafelka | `#10b981` → `#06b6d4`, 135° |
 | Zieleń marki | `#10b981` |
+| Dom na kafelku z gradientem | `#0b1220` |
 | Tekst na jasnym | `#0b1220` |
 | Tekst na ciemnym | `#ffffff` |
 | Ciemne tło materiałów | `#07090c` |
+
+## Kropka w wersjach jednobarwnych
+
+Na kafelkach kropka ma własny kolor i siedzi na kalenicy. W wersjach
+jednobarwnych (`znak-zielony`, `znak-bialy`, `znak-czarny`, `znak-mono`)
+nie ma czym jej odróżnić od bryły, więc unosi się ponad dach i zostaje
+czytelna dzięki prześwitowi. To jedyna dopuszczalna różnica między
+wariantami.
 
 ## Co wybrać
 
 **Sam znak, bez nazwy.** Awatary, ikony, favikona, media społecznościowe,
 wszędzie poniżej 32 px.
 
-- `znak-gradient` – podstawowy, kafelek z gradientem. Domyślny wybór.
-- `znak-kafelek-ciemny` – kafelek w kolorze tła ciemnych materiałów.
-- `znak-kafelek-bialy` – kafelek biały, glif zielony. Na kolorowe tła.
-- `znak-zielony`, `znak-bialy`, `znak-czarny` – sam glif, bez kafelka,
+- `znak-gradient` – podstawowy, kafelek z gradientem, dom ciemny. Domyślny wybór.
+- `znak-kafelek-ciemny` – kafelek w kolorze tła ciemnych materiałów, dom biały,
+  kropka zielona. Najbardziej stonowany wariant.
+- `znak-kafelek-bialy` – kafelek biały, dom zielony. Na kolorowe tła.
+- `znak-zielony`, `znak-bialy`, `znak-czarny` – sama bryła, bez kafelka,
   przezroczyste tło.
 - `znak-mono.svg` – jednobarwny, dziedziczy kolor po rodzicu
   (`currentColor`). Pieczątki, faksymile na umowach, druk jednobarwny.
@@ -65,8 +88,8 @@ Gdy ktoś prosi o logo do druku, wyślij SVG.
 
 - **Nie rozciągaj.** Skaluj proporcjonalnie.
 - **Zostaw powietrze** wokół logo: co najmniej tyle, ile wynosi średnica
-  kropki pod dachem.
+  kropki na kalenicy.
 - Na zdjęciach i niejednolitych tłach używaj wersji z kafelkiem albo
-  jednobarwnej, nie samego glifu w gradiencie.
+  jednobarwnej, nie samej bryły w gradiencie.
 - Poniżej 32 px używaj samego znaku. Napis przestaje być czytelny.
 - Nie zmieniaj kolorów gradientu ani proporcji między znakiem a napisem.
