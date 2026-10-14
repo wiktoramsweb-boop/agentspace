@@ -11,7 +11,7 @@ export default async function InvitePage({ params }: Props) {
 
   const { data: invitation } = await admin
     .from("invitations")
-    .select("*, agency:agencies(name)")
+    .select("*, agency:agencies!agency_id(name)")
     .eq("token", token)
     .single();
 

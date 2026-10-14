@@ -9,6 +9,10 @@
 -- poprzednią akceptację i poprosić o nową, a porównanie napisów jest tu
 -- prostsze i trudniejsze do pomylenia niż numerowanie.
 
+-- UWAGA przy dodawaniu kolejnych powiązań między agencies a profiles:
+-- każde nowe daje PostgREST kolejną możliwą relację, a wtedy zapytania
+-- dołączające biuro do profilu muszą wskazywać kolumnę wprost
+-- (`agencies!agency_id`). Bez tego logowanie przestaje działać dla wszystkich.
 alter table public.agencies
   add column if not exists dpa_accepted_at timestamptz,
   add column if not exists dpa_version text,

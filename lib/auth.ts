@@ -22,7 +22,11 @@ export const getCurrentUser = cache(async (): Promise<ProfileWithAgency | null> 
   const admin = createSupabaseAdmin();
   const { data: profile } = await admin
     .from("profiles")
-    .select("*, agency:agencies(*)")
+    // Podpowiedź `!agency_id` jest konieczna, nie kosmetyczna. Między profiles
+    // a agencies istnieje kilka relacji (agency_id, owner_id, dpa_accepted_by)
+    // i bez wskazania kolumny PostgREST odmawia dołączenia biura, a wtedy
+    // KAŻDY użytkownik widzi „konto nie jest przypisane do żadnego biura".
+    .select("*, agency:agencies!agency_id(*)")
     .eq("id", user.id)
     .single();
 
