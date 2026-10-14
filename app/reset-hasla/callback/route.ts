@@ -6,9 +6,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  * Krok 2 - użytkownik klika link z maila i ląduje tutaj. Zamieniamy token na
  * sesję odzyskiwania (cookies), potem przekierowujemy na formularz nowego hasła.
  *
- * Obsługujemy oba warianty szablonu maila Supabase:
- *  - domyślny (PKCE): przychodzi `?code=...` → exchangeCodeForSession
- *  - z `{{ .TokenHash }}`: przychodzi `?token_hash=...` → verifyOtp
+ * Nasze maile przysyłają `?token_hash=...`, bo ten wariant da się odczytać
+ * po stronie serwera. Obsługa `?code=...` zostaje na wypadek linków
+ * wystawionych przez samo Supabase.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

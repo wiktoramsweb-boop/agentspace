@@ -35,7 +35,18 @@ export async function requestPasswordReset(
       options: { redirectTo: `${APP_URL}/reset-hasla/callback` },
     });
 
-    const link = data?.properties?.action_link;
+    // Celowo NIE używamy gotowego action_link. Prowadzi on przez stronę
+    // Supabase, która odsyła dane w części adresu za znakiem #, a ta nigdy
+    // nie dociera do serwera. Nasz callback nie widział wtedy żadnego tokenu
+    // i każdy link kończył się komunikatem „link wygasł".
+    //
+    // Budujemy adres sami, prosto do naszego callbacku, z jednorazowym
+    // tokenem w zwykłym parametrze. Serwer wymienia go na sesję i od razu
+    // ustawia ciasteczka.
+    const token = data?.properties?.hashed_token;
+    const link = token
+      ? `${APP_URL}/reset-hasla/callback?token_hash=${encodeURIComponent(token)}`
+      : null;
     // Nieznany adres kończy się tutaj po cichu: odpowiedź dla przeglądarki
     // i tak jest identyczna, więc nie da się po niej zgadnąć, kto ma konto.
     if (!error && link) {
