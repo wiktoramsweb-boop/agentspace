@@ -10,6 +10,7 @@ import {
   pozostaloDoZaplaty,
   statusPlatnosci,
 } from "./invoice";
+import { oprawaMaila } from "./mail";
 
 /**
  * Przypomnienie o fakturach po terminie.
@@ -126,7 +127,7 @@ export async function przypomnijOZaleglychFakturach(): Promise<number> {
         from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
         to: owner.email as string,
         subject: `${faktury.length} ${faktury.length === 1 ? "faktura" : "faktur"} po terminie - ${formatMoney(suma)} zł`,
-        html: `
+        html: oprawaMaila(`
           <div style="font-family:-apple-system,Arial,sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#18181b;">
             <h2 style="color:#b91c1c;margin:0 0 6px;">Faktury po terminie</h2>
             <p style="margin:0 0 20px;color:#52525b;">
@@ -155,7 +156,7 @@ export async function przypomnijOZaleglychFakturach(): Promise<number> {
               Wiadomość wysyłana raz dziennie, tylko gdy coś zalega.
             </p>
           </div>
-        `,
+        `),
       });
 
       if (bladWysylki) {

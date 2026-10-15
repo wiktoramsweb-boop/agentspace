@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { oprawaMaila } from "@/lib/mail";
 
 type Payload = {
   name?: string;
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
         to: notifyEmail,
         replyTo: email,
         subject: `📩 Wiadomość kontaktowa: ${name}`,
-        html: `
+        html: oprawaMaila(`
           <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
             <h2 style="color: #10b981; margin: 0 0 16px;">Nowa wiadomość przez formularz kontaktowy</h2>
 
@@ -133,7 +134,7 @@ export async function POST(request: Request) {
 
             <p style="color: #71717a; font-size: 12px; margin-top: 24px;">Możesz odpowiedzieć bezpośrednio na ten email - pójdzie do ${escapeHtml(email)}.</p>
           </div>
-        `,
+        `),
       });
     } catch (emailError) {
       console.error("Resend error:", emailError);

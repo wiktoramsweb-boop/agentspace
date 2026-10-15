@@ -8,6 +8,7 @@ import {
 } from "./data";
 import { getAgencyCommissionByAgent } from "./data-platform";
 import { formatPln } from "./format";
+import { oprawaMaila } from "@/lib/mail";
 
 /**
  * Buduje i wysyła miesięczny raport dla właściciela agencji.
@@ -54,7 +55,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return false;
 
-  const html = `
+  const html = oprawaMaila(`
     <div style="font-family:-apple-system,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#18181b;">
       <h1 style="color:#10b981;font-size:22px;margin:0 0 4px;">Raport miesięczny - ${escapeHtml(agency.name)}</h1>
       <p style="color:#71717a;margin:0 0 24px;">${monthName}</p>
@@ -99,7 +100,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
       </p>
 
       <p style="color:#a1a1aa;font-size:12px;margin-top:24px;">AgentSpace · raport wysłany automatycznie</p>
-    </div>`;
+    </div>`);
 
   try {
     const resend = new Resend(resendKey);

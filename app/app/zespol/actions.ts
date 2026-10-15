@@ -12,6 +12,7 @@ import { sendAgencyMonthlyReport } from "@/lib/report";
 import { type UserRole } from "@/lib/types";
 import { ROLE_LABELS } from "@/lib/role";
 import { zapiszZdarzenie } from "@/lib/dziennik";
+import { oprawaMaila } from "@/lib/mail";
 
 const VALID_ROLES = ROLE.map((r) => r.id);
 
@@ -112,7 +113,7 @@ export async function inviteAgent(
         from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
         to: email,
         subject: `${owner.full_name ?? "Twój szef"} zaprasza Cię do AgentSpace`,
-        html: `
+        html: oprawaMaila(`
           <div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
             <h2 style="color:#10b981;">Zaproszenie do zespołu</h2>
             <p style="color:#3f3f46;font-size:15px;line-height:1.6;">
@@ -127,7 +128,7 @@ export async function inviteAgent(
             </p>
             <p style="color:#71717a;font-size:13px;">Link ważny 14 dni. Jeśli to pomyłka - zignoruj tę wiadomość.</p>
           </div>
-        `,
+        `),
       });
       emailSent = !sendError;
       if (sendError) console.error("Invite email error:", sendError);

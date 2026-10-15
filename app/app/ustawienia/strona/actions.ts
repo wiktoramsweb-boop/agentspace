@@ -9,6 +9,7 @@ import { ASSET_BUCKET } from "@/lib/storage";
 import { removeFiles, signUploads, type SignedUpload } from "@/lib/storage-server";
 import { slugify, type SiteBrand, type SiteContact, type SiteContent } from "@/lib/site/config";
 import { WZORY } from "@/lib/wzory/themes";
+import { oprawaMaila } from "@/lib/mail";
 
 export type SiteResult = { ok: true } | { ok: false; error: string };
 
@@ -306,9 +307,9 @@ export async function requestSiteAddon(): Promise<SiteResult> {
         from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
         to: process.env.NOTIFICATION_EMAIL ?? "wiktor.amsweb@gmail.com",
         subject: `Zapytanie o stronę www: ${owner.agency?.name ?? "biuro"}`,
-        html: `<p><strong>${escapeHtml(owner.agency?.name ?? "Biuro")}</strong> chce stronę internetową.</p>
+        html: oprawaMaila(`<p><strong>${escapeHtml(owner.agency?.name ?? "Biuro")}</strong> chce stronę internetową.</p>
                <p>Osoba: ${escapeHtml(owner.full_name ?? "-")} (${escapeHtml(owner.email ?? "-")})<br>
-               Telefon: ${escapeHtml(owner.phone ?? "-")}</p>`,
+               Telefon: ${escapeHtml(owner.phone ?? "-")}</p>`),
       });
     } catch {
       // Brak maila nie może zablokować zgłoszenia: zapis w bazie już jest.

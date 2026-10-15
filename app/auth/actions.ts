@@ -8,6 +8,7 @@ import { hitLimit, visitorKey } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/html";
 import { zapiszBlad } from "@/lib/blad";
 import { WERSJA_POWIERZENIA } from "@/lib/powierzenie";
+import { oprawaMaila } from "@/lib/mail";
 
 export type AuthResult = { error: string } | undefined;
 
@@ -32,7 +33,7 @@ async function powiadomONowymBiurze(dane: {
       from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
       to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
       subject: `Nowe biuro w AgentSpace: ${dane.agencyName}`,
-      html: `
+      html: oprawaMaila(`
         <div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
           <h2 style="color:#10b981;margin:0 0 16px;">Nowe biuro założyło konto</h2>
           <p style="margin:0 0 6px;"><strong>${escapeHtml(dane.agencyName)}</strong></p>
@@ -41,7 +42,7 @@ async function powiadomONowymBiurze(dane: {
           <p style="margin:0 0 16px;">${escapeHtml(dane.phone || "bez telefonu")}</p>
           <p style="color:#71717a;font-size:13px;">Okres próbny startuje od teraz.</p>
         </div>
-      `,
+      `),
     });
   } catch (err) {
     await zapiszBlad("rejestracja/powiadomienie", err);

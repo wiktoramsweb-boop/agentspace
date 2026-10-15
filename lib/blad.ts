@@ -1,5 +1,6 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import { escapeHtml } from "./html";
+import { oprawaMaila } from "./mail";
 
 /**
  * Zapis błędu do dziennika (v41).
@@ -68,14 +69,14 @@ async function powiadomOAwarii(gdzie: string, wiadomosc: string): Promise<void> 
       from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
       to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
       subject: `AgentSpace: awaria w ${gdzie}`,
-      html: `
+      html: oprawaMaila(`
         <div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
           <h2 style="color:#dc2626;margin:0 0 16px;">Nowy błąd na produkcji</h2>
           <p style="font-size:15px;color:#3f3f46;margin:0 0 8px;"><strong>${escapeHtml(gdzie)}</strong></p>
           <p style="font-size:15px;color:#3f3f46;margin:0 0 16px;">${escapeHtml(wiadomosc)}</p>
           <p style="font-size:13px;color:#71717a;">To pierwsze wystąpienie w ciągu doby. Kolejne powtórzenia nie wywołają maila. Pełny dziennik jest w panelu operatora.</p>
         </div>
-      `,
+      `),
     });
   } catch {
     // Poczta nie działa. Trudno: błąd jest już w dzienniku i w konsoli.

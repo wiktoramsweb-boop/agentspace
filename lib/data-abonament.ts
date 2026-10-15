@@ -12,6 +12,7 @@ import {
 } from "./abonament-cennik";
 import { SITE_ADDON } from "./site/addon";
 import { escapeHtml } from "./html";
+import { oprawaMaila } from "./mail";
 
 export { PLANS, planForAgents, cenaPakietu };
 export type { Plan };
@@ -277,7 +278,7 @@ async function powiadomOZamowieniu(orderId: string, agencyId: string): Promise<v
       from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
       to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
       subject: `Nowe zamówienie: ${biuro?.name ?? "biuro"}`,
-      html: `
+      html: oprawaMaila(`
         <div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
           <h2 style="color:#10b981;margin:0 0 16px;">Nowe zamówienie w AgentSpace</h2>
           <p style="font-size:15px;color:#3f3f46;margin:0 0 8px;"><strong>${escapeHtml(biuro?.name ?? "Biuro bez nazwy")}</strong></p>
@@ -285,7 +286,7 @@ async function powiadomOZamowieniu(orderId: string, agencyId: string): Promise<v
           <p style="font-size:13px;color:#71717a;">Numer zamówienia: ${escapeHtml(zam.id)}</p>
           <p style="font-size:13px;color:#71717a;">Wystaw fakturę, a po zaksięgowaniu wpłaty potwierdź zamówienie, żeby biuro dostało dostęp.</p>
         </div>
-      `,
+      `),
     });
   } catch (err) {
     await zapiszBlad("abonament/powiadomienie", err, { agencyId });

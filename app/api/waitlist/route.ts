@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { oprawaMaila } from "@/lib/mail";
 
 const VALID_TEAM_SIZES = ["1-3", "4-10", "11-25", "25+"] as const;
 type TeamSize = (typeof VALID_TEAM_SIZES)[number];
@@ -120,7 +121,7 @@ export async function POST(request: Request) {
         from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
         to: notifyEmail,
         subject: `🎉 Nowy zapis na waitlist: ${agencyName}`,
-        html: `
+        html: oprawaMaila(`
           <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
             <h2 style="color: #10b981; margin: 0 0 16px;">Nowy zapis na listę oczekujących AgentSpace</h2>
             <p style="color: #52525b; font-size: 14px; margin: 0 0 24px;">Ktoś właśnie zapisał się przez formularz na stronie głównej.</p>
@@ -134,7 +135,7 @@ export async function POST(request: Request) {
 
             <p style="color: #71717a; font-size: 12px; margin-top: 24px;">Sprawdź wszystkie zapisy w panelu Supabase.</p>
           </div>
-        `,
+        `),
       });
     } catch (emailError) {
       // Email nie powiódł się, ale zapis już jest w bazie - nie blokujemy odpowiedzi

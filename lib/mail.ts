@@ -12,6 +12,8 @@ import { escapeHtml } from "./html";
  */
 
 const ADRES_APLIKACJI = "https://agentspace.pl";
+// Obrazki prosto z www: część programów pocztowych nie podąża za przekierowaniem.
+const ADRES_GRAFIK = "https://www.agentspace.pl";
 
 export type Mail = {
   do: string;
@@ -24,14 +26,47 @@ export type Mail = {
   stopka?: string;
 };
 
+/**
+ * Firmowa oprawa każdego maila z AgentSpace: logo (sygnet z napisem) na górze,
+ * treść na białej karcie, stopka z adresem. Wszystkie maile systemowe idą
+ * przez tę funkcję, żeby odbiorca od pierwszego spojrzenia wiedział, od kogo
+ * jest wiadomość, i żeby nie wyglądała jak phishing.
+ *
+ * `tresc` to gotowy HTML środka (bez <html> i <body>).
+ */
+export function oprawaMaila(tresc: string): string {
+  return `<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:28px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+        <tr><td style="padding:0 4px 18px;">
+          <a href="${ADRES_APLIKACJI}" style="text-decoration:none;"><img src="${ADRES_GRAFIK}/marka/poziome-na-bialym-tle.png" alt="AgentSpace" width="168" style="display:block;border:0;height:auto;"></a>
+        </td></tr>
+        <tr><td style="background:#ffffff;border:1px solid #e2e3dd;border-top:4px solid #0b7a55;border-radius:14px;padding:28px 28px 24px;font-family:-apple-system,'Segoe UI',Arial,sans-serif;color:#14171a;">
+          ${tresc}
+        </td></tr>
+        <tr><td style="padding:16px 6px 0;">
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+            <td style="padding-right:10px;vertical-align:middle;"><img src="${ADRES_GRAFIK}/marka/znak-gradient-64.png" alt="" width="22" height="22" style="display:block;border:0;border-radius:5px;"></td>
+            <td style="vertical-align:middle;font-family:-apple-system,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.5;color:#7a8087;">AgentSpace, program dla biur nieruchomości · <a href="${ADRES_APLIKACJI}" style="color:#0b7a55;text-decoration:none;">agentspace.pl</a></td>
+          </tr></table>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
 function szablon(m: Mail): string {
   const akapity = m.akapity
-    .map((t) => `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#334155;">${escapeHtml(t)}</p>`)
+    .map((t) => `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#3d4349;">${escapeHtml(t)}</p>`)
     .join("");
 
   const przycisk = m.przycisk
     ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
-         <tr><td style="border-radius:12px;background:#10b981;">
+         <tr><td style="border-radius:12px;background:#0b7a55;">
            <a href="${m.przycisk.adres}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">${escapeHtml(m.przycisk.tekst)}</a>
          </td></tr>
        </table>`
@@ -41,25 +76,9 @@ function szablon(m: Mail): string {
     ? `<p style="margin:0;font-size:13px;line-height:1.6;color:#94a3b8;">${escapeHtml(m.stopka)}</p>`
     : "";
 
-  return `<!doctype html>
-<html lang="pl"><body style="margin:0;padding:0;background:#f1f5f9;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 16px;">
-    <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;overflow:hidden;">
-        <tr><td style="background:#07090c;padding:22px 32px;">
-          <img src="${ADRES_APLIKACJI}/marka/poziome-na-ciemnym-tle.png" alt="AgentSpace" width="180" style="display:block;border:0;">
-        </td></tr>
-        <tr><td style="padding:32px;">
-          <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;color:#0b1220;font-weight:600;">${escapeHtml(m.naglowek)}</h1>
-          ${akapity}${przycisk}${stopka}
-        </td></tr>
-        <tr><td style="padding:20px 32px;border-top:1px solid #e2e8f0;">
-          <p style="margin:0;font-size:12px;color:#94a3b8;">AgentSpace, system dla biur nieruchomości. <a href="${ADRES_APLIKACJI}" style="color:#10b981;text-decoration:none;">agentspace.pl</a></p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body></html>`;
+  return oprawaMaila(`
+          <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;color:#14171a;font-weight:600;">${escapeHtml(m.naglowek)}</h1>
+          ${akapity}${przycisk}${stopka}`);
 }
 
 /** Zwraca true, gdy mail poszedł. Nigdy nie rzuca: brak poczty nie może wywrócić akcji. */
