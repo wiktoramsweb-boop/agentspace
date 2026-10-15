@@ -10,12 +10,24 @@ import { removeFiles } from "@/lib/storage-server";
 import { CLIENT_STATUSES, PROPERTY_STATUSES, ACTIVITY_STATUSES, PROCESS_STAGES } from "@/lib/types";
 import { after } from "next/server";
 import { poZmianieEtapuOferty, poZmianieStatusuKlienta } from "@/lib/zdarzenia";
+import { zapiszZdarzenie, type RodzajZdarzenia } from "@/lib/dziennik";
 
 export type BulkEntity = "clients" | "properties" | "activities" | "searches";
 export type BulkResult = { ok: true; count: number } | { ok: false; error: string };
 
 /** Ile pozycji naraz. Więcej i tak nikt nie zaznacza świadomie. */
 const MAX = 300;
+
+const RODZAJ_DZIENNIKA: Record<BulkEntity, RodzajZdarzenia> = { clients: "klient", properties: "oferta", activities: "dzialanie", searches: "poszukiwanie" };
+const NAZWA_DZIENNIKA: Record<BulkEntity, string> = { clients: "klienci", properties: "oferty", activities: "działania", searches: "poszukiwania" };
+
+async function dziennikUsuniecia(user: { id: string; agency_id: string | null }, entity: BulkEntity, ile: number) {
+  if (!user.agency_id || ile <= 0) return;
+  await zapiszZdarzenie({
+    agencyId: user.agency_id, actorId: user.id, akcja: "masowe_usuniecie", rodzaj: RODZAJ_DZIENNIKA[entity],
+    opis: `Masowo usunięto: ${NAZWA_DZIENNIKA[entity]} (${ile})`,
+  });
+}
 
 const TABLE: Record<BulkEntity, string> = {
   clients: "clients",
@@ -151,6 +163,14 @@ export async function bulkAssignAgent(entity: BulkEntity, ids: string[], agentId
     .eq("agency_id", user.agency_id)
     .in("id", allowed);
   if (error) return { ok: false, error: `Nie udało się zapisać: ${error.message}` };
+  if (entity !== "activities") {
+    const { data: kto } = await admin.from("profiles").select("full_name").eq("id", agentId).maybeSingle();
+    await zapiszZdarzenie({
+      agencyId: user.agency_id, actorId: user.id, akcja: "przepisanie", rodzaj: RODZAJ_DZIENNIKA[entity],
+      opis: `Przepisano: ${NAZWA_DZIENNIKA[entity]} (${count ?? allowed.length}) na ${kto?.full_name ?? "agenta"}`,
+      meta: { ids: allowed.slice(0, 200), agentId },
+    });
+  }
   return done(entity, count ?? allowed.length);
 }
 
@@ -199,6 +219,7 @@ export async function bulkDelete(entity: BulkEntity, ids: string[]): Promise<Bul
       .in("id", list);
     await admin.from("activities").delete().eq("agency_id", user.agency_id).in("id", list);
     for (const row of before ?? []) await applyActivityToGoals(admin, row, -1);
+    await dziennikUsuniecia(user, entity, before?.length ?? 0);
     return done(entity, before?.length ?? list.length);
   }
 
@@ -220,6 +241,7 @@ export async function bulkDelete(entity: BulkEntity, ids: string[]): Promise<Bul
       .flatMap((ph) => [ph.path, ph.original_path])
       .filter((p): p is string => !!p && p.startsWith(`${user.agency_id}/`));
     await removeFiles(PHOTO_BUCKET, [...new Set(files)]);
+    await dziennikUsuniecia(user, entity, count ?? list.length);
     return done(entity, count ?? list.length);
   }
 
@@ -229,5 +251,6 @@ export async function bulkDelete(entity: BulkEntity, ids: string[]): Promise<Bul
     .eq("agency_id", user.agency_id)
     .in("id", list);
   if (error) return { ok: false, error: `Nie udało się usunąć: ${error.message}` };
+  await dziennikUsuniecia(user, entity, count ?? list.length);
   return done(entity, count ?? list.length);
 }

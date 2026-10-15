@@ -5,6 +5,7 @@ import { todayPL } from "@/lib/datetime";
 import { ZBIORY, doCsv } from "@/lib/eksport-csv";
 import { SCHEMAT } from "@/lib/eksport-schemat";
 import { spakuj } from "@/lib/zip";
+import { zapiszZdarzenie } from "@/lib/dziennik";
 
 /**
  * Całe dane biura w jednym archiwum.
@@ -69,6 +70,7 @@ export async function GET() {
 
   const archiwum = spakuj(pliki);
 
+  await zapiszZdarzenie({ agencyId: user.agency_id, actorId: user.id, akcja: "eksport_danych", rodzaj: "eksport", opis: "Pobrano pełny eksport danych biura (ZIP)" });
   return new Response(archiwum as BodyInit, {
     headers: {
       "content-type": "application/zip",

@@ -419,7 +419,7 @@ export async function deleteProperty(id: string): Promise<void> {
   // Zdjęcia oferty kasujemy razem z nią, inaczej zostałyby w magazynie na zawsze.
   const { data: prop } = await admin
     .from("properties")
-    .select("photos, agent_id")
+    .select("photos, agent_id, title")
     .eq("id", id)
     .eq("agency_id", user.agency_id)
     .maybeSingle();
@@ -428,6 +428,7 @@ export async function deleteProperty(id: string): Promise<void> {
 
   const { error } = await admin.from("properties").delete().eq("id", id).eq("agency_id", user.agency_id);
   if (!error && prop && user.agency_id) {
+    await zapiszZdarzenie({ agencyId: user.agency_id, actorId: user.id, akcja: "oferta_usunieta", rodzaj: "oferta", opis: `Usunięto ofertę: ${prop.title ?? "bez tytułu"}` });
     const files = ((prop.photos ?? []) as { path?: string; original_path?: string }[])
       .flatMap((p) => [p.path, p.original_path])
       .filter((p): p is string => !!p && p.startsWith(`${user.agency_id}/`));

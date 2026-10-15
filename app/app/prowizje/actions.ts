@@ -8,6 +8,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import type { DealStatus } from "@/lib/types";
 import { after } from "next/server";
 import { poZamknieciuTransakcji } from "@/lib/zdarzenia";
+import { zapiszZdarzenie } from "@/lib/dziennik";
 
 function num(v: FormDataEntryValue | null): number {
   const n = parseInt(String(v ?? "0").replace(/\s/g, ""), 10);
@@ -90,7 +91,10 @@ export async function setDealStatus(dealId: string, status: DealStatus): Promise
 export async function deleteDeal(dealId: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  await admin.from("deals").delete().eq("id", dealId).eq("agent_id", user.id);
+  const { data: usunieta } = await admin.from("deals").delete().eq("id", dealId).eq("agent_id", user.id).select("title, commission_pln");
+  if (usunieta?.length && user.agency_id) {
+    await zapiszZdarzenie({ agencyId: user.agency_id, actorId: user.id, akcja: "transakcja_usunieta", rodzaj: "transakcja", opis: `Usunięto transakcję: ${usunieta[0].title} (${usunieta[0].commission_pln} zł prowizji)` });
+  }
   revalidatePath("/app/prowizje");
   revalidatePath("/app");
 }

@@ -11,6 +11,7 @@ import { APP_URL } from "@/lib/supabase/config";
 import { sendAgencyMonthlyReport } from "@/lib/report";
 import { type UserRole } from "@/lib/types";
 import { ROLE_LABELS } from "@/lib/role";
+import { zapiszZdarzenie } from "@/lib/dziennik";
 
 const VALID_ROLES = ROLE.map((r) => r.id);
 
@@ -314,6 +315,13 @@ export async function setMemberRole(memberId: string, role: UserRole): Promise<R
     })
     .eq("id", memberId);
 
+  if (owner.agency_id && member.role !== role) {
+    const { data: kto } = await admin.from("profiles").select("full_name").eq("id", memberId).maybeSingle();
+    await zapiszZdarzenie({
+      agencyId: owner.agency_id, actorId: owner.id, akcja: "zmiana_roli", rodzaj: "osoba", id: memberId,
+      opis: `Zmiana roli: ${kto?.full_name ?? "osoba"}, ${ROLE_LABELS[member.role as UserRole] ?? member.role} → ${ROLE_LABELS[role]}`,
+    });
+  }
   revalidatePath("/app/zespol");
   revalidatePath(`/app/zespol/${memberId}`);
   return {};
@@ -425,6 +433,10 @@ export async function setMemberPermissions(
     .eq("id", memberId);
   if (error) {
     return { error: "Nie udało się zapisać. Uruchom migrację v38 (lib/SETUP-v38-role.sql)." };
+  }
+  if (owner.agency_id) {
+    const { data: kto } = await admin.from("profiles").select("full_name").eq("id", memberId).maybeSingle();
+    await zapiszZdarzenie({ agencyId: owner.agency_id, actorId: owner.id, akcja: "zmiana_uprawnien", rodzaj: "osoba", id: memberId, opis: `Zmieniono uprawnienia: ${kto?.full_name ?? "osoba"}` });
   }
 
   revalidatePath("/app/zespol");

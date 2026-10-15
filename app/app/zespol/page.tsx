@@ -130,7 +130,19 @@ export default async function ZespolPage() {
             ? `${user.agency?.name ?? "Twoje biuro"} - dane, nie przeczucia.`
             : "Twoi agenci - cele i wyniki AI."
         }
-        action={isOwner ? <ReportButton /> : undefined}
+        action={
+          isOwner ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/app/zespol/dziennik"
+                className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:border-slate-400"
+              >
+                Dziennik zdarzeń
+              </Link>
+              <ReportButton />
+            </div>
+          ) : undefined
+        }
       />
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

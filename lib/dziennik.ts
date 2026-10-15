@@ -11,11 +11,15 @@ import { createSupabaseAdmin } from "./supabase/admin";
  * drugą bazą danych osobowych. Nigdy nie rzuca.
  */
 
+export type RodzajZdarzenia =
+  | "klient" | "oferta" | "transakcja" | "faktura" | "koszt" | "osoba" | "dokument" | "automatyzacja"
+  | "eksport" | "ustawienia" | "lead" | "poszukiwanie" | "dzialanie";
+
 export type Zdarzenie = {
   agencyId: string;
   actorId: string | null;
   akcja: string;
-  rodzaj?: "klient" | "oferta" | "transakcja" | "faktura" | "koszt" | "osoba" | "dokument" | "automatyzacja" | "eksport" | "ustawienia" | "lead" | "poszukiwanie";
+  rodzaj?: RodzajZdarzenia;
   id?: string | null;
   opis: string;
   meta?: Record<string, unknown>;

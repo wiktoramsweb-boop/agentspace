@@ -4,6 +4,7 @@ import { maModul } from "@/lib/role";
 import { todayPL } from "@/lib/datetime";
 import { ZBIORY, doCsv, nazwaPliku, type Zbior } from "@/lib/eksport-csv";
 import { SCHEMAT } from "@/lib/eksport-schemat";
+import { zapiszZdarzenie } from "@/lib/dziennik";
 
 /**
  * Eksport danych biura do CSV.
@@ -52,6 +53,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ zbior: 
 
   const csv = doCsv(kolumny, (data ?? []) as unknown as Record<string, unknown>[]);
 
+  await zapiszZdarzenie({ agencyId: user.agency_id, actorId: user.id, akcja: "eksport_danych", rodzaj: "eksport", opis: `Pobrano eksport: ${zbior}` });
   return new Response(csv, {
     headers: {
       "content-type": "text/csv; charset=utf-8",

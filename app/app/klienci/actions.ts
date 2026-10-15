@@ -8,6 +8,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import type { ClientStatus, ClientType } from "@/lib/types";
 import { after } from "next/server";
 import { poNowymKliencie, poZmianieStatusuKlienta } from "@/lib/zdarzenia";
+import { zapiszZdarzenie } from "@/lib/dziennik";
 
 function floatOrNull(v: FormDataEntryValue | null): number | null {
   const n = parseFloat(String(v ?? "").replace(",", ".").replace(/\s/g, ""));
@@ -184,13 +185,16 @@ export async function deleteClient(clientId: string): Promise<void> {
   const admin = createSupabaseAdmin();
   const { data: rekord } = await admin
     .from("clients")
-    .select("agent_id")
+    .select("agent_id, name")
     .eq("id", clientId)
     .eq("agency_id", user.agency_id)
     .maybeSingle();
   // Agent usuwa tylko swoich klientów; cudzych CEO albo menedżer.
   if (!rekord || !mozeUsunac(user, rekord)) redirect(`/app/klienci/${clientId}`);
-  await admin.from("clients").delete().eq("id", clientId).eq("agency_id", user.agency_id);
+  const { error } = await admin.from("clients").delete().eq("id", clientId).eq("agency_id", user.agency_id);
+  if (!error && user.agency_id) {
+    await zapiszZdarzenie({ agencyId: user.agency_id, actorId: user.id, akcja: "klient_usuniety", rodzaj: "klient", opis: `Usunięto klienta: ${rekord.name ?? "bez nazwy"}` });
+  }
   revalidatePath("/app/klienci");
   redirect("/app/klienci");
 }
