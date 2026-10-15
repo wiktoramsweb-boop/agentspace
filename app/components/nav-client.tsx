@@ -188,8 +188,8 @@ export function NavClient({
             {t.login}
           </Link>
           <Link
-            href={href("/kontakt")}
-            className="hidden h-9 items-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 text-sm font-semibold text-[var(--mk-on-accent)] shadow-[0_6px_20px_-8px_rgba(16,185,129,0.9)] transition-all hover:shadow-[0_10px_28px_-8px_rgba(16,185,129,1)] hover:brightness-110 sm:inline-flex"
+            href="/signup"
+            className="hidden h-9 items-center rounded-lg bg-[var(--color-mk-accent)] px-4 text-sm font-semibold text-[var(--mk-on-accent)] transition-colors hover:bg-[var(--mk-accent-text)] sm:inline-flex"
           >
             {t.cta}
           </Link>
@@ -252,8 +252,8 @@ export function NavClient({
 
                 <div className="mt-6 flex flex-col gap-3">
                   <Link
-                    href={href("/kontakt")}
-                    className="inline-flex h-12 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 font-semibold text-[var(--mk-on-accent)]"
+                    href="/signup"
+                    className="inline-flex h-12 items-center justify-center rounded-xl bg-[var(--color-mk-accent)] px-5 font-semibold text-[var(--mk-on-accent)]"
                   >
                     {t.cta}
                   </Link>

@@ -95,7 +95,7 @@ export default async function Demo({ params }: { params: Promise<{ lang: string 
 
         {/* CTA */}
         <section className="px-6 py-20">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 text-center md:p-12">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-[var(--mk-card-bg)] p-8 text-center md:p-12">
             <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
               {t.cta.title}
             </h2>

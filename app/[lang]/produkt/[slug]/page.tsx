@@ -194,7 +194,7 @@ export default async function ProduktPage({
               </p>
               <span
                 aria-hidden="true"
-                className="absolute inset-x-0 bottom-0 h-px scale-x-0 bg-gradient-to-r from-emerald-400 to-cyan-400 transition-transform duration-500 group-hover:scale-x-100"
+                className="absolute inset-x-0 bottom-0 h-px scale-x-0 bg-[var(--color-mk-accent)] transition-transform duration-500 group-hover:scale-x-100"
               />
             </div>
             );

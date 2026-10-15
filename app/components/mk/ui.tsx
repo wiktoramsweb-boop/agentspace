@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-/** Etykieta nad nagłówkiem sekcji (pigułka z pulsującą kropką). */
+/** Krótka etykieta nad nagłówkiem sekcji. */
 export function Eyebrow({ children }: { children: ReactNode }) {
   return <p className="mk-eyebrow">{children}</p>;
 }
@@ -81,10 +81,8 @@ type ButtonProps = {
 };
 
 /**
- * Przycisk.
- * `primary` ma gradient marki + poświatę, która rośnie przy najechaniu,
- * oraz przesuwający się połysk (`.mk-sheen`) - to jedyne miejsce, gdzie
- * pozwalamy sobie na tak wyraźny efekt, bo to najważniejszy element strony.
+ * Przycisk. Jednolity kolor marki, bez poświaty i połysku: główne wezwanie
+ * ma się wyróżniać kontrastem i miejscem na stronie, nie efektem.
  */
 export function Button({
   href,
@@ -93,44 +91,23 @@ export function Button({
   className = "",
 }: ButtonProps) {
   const base =
-    "group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full px-8 text-[1.0625rem] font-semibold transition-all duration-300";
-
+    "inline-flex h-12 items-center justify-center rounded-xl px-6 text-[1rem] font-semibold transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-mk-accent)]";
   const styles =
     variant === "primary"
-      ? "text-[var(--mk-on-accent)] shadow-[0_10px_36px_-12px_rgba(16,185,129,0.75)] hover:shadow-[0_16px_50px_-12px_rgba(16,185,129,0.95)] hover:-translate-y-0.5"
-      : "border border-[var(--mk-hairline)] bg-[var(--mk-surface-2)] font-medium text-[var(--color-mk-text)] backdrop-blur-sm hover:border-emerald-400/40 hover:bg-[var(--mk-surface-3)] hover:-translate-y-0.5";
-
-  const isInternalRoute = href.startsWith("/");
+      ? "bg-[var(--color-mk-accent)] text-[var(--mk-on-accent)] hover:bg-[var(--mk-accent-text)]"
+      : "border border-[var(--mk-hairline-strong)] bg-[var(--mk-card-bg)] text-[var(--color-mk-text)] hover:border-[var(--color-mk-text)]";
   const cls = `${base} ${styles} ${className}`;
 
-  const inner = (
-    <>
-      {variant === "primary" ? (
-        <span
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-emerald-400 to-cyan-400"
-        />
-      ) : null}
-      {/* Połysk przejeżdżający przy hoverze */}
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-      />
-      <span className="relative z-10">{children}</span>
-    </>
-  );
-
-  if (isInternalRoute) {
+  if (href.startsWith("/")) {
     return (
       <Link href={href} className={cls}>
-        {inner}
+        {children}
       </Link>
     );
   }
-
   return (
     <a href={href} className={cls}>
-      {inner}
+      {children}
     </a>
   );
 }
@@ -140,9 +117,9 @@ export function Tick({ className = "" }: { className?: string }) {
   return (
     <span
       aria-hidden="true"
-      className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/12 ring-1 ring-emerald-500/25 ${className}`}
+      className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center ${className}`}
     >
-      <svg className="h-3 w-3 text-emerald-400" viewBox="0 0 20 20" fill="none">
+      <svg className="h-4 w-4 text-[var(--color-mk-accent)]" viewBox="0 0 20 20" fill="none">
         <path
           d="M4 10.5 8 14.5 16 5.5"
           stroke="currentColor"

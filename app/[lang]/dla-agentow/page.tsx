@@ -52,7 +52,7 @@ export default async function DlaAgentow({ params }: { params: Promise<{ lang: s
                 const Icon = benefit.icon;
                 return (
                   <StaggerItem key={benefit.title}>
-                    <div className="group relative h-full overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)] hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.2)]">
+                    <div className="group relative h-full overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)]">
                       <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-all duration-500 group-hover:bg-emerald-500/15" />
 
                       <div className="relative">
@@ -108,7 +108,7 @@ export default async function DlaAgentow({ params }: { params: Promise<{ lang: s
         {/* CTA */}
         <section className="px-6 py-20">
           <FadeIn>
-            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 text-center md:p-12">
+            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-[var(--mk-card-bg)] p-8 text-center md:p-12">
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
                 {t.cta.title}
               </h2>

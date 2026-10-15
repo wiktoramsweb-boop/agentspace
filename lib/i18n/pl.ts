@@ -21,11 +21,11 @@ export const pl = {
     ],
     login: "Zaloguj",
     loginLong: "Zaloguj się",
-    cta: "Umów rozmowę",
+    cta: "Wypróbuj za darmo",
     menu: "Menu",
     closeMenu: "Zamknij menu",
     language: "Język",
-    allModules: "Wszystkie 16 modułów",
+    allModules: "Wszystkie moduły",
   },
 
   footer: {
@@ -163,7 +163,7 @@ export const pl = {
         {
           key: "nieruchomosci",
           label: "Oferty",
-          note: "Wspólna baza ofert ze zdjęciami po obróbce i znakiem wodnym biura. Jedno zaznaczenie publikuje ofertę na stronie biura i na portalach.",
+          note: "Wspólna baza ofert ze zdjęciami po obróbce i znakiem wodnym biura. Jedno zaznaczenie publikuje ofertę na stronie biura.",
         },
         {
           key: "klienci",
@@ -210,7 +210,7 @@ export const pl = {
         {
           alt: "Agent pokazuje puste mieszkanie parze kupujących",
           title: "Prezentacja",
-          body: "Zdjęcia z sesji wrzucasz z telefonu, a system sam dokłada znak wodny biura i wysyła ofertę na stronę oraz na portale.",
+          body: "Zdjęcia z sesji wrzucasz z telefonu, a system sam dokłada znak wodny biura i publikuje ofertę na stronie biura.",
         },
         {
           alt: "Podpisywanie umowy przy stole, obok klucze do mieszkania",
@@ -863,7 +863,7 @@ export const pl = {
         items: [
           { title: "Bez WordPressa i wtyczek", body: "Nie ma czego łatać ani co się nie zaktualizuje. Strona to część systemu, nie kolejne oprogramowanie do pilnowania." },
           { title: "Oferty zawsze aktualne", body: "Zmiana ceny w CRM zmienia cenę na stronie. Sprzedana oferta znika ze strony sama." },
-          { title: "Zdjęcia raz, wszędzie", body: "Ten sam zestaw zdjęć ze znakiem wodnym idzie na stronę, do PDF dla klienta i na portale." },
+          { title: "Zdjęcia raz, wszędzie", body: "Ten sam zestaw zdjęć ze znakiem wodnym idzie na stronę biura i do PDF dla klienta." },
           { title: "Szybkość i Google", body: "Strony budujemy statycznie, więc ładują się w ułamku sekundy, co Google traktuje jako sygnał rankingowy." },
           { title: "Ulubione i historia", body: "Odwiedzający odkłada oferty do ulubionych, a agent widzi przy kontakcie, co ten człowiek oglądał." },
           { title: "Jeden abonament", body: "Strona, CRM i obsługa w jednej cenie. Bez faktur od trzech różnych firm co miesiąc." },

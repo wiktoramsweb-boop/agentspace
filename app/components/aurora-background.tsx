@@ -1,69 +1,8 @@
-"use client";
-
-import { motion } from "motion/react";
-
+/**
+ * Dawniej animowana zorza w tle nagłówków. Wyłączona przy przebudowie strony
+ * (2026-10): poświaty w tle to jeden z najbardziej rozpoznawalnych znaków
+ * strony z gotowca. Komponent zostaje, żeby nie ruszać miejsc, które go wołają.
+ */
 export function AuroraBackground() {
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Główna aurora - emerald */}
-      <motion.div
-        className="absolute -top-1/2 left-1/2 h-[620px] w-[620px] -translate-x-1/2 rounded-full bg-emerald-500/[0.11] blur-3xl"
-        animate={{
-          x: ["-50%", "-30%", "-50%", "-70%", "-50%"],
-          y: ["0%", "10%", "20%", "10%", "0%"],
-          scale: [1, 1.1, 1.2, 1.1, 1],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Drugi blob - cyan, po przeciwnej stronie */}
-      <motion.div
-        className="absolute -top-1/4 right-0 h-[480px] w-[480px] rounded-full bg-cyan-500/[0.08] blur-3xl"
-        animate={{
-          x: ["0%", "-20%", "10%", "-10%", "0%"],
-          y: ["10%", "30%", "20%", "0%", "10%"],
-          scale: [1, 1.2, 1, 1.1, 1],
-        }}
-        transition={{
-          duration: 22,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Trzeci blob - subtle violet */}
-      <motion.div
-        className="absolute top-1/4 left-0 h-[420px] w-[420px] rounded-full bg-violet-500/[0.06] blur-3xl"
-        animate={{
-          x: ["0%", "30%", "10%", "20%", "0%"],
-          y: ["20%", "0%", "30%", "10%", "20%"],
-          scale: [1, 0.9, 1.1, 1, 1],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Siatka w tle. Kolor linii zależy od motywu, żeby w jasnym nie znikała. */}
-      <div
-        className="absolute inset-0"
-        style={{
-          opacity: "var(--mk-grid-opacity, 0.022)",
-          backgroundImage:
-            "linear-gradient(var(--mk-grid-line, rgba(255,255,255,0.5)) 1px, transparent 1px), linear-gradient(90deg, var(--mk-grid-line, rgba(255,255,255,0.5)) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-        }}
-      />
-
-      {/* Dolne wygaszenie do koloru tła strony, a nie do czerni: w jasnym
-          motywie czarny pas zjadał nagłówek podstrony. */}
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[var(--color-mk-bg)] via-[var(--mk-aurora-fade)] to-transparent" />
-    </div>
-  );
+  return null;
 }

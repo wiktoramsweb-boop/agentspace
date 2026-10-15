@@ -87,7 +87,7 @@ export default async function Kontakt({ params }: { params: Promise<{ lang: stri
                 </div>
 
                 {/* Operator card */}
-                <div className="relative overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-gradient-to-br from-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-6 backdrop-blur-xl">
+                <div className="relative overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-6">
                   <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl" />
                   <div className="relative">
                     <h3 className="mb-3 text-base font-semibold text-[var(--color-mk-text)]">
@@ -110,7 +110,7 @@ export default async function Kontakt({ params }: { params: Promise<{ lang: stri
 
             {/* Form column */}
             <FadeIn delay={0.15}>
-              <div className="rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 backdrop-blur-xl md:p-10">
+              <div className="rounded-3xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 md:p-10">
                 <h2 className="mb-6 text-xl font-semibold text-[var(--color-mk-text)]">{t.formTitle}</h2>
                 <ContactForm lang={locale} />
               </div>

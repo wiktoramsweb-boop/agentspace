@@ -49,7 +49,7 @@ export default async function DlaWlascicieli({ params }: { params: Promise<{ lan
                   <div className="group relative h-full overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 transition-all hover:-translate-y-1 hover:border-red-500/30 hover:bg-[var(--mk-card-bg)]">
                     <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-red-500/5 blur-2xl transition-all duration-500 group-hover:bg-red-500/15" />
                     <div className="relative">
-                      <p className="mb-4 bg-gradient-to-br from-red-400 to-amber-400 bg-clip-text text-5xl font-semibold text-transparent md:text-6xl">
+                      <p className="mb-4 text-5xl font-semibold text-[var(--mk-warm)] md:text-6xl">
                         {problem.stat}
                       </p>
                       <h3 className="mb-3 text-lg font-semibold text-[var(--color-mk-text)]">{problem.title}</h3>
@@ -100,9 +100,7 @@ export default async function DlaWlascicieli({ params }: { params: Promise<{ lan
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <div className="relative overflow-hidden rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 backdrop-blur-xl md:p-10">
-                <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl" />
-                <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
+              <div className="relative overflow-hidden rounded-3xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 md:p-10">
 
                 <dl className="relative space-y-6">
                   {t.roi.map((item) => (
@@ -130,7 +128,7 @@ export default async function DlaWlascicieli({ params }: { params: Promise<{ lan
         {/* CTA */}
         <section className="px-6 py-20">
           <FadeIn>
-            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 text-center md:p-12">
+            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-[var(--mk-card-bg)] p-8 text-center md:p-12">
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
                 {t.cta.title}
               </h2>

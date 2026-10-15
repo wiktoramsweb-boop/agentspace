@@ -33,14 +33,12 @@ export function BrowserShot({
    */
   fit?: boolean;
 }) {
-  const reduce = useReducedMotion();
+  // Bez wjazdu i przechyłu: ekran produktu ma być widoczny od razu, także
+  // bez JavaScriptu, bo to on, a nie animacja, przekonuje biuro.
+  void tilt;
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 26, rotateX: tilt ? 8 : 0 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.8, ease }}
-      className={`overflow-hidden rounded-2xl border border-[var(--mk-hairline-strong)] bg-slate-100 shadow-[0_50px_120px_-40px_rgba(0,0,0,0.75)] ${className}`}
+    <div
+      className={`overflow-hidden rounded-xl border border-[var(--mk-hairline-strong)] bg-slate-100 shadow-[0_24px_48px_-32px_rgba(20,23,26,0.35)] ${className}`}
     >
       <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-2.5">
         <span className="flex gap-1.5">
@@ -51,7 +49,7 @@ export function BrowserShot({
         <span className="mx-auto rounded-md bg-slate-100 px-3 py-1 text-[11px] text-slate-500">{label}</span>
       </div>
       <div className={fit ? "w-full" : "aspect-[4/3] w-full sm:aspect-[16/11]"}>{children}</div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -119,6 +117,9 @@ export function ShotTabs({
   tabs: { key: string; label: string; note: string; node: React.ReactNode }[];
 }) {
   const [active, setActive] = useState(tabs[0].key);
+  // Pierwszy ekran bez animacji wejścia: ma być widoczny od razu, także przed
+  // załadowaniem JavaScriptu. Animujemy dopiero przełączenie zakładki.
+  const [przelaczono, setPrzelaczono] = useState(false);
   const current = tabs.find((t) => t.key === active) ?? tabs[0];
 
   return (
@@ -128,9 +129,9 @@ export function ShotTabs({
           <button
             key={t.key}
             type="button"
-            onClick={() => setActive(t.key)}
+            onClick={() => { setActive(t.key); setPrzelaczono(true); }}
             className={`relative rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-              active === t.key ? "text-emerald-950" : "text-[var(--color-mk-muted)] hover:text-[var(--color-mk-text)]"
+              active === t.key ? "text-[var(--mk-on-accent)]" : "text-[var(--color-mk-muted)] hover:text-[var(--color-mk-text)]"
             }`}
           >
             {active === t.key && (
@@ -146,7 +147,7 @@ export function ShotTabs({
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-center">
-        <motion.div key={current.key} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease }}>
+        <motion.div key={current.key} initial={przelaczono ? { opacity: 0, y: 8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease }}>
           <BrowserShot label={`agentspace.pl/app/${current.key}`}>{current.node}</BrowserShot>
         </motion.div>
         <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">{current.note}</p>

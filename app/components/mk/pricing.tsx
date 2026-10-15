@@ -89,7 +89,7 @@ export function Pricing({ lang = "pl" }: { lang?: string }) {
               aria-pressed={aktywny}
               className={`rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
                 aktywny
-                  ? "bg-gradient-to-r from-emerald-400 to-cyan-400 text-[var(--mk-on-accent)]"
+                  ? "bg-[var(--color-mk-accent)] text-[var(--mk-on-accent)]"
                   : "text-[var(--color-mk-muted)] hover:text-[var(--color-mk-text)]"
               }`}
             >

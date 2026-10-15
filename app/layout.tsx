@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter_Tight, Geist_Mono, Sora } from "next/font/google";
+import { Inter_Tight, Geist_Mono, Sora, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { ScrollProgress } from "./components/effects/scroll-progress";
 import { SchemaMarkup } from "./components/schema-markup";
@@ -12,11 +12,20 @@ const interTight = Inter_Tight({
   display: "swap",
 });
 
-// Krój napisu w logo. Ładujemy tylko wagę 600, bo poza logo go nie używamy.
+// Krój marki: napis w logo i nagłówki strony www.
 const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin", "latin-ext"],
-  weight: ["600"],
+  weight: ["500", "600"],
+  display: "swap",
+});
+
+// Tekst strony www. Czytelny przy długich akapitach i z pełnymi polskimi
+// znakami; celowo nie Inter, którego używa połowa stron SaaS.
+const plex = IBM_Plex_Sans({
+  variable: "--font-plex",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -96,7 +105,7 @@ export default function RootLayout({
     <html
       lang="pl"
       suppressHydrationWarning
-      className={`${interTight.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}
+      className={`${interTight.variable} ${geistMono.variable} ${sora.variable} ${plex.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--color-mk-bg)]">
         <SchemaMarkup />

@@ -21,8 +21,9 @@ export function ThemeSwitch({ className = "" }: { className?: string }) {
     } catch {
       saved = null;
     }
-    const system = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-    const theme = saved ?? system;
+    // Strona jest domyślnie jasna, niezależnie od systemu: tak ją projektujemy
+    // i tak wygląda na zdjęciach w reklamach. Ciemny motyw tylko na życzenie.
+    const theme = saved ?? "light";
     if (saved) document.documentElement.dataset.mk = saved;
     setLight(theme === "light");
   }, []);

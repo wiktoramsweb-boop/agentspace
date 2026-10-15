@@ -85,7 +85,7 @@ export function ModulesExplorer({
                   <motion.span
                     layoutId="mk-tab"
                     transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 36 }}
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400"
+                    className="absolute inset-0 rounded-full bg-[var(--color-mk-accent)]"
                   />
                 )}
                 <span className="relative">{k.label}</span>
@@ -118,7 +118,7 @@ export function ModulesExplorer({
                   <motion.span
                     layoutId="mk-modul"
                     transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 36 }}
-                    className="absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-emerald-400 to-cyan-400"
+                    className="absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--color-mk-accent)]"
                   />
                 )}
                 <span className="w-6 shrink-0 font-mono text-[11px] tabular-nums text-[var(--color-mk-muted)] opacity-70">

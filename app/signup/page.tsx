@@ -1,56 +1,18 @@
-"use client";
+import { DNI_PROBNE } from "@/lib/abonament-cennik";
+import { FormularzRejestracji } from "./formularz";
 
-import Link from "next/link";
-import { useActionState } from "react";
-import { signUpOwner } from "../auth/actions";
-import { AuthShell } from "../components/auth/auth-shell";
-import { FormField, SubmitButton, FormError } from "../components/auth/form-field";
+export const metadata = {
+  title: "Załóż konto | AgentSpace",
+  description: "Konto dla biura nieruchomości: pełny dostęp przez okres próbny, bez karty płatniczej.",
+};
 
-export default function SignupPage() {
-  const [state, formAction, pending] = useActionState(signUpOwner, undefined);
-
-  return (
-    <AuthShell
-      title="Załóż biuro w AgentSpace"
-      subtitle="Konto właściciela, na zaproszenie. Agentów dodasz po zalogowaniu."
-      footer={
-        <>
-          Masz już konto?{" "}
-          <Link href="/login" className="font-medium text-emerald-400 underline-offset-2 hover:text-emerald-300 hover:underline">
-            Zaloguj się
-          </Link>
-        </>
-      }
-    >
-      <form action={formAction} className="space-y-4">
-        {/* Pułapka na boty: człowiek tego pola nie widzi i go nie wypełni. */}
-        <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-        <FormField
-          label="Kod zaproszenia"
-          name="inviteCode"
-          placeholder="Kod od AgentSpace"
-          hint="Dostajesz go przy rozmowie wdrożeniowej."
-        />
-        <FormField label="Imię i nazwisko" name="fullName" autoComplete="name" placeholder="Jan Kowalski" />
-        <FormField label="Nazwa biura" name="agencyName" placeholder="Np. Nowak Nieruchomości" />
-        <FormField label="Email" name="email" type="email" autoComplete="email" placeholder="ty@biuro.pl" />
-        <FormField label="Telefon" name="phone" type="tel" autoComplete="tel" placeholder="+48 600 000 000" />
-        <FormField
-          label="Hasło"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          placeholder="min. 8 znaków"
-          hint="Minimum 8 znaków."
-        />
-        <FormError message={state?.error} />
-        <SubmitButton pending={pending}>Załóż biuro →</SubmitButton>
-        <p className="text-center text-xs text-zinc-400">
-          Zakładając konto akceptujesz{" "}
-          <Link href="/regulamin" className="underline underline-offset-2 hover:text-emerald-300">regulamin</Link> i{" "}
-          <Link href="/polityka-prywatnosci" className="underline underline-offset-2 hover:text-emerald-300">politykę prywatności</Link>.
-        </p>
-      </form>
-    </AuthShell>
-  );
+/**
+ * Pole kodu pokazujemy tylko, gdy operator wymaga zaproszenia (SIGNUP_CODE).
+ * Bez zmiennej rejestracja jest otwarta i pole tylko by myliło: wygląda jak
+ * przeszkoda, której nie ma.
+ */
+export default async function SignupPage({ searchParams }: { searchParams: Promise<{ email?: string }> }) {
+  const { email } = await searchParams;
+  const czysty = typeof email === "string" && /^[^\s@]{1,64}@[^\s@]{1,190}$/.test(email) ? email : "";
+  return <FormularzRejestracji wymagaKodu={!!process.env.SIGNUP_CODE} email={czysty} dniProbne={DNI_PROBNE} />;
 }

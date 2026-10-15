@@ -1835,3 +1835,128 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print
   color: #0f172a !important;
   border-color: #cbd5e1 !important;
 }
+
+/* ═════════════════════════════════════════════════════════════
+   STRONA WWW 2026-10: „biuro, nie kosmos”
+   Nadpisuje wcześniejszy, ciemny styl z poświatami. Powód: gradientowe
+   nagłówki, zorze w tle, pulsujące kropki i szklane karty to dziś
+   najbardziej rozpoznawalne znaki strony złożonej z gotowców, a nasz
+   klient (właściciel biura) ma zobaczyć narzędzie do pracy, nie efekt.
+   Zasady: jasny papier, jeden zielony z logo, nagłówki w Sorze, tekst
+   w IBM Plex Sans, ramki zamiast cieni, ruch tylko tam, gdzie coś tłumaczy.
+   ═════════════════════════════════════════════════════════════ */
+html:not([data-mk="dark"]) {
+  --color-mk-bg: #f7f7f4;
+  --color-mk-surface: #ffffff;
+  --color-mk-line: #e2e3dd;
+  --color-mk-line-lit: #b9bcb3;
+  --color-mk-text: #14171a;
+  --color-mk-muted: #555b61;
+  --color-mk-accent: #0b7a55;
+  --mk-accent-text: #0a6a4a;
+  --color-mk-accent-2: #0b7a55;
+  --color-mk-accent-soft: #e6f2ec;
+  --mk-hairline: #e2e3dd;
+  --mk-hairline-strong: #cdd0c8;
+  --mk-surface-2: #ffffff;
+  --mk-surface-3: #f0f1ec;
+  --mk-card-bg: #ffffff;
+  --mk-card-tint: none;
+  --mk-card-shadow: none;
+  --mk-nav-bg: rgba(247, 247, 244, 0.92);
+  --mk-nav-panel: #ffffff;
+  --mk-on-accent: #ffffff;
+  --mk-eyebrow-text: #0a6a4a;
+  --mk-warm: #b45f06;
+}
+html[data-mk="dark"] {
+  --color-mk-bg: #111315;
+  --color-mk-surface: #181b1e;
+  --color-mk-line: #2a2e33;
+  --color-mk-text: #eef0ee;
+  --color-mk-muted: #a3aaa6;
+  --color-mk-accent: #34b585;
+  --mk-accent-text: #5ccb9f;
+  --color-mk-accent-2: #34b585;
+  --color-mk-accent-soft: rgba(52, 181, 133, 0.12);
+  --mk-hairline: #2a2e33;
+  --mk-hairline-strong: #3a3f45;
+  --mk-surface-2: #181b1e;
+  --mk-surface-3: #1f2326;
+  --mk-card-bg: #181b1e;
+  --mk-card-tint: none;
+  --mk-card-shadow: none;
+  --mk-on-accent: #07140e;
+  --mk-eyebrow-text: #5ccb9f;
+  --mk-warm: #f0a24a;
+}
+
+.mk {
+  background-image: none;
+  font-family: var(--font-plex), system-ui, -apple-system, sans-serif;
+  font-size: 1.0625rem;
+}
+.mk::before { display: none; }
+
+.mk h1,
+.mk h2,
+.mk h3,
+.mk h4 {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--color-mk-text);
+  font-family: var(--font-sora), var(--font-plex), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.mk h1 { font-size: clamp(2.375rem, 5vw, 3.75rem); line-height: 1.05; }
+.mk h2 { font-size: clamp(1.875rem, 3.4vw, 2.75rem); line-height: 1.1; }
+.mk h3 { font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1.15; }
+.mk h4 { font-size: 1.1875rem; line-height: 1.3; font-weight: 600; letter-spacing: -0.015em; }
+
+/* Akcent w nagłówku: kolor, nie gradient, i bez migotania. */
+.mk .grad,
+.mk-paper .grad {
+  background: none;
+  -webkit-text-fill-color: var(--mk-accent-text);
+  color: var(--mk-accent-text);
+  animation: none;
+}
+
+.mk-card {
+  border-radius: 14px;
+  border: 1px solid var(--mk-hairline);
+  background: var(--mk-card-bg);
+  backdrop-filter: none;
+}
+.mk-card::after { display: none; }
+.mk-card:hover {
+  transform: none;
+  border-color: var(--mk-hairline-strong);
+  box-shadow: none;
+}
+.mk-card-accent {
+  border-color: var(--color-mk-accent);
+  background: var(--mk-card-bg);
+  box-shadow: none;
+}
+
+.mk-eyebrow {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--mk-eyebrow-text);
+}
+.mk-eyebrow::before { display: none; }
+
+/* Zdjęcia bez przyciemniania i bez filtrów: mają wyglądać jak zdjęcia. */
+.mk img { filter: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mk *, .mk *::before, .mk *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

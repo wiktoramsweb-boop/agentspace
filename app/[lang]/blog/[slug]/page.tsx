@@ -108,7 +108,7 @@ export default async function BlogPost({ params }: Props) {
             </p>
 
             <div className="flex items-center gap-3 border-t border-[var(--mk-hairline)] pt-6 text-sm text-[var(--color-mk-muted)]">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-xs font-bold text-[var(--mk-on-accent)]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-mk-accent)] text-xs font-bold text-[var(--mk-on-accent)]">
                 {post.author.charAt(0)}
               </div>
               <span className="text-[var(--color-mk-text)]">{post.author}</span>
@@ -168,7 +168,7 @@ export default async function BlogPost({ params }: Props) {
 
         {/* CTA */}
         <section className="px-6 py-20">
-          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 md:p-12">
+          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-emerald-500/30 bg-[var(--mk-card-bg)] p-8 md:p-12">
             <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
               AgentSpace
             </p>

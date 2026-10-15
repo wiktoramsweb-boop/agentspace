@@ -20,11 +20,11 @@ export const en: Dict = {
     ],
     login: "Log in",
     loginLong: "Log in",
-    cta: "Book a call",
+    cta: "Start free trial",
     menu: "Menu",
     closeMenu: "Close menu",
     language: "Language",
-    allModules: "All 16 modules",
+    allModules: "All modules",
   },
 
   footer: {
@@ -162,7 +162,7 @@ export const en: Dict = {
         {
           key: "nieruchomosci",
           label: "Listings",
-          note: "A shared listing database with processed photos and the agency watermark. One checkbox publishes a listing on the agency website and on portals.",
+          note: "A shared listing database with processed photos and the agency watermark. One checkbox publishes a listing on the agency website.",
         },
         {
           key: "klienci",
@@ -209,7 +209,7 @@ export const en: Dict = {
         {
           alt: "Agent showing an empty apartment to a young couple",
           title: "Viewing",
-          body: "You upload photos from your phone and the system adds the agency watermark and pushes the listing to the website and the portals.",
+          body: "You upload photos from your phone and the system adds the agency watermark and publishes the listing on the agency website.",
         },
         {
           alt: "Signing a contract at a desk next to a set of keys",
@@ -863,7 +863,7 @@ export const en: Dict = {
         items: [
           { title: "No WordPress, no plugins", body: "Nothing to patch and nothing that fails to update. The website is part of the system, not another piece of software to babysit." },
           { title: "Listings always current", body: "Change the price in the CRM and the price on the site changes. A sold listing disappears from the site on its own." },
-          { title: "Photos once, everywhere", body: "The same watermarked photo set goes to the website, to the client PDF and to the portals." },
+          { title: "Photos once, everywhere", body: "The same watermarked photo set goes to the agency website and to the client PDF." },
           { title: "Speed and Google", body: "We build the sites statically, so they load in a fraction of a second, which Google treats as a ranking signal." },
           { title: "Favourites and history", body: "A visitor saves listings to favourites, and the agent sees on the contact record what that person was looking at." },
           { title: "One subscription", body: "Website, CRM and support in one price. No invoices from three different companies every month." },

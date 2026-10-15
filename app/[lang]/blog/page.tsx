@@ -56,7 +56,7 @@ export default async function BlogIndex({ params }: { params: Promise<{ lang: st
                 <StaggerItem key={post.slug}>
                   <Link
                     href={localeHref(locale, `/blog/${post.slug}`)}
-                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)] hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.3)]"
+                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] transition-all hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-[var(--mk-card-bg)]"
                   >
                     {/* Visual cover */}
                     <BlogVisual category={post.category} />
@@ -100,7 +100,7 @@ export default async function BlogIndex({ params }: { params: Promise<{ lang: st
 
         {/* CTA na końcu */}
         <section className="border-t border-[var(--mk-hairline)] px-6 py-20">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 text-center md:p-12">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-[var(--mk-card-bg)] p-8 text-center md:p-12">
             <h2 className="mb-4 text-2xl font-semibold tracking-tight md:text-3xl">
               Buduj wiedzę. Buduj zespół.
             </h2>

@@ -40,17 +40,17 @@ export default async function ONas({ params }: { params: Promise<{ lang: string 
         <section className="border-b border-[var(--mk-hairline)] px-6 py-20 md:py-28">
           <div className="mx-auto max-w-5xl">
             <FadeIn>
-              <TiltCard className="rounded-3xl border border-[var(--mk-hairline)] bg-gradient-to-br from-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 backdrop-blur-xl md:p-12">
+              <TiltCard className="rounded-3xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-8 md:p-12">
                 <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-12">
                   {/* Avatar - duży, animowany glow */}
                   <div className="flex justify-center md:justify-start">
                     <div className="relative">
                       {/* Outer glow rings */}
-                      <div className="absolute inset-0 -m-4 animate-pulse rounded-full bg-gradient-to-br from-emerald-400/30 to-cyan-400/30 blur-2xl" />
-                      <div className="absolute inset-0 -m-2 rounded-full bg-gradient-to-br from-emerald-400/40 to-cyan-400/40 blur-lg" />
+                      <div className="absolute inset-0 -m-4 animate-pulse rounded-full hidden" />
+                      <div className="absolute inset-0 -m-2 rounded-full hidden" />
 
                       {/* Main avatar */}
-                      <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-5xl font-bold text-[var(--mk-on-accent)] shadow-2xl">
+                      <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-[var(--color-mk-accent)] text-5xl font-bold text-[var(--mk-on-accent)] shadow-2xl">
                         W
                       </div>
 
@@ -105,7 +105,7 @@ export default async function ONas({ params }: { params: Promise<{ lang: string 
                     <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-all duration-500 group-hover:bg-emerald-500/10" />
 
                     <div className="relative">
-                      <p className="mb-4 bg-gradient-to-br from-emerald-400 to-cyan-400 bg-clip-text text-5xl font-semibold text-transparent">
+                      <p className="mb-4 text-5xl font-semibold text-[var(--mk-accent-text)]">
                         {principle.number}
                       </p>
                       <h3 className="mb-3 text-xl font-semibold text-[var(--color-mk-text)]">
@@ -141,7 +141,7 @@ export default async function ONas({ params }: { params: Promise<{ lang: string 
         {/* CTA */}
         <section className="px-6 py-20">
           <FadeIn>
-            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--mk-card-bg)] to-[var(--mk-card-bg)] p-8 text-center md:p-12">
+            <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-500/30 bg-[var(--mk-card-bg)] p-8 text-center md:p-12">
               <h2 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
                 {t.cta.title}
               </h2>

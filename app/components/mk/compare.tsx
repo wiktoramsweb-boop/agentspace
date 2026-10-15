@@ -31,7 +31,7 @@ export function Compare({ t }: { t: Dict["home"]["compare"] }) {
               className={`h-12 rounded-full px-7 text-[0.9375rem] font-medium transition-all duration-300 ${
                 isActive
                   ? key === "with"
-                    ? "bg-gradient-to-r from-emerald-400 to-cyan-400 text-[var(--mk-on-accent)] shadow-[0_8px_28px_-10px_rgba(16,185,129,0.8)]"
+                    ? "bg-[var(--color-mk-accent)] text-[var(--mk-on-accent)]"
                     : "bg-[var(--mk-surface-3)] text-[var(--color-mk-text)]"
                   : "text-[var(--color-mk-muted)] hover:text-[var(--color-mk-text)]"
               }`}

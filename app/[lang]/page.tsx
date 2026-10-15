@@ -1,670 +1,355 @@
-import { FadeIn, StaggerContainer, StaggerItem } from "@/app/components/fade-in";
 import Link from "next/link";
-import Image from "next/image";
+import type { Metadata } from "next";
 import { SiteNav } from "@/app/components/site-nav";
-import { BrowserShot, MkMarquee, PhotoTile, ShotTabs, TemplateTile } from "@/app/components/mk/showcase";
-import { Beams, RevealWords, SpotlightCard, StickySteps, Ticker, TiltPhoto } from "@/app/components/mk/motion-bits";
+import { SiteFooter } from "@/app/components/site-footer";
+import { FadeIn } from "@/app/components/fade-in";
+import { BrowserShot, ShotTabs } from "@/app/components/mk/showcase";
 import {
-  ShotCele,
-  ShotDokumenty,
-  ShotKalendarz,
-  ShotKlient,
-  ShotOferty,
-  ShotPanel,
-  ShotProwizje,
-  ShotPulpit,
+  ShotCele, ShotDokumenty, ShotKalendarz, ShotKlient, ShotOferty, ShotPanel, ShotProwizje, ShotPulpit,
 } from "@/app/components/mockups/light-shots";
 import { CoachLive } from "@/app/components/mk/coach-live";
-import { WZORY } from "@/lib/wzory/themes";
-import { kategorieZModulami, listModules } from "@/lib/marketing/modules";
 import { ModulesExplorer } from "@/app/components/mk/modules-explorer";
-import { SiteFooter } from "@/app/components/site-footer";
-import { AuroraBackground } from "@/app/components/aurora-background";
-import { Spotlight } from "@/app/components/effects/spotlight";
-import { Magnetic } from "@/app/components/effects/magnetic-button";
-import { GlowCard } from "@/app/components/effects/glow-card";
-import { Button, Card, Section, SectionHead, Tick } from "@/app/components/mk/ui";
 import { Pricing } from "@/app/components/mk/pricing";
-import { Compare } from "@/app/components/mk/compare";
+import { Tick } from "@/app/components/mk/ui";
+import { SlotZdjecia } from "@/app/components/mk/slot-zdjecia";
+import { kategorieZModulami } from "@/lib/marketing/modules";
+import { trescStronyGlownej } from "@/lib/marketing/strona-glowna";
+import { OPINIE } from "@/lib/marketing/opinie";
+import { DNI_PROBNE } from "@/lib/abonament-cennik";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
-import type { Metadata } from "next";
 
-/* ── Strona ────────────────────────────────────────────────── */
-
-/** Zdjęcia kroków - nie tłumaczą się, więc zostają poza słownikiem. */
-const STEP_PHOTOS = [
-  "/zdjecia/rozmowa-audyt.jpg",
-  "/zdjecia/wdrozenie.jpg",
-  "/zdjecia/pierwsze-wnioski.jpg",
-];
-
-/** Makiety ekranów - podpięte po kluczu zakładki ze słownika. */
-const FIELD_PHOTOS = [
-  "/zdjecia/pozyskanie.jpg",
-  "/zdjecia/prezentacja.jpg",
-  "/zdjecia/transakcja.jpg",
-];
-
-function shots(lang: string): Record<string, React.ReactNode> {
-  return {
-    pulpit: <ShotPulpit lang={lang} />,
-    nieruchomosci: <ShotOferty lang={lang} />,
-    klienci: <ShotKlient lang={lang} />,
-    cele: <ShotCele lang={lang} />,
-    kalendarz: <ShotKalendarz lang={lang} />,
-    prowizje: <ShotProwizje lang={lang} />,
-    dokumenty: <ShotDokumenty lang={lang} />,
-    zespol: <ShotPanel lang={lang} />,
-  };
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}): Promise<Metadata> {
-  const { lang } = await params;
-  const locale = toLocale(lang);
-  const t = getDict(locale).home.meta;
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const locale = toLocale((await params).lang);
+  const t = trescStronyGlownej(locale, DNI_PROBNE).meta;
   return pageMetadata(locale, "/", t.title, t.description);
 }
 
+/**
+ * Formularz próbny: zwykły formularz GET do /signup z adresem e-mail.
+ * Działa bez JavaScriptu, a rejestracja przejmuje adres z linku.
+ */
+function FormularzProby({ pole, przycisk, id }: { pole: string; przycisk: string; id: string }) {
+  return (
+    <form action="/signup" method="get" className="flex w-full max-w-[34rem] flex-col gap-2 sm:flex-row">
+      <label htmlFor={id} className="sr-only">{pole}</label>
+      <input
+        id={id}
+        name="email"
+        type="email"
+        required
+        autoComplete="email"
+        placeholder={pole}
+        className="h-12 w-full min-w-0 rounded-xl sm:w-auto sm:flex-1 border border-[var(--mk-hairline-strong)] bg-[var(--mk-card-bg)] px-4 text-[1rem] text-[var(--color-mk-text)] placeholder:text-[var(--color-mk-muted)] focus:border-[var(--color-mk-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mk-accent-soft)]"
+      />
+      <button
+        type="submit"
+        className="h-12 flex-shrink-0 rounded-xl bg-[var(--color-mk-accent)] px-6 text-[1rem] font-semibold text-[var(--mk-on-accent)] transition-colors hover:bg-[var(--mk-accent-text)]"
+      >
+        {przycisk}
+      </button>
+    </form>
+  );
+}
+
+function Naglowek({ etykieta, tytul, lead, className = "" }: { etykieta: string; tytul: string; lead?: string; className?: string }) {
+  return (
+    <div className={`max-w-[46rem] ${className}`}>
+      <p className="mk-eyebrow mb-3">{etykieta}</p>
+      <h2>{tytul}</h2>
+      {lead && <p className="mt-4 max-w-[62ch] text-[1.0625rem] leading-relaxed">{lead}</p>}
+    </div>
+  );
+}
+
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
-  const { lang } = await params;
-  const locale = toLocale(lang);
+  const locale = toLocale((await params).lang);
   const d = getDict(locale);
-  const t = d.home;
+  const t = trescStronyGlownej(locale, DNI_PROBNE);
   const href = (path: string) => localeHref(locale, path);
-  const modulyProduktu = listModules(locale);
-  const STEPS = t.steps.items.map((step, i) => ({ ...step, photo: STEP_PHOTOS[i] }));
-  const SHOTS = shots(locale);
+
+  const ekrany: Record<string, React.ReactNode> = {
+    pulpit: <ShotPulpit lang={locale} />,
+    nieruchomosci: <ShotOferty lang={locale} />,
+    klienci: <ShotKlient lang={locale} />,
+    cele: <ShotCele lang={locale} />,
+    kalendarz: <ShotKalendarz lang={locale} />,
+    prowizje: <ShotProwizje lang={locale} />,
+    dokumenty: <ShotDokumenty lang={locale} />,
+    zespol: <ShotPanel lang={locale} />,
+  };
+
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: t.faq.pozycje.map((p) => ({ "@type": "Question", name: p.q, acceptedAnswer: { "@type": "Answer", text: p.a } })),
+  };
 
   return (
     <div className="mk relative min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <SiteNav lang={locale} />
 
-      {/* ── HERO ── */}
-      <section className="relative overflow-hidden px-6 pt-[120px] pb-14 md:pt-[148px] md:pb-20">
-        <AuroraBackground />
-        <Spotlight />
-
-        <div className="relative z-10 mx-auto grid max-w-[1240px] items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
+      {/* ── HERO: obietnica, próba za darmo, prawdziwy ekran ── */}
+      <section className="px-5 pb-16 pt-[112px] md:px-6 md:pb-24 md:pt-[136px]">
+        <div className="mx-auto grid max-w-[1200px] items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-14">
           <div>
-            <FadeIn>
-              <p className="mk-eyebrow mb-6">{t.hero.eyebrow}</p>
-            </FadeIn>
-
-            <FadeIn delay={0.08}>
-              <h1 className="max-w-[15ch] !text-left">
-                {t.hero.title.a}<span className="grad">{t.hero.title.b}</span>
-              </h1>
-            </FadeIn>
-
-            <FadeIn delay={0.16}>
-              <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-[var(--color-mk-muted)]">
-                {t.hero.lead.a}
-                <span className="text-[var(--color-mk-text)]">{t.hero.lead.strong}</span>
-                {t.hero.lead.b}
+            <h1 className="max-w-[16ch]">{t.hero.tytul}</h1>
+            <p className="mt-6 max-w-[50ch] text-[1.1875rem] leading-relaxed">{t.hero.lead}</p>
+            <div className="mt-8">
+              <FormularzProby id="email-hero" pole={t.hero.pole} przycisk={t.hero.przycisk} />
+              <p className="mt-3 max-w-[34rem] text-[0.9375rem] leading-relaxed">{t.hero.podPolem}</p>
+              <p className="mt-4 text-[0.9375rem]">
+                {t.hero.albo}{" "}
+                <Link href={href("/kontakt")} className="font-semibold text-[var(--mk-accent-text)] underline decoration-1 underline-offset-4 hover:decoration-2">
+                  {t.hero.alboLink}
+                </Link>
               </p>
-            </FadeIn>
-
-            <FadeIn delay={0.24}>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
-                <Magnetic strength={0.24}>
-                  <Button href={href("/kontakt")}>{t.hero.ctaPrimary}</Button>
-                </Magnetic>
-                <Magnetic strength={0.18}>
-                  <Button href="#w-srodku" variant="ghost">
-                    {t.hero.ctaGhost}
-                  </Button>
-                </Magnetic>
-              </div>
-            </FadeIn>
-
-            <FadeIn delay={0.32}>
-              <p className="mt-6 text-sm text-[var(--color-mk-muted)]">
-                {t.hero.note}
-              </p>
-            </FadeIn>
-
-            <FadeIn delay={0.4} className="mt-10">
-              <div className="grid max-w-lg grid-cols-3 gap-0">
-                {t.hero.facts
-                  .map((fact, i) =>
-                    i === 0 ? { ...fact, value: modulyProduktu.length } : fact,
-                  )
-                  .map((fact, i) => (
-                  <div key={fact.label} className={`pr-5 ${i > 0 ? "border-l border-[var(--mk-hairline)] pl-5" : ""}`}>
-                    <p className="mb-1 text-3xl font-semibold md:text-4xl">
-                      <span className="grad">
-                        <Ticker value={fact.value} suffix={fact.suffix} />
-                      </span>
-                    </p>
-                    <p className="text-[0.8125rem] leading-snug text-[var(--color-mk-muted)]">{fact.label}</p>
-                  </div>
-                ))}
-              </div>
-            </FadeIn>
+            </div>
           </div>
-
-          {/* Podgląd produktu zamiast kolejnego akapitu: w trzy sekundy widać,
-              czy to wygląda jak coś, w czym agent chce pracować. */}
           <div className="relative">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -inset-10 -z-10 opacity-60"
-              style={{ background: "radial-gradient(50% 50% at 60% 40%, rgba(16,185,129,0.22), transparent 70%)" }}
-            />
-            <BrowserShot label="agentspace.pl/app" tilt>
+            <BrowserShot label="agentspace.pl/app">
               <ShotPulpit lang={locale} />
             </BrowserShot>
           </div>
         </div>
+
+        <ul className="mx-auto mt-16 grid max-w-[1200px] gap-6 border-t border-[var(--mk-hairline)] pt-8 md:grid-cols-3 md:gap-10">
+          {t.hero.fakty.map((f) => (
+            <li key={f.tytul}>
+              <p className="font-semibold text-[var(--color-mk-text)]">{f.tytul}</p>
+              <p className="mt-1 text-[0.9375rem] leading-relaxed">{f.tekst}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <div className="py-6">
-        <MkMarquee items={modulyProduktu.map((m) => m.name)} />
-      </div>
+      {/* ── DZIEŃ AGENTA: cztery momenty, zdjęcie i to, co robi program ── */}
+      <section className="border-t border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-[1200px]">
+          <Naglowek etykieta={t.dzien.etykieta} tytul={t.dzien.tytul} lead={t.dzien.lead} />
+          <ol className="mt-14 space-y-16 md:space-y-24">
+            {t.dzien.momenty.map((m, i) => (
+              <li key={m.pora} className="grid items-center gap-8 md:grid-cols-2 md:gap-14">
+                <FadeIn className={i % 2 ? "md:order-2" : ""}>
+                  <SlotZdjecia id={m.zdjecie} lang={locale} />
+                </FadeIn>
+                <div>
+                  <p className="font-[family-name:var(--font-sora)] text-sm font-semibold tabular-nums text-[var(--mk-accent-text)]">{m.pora}</p>
+                  <h3 className="mt-2">{m.tytul}</h3>
+                  <p className="mt-4 max-w-[52ch] leading-relaxed">{m.tekst}</p>
+                  <ul className="mt-5 space-y-2">
+                    {m.punkty.map((p) => (
+                      <li key={p} className="flex gap-2.5 text-[0.9375rem] text-[var(--color-mk-text)]">
+                        <Tick />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
 
-      {/* ── WARTOŚCI ── */}
-      <Section>
-        <SectionHead
-          eyebrow={t.values.eyebrow}
-          title={
-            <>
-              {t.values.title.a}
-              <span className="grad">{t.values.title.b}</span>
-            </>
-          }
-        />
-
-        <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-3">
-          {t.values.items.map((value) => (
-            <StaggerItem key={value.title}>
-              <GlowCard className="mk-card h-full rounded-[20px] p-8">
-                <h4 className="mb-3">{value.title}</h4>
-                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                  {value.body}
-                </p>
-              </GlowCard>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </Section>
-
-      {/* ── MODUŁY ── */}
-      <Section id="moduly">
-        <SectionHead
-          eyebrow={t.modules.eyebrow}
-          title={
-            <>
-              {t.modules.title.a}
-              <span className="grad">{t.modules.title.b}</span>
-            </>
-          }
-          lead={t.modules.lead}
-        />
-
-        <ModulesExplorer
-          kategorie={kategorieZModulami(locale).map((k) => ({
-            id: k.id,
-            label: k.label,
-            opis: k.opis,
-            moduly: k.moduly.map((m) => ({
-              slug: m.slug,
-              name: m.name,
-              lead: m.lead,
-              ilustracja: m.ilustracja,
-              photo: m.photo,
-              ile: m.capabilities.length,
-            })),
-          }))}
-          lang={locale}
-          t={{
-            seeModule: d.common.seeModule,
-            all: d.common.allModules,
-            capabilities: d.common.capabilitiesCount,
-          }}
-        />
-      </Section>
-
-      {/* ── W ŚRODKU: jasna przerwa z podglądem produktu ── */}
-      <section id="w-srodku" className="mk-paper py-24 md:py-32">
-        <div className="mx-auto max-w-[1240px] px-6">
-          <p className="mk-eyebrow mb-5">{t.inside.eyebrow}</p>
-          <h2 className="max-w-[22ch] text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] tracking-[-0.03em]">
-            {t.inside.title}
-          </h2>
-          <p className="mt-5 max-w-[62ch] text-[1.0625rem] leading-relaxed mk-soft">
-            {t.inside.lead}
-          </p>
-
-          <div className="mt-12">
-            <ShotTabs
-              tabs={t.inside.tabs.map((tab) => ({ ...tab, node: SHOTS[tab.key] }))}
-            />
+      {/* ── W ŚRODKU: prawdziwe ekrany ── */}
+      <section id="w-srodku" className="px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-[1200px]">
+          <Naglowek etykieta={t.srodek.etykieta} tytul={t.srodek.tytul} lead={t.srodek.lead} />
+          <div className="mt-10">
+            <ShotTabs tabs={d.home.inside.tabs.map((tab) => ({ ...tab, node: ekrany[tab.key] }))} />
           </div>
+        </div>
+      </section>
+
+      {/* ── DLA WŁAŚCICIELA ── */}
+      <section className="border-y border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto grid max-w-[1200px] gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
+          <div>
+            <Naglowek etykieta={t.wlasciciel.etykieta} tytul={t.wlasciciel.tytul} lead={t.wlasciciel.lead} />
+            <FadeIn className="mt-10">
+              <SlotZdjecia id="wlasciciel" lang={locale} />
+            </FadeIn>
+          </div>
+          <ul className="grid content-start gap-x-10 gap-y-8 sm:grid-cols-2 lg:pt-14">
+            {t.wlasciciel.punkty.map((p) => (
+              <li key={p.tytul} className="border-t border-[var(--mk-hairline-strong)] pt-4">
+                <Link href={href(p.href)} className="group block">
+                  <p className="font-semibold text-[var(--color-mk-text)] group-hover:text-[var(--mk-accent-text)]">{p.tytul}</p>
+                  <p className="mt-1.5 text-[0.9375rem] leading-relaxed">{p.tekst}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       {/* ── AI COACH: rozmowa, która odtwarza się sama ── */}
-      <Section className="relative">
-        <Beams />
-        <div className="relative">
+      <section className="px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-[1200px]">
           <CoachLive t={d.coach} />
-        </div>
-      </Section>
-
-      {/* ── DZIEŃ W BIURZE: zdjęcia zamiast kolejnych kart z tekstem ── */}
-      <Section>
-        <SectionHead
-          eyebrow={t.field.eyebrow}
-          title={
-            <>
-              {t.field.title.a}
-              <span className="grad">{t.field.title.b}</span>
-              {t.field.title.c}
-            </>
-          }
-          lead={t.field.lead}
-        />
-
-        <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-3">
-          {t.field.tiles.map((tile, i) => (
-            <StaggerItem key={tile.title}>
-              <PhotoTile
-                src={FIELD_PHOTOS[i]}
-                alt={tile.alt}
-                title={tile.title}
-                body={tile.body}
-                className="aspect-[3/4]"
-                priority={i === 0}
-              />
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </Section>
-
-      {/* ── JAK TO DZIAŁA ── */}
-      <Section id="jak-to-dziala">
-        <SectionHead
-          eyebrow={t.steps.eyebrow}
-          title={
-            <>
-              {t.steps.title.a}
-              <span className="grad">{t.steps.title.b}</span>
-            </>
-          }
-        />
-
-        <div className="mt-12">
-          <StickySteps steps={STEPS} />
-        </div>
-      </Section>
-
-      {/* ── PROBLEMY ── */}
-      <Section>
-        <SectionHead
-          eyebrow={t.problems.eyebrow}
-          title={
-            <>
-              {t.problems.title.a}
-              <span className="grad">{t.problems.title.b}</span>
-            </>
-          }
-          lead={t.problems.lead}
-        />
-
-        <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-3">
-          {t.problems.items.map((problem) => (
-            <StaggerItem key={problem.title}>
-              <Card className="h-full p-8">
-                <span
-                  aria-hidden="true"
-                  className="mb-6 flex h-11 w-11 items-center justify-center rounded-full bg-rose-500/10 ring-1 ring-rose-500/25"
-                >
-                  <svg className="h-5 w-5 text-rose-400" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M12 8.5v4.5m0 3.5h.01M10.3 3.9 2.5 17.4A2 2 0 0 0 4.2 20.4h15.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <h4 className="mb-3">{problem.title}</h4>
-                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                  {problem.body}
-                </p>
-              </Card>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </Section>
-
-      {/* ── PORÓWNANIE ── */}
-      <Section>
-        <SectionHead
-          eyebrow={t.compare.eyebrow}
-          title={
-            <>
-              {t.compare.title.a}
-              <span className="grad">{t.compare.title.b}</span>
-            </>
-          }
-        />
-        <div className="mt-12">
-          <Compare t={t.compare} />
-        </div>
-      </Section>
-
-      {/* ── PROGRAM PIERWSZYCH 10 BIUR ── */}
-      <Section>
-        <div className="mx-auto max-w-3xl">
-          <FadeIn>
-            <Card accent className="overflow-hidden p-8 md:p-14">
-              {/* Poświaty w rogach - karta ma być najjaśniejszym punktem strony */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-emerald-500/20 blur-3xl"
-              />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-cyan-500/15 blur-3xl"
-              />
-
-              <div className="relative flex flex-col items-center text-center">
-                <p className="mk-eyebrow mb-7">{t.onboarding.eyebrow}</p>
-                <h3 className="max-w-[20ch]">
-                  {t.onboarding.title.a}
-                  <span className="grad">{t.onboarding.title.b}</span>
-                </h3>
-                <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                  {t.onboarding.body}
-                </p>
-
-                <ul className="mt-10 flex w-full max-w-md flex-col gap-4 text-left">
-                  {t.onboarding.items.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-3 text-[0.9375rem] leading-snug text-[var(--color-mk-muted)]"
-                    >
-                      <Tick />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-11">
-                  <Magnetic strength={0.2}>
-                    <Button href={href("/kontakt")}>{t.onboarding.cta}</Button>
-                  </Magnetic>
-                </div>
-              </div>
-            </Card>
-          </FadeIn>
-        </div>
-      </Section>
-
-      {/* ── SKĄD TO SIĘ WZIĘŁO ── */}
-      {/* ── MANIFEST: zdanie odsłaniane przy przewijaniu + zdjęcia ── */}
-      <Section>
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-16">
-          <div>
-            <p className="mk-eyebrow mb-7">{t.manifest.eyebrow}</p>
-            <RevealWords
-              text={t.manifest.text}
-              className="text-[clamp(1.5rem,3.1vw,2.5rem)] font-medium leading-[1.25] tracking-[-0.025em] text-[var(--color-mk-text)]"
-            />
-            <div className="mt-9 grid gap-4 sm:grid-cols-3">
-              {t.manifest.points.map((point) => (
-                <div key={point.title}>
-                  <p className="mb-1.5 font-medium text-[var(--color-mk-text)]">{point.title}</p>
-                  <p className="text-sm leading-relaxed text-[var(--color-mk-muted)]">{point.body}</p>
-                </div>
+          <div className="mt-12 rounded-xl border border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] p-6 md:p-8">
+            <p className="font-semibold text-[var(--color-mk-text)]">{t.coach.etykieta}: {locale === "en" ? "new in October" : "nowe w październiku"}</p>
+            <ul className="mt-4 grid gap-4 md:grid-cols-3">
+              {t.coach.nowosci.map((n) => (
+                <li key={n} className="flex gap-2.5 text-[0.9375rem] leading-relaxed">
+                  <Tick />
+                  <span>{n}</span>
+                </li>
               ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <TiltPhoto
-              src="/zdjecia/odbior-kluczy.jpg"
-              alt={t.manifest.photos[0].alt}
-              className="aspect-[3/4]"
-            />
-            <div className="grid gap-4 pt-10">
-              <TiltPhoto
-                src="/zdjecia/poranek-przy-kawie.jpg"
-                alt={t.manifest.photos[1].alt}
-                className="aspect-square"
-              />
-              <TiltPhoto
-                src="/zdjecia/miedzy-spotkaniami.jpg"
-                alt={t.manifest.photos[2].alt}
-                className="aspect-square"
-              />
-            </div>
+            </ul>
           </div>
         </div>
-      </Section>
+      </section>
 
-      <Section>
-        <div className="mx-auto max-w-3xl">
-          <SectionHead eyebrow={t.origin.eyebrow} title={t.origin.title} />
+      {/* ── MODUŁY ── */}
+      <section id="moduly" className="border-t border-[var(--mk-hairline)] px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-[1200px]">
+          <Naglowek etykieta={t.moduly.etykieta} tytul={t.moduly.tytul} lead={t.moduly.lead} className="mb-10" />
+          <ModulesExplorer
+            kategorie={kategorieZModulami(locale).map((k) => ({
+              id: k.id,
+              label: k.label,
+              opis: k.opis,
+              moduly: k.moduly.map((m) => ({ slug: m.slug, name: m.name, lead: m.lead, ilustracja: m.ilustracja, photo: m.photo, ile: m.capabilities.length })),
+            }))}
+            lang={locale}
+            t={{ seeModule: d.common.seeModule, all: d.common.allModules, capabilities: d.common.capabilitiesCount }}
+          />
+        </div>
+      </section>
 
-          <FadeIn delay={0.1}>
-            <Card className="mt-12 p-8 md:p-12">
-              <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start md:gap-10">
-                <div className="flex justify-center md:justify-start">
-                  <div className="relative">
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 opacity-45 blur-xl"
-                    />
-                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-2xl font-bold text-[var(--mk-on-accent)]">
-                      W
-                    </div>
-                  </div>
-                </div>
+      {/* ── CO NOWEGO: dowód, że produkt żyje ── */}
+      <section className="border-t border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-5 py-20 md:px-6 md:py-24">
+        <div className="mx-auto grid max-w-[1200px] gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <Naglowek etykieta={t.nowosci.etykieta} tytul={t.nowosci.tytul} lead={t.nowosci.lead} />
+          <ul className="divide-y divide-[var(--mk-hairline)] border-y border-[var(--mk-hairline)]">
+            {t.nowosci.pozycje.map((p) => (
+              <li key={p.tytul}>
+                <Link href={href(p.href)} className="group flex items-baseline justify-between gap-6 py-4">
+                  <span>
+                    <span className="block font-semibold text-[var(--color-mk-text)] group-hover:text-[var(--mk-accent-text)]">{p.tytul}</span>
+                    <span className="mt-0.5 block text-[0.9375rem] leading-relaxed">{p.tekst}</span>
+                  </span>
+                  <span aria-hidden="true" className="text-[var(--color-mk-muted)] transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
-                <div>
-                  <svg
-                    aria-hidden="true"
-                    className="mb-4 h-7 w-7 text-emerald-400/45"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                  </svg>
+      {/* ── ZMIANA SYSTEMU ── */}
+      <section className="px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-[1200px]">
+          <Naglowek etykieta={t.przejscie.etykieta} tytul={t.przejscie.tytul} lead={t.przejscie.lead} />
+          <ol className="mt-12 grid gap-8 md:grid-cols-3">
+            {t.przejscie.kroki.map((k, i) => (
+              <li key={k.tytul} className="border-l-2 border-[var(--color-mk-accent)] pl-5">
+                <p className="font-[family-name:var(--font-sora)] text-sm font-semibold text-[var(--mk-accent-text)]">{String(i + 1).padStart(2, "0")}</p>
+                <p className="mt-1 font-semibold text-[var(--color-mk-text)]">{k.tytul}</p>
+                <p className="mt-1.5 text-[0.9375rem] leading-relaxed">{k.tekst}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-12">
+            <SlotZdjecia id="zespol-odprawa" lang={locale} sizes="(min-width: 1200px) 1200px, 100vw" className="max-h-[480px] w-full" />
+          </div>
+        </div>
+      </section>
 
-                  <p className="text-lg leading-relaxed text-[var(--color-mk-text)]">
-                    {t.origin.quote.a}
-                    <span className="font-medium">{t.origin.quote.company}</span>
-                    {t.origin.quote.b}
-                    <span className="grad font-medium">{t.origin.quote.accent}</span>
-                    {t.origin.quote.c}
-                  </p>
-
-                  <div className="mt-8 flex items-center gap-4">
-                    <div className="h-px w-10 bg-gradient-to-r from-emerald-400/70 to-transparent" />
-                    <div>
-                      <p className="text-[0.9375rem] font-medium text-[var(--color-mk-text)]">
-                        {t.origin.author}
-                      </p>
-                      <p className="text-sm text-[var(--color-mk-muted)]">
-                        {t.origin.role}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+      {/* ── OPINIE: tylko prawdziwe ── */}
+      <section className="border-t border-[var(--mk-hairline)] bg-[var(--mk-card-bg)] px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-[1200px]">
+          <Naglowek etykieta={t.opinie.etykieta} tytul={t.opinie.tytul} lead={t.opinie.lead} />
+          <div className="mt-12 grid gap-6 lg:grid-cols-2">
+            <figure className="rounded-xl border border-[var(--mk-hairline)] p-7 md:p-9">
+              <blockquote className="text-[1.1875rem] leading-relaxed text-[var(--color-mk-text)]">„{t.opinie.zalozyciel.cytat}”</blockquote>
+              <figcaption className="mt-6 flex items-center gap-4">
+                {/* Tu ma stać prawdziwe zdjęcie Wiktora, nie wygenerowane: to podpis
+                    pod cytatem, więc twarz musi być jego. Do tego czasu inicjały. */}
+                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-mk-accent-soft)] font-[family-name:var(--font-sora)] font-semibold text-[var(--mk-accent-text)]">
+                  WS
+                </span>
+                <span>
+                  <span className="block font-semibold text-[var(--color-mk-text)]">{t.opinie.zalozyciel.kto}</span>
+                  <span className="block text-[0.875rem]">{t.opinie.zalozyciel.rola}</span>
+                </span>
+              </figcaption>
+            </figure>
+            {OPINIE.length === 0 ? (
+              <div className="flex items-center rounded-xl border border-dashed border-[var(--mk-hairline-strong)] p-7 md:p-9">
+                <p className="leading-relaxed">{t.opinie.brak}</p>
               </div>
-            </Card>
-          </FadeIn>
+            ) : (
+              OPINIE.map((o) => (
+                <figure key={o.imie + o.data} className="rounded-xl border border-[var(--mk-hairline)] p-7 md:p-9">
+                  <blockquote className="text-[1.0625rem] leading-relaxed text-[var(--color-mk-text)]">„{o.tresc}”</blockquote>
+                  <figcaption className="mt-6">
+                    <span className="block font-semibold text-[var(--color-mk-text)]">{o.imie}</span>
+                    <span className="block text-[0.875rem]">
+                      {o.rola}, {o.biuro}, {o.miasto}
+                      {o.miesiecy ? ` · ${o.miesiecy} mies. w AgentSpace` : ""}
+                    </span>
+                    {o.link && (
+                      <a href={o.link} rel="nofollow noopener" target="_blank" className="mt-1 inline-block text-[0.8125rem] underline underline-offset-2">
+                        {locale === "en" ? "See the original review" : "Zobacz oryginał opinii"}
+                      </a>
+                    )}
+                  </figcaption>
+                </figure>
+              ))
+            )}
+          </div>
         </div>
-      </Section>
-
-      {/* ── STRONY WWW: osobny dodatek, ale wizualnie najmocniejszy argument ── */}
-      <Section>
-        <SectionHead
-          eyebrow={t.sites.eyebrow}
-          title={
-            <>
-              {t.sites.title.a}
-              <span className="grad">{t.sites.title.b}</span>
-            </>
-          }
-          lead={t.sites.lead}
-        />
-
-        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {WZORY.slice(0, 4).map((w) => (
-            <StaggerItem key={w.slug}>
-              <TemplateTile
-                href={`/wzory/${w.slug}`}
-                photo={w.preview}
-                name={w.name}
-                forWhom={w.forWhom}
-                swatch={[...w.swatch]}
-              />
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          <Button href={href("/wzory")}>{t.sites.cta}</Button>
-          <Link
-            href={href("/cennik")}
-            className="text-[0.9375rem] text-[var(--color-mk-muted)] underline-offset-4 hover:underline"
-          >
-            {t.sites.priceLink}
-          </Link>
-        </div>
-      </Section>
+      </section>
 
       {/* ── CENNIK ── */}
-      <Section id="cennik">
-        <SectionHead
-          eyebrow={t.pricing.eyebrow}
-          title={
-            <>
-              {t.pricing.title.a}
-              <span className="grad">{t.pricing.title.b}</span>
-            </>
-          }
-          lead={t.pricing.lead}
-        />
-        <div className="mt-12">
+      <section id="cennik" className="px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-[1200px]">
+          <Naglowek etykieta={t.cennik.etykieta} tytul={t.cennik.tytul} lead={t.cennik.lead} className="mb-10" />
           <Pricing lang={locale} />
         </div>
-      </Section>
-
-      {/* ── DLA KOGO NIE JEST ── */}
-      <Section>
-        <SectionHead
-          eyebrow={t.notFor.eyebrow}
-          title={t.notFor.title}
-          lead={t.notFor.lead}
-        />
-
-        <StaggerContainer className="mt-12 grid gap-5 md:grid-cols-3">
-          {t.notFor.items.map((item) => (
-            <StaggerItem key={item.title}>
-              <Card className="h-full p-8">
-                <span
-                  aria-hidden="true"
-                  className="mb-6 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--mk-surface-2)] ring-1 ring-white/10"
-                >
-                  <svg
-                    className="h-4.5 w-4.5 text-zinc-400"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    style={{ width: 18, height: 18 }}
-                  >
-                    <path
-                      d="M6 18 18 6M6 6l12 12"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-                <h4 className="mb-3">{item.title}</h4>
-                <p className="text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                  {item.body}
-                </p>
-              </Card>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </Section>
+      </section>
 
       {/* ── FAQ ── */}
-      <Section id="faq">
-        <div className="mx-auto max-w-3xl">
-          <SectionHead eyebrow={t.faq.eyebrow} title={t.faq.title} />
-
-          <StaggerContainer className="mt-12 flex flex-col gap-3" staggerDelay={0.05}>
-            {t.faq.items.map((item) => (
-              <StaggerItem key={item.question}>
-                <details className="mk-card group px-6 py-5 md:px-8 [&[open]]:bg-[var(--mk-surface-2)]">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-[1.0625rem] font-medium text-[var(--color-mk-text)]">
-                    {item.question}
-                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--mk-surface-2)] transition-all duration-300 group-open:rotate-180 group-open:bg-emerald-500/15">
-                      <svg
-                        aria-hidden="true"
-                        className="h-4 w-4 text-[var(--color-mk-muted)] transition-colors group-open:text-emerald-400"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                      >
-                        <path
-                          d="M5 7.5 10 12.5 15 7.5"
-                          stroke="currentColor"
-                          strokeWidth="1.4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </summary>
-                  <p className="mt-4 max-w-[62ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                    {item.answer}
-                  </p>
-                </details>
-              </StaggerItem>
+      <section id="faq" className="border-t border-[var(--mk-hairline)] px-5 py-20 md:px-6 md:py-28">
+        <div className="mx-auto grid max-w-[1200px] gap-10 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
+          <Naglowek etykieta={t.faq.etykieta} tytul={t.faq.tytul} />
+          <div className="divide-y divide-[var(--mk-hairline)] border-y border-[var(--mk-hairline)]">
+            {t.faq.pozycje.map((p) => (
+              <details key={p.q} className="group py-5">
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 font-semibold text-[var(--color-mk-text)]">
+                  {p.q}
+                  <span aria-hidden="true" className="mt-0.5 text-xl leading-none text-[var(--color-mk-muted)] transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-3 max-w-[64ch] leading-relaxed">{p.a}</p>
+              </details>
             ))}
-          </StaggerContainer>
-        </div>
-      </Section>
-
-      {/* ── CTA ── */}
-      <Section className="pb-32">
-        <FadeIn>
-          <div className="relative flex flex-col items-center overflow-hidden rounded-[28px] px-6 py-20 text-center">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/12 blur-[100px]"
-            />
-
-            <div className="relative">
-              <h2 className="max-w-[20ch]">
-                {t.cta.title.a}
-                <span className="grad">{t.cta.title.b}</span>
-                {t.cta.title.c}
-              </h2>
-              <p className="mx-auto mt-6 max-w-[48ch] text-[1.0625rem] leading-relaxed text-[var(--color-mk-muted)]">
-                {t.cta.lead}
-              </p>
-              <div className="mt-11 flex justify-center">
-                <Magnetic strength={0.24}>
-                  <Button href={href("/kontakt")}>{t.cta.button}</Button>
-                </Magnetic>
-              </div>
-            </div>
           </div>
-        </FadeIn>
-      </Section>
+        </div>
+      </section>
+
+      {/* ── KONIEC: druga szansa na próbę ── */}
+      <section className="px-5 pb-24 md:px-6 md:pb-32">
+        <div className="mx-auto grid max-w-[1200px] items-center gap-10 overflow-hidden rounded-2xl bg-[#0f2a20] px-6 py-14 text-white md:px-14 md:py-16 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
+          <div>
+          <h2 className="max-w-[20ch] !text-white">{t.koniec.tytul}</h2>
+          <p className="mt-4 max-w-[52ch] text-[1.0625rem] leading-relaxed text-white/80">{t.koniec.lead}</p>
+          <div className="mt-8 [&_input]:border-white/20 [&_input]:bg-white [&_input]:text-[#14171a] [&_button]:bg-[#3ccf96] [&_button]:text-[#07140e] [&_button:hover]:bg-[#5ddcab]">
+            <FormularzProby id="email-koniec" pole={t.hero.pole} przycisk={t.hero.przycisk} />
+          </div>
+          <p className="mt-4 text-[0.9375rem] text-white/70">
+            {t.hero.albo}{" "}
+            <Link href={href("/kontakt")} className="font-semibold text-white underline underline-offset-4">
+              {t.hero.alboLink}
+            </Link>
+          </p>
+          </div>
+          <SlotZdjecia id="hero-teren" lang={locale} sizes="(min-width: 1024px) 380px, 100vw" className="hidden lg:block" />
+        </div>
+      </section>
 
       <SiteFooter lang={locale} />
     </div>
