@@ -4,6 +4,26 @@
 > Czytaj razem z `CLAUDE.md` (architektura + zasady).
 
 
+## 🚀 WIELKA ROZBUDOWA (15 października 2026) - czytaj najpierw
+
+**⚠️ WIKTOR MUSI URUCHOMIĆ `lib/SETUP-v49-rozbudowa.sql` w Supabase SQL Editor.** Bez tego moduły poniżej pokazują ekran „czeka na aktualizację bazy” (kod jest odporny, nic się nie sypie). Sprawdzenie: `maV49()` w `lib/schemat.ts` (GET na `property_price_history`, nie HEAD: HEAD zwraca 204 dla brakującej tabeli).
+
+Nowe moduły (wszystkie na produkcji):
+- **Tablica transakcji** (kanban klientów i ofert z przeciąganiem): `app/app/components/tablica.tsx`, `lib/data-tablica.ts`, `app/app/tablica-actions.ts`. Działa bez v49 (kolumna kanban_pos opcjonalna).
+- **Historia cen ofert** (trigger w v49), **czat zespołu** `/app/czat` (realtime), **automatyzacje** `/app/automatyzacje` (`lib/automatyzacje*.ts`, test `npm run test:automatyzacje`), **urlopy i zastępstwa** `/app/urlopy`, **zgody RODO** (zakładka na karcie klienta), **wysyłka maili z karty klienta** (`lib/poczta-biura.ts`), **powiadomienia w dzwonku** (`lib/powiadomienia.ts`).
+- **Dokumenty i umowy** `/app/dokumenty`: silnik wzorów `lib/dokumenty/` (silnik, najem, posrednictwo, inne, pdf). 11 wzorów: najem okazjonalny (+ zgłoszenie do US, żądanie opróżnienia), najem zwykły, kaucja, umowy pośrednictwa (sprzedaż/kupno/najem, pouczenie konsumenta + żądanie rozpoczęcia usług przed 14 dniami), potwierdzenie prezentacji, pełnomocnictwo, oświadczenie sprzedającego. Prefill z CRM respektuje ukrywanie kontaktów. Zapis PDF do karty klienta/oferty. Nowy wzór = nowy obiekt `Wzor`, bez nowego ekranu.
+- **Kalkulator remontu** `/app/kalkulatory/remont` (`lib/remont.ts`, `lib/remont-pdf.ts`).
+- **Koszty i wynik** `/app/finanse` (moduł `faktury`): koszty, stałe opłaty (dopisywane leniwie przy wejściu, bez crona), wypłaty prowizji (`deals.agent_paid_at`), wynik 6 mies., eksport CSV `/api/eksport/finanse`. Test `npm run test:koszty`.
+- **Dziennik zdarzeń** `/app/zespol/dziennik` (tylko CEO/dyrektor): usunięcia, przepisania, eksporty, zmiany ról (`lib/dziennik.ts`).
+- **AI Coach**: trening na własnej ofercie (`lib/ai/oferta-kontekst.ts`, migawka w `training_sessions.context`), zadania od menedżera `/app/trening/zadania` z progiem zaliczenia, „kluczowe momenty” w ocenie (`session_scores.moments`).
+- **Ranking ofert AI** na stronie poszukiwania (`lib/ai/dopasowanie.ts`, 3 kredyty, operacja `dopasowanie_ai`).
+
+**Strona www przebudowana** (styl „biuro, nie kosmos”): jasna, Sora + IBM Plex Sans, bez poświat/gradientów (nadpisania na końcu `app/globals.css`). Nowa strona główna `app/[lang]/page.tsx` + treści `lib/marketing/strona-glowna.ts`. 24 moduły w `lib/marketing/modules.ts` (8 nowych podstron SEO). Miejsca na zdjęcia: `lib/marketing/sloty-zdjec.ts` + `STRONA-ZDJECIA-PROMPTY.md` (opisy do Nano Banana Pro; brak pliku = zdjęcie zastępcze). Opinie tylko prawdziwe: `lib/marketing/opinie.ts` (Omnibus/UOKiK).
+
+**Trial:** CTA wszędzie prowadzi do `/signup?email=`. Pole kodu zaproszenia pokazuje się tylko, gdy w Vercel jest `SIGNUP_CODE`. **Decyzja Wiktora:** usunąć `SIGNUP_CODE` w Vercel, żeby trial był samoobsługowy (zabezpieczenia: 3 rejestracje/IP/dobę, pułapka na boty, pula kredytów trial).
+
+**Nadal NIE ma:** eksportu ofert na portale (świadomie później), płatności online.
+
 ## ⏳ DO ZROBIENIA TUŻ PRZED PIERWSZYM PŁATNYM KLIENTEM
 
 Wiktor świadomie odkłada te dwie opłaty, żeby nie płacić miesiąca za nic.

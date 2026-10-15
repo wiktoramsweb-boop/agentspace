@@ -12,7 +12,7 @@
 
 **⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić w Supabase SQL Editor pliki `lib/SETUP-*.sql` po kolei - v1 ✅ uruchomione; **v2 (platforma), v3 (kategorie+cele), v4 (łatwe scenariusze) prawdopodobnie do uruchomienia - POTWIERDZIĆ Z USEREM**. Kod odporny na brak tabel (puste, nie crashuje).
 
-**Migracje:** v36, v37, v38 ✅ uruchomione. **Do uruchomienia: v39** (kolumny `kind` i `credits` w `subscription_orders` - doszły do v37 już po tym, jak została uruchomiona, a `create table if not exists` ich nie dokłada).
+**Migracje:** v36, v37, v38 ✅ uruchomione. **v49 (`lib/SETUP-v49-rozbudowa.sql`) DO URUCHOMIENIA** - czat, automatyzacje, urlopy, RODO, historia cen, koszty, dziennik, zadania AI Coach (szczegóły: PROJEKT-STATUS.md, „Wielka rozbudowa”). **Do uruchomienia: v39** (kolumny `kind` i `credits` w `subscription_orders` - doszły do v37 już po tym, jak została uruchomiona, a `create table if not exists` ich nie dokłada).
 
 **Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa - portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`. **`CRON_SECRET` jest WYMAGANY** - bez niego crony odmawiają (`lib/cron-auth.ts`). Limity AI: system kredytów (v35, `lib/kredyty-cennik.ts`) - pula miesięczna biura z pakietu, plus dzienny bezpiecznik na osobę `AI_DAILY_CREDITS_USER` (domyślnie 120 kredytów).
 
@@ -51,6 +51,9 @@ z wybranego wzoru. Klient edytuje wszystko w `/app/ustawienia/strona`. Wymaga mi
 - Każdy nowy endpoint AI: `brakKredytow` z `lib/kredyty.ts` z własną wyceną w `lib/kredyty-cennik.ts` + limit długości tekstu. Publiczny formularz: pułapka `website` + `hitLimit` po skrócie IP.
 - Tekst od użytkownika w mailu HTML zawsze przez `escapeHtml` (`lib/html.ts`).
 - „Dzisiaj” zawsze `todayPL()` / `dateKeyPL()` z `lib/datetime.ts`, nigdy `toISOString().slice(0, 10)`.
+- Istnienie tabeli sprawdzamy zapytaniem GET (`select("id").limit(1)`), nigdy HEAD: brakująca tabela przy HEAD zwraca 204 bez błędu.
+- Ważne czynności (usunięcia, przepisania, eksporty, role, pieniądze) zapisujemy w `lib/dziennik.ts` (`zapiszZdarzenie`).
+- Strona www: bez gradientowego tekstu, poświat, szkła i karuzel; kolory z tokenów `--color-mk-*`; nie obiecujemy funkcji, których nie ma (np. eksportu na portale); opinie tylko prawdziwe (`lib/marketing/opinie.ts`).
 
 ## Co to jest
 
