@@ -4,6 +4,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 import { buildClientSystemPrompt } from "@/lib/ai/coach";
 import type { KontekstOferty } from "@/lib/ai/oferta-kontekst";
+import { plecZWyboru, scenariuszWPlci } from "@/lib/coach/scenariusz-plec";
 import type { ChatMessage } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
   // Sesja + scenariusz
   const { data: session } = await admin
     .from("training_sessions")
-    .select("*, scenario:scenarios(system_prompt)")
+    .select("*, scenario:scenarios(slug, brief, system_prompt)")
     .eq("id", sessionId)
     .single();
 
@@ -54,8 +55,15 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ error: "Sesja zakończona" }), { status: 409 });
   }
 
-  const scenarioSystemPrompt =
-    (session.scenario as { system_prompt: string } | null)?.system_prompt ?? "";
+  const sc = session.scenario as { slug: string; brief: string; system_prompt: string } | null;
+  const kontekst = session.context as { oferta?: KontekstOferty; plec?: string } | null | undefined;
+  // Płeć wybrana przy starcie (głos kobiecy/męski): postać, imię i odmiana
+  // muszą się z nią zgadzać, inaczej „Pani” odpowiada, że ma na imię Krzysztof.
+  const wersja = scenariuszWPlci(
+    { slug: sc?.slug, brief: sc?.brief ?? "", system_prompt: sc?.system_prompt ?? "" },
+    plecZWyboru(kontekst?.plec),
+  );
+  const scenarioSystemPrompt = wersja.system_prompt;
   const transcript = (session.transcript ?? []) as ChatMessage[];
   if (transcript.filter((m) => m.role === "agent").length >= MAX_AGENT_TURNS) {
     return new Response(
@@ -83,12 +91,13 @@ export async function POST(request: Request) {
   }
 
   // Kolumna context istnieje od migracji v49; przed nią select("*") jej nie zwraca.
-  const oferta = (session.context as { oferta?: KontekstOferty } | null | undefined)?.oferta ?? null;
+  const oferta = kontekst?.oferta ?? null;
   const system = buildClientSystemPrompt(
     scenarioSystemPrompt,
     session.personality ?? "",
     session.difficulty ?? "sredni",
     oferta,
+    wersja.instrukcja,
   );
 
   let anthropic;

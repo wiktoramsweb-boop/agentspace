@@ -21,6 +21,7 @@ export function buildClientSystemPrompt(
   personality: string,
   difficulty = "sredni",
   oferta?: KontekstOferty | null,
+  instrukcjaPlci = "",
 ): string {
   const p = PERSONALITIES.find((x) => x.value === personality);
   const desc = p
@@ -31,7 +32,7 @@ export function buildClientSystemPrompt(
   const style =
     "\n\nINTERPUNKCJA: nie używaj myślnika ani półpauzy (znaki — i –). Zamiast nich przecinek, dwukropek lub kropka." +
     "\n\nDŁUGOŚĆ: mów jak w prawdziwej rozmowie telefonicznej, zwykle 1-3 zdania naraz. Jedno pytanie na raz, nie zasypuj agenta kilkoma.";
-  return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc) + (oferta ? blokOferty(oferta) : "") + diff + style;
+  return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc) + instrukcjaPlci + (oferta ? blokOferty(oferta) : "") + diff + style;
 }
 
 /**

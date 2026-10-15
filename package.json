@@ -22,7 +22,8 @@
     "test:glos": "node --experimental-strip-types lib/sprawdz-glos.mjs",
     "test:import": "node --experimental-strip-types lib/sprawdz-import.mjs",
     "test:automatyzacje": "node --experimental-strip-types --no-warnings lib/sprawdz-automatyzacje.mjs",
-    "test:koszty": "node --experimental-strip-types --no-warnings lib/sprawdz-koszty.mjs"
+    "test:koszty": "node --experimental-strip-types --no-warnings lib/sprawdz-koszty.mjs",
+    "test:plec": "node --experimental-strip-types --no-warnings lib/sprawdz-plec.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",

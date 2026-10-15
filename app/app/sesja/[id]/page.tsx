@@ -5,6 +5,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { SessionChat } from "./chat";
 import { SessionResults } from "./results";
 import { glosWlaczony } from "@/lib/glos";
+import { plecZWyboru, scenariuszWPlci } from "@/lib/coach/scenariusz-plec";
 
 // Scoring (endSession) potrafi trwać kilka-kilkanaście sekund - daj mu czas.
 export const maxDuration = 60;
@@ -50,17 +51,22 @@ export default async function SessionPage({ params, searchParams }: Props) {
   }
 
   const scenario = await getScenarioById(session.scenario_id);
+  const plecSesji = plecZWyboru(session.context?.plec) ?? plecZWyboru(plec);
+  const wersja = scenariuszWPlci(
+    { slug: scenario?.slug, brief: scenario?.brief ?? "", system_prompt: scenario?.system_prompt ?? "" },
+    plecSesji,
+  );
 
   return (
     <SessionChat
       sessionId={session.id}
       initialTranscript={session.transcript}
       scenarioTitle={session.scenario_title ?? scenario?.title ?? "Sesja"}
-      brief={scenario?.brief ?? ""}
+      brief={wersja.brief}
       personality={session.personality ?? "biznesowy"}
       glos={glosWlaczony()}
       trybGlosu={tryb === "glos" && glosWlaczony()}
-      plec={plec === "k" || plec === "m" ? plec : null}
+      plec={plecSesji}
     />
   );
 }

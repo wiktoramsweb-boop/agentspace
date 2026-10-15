@@ -7,6 +7,7 @@ import { startSession } from "../actions";
 import { Card } from "../../components/ui";
 import { SubmitButton } from "../../components/submit-button";
 import { glosWlaczony } from "@/lib/glos";
+import { plecRozmowcy } from "@/lib/karta-rozmowy";
 import { maV49 } from "@/lib/schemat";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { Select } from "../../components/select";
@@ -179,20 +180,21 @@ export default async function ScenarioSetupPage({ params, searchParams }: Props)
               />
             </div>
 
-            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
-              Głos klienta
-            </p>
-            <p className="mb-4 text-sm text-slate-500">
-              Domyślnie dobieramy go po scenariuszu, bo w opisie stoi Pan Krzysztof albo
-              Pani Anna. Możesz to nadpisać, jeśli chcesz poćwiczyć rozmowę z inną osobą.
-            </p>
-            <div className="mb-8 grid gap-3 sm:grid-cols-3">
-              <GlosKarty wartosc="auto" domyslny tytul="Jak w scenariuszu" opis="Zgodnie z opisem zadania" />
-              <GlosKarty wartosc="k" tytul="Kobiecy" opis="Zawsze kobiecy głos" />
-              <GlosKarty wartosc="m" tytul="Męski" opis="Zawsze męski głos" />
-            </div>
           </>
         )}
+
+        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
+          Kto odbierze
+        </p>
+        <p className="mb-4 text-sm text-slate-500">
+          Domyślnie tak jak w scenariuszu. Wybierz kobietę albo mężczyznę, a klient zmieni się
+          w całości: imię, „Pan” albo „Pani” i sposób mówienia, także głos w rozmowie telefonicznej.
+        </p>
+        <div className="mb-8 grid gap-3 sm:grid-cols-3">
+          <GlosKarty wartosc="auto" domyslny tytul="Jak w scenariuszu" opis={plecRozmowcy(scenario!.brief) === "k" ? "Kobieta, zgodnie z opisem" : "Mężczyzna, zgodnie z opisem"} />
+          <GlosKarty wartosc="k" tytul="Kobieta" opis="Pani, kobiecy głos" />
+          <GlosKarty wartosc="m" tytul="Mężczyzna" opis="Pan, męski głos" />
+        </div>
 
         <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">
           Krok {glos ? 3 : 2} · Wybierz typ klienta

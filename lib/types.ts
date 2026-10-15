@@ -105,7 +105,7 @@ export type TrainingSession = {
   completed_at: string | null;
   // ── v49: trening na własnej ofercie i zadania od menedżera ──
   property_id?: string | null;
-  context?: { oferta?: { dzielnica: string; miasto: string; tytul: string; cena: number | null; metraz: number | null } } | null;
+  context?: { oferta?: { dzielnica: string; miasto: string; tytul: string; cena: number | null; metraz: number | null }; plec?: "k" | "m" } | null;
   assignment_id?: string | null;
 };
 

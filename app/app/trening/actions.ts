@@ -74,7 +74,15 @@ export async function startSession(formData: FormData): Promise<void> {
       difficulty,
       transcript: [],
       status: "in_progress",
-      ...(v49 ? { property_id: oferta?.propertyId ?? null, context: oferta ? { oferta } : null, assignment_id: zadanie } : {}),
+      ...(v49
+        ? {
+            property_id: oferta?.propertyId ?? null,
+            // Płeć klienta zapisujemy w sesji, a nie tylko w adresie: czat
+            // tekstowy też musi wiedzieć, czy rozmawia Pani Krystyna, czy Pan Krzysztof.
+            context: oferta || plec ? { ...(oferta ? { oferta } : {}), ...(plec ? { plec } : {}) } : null,
+            assignment_id: zadanie,
+          }
+        : {}),
     })
     .select("id")
     .single();

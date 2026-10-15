@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { buildClientSystemPrompt } from "@/lib/ai/coach";
 import { kontekstSesji } from "@/lib/ai/oferta-kontekst";
+import { scenariuszWPlci } from "@/lib/coach/scenariusz-plec";
 import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { kredytyZGory, MAX_MINUT_ROZMOWY } from "@/lib/kredyty-cennik";
 import { glosWlaczony, dostepDoRozmowy, pierwszeZdanie } from "@/lib/glos";
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
   const admin = createSupabaseAdmin();
   const { data: sesja } = await admin
     .from("training_sessions")
-    .select("id, agent_id, personality, difficulty, status, scenario:scenarios(system_prompt, category, brief)")
+    .select("id, agent_id, personality, difficulty, status, scenario:scenarios(slug, system_prompt, category, brief)")
     .eq("id", sessionId)
     .maybeSingle();
 
@@ -42,17 +43,8 @@ export async function POST(req: Request) {
     return brakKredytowResponse();
   }
 
-  const scenariusz = sesja.scenario as unknown as { system_prompt: string; category: string; brief: string } | null;
+  const scenariusz = sesja.scenario as unknown as { slug: string; system_prompt: string; category: string; brief: string } | null;
   if (!scenariusz) return Response.json({ error: "Nie ma takiego scenariusza." }, { status: 404 });
-
-  // Ta sama instrukcja, którą dostaje klient AI w trybie tekstowym. Dzięki temu
-  // rozmowa głosowa i pisana zachowują się tak samo, a scenariusze pisze się raz.
-  const prompt = buildClientSystemPrompt(
-    scenariusz.system_prompt,
-    (sesja.personality as string) ?? "biznesowy",
-    (sesja.difficulty as string) ?? "sredni",
-    await kontekstSesji(sessionId),
-  );
 
   // Głos ustawia się na agencie u dostawcy, nie na pojedynczej rozmowie, więc
   // kobiece scenariusze kierujemy na drugiego agenta. Płeć bierzemy z opisu
@@ -64,9 +56,22 @@ export async function POST(req: Request) {
 
   // Drugi agent bywa nieskonfigurowany albo nieopublikowany. Lepiej, żeby
   // rozmowa odbyła się nie tym głosem, niż żeby nie odbyła się wcale.
+  let plecGlosu = plec;
   if (!dostep.token && !dostep.adres && plec === "k") {
     dostep = await dostepDoRozmowy("m");
+    plecGlosu = "m";
   }
+
+  // Ta sama instrukcja, którą dostaje klient AI w trybie tekstowym. Postać ma
+  // płeć głosu, który faktycznie słychać: imię, „Pan/Pani” i odmiana.
+  const wersja = scenariuszWPlci(scenariusz, plecGlosu);
+  const prompt = buildClientSystemPrompt(
+    wersja.system_prompt,
+    (sesja.personality as string) ?? "biznesowy",
+    (sesja.difficulty as string) ?? "sredni",
+    await kontekstSesji(sessionId),
+    wersja.instrukcja,
+  );
 
   if (!dostep.token && !dostep.adres) {
     return Response.json(

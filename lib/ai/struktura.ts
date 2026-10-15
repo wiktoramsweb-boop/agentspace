@@ -69,6 +69,21 @@ async function wyslij(apiKey: string, body: unknown, beta?: string) {
   return fetch(API, { method: "POST", headers, body: JSON.stringify(body) });
 }
 
+/**
+ * Structured outputs wymagają `additionalProperties: false` przy KAŻDYM
+ * obiekcie, także zagnieżdżonym (elementy list, pola-obiekty). Bez tego API
+ * odpowiada 400 i lecimy drogą awaryjną: wolniej, drożej i z mailem o awarii.
+ * Uzupełniamy to tutaj, zamiast pilnować w każdym schemacie osobno.
+ */
+function domknijObiekty(w: unknown): unknown {
+  if (Array.isArray(w)) return w.map(domknijObiekty);
+  if (!w || typeof w !== "object") return w;
+  const o: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(w)) o[k] = domknijObiekty(v);
+  if (o.type === "object" && o.additionalProperties === undefined) o.additionalProperties = false;
+  return o;
+}
+
 export async function odpowiedzJson<T>({
   model,
   system,
@@ -89,7 +104,7 @@ export async function odpowiedzJson<T>({
       max_tokens: maxTokens,
       system,
       messages,
-      output_config: { format: { type: "json_schema", schema: schemat } },
+      output_config: { format: { type: "json_schema", schema: domknijObiekty(schemat) } },
     },
     BETA_STRUCTURED,
   );
