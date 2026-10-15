@@ -18,6 +18,7 @@ import {
   type WarunkiReguly,
   type Zdarzenie,
 } from "./automatyzacje-model";
+import { adresZMiastem } from "./adres";
 
 /**
  * Silnik automatyzacji. Opis reguł i warunków w `automatyzacje-model.ts`.
@@ -96,7 +97,7 @@ async function wzbogac(admin: Admin, agencyId: string, k: Kontekst): Promise<Kon
       .maybeSingle();
     if (p) {
       out.nazwaOferty ??= p.title;
-      out.adresOferty ??= [p.address, p.city].filter(Boolean).join(", ") || p.title;
+      out.adresOferty ??= adresZMiastem(p.address, p.city) || p.title;
       out.nowaCena ??= p.price_pln == null ? null : Number(p.price_pln);
       out.rodzajOferty ??= p.deal_kind;
       out.etapOferty ??= p.process_stage ?? "przyjeta";
@@ -529,7 +530,7 @@ export async function uruchomAutomatyzacjeCzasowe(): Promise<{ biur: number; reg
               zdarzenie: "oferta_bez_prezentacji",
               ofertaId: p.id,
               nazwaOferty: p.title,
-              adresOferty: [p.address, p.city].filter(Boolean).join(", ") || p.title,
+              adresOferty: adresZMiastem(p.address, p.city) || p.title,
               nowaCena: p.price_pln == null ? null : Number(p.price_pln),
               rodzajOferty: p.deal_kind,
               etapOferty: p.process_stage ?? "przyjeta",

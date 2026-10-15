@@ -110,7 +110,7 @@ export function ZgodyRodo({
                 <p className="mt-0.5 text-sm text-slate-500">{r.opis}</p>
                 <p className="mt-1.5 text-xs text-slate-400">
                   {w
-                    ? `${tak ? (r.value === "obowiazek_informacyjny" ? "Przekazana" : "Udzielona") : "Wycofana"} ${data(w.recorded_at)} · ${ZRODLA_ZGODY.find((z) => z.value === w.source)?.nazwa ?? w.source}${w.recorded_by ? ` · odnotował(a) ${imie.get(w.recorded_by) ?? "osoba z zespołu"}` : ""}`
+                    ? `${tak ? (r.value === "obowiazek_informacyjny" ? "Przekazana" : "Udzielona") : "Wycofana"} ${data(w.recorded_at)} · ${ZRODLA_ZGODY.find((z) => z.value === w.source)?.nazwa ?? w.source}${w.recorded_by ? ` · wpis: ${imie.get(w.recorded_by) ?? "osoba z zespołu"}` : ""}`
                     : "Brak wpisu"}
                 </p>
               </div>
@@ -133,7 +133,10 @@ export function ZgodyRodo({
       </ul>
 
       {zmiana && (
-        <div className="rounded-2xl border border-emerald-500/40 bg-emerald-100 p-5">
+        <div
+          ref={(el) => el?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
+          className="rounded-2xl border border-emerald-500/40 bg-emerald-100 p-5"
+        >
           <p className="font-semibold text-slate-900">
             {zmiana.udzielona ? "Odnotuj zgodę" : "Odnotuj wycofanie"}: {RODZAJE_ZGOD.find((r) => r.value === zmiana.rodzaj)?.nazwa}
           </p>

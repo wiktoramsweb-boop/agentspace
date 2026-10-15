@@ -8,6 +8,7 @@ import { PERSONALITIES, SCENARIO_CATEGORIES } from "@/lib/types";
 import { PageHeader } from "../../components/ui";
 import { BrakMigracji } from "../../components/brak-migracji";
 import { FormularzZadania, ListaZadan, type ZadanieWiersz } from "./formularz";
+import { adresZMiastem } from "@/lib/adres";
 
 export const metadata = { title: "Zadania treningowe" };
 
@@ -70,7 +71,7 @@ export default async function ZadaniaPage() {
             scenarios.filter((s) => s.category === c.value).map((s) => ({ value: s.id, label: s.title, hint: c.label })),
           )}
           osobowosci={PERSONALITIES.map((p) => ({ value: p.value, label: p.label }))}
-          oferty={(oferty ?? []).map((o) => ({ value: o.id as string, label: [o.address, o.city].filter(Boolean).join(", ") || (o.title as string) }))}
+          oferty={(oferty ?? []).map((o) => ({ value: o.id as string, label: adresZMiastem(o.address as string | null, o.city as string | null) || (o.title as string) }))}
         />
         <ListaZadan zadania={wiersze} />
       </div>

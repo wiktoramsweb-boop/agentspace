@@ -1,5 +1,6 @@
 import {
   data,
+  kwota,
   imiona,
   numeruj,
   opisBiura,
@@ -42,7 +43,7 @@ const potwierdzeniePrezentacji: Wzor = {
       wstep: [`${miejscowosc(d, k)}, dnia ${data(d, "data")} r.${d.godzina ? `, godz. ${tekst(d, "godzina")}` : ""}`],
       paragrafy: [
         { ustepy: numeruj([
-          `${opisStron(O, "Oglądający")} potwierdza, że w dniu ${data(d, "data")} r. ${opisBiura(k)} (dalej: „Pośrednik”) przedstawił mu nieruchomość położoną pod adresem **${tekst(d, "adres", "adres nieruchomości")}**${d.numerOferty ? `, oferta nr ${tekst(d, "numerOferty")}` : ""}, oferowaną${d.cena ? ` w cenie ${tekst(d, "cena")} zł` : ""}.`,
+          `${opisStron(O, "Oglądający")} potwierdza, że w dniu ${data(d, "data")} r. ${opisBiura(k)} (dalej: „Pośrednik”) przedstawił mu nieruchomość położoną pod adresem **${tekst(d, "adres", "adres nieruchomości")}**${d.numerOferty ? `, oferta nr ${tekst(d, "numerOferty")}` : ""}, oferowaną${d.cena ? ` w cenie ${kwota(d, "cena")}` : ""}.`,
           "Oglądający oświadcza, że przed dniem prezentacji nie znał tej nieruchomości jako oferty sprzedaży lub najmu ani jej właściciela w związku z tą ofertą, chyba że zaznaczył to poniżej.",
           "Oglądający przyjmuje do wiadomości, że informacje o nieruchomości i jej właścicielu uzyskał od Pośrednika, a zawarcie umowy dotyczącej tej nieruchomości z jej właścicielem w okresie 12 miesięcy od prezentacji, z pominięciem Pośrednika, może rodzić obowiązek zapłaty wynagrodzenia zgodnie z zawartą umową pośrednictwa.",
           "Uwagi Oglądającego: …………………………………………………………………………………………………………",

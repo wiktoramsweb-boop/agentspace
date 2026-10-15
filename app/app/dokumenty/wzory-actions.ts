@@ -8,6 +8,7 @@ import { nieobecnosciWDniu } from "@/lib/zastepstwa";
 import { maV49 } from "@/lib/schemat";
 import { wzor } from "@/lib/dokumenty";
 import type { Dane, Strona } from "@/lib/dokumenty/silnik";
+import { adresZMiastem } from "@/lib/adres";
 
 type Wynik<T = object> = ({ ok: true } & T) | { ok: false; error: string };
 
@@ -71,7 +72,7 @@ export async function ofertaDoDokumentu(id: string): Promise<Wynik<{ pola: Recor
   return {
     ok: true,
     pola: {
-      adres: String(p.address ?? "").toLowerCase().includes(String(p.city ?? "").toLowerCase()) ? n(p.address) : [p.address, p.city].filter(Boolean).join(", "),
+      adres: adresZMiastem(p.address, p.city),
       cena: najem ? "" : n(p.price_pln),
       czynsz: najem ? n(p.price_pln) : "",
       kaucja: n(p.deposit_pln),

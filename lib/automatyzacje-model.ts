@@ -275,6 +275,14 @@ export function opisReguly(r: { trigger: string; trigger_config: WarunkiReguly; 
   const kiedy = z ? `Kiedy ${z.zdanie}` : "Kiedy zajdzie zdarzenie";
   const w = r.trigger_config ?? {};
   const warunki: string[] = [];
+  // Wartości z bazy („w_kontakcie”) zamieniamy na czytelne słowa. Model nie
+  // importuje słowników z lib/types, żeby test działał w gołym node.
+  const ludzko = (l: string[]) => l.map((v) => v.replace(/_/g, " ")).join(" lub ");
+  if (w.statusNa?.length) warunki.push(`tylko na etap: ${ludzko(w.statusNa)}`);
+  if (w.etapNa?.length) warunki.push(`tylko na etap: ${ludzko(w.etapNa)}`);
+  if (w.typKlienta?.length) warunki.push(`klient: ${ludzko(w.typKlienta)}`);
+  if (w.zrodlo?.length) warunki.push(`źródło: ${ludzko(w.zrodlo)}`);
+  if (w.rodzajOferty?.length) warunki.push(`oferta: ${ludzko(w.rodzajOferty)}`);
   if (w.dni) warunki.push(`po ${w.dni} ${w.dni === 1 ? "dniu" : "dniach"}`);
   if (w.kierunekCeny === "obnizka") warunki.push("tylko przy obniżce");
   if (w.kierunekCeny === "podwyzka") warunki.push("tylko przy podwyżce");

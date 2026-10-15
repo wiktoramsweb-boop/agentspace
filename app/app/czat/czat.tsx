@@ -52,7 +52,10 @@ export function Czat({ ja, agencyId, ludzie, startowyKanal }: { ja: string; agen
     naDole.current = true;
     setLista(w.lista);
     setWiecej(w.wiecej);
-    void przeczytane(id).then(odswiezKanaly);
+    void przeczytane(id).then(() => {
+      void odswiezKanaly();
+      window.dispatchEvent(new Event("czat-przeczytane"));
+    });
   }, [odswiezKanaly]);
 
   useEffect(() => {
@@ -77,14 +80,19 @@ export function Czat({ ja, agencyId, ludzie, startowyKanal }: { ja: string; agen
     zapasMs: 15_000,
     onZmiana: (z) => {
       const kanal = z?.new?.channel_id as string | undefined;
-      void odswiezKanaly();
       if (aktywny && (!kanal || kanal === aktywny)) {
-        void wiadomosci(aktywny).then((w) => {
+        // Najpierw „przeczytane”, potem liczniki: odwrotna kolejność pokazywała
+        // nieprzeczytaną wiadomość w rozmowie, którą właśnie widać na ekranie.
+        void wiadomosci(aktywny).then(async (w) => {
           if (w.ok) {
             setLista(w.lista);
-            void przeczytane(aktywny);
+            await przeczytane(aktywny);
           }
+          void odswiezKanaly();
+          window.dispatchEvent(new Event("czat-przeczytane"));
         });
+      } else {
+        void odswiezKanaly();
       }
     },
   });

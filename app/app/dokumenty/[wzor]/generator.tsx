@@ -13,6 +13,20 @@ import { klientDoDokumentu, ofertaDoDokumentu, oznaczWzor } from "../wzory-actio
 
 export type Rekord = { id: string; nazwa: string; opis?: string };
 
+type WzorDok = NonNullable<ReturnType<typeof znajdzWzor>>;
+
+/** Pola dokumentu wypełniane z oferty (adres, cena, metraż…). */
+function polaZOferty(w: WzorDok, pola: Record<string, string>, obecne: Dane): Dane {
+  const n: Dane = {};
+  for (const [zrodlo, pole] of Object.entries(w.zOferty ?? {})) {
+    const v = pola[zrodlo];
+    if (v && pole) n[pole] = v;
+  }
+  if (pola.numerOferty && "numerOferty" in obecne) n.numerOferty = pola.numerOferty;
+  if (pola.miasto && "miasto" in obecne && !String(obecne.miasto ?? "").trim()) n.miasto = pola.miasto;
+  return n;
+}
+
 /** Rodzaj dokumentu w karcie klienta/oferty. Nieznany zapisze się jako „inne". */
 function rodzajWKarcie(wzorId: string): string {
   if (wzorId.startsWith("umowa-posrednictwa")) return "umowa_posrednictwa";
@@ -36,7 +50,7 @@ function Bogaty({ t }: { t: string }) {
 }
 
 export function Generator({
-  wzorId, kontekst, stopka, dzis, klienci, oferty, startKlient, startOferta,
+  wzorId, kontekst, stopka, dzis, klienci, oferty, startKlient, startOferta, startStrona, startUkryte, startPola,
 }: {
   wzorId: string;
   kontekst: Kontekst;
@@ -46,6 +60,9 @@ export function Generator({
   oferty: Rekord[];
   startKlient?: string;
   startOferta?: string;
+  startStrona?: Strona;
+  startUkryte?: boolean;
+  startPola?: Record<string, string>;
 }) {
   const w = znajdzWzor(wzorId)!;
   const kluczSzkicu = `agentspace:wzor:${wzorId}`;
@@ -53,11 +70,15 @@ export function Generator({
   const [d, setD] = useState<Dane>(() => {
     const start = daneStartowe(w, dzis);
     if (!start.miasto && w.grupy.some((g) => g.pola.some((p) => p.k === "miasto"))) start.miasto = kontekst.miasto;
+    if (startStrona && w.poleKlienta) start[w.poleKlienta] = [startStrona];
+    if (startPola) Object.assign(start, polaZOferty(w, startPola, start));
     return start;
   });
   const [klient, setKlient] = useState(startKlient ?? "");
   const [oferta, setOferta] = useState(startOferta ?? "");
-  const [info, setInfo] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(
+    startUkryte ? "Biuro ukrywa dane klientów innych agentów, więc wpisałem tylko imię i nazwisko. PESEL i adres uzupełnij z klientem." : null,
+  );
   const [szkic, setSzkic] = useState<Dane | null>(null);
   const [pracuje, setPracuje] = useState<false | "zapis" | "druk">(false);
   const [zapisCrm, setZapisCrm] = useState(false);
@@ -110,27 +131,9 @@ export function Generator({
     const r = await ofertaDoDokumentu(id);
     if (!r.ok) return setBlad(r.error);
     zmieniono.current = true;
-    setD((p) => {
-      const n = { ...p };
-      for (const [zrodlo, pole] of Object.entries(w.zOferty ?? {})) {
-        const v = r.pola[zrodlo];
-        if (v && pole) n[pole] = v;
-      }
-      if (r.pola.numerOferty && "numerOferty" in n) n.numerOferty = r.pola.numerOferty;
-      if (r.pola.miasto && "miasto" in n && !String(n.miasto ?? "").trim()) n.miasto = r.pola.miasto;
-      return n;
-    });
+    setD((p) => ({ ...p, ...polaZOferty(w, r.pola, p) }));
   }
 
-  // Podpięcie z linku „Utwórz dokument" na karcie klienta albo oferty.
-  const startowano = useRef(false);
-  useEffect(() => {
-    if (startowano.current) return;
-    startowano.current = true;
-    if (startKlient) void wczytajKlienta(startKlient);
-    if (startOferta) void wczytajOferte(startOferta);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const dokument = useMemo(() => w.buduj(d, kontekst), [w, d, kontekst]);
   const tytulPliku = useMemo(() => {

@@ -1,6 +1,7 @@
 import { SCORING_MODEL } from "./client";
 import { odpowiedzJson } from "./struktura";
 import type { Property, Search } from "../types";
+import { adresZMiastem } from "../adres";
 
 /**
  * Ranking ofert AI dla poszukiwania.
@@ -35,7 +36,7 @@ function opisOferty(p: Property): string {
   return [
     `ID: ${p.id}`,
     `${p.title}`,
-    [p.address, p.city].filter(Boolean).join(", "),
+    adresZMiastem(p.address, p.city),
     p.price_pln ? `cena ${p.price_pln} zł` : "",
     p.area_m2 ? `${p.area_m2} m²` : "",
     p.rooms ? `${p.rooms} pok.` : "",

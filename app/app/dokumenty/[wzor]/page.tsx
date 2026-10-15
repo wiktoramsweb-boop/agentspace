@@ -8,6 +8,7 @@ import { wzor } from "@/lib/dokumenty";
 import type { Kontekst } from "@/lib/dokumenty/silnik";
 import { PageHeader } from "../../components/ui";
 import { Generator, type Rekord } from "./generator";
+import { klientDoDokumentu, ofertaDoDokumentu } from "../wzory-actions";
 
 function adresZMiastem(adres: string | null, miasto: string | null): string {
   const a = (adres ?? "").trim();
@@ -61,6 +62,12 @@ export default async function WzorPage({
   }));
   const okKlient = sp.klient && klienci.some((k) => k.id === sp.klient) ? sp.klient : undefined;
   const okOferta = sp.oferta && oferty.some((o) => o.id === sp.oferta) ? sp.oferta : undefined;
+  // Dane z linku („Utwórz dokument” z karty klienta albo oferty) wczytujemy
+  // na serwerze, żeby formularz otworzył się już wypełniony.
+  const [zKlienta, zOferty] = await Promise.all([
+    okKlient && w.poleKlienta ? klientDoDokumentu(okKlient) : Promise.resolve(null),
+    okOferta && w.zOferty ? ofertaDoDokumentu(okOferta) : Promise.resolve(null),
+  ]);
 
   return (
     <>
@@ -83,6 +90,9 @@ export default async function WzorPage({
         oferty={oferty}
         startKlient={okKlient}
         startOferta={okOferta}
+        startStrona={zKlienta?.ok ? zKlienta.strona : undefined}
+        startUkryte={zKlienta?.ok ? zKlienta.ukryte : false}
+        startPola={zOferty?.ok ? zOferty.pola : undefined}
       />
     </>
   );

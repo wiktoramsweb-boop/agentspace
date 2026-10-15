@@ -15,6 +15,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { kodQrSvg } from "@/lib/qr";
 import { APP_URL } from "@/lib/supabase/config";
 import { DostepPortal, type DostepWiersz } from "../../klienci/[id]/dostep-portal";
+import { adresZMiastem } from "@/lib/adres";
 
 const STATUS_MAP = Object.fromEntries(SEARCH_STATUSES.map((s) => [s.value, s]));
 const TYPE_MAP = Object.fromEntries(PROPERTY_TYPES.map((t) => [t.value, t.label]));
@@ -188,7 +189,7 @@ export default async function SearchDetailPage({ params }: Props) {
                 allMatches.map((m) => [
                   m.property.id,
                   {
-                    nazwa: [m.property.address, m.property.city].filter(Boolean).join(", ") || m.property.title,
+                    nazwa: adresZMiastem(m.property.address, m.property.city) || m.property.title,
                     cena: m.property.price_pln ? zl(m.property.price_pln) : "cena do ustalenia",
                   },
                 ]),

@@ -10,6 +10,7 @@ import { glosWlaczony } from "@/lib/glos";
 import { maV49 } from "@/lib/schemat";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { Select } from "../../components/select";
+import { adresZMiastem } from "@/lib/adres";
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ oferta?: string; zadanie?: string }> };
 
@@ -25,7 +26,7 @@ async function ofertyDoTreningu(agencyId: string, userId: string, role: string) 
   const { data } = await q;
   return (data ?? []).map((o) => ({
     value: o.id as string,
-    label: [o.address, o.city].filter(Boolean).join(", ") || (o.title as string),
+    label: adresZMiastem(o.address as string | null, o.city as string | null) || (o.title as string),
     hint: [o.area_m2 ? `${o.area_m2} m²` : "", o.price_pln ? `${new Intl.NumberFormat("pl-PL").format(Number(o.price_pln))} zł` : ""].filter(Boolean).join(" · ") || undefined,
   }));
 }

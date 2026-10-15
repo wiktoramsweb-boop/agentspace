@@ -29,7 +29,8 @@ export function buildClientSystemPrompt(
   const diff = DIFFICULTY_BLOCK[difficulty] ?? DIFFICULTY_BLOCK.sredni;
   // Klient AI ma mówić jak człowiek, a myślnik w wypowiedzi zdradza tekst z AI.
   const style =
-    "\n\nINTERPUNKCJA: nie używaj myślnika ani półpauzy (znaki — i –). Zamiast nich przecinek, dwukropek lub kropka.";
+    "\n\nINTERPUNKCJA: nie używaj myślnika ani półpauzy (znaki — i –). Zamiast nich przecinek, dwukropek lub kropka." +
+    "\n\nDŁUGOŚĆ: mów jak w prawdziwej rozmowie telefonicznej, zwykle 1-3 zdania naraz. Jedno pytanie na raz, nie zasypuj agenta kilkoma.";
   return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc) + (oferta ? blokOferty(oferta) : "") + diff + style;
 }
 
@@ -71,7 +72,7 @@ export async function streamClientReply(
 
   const stream = await anthropic.messages.create({
     model: COACH_MODEL,
-    max_tokens: 400,
+    max_tokens: 700,
     system: [
       {
         type: "text",

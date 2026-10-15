@@ -41,13 +41,18 @@ export async function poZmianieStatusuKlienta(
   nazwa?: string | null,
 ): Promise<void> {
   if (!user.agency_id) return;
+  // Bez nazwy wpis w dzienniku („status zmieniony na…”) nie mówi, kogo dotyczy.
+  if (!nazwa) {
+    const { data } = await createSupabaseAdmin().from("clients").select("name").eq("id", klientId).eq("agency_id", user.agency_id).maybeSingle();
+    nazwa = (data?.name as string | undefined) ?? null;
+  }
   await zapiszZdarzenie({
     agencyId: user.agency_id,
     actorId: user.id,
     akcja: "status_klienta",
     rodzaj: "klient",
     id: klientId,
-    opis: `${nazwa ? `„${nazwa}": ` : ""}status zmieniony na „${etykietaStatusu(status)}"`,
+    opis: `${nazwa ? `${nazwa}: ` : "Klient: "}status zmieniony na „${etykietaStatusu(status)}"`,
   });
   await uruchomAutomatyzacje(user.agency_id, {
     zdarzenie: "zmiana_statusu_klienta",
@@ -104,13 +109,17 @@ export async function poNowejOfercie(user: Kto, ofertaId: string): Promise<void>
 
 export async function poZmianieEtapuOferty(user: Kto, ofertaId: string, etap: string, tytul?: string | null): Promise<void> {
   if (!user.agency_id) return;
+  if (!tytul) {
+    const { data } = await createSupabaseAdmin().from("properties").select("title").eq("id", ofertaId).eq("agency_id", user.agency_id).maybeSingle();
+    tytul = (data?.title as string | undefined) ?? null;
+  }
   await zapiszZdarzenie({
     agencyId: user.agency_id,
     actorId: user.id,
     akcja: "etap_oferty",
     rodzaj: "oferta",
     id: ofertaId,
-    opis: `${tytul ? `„${tytul}": ` : ""}etap zmieniony na „${etykietaEtapu(etap)}"`,
+    opis: `${tytul ? `${tytul}: ` : "Oferta: "}etap zmieniony na „${etykietaEtapu(etap)}"`,
   });
   await uruchomAutomatyzacje(user.agency_id, {
     zdarzenie: "zmiana_etapu_oferty",

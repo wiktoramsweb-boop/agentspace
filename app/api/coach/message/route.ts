@@ -107,7 +107,7 @@ export async function POST(request: Request) {
   try {
     aiStream = await anthropic.messages.create({
       model: COACH_MODEL,
-      max_tokens: 400,
+      max_tokens: 700,
       system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       messages,
       stream: true,

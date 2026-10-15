@@ -12,6 +12,10 @@ export function LicznikCzatu({ userId }: { userId: string }) {
   }, []);
   useEffect(() => {
     odswiez();
+    // Czat ogłasza, że oznaczył rozmowę jako przeczytaną: bez tego plakietka
+    // w menu czekała na kolejną wiadomość albo zapasowe odświeżenie.
+    window.addEventListener("czat-przeczytane", odswiez);
+    return () => window.removeEventListener("czat-przeczytane", odswiez);
   }, [odswiez]);
   useNaZywo({ kanal: `licznik-czatu-${userId}`, tabela: "chat_messages", onZmiana: odswiez, wlaczony: ile !== null, zapasMs: 45_000 });
   if (!ile) return null;

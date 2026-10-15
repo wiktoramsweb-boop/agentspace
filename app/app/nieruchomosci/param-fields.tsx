@@ -32,11 +32,17 @@ export function ParamFields({
   const cols = (property ?? {}) as unknown as Record<string, unknown>;
   const details = (property?.details ?? {}) as Record<string, unknown>;
 
+  const KOLUMNA_POLA: Record<string, string> = { price: "price_pln", area: "area_m2" };
+
   function valueOf(f: PropertyField): unknown {
     if (!f.column) return details[f.key];
     // Piętro trzymamy w bazie jako liczbę, a wybiera się je z listy etykiet
     // („Parter", „> 10"), więc przy wczytywaniu tłumaczymy je z powrotem.
     if (f.key === "floor") return pietroEtykieta(cols.floor as number | null);
+    // Pola formularza „price” i „area” zapisują się do kolumn z jednostką
+    // w nazwie (actions.ts). Bez tego tłumaczenia edycja pokazywała pustą
+    // cenę i metraż, a zapis bez ich przepisania czyścił je w bazie.
+    if (f.key in KOLUMNA_POLA) return cols[KOLUMNA_POLA[f.key]];
     return cols[f.key];
   }
 

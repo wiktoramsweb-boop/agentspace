@@ -77,7 +77,10 @@ export async function zapiszZgode(
     akcja: "zgoda_rodo",
     rodzaj: "klient",
     id: clientId,
-    opis: `„${klient.name}": ${r.nazwa.toLowerCase()} – ${udzielona ? (r.value === "obowiazek_informacyjny" ? "przekazana" : "udzielona") : "wycofana"}`,
+    opis:
+      r.value === "obowiazek_informacyjny"
+        ? `RODO, ${klient.name}: klauzula informacyjna ${udzielona ? "przekazana" : "cofnięta"}`
+        : `RODO, ${klient.name}: ${udzielona ? "zgoda udzielona" : "zgoda wycofana"} (${r.nazwa.toLowerCase()})`,
   });
   revalidatePath(`/app/klienci/${clientId}`);
   return { ok: true, wpisy };

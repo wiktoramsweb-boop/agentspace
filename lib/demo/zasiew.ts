@@ -1,3 +1,4 @@
+import { maV49 } from "../schemat";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { ZESPOL } from "./dane";
 import {
@@ -117,18 +118,28 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
   // Transakcje robimy ze sfinalizowanych ofert: niosą prawdziwą cenę końcową,
   // a przy okazji dają panelowi właściciela prowizje per agent.
   const sfinalizowane = listaOfert.filter((o) => o.status === "sfinalizowana");
-  const transakcje = sfinalizowane.map((o, i) => ({
-    agency_id: agencyId,
-    agent_id: o.agent_id,
-    client_id: listaKlientow[i % Math.max(1, listaKlientow.length)]?.id ?? null,
-    property_id: o.id,
-    title: `[DEMO] ${o.title}`,
-    transaction_value_pln: o.price_pln,
-    commission_pln: Math.round((o.price_pln * los.between(0.018, 0.028)) / 100) * 100,
-    agent_split_pct: 50,
-    status: "zamkniety",
-    closed_at: o.updated_at,
-  }));
+  // Wypłaty (v49): starsze transakcje są już rozliczone z agentem, dwie
+  // najnowsze czekają, żeby zakładka „Wypłaty prowizji” miała co pokazać.
+  const v49 = await maV49();
+  const najnowsze = [...sfinalizowane].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 2).map((o) => o.id);
+  const transakcje = sfinalizowane.map((o, i) => {
+    const prowizja = Math.round((o.price_pln * los.between(0.018, 0.028)) / 100) * 100;
+    const dlaAgenta = Math.round(prowizja * 0.5);
+    return {
+      agency_id: agencyId,
+      agent_id: o.agent_id,
+      client_id: listaKlientow[i % Math.max(1, listaKlientow.length)]?.id ?? null,
+      property_id: o.id,
+      title: `[DEMO] ${o.title}`,
+      transaction_value_pln: o.price_pln,
+      commission_pln: prowizja,
+      agent_split_pct: 50,
+      agent_earnings_pln: dlaAgenta,
+      status: "zamkniety",
+      closed_at: o.updated_at,
+      ...(v49 && !najnowsze.includes(o.id) ? { agent_paid_at: o.updated_at, agent_paid_pln: dlaAgenta } : {}),
+    };
+  });
   const zapisaneTransakcje = (await admin.from("deals").insert(transakcje).select("id")) as {
     data: { id: string }[] | null;
   };

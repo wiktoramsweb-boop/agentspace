@@ -60,7 +60,7 @@ export async function dodajNieobecnosc(input: {
     await powiadom(user.agency_id, [input.zastepcaId], {
       rodzaj: "zastepstwo",
       tytul: `Zastępujesz: ${imie(input.agentId)}`,
-      tresc: `${zakres}, ${etykieta}. W tym czasie zadania z automatyzacji i powiadomienia o sprawach ${imie(input.agentId)} trafią do Ciebie.`,
+      tresc: `${zakres}, ${etykieta}. W tym czasie zadania z automatyzacji i powiadomienia w sprawach klientów tej osoby trafiają do Ciebie i widzisz ich kontakty.`,
       adres: "/app/urlopy",
     });
   }
