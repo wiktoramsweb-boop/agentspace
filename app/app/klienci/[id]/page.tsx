@@ -42,6 +42,9 @@ import { DocumentsCard } from "../../dokumenty/documents-card";
 import { ClientCorrespondence } from "./client-correspondence";
 import { nieobecnosciWDniu } from "@/lib/zastepstwa";
 import { ukryjKontakt } from "@/lib/uprawnienia";
+import { zgodyKlienta } from "../rodo-actions";
+import { ZgodyRodo } from "./zgody-rodo";
+import { BrakMigracji } from "../../components/brak-migracji";
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ z?: string }> };
 
@@ -59,6 +62,7 @@ const ZAKLADKI: readonly Zakladka[] = [
   { key: "portal", label: "Portal i kod QR", ikona: "telefon" },
   { key: "korespondencja", label: "Korespondencja", ikona: "koperta" },
   { key: "dokumenty", label: "Dokumenty", ikona: "teczka" },
+  { key: "rodo", label: "RODO", ikona: "tarcza" },
 ];
 
 function reminderState(next: string | null): { due: boolean; label: string } | null {
@@ -112,6 +116,7 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
   const zastepowani = nieobecni.filter((n) => n.substitute_id === user.id).map((n) => n.agent_id);
   const urlopOpiekuna = client.agent_id ? nieobecni.find((n) => n.agent_id === client.agent_id) ?? null : null;
   const masked = ukryjKontakt(user, settings.options.hide_contacts, client, zastepowani);
+  const zgody = tab === "rodo" ? await zgodyKlienta(client.id) : null;
   // Dostępy do portalu. Brak tabeli (migracja v46 nieuruchomiona) daje pustą
   // listę, a nie błąd całej karty klienta.
   const dostepyPortalu = ((
@@ -429,6 +434,9 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
             clientPhone={contact.phone ?? null}
             initial={correspondence.messages}
             ready={correspondence.ready}
+            clientName={client.name}
+            agentName={user.full_name ?? ""}
+            agencyName={settings.company.name || user.agency?.name || ""}
           />
         </Card>
       )}
@@ -441,6 +449,26 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
           <DocumentsCard entity="client" entityId={client.id} initial={documents.docs} ready={documents.ready} />
         </Card>
       )}
+
+      {tab === "rodo" &&
+        (zgody ? (
+          <ZgodyRodo
+            clientId={client.id}
+            clientName={client.name}
+            poczatkowe={zgody.wpisy}
+            ludzie={agents}
+            administrator={{
+              nazwa: settings.company.name || user.agency?.name || "",
+              adres: [settings.company.street, [settings.company.postal_code, settings.company.city].filter(Boolean).join(" ")].filter(Boolean).join(", "),
+              nip: settings.company.nip ?? null,
+              email: settings.company.email ?? null,
+              telefon: settings.company.phone ?? null,
+            }}
+            stopka={[settings.company.name, settings.company.nip ? `NIP ${settings.company.nip}` : "", settings.company.phone, settings.company.email].filter(Boolean).join(" · ")}
+          />
+        ) : (
+          <BrakMigracji />
+        ))}
     </>
   );
 }

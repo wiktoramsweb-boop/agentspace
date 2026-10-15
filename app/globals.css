@@ -972,6 +972,8 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .placeholder\:text-slate-4
 
 /* Kreski */
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-200 { border-color: #27272a !important; }
+/* Obwódka kropki „w aplikacji" na awatarze: ma zlewać się z tłem listy. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-white { border-color: #18181b !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-300 { border-color: #3f3f46 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-400 { border-color: #52525b !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .divide-slate-200 > * + * { border-color: #27272a !important; }

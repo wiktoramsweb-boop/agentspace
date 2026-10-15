@@ -4,7 +4,8 @@ import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { ClientMessage } from "@/lib/data-messages";
 import { formatDateTimePL } from "@/lib/datetime";
-import { addClientMessage, deleteClientMessage } from "../message-actions";
+import { addClientMessage, deleteClientMessage, szablonyWiadomosci, usunSzablon, wyslijMailZKarty, zapiszSzablon } from "../message-actions";
+import { wypelnijSzablon, type SzablonWiadomosci } from "@/lib/szablony-wiadomosci";
 import { mailtoHref, smsHref } from "@/lib/message-links";
 
 type Channel = ClientMessage["channel"];
@@ -20,12 +21,18 @@ export function ClientCorrespondence({
   clientPhone,
   initial,
   ready,
+  clientName = "",
+  agentName = "",
+  agencyName = "",
 }: {
   clientId: string;
   clientEmail: string | null;
   clientPhone: string | null;
   initial: ClientMessage[];
   ready: boolean;
+  clientName?: string;
+  agentName?: string;
+  agencyName?: string;
 }) {
   const reduce = useReducedMotion();
   const [messages, setMessages] = useState(initial);
@@ -39,6 +46,55 @@ export function ClientCorrespondence({
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [szablony, setSzablony] = useState<SzablonWiadomosci[] | null>(null);
+  const [listaSzablonow, setListaSzablonow] = useState(false);
+  const [info, setInfo] = useState<string | null>(null);
+
+  async function otworzSzablony() {
+    setListaSzablonow((v) => !v);
+    if (!szablony) setSzablony(await szablonyWiadomosci());
+  }
+
+  function uzyj(t: SzablonWiadomosci) {
+    const dane = { klient: clientName, agent: agentName, biuro: agencyName };
+    setChannel(t.kanal);
+    setDirection("wyslana");
+    if (t.temat) setSubject(wypelnijSzablon(t.temat, dane));
+    setBody(wypelnijSzablon(t.tresc, dane));
+    setListaSzablonow(false);
+  }
+
+  async function zapiszJakoSzablon() {
+    const nazwa = prompt("Nazwa szablonu (zobaczy go cały zespół):");
+    if (!nazwa) return;
+    const r = await zapiszSzablon({ kanal: channel === "sms" ? "sms" : "mail", nazwa, temat: subject, tresc: body });
+    if (!r.ok) setError(r.error);
+    else {
+      setSzablony(await szablonyWiadomosci());
+      setInfo("Szablon zapisany.");
+    }
+  }
+
+  async function wyslijZAplikacji() {
+    setError(null);
+    setInfo(null);
+    if (!subject.trim() || !body.trim()) {
+      setError("Mail musi mieć temat i treść.");
+      return;
+    }
+    setBusy(true);
+    const res = await wyslijMailZKarty(clientId, subject, body);
+    setBusy(false);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setMessages((m) => [res.message, ...m]);
+    setSubject("");
+    setBody("");
+    setComposing(false);
+    setInfo(`Mail wysłany do ${clientEmail}. Odpowiedź klienta trafi do Twojej skrzynki.`);
+  }
 
   if (!ready) {
     return (
@@ -134,7 +190,7 @@ export function ClientCorrespondence({
             className="overflow-hidden"
           >
             <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Segmented
                   value={channel}
                   onChange={(v) => setChannel(v as Channel)}
@@ -152,6 +208,44 @@ export function ClientCorrespondence({
                     ["otrzymana", "Otrzymana"],
                   ]}
                 />
+                <div className="relative ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => void otworzSzablony()}
+                    className="rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-400"
+                  >
+                    Szablony
+                  </button>
+                  {listaSzablonow && (
+                    <div className="absolute right-0 top-full z-20 mt-1 max-h-80 w-72 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+                      {!szablony && <p className="px-3 py-2 text-xs text-slate-400">Wczytuję…</p>}
+                      {szablony?.filter((t) => channel === "inne" || t.kanal === channel).map((t) => (
+                        <div key={t.id} className="flex items-center gap-1 pr-1 hover:bg-slate-100">
+                          <button type="button" onClick={() => uzyj(t)} className="min-w-0 flex-1 px-3 py-2 text-left">
+                            <span className="block truncate text-sm text-slate-800">{t.nazwa}</span>
+                            <span className="text-[11px] uppercase tracking-wide text-slate-400">
+                              {t.kanal}{t.wlasny ? " · szablon biura" : ""}
+                            </span>
+                          </button>
+                          {t.wlasny && (
+                            <button
+                              type="button"
+                              title="Usuń szablon"
+                              onClick={async () => {
+                                if (!confirm(`Usunąć szablon „${t.nazwa}"?`)) return;
+                                await usunSzablon(t.id);
+                                setSzablony(await szablonyWiadomosci());
+                              }}
+                              className="rounded-md px-1.5 text-slate-400 hover:text-red-600"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               {channel === "mail" && (
                 <input
@@ -173,7 +267,12 @@ export function ClientCorrespondence({
                 className="w-full resize-y rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
               />
               {error && <p className="text-sm text-red-600">{error}</p>}
-              <div className="flex flex-wrap justify-end gap-2">
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {body.trim() && direction === "wyslana" && (
+                  <button type="button" onClick={() => void zapiszJakoSzablon()} className="mr-auto text-xs font-medium text-slate-500 hover:text-slate-800">
+                    Zapisz jako szablon
+                  </button>
+                )}
                 <button
                   type="button"
                   disabled={busy}
@@ -182,15 +281,36 @@ export function ClientCorrespondence({
                 >
                   Zapisz
                 </button>
-                {direction === "wyslana" && channel !== "inne" && (
+                {direction === "wyslana" && channel === "sms" && (
                   <button
                     type="button"
-                    disabled={busy || (channel === "mail" ? false : !clientPhone)}
+                    disabled={busy || !clientPhone}
                     onClick={() => void save(true)}
                     className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-emerald-500/25 transition hover:bg-emerald-400 disabled:opacity-50"
                   >
-                    {channel === "sms" ? "Zapisz i otwórz SMS" : "Zapisz i otwórz w poczcie"}
+                    Zapisz i otwórz SMS
                   </button>
+                )}
+                {direction === "wyslana" && channel === "mail" && (
+                  <>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void save(true)}
+                      className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      Otwórz w mojej poczcie
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy || !clientEmail}
+                      title={clientEmail ? `Wyśle na ${clientEmail}` : "Klient nie ma adresu e-mail"}
+                      onClick={() => void wyslijZAplikacji()}
+                      className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-emerald-500/25 transition hover:bg-emerald-400 disabled:opacity-50"
+                    >
+                      {busy ? "Wysyłam…" : "Wyślij teraz"}
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -200,6 +320,9 @@ export function ClientCorrespondence({
 
       {error && !composing && (
         <p className="rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+      )}
+      {info && (
+        <p className="rounded-xl border border-emerald-500/30 bg-emerald-100 px-3 py-2 text-sm text-emerald-700">{info}</p>
       )}
 
       {shown.length === 0 ? (
@@ -244,6 +367,14 @@ export function ClientCorrespondence({
                       <span className="uppercase tracking-wide text-slate-400">
                         {m.channel === "mail" ? "mail" : m.channel === "sms" ? "sms" : "inne"}
                       </span>
+                      {m.status === "wyslana" && (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-700">wysłany z AgentSpace</span>
+                      )}
+                      {m.status === "blad" && (
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-700" title={m.error ?? ""}>
+                          nie wyszedł
+                        </span>
+                      )}
                       <span className="ml-auto text-slate-400">
                         {formatDateTimePL(m.sent_at)}
                         {m.authorName ? ` · ${m.authorName}` : ""}

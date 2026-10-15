@@ -8,6 +8,9 @@ export type ClientMessage = {
   body: string;
   sent_at: string;
   authorName: string | null;
+  /** v49: wyslana | blad, gdy mail poszedł z aplikacji. Puste przy wpisach ręcznych. */
+  status?: string | null;
+  error?: string | null;
 };
 
 /** Korespondencja z klientem, od najnowszej. `ready: false` = brak tabeli (v23). */
@@ -19,7 +22,9 @@ export async function getClientMessages(
   const admin = createSupabaseAdmin();
   const { data, error } = await admin
     .from("client_messages")
-    .select("id, channel, direction, subject, body, sent_at, author_id")
+    // Gwiazdka, a nie lista kolumn: kolumny statusu dochodzą w v49, a jawna
+    // lista z nimi wywracałaby korespondencję w bazie sprzed migracji.
+    .select("*")
     .eq("agency_id", agencyId)
     .eq("client_id", clientId)
     .order("sent_at", { ascending: false })
@@ -42,6 +47,8 @@ export async function getClientMessages(
       body: m.body,
       sent_at: m.sent_at,
       authorName: m.author_id ? names.get(m.author_id) ?? null : null,
+      status: (m as { status?: string | null }).status ?? null,
+      error: (m as { error?: string | null }).error ?? null,
     })),
   };
 }
