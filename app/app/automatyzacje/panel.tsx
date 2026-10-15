@@ -548,7 +548,7 @@ function Warunki({ trigger, w, onChange }: { trigger: Zdarzenie; w: WarunkiRegul
           max={365}
           value={w.dni ?? 14}
           onChange={(e) => onChange({ ...w, dni: Number(e.target.value) })}
-          className={`${pole} w-24`}
+          className={`${pole.replace("w-full", "")} w-24`}
         />
         <span className="text-sm text-slate-500">Sprawdzamy raz dziennie rano.</span>
       </div>
@@ -639,9 +639,9 @@ function EdytorAkcji({ akcja: a, ludzie, czego, onChange }: { akcja: Akcja; ludz
           />
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-500">Termin za</span>
-            <input type="number" min={0} max={365} value={a.za_dni} onChange={(e) => onChange({ ...a, za_dni: Number(e.target.value) })} className={`${pole} w-20`} />
+            <input type="number" min={0} max={365} value={a.za_dni} onChange={(e) => onChange({ ...a, za_dni: Number(e.target.value) })} className={`${pole.replace("w-full", "")} w-20`} />
             <span className="text-sm text-slate-500">dni, o</span>
-            <input type="time" value={a.godzina ?? "09:00"} onChange={(e) => onChange({ ...a, godzina: e.target.value })} className={`${pole} w-28`} />
+            <input type="time" value={a.godzina ?? "09:00"} onChange={(e) => onChange({ ...a, godzina: e.target.value })} className={`${pole.replace("w-full", "")} w-28`} />
           </div>
           <Select
             aria-label="Priorytet"

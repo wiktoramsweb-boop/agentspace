@@ -15,6 +15,10 @@ import { usunKosztorys, zapiszKosztorys, type ZapisanyKosztorys } from "./action
 
 export type OfertaRemont = { id: string; nazwa: string; metraz: number | null; pokoje: number | null };
 
+// Wąskie pola (ilość, cena) bez „w-full” z klocków: inaczej pole rozciągało
+// się na całą linię, przykrywało checkbox i nie dało się nic zaznaczyć.
+const waskie = pole.replace("w-full", "");
+
 const zl = (n: number) => new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(Math.round(n)) + " zł";
 const liczbaZ = (s: string) => {
   const n = Number(s.replace(/\s/g, "").replace(",", "."));
@@ -243,10 +247,10 @@ export function KalkulatorRemontu({
                         <td className="px-2 py-1.5 text-slate-700">{p.nazwa}</td>
                         <td className="px-2 py-1.5 text-slate-400">{p.jedn}</td>
                         <td className="px-2 py-1.5 text-right">
-                          <input aria-label={`Robocizna: ${p.nazwa}`} inputMode="decimal" value={String(c?.r ?? p.r)} onChange={(e) => ustaw("r", e.target.value)} className={`${pole} w-24 py-1.5 text-right`} />
+                          <input aria-label={`Robocizna: ${p.nazwa}`} inputMode="decimal" value={String(c?.r ?? p.r)} onChange={(e) => ustaw("r", e.target.value)} className={`${waskie} w-24 py-1.5 text-right`} />
                         </td>
                         <td className="px-2 py-1.5 text-right">
-                          <input aria-label={`Materiał: ${p.nazwa}`} inputMode="decimal" value={String(c?.m ?? p.m)} onChange={(e) => ustaw("m", e.target.value)} className={`${pole} w-24 py-1.5 text-right`} />
+                          <input aria-label={`Materiał: ${p.nazwa}`} inputMode="decimal" value={String(c?.m ?? p.m)} onChange={(e) => ustaw("m", e.target.value)} className={`${waskie} w-24 py-1.5 text-right`} />
                         </td>
                       </tr>
                     );
@@ -476,9 +480,9 @@ function PomieszczenieKarta({
                       else n[p.id] = liczbaZ(v);
                       onZmiana({ ilosci: n });
                     }}
-                    className={`${pole} w-20 py-1 text-right disabled:opacity-40 ${reczna != null ? "border-amber-300" : ""}`}
+                    className={`${waskie} w-20 flex-shrink-0 py-1 text-right disabled:opacity-40 ${reczna != null ? "border-amber-300" : ""}`}
                   />
-                  <span className="w-8 text-xs text-slate-400">{p.jedn}</span>
+                  <span className="w-8 flex-shrink-0 text-xs text-slate-400">{p.jedn}</span>
                 </li>
               );
             })}
