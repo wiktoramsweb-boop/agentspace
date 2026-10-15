@@ -20,14 +20,14 @@ type Copy = { title: string; lead: string; tags: string[] };
 
 const COPY: Record<string, Copy> = {
   pl: {
-    title: "Całe biuro nieruchomości w jednym miejscu",
-    lead: "Klienci, oferty, cele, prowizje i AI Coach. Jeden system dla całego zespołu.",
-    tags: ["CRM", "Nieruchomości", "Cele", "Prowizje", "AI Coach"],
+    title: "Program dla biura nieruchomości, w którym agenci naprawdę pracują",
+    lead: "CRM, umowy, prowizje, koszty biura i trening rozmów z AI. 7\u00a0dni za darmo, bez karty.",
+    tags: ["CRM", "Umowy", "Prowizje", "Czat zespołu", "AI Coach"],
   },
   en: {
-    title: "The whole agency in one place",
-    lead: "Clients, listings, goals, commissions and an AI Coach. One system for the whole team.",
-    tags: ["CRM", "Listings", "Goals", "Commissions", "AI Coach"],
+    title: "Real estate agency software your agents will actually use",
+    lead: "CRM, contracts, commissions, office costs and AI call training. 7-day free trial, no card.",
+    tags: ["CRM", "Contracts", "Commissions", "Team chat", "AI Coach"],
   },
 };
 
@@ -43,35 +43,23 @@ export function ogImage(lang: string = "pl") {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "linear-gradient(135deg, #07090c 0%, #0d1b1a 55%, #06232b 100%)",
+          borderTop: "14px solid #0b7a55",
+          background: "#f7f7f4",
           padding: 72,
           position: "relative",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: -220,
-            right: -160,
-            width: 620,
-            height: 620,
-            borderRadius: 9999,
-            background: "radial-gradient(circle, rgba(16,185,129,0.34) 0%, rgba(16,185,129,0) 68%)",
-            display: "flex",
-          }}
-        />
-
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={ZNAK_URI} width={52} height={52} alt="" />
-          <div style={{ color: "#f8fafc", fontSize: 30, fontWeight: 600, letterSpacing: -0.5 }}>AgentSpace</div>
+          <div style={{ color: "#14171a", fontSize: 30, fontWeight: 600, letterSpacing: -0.5 }}>AgentSpace</div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
-              color: "#f8fafc",
-              fontSize: 74,
+              color: "#14171a",
+              fontSize: 66,
               fontWeight: 600,
               lineHeight: 1.08,
               letterSpacing: -2.5,
@@ -83,8 +71,8 @@ export function ogImage(lang: string = "pl") {
           </div>
           <div
             style={{
-              color: "#94a3b8",
-              fontSize: 31,
+              color: "#555b61",
+              fontSize: 30,
               lineHeight: 1.4,
               marginTop: 26,
               maxWidth: 880,
@@ -103,8 +91,9 @@ export function ogImage(lang: string = "pl") {
                 display: "flex",
                 padding: "10px 22px",
                 borderRadius: 9999,
-                border: "1px solid rgba(148,163,184,0.28)",
-                color: "#cbd5e1",
+                border: "1px solid #cdd0c8",
+                background: "#ffffff",
+                color: "#0a6a4a",
                 fontSize: 23,
               }}
             >

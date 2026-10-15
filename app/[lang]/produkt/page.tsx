@@ -13,7 +13,7 @@ const META = {
   pl: {
     title: "Moduły systemu dla biura nieruchomości | AgentSpace",
     description:
-      "Szesnaście modułów w jednym systemie: CRM, leady, oferty, prowizje, faktury, umowy, cele, raporty i strona internetowa biura. Zobacz, co dokładnie robi każdy z nich.",
+      "24 moduły w jednym systemie: CRM, leady, oferty, tablica transakcji, umowy i najem okazjonalny, prowizje, koszty biura, czat zespołu, AI Coach i strona biura. Zobacz, co robi każdy z nich.",
   },
   en: {
     title: "Modules of the real estate agency system | AgentSpace",
@@ -53,7 +53,7 @@ export default async function ProduktIndexPage({
         title={
           pl ? (
             <>
-              Szesnaście narzędzi biura, <span className="grad">jeden system</span>
+              24 narzędzia biura, <span className="grad">jeden system</span>
             </>
           ) : (
             <>

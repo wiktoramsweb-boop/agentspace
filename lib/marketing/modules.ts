@@ -160,6 +160,10 @@ export const MODULES: ProductModule[] = [
         title: "Umowa rezerwacyjna w PDF",
         body: "Generowana z danych transakcji, gotowa do podpisu. Bez przepisywania tych samych danych do Worda.",
       },
+      {
+        title: "Wypłaty dla agentów",
+        body: "Księgowa albo właściciel oznacza wypłatę prowizji z kwotą i datą. Zaległe wypłaty z poprzednich miesięcy nie znikają z listy.",
+      },
     ],
     forWhom:
       "Dla właściciela: kontrola nad rozliczeniami. Dla agenta: pewność, że prowizja jest policzona uczciwie.",
@@ -207,6 +211,18 @@ export const MODULES: ProductModule[] = [
       {
         title: "Scoring i feedback",
         body: "Ocena w czterech kategoriach plus konkretne wskazówki po polsku - co powiedzieć następnym razem, a czego unikać.",
+      },
+      {
+        title: "Trening na własnej ofercie",
+        body: "Agent wybiera swoją ofertę, a klient AI pyta o to konkretne mieszkanie: cenę, metraż, to, czego nie ma w opisie. Ocena sprawdza też, czy agent zna swoją ofertę.",
+      },
+      {
+        title: "Zadania od menedżera",
+        body: "Menedżer zleca konkretną rozmowę z progiem zaliczenia i terminem. Gdy agent zaliczy, menedżer dostaje powiadomienie.",
+      },
+      {
+        title: "Kluczowe momenty",
+        body: "Po rozmowie agent widzi swoje dosłowne zdania: co zadziałało i co poprawić, z gotową lepszą wersją do powtórzenia.",
       },
     ],
     forWhom:
@@ -299,6 +315,10 @@ export const MODULES: ProductModule[] = [
       {
         title: "Przypisanie do agenta",
         body: "Wiadomo, kto prowadzi ofertę i kto odpowiada za kontakt z właścicielem.",
+      },
+      {
+        title: "Historia zmian ceny",
+        body: "Każda zmiana ceny zapisuje się z datą i osobą. Na karcie oferty widać, ile razy i o ile cena spadła, co pomaga w rozmowie z właścicielem.",
       },
     ],
     forWhom:
@@ -444,6 +464,10 @@ export const MODULES: ProductModule[] = [
         title: "Więcej transakcji wewnętrznych",
         body: "Im większe biuro, tym częściej kupujący jednego agenta trafia na ofertę drugiego. Prowizja zostaje w biurze.",
       },
+      {
+        title: "Ranking AI według rozmów",
+        body: "AI czyta notatki z rozmów z klientem i układa pasujące oferty według tego, co klient naprawdę mówił, z jednym zdaniem uzasadnienia i pytaniem, które warto zadać przed prezentacją.",
+      },
     ],
     forWhom:
       "Dla biur z kilkoma agentami, w których oferty i kupujący dotąd nie spotykali się na czas.",
@@ -491,6 +515,10 @@ export const MODULES: ProductModule[] = [
       {
         title: "Protokół także po sprzedaży",
         body: "Osobny wariant na przekazanie lokalu po akcie: liczniki, klucze, uwagi i podpisy na jednej stronie.",
+      },
+      {
+        title: "Generator umów z wzorów",
+        body: "Umowy pośrednictwa, najmu i najmu okazjonalnego, pełnomocnictwo, potwierdzenie prezentacji i oświadczenie sprzedającego. Dane z karty klienta i oferty, podgląd na żywo i PDF zapisany od razu w karcie.",
       },
     ],
     forWhom:
@@ -579,6 +607,10 @@ export const MODULES: ProductModule[] = [
       {
         title: "Rentowność najmu",
         body: "Dla kupujących pod wynajem: zwrot, cash flow i porównanie z lokatą.",
+      },
+      {
+        title: "Kalkulator remontu",
+        body: "Kosztorys remontu z metrażu i standardu, z VAT 8% albo 23% i czasem prac. PDF dla kupującego w minutę.",
       },
     ],
     forWhom:
@@ -720,6 +752,10 @@ export const MODULES: ProductModule[] = [
         title: "Ukrywanie kontaktów",
         body: "Numer klienta widzi jego opiekun. Działa też na kartach i w listach wyboru, nie tylko w zestawieniach.",
       },
+      {
+        title: "Dziennik zdarzeń",
+        body: "Właściciel widzi, kto usunął klienta, kto przepisał ofertę, kto pobrał eksport bazy i kto zmienił komuś rolę. Wpisów nie da się usunąć z aplikacji.",
+      },
     ],
     forWhom:
       "Dla biur z rozbudowaną strukturą i dla tych, które zatrudniają księgowość albo asystentkę na część etatu.",
@@ -785,6 +821,198 @@ export const MODULES: ProductModule[] = [
       },
     ],
   },
+  {
+    slug: "umowa-najmu-okazjonalnego",
+    name: "Umowy i dokumenty najmu",
+    headline: "Umowa najmu okazjonalnego bez szukania wzoru w internecie",
+    lead: "Umowa z załącznikami, zgłoszenie do urzędu skarbowego, żądanie opróżnienia lokalu i potwierdzenie kaucji. Dane wchodzą z karty klienta i oferty, a program pilnuje terminów i limitów z ustawy.",
+    seoTitle: "Umowa najmu okazjonalnego: generator wzoru z załącznikami | AgentSpace",
+    seoDescription:
+      "Generator umowy najmu okazjonalnego z załącznikami (art. 19a), zgłoszeniem do US w 14 dni i żądaniem opróżnienia lokalu. Pilnuje kaucji do 6-krotności czynszu. PDF w minutę.",
+    problem:
+      "Agent szuka wzoru umowy najmu okazjonalnego w internecie, dostaje wersję sprzed lat bez załączników i kaucją wyższą, niż pozwala ustawa. Właściciel orientuje się dopiero wtedy, gdy najemca przestaje płacić, a szybka ścieżka eksmisji nie działa, bo umowy nie zgłoszono w urzędzie skarbowym.",
+    capabilities: [
+      {
+        title: "Komplet do najmu okazjonalnego",
+        body: "Umowa z oświadczeniem o poddaniu się egzekucji, wskazaniem lokalu zastępczego i zgodą jego właściciela. Program przypomina, że oświadczenie najemcy robi notariusz, a zgodę właściciela lokalu zastępczego można podpisać notarialnie na żądanie wynajmującego.",
+      },
+      {
+        title: "Pilnuje przepisów",
+        body: "Ostrzega, gdy kaucja przekracza sześciokrotność czynszu, gdy umowa jest dłuższa niż 10 lat albo gdy termin w żądaniu opróżnienia jest krótszy niż 7 dni. Ostrzeżenia widzi agent, na wydruk nie trafiają.",
+      },
+      {
+        title: "Pisma po podpisaniu",
+        body: "Zgłoszenie zawarcia umowy do naczelnika urzędu skarbowego z wyliczonym terminem 14 dni, potwierdzenie przyjęcia kaucji i żądanie opróżnienia lokalu. Wszystko z tych samych danych, bez przepisywania.",
+      },
+      {
+        title: "Umowy pośrednictwa i pisma sprzedażowe",
+        body: "Umowy pośrednictwa w sprzedaży, kupnie i najmie (z pouczeniem konsumenta i formularzem odstąpienia przy umowie poza biurem), potwierdzenie prezentacji, pełnomocnictwo i oświadczenie sprzedającego.",
+      },
+    ],
+    forWhom: "Dla agentów najmu i biur, które obsługują właścicieli mieszkań na wynajem, a także dla każdego, kto podpisuje umowy pośrednictwa poza biurem.",
+    photo: "/zdjecia/transakcja.jpg",
+    shot: "ShotDokumenty",
+    faq: [
+      { q: "Czy umowa najmu okazjonalnego musi być u notariusza?", a: "Sama umowa nie. U notariusza najemca składa oświadczenie o poddaniu się egzekucji. Wynajmujący może dodatkowo zażądać, żeby podpis właściciela lokalu zastępczego był notarialnie poświadczony. Program to opisuje i pyta, czy takie żądanie ma się znaleźć w umowie." },
+      { q: "Jaka kaucja jest dozwolona przy najmie okazjonalnym?", a: "Najwyżej sześciokrotność miesięcznego czynszu. Kaucja wraca do najemcy w ciągu miesiąca od opróżnienia lokalu, po potrąceniu należności. Program ostrzega, gdy wpisana kaucja jest wyższa." },
+      { q: "Co jeśli właściciel nie zgłosi umowy do urzędu skarbowego?", a: "Ma na to 14 dni od rozpoczęcia najmu. Bez zgłoszenia umowa nie korzysta z ochrony najmu okazjonalnego, więc szybka ścieżka opróżnienia lokalu nie zadziała. Program przygotowuje gotowe zgłoszenie z wyliczonym terminem." },
+      { q: "Czy mogę zapisać umowę przy kliencie?", a: "Tak. Gotowy PDF zapisuje się jednym kliknięciem w karcie klienta albo oferty, razem z danymi formularza, żeby później dało się go poprawić." },
+    ],
+  },
+  {
+    slug: "tablica-transakcji",
+    name: "Tablica transakcji",
+    headline: "Wszyscy klienci i oferty na jednej tablicy",
+    lead: "Kolumny to etapy, karty to klienci albo oferty. Przeciągasz kartę, a etap zmienia się od razu, razem z zadaniami z automatyzacji.",
+    seoTitle: "Pipeline kanban dla biura nieruchomości: tablica klientów i ofert | AgentSpace",
+    seoDescription: "Tablica kanban z przeciąganiem dla biura nieruchomości: etapy klientów i ofert, filtr opiekuna, oznaczenie obniżek ceny. Widać, gdzie utykają transakcje.",
+    problem: "Lista klientów pokazuje, kto jest w bazie, ale nie pokazuje, gdzie utknął. Dopiero na tablicy widać, że w negocjacjach leży osiem transakcji, a w umowie żadna.",
+    capabilities: [
+      { title: "Przeciągnij i upuść", body: "Na komputerze myszką, na telefonie za uchwyt karty. Etap zapisuje się od razu, a pozostali widzą zmianę." },
+      { title: "Klienci i oferty", body: "Osobna tablica dla klientów (etapy pipeline) i dla ofert (etapy obsługi). Przełączasz widok listy i tablicy jednym kliknięciem." },
+      { title: "Filtr opiekuna", body: "Menedżer patrzy na tablicę swojego zespołu albo jednego agenta, właściciel na całe biuro." },
+      { title: "Sygnały na kartach", body: "Karta oferty pokazuje obniżkę ceny, karta klienta termin następnego kontaktu. Nie trzeba otwierać, żeby wiedzieć, co się dzieje." },
+    ],
+    forWhom: "Dla agentów, którzy prowadzą kilkanaście transakcji naraz, i menedżerów, którzy chcą widzieć, gdzie zespół utyka.",
+    photo: "/zdjecia/plan-dnia.jpg",
+    shot: "ShotTablica",
+    faq: [
+      { q: "Czy tablica działa na telefonie?", a: "Tak. Na telefonie kartę przesuwasz za uchwyt albo wybierasz etap z menu na karcie, bo przeciąganie palcem po przewijanej stronie bywa niewygodne." },
+      { q: "Czy zmiana etapu na tablicy uruchamia automatyzacje?", a: "Tak, tak samo jak zmiana na karcie klienta. Jeśli masz regułę „etap zmieniony, utwórz zadanie”, zadanie powstanie." },
+    ],
+  },
+  {
+    slug: "czat-zespolu",
+    name: "Czat zespołu",
+    headline: "Rozmowy biura w biurze, a nie na prywatnym WhatsAppie",
+    lead: "Kanały, rozmowy prywatne i grupy. Do wiadomości dołączasz kartę klienta albo oferty, a rozmowa zostaje w biurze, gdy agent odchodzi.",
+    seoTitle: "Czat dla zespołu biura nieruchomości z odnośnikami do ofert | AgentSpace",
+    seoDescription: "Komunikator zespołu w systemie biura nieruchomości: kanały, rozmowy prywatne, załączniki, odnośniki do klientów i ofert, powiadomienia na telefon.",
+    problem: "Zespół rozmawia na prywatnych komunikatorach. Numer klienta, zdjęcie umowy i ustalenia z właścicielem lądują w telefonie agenta i znikają razem z nim.",
+    capabilities: [
+      { title: "Kanały i rozmowy prywatne", body: "Kanał całego biura, grupy (np. najem, kupujący) i rozmowy jeden na jeden. Wyciszasz to, co Cię nie dotyczy." },
+      { title: "Karta klienta w wiadomości", body: "Wyszukujesz klienta albo ofertę i wklejasz jako kartę. Kolega klika i jest na właściwej stronie, bez przepisywania numerów." },
+      { title: "Załączniki i powiadomienia", body: "Zdjęcia i pliki w rozmowie, licznik nieprzeczytanych w menu i powiadomienia na telefon." },
+      { title: "Zostaje w biurze", body: "Historia rozmów należy do biura i zostaje w programie, gdy agent odchodzi. Nowa osoba w zespole czyta ustalenia, zamiast pytać od nowa." },
+    ],
+    forWhom: "Dla biur od trzech osób w górę, w których połowa ustaleń dzieje się dziś poza systemem.",
+    photo: "/zdjecia/zespol.jpg",
+    shot: "ShotCzat",
+    faq: [
+      { q: "Czy to zastąpi WhatsAppa?", a: "W sprawach biura tak. Prywatne rozmowy zostaną tam, gdzie są, ale wszystko, co dotyczy klientów i ofert, ma sens tylko w miejscu, które zostaje w biurze." },
+      { q: "Czy czat działa na żywo?", a: "Tak, wiadomości pojawiają się od razu u wszystkich uczestników rozmowy, także na telefonie." },
+    ],
+  },
+  {
+    slug: "urlopy-i-zastepstwa",
+    name: "Urlopy i zastępstwa",
+    headline: "Agent na urlopie, a klienci dalej obsłużeni",
+    lead: "Nieobecność z datami i zastępcą. Zastępca widzi klientów nieobecnego, a zadania z automatyzacji trafiają do niego, a nie w próżnię.",
+    seoTitle: "Urlopy i zastępstwa agentów w biurze nieruchomości | AgentSpace",
+    seoDescription: "Planowanie urlopów agentów nieruchomości z zastępcą: dostęp do klientów nieobecnego, przekierowanie zadań, informacja na karcie klienta.",
+    problem: "Agent wyjeżdża na dwa tygodnie. Klient dzwoni, nikt nie wie, na czym stanęło, a jeśli biuro ukrywa kontakty, kolega nawet nie może oddzwonić.",
+    capabilities: [
+      { title: "Nieobecność z zastępcą", body: "Urlop, L4 albo szkolenie z datami i wskazaną osobą zastępującą. Zespół widzi, kto jest dziś nieobecny." },
+      { title: "Dostęp na czas zastępstwa", body: "Zastępca widzi kontakty klientów nieobecnego tylko w dniach zastępstwa. Po powrocie wszystko wraca do normy." },
+      { title: "Zadania nie giną", body: "Automatyzacje, które utworzyłyby zadanie dla nieobecnego, kierują je do zastępcy." },
+      { title: "Informacja na karcie klienta", body: "Kto otworzy kartę klienta, zobaczy, że opiekun jest na urlopie i do kogo się zwrócić." },
+    ],
+    forWhom: "Dla biur, w których urlop agenta oznacza dziś dwa tygodnie zawieszonych transakcji.",
+    photo: "/zdjecia/wnetrze-biura.jpg",
+    shot: "ShotKalendarz",
+    faq: [
+      { q: "Czy zastępca widzi wszystkich klientów nieobecnego na stałe?", a: "Nie, tylko w dniach zastępstwa. Uprawnienie wynika z wpisu o nieobecności i wygasa samo." },
+      { q: "Kto może wpisać urlop?", a: "Agent swój, a właściciel i menedżer dowolnej osoby z zespołu." },
+    ],
+  },
+  {
+    slug: "automatyzacje",
+    name: "Automatyzacje",
+    headline: "Rzeczy, które dzieją się same, kiedy coś się zmienia",
+    lead: "Reguła to zdanie: kiedy coś się stanie, zrób to. Zmiana etapu, cena, nowy lead albo klient bez kontaktu tworzą zadanie, powiadomienie, przydział albo mail.",
+    seoTitle: "Automatyzacje w CRM dla biura nieruchomości | AgentSpace",
+    seoDescription: "Automatyzacje dla biura nieruchomości: zadania po zmianie etapu, przydział leadów, przypomnienia o klientach bez kontaktu, maile z szablonów.",
+    problem: "Biuro ma zasady (oddzwoń w godzinę, zadzwoń po prezentacji, odśwież ofertę po miesiącu), ale pilnuje ich pamięć agentów. Pamięć zawodzi akurat wtedy, gdy jest najwięcej pracy.",
+    capabilities: [
+      { title: "11 wyzwalaczy", body: "Nowy klient, lead i oferta, zmiana etapu i ceny, prezentacja, dopasowanie oferty do poszukiwania, klient bez kontaktu, oferta bez prezentacji, zamknięta transakcja." },
+      { title: "Kilka akcji w jednej regule", body: "Zadanie dla opiekuna i powiadomienie dla właściciela naraz. Przydział leada najmniej obciążonej osobie. Mail do klienta z szablonu." },
+      { title: "Gotowe przepisy", body: "Zaczynasz od sprawdzonych reguł i zmieniasz terminy pod siebie, zamiast budować wszystko od zera." },
+      { title: "Bez dubli", body: "Każde zdarzenie uruchamia regułę raz. Automatyzacje nie wywołują się nawzajem w kółko." },
+    ],
+    forWhom: "Dla właścicieli, którzy chcą, żeby standard obsługi klienta działał także wtedy, gdy nikt go nie pilnuje.",
+    photo: "/zdjecia/plan-dnia.jpg",
+    shot: "ShotAutomatyzacje",
+    faq: [
+      { q: "Czy automatyzacja może wysłać mail do klienta?", a: "Tak, z szablonu i z poczty biura, z kopią w korespondencji przy kliencie. Odpowiedź klienta trafia do agenta." },
+      { q: "Co jeśli agent jest na urlopie?", a: "Zadanie trafia do zastępcy wskazanego przy nieobecności." },
+    ],
+  },
+  {
+    slug: "kalkulator-remontu",
+    name: "Kalkulator remontu",
+    headline: "Ile kosztuje doprowadzenie mieszkania do stanu",
+    lead: "Kosztorys z metrażu i liczby pokoi: zakres prac, standard wykończenia, VAT 8% albo 23%, rezerwa i czas trwania. PDF dla kupującego w minutę.",
+    seoTitle: "Kalkulator remontu mieszkania 2026: kosztorys z VAT i PDF | AgentSpace",
+    seoDescription: "Kalkulator kosztów remontu mieszkania: odświeżenie, średni i generalny remont, trzy standardy, VAT 8% i 23%, koszt za m², czas prac i PDF dla klienta.",
+    problem: "Kupujący pyta przy oglądaniu, ile będzie kosztował remont. Agent mówi „ze sto tysięcy”, a klient wychodzi z poczuciem, że nikt tego naprawdę nie policzył.",
+    capabilities: [
+      { title: "Z metrażu do kosztorysu", body: "Program rozkłada mieszkanie na pomieszczenia i liczy ilości: ściany, sufity, podłogi, punkty elektryczne. Każdą ilość możesz poprawić." },
+      { title: "Zakres i standard", body: "Odświeżenie, średni albo generalny remont, w standardzie ekonomicznym, zwykłym lub premium. Wynik zmienia się od razu." },
+      { title: "Uczciwy VAT", body: "8% przy remoncie lokalu mieszkalnego do 150 m², 23% na materiały kupione samodzielnie i powyżej 150 m²." },
+      { title: "Twoje stawki", body: "Ceny domyślne to średnie rynkowe dla dużego miasta w 2026 r. Wpisujesz stawki znajomych ekip, a kosztorys liczy już po Twojemu." },
+    ],
+    forWhom: "Dla agentów sprzedających mieszkania do remontu i dla doradców, którzy pomagają kupującemu policzyć cały budżet.",
+    photo: "/zdjecia/odbior-kluczy.jpg",
+    shot: "ShotRemont",
+    faq: [
+      { q: "Ile kosztuje generalny remont mieszkania w 2026 roku?", a: "W dużym mieście zwykle od około 1 700 do 2 500 zł brutto za metr w standardzie średnim, z materiałami. Kalkulator pokazuje to dla konkretnego układu mieszkania." },
+      { q: "Czy kosztorys można zapisać przy ofercie?", a: "Tak, kosztorys zapisuje się w programie z odnośnikiem do oferty, a PDF wysyłasz klientowi." },
+    ],
+  },
+  {
+    slug: "rodo",
+    name: "Zgody RODO",
+    headline: "Zgody klientów z datą, źródłem i historią",
+    lead: "Przy każdym kliencie wiesz, na co się zgodził, kiedy i skąd. Obowiązek informacyjny drukujesz jako PDF, a wycofanie zgody zostaje w historii.",
+    seoTitle: "Zgody RODO w biurze nieruchomości: rejestr zgód klientów | AgentSpace",
+    seoDescription: "Rejestr zgód RODO przy kliencie biura nieruchomości: marketing, kontakt, udostępnianie danych, historia zmian, obowiązek informacyjny w PDF.",
+    problem: "Klient pisze, że nie zgadzał się na wysyłkę ofert. Biuro ma podpis gdzieś w segregatorze albo nie ma go wcale, i nie potrafi pokazać, kiedy zgoda została udzielona.",
+    capabilities: [
+      { title: "Rejestr zgód", body: "Klauzula informacyjna, przetwarzanie w celu obsługi, marketing mailem, telefonem i SMS-em oraz udostępnienie danych biurom współpracującym. Każda pozycja z datą, źródłem i osobą, która ją odnotowała." },
+      { title: "Historia zmian", body: "Wycofanie zgody nie kasuje wpisu, tylko dopisuje nowy. W razie kontroli pokazujesz pełną historię." },
+      { title: "Obowiązek informacyjny", body: "Gotowa klauzula informacyjna z danymi biura jako PDF do podpisu albo wysłania." },
+      { title: "Umowa powierzenia", body: "Dane biura przetwarzamy na serwerach w UE, na podstawie umowy powierzenia zawieranej przy założeniu konta." },
+    ],
+    forWhom: "Dla właścicieli biur, którzy chcą mieć porządek w zgodach, zanim ktoś o nie zapyta.",
+    photo: "/zdjecia/rozmowa-audyt.jpg",
+    shot: "ShotKlient",
+    faq: [
+      { q: "Czy zgoda na kontakt jest potrzebna, żeby zadzwonić do klienta?", a: "Zależy od sytuacji: przy obsłudze umowy podstawą jest umowa, przy marketingu potrzebna jest zgoda. Program pozwala odnotować obie sytuacje i jej podstawę." },
+      { q: "Gdzie są przechowywane dane?", a: "Na serwerach w Unii Europejskiej (Frankfurt)." },
+    ],
+  },
+  {
+    slug: "koszty-i-wynik",
+    name: "Koszty i wynik",
+    headline: "Ile biuro zarobiło w tym miesiącu, naprawdę",
+    lead: "Prowizje z transakcji, wypłaty dla agentów i koszty biura w jednym widoku. Stałe opłaty dopisują się same, a paczkę dla księgowej pobierasz jednym kliknięciem.",
+    seoTitle: "Koszty biura nieruchomości i wynik miesiąca: panel dla właściciela | AgentSpace",
+    seoDescription: "Koszty biura nieruchomości, stałe opłaty, wypłaty prowizji agentów i wynik miesiąca. Eksport CSV dla księgowej: koszty, wypłaty, ewidencja sprzedaży.",
+    problem: "Właściciel zna przychód z prowizji, ale wynik poznaje dopiero od księgowej, kilka tygodni po fakcie. Koszty są w mailach z fakturami, a wypłaty dla agentów w osobnym Excelu.",
+    capabilities: [
+      { title: "Koszty z kategoriami", body: "Czynsz, portale, oprogramowanie, reklama, samochód. Kwota netto albo brutto, VAT, kontrahent, numer faktury i status zapłaty." },
+      { title: "Stałe opłaty", body: "Czynsz i abonamenty wpisujesz raz, a co miesiąc w dniu płatności dopisują się do kosztów." },
+      { title: "Wypłaty prowizji", body: "Kto ma dostać ile i za którą transakcję. Zaległe wypłaty z poprzednich miesięcy są zawsze na górze listy." },
+      { title: "Paczka dla księgowej", body: "Koszty, wypłaty i ewidencja sprzedaży z faktur w plikach, które otwierają się w Excelu dwuklikiem." },
+    ],
+    forWhom: "Dla właściciela biura i księgowej. Rola „Księgowość” widzi finanse, ale nie bazę klientów.",
+    photo: "/zdjecia/pierwsze-wnioski.jpg",
+    shot: "ShotKoszty",
+    faq: [
+      { q: "Czy to zastępuje księgowość?", a: "Nie. To widok zarządczy dla właściciela. Księgi prowadzi księgowa, a program daje jej uporządkowane dane co miesiąc." },
+      { q: "Czy agent widzi koszty biura?", a: "Nie. Finanse widzi właściciel, dyrektor i księgowa. Agent widzi swoje prowizje." },
+    ],
+  },
 ];
 
 /**
@@ -835,7 +1063,7 @@ export const KATEGORIE_MODULOW: KategoriaModulow[] = [
     labelEn: "Sales and clients",
     opis: "Wszystko, co dzieje się między pierwszym telefonem a podpisaną umową.",
     opisEn: "Everything between the first phone call and a signed contract.",
-    slugs: ["crm", "leady", "poszukiwania", "dzialania"],
+    slugs: ["crm", "leady", "poszukiwania", "dzialania", "tablica-transakcji", "automatyzacje"],
   },
   {
     id: "oferty",
@@ -843,7 +1071,7 @@ export const KATEGORIE_MODULOW: KategoriaModulow[] = [
     labelEn: "Listings and marketing",
     opis: "Oferta biura w jednym miejscu i wszędzie tam, gdzie widzi ją klient.",
     opisEn: "Your listings in one place and everywhere the client sees them.",
-    slugs: ["nieruchomosci", "ofertowka", "strona-www", "kalkulatory"],
+    slugs: ["nieruchomosci", "ofertowka", "strona-www", "kalkulatory", "kalkulator-remontu"],
   },
   {
     id: "rozliczenia",
@@ -851,7 +1079,7 @@ export const KATEGORIE_MODULOW: KategoriaModulow[] = [
     labelEn: "Settlements and documents",
     opis: "Prowizje, faktury i papiery, których nikt nie chce pisać ręcznie.",
     opisEn: "Commissions, invoices and the paperwork nobody wants to retype.",
-    slugs: ["prowizje", "faktury", "dokumenty"],
+    slugs: ["prowizje", "faktury", "koszty-i-wynik", "dokumenty", "umowa-najmu-okazjonalnego", "rodo"],
   },
   {
     id: "zespol",
@@ -859,7 +1087,7 @@ export const KATEGORIE_MODULOW: KategoriaModulow[] = [
     labelEn: "Team and results",
     opis: "Co robi zespół, ile dowozi i kto ma do czego dostęp.",
     opisEn: "What the team does, what it delivers and who can see what.",
-    slugs: ["cele", "panel-wlasciciela", "raporty", "ai-coach", "role-i-uprawnienia"],
+    slugs: ["cele", "panel-wlasciciela", "raporty", "ai-coach", "role-i-uprawnienia", "czat-zespolu", "urlopy-i-zastepstwa"],
   },
 ];
 

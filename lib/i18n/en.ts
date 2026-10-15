@@ -65,7 +65,7 @@ export const en: Dict = {
   common: {
     bookCall: "Book a call",
     seeModule: "See the module",
-    allModules: "See all 16 modules",
+    allModules: "See all 24 modules",
     capabilitiesCount: "features in this module",
     priceSuffix: "PLN / mo",
     from: "from",

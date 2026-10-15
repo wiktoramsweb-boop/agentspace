@@ -8,7 +8,7 @@ Odbiorca decyzyjny: właściciel lub menedżer biura nieruchomości. Użytkownic
 
 ## Produkt
 
-Szesnaście modułów w jednym systemie. Pełny spis: https://agentspace.pl/produkt
+24 moduły w jednym systemie. Pełny spis: https://agentspace.pl/produkt
 
 - [CRM klientów](https://agentspace.pl/produkt/crm): Karty klientów z historią, notatkami i pipeline. Osobno sprzedający, kupujący, wynajmujący i najemcy - bo każdy z nich wymaga innej rozmowy.
 - [Cele i lejek](https://agentspace.pl/produkt/cele): Lejek od telefonu do sprzedaży, policzony wstecz. Agent wie, ile rozmów musi wykonać dziś, żeby dowieźć rok.
@@ -25,11 +25,19 @@ Szesnaście modułów w jednym systemie. Pełny spis: https://agentspace.pl/prod
 - [Faktury i podatki](https://agentspace.pl/produkt/faktury): Wystawiasz fakturę z transakcji, którą już macie w bazie, a kalkulator podatkowy pokazuje, co z tego zostaje.
 - [Raporty dla właściciela](https://agentspace.pl/produkt/raporty): Przychód, lejek, źródła transakcji i wyniki zespołu liczone z codziennej pracy agentów, a nie z osobnego raportowania.
 - [Role i uprawnienia](https://agentspace.pl/produkt/role-i-uprawnienia): Osiem stanowisk z gotowymi zestawami dostępów i możliwość dołożenia albo odebrania pojedynczego modułu konkretnej osobie.
+- [Tablica transakcji](https://agentspace.pl/produkt/tablica-transakcji): Klienci i oferty w kolumnach etapów, z przeciąganiem kart, filtrem opiekuna i oznaczeniem obniżek ceny.
+- [Automatyzacje](https://agentspace.pl/produkt/automatyzacje): Reguły „kiedy coś się stanie, zrób to": 11 wyzwalaczy (etap, cena, nowy lead, klient bez kontaktu) i akcje: zadanie, powiadomienie, przydział, mail z szablonu.
+- [Umowa najmu okazjonalnego i umowy pośrednictwa](https://agentspace.pl/produkt/umowa-najmu-okazjonalnego): Generator umów i pism z danych CRM: najem okazjonalny z załącznikami (art. 19a), zgłoszenie do US, żądanie opróżnienia lokalu, umowy pośrednictwa z pouczeniem konsumenta, pełnomocnictwo.
+- [Zgody RODO](https://agentspace.pl/produkt/rodo): Rejestr zgód klienta z datą, źródłem i historią zmian, klauzula informacyjna w PDF.
+- [Koszty i wynik](https://agentspace.pl/produkt/koszty-i-wynik): Koszty biura, stałe opłaty, wypłaty prowizji agentów, wynik miesiąca i eksport CSV dla księgowej.
+- [Kalkulator remontu](https://agentspace.pl/produkt/kalkulator-remontu): Kosztorys remontu mieszkania z metrażu, zakresu i standardu, z VAT 8%/23%, czasem prac i PDF.
+- [Czat zespołu](https://agentspace.pl/produkt/czat-zespolu): Kanały i rozmowy prywatne z odnośnikami do klientów i ofert, powiadomienia na telefon.
+- [Urlopy i zastępstwa](https://agentspace.pl/produkt/urlopy-i-zastepstwa): Nieobecności z zastępcą, czasowy dostęp do klientów nieobecnego i przekierowanie zadań.
 - [Strona internetowa biura](https://agentspace.pl/wzory): Osiem wzorów do wyboru. Oferty, zespół i poradnik zaciągają się z systemu, a zapytania ze strony wracają do CRM.
 
 ## Cennik
 
-- [Cennik](https://agentspace.pl/cennik): Start 299 zł/mc (do 5 agentów), Pro 599 zł/mc (do 15 agentów), Biuro od 999 zł/mc (bez limitu). Ceny netto, brak umowy na czas określony. Rozliczenie miesięczne, półroczne (10% taniej) albo roczne (20% taniej). Nowe biuro ma 7 dni okresu próbnego.
+- [Cennik](https://agentspace.pl/cennik): Start 299 zł/mc (do 5 agentów), Pro 599 zł/mc (do 15 agentów), Biuro od 999 zł/mc (bez limitu). Ceny netto, brak umowy na czas określony. Rozliczenie miesięczne, półroczne (10% taniej) albo roczne (20% taniej). Nowe biuro ma 7 dni okresu próbnego z pełnym dostępem, bez karty płatniczej.
 
 ## Integracje
 

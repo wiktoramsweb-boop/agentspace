@@ -16,6 +16,7 @@ import {
   ShotProwizje,
   ShotRole,
 } from "@/app/components/mockups/light-shots";
+import { ShotAutomatyzacje, ShotCzat, ShotKoszty, ShotRemont, ShotTablica } from "@/app/components/mockups/nowe-shots";
 
 /**
  * Makieta ekranu aplikacji dobrana do modułu.
@@ -38,6 +39,11 @@ const MAKIETY: Record<string, (p: { lang?: string }) => React.ReactElement> = {
   ShotKalkulatory,
   ShotFaktury,
   ShotRole,
+  ShotTablica,
+  ShotCzat,
+  ShotKoszty,
+  ShotRemont,
+  ShotAutomatyzacje,
   AiCoach: () => <AiCoachMockup />,
 };
 

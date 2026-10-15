@@ -85,7 +85,7 @@ export function NavClient({
           <Logo rozmiar={28} ton="dziedzicz" />
         </Link>
 
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => {
             // Pierwsza pozycja („Produkt”) rozwija listę modułów. Sam link
             // dalej działa i prowadzi na spis, więc klik myszą nic nie traci.
@@ -95,7 +95,7 @@ export function NavClient({
                 <Link
                   key={link.href}
                   href={href(link.href)}
-                  className="rounded-full px-3 py-2 text-sm font-medium text-[var(--color-mk-muted)] transition-colors hover:bg-[var(--mk-surface-2)] hover:text-[var(--color-mk-text)]"
+                  className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-[var(--color-mk-muted)] transition-colors hover:bg-[var(--mk-surface-2)] hover:text-[var(--color-mk-text)]"
                 >
                   {link.label}
                 </Link>
@@ -189,7 +189,7 @@ export function NavClient({
           </Link>
           <Link
             href="/signup"
-            className="hidden h-9 items-center rounded-lg bg-[var(--color-mk-accent)] px-4 text-sm font-semibold text-[var(--mk-on-accent)] transition-colors hover:bg-[var(--mk-accent-text)] sm:inline-flex"
+            className="hidden h-9 items-center whitespace-nowrap rounded-lg bg-[var(--color-mk-accent)] px-4 text-sm font-semibold text-[var(--mk-on-accent)] transition-colors hover:bg-[var(--mk-accent-text)] sm:inline-flex"
           >
             {t.cta}
           </Link>
@@ -199,7 +199,7 @@ export function NavClient({
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? t.closeMenu : t.menu}
             aria-expanded={open}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[var(--mk-hairline-strong)] text-[var(--color-mk-text)] transition-colors hover:bg-[var(--mk-surface-3)] md:hidden"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[var(--mk-hairline-strong)] text-[var(--color-mk-text)] transition-colors hover:bg-[var(--mk-surface-3)] lg:hidden"
           >
             <span className="sr-only">{t.menu}</span>
             <span aria-hidden="true" className="relative block h-3.5 w-5">
@@ -230,7 +230,7 @@ export function NavClient({
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12 }}
             transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
-            className="absolute inset-x-0 top-[68px] md:hidden"
+            className="absolute inset-x-0 top-[68px] lg:hidden"
           >
             <div className="border-b border-[var(--mk-hairline)] bg-[var(--mk-nav-panel)] px-6 pb-8 pt-4 backdrop-blur-xl">
               <div className="mx-auto max-w-[1080px]">

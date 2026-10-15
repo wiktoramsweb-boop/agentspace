@@ -66,7 +66,7 @@ export const pl = {
   common: {
     bookCall: "Umów rozmowę",
     seeModule: "Zobacz moduł",
-    allModules: "Zobacz wszystkie 16 modułów",
+    allModules: "Zobacz wszystkie 24 moduły",
     capabilitiesCount: "możliwości w module",
     priceSuffix: "zł / mc",
     from: "od",
@@ -76,7 +76,7 @@ export const pl = {
     meta: {
       title: "AgentSpace | System operacyjny dla biura nieruchomości",
       description:
-        "Szesnaście modułów w jednym systemie: CRM, baza ofert, leady, cele, prowizje, faktury, umowy i strona biura. Polski produkt, wdrożenie w jeden dzień.",
+        "24 moduły w jednym systemie: CRM, baza ofert, tablica transakcji, umowy, prowizje, koszty biura, czat zespołu i trening rozmów z AI. Polski produkt, 7 dni za darmo.",
     },
     hero: {
       eyebrow: "Dla biur nieruchomości w Polsce",

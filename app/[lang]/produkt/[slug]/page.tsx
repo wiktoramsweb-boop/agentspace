@@ -78,7 +78,10 @@ export default async function ProduktPage({
         title={mod.headline}
         description={mod.lead}
       >
-        <Button href={href("/kontakt")}>{t.cta}</Button>
+        <div className="flex flex-wrap gap-3">
+          <Button href="/signup">{getDict(locale).nav.cta}</Button>
+          <Button href={href("/kontakt")} variant="ghost">{t.cta}</Button>
+        </div>
       </PageHero>
 
       {/* Okruszki. Na podstronie modułu łatwo stracić orientację, gdzie się jest
@@ -302,8 +305,9 @@ export default async function ProduktPage({
           <p className="mt-5 max-w-[50ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
             {t.ctaLead.replace("{name}", mod.name.toLowerCase())}
           </p>
-          <div className="mt-10">
-            <Button href={href("/kontakt")}>{t.cta}</Button>
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Button href="/signup">{getDict(locale).nav.cta}</Button>
+            <Button href={href("/kontakt")} variant="ghost">{t.cta}</Button>
           </div>
         </div>
       </Section>
