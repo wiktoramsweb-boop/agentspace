@@ -6,6 +6,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { brakKredytow } from "@/lib/kredyty";
+import { getSearch, getActiveProperties } from "@/lib/data-searches";
+import { findMatches } from "@/lib/matching";
+import { getAgencySettings, matchTolerance } from "@/lib/agency-settings";
+import { rankingAi, type WynikDopasowania } from "@/lib/ai/dopasowanie";
 
 function num(v: FormDataEntryValue | null): number | null {
   const n = parseFloat(String(v ?? "").replace(",", ".").replace(/\s/g, ""));
@@ -129,4 +134,46 @@ export async function setMatchStatus(
     { onConflict: "search_id,property_id" },
   );
   revalidatePath(`/app/poszukiwania/${searchId}`);
+}
+
+/**
+ * Ranking AI ofert dla poszukiwania: kandydaci z reguł, kolejność z notatek
+ * o kliencie. Płatne kredytami, bo każde wywołanie to zapytanie do modelu.
+ */
+export async function rankingDopasowan(
+  searchId: string,
+): Promise<{ ok: true; ranking: WynikDopasowania[] } | { ok: false; error: string }> {
+  const user = await requireUser();
+  if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
+  const search = await getSearch(searchId, user.agency_id);
+  if (!search) return { ok: false, error: "Nie znaleziono poszukiwania." };
+
+  const [properties, settings] = await Promise.all([
+    getActiveProperties(user.agency_id),
+    getAgencySettings(user.agency_id, user.agency?.name),
+  ]);
+  const kandydaci = findMatches(search, properties, matchTolerance(settings))
+    .sort((a, b) => Number(b.fits) - Number(a.fits) || b.score - a.score)
+    .slice(0, 25)
+    .map((m) => m.property);
+  if (kandydaci.length === 0) return { ok: false, error: "Nie ma ofert do ułożenia. Poszerz kryteria poszukiwania." };
+  if (await brakKredytow(user, "dopasowanie_ai")) return { ok: false, error: "Skończyła się pula kredytów AI biura na ten miesiąc." };
+
+  const notatki: string[] = [];
+  if (search.client_id) {
+    const admin = createSupabaseAdmin();
+    const [{ data: klient }, { data: wpisy }] = await Promise.all([
+      admin.from("clients").select("notes").eq("id", search.client_id).eq("agency_id", user.agency_id).maybeSingle(),
+      admin.from("client_notes").select("content").eq("client_id", search.client_id).order("created_at", { ascending: false }).limit(12),
+    ]);
+    for (const w of wpisy ?? []) if (w.content) notatki.push(String(w.content).slice(0, 600));
+    if (klient?.notes) notatki.push(String(klient.notes).slice(0, 1200));
+  }
+
+  try {
+    return { ok: true, ranking: await rankingAi(search, notatki, kandydaci) };
+  } catch (err) {
+    console.error("rankingDopasowan:", err);
+    return { ok: false, error: "AI chwilowo nie odpowiada. Spróbuj za chwilę." };
+  }
 }

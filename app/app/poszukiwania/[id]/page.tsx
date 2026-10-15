@@ -8,6 +8,7 @@ import { getAgencySettings, matchTolerance } from "@/lib/agency-settings";
 import { Card } from "../../components/ui";
 import { PROPERTY_ICONS } from "../../components/icons";
 import { MatchList } from "./match-list";
+import { RankingAi } from "./ranking-ai";
 import { SearchActions } from "./search-actions";
 import { PROPERTY_TYPES, SEARCH_STATUSES, PROPERTY_FEATURES } from "@/lib/types";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
@@ -179,6 +180,21 @@ export default async function SearchDetailPage({ params }: Props) {
         </div>
 
         <div className="space-y-6">
+          {allMatches.length > 0 && (
+            <RankingAi
+              searchId={search.id}
+              maNotatki={!!search.client_id}
+              oferty={Object.fromEntries(
+                allMatches.map((m) => [
+                  m.property.id,
+                  {
+                    nazwa: [m.property.address, m.property.city].filter(Boolean).join(", ") || m.property.title,
+                    cena: m.property.price_pln ? zl(m.property.price_pln) : "cena do ustalenia",
+                  },
+                ]),
+              )}
+            />
+          )}
           <div>
             <h2 className="mb-3 flex flex-wrap items-center gap-2 text-sm font-medium uppercase tracking-wider text-slate-500">
               Pasujące oferty
