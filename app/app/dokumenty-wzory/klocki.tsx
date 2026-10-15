@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 /** Wspólne klocki formularzy dokumentów: protokołu, aneksu i kolejnych. */
 
@@ -18,10 +18,12 @@ export function Pole({
   hint?: string;
   maxLength?: number;
 }) {
+  const id = useId();
   return (
     <div>
-      <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
+      <label htmlFor={id} className="mb-1.5 block text-sm text-slate-500">{label}</label>
       <input
+        id={id}
         type={type}
         value={value}
         maxLength={maxLength}

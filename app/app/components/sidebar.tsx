@@ -8,7 +8,7 @@ import { ROLE_LABELS } from "@/lib/role";
 import { ThemeToggle } from "./theme-toggle";
 import { GlobalSearch } from "./global-search";
 import { signOut } from "@/app/auth/actions";
-import { SECTIONS, TILE } from "./nav-meta";
+import { SECTIONS, TILE, aktywnaPozycja } from "./nav-meta";
 import { maModul, type Uprawnienia } from "@/lib/role";
 import { Logo } from "@/app/components/marka";
 import { Dzwonek } from "./dzwonek";
@@ -91,7 +91,7 @@ export function Sidebar({
         const items = section.items.filter((i) => !i.modul || maModul({ id: "", role, permissions }, i.modul));
         if (items.length === 0) return null;
         // Sekcja z aktywną pozycją zostaje otwarta, żeby agent widział, gdzie jest.
-        const hasActive = items.some((i) => isActive(i.href));
+        const hasActive = items.some((i) => aktywnaPozycja(i, pathname));
         const isCollapsed = collapsed.includes(section.title) && !hasActive;
         return (
           <div key={section.title}>
@@ -106,7 +106,7 @@ export function Sidebar({
             </button>
             <div className={`flex flex-col gap-0.5 ${isCollapsed ? "hidden" : ""}`}>
               {items.map((item) => {
-                const active = isActive(item.href);
+                const active = aktywnaPozycja(item, pathname);
                 // Po wygaśnięciu dostępu pozycja zostaje widoczna, ale z kłódką
                 // i bez linku: biuro ma widzieć, co traci, a nie puste menu.
                 const zamkniete =

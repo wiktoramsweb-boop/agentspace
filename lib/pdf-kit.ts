@@ -328,6 +328,8 @@ export async function nowyDokument(opts: {
     const colW = (CONTENT_W - 44) / 2;
     const lineY = y - (o.ciasno ? 20 : 26);
     for (const [i, c] of [lewa, prawa].entries()) {
+      // Pusta rola = jedna kolumna podpisu (pełnomocnictwo, oświadczenie).
+      if (!c.rola) continue;
       const x = MARGIN + i * (colW + 44);
       page.drawLine({
         start: { x, y: lineY }, end: { x: x + colW, y: lineY },

@@ -24,6 +24,8 @@ export type NavItem = {
   modul?: Modul;
   /** Plakietka z licznikiem obok nazwy. */
   licznik?: "czat";
+  /** Inne adresy tego samego modułu (np. starsze kreatory dokumentów). */
+  aliasy?: string[];
 };
 export type NavSection = { title: string; items: NavItem[] };
 
@@ -80,9 +82,10 @@ export const SECTIONS: NavSection[] = [
       { href: "/app/poszukiwania", label: "Poszukiwania", icon: <SearchIcon />, color: "sky", modul: "klienci" },
       { href: "/app/ofertowka", label: "Ofertówka", icon: <PhotoIcon />, color: "fuchsia", modul: "nieruchomosci" },
       { href: "/app/oferta-wspolpracy", label: "Oferta współpracy", icon: <HandshakeIcon />, color: "teal", modul: "dokumenty" },
-      { href: "/app/rezerwacje", label: "Umowa rezerwacyjna", icon: <KeyIcon />, color: "amber", modul: "dokumenty" },
-      { href: "/app/protokol", label: "Protokół zdawczo-odbiorczy", icon: <ClipboardIcon />, color: "sky", modul: "dokumenty" },
-      { href: "/app/aneks", label: "Aneks do umowy", icon: <AnnexIcon />, color: "violet", modul: "dokumenty" },
+      {
+        href: "/app/dokumenty", label: "Dokumenty i umowy", icon: <DocIcon />, color: "amber", modul: "dokumenty",
+        aliasy: ["/app/rezerwacje", "/app/protokol", "/app/aneks"],
+      },
       { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green", modul: "prowizje" },
       { href: "/app/kalkulatory", label: "Kalkulatory", icon: <CalcIcon />, color: "sky", modul: "nieruchomosci" },
     ],
@@ -133,8 +136,16 @@ export function navItemFor(pathname: string): NavItem | null {
   return (
     all
       .filter((i) => i.href !== "/app" && pasuje(i.href))
-      .sort((a, b) => b.href.length - a.href.length)[0] ?? null
+      .sort((a, b) => b.href.length - a.href.length)[0] ??
+    all.find((i) => i.aliasy?.some(pasuje)) ??
+    null
   );
+}
+
+/** Czy pozycja menu jest aktywna pod tym adresem (z aliasami). */
+export function aktywnaPozycja(item: NavItem, pathname: string): boolean {
+  if (item.href === "/app") return pathname === "/app";
+  return [item.href, ...(item.aliasy ?? [])].some((h) => pathname === h || pathname.startsWith(h + "/"));
 }
 
 function CalendarNavIcon() {
@@ -176,9 +187,6 @@ function InvoiceIcon() {
 function DocIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>;
 }
-function KeyIcon() {
-  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>;
-}
 function HandshakeIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>;
 }
@@ -207,12 +215,6 @@ function CogIcon() {
 }
 function ChartIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg>;
-}
-function ClipboardIcon() {
-  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" /></svg>;
-}
-function AnnexIcon() {
-  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>;
 }
 function LeadIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-4.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" /></svg>;
