@@ -103,6 +103,10 @@ export type TrainingSession = {
   status: "in_progress" | "completed";
   started_at: string;
   completed_at: string | null;
+  // ── v49: trening na własnej ofercie i zadania od menedżera ──
+  property_id?: string | null;
+  context?: { oferta?: { dzielnica: string; miasto: string; tytul: string; cena: number | null; metraz: number | null } } | null;
+  assignment_id?: string | null;
 };
 
 export type SessionScore = {
@@ -117,6 +121,8 @@ export type SessionScore = {
   closing: number;
   summary: string;
   suggestions: string[];
+  /** v49: kluczowe momenty rozmowy z cytatem i lepszym sformułowaniem. */
+  moments?: { cytat: string; ocena: "dobrze" | "do_poprawy"; komentarz: string; lepiej?: string }[] | null;
   created_at: string;
 };
 

@@ -1,6 +1,7 @@
 import { createAnthropic, COACH_MODEL, SCORING_MODEL } from "./client";
 import { odpowiedzJson } from "./struktura";
 import { PERSONALITIES, type ChatMessage } from "../types";
+import { blokOferty, faktyOferty, type KontekstOferty } from "./oferta-kontekst";
 
 /**
  * Buduje system prompt dla AI grającego klienta: wstawia opis osobowości
@@ -19,6 +20,7 @@ export function buildClientSystemPrompt(
   scenarioSystemPrompt: string,
   personality: string,
   difficulty = "sredni",
+  oferta?: KontekstOferty | null,
 ): string {
   const p = PERSONALITIES.find((x) => x.value === personality);
   const desc = p
@@ -28,7 +30,7 @@ export function buildClientSystemPrompt(
   // Klient AI ma mówić jak człowiek, a myślnik w wypowiedzi zdradza tekst z AI.
   const style =
     "\n\nINTERPUNKCJA: nie używaj myślnika ani półpauzy (znaki — i –). Zamiast nich przecinek, dwukropek lub kropka.";
-  return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc) + diff + style;
+  return scenarioSystemPrompt.replace("{{PERSONALITY}}", desc) + (oferta ? blokOferty(oferta) : "") + diff + style;
 }
 
 /**
@@ -106,6 +108,15 @@ export async function streamClientReply(
   });
 }
 
+/** Jeden konkretny moment rozmowy: cytat agenta i co z nim zrobić. */
+export type Moment = {
+  cytat: string;
+  ocena: "dobrze" | "do_poprawy";
+  komentarz: string;
+  /** Gotowe zdanie, które agent może powiedzieć następnym razem. */
+  lepiej?: string;
+};
+
 export type ScoringResult = {
   overall: number;
   opening: number;
@@ -114,6 +125,7 @@ export type ScoringResult = {
   closing: number;
   summary: string;
   suggestions: string[];
+  moments: Moment[];
 };
 
 const SCORING_SYSTEM = `Jesteś doświadczonym trenerem sprzedaży nieruchomości w Polsce. Analizujesz transkrypt sesji treningowej, w której AGENT ćwiczył rozmowę z (symulowanym) KLIENTEM.
@@ -132,6 +144,8 @@ summary: 2-3 zdania podsumowania po polsku - co poszło dobrze, co najważniejsz
 
 suggestions: 2-4 KONKRETNE wskazówki po polsku. Każda odnosi się do tego co agent FAKTYCZNIE powiedział (lub czego nie powiedział). Cytuj/parafrazuj realne momenty. Dawaj gotowe sformułowania których agent może użyć następnym razem. NIE ogólniki.
 
+moments: 3-5 kluczowych momentów rozmowy. Każdy to DOSŁOWNY cytat wypowiedzi agenta (fragment do 200 znaków, skopiowany z transkryptu bez zmian), ocena "dobrze" albo "do_poprawy", jedno-dwa zdania komentarza: dlaczego to zadziałało albo co klient poczuł, oraz przy "do_poprawy" pole "lepiej": gotowe zdanie, które agent mógł powiedzieć zamiast tego. Daj przynajmniej jeden moment "dobrze", jeśli jakikolwiek się zdarzył: agent ma wiedzieć, co powtarzać, a nie tylko co poprawiać.
+
 Bądź sprawiedliwy ale wymagający. Jeśli rozmowa była krótka lub agent zrobił mało - niższe oceny. Odpowiadasz TYLKO w formacie JSON, bez dodatkowego tekstu.
 
 INTERPUNKCJA (ważne): w summary i suggestions nie używaj myślnika ani półpauzy (znaki — i –). Zamiast nich stosuj przecinek, dwukropek albo kropkę.`;
@@ -143,6 +157,7 @@ INTERPUNKCJA (ważne): w summary i suggestions nie używaj myślnika ani półpa
 export async function scoreSession(
   scenarioTitle: string,
   transcript: ChatMessage[],
+  oferta?: KontekstOferty | null,
 ): Promise<ScoringResult> {
   const dialogue = transcript
     .map((m) => `${m.role === "agent" ? "AGENT" : "KLIENT"}: ${m.content}`)
@@ -150,7 +165,7 @@ export async function scoreSession(
 
   const parsed = await odpowiedzJson<ScoringResult>({
     model: SCORING_MODEL,
-    maxTokens: 1500,
+    maxTokens: 2600,
     system: SCORING_SYSTEM,
     schemat: {
       type: "object",
@@ -166,6 +181,21 @@ export async function scoreSession(
           items: { type: "string" },
           description: "2-4 konkretne wskazówki po polsku",
         },
+        moments: {
+          type: "array",
+          description: "3-5 kluczowych momentów rozmowy",
+          items: {
+            type: "object",
+            properties: {
+              cytat: { type: "string", description: "Dosłowny cytat wypowiedzi agenta" },
+              ocena: { type: "string", enum: ["dobrze", "do_poprawy"] },
+              komentarz: { type: "string", description: "1-2 zdania po polsku" },
+              lepiej: { type: "string", description: "Gotowe lepsze zdanie (tylko przy do_poprawy)" },
+            },
+            required: ["cytat", "ocena", "komentarz"],
+            additionalProperties: false,
+          },
+        },
       },
       required: [
         "overall",
@@ -175,13 +205,19 @@ export async function scoreSession(
         "closing",
         "summary",
         "suggestions",
+        "moments",
       ],
       additionalProperties: false,
     },
     messages: [
       {
         role: "user",
-        content: `Scenariusz: ${scenarioTitle}\n\nTranskrypt rozmowy:\n\n${dialogue}\n\nOceń wypowiedzi agenta.`,
+        content:
+          `Scenariusz: ${scenarioTitle}\n\n` +
+          (oferta
+            ? `Rozmowa dotyczyła konkretnej oferty agenta. Dane oferty:\n${faktyOferty(oferta).map((f) => `- ${f}`).join("\n")}\n\nOceń także, czy agent znał swoją ofertę: czy podawał zgodne z nią fakty i czy umiał odpowiedzieć na pytania o nią. Pomyłkę w faktach o ofercie pokaż jako moment "do_poprawy".\n\n`
+            : "") +
+          `Transkrypt rozmowy:\n\n${dialogue}\n\nOceń wypowiedzi agenta.`,
       },
     ],
   });
@@ -196,5 +232,14 @@ export async function scoreSession(
     closing: clamp(parsed.closing),
     summary: parsed.summary ?? "",
     suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 5) : [],
+    moments: (Array.isArray(parsed.moments) ? parsed.moments : [])
+      .filter((m) => m && typeof m.cytat === "string" && typeof m.komentarz === "string")
+      .slice(0, 6)
+      .map((m) => ({
+        cytat: m.cytat.slice(0, 300),
+        ocena: m.ocena === "dobrze" ? "dobrze" : "do_poprawy",
+        komentarz: m.komentarz.slice(0, 500),
+        ...(m.lepiej ? { lepiej: String(m.lepiej).slice(0, 400) } : {}),
+      })),
   };
 }

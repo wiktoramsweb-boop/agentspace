@@ -3,6 +3,23 @@ import { requireUser, requireModul } from "@/lib/auth";
 import { getScenarios, getWeeklySessionCount } from "@/lib/data";
 import { SCENARIO_CATEGORIES, type ScenarioCategory } from "@/lib/types";
 import { PageHeader, EmptyState } from "../components/ui";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { maV49 } from "@/lib/schemat";
+
+type MojeZadanie = { id: string; scenario_id: string; difficulty: string; min_score: number | null; due_on: string | null; note: string | null; best_score: number | null; attempts: number };
+
+/** Zadania od menedżera, które czekają na zaliczenie. Przed migracją v49 pusto. */
+async function mojeZadania(userId: string): Promise<MojeZadanie[]> {
+  if (!(await maV49())) return [];
+  const { data } = await createSupabaseAdmin()
+    .from("training_assignments")
+    .select("id, scenario_id, difficulty, min_score, due_on, note, best_score, attempts")
+    .eq("agent_id", userId)
+    .eq("status", "do_zrobienia")
+    .order("due_on", { ascending: true, nullsFirst: false })
+    .limit(10);
+  return (data ?? []) as MojeZadanie[];
+}
 
 // Kolory per kategoria - żeby karty się wyróżniały (pełne klasy dla Tailwind).
 const CAT_STYLE: Record<string, { tile: string; bar: string; hover: string; trenuj: string }> = {
@@ -41,7 +58,8 @@ export default async function TreningPage({
 }) {
   const user = await requireModul("coach");
   const { limit: limitParam } = await searchParams;
-  const scenarios = await getScenarios();
+  const [scenarios, zadania] = await Promise.all([getScenarios(), mojeZadania(user.id)]);
+  const zlecajacy = ["owner", "director", "manager"].includes(user.role);
 
   // Tygodniowy limit rozmów AI (ustawiany przez CEO).
   const weeklyLimit = user.weekly_ai_limit;
@@ -66,7 +84,41 @@ export default async function TreningPage({
       <PageHeader
         title="AI Coach"
         subtitle="Wybierz kategorię i scenariusz. Ćwicz rozmowę z AI klientem, dostań scoring i feedback."
+        action={
+          zlecajacy ? (
+            <Link href="/app/trening/zadania" className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:border-slate-400">
+              Zadania dla zespołu
+            </Link>
+          ) : undefined
+        }
       />
+
+      {zadania.length > 0 && (
+        <section className="mb-8 rounded-2xl border border-violet-200 bg-violet-50 p-5">
+          <p className="text-xs font-medium uppercase tracking-wider text-violet-700">Od menedżera</p>
+          <h2 className="mt-1 text-lg font-semibold text-slate-900">Twoje zadania treningowe</h2>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {zadania.map((z) => {
+              const sc = scenarios.find((x) => x.id === z.scenario_id);
+              if (!sc) return null;
+              return (
+                <li key={z.id} className="flex flex-col rounded-xl border border-violet-200 bg-white p-4">
+                  <p className="font-medium text-slate-900">{sc.title}</p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    Zalicz na {z.min_score ?? 7}/10
+                    {z.due_on ? ` · do ${z.due_on.split("-").reverse().join(".")}` : ""}
+                    {z.attempts ? ` · podejścia: ${z.attempts}, najlepiej ${z.best_score ?? "-"}` : ""}
+                  </p>
+                  {z.note && <p className="mt-2 text-sm italic text-slate-600">„{z.note}”</p>}
+                  <Link href={`/app/trening/${sc.slug}?zadanie=${z.id}`} className="mt-3 self-start rounded-lg bg-violet-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-violet-500">
+                    {z.attempts ? "Spróbuj jeszcze raz" : "Zacznij"} →
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {/* Limit tygodniowy (jeśli CEO ustawił) */}
       {weeklyLimit != null && (

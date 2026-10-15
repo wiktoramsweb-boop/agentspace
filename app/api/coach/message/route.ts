@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { createAnthropic, COACH_MODEL } from "@/lib/ai/client";
 import { buildClientSystemPrompt } from "@/lib/ai/coach";
+import type { KontekstOferty } from "@/lib/ai/oferta-kontekst";
 import type { ChatMessage } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -81,10 +82,13 @@ export async function POST(request: Request) {
     messages.push({ role: "user", content: "[System: rozpocznij rozmowę zgodnie z instrukcją.]" });
   }
 
+  // Kolumna context istnieje od migracji v49; przed nią select("*") jej nie zwraca.
+  const oferta = (session.context as { oferta?: KontekstOferty } | null | undefined)?.oferta ?? null;
   const system = buildClientSystemPrompt(
     scenarioSystemPrompt,
     session.personality ?? "",
     session.difficulty ?? "sredni",
+    oferta,
   );
 
   let anthropic;

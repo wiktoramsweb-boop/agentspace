@@ -7,8 +7,28 @@ import { startSession } from "../actions";
 import { Card } from "../../components/ui";
 import { SubmitButton } from "../../components/submit-button";
 import { glosWlaczony } from "@/lib/glos";
+import { maV49 } from "@/lib/schemat";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { Select } from "../../components/select";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ oferta?: string; zadanie?: string }> };
+
+/** Oferty do treningu: agent swoje, reszta zespołu wszystkie z biura. */
+async function ofertyDoTreningu(agencyId: string, userId: string, role: string) {
+  let q = createSupabaseAdmin()
+    .from("properties")
+    .select("id, title, address, city, price_pln, area_m2")
+    .eq("agency_id", agencyId)
+    .order("updated_at", { ascending: false })
+    .limit(300);
+  if (role === "agent" || role === "trainee") q = q.eq("agent_id", userId);
+  const { data } = await q;
+  return (data ?? []).map((o) => ({
+    value: o.id as string,
+    label: [o.address, o.city].filter(Boolean).join(", ") || (o.title as string),
+    hint: [o.area_m2 ? `${o.area_m2} m²` : "", o.price_pln ? `${new Intl.NumberFormat("pl-PL").format(Number(o.price_pln))} zł` : ""].filter(Boolean).join(" · ") || undefined,
+  }));
+}
 
 /** Karta wyboru głosu. Węższa niż karta trybu, bo opis jest jednozdaniowy. */
 function GlosKarty({
@@ -65,13 +85,27 @@ function TrybKarty({
   );
 }
 
-export default async function ScenarioSetupPage({ params }: Props) {
+export default async function ScenarioSetupPage({ params, searchParams }: Props) {
   const user = await requireUser();
   const { slug } = await params;
+  const sp = await searchParams;
   const scenario = await getScenarioBySlug(slug);
   if (!scenario) notFound();
 
   const glos = glosWlaczony();
+  const v49 = await maV49();
+  const oferty = user.agency_id && v49 ? await ofertyDoTreningu(user.agency_id, user.id, user.role) : [];
+  const zadanie =
+    v49 && sp.zadanie
+      ? (
+          await createSupabaseAdmin()
+            .from("training_assignments")
+            .select("id, min_score, difficulty, personality, property_id, note")
+            .eq("id", sp.zadanie)
+            .eq("agent_id", user.id)
+            .maybeSingle()
+        ).data
+      : null;
 
   // Tygodniowy limit rozmów AI - jeśli wyczerpany, nie pozwól zacząć.
   const limitReached =
@@ -103,8 +137,20 @@ export default async function ScenarioSetupPage({ params }: Props) {
         </Card>
       )}
 
+      {zadanie && (
+        <Card className="mb-8 !border-violet-300 !bg-violet-50">
+          <p className="text-xs font-medium uppercase tracking-wider text-violet-700">Zadanie od menedżera</p>
+          <p className="mt-1 text-slate-800">
+            Próg zaliczenia: <strong>{zadanie.min_score ?? 7}/10</strong>. Trudność{zadanie.personality ? ", typ klienta" : ""}
+            {zadanie.property_id ? " i oferta są" : " jest"} ustawione w zadaniu, wybór poniżej ich nie zmieni.
+          </p>
+          {zadanie.note && <p className="mt-2 text-sm italic text-slate-600">„{zadanie.note}”</p>}
+        </Card>
+      )}
+
       <form action={startSession}>
         <input type="hidden" name="scenarioId" value={scenario!.id} />
+        {zadanie && <input type="hidden" name="assignmentId" value={zadanie.id} />}
 
         {glos && (
           <>
@@ -209,6 +255,26 @@ export default async function ScenarioSetupPage({ params }: Props) {
             </label>
           ))}
         </div>
+
+        {oferty.length > 0 && (
+          <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-5">
+            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-600">Opcjonalnie · Twoja oferta</p>
+            <h2 className="mb-1 text-lg font-semibold text-slate-900">Trenuj na swojej ofercie</h2>
+            <p className="mb-4 text-sm text-slate-500">
+              Klient zapyta o to konkretne mieszkanie: cenę, metraż, to, czego nie ma w opisie. Najlepsza rozgrzewka
+              przed prawdziwym telefonem. Ocena sprawdzi też, czy znasz swoją ofertę.
+            </p>
+            <div className="max-w-md">
+              <Select
+                name="propertyId"
+                aria-label="Oferta do treningu"
+                options={oferty}
+                defaultValue={sp.oferta && oferty.some((o) => o.value === sp.oferta) ? sp.oferta : ""}
+                placeholder="Bez oferty, jak w scenariuszu"
+              />
+            </div>
+          </div>
+        )}
 
         <p className="mb-3 text-xs font-medium uppercase tracking-wider text-emerald-600">
           Krok {glos ? 5 : 4} · Zaczynamy

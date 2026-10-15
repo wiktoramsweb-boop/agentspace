@@ -38,6 +38,14 @@ export function SessionResults({
           <p className="mt-1 text-slate-500">
             Klient: {session.personality} · {inProgress ? "w trakcie (niedokończona)" : "zakończona"}
           </p>
+          {session.context?.oferta && (
+            <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-800">
+              Trening na ofercie: {[session.context.oferta.dzielnica, session.context.oferta.miasto].filter(Boolean).join(", ") || session.context.oferta.tytul}
+              {session.property_id && (
+                <Link href={`/app/nieruchomosci/${session.property_id}`} className="underline">otwórz</Link>
+              )}
+            </p>
+          )}
         </div>
         {showTrainAgain && (
           <Link
@@ -109,6 +117,31 @@ export function SessionResults({
               })}
             </div>
           </div>
+
+          {/* Kluczowe momenty */}
+          {score.moments && score.moments.length > 0 && (
+            <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="mb-1 text-sm font-medium uppercase tracking-wider text-slate-500">Kluczowe momenty</h2>
+              <p className="mb-5 text-sm text-slate-500">Twoje słowa z rozmowy i co z nimi zrobić następnym razem.</p>
+              <ol className="space-y-4">
+                {score.moments.map((m, i) => (
+                  <li key={i} className={`rounded-xl border-l-4 p-4 ${m.ocena === "dobrze" ? "border-emerald-500 bg-emerald-50" : "border-amber-500 bg-amber-50"}`}>
+                    <p className={`text-xs font-semibold uppercase tracking-wider ${m.ocena === "dobrze" ? "text-emerald-700" : "text-amber-700"}`}>
+                      {m.ocena === "dobrze" ? "To zadziałało" : "Do poprawy"}
+                    </p>
+                    <blockquote className="mt-2 text-[15px] italic leading-relaxed text-slate-800">„{m.cytat}”</blockquote>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{m.komentarz}</p>
+                    {m.lepiej && (
+                      <div className="mt-3 rounded-lg bg-white p-3">
+                        <p className="text-xs font-semibold text-slate-500">Spróbuj tak:</p>
+                        <p className="mt-1 text-sm leading-relaxed text-slate-900">„{m.lepiej}”</p>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
 
           {/* Sugestie */}
           {score.suggestions.length > 0 && (

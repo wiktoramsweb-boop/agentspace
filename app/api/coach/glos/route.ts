@@ -1,6 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { buildClientSystemPrompt } from "@/lib/ai/coach";
+import { kontekstSesji } from "@/lib/ai/oferta-kontekst";
 import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { kredytyZGory, MAX_MINUT_ROZMOWY } from "@/lib/kredyty-cennik";
 import { glosWlaczony, dostepDoRozmowy, pierwszeZdanie } from "@/lib/glos";
@@ -50,6 +51,7 @@ export async function POST(req: Request) {
     scenariusz.system_prompt,
     (sesja.personality as string) ?? "biznesowy",
     (sesja.difficulty as string) ?? "sredni",
+    await kontekstSesji(sessionId),
   );
 
   // Głos ustawia się na agencie u dostawcy, nie na pojedynczej rozmowie, więc
