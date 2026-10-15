@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireAktywny } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { PageHeader } from "../components/ui";
@@ -11,7 +12,15 @@ export default async function KalkulatoryPage() {
       <div className="print-hide">
         <PageHeader
           title="Kalkulatory"
-          subtitle="Policz przy kliencie ratę, koszty zakupu i rentowność najmu - i wyślij mu ładny PDF."
+          subtitle="Policz przy kliencie ratę, koszty zakupu, rentowność najmu i koszt remontu, a potem wyślij mu ładny PDF."
+          action={
+            <Link
+              href="/app/kalkulatory/remont"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:border-emerald-400 hover:text-emerald-700"
+            >
+              Kalkulator remontu →
+            </Link>
+          }
         />
       </div>
       <Calculators
