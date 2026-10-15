@@ -18,10 +18,9 @@ export async function maV49(): Promise<boolean> {
   if (Date.now() - sprawdzonoO < 60_000) return false;
   sprawdzonoO = Date.now();
   try {
-    const { error } = await createSupabaseAdmin()
-      .from("property_price_history")
-      .select("id", { head: true, count: "exact" })
-      .limit(1);
+    // Bez HEAD: odpowiedź HEAD nie ma treści i brak tabeli nie zawsze
+    // wraca jako błąd, a tu pomyłka „jest" psułaby zapis ofert.
+    const { error } = await createSupabaseAdmin().from("property_price_history").select("id").limit(1);
     potwierdzona = !error;
   } catch {
     potwierdzona = false;

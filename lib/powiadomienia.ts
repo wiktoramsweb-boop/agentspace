@@ -34,6 +34,11 @@ export type Powiadomienie = {
   znacznik?: string;
   /** Push zostaje na ekranie do dotknięcia. */
   pilne?: boolean;
+  /**
+   * Zapis w dzwonku. Domyślnie tak. Czat wyłącza: rozmowa ma własny licznik
+   * nieprzeczytanych, a każda wiadomość w dzwonku zalałaby resztę powiadomień.
+   */
+  wDzwonku?: boolean;
 };
 
 export async function powiadom(
@@ -44,7 +49,7 @@ export async function powiadom(
   const ids = [...new Set(odbiorcy.filter((x): x is string => typeof x === "string" && x.length > 0))];
   if (ids.length === 0) return 0;
 
-  try {
+  if (p.wDzwonku !== false) try {
     const admin = createSupabaseAdmin();
     const { error } = await admin.from("notifications").insert(
       ids.map((user_id) => ({

@@ -26,7 +26,8 @@ export function useNaZywo({
   tabela: string;
   /** Filtr Realtime, np. `user_id=eq.<uuid>`. */
   filtr?: string;
-  onZmiana: () => void;
+  /** Dostaje treść zdarzenia z Realtime, gdy przyszło na żywo, albo nic przy odpytywaniu. */
+  onZmiana: (zdarzenie?: { new?: Record<string, unknown>; old?: Record<string, unknown> }) => void;
   zapasMs?: number;
   wlaczony?: boolean;
 }) {
@@ -52,7 +53,7 @@ export function useNaZywo({
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: tabela, ...(filtr ? { filter: filtr } : {}) },
-          () => cb.current(),
+          (p) => cb.current(p as { new?: Record<string, unknown>; old?: Record<string, unknown> }),
         )
         .subscribe();
     } catch {

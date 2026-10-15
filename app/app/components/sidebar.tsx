@@ -12,6 +12,7 @@ import { SECTIONS, TILE } from "./nav-meta";
 import { maModul, type Uprawnienia } from "@/lib/role";
 import { Logo } from "@/app/components/marka";
 import { Dzwonek } from "./dzwonek";
+import { LicznikCzatu } from "./licznik-czatu";
 
 const COLLAPSE_KEY = "as_nav_collapsed";
 
@@ -150,6 +151,7 @@ export function Sidebar({
                       {item.icon}
                     </span>
                     {item.label}
+                    {item.licznik === "czat" && userId && <LicznikCzatu userId={userId} />}
                   </Link>
                 );
               })}
