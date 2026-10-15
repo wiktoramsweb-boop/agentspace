@@ -98,6 +98,7 @@ export const SECTIONS: NavSection[] = [
       { href: "/app/raporty", label: "Raporty", icon: <ChartIcon />, color: "violet", modul: "raporty" },
       { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, color: "fuchsia", modul: "zespol" },
       { href: "/app/automatyzacje", label: "Automatyzacje", icon: <AutomationIcon />, color: "amber", modul: "zespol" },
+      { href: "/app/urlopy", label: "Urlopy i zastępstwa", icon: <PlaneIcon />, color: "sky" },
       { href: "/app/ustawienia", label: "Ustawienia", icon: <CogIcon />, color: "slate" },
     ],
   },
@@ -225,4 +226,8 @@ function CompassIcon() {
 
 function AutomationIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg>;
+}
+
+function PlaneIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" /></svg>;
 }

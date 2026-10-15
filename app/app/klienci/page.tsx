@@ -13,6 +13,7 @@ import { TablicaKlientow } from "./tablica-klientow";
 import { PrzelacznikWidoku } from "../components/widok";
 import { FiltrOpiekuna } from "../components/filtr-opiekuna";
 import { kartyKlientow } from "@/lib/data-tablica";
+import { kogoZastepuje } from "@/lib/zastepstwa";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -53,6 +54,7 @@ export default async function KlienciPage({ searchParams }: Props) {
       counts(agencyId),
     ]);
     const mask = settings.options.hide_contacts && user.role === "agent";
+    const zastepowani = mask ? (await kogoZastepuje(agencyId, user.id)).map((z) => z.agent_id) : [];
     return (
       <>
         <PageHeader
@@ -65,7 +67,13 @@ export default async function KlienciPage({ searchParams }: Props) {
           <FiltrOpiekuna ludzie={agents} wartosc={query.agent} />
         </div>
         <TablicaKlientow
-          karty={mask ? karty.map((k) => (k.agent_id === user.id ? k : { ...k, phone: null })) : karty}
+          karty={
+            mask
+              ? karty.map((k) =>
+                  k.agent_id === user.id || (k.agent_id && zastepowani.includes(k.agent_id)) ? k : { ...k, phone: null },
+                )
+              : karty
+          }
         />
       </>
     );
@@ -83,9 +91,11 @@ export default async function KlienciPage({ searchParams }: Props) {
   // Ukrywanie kontaktów (Ustawienia → Pozostałe) dotyczy tylko agentów.
   // Maskujemy na serwerze: do przeglądarki nie trafia pełny numer ani e-mail.
   const mask = settings.options.hide_contacts && user.role === "agent";
+  // Zastępca widzi kontakty klientów osoby, którą dziś zastępuje.
+  const zastepowani = mask && agencyId ? (await kogoZastepuje(agencyId, user.id)).map((z) => z.agent_id) : [];
   const rows = mask
     ? page.rows.map((c) =>
-        c.agent_id === user.id
+        c.agent_id === user.id || (c.agent_id && zastepowani.includes(c.agent_id))
           ? c
           : { ...c, phone: maskPhone(c.phone), email: c.email ? "ukryty" : null },
       )

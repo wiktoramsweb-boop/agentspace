@@ -43,9 +43,24 @@ export function widziRaportyBiura(user: Kto): boolean {
   return user.role === "owner";
 }
 
-/** Czy przed tą osobą ukrywamy kontakt do klienta (ustawienie biura „ukryj kontakty”). */
-export function ukryjKontakt(user: Kto, ukrywanieWlaczone: boolean, rekord: ZOpiekunem): boolean {
-  return ukrywanieWlaczone && user.role === "agent" && rekord.agent_id !== user.id;
+/**
+ * Czy przed tą osobą ukrywamy kontakt do klienta (ustawienie biura „ukryj kontakty”).
+ *
+ * `zastepowani` to osoby, które ta osoba dziś zastępuje (urlopy, v49). Zastępca
+ * musi móc zadzwonić do klientów nieobecnego, inaczej zastępstwo jest fikcją.
+ */
+export function ukryjKontakt(
+  user: Kto,
+  ukrywanieWlaczone: boolean,
+  rekord: ZOpiekunem,
+  zastepowani: readonly string[] = [],
+): boolean {
+  return (
+    ukrywanieWlaczone &&
+    user.role === "agent" &&
+    rekord.agent_id !== user.id &&
+    !(rekord.agent_id && zastepowani.includes(rekord.agent_id))
+  );
 }
 
 /**
@@ -57,9 +72,10 @@ export function bezCudzychTelefonow<T extends { agent_id?: string | null; phone:
   lista: T[],
   user: Kto,
   ukrywanieWlaczone: boolean,
+  zastepowani: readonly string[] = [],
 ): T[] {
   if (!ukrywanieWlaczone || user.role !== "agent") return lista;
-  return lista.map((c) => (ukryjKontakt(user, true, c) ? { ...c, phone: null } : c));
+  return lista.map((c) => (ukryjKontakt(user, true, c, zastepowani) ? { ...c, phone: null } : c));
 }
 
 /** Usunięcie działania: autor, przypisana osoba albo CEO/menedżer. */

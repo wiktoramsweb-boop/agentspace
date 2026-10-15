@@ -55,6 +55,11 @@ sprawdz("bez ustawienia nic nie ukrywamy", !ukryjKontakt(agent, false, cudzy));
 sprawdz("agent nie widzi kontaktu cudzego klienta", ukryjKontakt(agent, true, cudzy));
 sprawdz("agent widzi kontakt swojego klienta", !ukryjKontakt(agent, true, moj));
 sprawdz("CEO zawsze widzi kontakt", !ukryjKontakt(ceo, true, cudzy));
+sprawdz(
+  "zastępca widzi kontakt klienta osoby na urlopie",
+  !ukryjKontakt(agent, true, cudzy, [cudzy.agent_id as string]),
+);
+sprawdz("zastępstwo za kogoś innego nie odsłania kontaktu", ukryjKontakt(agent, true, cudzy, ["ktos-inny"]));
 
 const lista = [
   { id: "k1", agent_id: "a1", phone: "600100200" },

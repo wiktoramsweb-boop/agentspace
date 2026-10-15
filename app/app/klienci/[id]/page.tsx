@@ -40,6 +40,8 @@ import { getDocuments } from "@/lib/data-documents";
 import { getClientMessages } from "@/lib/data-messages";
 import { DocumentsCard } from "../../dokumenty/documents-card";
 import { ClientCorrespondence } from "./client-correspondence";
+import { nieobecnosciWDniu } from "@/lib/zastepstwa";
+import { ukryjKontakt } from "@/lib/uprawnienia";
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ z?: string }> };
 
@@ -104,7 +106,12 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
   // Ukrywanie kontaktów (Ustawienia → Pozostałe) działa tu tak samo jak na
   // liście: agent nie dostaje pełnych danych cudzego klienta. Bez tego wystarczyło
   // kliknąć w klienta, żeby spisać numer, i ustawienie niczego nie chroniło.
-  const masked = settings.options.hide_contacts && user.role === "agent" && client.agent_id !== user.id;
+  // Urlopy (v49): zastępca widzi kontakt klientów osoby, którą dziś zastępuje,
+  // a każdy widzi na karcie, że opiekun jest nieobecny i do kogo się zwrócić.
+  const nieobecni = agencyId ? await nieobecnosciWDniu(agencyId) : [];
+  const zastepowani = nieobecni.filter((n) => n.substitute_id === user.id).map((n) => n.agent_id);
+  const urlopOpiekuna = client.agent_id ? nieobecni.find((n) => n.agent_id === client.agent_id) ?? null : null;
+  const masked = ukryjKontakt(user, settings.options.hide_contacts, client, zastepowani);
   // Dostępy do portalu. Brak tabeli (migracja v46 nieuruchomiona) daje pustą
   // listę, a nie błąd całej karty klienta.
   const dostepyPortalu = ((
@@ -150,6 +157,20 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
       <Link href="/app/klienci" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Wszyscy klienci
       </Link>
+
+      {urlopOpiekuna && (
+        <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-sky-500/30 bg-sky-100 px-4 py-3 text-sm">
+          <span className="font-semibold text-sky-700">
+            Opiekun {agents.find((a) => a.id === urlopOpiekuna.agent_id)?.name ?? ""} jest nieobecny do{" "}
+            {urlopOpiekuna.ends_on.split("-").reverse().join(".")}
+          </span>
+          <span className="text-slate-600">
+            {urlopOpiekuna.substitute_id
+              ? `Sprawę prowadzi zastępca: ${agents.find((a) => a.id === urlopOpiekuna.substitute_id)?.name ?? "osoba z zespołu"}.`
+              : "Bez wskazanego zastępcy."}
+          </span>
+        </div>
+      )}
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-4">

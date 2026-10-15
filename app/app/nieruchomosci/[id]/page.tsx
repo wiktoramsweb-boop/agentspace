@@ -31,6 +31,8 @@ import { MatchingSearches } from "./matching-searches";
 import { getActiveSearches } from "@/lib/data-searches";
 import { NearbyCard } from "./nearby-card";
 import { DetailsCard } from "./details-card";
+import { HistoriaCeny } from "./historia-ceny";
+import { historiaCeny } from "@/lib/data-historia-ceny";
 import { getDocuments } from "@/lib/data-documents";
 import { getActivitiesForProperty } from "@/lib/data-platform";
 import { getAgencyAgents } from "@/lib/data-activities";
@@ -75,7 +77,10 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
     getActivitiesForProperty(id, user.agency_id),
   ]);
 
-  const agents = user.agency_id ? await getAgencyAgents(user.agency_id) : [];
+  const [agents, ceny] = await Promise.all([
+    user.agency_id ? getAgencyAgents(user.agency_id) : Promise.resolve([]),
+    user.agency_id ? historiaCeny(id, user.agency_id) : Promise.resolve(null),
+  ]);
   // Okno działania wywoływane z karty oferty ma tę ofertę już wybraną - agent
   // nie szuka jej na liście wszystkich nieruchomości biura.
   const dodajDzialanie = (
@@ -274,6 +279,13 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
                 clients={allClients}
               />
             </Card>
+
+            {ceny && (
+              <Card>
+                <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">Historia ceny</h2>
+                <HistoriaCeny zmiany={ceny} rodzaj={property.deal_kind} />
+              </Card>
+            )}
 
             <div className="pt-2">
               {mozeUsunac(user, property) && <DeletePropertyButton propertyId={property.id} />}

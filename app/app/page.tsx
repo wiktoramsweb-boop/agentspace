@@ -30,6 +30,7 @@ import { getPrzewodnik } from "@/lib/data-przewodnik";
 import { stanDostepu } from "@/lib/abonament-cennik";
 import { DostepWstrzymany } from "./dostep-wstrzymany";
 import { getAgencySettings } from "@/lib/agency-settings";
+import { ZastepstwoKarta } from "./zastepstwo-karta";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -106,6 +107,9 @@ export default async function DashboardPage() {
 
       {/* Przewodnik dla nowego biura (znika po domknięciu kroków niezbędnych) */}
       <BanerPrzewodnika przewodnik={przewodnik} />
+
+      {/* Zastępstwo: sprawy osoby na urlopie, które przejmuję dziś */}
+      {user.agency_id && <ZastepstwoKarta agencyId={user.agency_id} userId={user.id} />}
 
       {/* Gamifikacja: poziom, passa, następna odznaka */}
       <GameStrip game={game} />
