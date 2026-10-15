@@ -1,5 +1,8 @@
 "use server";
 
+import { after } from "next/server";
+import { poNowymLeadzie } from "@/lib/zdarzenia";
+
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
@@ -58,7 +61,7 @@ export async function dodajLeadRecznie(formData: FormData): Promise<Wynik> {
   }
 
   const admin = createSupabaseAdmin();
-  const { error } = await admin.from("leads").insert({
+  const { data: lead, error } = await admin.from("leads").insert({
     agency_id: user.agency_id,
     agent_id: t("agent_id") ?? user.id,
     name: t("name"),
@@ -72,9 +75,11 @@ export async function dodajLeadRecznie(formData: FormData): Promise<Wynik> {
     campaign: t("campaign"),
     status: "nowy",
     submitted_at: new Date().toISOString(),
-  });
+  }).select("id").maybeSingle();
 
   if (error) return { ok: false, error: error.message };
+  const agencyId = user.agency_id;
+  if (lead?.id) after(() => poNowymLeadzie(agencyId, lead.id as string, user.id));
   revalidatePath("/app/leady");
   return { ok: true };
 }

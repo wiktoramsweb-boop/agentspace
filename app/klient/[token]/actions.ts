@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { dostepPoTokenie } from "@/lib/data-portal";
 import { todayPL } from "@/lib/datetime";
+import { after } from "next/server";
+import { powiadom } from "@/lib/powiadomienia";
+import { zapiszZdarzenie } from "@/lib/dziennik";
+import { uruchomAutomatyzacje } from "@/lib/automatyzacje";
 
 /**
  * Akcje klienta w portalu.
@@ -157,11 +161,47 @@ export async function decyzjaOCenie(
   // Zgoda od razu zmienia cenę w ofercie - inaczej agent musiałby pilnować
   // tego ręcznie i portal byłby tylko ankietą.
   if (zgoda) {
-    await admin
+    const { data: przed } = await admin
+      .from("properties")
+      .select("price_pln, title, agent_id")
+      .eq("id", prop.property_id)
+      .eq("agency_id", dostep.agency_id)
+      .maybeSingle();
+    const { error } = await admin
       .from("properties")
       .update({ price_pln: prop.cena_proponowana })
       .eq("id", prop.property_id)
       .eq("agency_id", dostep.agency_id);
+    if (!error && przed) {
+      const agencyId = dostep.agency_id as string;
+      const staraCena = przed.price_pln == null ? null : Number(przed.price_pln);
+      const nowaCena = Number(prop.cena_proponowana);
+      after(async () => {
+        // Agent dowiaduje się od razu: zgoda właściciela to sygnał do
+        // telefonów do kupujących, którzy odpadli przez cenę.
+        await powiadom(agencyId, [przed.agent_id], {
+          rodzaj: "cena",
+          tytul: `Właściciel zaakceptował nową cenę: ${przed.title ?? "oferta"}`,
+          tresc: `Zgoda w portalu klienta. Nowa cena: ${nowaCena.toLocaleString("pl-PL")} zł.`,
+          adres: `/app/nieruchomosci/${prop.property_id}`,
+          pilne: true,
+        });
+        await zapiszZdarzenie({
+          agencyId,
+          actorId: null,
+          akcja: "zmiana_ceny",
+          rodzaj: "oferta",
+          id: prop.property_id,
+          opis: `Właściciel zaakceptował w portalu cenę ${nowaCena.toLocaleString("pl-PL")} zł dla „${przed.title ?? "oferta"}"`,
+        });
+        await uruchomAutomatyzacje(agencyId, {
+          zdarzenie: "zmiana_ceny_oferty",
+          ofertaId: prop.property_id,
+          staraCena,
+          nowaCena,
+        });
+      });
+    }
   }
 
   revalidatePath(`/klient/${token}/n/${prop.property_id}`);

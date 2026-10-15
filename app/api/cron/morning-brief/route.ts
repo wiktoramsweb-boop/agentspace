@@ -10,11 +10,12 @@ import { sendPushToAgent } from "@/lib/push";
 import { przypomnijOZaleglychFakturach } from "@/lib/przypomnienia-faktury";
 import { wystawZaplanowaneFaktury } from "@/lib/faktury-cykliczne";
 import { zapiszBlad } from "@/lib/blad";
+import { uruchomAutomatyzacjeCzasowe } from "@/lib/automatyzacje";
 
 export const maxDuration = 300;
 
 /**
- * Poranna odprawa push i przypomnienia o fakturach.
+ * Poranna odprawa push, przypomnienia o fakturach i reguły czasowe automatyzacji.
  *
  * Przypomnienia doczepione tutaj, a nie w osobnym cronie, bo plan Hobby
  * daje tylko dwa zadania i oba są już zajęte. Zadanie i tak chodzi raz
@@ -82,5 +83,15 @@ export async function GET(request: Request) {
     await zapiszBlad("cron/przypomnienia-faktury", err);
   }
 
-  return Response.json({ ok: true, agents: agentIds.length, notified, cykliczne, przypomnienia });
+  // Reguły czasowe biur: klient bez kontaktu, oferta bez prezentacji.
+  // Po porannej odprawie, żeby zadania z automatyzacji były już w kalendarzu,
+  // kiedy agent pierwszy raz otworzy aplikację.
+  let automatyzacje = { biur: 0, regul: 0 };
+  try {
+    automatyzacje = await uruchomAutomatyzacjeCzasowe();
+  } catch (err) {
+    await zapiszBlad("cron/automatyzacje", err);
+  }
+
+  return Response.json({ ok: true, agents: agentIds.length, notified, cykliczne, przypomnienia, automatyzacje });
 }

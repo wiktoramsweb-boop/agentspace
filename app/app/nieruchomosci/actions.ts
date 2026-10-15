@@ -6,12 +6,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
+import { maV49 } from "@/lib/schemat";
+import { zapiszZdarzenie } from "@/lib/dziennik";
+import { uruchomAutomatyzacje } from "@/lib/automatyzacje";
+import { formatPln } from "@/lib/format";
 import { PROPERTY_TYPES, type PropertyDealKind, type PropertyStatus, type PropertyType } from "@/lib/types";
 import { DETAIL_PREFIX, detailFieldsFor, PIETRO_NA_LICZBE } from "@/lib/property-fields";
 import { sanitizePhotos } from "@/lib/property-photos";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { PHOTO_BUCKET } from "@/lib/storage";
 import { removeFiles } from "@/lib/storage-server";
+import { after } from "next/server";
+import { poNowejOfercie, poZmianieEtapuOferty } from "@/lib/zdarzenia";
 
 function intOrNull(v: FormDataEntryValue | null): number | null {
   const n = parseInt(String(v ?? "").replace(/\s/g, ""), 10);
@@ -290,8 +296,10 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
   await saveEnergyCert(admin, data.id, user.agency_id, formData);
   await saveDetails(admin, data.id, user.agency_id, formData, fields.property_type, fields.deal_kind);
 
+  const nowaId = data.id as string;
+  after(() => poNowejOfercie(user, nowaId));
   revalidatePath("/app/nieruchomosci");
-  redirect(`/app/nieruchomosci/${data.id}`);
+  redirect(`/app/nieruchomosci/${nowaId}`);
 }
 
 /**
@@ -311,7 +319,7 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
   fields.owner_client_id = await idZBiura(admin, "clients", fields.owner_client_id, user.agency_id);
   const { data: before } = await admin
     .from("properties")
-    .select("photos, export_to_web, web_published_at")
+    .select("photos, export_to_web, web_published_at, price_pln, title")
     .eq("id", id)
     .eq("agency_id", user.agency_id)
     .maybeSingle();
@@ -333,6 +341,9 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
     // Data publikacji na stronie ustawiana przy pierwszym włączeniu eksportu.
     web_published_at: extra.export_to_web ? before.web_published_at ?? now : null,
     updated_at: now,
+    // Autor zmiany dla historii ceny (v49). Bez migracji kolumny nie ma,
+    // a nieznana kolumna odrzuciłaby cały zapis oferty.
+    ...((await maV49()) ? { edited_by: user.id } : {}),
   };
 
   let { error } = await admin.from("properties").update(full).eq("id", id).eq("agency_id", user.agency_id);
@@ -355,6 +366,31 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
 
   await saveEnergyCert(admin, id, user.agency_id, formData);
   await saveDetails(admin, id, user.agency_id, formData, fields.property_type, fields.deal_kind);
+
+  const staraCena = before.price_pln == null ? null : Number(before.price_pln);
+  const nowaCena = fields.price_pln == null ? null : Number(fields.price_pln);
+  if (staraCena !== nowaCena) {
+    await zapiszZdarzenie({
+      agencyId: user.agency_id,
+      actorId: user.id,
+      akcja: "zmiana_ceny",
+      rodzaj: "oferta",
+      id,
+      opis: `Cena „${fields.title}": ${staraCena == null ? "brak" : formatPln(staraCena)} → ${nowaCena == null ? "brak" : formatPln(nowaCena)}`,
+    });
+    // Reguły „cena oferty spadła" i podobne: odpalamy po zapisie, nie przed,
+    // żeby automatyzacja nie widziała starej ceny.
+    const agencyId = user.agency_id;
+    after(() =>
+      uruchomAutomatyzacje(agencyId, {
+        zdarzenie: "zmiana_ceny_oferty",
+        ofertaId: id,
+        staraCena,
+        nowaCena,
+        autorId: user.id,
+      }),
+    );
+  }
 
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");
@@ -528,7 +564,7 @@ export async function attachNewOwner(
 export async function setProcessStage(propertyId: string, stage: string): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  await admin
+  const { error } = await admin
     .from("properties")
     .update({
       process_stage: stage,
@@ -537,5 +573,6 @@ export async function setProcessStage(propertyId: string, stage: string): Promis
     })
     .eq("id", propertyId)
     .eq("agency_id", user.agency_id);
+  if (!error) after(() => poZmianieEtapuOferty(user, propertyId, stage));
   revalidatePath(`/app/nieruchomosci/${propertyId}`);
 }

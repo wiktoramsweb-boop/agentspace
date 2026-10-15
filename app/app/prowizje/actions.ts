@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import type { DealStatus } from "@/lib/types";
+import { after } from "next/server";
+import { poZamknieciuTransakcji } from "@/lib/zdarzenia";
 
 function num(v: FormDataEntryValue | null): number {
   const n = parseInt(String(v ?? "0").replace(/\s/g, ""), 10);
@@ -75,11 +77,12 @@ export async function setDealStatus(dealId: string, status: DealStatus): Promise
   const user = await requireUser();
   const admin = createSupabaseAdmin();
   const closedAt = status === "zamkniety" ? new Date().toISOString() : null;
-  await admin
+  const { error } = await admin
     .from("deals")
     .update({ status, closed_at: closedAt })
     .eq("id", dealId)
     .eq("agent_id", user.id);
+  if (!error && status === "zamkniety") after(() => poZamknieciuTransakcji(user, dealId));
   revalidatePath("/app/prowizje");
   revalidatePath("/app");
 }

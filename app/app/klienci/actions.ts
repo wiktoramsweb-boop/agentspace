@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import type { ClientStatus, ClientType } from "@/lib/types";
+import { after } from "next/server";
+import { poNowymKliencie, poZmianieStatusuKlienta } from "@/lib/zdarzenia";
 
 function floatOrNull(v: FormDataEntryValue | null): number | null {
   const n = parseFloat(String(v ?? "").replace(",", ".").replace(/\s/g, ""));
@@ -100,8 +102,10 @@ export async function createClient(formData: FormData): Promise<SaveResult> {
     };
   }
 
+  const nowyId = data.id as string;
+  after(() => poNowymKliencie(user, nowyId));
   revalidatePath("/app/klienci");
-  redirect(`/app/klienci/${data.id}`);
+  redirect(`/app/klienci/${nowyId}`);
 }
 
 /** Ustawia (lub czyści) datę następnego zaplanowanego kontaktu. */
@@ -127,11 +131,12 @@ export async function updateClientStatus(
 ): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  await admin
+  const { error } = await admin
     .from("clients")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", clientId)
     .eq("agency_id", user.agency_id);
+  if (!error) after(() => poZmianieStatusuKlienta(user, clientId, status));
   revalidatePath(`/app/klienci/${clientId}`);
   revalidatePath("/app/klienci");
 }

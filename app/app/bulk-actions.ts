@@ -8,6 +8,8 @@ import { applyActivityToGoals } from "@/lib/goal-sync";
 import { PHOTO_BUCKET } from "@/lib/storage";
 import { removeFiles } from "@/lib/storage-server";
 import { CLIENT_STATUSES, PROPERTY_STATUSES, ACTIVITY_STATUSES, PROCESS_STAGES } from "@/lib/types";
+import { after } from "next/server";
+import { poZmianieEtapuOferty, poZmianieStatusuKlienta } from "@/lib/zdarzenia";
 
 export type BulkEntity = "clients" | "properties" | "activities" | "searches";
 export type BulkResult = { ok: true; count: number } | { ok: false; error: string };
@@ -86,6 +88,13 @@ export async function bulkSetStatus(entity: BulkEntity, ids: string[], status: s
     .eq("agency_id", user.agency_id)
     .in("id", list);
   if (error) return { ok: false, error: `Nie udało się zapisać: ${error.message}` };
+  // Masowa zmiana statusu klientów uruchamia te same reguły co pojedyncza.
+  // Limit, bo zaznaczenie tysiąca rekordów nie może zasypać zespołu zadaniami.
+  if (entity === "clients") {
+    after(async () => {
+      for (const id of list.slice(0, 100)) await poZmianieStatusuKlienta(user, id, status);
+    });
+  }
   return done(entity, count ?? list.length);
 }
 
@@ -161,6 +170,9 @@ export async function bulkSetStage(ids: string[], stage: string): Promise<BulkRe
     .eq("agency_id", user.agency_id)
     .in("id", list);
   if (error) return { ok: false, error: `Nie udało się zapisać: ${error.message}` };
+  after(async () => {
+    for (const id of list.slice(0, 100)) await poZmianieEtapuOferty(user, id, stage);
+  });
   return done("properties", count ?? list.length);
 }
 

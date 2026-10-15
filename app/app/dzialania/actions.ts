@@ -8,6 +8,8 @@ import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { warsawToIso } from "@/lib/datetime";
 import { applyActivityToGoals } from "@/lib/goal-sync";
+import { after } from "next/server";
+import { poWykonanymDzialaniu } from "@/lib/zdarzenia";
 
 function txt(fd: FormData, k: string): string | null {
   const v = String(fd.get(k) ?? "").trim();
@@ -189,6 +191,10 @@ export async function createActivity(formData: FormData): Promise<SaveResult> {
     1,
   );
 
+  // Prezentacja zapisana od razu jako wykonana też uruchamia reguły biura.
+  const zapisaneId = zapisane?.id as string | undefined;
+  if (zapisaneId && status === "wykonane") after(() => poWykonanymDzialaniu(user, zapisaneId));
+
   // Wykonane działanie = był kontakt. Aktualizujemy datę u klienta, żeby
   // przypomnienia „dawno nie dzwoniłeś" liczyły się od realnej rozmowy.
   if (linkedClientId && status === "wykonane") {
@@ -266,6 +272,7 @@ export async function setActivityStatus(id: string, status: string): Promise<voi
 
   await applyActivityToGoals(admin, before, -1);
   await applyActivityToGoals(admin, { ...before, status, completed_at: completedAt }, 1);
+  if (status === "wykonane") after(() => poWykonanymDzialaniu(user, id));
 
   revalidatePath("/app/dzialania");
 

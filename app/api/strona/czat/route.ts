@@ -5,6 +5,8 @@ import { hitLimit, visitorKey } from "@/lib/rate-limit";
 import { odpowiedzCzatu, promptCzatu, telefonZTekstu } from "@/lib/ai/czat-strony";
 import { zapiszBlad } from "@/lib/blad";
 import { cyfryTelefonu } from "@/lib/leady-import";
+import { after } from "next/server";
+import { poNowymLeadzie } from "@/lib/zdarzenia";
 
 /**
  * Czat na publicznej stronie biura.
@@ -91,7 +93,7 @@ export async function POST(req: Request) {
         .join("\n")
         .slice(0, 4000);
 
-      await admin.from("leads").insert({
+      const { data: lead } = await admin.from("leads").insert({
         agency_id: site.agencyId,
         name: wynik.imie?.slice(0, 120) ?? null,
         phone: telefon,
@@ -101,7 +103,9 @@ export async function POST(req: Request) {
         source: "czat na stronie",
         status: "nowy",
         submitted_at: new Date().toISOString(),
-      });
+      }).select("id").maybeSingle();
+      // Lead z czatu nie ma opiekuna: reguła „nowy lead" może go od razu komuś dać.
+      if (lead?.id) after(() => poNowymLeadzie(site.agencyId, lead.id as string));
     }
 
     return Response.json({ odpowiedz: wynik.odpowiedz, zapisany: Boolean(telefon) });

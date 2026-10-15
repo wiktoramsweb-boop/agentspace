@@ -9,6 +9,10 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PageHeader, EmptyState } from "../components/ui";
 import { PropertyWizard } from "./property-wizard";
 import { PropertiesBrowser, type MapPoint } from "./properties-browser";
+import { TablicaOfert } from "./tablica-ofert";
+import { PrzelacznikWidoku } from "../components/widok";
+import { FiltrOpiekuna } from "../components/filtr-opiekuna";
+import { kartyOfert } from "@/lib/data-tablica";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -66,7 +70,39 @@ async function mapData(agencyId: string) {
 export default async function NieruchomosciPage({ searchParams }: Props) {
   const user = await requireModul("nieruchomosci");
   const agencyId = user.agency_id;
-  const query = parseListQuery(await searchParams, { sort: "nowe", dateField: "zmiana" });
+  const sp = await searchParams;
+  const query = parseListQuery(sp, { sort: "nowe", dateField: "zmiana" });
+
+  if (sp.widok === "tablica" && agencyId) {
+    const agentFiltr = query.agent === "ja" ? user.id : query.agent || null;
+    const [karty, agents, clients, settings] = await Promise.all([
+      kartyOfert(agencyId, { agent: agentFiltr }),
+      getAgencyAgents(agencyId),
+      getAgencyClientsLite(agencyId),
+      getAgencySettings(agencyId, user.agency?.name),
+    ]);
+    return (
+      <>
+        <PageHeader
+          title="Nieruchomości"
+          subtitle={`${karty.filter((k) => k.status === "aktywna").length} aktywnych w procesie · przeciągnij kartę, żeby zmienić etap obsługi`}
+          action={
+            <PropertyWizard
+              clients={bezCudzychTelefonow(clients, user, settings.options.hide_contacts)}
+              photoConfig={photoConfigFrom(settings)}
+              offerPrefix={settings.options.offer_prefix}
+              canEditSettings={user.role === "owner"}
+            />
+          }
+        />
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <PrzelacznikWidoku sciezka="/app/nieruchomosci" aktywny="tablica" agent={query.agent} />
+          <FiltrOpiekuna ludzie={agents} wartosc={query.agent} />
+        </div>
+        <TablicaOfert karty={karty} />
+      </>
+    );
+  }
 
   const [page, agents, clients, settings, map] = await Promise.all([
     agencyId ? queryProperties(agencyId, query, user.id) : Promise.resolve({ rows: [], total: 0, pages: 1 }),
@@ -92,6 +128,12 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
           />
         }
       />
+
+      {map.allCount > 0 && (
+        <div className="mb-5">
+          <PrzelacznikWidoku sciezka="/app/nieruchomosci" aktywny="lista" agent={query.agent} />
+        </div>
+      )}
 
       {map.allCount === 0 ? (
         <EmptyState
