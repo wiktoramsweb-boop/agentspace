@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
+import { Logo } from "./marka";
 
 export function SiteFooter({ lang = "pl" }: { lang?: string }) {
   const locale = toLocale(lang);
@@ -13,12 +14,8 @@ export function SiteFooter({ lang = "pl" }: { lang?: string }) {
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           {/* Brand */}
           <div>
-            <Link href={href("/")} className="mb-4 flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              <span className="text-lg font-semibold text-[var(--color-mk-text)]">AgentSpace</span>
+            <Link href={href("/")} className="mb-4 inline-flex text-[var(--color-mk-text)]" aria-label="AgentSpace, strona główna">
+              <Logo rozmiar={32} ton="dziedzicz" />
             </Link>
             <p className="mb-6 max-w-xs text-sm leading-relaxed text-zinc-500">{t.tagline}</p>
             <p className="text-xs text-zinc-600">

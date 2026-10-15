@@ -62,6 +62,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       />
       <div className="app-shell min-h-screen text-slate-900 md:flex">
         <Sidebar
+          userId={user.id}
           role={user.role}
           permissions={user.permissions}
           przewodnik={zablokowane || przewodnik.ukonczony ? null : przewodnik}

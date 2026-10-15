@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { AuroraBackground } from "../aurora-background";
+import { Logo } from "../marka";
 
 /**
  * Wspólna oprawa stron logowania i rejestracji.
@@ -42,12 +43,8 @@ export function AuthShell({
       />
 
       <div className="relative z-10 w-full max-w-md">
-        <Link href="/" className="mb-8 flex items-center justify-center gap-2.5">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_1px_rgba(16,185,129,0.8)]" />
-          </span>
-          <span className="text-lg font-semibold tracking-tight text-white">AgentSpace</span>
+        <Link href="/" className="mb-8 flex items-center justify-center" aria-label="AgentSpace, strona główna">
+          <Logo rozmiar={36} ton="jasny" />
         </Link>
 
         <div className="rounded-3xl border border-white/10 bg-zinc-900/80 p-8 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.9)] backdrop-blur-xl">

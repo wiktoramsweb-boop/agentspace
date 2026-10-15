@@ -260,4 +260,47 @@ await png(ikona, 512, 512, path.join(PUBLIC, "icon-512.png"));
 await png(ikona, 500, 500, path.join(PUBLIC, "logo.png"));
 zapisanych += 3;
 
+/*
+ * Ikony, które Next podaje sam: karta przeglądarki, ekran główny iPhone'a
+ * i favicon.ico dla starszych czytników. Leżą w app/, nie w public/,
+ * bo tam szuka ich Next przy budowaniu znaczników <link rel="icon">.
+ */
+const APP = path.join(KORZEN, "app");
+await png(ikona, 512, 512, path.join(APP, "icon.png"));
+await png(ikona, 180, 180, path.join(APP, "apple-icon.png"));
+
+/*
+ * Plik ICO może trzymać w środku zwykłe PNG (od Windows Vista), więc nie
+ * potrzebujemy osobnego konwertera: nagłówek, katalog obrazów i same PNG.
+ */
+const rozmiaryIco = [16, 32, 48];
+const obrazy = [];
+for (const px of rozmiaryIco) {
+  const tmp = path.join(TU, `.ico-${px}.png`);
+  await png(ikona, px, px, tmp);
+  obrazy.push(fs.readFileSync(tmp));
+  fs.unlinkSync(tmp);
+}
+const naglowek = Buffer.alloc(6);
+naglowek.writeUInt16LE(0, 0);
+naglowek.writeUInt16LE(1, 2);
+naglowek.writeUInt16LE(obrazy.length, 4);
+const katalog = Buffer.alloc(16 * obrazy.length);
+let przesuniecie = 6 + katalog.length;
+obrazy.forEach((dane, i) => {
+  const px = rozmiaryIco[i];
+  const o = i * 16;
+  katalog.writeUInt8(px >= 256 ? 0 : px, o);
+  katalog.writeUInt8(px >= 256 ? 0 : px, o + 1);
+  katalog.writeUInt8(0, o + 2);
+  katalog.writeUInt8(0, o + 3);
+  katalog.writeUInt16LE(1, o + 4);
+  katalog.writeUInt16LE(32, o + 6);
+  katalog.writeUInt32LE(dane.length, o + 8);
+  katalog.writeUInt32LE(przesuniecie, o + 12);
+  przesuniecie += dane.length;
+});
+fs.writeFileSync(path.join(APP, "favicon.ico"), Buffer.concat([naglowek, katalog, ...obrazy]));
+zapisanych += 3;
+
 console.log(`gotowe, plików: ${zapisanych}`);

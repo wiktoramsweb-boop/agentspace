@@ -8,6 +8,7 @@ import { ThemeSwitch } from "./mk/theme-switch";
 import { LangSwitch } from "./mk/lang-switch";
 import { localeHref, type Locale } from "@/lib/i18n/config";
 import type { Dict } from "@/lib/i18n/pl";
+import { Logo } from "./marka";
 
 /**
  * Górna nawigacja marketingu.
@@ -78,13 +79,10 @@ export function NavClient({
       <nav className="relative mx-auto flex h-full max-w-[1080px] items-center justify-between gap-4 px-6">
         <Link
           href={href("/")}
-          className="flex items-center gap-2.5 text-[0.9375rem] font-semibold tracking-tight text-[var(--color-mk-text)] transition-opacity hover:opacity-80"
+          aria-label="AgentSpace, strona główna"
+          className="flex items-center text-[var(--color-mk-text)] transition-opacity hover:opacity-80"
         >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400 opacity-70" />
-            <span className="relative h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_1px_rgba(16,185,129,0.9)]" />
-          </span>
-          AgentSpace
+          <Logo rozmiar={28} ton="dziedzicz" />
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">

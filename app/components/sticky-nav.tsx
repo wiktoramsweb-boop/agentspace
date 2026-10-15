@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useScroll, useMotionValueEvent } from "motion/react";
 import { useState } from "react";
+import { Logo } from "./marka";
 
 export function StickyNav() {
   const { scrollY } = useScroll();
@@ -21,9 +22,8 @@ export function StickyNav() {
           transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
           className="fixed inset-x-0 top-4 z-50 mx-auto flex w-full max-w-3xl items-center justify-between gap-4 rounded-2xl border border-[var(--mk-hairline)] bg-[var(--color-mk-bg)]/70 px-4 py-3 backdrop-blur-xl md:px-6"
         >
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-            <span className="text-sm font-semibold text-[var(--color-mk-text)]">AgentSpace</span>
+          <div className="flex items-center text-[var(--color-mk-text)]">
+            <Logo rozmiar={24} ton="dziedzicz" />
           </div>
           <a
             href="#waitlist"

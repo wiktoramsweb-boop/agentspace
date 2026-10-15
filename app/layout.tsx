@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter_Tight, Geist_Mono } from "next/font/google";
+import { Inter_Tight, Geist_Mono, Sora } from "next/font/google";
 import "./globals.css";
 import { ScrollProgress } from "./components/effects/scroll-progress";
 import { SchemaMarkup } from "./components/schema-markup";
@@ -9,6 +9,14 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 const interTight = Inter_Tight({
   variable: "--font-inter-tight",
   subsets: ["latin", "latin-ext"],
+  display: "swap",
+});
+
+// Krój napisu w logo. Ładujemy tylko wagę 600, bo poza logo go nie używamy.
+const sora = Sora({
+  variable: "--font-sora",
+  subsets: ["latin", "latin-ext"],
+  weight: ["600"],
   display: "swap",
 });
 
@@ -88,7 +96,7 @@ export default function RootLayout({
     <html
       lang="pl"
       suppressHydrationWarning
-      className={`${interTight.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${interTight.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--color-mk-bg)]">
         <SchemaMarkup />

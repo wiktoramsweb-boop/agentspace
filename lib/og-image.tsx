@@ -9,6 +9,13 @@ import { ImageResponse } from "next/og";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
+/**
+ * Znak na kafelku jako obrazek. Satori nie rysuje gradientu tła za SVG tak
+ * jak przeglądarka, więc cały kafelek, razem z gradientem, siedzi w jednym SVG.
+ */
+const ZNAK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" rx="22.6" fill="url(#g)"/><g transform="translate(50 50) scale(0.91) translate(-50 -50)"><g transform="translate(0 -2.15)"><path d="M 50 29.3 L 80.5 54 L 72.3 54 L 72.3 76.6 L 60.6 76.6 L 60.6 59.9 L 39.6 59.9 L 39.6 76.6 L 27.9 76.6 L 27.9 54 L 19.5 54 Z" fill="#0b1220" stroke="#0b1220" stroke-width="6" stroke-linejoin="round"/><circle cx="50" cy="27.6" r="2.9" fill="#ffffff"/></g></g></svg>`;
+const ZNAK_URI = `data:image/svg+xml;base64,${Buffer.from(ZNAK_SVG).toString("base64")}`;
+
 type Copy = { title: string; lead: string; tags: string[] };
 
 const COPY: Record<string, Copy> = {
@@ -55,7 +62,8 @@ export function ogImage(lang: string = "pl") {
         />
 
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 16, height: 16, borderRadius: 9999, background: "#34d399", display: "flex" }} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ZNAK_URI} width={52} height={52} alt="" />
           <div style={{ color: "#f8fafc", fontSize: 30, fontWeight: 600, letterSpacing: -0.5 }}>AgentSpace</div>
         </div>
 

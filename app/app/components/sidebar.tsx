@@ -10,10 +10,13 @@ import { GlobalSearch } from "./global-search";
 import { signOut } from "@/app/auth/actions";
 import { SECTIONS, TILE } from "./nav-meta";
 import { maModul, type Uprawnienia } from "@/lib/role";
+import { Logo } from "@/app/components/marka";
+import { Dzwonek } from "./dzwonek";
 
 const COLLAPSE_KEY = "as_nav_collapsed";
 
 export function Sidebar({
+  userId,
   role,
   permissions,
   przewodnik,
@@ -22,6 +25,8 @@ export function Sidebar({
   agencyName,
   avatarUrl,
 }: {
+  /** Bez identyfikatora (podgląd motywu) dzwonek się nie pokazuje. */
+  userId?: string;
   role: UserRole;
   permissions?: Uprawnienia | null;
   /** Postęp przewodnika. Podany tylko, póki nie jest domknięty. */
@@ -157,12 +162,8 @@ export function Sidebar({
   );
 
   const brand = (
-    <Link href="/app" className="flex items-center gap-2 px-3 py-2">
-      <span className="relative flex h-2.5 w-2.5">
-        <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />
-        <span className="relative h-2.5 w-2.5 rounded-full bg-emerald-500" />
-      </span>
-      <span className="font-semibold text-white">AgentSpace</span>
+    <Link href="/app" className="flex items-center px-2 py-1.5" aria-label="AgentSpace, pulpit">
+      <Logo rozmiar={30} ton="jasny" />
     </Link>
   );
 
@@ -204,6 +205,8 @@ export function Sidebar({
       {/* Mobile top bar */}
       <div className="app-sidebar print-hide sticky top-0 z-30 flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
         {brand}
+        <div className="flex items-center gap-1">
+          {userId && <Dzwonek userId={userId} rozwijaW="dol" />}
         <button
           onClick={() => setMobileOpen((v) => !v)}
           className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800"
@@ -211,6 +214,7 @@ export function Sidebar({
         >
           {mobileOpen ? <CloseIcon /> : <MenuIcon />}
         </button>
+        </div>
       </div>
 
       {/* Mobile drawer */}
@@ -223,7 +227,10 @@ export function Sidebar({
 
       {/* Desktop sidebar */}
       <aside className="app-sidebar sticky top-0 hidden h-screen w-64 flex-col border-r border-white/10 p-4 md:flex">
-        <div className="mb-6">{brand}</div>
+        <div className="mb-6 flex items-center justify-between gap-2">
+          {brand}
+          {userId && <Dzwonek userId={userId} />}
+        </div>
         {nav}
         {account}
       </aside>
