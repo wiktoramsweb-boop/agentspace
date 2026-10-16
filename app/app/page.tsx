@@ -7,22 +7,20 @@ import {
 } from "@/lib/data";
 import {
   getTodayTasks,
-  getClientsNeedingContact,
-  getContactReminders,
   getCommissionStats,
   getGoal,
 } from "@/lib/data-platform";
 import { getGameData, getWeeklyChallenge } from "@/lib/gamification";
 import { computeFunnel } from "@/lib/funnel";
-import { CLIENT_STATUSES } from "@/lib/types";
-import { BellIcon } from "./components/icons";
 import { PageHeader, StatCard, ScoreBadge, Card } from "./components/ui";
-import { formatPln, daysAgo } from "@/lib/format";
+import { formatPln } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
 import { TaskList } from "./components/task-list";
 import { DailyAssistant } from "./components/daily-assistant";
 import { TodayActivities } from "./components/today-activities";
-import { getActivities } from "@/lib/data-activities";
+import { getActivities, getAgencyAgents } from "@/lib/data-activities";
+import { priorytetyDnia } from "@/lib/data-priorytety";
+import { PriorytetyDnia } from "./components/priorytety-dnia";
 import { GameStrip, BadgesCard } from "./components/game-strip";
 import { BanerPrzewodnika } from "./components/baner-przewodnika";
 import { redirect } from "next/navigation";
@@ -58,21 +56,16 @@ export default async function DashboardPage() {
   ) {
     redirect("/app/start");
   }
-  const [stats, recent, tasks, reminders, needContact, commission, goalRow] =
+  const [stats, recent, tasks, commission, goalRow, priorytety, agenci] =
     await Promise.all([
       getAgentStats(user.id),
       getRecentSessions(user.id, 4),
       getTodayTasks(user.id),
-      getContactReminders(user.id, 5),
-      getClientsNeedingContact(user.id, 6),
       getCommissionStats(user.id),
       getGoal(user.id),
+      priorytetyDnia(user.id),
+      user.agency_id ? getAgencyAgents(user.agency_id) : Promise.resolve([]),
     ]);
-
-  // Zaplanowane przypomnienia mają priorytet; klientów "zapomnianych" pokazujemy
-  // poniżej, bez duplikatów.
-  const reminderIds = new Set(reminders.map((c) => c.id));
-  const hotClients = needContact.filter((c) => !reminderIds.has(c.id)).slice(0, 5);
 
   // Cel dzienny telefonów (z lejka) → gamifikacja
   const dailyCallTarget = goalRow ? computeFunnel(goalRow).byStage.cold_calls.daily : 0;
@@ -110,6 +103,14 @@ export default async function DashboardPage() {
 
       {/* Zastępstwo: sprawy osoby na urlopie, które przejmuję dziś */}
       {user.agency_id && <ZastepstwoKarta agencyId={user.agency_id} userId={user.id} />}
+
+      {/* Najważniejsze sprawy dnia z oceną klienta i krokami etapu */}
+      <PriorytetyDnia
+        sprawy={priorytety.sprawy}
+        aktywnych={priorytety.aktywnych}
+        agenci={agenci}
+        raportDomyslnie={options.report_default}
+      />
 
       {/* Gamifikacja: poziom, passa, następna odznaka */}
       <GameStrip game={game} />
@@ -151,7 +152,7 @@ export default async function DashboardPage() {
         <DailyAssistant />
       </div>
 
-      {/* Plan dnia + Klienci do kontaktu */}
+      {/* Działania i plan dnia */}
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
         <Card>
           <div className="mb-4 flex items-center justify-between gap-3">
@@ -168,68 +169,6 @@ export default async function DashboardPage() {
           <TaskList tasks={tasks} />
         </Card>
 
-        <Card>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">Do kontaktu</h2>
-            <Link href="/app/klienci" className="text-sm text-emerald-600 hover:text-emerald-700">
-              Wszyscy →
-            </Link>
-          </div>
-          {reminders.length === 0 && hotClients.length === 0 ? (
-            <p className="py-4 text-center text-sm text-slate-400">
-              Wszyscy klienci na bieżąco.
-            </p>
-          ) : (
-            <ul className="space-y-1">
-              {reminders.map((c) => (
-                <li key={c.id}>
-                  <Link
-                    href={`/app/klienci/${c.id}`}
-                    className="flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 transition hover:bg-slate-50"
-                  >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
-                        {c.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-slate-900">{c.name}</p>
-                        <p className="flex items-center gap-1 text-xs text-amber-600">
-                          <BellIcon className="h-3.5 w-3.5" /> zaplanowany kontakt
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-              {hotClients.map((c) => {
-                const status = CLIENT_STATUSES.find((s) => s.value === c.status);
-                return (
-                  <li key={c.id}>
-                    <Link
-                      href={`/app/klienci/${c.id}`}
-                      className="flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 transition hover:bg-slate-50"
-                    >
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700">
-                          {c.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-slate-900">{c.name}</p>
-                          <p className="text-xs text-amber-600">{daysAgo(c.last_contact_at)}</p>
-                        </div>
-                      </div>
-                      {status && (
-                        <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${status.color}`}>
-                          {status.label}
-                        </span>
-                      )}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </Card>
       </div>
 
       {/* Odznaki + wyzwanie tygodnia */}

@@ -45,6 +45,7 @@ export function ActivityModal({
   open: openProp,
   onOpenChange,
   parent,
+  presetKind,
 }: {
   agents: Lite[];
   clients: ClientLite[];
@@ -62,6 +63,8 @@ export function ActivityModal({
   onOpenChange?: (open: boolean) => void;
   /** Tryb „kolejna rozmowa": dopisujemy do istniejącego wątku zamiast tworzyć nowy. */
   parent?: ThreadParent;
+  /** Od razu wybrany rodzaj (np. spotkanie z pulpitu), bez kroku wyboru. */
+  presetKind?: ActivityKind;
 }) {
   const [openState, setOpenState] = useState(false);
   const open = openProp ?? openState;
@@ -69,13 +72,13 @@ export function ActivityModal({
     setOpenState(v);
     onOpenChange?.(v);
   };
-  const [kind, setKind] = useState<ActivityKind | null>(null);
+  const [kind, setKind] = useState<ActivityKind | null>(presetKind ?? null);
   // W trybie wątku rodzaj bierzemy z rozmowy, do której dopisujemy.
   const activeKind = parent ? parent.kind : kind;
 
   function close() {
     setOpen(false);
-    setKind(null);
+    setKind(presetKind ?? null);
   }
 
   return (
