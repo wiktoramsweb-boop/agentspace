@@ -1,6 +1,7 @@
 import { maV49 } from "../schemat";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { ZESPOL } from "./dane";
+import { dateKeyPL } from "@/lib/datetime";
 import {
   generujCele,
   generujDziennik,
@@ -143,7 +144,42 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
       ...(v49 && !najnowsze.includes(o.id) ? { agent_paid_at: o.updated_at, agent_paid_pln: dlaAgenta } : {}),
     };
   });
-  const zapisaneTransakcje = (await admin.from("deals").insert(transakcje).select("id")) as {
+  // Pokaz zawsze wypada „w tym miesiącu”, więc dwie najnowsze transakcje
+  // przesuwamy na bieżący miesiąc, a jedną z nich dajemy właścicielowi:
+  // bez tego pulpit, Prowizje i Raporty na pokazie świeciły zerami.
+  const wlasciciel = zespol.find((p) => p.role === "owner")?.id;
+  const dzien = 24 * 3600 * 1000;
+  const wTymMiesiacu = (dni: number) => new Date(Math.max(new Date(now.getFullYear(), now.getMonth(), 1, 12).getTime(), now.getTime() - dni * dzien)).toISOString();
+  transakcje.forEach((t) => {
+    const k = najnowsze.indexOf(t.property_id);
+    if (k < 0) return;
+    t.closed_at = wTymMiesiacu(k === 0 ? 2 : 6);
+    if (k === 0 && wlasciciel) t.agent_id = wlasciciel;
+  });
+
+  // Kilka transakcji w toku z aktywnych ofert, żeby był pipeline i prognoza.
+  const wToku = listaOfert
+    .filter((o) => o.status === "aktywna")
+    .slice(0, 4)
+    .map((o, i) => {
+      const prowizja = Math.round((o.price_pln * 0.025) / 100) * 100;
+      return {
+        agency_id: agencyId,
+        agent_id: i === 0 && wlasciciel ? wlasciciel : o.agent_id,
+        client_id: listaKlientow[(i + 3) % Math.max(1, listaKlientow.length)]?.id ?? null,
+        property_id: o.id,
+        title: `[DEMO] ${o.title}`,
+        transaction_value_pln: o.price_pln,
+        commission_pln: prowizja,
+        commission_seller_pln: prowizja,
+        agent_split_pct: 50,
+        agent_earnings_pln: Math.round((prowizja / 1.23) * 0.5),
+        status: "w_toku",
+        expected_close: dateKeyPL(new Date(now.getTime() + (10 + i * 9) * dzien).toISOString()),
+      };
+    });
+
+  const zapisaneTransakcje = (await admin.from("deals").insert([...transakcje, ...wToku]).select("id")) as {
     data: { id: string }[] | null;
   };
 
