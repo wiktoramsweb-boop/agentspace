@@ -140,5 +140,7 @@ Kolejność: najpierw 1-3 (pulpit, zadania etapowe, okna zadań), potem 6-7 (men
 2 (kroki etapu liczone z danych CRM, bez nowej tabeli), 3 (notatka, przypomnienie i spotkanie w oknach na pulpicie),
 4 (asystent AI na każdym ekranie, `/api/assistant/chat`, kredyt `asystent_czat`), 5 (był: baner „Pierwsze kroki”),
 6 (menu w grupach Dziś / Sprzedaż / Dokumenty i oferty / Rozwój / Biuro + dolny pasek na telefonie).
-Zostaje 7 (spójny wygląd pozostałych ekranów) i 8 (osiągnięcia).
+7 częściowo (sortowanie obok filtrów na wszystkich listach, krótsze wiersze działań, miejsce pod przycisk asystenta).
+Zrzuty aplikacji na stronie zrobione od nowa 17.10 (demo ma już transakcje z bieżącego miesiąca i w toku).
+Zostaje 8 (osiągnięcia) i decyzje z listy „Funkcje, których nie mamy”.
 Po przebudowie robię zrzuty aplikacji od nowa i podmieniam je na stronie.
