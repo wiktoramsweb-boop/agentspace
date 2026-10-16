@@ -137,13 +137,16 @@ export function ListToolbar({
           )}
         </button>
 
-        <Select value={query.sort || sorts[0]?.value} onChange={(e) => go({ sort: e.target.value })} aria-label="Sortowanie">
-          {sorts.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </Select>
+        {/* Select ma pełną szerokość, więc bez ramki spadał do osobnego wiersza. */}
+        <div className="w-full sm:w-56">
+          <Select value={query.sort || sorts[0]?.value} onChange={(e) => go({ sort: e.target.value })} aria-label="Sortowanie">
+            {sorts.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </Select>
+        </div>
 
         {children}
       </div>

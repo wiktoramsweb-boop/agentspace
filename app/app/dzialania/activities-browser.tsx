@@ -158,9 +158,12 @@ export function ActivitiesBrowser({
                     <Row label="Typ">
                       <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${km.badge}`}>{km.label}</span>
                     </Row>
-                    <Row label="Priorytet">
-                      <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${pm.color}`}>{pm.label}</span>
-                    </Row>
+                    {/* Normalny priorytet to domyślny, pokazujemy tylko odstępstwa. */}
+                    {a.priority !== "normalny" && (
+                      <Row label="Priorytet">
+                        <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${pm.color}`}>{pm.label}</span>
+                      </Row>
+                    )}
                     <Row label="Status">
                       <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${sm.color}`}>{sm.label}</span>
                     </Row>
@@ -172,36 +175,33 @@ export function ActivitiesBrowser({
 
                     {a.purpose && <Row label="Cel">{PURPOSE_MAP[a.purpose] ?? a.purpose}</Row>}
                     <Row label="Agent">{a.assigneeNames.join(", ") || "-"}</Row>
-                    <Row label="Telefon">
-                      {a.contact_phone?.includes("•") ? (
-                        <span className="text-slate-500">{a.contact_phone}</span>
-                      ) : a.contact_phone ? (
-                        <a href={`tel:${a.contact_phone}`} className="text-blue-600 hover:underline">
-                          {formatPhone(a.contact_phone)}
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </Row>
-                    <Row label="Kontakt">{a.contact_name ?? "-"}</Row>
-                    <Row label="Klient">
-                      {a.client_id && a.clientName ? (
+                    {/* Puste pola pomijamy: wiersz z czterema kreskami czytało się gorzej niż krótki. */}
+                    {a.contact_phone && (
+                      <Row label="Telefon">
+                        {a.contact_phone.includes("•") ? (
+                          <span className="text-slate-500">{a.contact_phone}</span>
+                        ) : (
+                          <a href={`tel:${a.contact_phone}`} className="text-blue-600 hover:underline">
+                            {formatPhone(a.contact_phone)}
+                          </a>
+                        )}
+                      </Row>
+                    )}
+                    {a.contact_name && a.contact_name !== a.clientName && <Row label="Kontakt">{a.contact_name}</Row>}
+                    {a.client_id && a.clientName && (
+                      <Row label="Klient">
                         <Link href={`/app/klienci/${a.client_id}`} className="text-blue-600 hover:underline">
                           {a.clientName}
                         </Link>
-                      ) : (
-                        "-"
-                      )}
-                    </Row>
-                    <Row label="Nieruchomość">
-                      {a.property_id && a.propertyTitle ? (
+                      </Row>
+                    )}
+                    {a.property_id && a.propertyTitle && (
+                      <Row label="Nieruchomość">
                         <Link href={`/app/nieruchomosci/${a.property_id}`} className="text-blue-600 hover:underline">
                           {a.propertyTitle}
                         </Link>
-                      ) : (
-                        "-"
-                      )}
-                    </Row>
+                      </Row>
+                    )}
                     {dur && <Row label="Czas rozmowy">{dur}</Row>}
                   </div>
 
