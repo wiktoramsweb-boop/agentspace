@@ -84,7 +84,8 @@ export type Operacja =
   | "parsowanie_dokumentu"
   | "coach_glos"
   | "czat_strony"
-  | "dopasowanie_ai";
+  | "dopasowanie_ai"
+  | "asystent_czat";
 
 export const CENNIK_KREDYTOW: Record<Operacja, number> = {
   coach_tura: 1,
@@ -97,6 +98,7 @@ export const CENNIK_KREDYTOW: Record<Operacja, number> = {
   coach_glos: KREDYTY_ZA_MINUTE_GLOSU,
   czat_strony: 1,
   dopasowanie_ai: 3,
+  asystent_czat: 1,
 };
 
 /** Nazwy po polsku na ekran zużycia. */
@@ -111,6 +113,7 @@ export const NAZWY_OPERACJI: Record<Operacja, string> = {
   coach_glos: "AI Coach - rozmowa głosowa",
   czat_strony: "Czat na stronie biura",
   dopasowanie_ai: "Dopasowanie ofert AI",
+  asystent_czat: "Asystent AI (rozmowa)",
 };
 
 /**

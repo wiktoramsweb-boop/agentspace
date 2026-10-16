@@ -6,6 +6,7 @@ import { OnboardingRedirect } from "./onboarding-redirect";
 import { ToastProvider } from "./components/toast";
 import { PageTransition } from "./components/page-transition";
 import { PwaInstall } from "./components/pwa-install";
+import { AsystentAi } from "./components/asystent-ai";
 import { odswiezDemoJesliTrzeba } from "@/lib/demo/zasiew";
 import { stanDostepu } from "@/lib/abonament-cennik";
 import { PasekAbonamentu } from "./pasek-abonamentu";
@@ -86,6 +87,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <PageTransition>{children}</PageTransition>
           </div>
         </main>
+        {/* W środku app-shell, żeby ciemny motyw obejmował też okno asystenta. */}
+        {!zablokowane && <AsystentAi userId={user.id} />}
       </div>
       <PwaInstall />
     </ToastProvider>
