@@ -153,7 +153,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Działania i plan dnia */}
-      <div className="mb-6 grid gap-6 lg:grid-cols-2">
+      <div className="mb-6 grid gap-6 lg:grid-cols-2 [&>*]:min-w-0">
         <Card>
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-slate-900">Działania na dziś</h2>
@@ -172,7 +172,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Odznaki + wyzwanie tygodnia */}
-      <div className="mb-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+      <div className="mb-6 grid gap-6 lg:grid-cols-[1.5fr_1fr] [&>*]:min-w-0">
         <BadgesCard game={game} />
         <Card>
           <div className="mb-4 flex items-center justify-between">

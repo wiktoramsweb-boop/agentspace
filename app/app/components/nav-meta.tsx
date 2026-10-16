@@ -60,17 +60,17 @@ export const HEADER_TILE: Record<NavColor, string> = {
   slate: "bg-slate-200 text-slate-600",
 };
 
+// Grupy idą za dniem pracy agenta: najpierw dzisiejsze sprawy, potem sprzedaż,
+// papiery, nauka, a na końcu sprawy biura, które agent otwiera rzadko.
 export const SECTIONS: NavSection[] = [
   {
-    title: "Główne",
+    title: "Dziś",
     items: [
       { href: "/app", label: "Pulpit", icon: <HomeIcon />, color: "emerald" },
       { href: "/app/dzialania", label: "Działania", icon: <BoltIcon />, color: "amber" },
-      { href: "/app/czat", label: "Czat zespołu", icon: <ChatIcon />, color: "violet", licznik: "czat" },
       { href: "/app/kalendarz", label: "Kalendarz", icon: <CalendarNavIcon />, color: "sky", modul: "klienci" },
       { href: "/app/szybki-wpis", label: "Szybki wpis", icon: <VoiceIcon />, color: "teal", modul: "klienci" },
-      { href: "/app/cele", label: "Cele", icon: <TargetIcon />, color: "violet", modul: "coach" },
-      { href: "/app/trening", label: "AI Coach", icon: <MicIcon />, color: "cyan", modul: "coach" },
+      { href: "/app/czat", label: "Czat zespołu", icon: <ChatIcon />, color: "violet", licznik: "czat" },
     ],
   },
   {
@@ -80,30 +80,37 @@ export const SECTIONS: NavSection[] = [
       { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon />, color: "rose", modul: "klienci" },
       { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue", modul: "nieruchomosci" },
       { href: "/app/poszukiwania", label: "Poszukiwania", icon: <SearchIcon />, color: "sky", modul: "klienci" },
-      { href: "/app/ofertowka", label: "Ofertówka", icon: <PhotoIcon />, color: "fuchsia", modul: "nieruchomosci" },
-      { href: "/app/oferta-wspolpracy", label: "Oferta współpracy", icon: <HandshakeIcon />, color: "teal", modul: "dokumenty" },
+      { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green", modul: "prowizje" },
+    ],
+  },
+  {
+    title: "Dokumenty i oferty",
+    items: [
       {
         href: "/app/dokumenty", label: "Dokumenty i umowy", icon: <DocIcon />, color: "amber", modul: "dokumenty",
         aliasy: ["/app/rezerwacje", "/app/protokol", "/app/aneks"],
       },
-      { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green", modul: "prowizje" },
+      { href: "/app/ofertowka", label: "Ofertówka", icon: <PhotoIcon />, color: "fuchsia", modul: "nieruchomosci" },
+      { href: "/app/oferta-wspolpracy", label: "Oferta współpracy", icon: <HandshakeIcon />, color: "teal", modul: "dokumenty" },
       { href: "/app/kalkulatory", label: "Kalkulatory", icon: <CalcIcon />, color: "sky", modul: "nieruchomosci" },
     ],
   },
   {
-    title: "Finanse",
+    title: "Rozwój",
     items: [
-      { href: "/app/faktury", label: "Faktury", icon: <InvoiceIcon />, color: "amber", modul: "faktury" },
-      { href: "/app/finanse", label: "Koszty i wynik", icon: <PieIcon />, color: "emerald", modul: "faktury" },
-      { href: "/app/podatki", label: "Kalkulator podatkowy", icon: <TaxIcon />, color: "green", modul: "faktury" },
+      { href: "/app/trening", label: "AI Coach", icon: <MicIcon />, color: "cyan", modul: "coach" },
+      { href: "/app/cele", label: "Cele", icon: <TargetIcon />, color: "violet", modul: "coach" },
+      { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate", modul: "coach" },
     ],
   },
   {
-    title: "Więcej",
+    title: "Biuro",
     items: [
-      { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate", modul: "coach" },
       { href: "/app/raporty", label: "Raporty", icon: <ChartIcon />, color: "violet", modul: "raporty" },
       { href: "/app/zespol", label: "Zespół", icon: <UsersIcon />, color: "fuchsia", modul: "zespol" },
+      { href: "/app/faktury", label: "Faktury", icon: <InvoiceIcon />, color: "amber", modul: "faktury" },
+      { href: "/app/finanse", label: "Koszty i wynik", icon: <PieIcon />, color: "emerald", modul: "faktury" },
+      { href: "/app/podatki", label: "Kalkulator podatkowy", icon: <TaxIcon />, color: "green", modul: "faktury" },
       { href: "/app/automatyzacje", label: "Automatyzacje", icon: <AutomationIcon />, color: "amber", modul: "zespol" },
       { href: "/app/urlopy", label: "Urlopy i zastępstwa", icon: <PlaneIcon />, color: "sky" },
       { href: "/app/ustawienia", label: "Ustawienia", icon: <CogIcon />, color: "slate" },

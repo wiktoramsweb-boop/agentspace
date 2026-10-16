@@ -71,7 +71,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           agencyName={user.agency?.name ?? "Biuro"}
           avatarUrl={avatarUrl(user.avatar_path)}
         />
-        <main className="min-w-0 flex-1 px-5 py-8 md:px-10 md:py-10">
+        <main className="min-w-0 flex-1 px-5 pt-8 pb-[calc(104px+env(safe-area-inset-bottom))] md:px-10 md:py-10">
           <div className="mx-auto max-w-6xl">
             {user.role === "owner" && !powierzenie.zaakceptowana && (
               <BanerPowierzenia nieaktualna={powierzenie.nieaktualna} />

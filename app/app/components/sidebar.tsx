@@ -40,7 +40,7 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  // Menu ma 19 pozycji - na niższych ekranach nie mieści się w całości.
+  // Menu ma ponad 20 pozycji - na niższych ekranach nie mieści się w całości.
   // Agent może zwinąć sekcje, z których nie korzysta; wybór zostaje na stałe.
   const [collapsed, setCollapsed] = useState<string[]>([]);
 
@@ -209,19 +209,33 @@ export function Sidebar({
         {brand}
         <div className="flex items-center gap-1">
           {userId && <Dzwonek userId={userId} rozwijaW="dol" />}
-        <button
-          onClick={() => setMobileOpen((v) => !v)}
-          className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800"
-          aria-label="Menu"
-        >
-          {mobileOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
+        {zablokowane && (
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800"
+            aria-label="Menu"
+          >
+            {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        )}
         </div>
       </div>
 
+      {/* Dolny pasek na telefonie: najczęstsze miejsca pod kciukiem */}
+      {!zablokowane && (
+        <DolnyPasek
+          pathname={pathname}
+          role={role}
+          permissions={permissions}
+          menuOtwarte={mobileOpen}
+          onMenu={() => setMobileOpen((v) => !v)}
+          onIdz={() => setMobileOpen(false)}
+        />
+      )}
+
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="app-sidebar fixed inset-0 z-20 flex flex-col px-4 pb-6 pt-20 md:hidden">
+        <div className="app-sidebar fixed inset-0 z-20 flex flex-col px-4 pb-[calc(88px+env(safe-area-inset-bottom))] pt-20 md:hidden">
           {nav}
           {account}
         </div>
@@ -237,6 +251,80 @@ export function Sidebar({
         {account}
       </aside>
     </>
+  );
+}
+
+function DolnyPasek({
+  pathname,
+  role,
+  permissions,
+  menuOtwarte,
+  onMenu,
+  onIdz,
+}: {
+  pathname: string;
+  role: UserRole;
+  permissions?: Uprawnienia | null;
+  menuOtwarte: boolean;
+  onMenu: () => void;
+  onIdz: () => void;
+}) {
+  const wszystkie = SECTIONS.flatMap((s) => s.items);
+  const dostepne = (href: string) => {
+    const i = wszystkie.find((x) => x.href === href);
+    return i && (!i.modul || maModul({ id: "", role, permissions }, i.modul)) ? i : null;
+  };
+  // Osoba bez dostępu do klientów (np. sama księgowość) dostaje zamienniki.
+  const lewe = [dostepne("/app"), dostepne("/app/klienci") ?? dostepne("/app/dzialania")];
+  const prawe = [dostepne("/app/kalendarz") ?? dostepne("/app/trening")];
+  const srodek = dostepne("/app/szybki-wpis");
+
+  const zakladka = (item: NonNullable<ReturnType<typeof dostepne>>) => {
+    const on = !menuOtwarte && aktywnaPozycja(item, pathname);
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        onClick={onIdz}
+        aria-current={on ? "page" : undefined}
+        className={`flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium transition ${on ? "text-emerald-400" : "text-zinc-400"}`}
+      >
+        <span className="[&>svg]:h-6 [&>svg]:w-6">{item.icon}</span>
+        {item.label === "Pulpit" ? "Dziś" : item.label}
+      </Link>
+    );
+  };
+
+  return (
+    <nav
+      aria-label="Szybka nawigacja"
+      className="app-sidebar print-hide fixed inset-x-0 bottom-0 z-40 flex items-end border-t border-white/10 px-2 pb-[env(safe-area-inset-bottom)] md:hidden"
+    >
+      {lewe.filter((i) => i !== null).map(zakladka)}
+      {srodek && (
+        <Link
+          href={srodek.href}
+          onClick={onIdz}
+          aria-label="Szybki wpis głosem"
+          className="flex flex-1 flex-col items-center gap-1 pb-2 text-[11px] font-medium text-zinc-300"
+        >
+          <span className="-mt-5 grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-zinc-950 shadow-lg shadow-emerald-500/30 ring-4 ring-[#0d1d26] [&>svg]:h-6 [&>svg]:w-6">
+            {srodek.icon}
+          </span>
+          Wpis
+        </Link>
+      )}
+      {prawe.filter((i) => i !== null).map(zakladka)}
+      <button
+        type="button"
+        onClick={onMenu}
+        aria-expanded={menuOtwarte}
+        className={`flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium transition ${menuOtwarte ? "text-emerald-400" : "text-zinc-400"}`}
+      >
+        {menuOtwarte ? <CloseIcon /> : <MenuIcon />}
+        Menu
+      </button>
+    </nav>
   );
 }
 
