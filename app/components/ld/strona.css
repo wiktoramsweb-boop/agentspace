@@ -219,6 +219,8 @@ html.ld-blok { overflow: hidden; }
 .ld-jasna .ld-kropki button span { background: rgba(11, 18, 32, 0.22); }
 .ld-jasna .ld-kropki button.on span { background: var(--noc); }
 .ld-inline { display: none; }
+.ld-ilu.ld-widok-tlo { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; }
+.ld-widok-tlo::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(11, 18, 32, 0.15), rgba(11, 18, 32, 0.55)); }
 @media (max-width: 960px) {
   .ld-hist { grid-template-columns: minmax(0, 1fr); }
   .ld-hist__bok { display: none; }

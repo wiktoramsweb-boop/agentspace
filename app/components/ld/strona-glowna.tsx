@@ -390,6 +390,7 @@ export function StronaGlowna({ lang }: { lang: string }) {
               {t.coach.kroki.map((k, i) => (
                 <article className="ld-krok" key={k.tytul}>
                   <div className="ld-inline">
+                    <Ilustracja nazwa="coach-telefon-tlo" rodzaj="panorama" ziarno={7} w={1600} h={1250} pora="noc" alt="" className="ld-ilu ld-widok-tlo" sizes="(max-width: 960px) 100vw, 60vw" />
                     <div className="ld-ekran">{krokiCoach[i]}</div>
                   </div>
                   <h3>{k.tytul}</h3>
@@ -406,6 +407,7 @@ export function StronaGlowna({ lang }: { lang: string }) {
             </div>
             <div className="ld-hist__bok">
               <div className="ld-hist__widok">
+                <Ilustracja nazwa="coach-telefon-tlo" rodzaj="panorama" ziarno={7} w={1600} h={1250} pora="noc" alt="" className="ld-ilu ld-widok-tlo" sizes="(max-width: 960px) 100vw, 60vw" />
                 {krokiCoach.map((w, i) => (
                   <div className="ld-ekran" key={i} data-ekran>
                     {w}
