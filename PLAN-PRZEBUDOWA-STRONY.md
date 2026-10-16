@@ -135,4 +135,10 @@ Funkcje, których nie mamy, do decyzji osobno (każda to większy projekt):
 - wycena na danych z Rejestru Cen Nieruchomości.
 
 Kolejność: najpierw 1-3 (pulpit, zadania etapowe, okna zadań), potem 6-7 (menu i wygląd), potem reszta.
+
+**Stan (16.10.2026):** zrobione 1 (Priorytety na dziś, `lib/priorytety.ts` + test `npm run test:priorytety`),
+2 (kroki etapu liczone z danych CRM, bez nowej tabeli), 3 (notatka, przypomnienie i spotkanie w oknach na pulpicie),
+4 (asystent AI na każdym ekranie, `/api/assistant/chat`, kredyt `asystent_czat`), 5 (był: baner „Pierwsze kroki”),
+6 (menu w grupach Dziś / Sprzedaż / Dokumenty i oferty / Rozwój / Biuro + dolny pasek na telefonie).
+Zostaje 7 (spójny wygląd pozostałych ekranów) i 8 (osiągnięcia).
 Po przebudowie robię zrzuty aplikacji od nowa i podmieniam je na stronie.
