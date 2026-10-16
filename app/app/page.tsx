@@ -16,7 +16,6 @@ import { PageHeader, StatCard, ScoreBadge, Card } from "./components/ui";
 import { formatPln } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
 import { TaskList } from "./components/task-list";
-import { DailyAssistant } from "./components/daily-assistant";
 import { TodayActivities } from "./components/today-activities";
 import { getActivities, getAgencyAgents } from "@/lib/data-activities";
 import { priorytetyDnia } from "@/lib/data-priorytety";
@@ -112,10 +111,27 @@ export default async function DashboardPage() {
         raportDomyslnie={options.report_default}
       />
 
-      {/* Gamifikacja: poziom, passa, następna odznaka */}
-      <GameStrip game={game} />
+      {/* Działania i plan dnia */}
+      <div className="mb-6 grid gap-6 lg:grid-cols-2 [&>*]:min-w-0">
+        <Card>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-slate-900">Działania na dziś</h2>
+            <Link href="/app/dzialania" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+              Wszystkie →
+            </Link>
+          </div>
+          <TodayActivities activities={myActivities} />
+        </Card>
 
-      {/* Górne statystyki */}
+        <Card>
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">Plan dnia</h2>
+          <TaskList tasks={tasks} />
+        </Card>
+
+      </div>
+
+      {/* Twój miesiąc: liczby pod sprawami dnia, bo rano liczy się, do kogo zadzwonić */}
+      <h2 className="mb-3 text-lg font-semibold text-slate-900">Twój miesiąc</h2>
       <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           label="Twój zarobek (mc)"
@@ -147,29 +163,8 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* AI Asystent Dnia */}
-      <div className="mb-6">
-        <DailyAssistant />
-      </div>
-
-      {/* Działania i plan dnia */}
-      <div className="mb-6 grid gap-6 lg:grid-cols-2 [&>*]:min-w-0">
-        <Card>
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-slate-900">Działania na dziś</h2>
-            <Link href="/app/dzialania" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
-              Wszystkie →
-            </Link>
-          </div>
-          <TodayActivities activities={myActivities} />
-        </Card>
-
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Plan dnia</h2>
-          <TaskList tasks={tasks} />
-        </Card>
-
-      </div>
+      {/* Gamifikacja: poziom, passa, następna odznaka */}
+      <GameStrip game={game} />
 
       {/* Odznaki + wyzwanie tygodnia */}
       <div className="mb-6 grid gap-6 lg:grid-cols-[1.5fr_1fr] [&>*]:min-w-0">
