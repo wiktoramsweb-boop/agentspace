@@ -194,6 +194,7 @@ function pl(dni: number): NowaStrona {
       etykieta: "Cały program",
       tytul: "I wszystko, czego biuro używa na co dzień.",
       lista: [
+        { nazwa: "Pulpit", tytul: "Rano wiesz, do kogo dzwonić.", tekst: "Priorytety na dziś: ocena każdego klienta od 0 do 100, powód, dlaczego dziś, i kroki etapu. Notatka, przypomnienie i spotkanie bez zmiany ekranu.", zrzut: "pulpit" },
         { nazwa: "Klienci", tytul: "Klienci na tablicy etapów.", tekst: "Przeciągasz kartę, gdy klient idzie dalej. Historia kontaktu, zgody RODO i zadania są przy kliencie.", zrzut: "tablica" },
         { nazwa: "Oferty", tytul: "Oferty biura na mapie.", tekst: "Wspólna baza ofert ze zdjęciami, ceną i etapem sprzedaży. Każdą widać na mapie miasta.", zrzut: "oferty" },
         { nazwa: "Kalendarz", tytul: "Tydzień agenta na jednym ekranie.", tekst: "Telefony, prezentacje i zadania na osi czasu. Przeciągasz wpis, żeby zmienić termin.", zrzut: "kalendarz" },
@@ -412,6 +413,7 @@ function en(dni: number): NowaStrona {
       etykieta: "The whole app",
       tytul: "And everything an agency uses every day.",
       lista: [
+        { nazwa: "Dashboard", tytul: "In the morning you know who to call.", tekst: "Today's priorities: every client scored from 0 to 100, the reason it matters today, and the steps of the stage. Note, reminder and meeting without leaving the screen.", zrzut: "pulpit" },
         { nazwa: "Clients", tytul: "Clients on a stage board.", tekst: "Drag the card when a client moves forward. Contact history, GDPR consents and tasks live on the client.", zrzut: "tablica" },
         { nazwa: "Listings", tytul: "Agency listings on a map.", tekst: "A shared listing base with photos, price and sales stage. Every listing on the city map.", zrzut: "oferty" },
         { nazwa: "Calendar", tytul: "An agent's week on one screen.", tekst: "Calls, viewings and tasks on a timeline. Drag an entry to change the date.", zrzut: "kalendarz" },
