@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import {
   oznaczPrzeczytane,
   pobierzPowiadomienia,
@@ -22,6 +23,10 @@ export function Dzwonek({ userId, rozwijaW = "prawo" }: { userId: string; rozwij
   const [aktywny, setAktywny] = useState(false);
   const [, startTransition] = useTransition();
   const box = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  // Panel rysujemy w <body>, na wierzchu: w menu bocznym chował się pod
+  // treścią strony, bo menu i treść to osobne warstwy.
+  const [miejsce, setMiejsce] = useState<{ top: number; left: number } | null>(null);
 
   const odswiez = useCallback(() => {
     pobierzPowiadomienia()
@@ -52,7 +57,9 @@ export function Dzwonek({ userId, rozwijaW = "prawo" }: { userId: string; rozwij
   useEffect(() => {
     if (!otwarty) return;
     function klik(e: MouseEvent) {
-      if (box.current && !box.current.contains(e.target as Node)) setOtwarty(false);
+      const t = e.target as Node;
+      if (box.current?.contains(t) || panel.current?.contains(t)) return;
+      setOtwarty(false);
     }
     function esc(e: KeyboardEvent) {
       if (e.key === "Escape") setOtwarty(false);
@@ -64,6 +71,25 @@ export function Dzwonek({ userId, rozwijaW = "prawo" }: { userId: string; rozwij
       document.removeEventListener("keydown", esc);
     };
   }, [otwarty]);
+
+  useEffect(() => {
+    if (!otwarty) return;
+    function ustaw() {
+      const r = box.current?.getBoundingClientRect();
+      if (!r) return;
+      const szer = Math.min(380, window.innerWidth - 24);
+      const left = rozwijaW === "prawo" ? r.right + 12 : r.right - szer;
+      const top = rozwijaW === "prawo" ? r.top : r.bottom + 8;
+      setMiejsce({ top: Math.max(12, top), left: Math.min(Math.max(12, left), window.innerWidth - szer - 12) });
+    }
+    ustaw();
+    window.addEventListener("resize", ustaw);
+    window.addEventListener("scroll", ustaw, true);
+    return () => {
+      window.removeEventListener("resize", ustaw);
+      window.removeEventListener("scroll", ustaw, true);
+    };
+  }, [otwarty, rozwijaW]);
 
   if (!aktywny) return null;
 
@@ -101,11 +127,11 @@ export function Dzwonek({ userId, rozwijaW = "prawo" }: { userId: string; rozwij
         )}
       </button>
 
-      {otwarty && (
+      {otwarty && miejsce && createPortal(
         <div
-          className={`dzwonek-panel absolute z-50 w-[min(380px,calc(100vw-24px))] overflow-hidden rounded-2xl border border-white/10 bg-[#111318] shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)] ${
-            rozwijaW === "prawo" ? "left-full top-0 ml-3" : "right-0 top-full mt-2"
-          }`}
+          ref={panel}
+          style={{ top: miejsce.top, left: miejsce.left }}
+          className="dzwonek-panel fixed z-[200] w-[min(380px,calc(100vw-24px))] overflow-hidden rounded-2xl border border-white/10 bg-[#111318] shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)]"
         >
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
             <p className="text-sm font-semibold text-white">Powiadomienia</p>
@@ -156,7 +182,8 @@ export function Dzwonek({ userId, rozwijaW = "prawo" }: { userId: string; rozwij
               );
             })}
           </ul>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

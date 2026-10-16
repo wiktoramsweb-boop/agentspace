@@ -2,64 +2,162 @@
 
 import { SubmitButton } from "../components/submit-button";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { createDeal, setDealStatus, deleteDeal } from "./actions";
 import type { DealStatus } from "@/lib/types";
 import { formatPln } from "@/lib/format";
 import { Modal } from "../components/modal";
 import { useToast } from "../components/toast";
-import { Select } from "@/app/app/components/select";
 
-type PropertyLite = { id: string; title: string; price_pln: number | null };
+/** Oferta do wyboru w formularzu. Pola poza id/tytułem są opcjonalne (np. karta oferty podaje mniej). */
+export type OfertaDoWyboru = {
+  id: string;
+  tytul: string;
+  adres?: string;
+  cena: number | null;
+  rodzaj?: "sprzedaz" | "wynajem";
+  wlascicielId?: string | null;
+};
+export type KlientDoWyboru = { id: string; nazwa: string; typ?: string };
+export type StartTransakcji = { ofertaId?: string; klientId?: string };
 
 type Mode = "pln" | "pct";
 type Party = { val: string; mode: Mode };
+type Rodzaj = "sprzedaz" | "wynajem";
 
 const PARTY_DEFS = [
-  { key: "seller", name: "commission_seller", label: "Od sprzedającego" },
-  { key: "buyer", name: "commission_buyer", label: "Od kupującego" },
-  { key: "landlord", name: "commission_landlord", label: "Od wynajmującego" },
-  { key: "tenant", name: "commission_tenant", label: "Od najemcy" },
+  { key: "seller", name: "commission_seller", label: "Od sprzedającego", rodzaj: "sprzedaz" },
+  { key: "buyer", name: "commission_buyer", label: "Od kupującego", rodzaj: "sprzedaz" },
+  { key: "landlord", name: "commission_landlord", label: "Od wynajmującego", rodzaj: "wynajem" },
+  { key: "tenant", name: "commission_tenant", label: "Od najemcy", rodzaj: "wynajem" },
 ] as const;
 
 type PartyKey = (typeof PARTY_DEFS)[number]["key"];
 
+const POLE =
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
+
+/** Kwoty tolerują przecinek (klawiatura PL) i spacje. */
+function liczba(v: string): number {
+  return parseFloat(v.replace(",", ".").replace(/\s/g, "")) || 0;
+}
+
+/** Przycisk otwierający formularz. Używany w karcie oferty i tam, gdzie nie ma panelu Prowizji. */
 export function NewDealButton({
   properties = [],
+  klienci = [],
   defaultSplit = 50,
 }: {
-  properties?: PropertyLite[];
+  properties?: { id: string; title: string; price_pln: number | null }[];
+  klienci?: KlientDoWyboru[];
   defaultSplit?: number;
 }) {
   const [open, setOpen] = useState(false);
+  const oferty = useMemo<OfertaDoWyboru[]>(
+    () => properties.map((p) => ({ id: p.id, tytul: p.title, cena: p.price_pln })),
+    [properties],
+  );
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
+      >
+        + Dodaj transakcję
+      </button>
+      {open && (
+        <NowaTransakcja
+          oferty={oferty}
+          klienci={klienci}
+          defaultSplit={defaultSplit}
+          start={oferty.length === 1 ? { ofertaId: oferty[0].id } : undefined}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
+/**
+ * Formularz nowej transakcji. Wybór oferty uzupełnia opis, cenę, rodzaj
+ * i właściciela; wybór klienta podpowiada jego oferty. Dzięki temu agent
+ * zwykle wpisuje tylko procent prowizji.
+ */
+export function NowaTransakcja({
+  oferty,
+  klienci,
+  defaultSplit,
+  start,
+  onClose,
+}: {
+  oferty: OfertaDoWyboru[];
+  klienci: KlientDoWyboru[];
+  defaultSplit: number;
+  start?: StartTransakcji;
+  onClose: () => void;
+}) {
+  const toast = useToast();
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [propertyId, setPropertyId] = useState("");
-  const [tx, setTx] = useState("");
+  // Start z podpowiedzi albo z karty oferty: formularz od razu wypełniony.
+  const [poczatek] = useState(() => {
+    const o = start?.ofertaId ? oferty.find((x) => x.id === start.ofertaId) : undefined;
+    const r: Rodzaj = o?.rodzaj ?? "sprzedaz";
+    const wlasc = o?.wlascicielId && klienci.some((k) => k.id === o.wlascicielId) ? o.wlascicielId : "";
+    return {
+      ofertaId: o?.id ?? "",
+      klientId: start?.klientId ?? wlasc,
+      rodzaj: r,
+      tx: o?.cena != null ? String(o.cena) : "",
+      title: o ? `${r === "wynajem" ? "Najem" : "Sprzedaż"}: ${o.adres || o.tytul}` : "",
+    };
+  });
+  const [title, setTitle] = useState(poczatek.title);
+  const tytulReczny = useRef(false);
+  const [ofertaId, setOfertaId] = useState(poczatek.ofertaId);
+  const [klientId, setKlientId] = useState(poczatek.klientId);
+  const [rodzaj, setRodzaj] = useState<Rodzaj>(poczatek.rodzaj);
+  const [tx, setTx] = useState(poczatek.tx);
   const [split, setSplit] = useState(String(defaultSplit));
   const [extras, setExtras] = useState("");
   const [parties, setParties] = useState<Record<PartyKey, Party>>({
     seller: { val: "", mode: "pct" },
-    buyer: { val: "", mode: "pln" },
+    buyer: { val: "", mode: "pct" },
     landlord: { val: "", mode: "pln" },
     tenant: { val: "", mode: "pln" },
   });
 
-  // Kwoty tolerują przecinek (klawiatura PL) i spacje.
-  const txNum = Math.round(parseFloat(tx.replace(",", ".").replace(/\s/g, "")) || 0);
-  const splitNum = Math.min(100, Math.max(0, parseInt(split.replace(",", "."), 10) || 0));
-  const extrasNum = Math.round(parseFloat(extras.replace(",", ".").replace(/\s/g, "")) || 0);
+  const oferta = oferty.find((o) => o.id === ofertaId) ?? null;
+  const klient = klienci.find((k) => k.id === klientId) ?? null;
 
-  function resolve(p: Party): number {
-    const v = parseFloat(p.val.replace(",", ".").replace(/\s/g, "")) || 0;
-    return p.mode === "pct" ? Math.round((txNum * v) / 100) : Math.round(v);
+  function wybierzOferte(id: string) {
+    setOfertaId(id);
+    const o = oferty.find((x) => x.id === id);
+    if (!o) return;
+    const r = o.rodzaj ?? "sprzedaz";
+    setRodzaj(r);
+    if (o.cena != null) setTx(String(o.cena));
+    if (!tytulReczny.current) setTitle(`${r === "wynajem" ? "Najem" : "Sprzedaż"}: ${o.adres || o.tytul}`);
+    if (o.wlascicielId && klienci.some((k) => k.id === o.wlascicielId)) setKlientId((obecny) => obecny || o.wlascicielId!);
   }
+
+  // Powiązania: oferty wybranego klienta i właściciel wybranej oferty.
+  const ofertyKlienta = klient ? oferty.filter((o) => o.wlascicielId === klient.id && o.id !== ofertaId) : [];
+  const wlasciciel = oferta?.wlascicielId ? klienci.find((k) => k.id === oferta.wlascicielId) : undefined;
+
+  const txNum = Math.round(liczba(tx));
+  const splitNum = Math.min(100, Math.max(0, parseInt(split.replace(",", "."), 10) || 0));
+  const extrasNum = Math.round(liczba(extras));
 
   const resolved = useMemo(() => {
     const r = {} as Record<PartyKey, number>;
-    for (const d of PARTY_DEFS) r[d.key] = resolve(parties[d.key]);
+    for (const d of PARTY_DEFS) {
+      const p = parties[d.key];
+      const v = liczba(p.val);
+      // Strony drugiego rodzaju nie liczą się, nawet jeśli coś w nich zostało.
+      r[d.key] = d.rodzaj !== rodzaj ? 0 : p.mode === "pct" ? Math.round((txNum * v) / 100) : Math.round(v);
+    }
     return r;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parties, txNum]);
+  }, [parties, txNum, rodzaj]);
 
   const officeTotal = Object.values(resolved).reduce((a, b) => a + b, 0); // brutto
   const netto = officeTotal / 1.23;
@@ -71,65 +169,99 @@ export function NewDealButton({
     setParties((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
   }
 
-  function onPickProperty(id: string) {
-    setPropertyId(id);
-    const p = properties.find((x) => x.id === id);
-    if (p?.price_pln != null) setTx(String(p.price_pln));
-  }
-
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
-      >
-        + Dodaj transakcję
-      </button>
-    );
-  }
-
   return (
-    <Modal title="Nowa transakcja" onClose={() => setOpen(false)}>
+    <Modal title="Nowa transakcja" onClose={onClose}>
       <form
         action={async (fd) => {
           setSaveError(null);
           const res = await createDeal(fd);
-          if (res.ok) setOpen(false);
-          else setSaveError(res.error);
+          if (res.ok) {
+            toast("Transakcja dodana.");
+            onClose();
+          } else setSaveError(res.error);
         }}
         className="flex min-h-0 flex-1 flex-col"
       >
         <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
+          {oferty.length > 0 && (
+            <Labeled label="Oferta">
+              <Wybieracz
+                opcje={oferty.map((o) => ({
+                  id: o.id,
+                  nazwa: o.adres || o.tytul,
+                  opis: [o.adres && o.tytul !== o.adres ? o.tytul : null, o.cena != null ? formatPln(o.cena) : null]
+                    .filter(Boolean)
+                    .join(" · "),
+                }))}
+                wartosc={ofertaId}
+                onWybor={(id) => (id ? wybierzOferte(id) : setOfertaId(""))}
+                placeholder="Szukaj po adresie lub tytule…"
+              />
+              <input type="hidden" name="property_id" value={ofertaId} />
+            </Labeled>
+          )}
+
+          {klienci.length > 0 && (
+            <Labeled label="Klient">
+              <Wybieracz
+                opcje={klienci.map((k) => ({ id: k.id, nazwa: k.nazwa, opis: k.typ ? ETYKIETY_TYPU[k.typ] ?? "" : "" }))}
+                wartosc={klientId}
+                onWybor={setKlientId}
+                placeholder="Szukaj klienta…"
+              />
+              <input type="hidden" name="client_id" value={klientId} />
+              {wlasciciel && wlasciciel.id !== klientId && (
+                <Podpowiedzi
+                  etykieta="Właściciel tej oferty:"
+                  pozycje={[{ id: wlasciciel.id, nazwa: wlasciciel.nazwa }]}
+                  onWybor={setKlientId}
+                />
+              )}
+              {ofertyKlienta.length > 0 && (
+                <Podpowiedzi
+                  etykieta="Oferty tego klienta:"
+                  pozycje={ofertyKlienta.slice(0, 4).map((o) => ({ id: o.id, nazwa: o.adres || o.tytul }))}
+                  onWybor={wybierzOferte}
+                />
+              )}
+            </Labeled>
+          )}
+
           <Labeled label="Opis">
             <input
               name="title"
               required
+              value={title}
+              onChange={(e) => {
+                tytulReczny.current = true;
+                setTitle(e.target.value);
+              }}
               placeholder="Sprzedaż mieszkania, ul. Polna 12"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
+              className={POLE}
             />
           </Labeled>
 
-          {properties.length > 0 && (
-            <Labeled label="Nieruchomość (opcjonalnie - podstawi cenę)">
-              <Select name="property_id" value={propertyId} onChange={(e) => onPickProperty(e.target.value)}>
-                <option value="">- brak -</option>
-                {properties.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.title}
-                  </option>
-                ))}
-              </Select>
-            </Labeled>
-          )}
+          <div>
+            <p className="mb-1.5 text-sm text-slate-500">Rodzaj</p>
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1">
+              {(["sprzedaz", "wynajem"] as const).map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRodzaj(r)}
+                  aria-pressed={rodzaj === r}
+                  className={`rounded-lg py-2 text-sm font-medium transition ${
+                    rodzaj === r ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  {r === "sprzedaz" ? "Sprzedaż" : "Najem"}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <Labeled label="Wartość transakcji / cena (zł)">
-            <input
-              value={tx}
-              onChange={(e) => setTx(e.target.value)}
-              inputMode="decimal"
-              placeholder="650000"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
-            />
+          <Labeled label={rodzaj === "wynajem" ? "Czynsz najmu (zł/mc)" : "Cena transakcji (zł)"}>
+            <PoleKwoty value={tx} onChange={setTx} jednostka="zł" placeholder={rodzaj === "wynajem" ? "3500" : "650 000"} />
             <input type="hidden" name="transaction_value" value={txNum} />
           </Labeled>
 
@@ -137,25 +269,38 @@ export function NewDealButton({
           <div className="space-y-2">
             <p className="text-sm text-slate-500">Prowizja od stron</p>
             {PARTY_DEFS.map((d) => (
-              <div key={d.key} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div key={d.key} className={d.rodzaj === rodzaj ? "rounded-xl border border-slate-200 bg-slate-50 p-3" : "hidden"}>
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="text-sm text-slate-700">{d.label}</span>
                   {resolved[d.key] > 0 && (
                     <span className="text-sm font-semibold text-emerald-600">{formatPln(resolved[d.key])}</span>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  <input
-                    value={parties[d.key].val}
-                    onChange={(e) => setParty(d.key, { val: e.target.value })}
-                    inputMode="decimal"
-                    placeholder="0"
-                    className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
-                  />
-                  <Select value={parties[d.key].mode} onChange={(e) => setParty(d.key, { mode: e.target.value as Mode })} aria-label={`Jednostka prowizji ${d.label}`}>
-                    <option value="pln">zł</option>
-                    <option value="pct">%</option>
-                  </Select>
+                <div className="flex items-stretch gap-2">
+                  <div className="min-w-0 flex-1">
+                    <PoleKwoty
+                      value={parties[d.key].val}
+                      onChange={(v) => setParty(d.key, { val: v })}
+                      jednostka={parties[d.key].mode === "pct" ? "%" : "zł"}
+                      placeholder={parties[d.key].mode === "pct" ? "2,5" : "0"}
+                      aria-label={d.label}
+                    />
+                  </div>
+                  <div className="flex flex-shrink-0 rounded-xl border border-slate-200 bg-white p-1" role="group" aria-label={`Jednostka: ${d.label}`}>
+                    {(["pct", "pln"] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setParty(d.key, { mode: m })}
+                        aria-pressed={parties[d.key].mode === m}
+                        className={`w-10 rounded-lg text-sm font-semibold transition ${
+                          parties[d.key].mode === m ? "bg-emerald-500 text-white" : "text-slate-500 hover:bg-slate-100"
+                        }`}
+                      >
+                        {m === "pct" ? "%" : "zł"}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <input type="hidden" name={d.name} value={resolved[d.key]} />
               </div>
@@ -164,34 +309,18 @@ export function NewDealButton({
 
           {/* Split + dodatki */}
           <div className="grid grid-cols-2 gap-3">
-            <Labeled label="Twój udział (%)">
-              <input
-                name="split"
-                value={split}
-                onChange={(e) => setSplit(e.target.value)}
-                inputMode="decimal"
-                placeholder="50"
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none"
-              />
+            <Labeled label="Twój udział">
+              <PoleKwoty value={split} onChange={setSplit} jednostka="%" placeholder="50" name="split" />
             </Labeled>
-            <Labeled label="Dodatki (zł)">
-              <input
-                name="extras"
-                value={extras}
-                onChange={(e) => setExtras(e.target.value)}
-                inputMode="decimal"
-                placeholder="np. 1000"
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
-              />
+            <Labeled label="Dodatki">
+              <PoleKwoty value={extras} onChange={setExtras} jednostka="zł" placeholder="np. 1000" name="extras" />
             </Labeled>
           </div>
-          <Labeled label="Opis dodatków (np. prowizja od doradcy kredytowego)">
-            <input
-              name="extras_note"
-              placeholder="Doradca kredytowy - Bartek"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
-            />
-          </Labeled>
+          {extrasNum > 0 && (
+            <Labeled label="Za co dodatki (np. prowizja od doradcy kredytowego)">
+              <input name="extras_note" placeholder="Doradca kredytowy - Bartek" className={POLE} />
+            </Labeled>
+          )}
 
           {/* Podsumowanie na żywo */}
           <div className="space-y-1.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
@@ -206,12 +335,8 @@ export function NewDealButton({
             </div>
           </div>
 
-          <Labeled label="Przewidywane zamknięcie (opcjonalnie)">
-            <input
-              name="expectedClose"
-              type="date"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none"
-            />
+          <Labeled label="Planowane zamknięcie (wchodzi do prognozy)">
+            <input name="expectedClose" type="date" className={POLE} />
           </Labeled>
         </div>
 
@@ -230,7 +355,7 @@ export function NewDealButton({
           </SubmitButton>
           <button
             type="button"
-            onClick={() => setOpen(false)}
+            onClick={onClose}
             className="rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition hover:bg-slate-100"
           >
             Anuluj
@@ -238,6 +363,158 @@ export function NewDealButton({
         </div>
       </form>
     </Modal>
+  );
+}
+
+const ETYKIETY_TYPU: Record<string, string> = {
+  sprzedajacy: "Sprzedający",
+  kupujacy: "Kupujący",
+  wynajmujacy: "Wynajmujący",
+  najemca: "Najemca",
+  inny: "Inny",
+};
+
+/** Pole kwoty z jednostką w środku. Pełna szerokość, więc wpisana liczba zawsze jest widoczna. */
+function PoleKwoty({
+  value,
+  onChange,
+  jednostka,
+  placeholder,
+  name,
+  "aria-label": ariaLabel,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  jednostka: string;
+  placeholder?: string;
+  name?: string;
+  "aria-label"?: string;
+}) {
+  return (
+    <div className="relative">
+      <input
+        name={name}
+        value={value}
+        onChange={(e) => onChange(e.target.value.replace(/[^\d.,\s]/g, ""))}
+        inputMode="decimal"
+        autoComplete="off"
+        placeholder={placeholder}
+        aria-label={ariaLabel}
+        className={`${POLE} pr-10 tabular-nums`}
+      />
+      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-slate-400">{jednostka}</span>
+    </div>
+  );
+}
+
+/** Pole z wyszukiwaniem: wpisujesz kawałek adresu albo nazwiska i wybierasz z listy. */
+function Wybieracz({
+  opcje,
+  wartosc,
+  onWybor,
+  placeholder,
+}: {
+  opcje: { id: string; nazwa: string; opis?: string }[];
+  wartosc: string;
+  onWybor: (id: string) => void;
+  placeholder: string;
+}) {
+  const [szukaj, setSzukaj] = useState("");
+  const [otwarte, setOtwarte] = useState(false);
+  const wybrana = opcje.find((o) => o.id === wartosc);
+
+  const pasujace = useMemo(() => {
+    const q = szukaj.trim().toLowerCase();
+    const lista = q ? opcje.filter((o) => `${o.nazwa} ${o.opis ?? ""}`.toLowerCase().includes(q)) : opcje;
+    return lista.slice(0, 8);
+  }, [opcje, szukaj]);
+
+  if (wybrana) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium text-slate-900">{wybrana.nazwa}</p>
+          {wybrana.opis && <p className="truncate text-xs text-slate-500">{wybrana.opis}</p>}
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            onWybor("");
+            setSzukaj("");
+          }}
+          className="flex-shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-slate-500 transition hover:bg-white hover:text-slate-700"
+        >
+          Zmień
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <input
+        value={szukaj}
+        onChange={(e) => {
+          setSzukaj(e.target.value);
+          setOtwarte(true);
+        }}
+        onFocus={() => setOtwarte(true)}
+        onBlur={() => setTimeout(() => setOtwarte(false), 150)}
+        placeholder={placeholder}
+        autoComplete="off"
+        className={POLE}
+      />
+      {otwarte && (
+        <ul className="absolute inset-x-0 top-full z-10 mt-1 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+          {pasujace.length === 0 ? (
+            <li className="px-3 py-2 text-sm text-slate-400">Nic nie pasuje</li>
+          ) : (
+            pasujace.map((o) => (
+              <li key={o.id}>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    onWybor(o.id);
+                    setOtwarte(false);
+                  }}
+                  className="block w-full px-3 py-2 text-left transition hover:bg-slate-50"
+                >
+                  <span className="block truncate text-sm text-slate-900">{o.nazwa}</span>
+                  {o.opis && <span className="block truncate text-xs text-slate-500">{o.opis}</span>}
+                </button>
+              </li>
+            ))
+          )}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function Podpowiedzi({
+  etykieta,
+  pozycje,
+  onWybor,
+}: {
+  etykieta: string;
+  pozycje: { id: string; nazwa: string }[];
+  onWybor: (id: string) => void;
+}) {
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+      <span className="text-xs text-slate-500">{etykieta}</span>
+      {pozycje.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          onClick={() => onWybor(p.id)}
+          className="max-w-full truncate rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-50"
+        >
+          + {p.nazwa}
+        </button>
+      ))}
+    </div>
   );
 }
 

@@ -1,41 +1,26 @@
-import Link from "next/link";
 import { requireModul } from "@/lib/auth";
-import { getDeals, getCommissionStats, getPropertiesLite } from "@/lib/data-platform";
-import { DEAL_STATUSES } from "@/lib/types";
-import { PageHeader, StatCard, Card, EmptyState } from "../components/ui";
-import { formatPln, formatDateShort } from "@/lib/format";
-import { NewDealButton, DealActions } from "./deal-controls";
+import { getCommissionStats } from "@/lib/data-platform";
+import { daneProwizji } from "@/lib/data-prowizje";
+import { StatCard } from "../components/ui";
+import { formatPln } from "@/lib/format";
+import { ProwizjePanel } from "./panel";
 
 export default async function ProwizjePage() {
   const user = await requireModul("prowizje");
-  const [deals, stats, properties] = await Promise.all([
-    getDeals(user.id),
-    getCommissionStats(user.id),
-    getPropertiesLite(user.id),
-  ]);
+  const [stats, dane] = await Promise.all([getCommissionStats(user.id), daneProwizji(user.id, user.agency_id)]);
 
   const goal = user.monthly_goal_pln ?? 0;
   const progress = goal > 0 ? Math.min(100, Math.round((stats.monthClosed / goal) * 100)) : 0;
 
-  return (
+  const statystyki = (
     <>
-      <PageHeader
-        title="Prowizje"
-        subtitle="Śledź transakcje i postęp do celu miesięcznego."
-        action={<NewDealButton properties={properties} defaultSplit={user.default_split_pct ?? 50} />}
-      />
-
-      {/* Cel miesięczny */}
       {goal > 0 && (
-        <Card className="hero-goal mb-6">
-          <div className="mb-2 flex items-end justify-between">
+        <div className="hero-goal mb-4 rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="mb-2 flex items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                Cel miesięczny
-              </p>
-              <p className="text-3xl font-semibold text-slate-900">
-                {formatPln(stats.monthClosed)}{" "}
-                <span className="text-lg text-slate-500">/ {formatPln(goal)}</span>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Cel w tym miesiącu</p>
+              <p className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+                {formatPln(stats.monthClosed)} <span className="text-base text-slate-500 sm:text-lg">/ {formatPln(goal)}</span>
               </p>
             </div>
             <p className="text-2xl font-semibold text-emerald-600">{progress}%</p>
@@ -46,86 +31,39 @@ export default async function ProwizjePage() {
               style={{ width: `${progress}%` }}
             />
           </div>
-        </Card>
+          {stats.monthClosed < goal && (
+            <p className="mt-2 text-xs text-slate-500">
+              Brakuje {formatPln(goal - stats.monthClosed)}. W toku masz {formatPln(stats.pipelineValue)}.
+            </p>
+          )}
+        </div>
       )}
-
-      <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
-          label="Twój zarobek (mc)"
+          label="Zarobione w tym miesiącu"
           value={formatPln(stats.monthClosed)}
-          sub={`${stats.dealsClosedThisMonth} transakcji · biuro ${formatPln(stats.officeMonthClosed)}`}
+          sub={`${stats.dealsClosedThisMonth} zamkniętych`}
           accent
         />
-        <StatCard
-          label="Prognoza (kwartał)"
-          value={formatPln(stats.forecastQuarter)}
-          sub="planowane zamknięcia do końca kwartału"
-        />
-        <StatCard
-          label="Twój pipeline (w toku)"
-          value={formatPln(stats.pipelineValue)}
-          sub={`${stats.dealsInProgress} transakcji`}
-        />
+        <StatCard label="W toku" value={formatPln(stats.pipelineValue)} sub={`${stats.dealsInProgress} transakcji`} />
+        <StatCard label="Prognoza do końca kwartału" value={formatPln(stats.forecastQuarter)} sub="z planowaną datą" />
         <StatCard
           label="Cel miesięczny"
           value={goal > 0 ? formatPln(goal) : "-"}
-          sub={goal > 0 ? undefined : "ustaw w ustawieniach"}
+          sub={goal > 0 ? undefined : "ustawisz w Ustawieniach"}
         />
       </div>
-
-      {deals.length === 0 ? (
-        <EmptyState
-          title="Brak transakcji"
-          body="Dodaj pierwszą transakcję, żeby śledzić prowizje i postęp do celu miesięcznego."
-          icon={
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-            </svg>
-          }
-        />
-      ) : (
-        <div className="space-y-2.5">
-          {deals.map((d) => {
-            const status = DEAL_STATUSES.find((s) => s.value === d.status);
-            const accent =
-              d.status === "zamkniety"
-                ? "bg-emerald-400"
-                : d.status === "przepadl"
-                  ? "bg-red-400"
-                  : "bg-amber-400";
-            return (
-              <div
-                key={d.id}
-                className="flex items-center gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 pl-0 transition hover:border-slate-300 hover:bg-slate-100"
-              >
-                <span className={`h-12 w-1.5 flex-shrink-0 rounded-r-full ${accent}`} />
-                <Link href={`/app/prowizje/${d.id}`} className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-slate-900">{d.title}</p>
-                  <p className="text-sm text-slate-500">
-                    <span className="font-medium text-emerald-600">{formatPln(d.agent_earnings_pln)}</span>
-                    {` dla Ciebie · biuro ${formatPln(d.commission_pln)} brutto (netto ${formatPln(d.commission_pln / 1.23)})`}
-                    {d.agent_split_pct ? ` · ${d.agent_split_pct}%` : ""}
-                    {d.status === "zamkniety" && d.closed_at
-                      ? ` · zamknięta ${formatDateShort(d.closed_at)}`
-                      : d.expected_close
-                        ? ` · plan: ${formatDateShort(d.expected_close)}`
-                        : ""}
-                  </p>
-                  <p className="mt-0.5 text-xs text-emerald-400/70">Otwórz kartę transakcji →</p>
-                </Link>
-                <div className="flex flex-shrink-0 items-center gap-3 pr-4">
-                  {status && (
-                    <span className={`hidden rounded-md px-2 py-1 text-xs font-medium sm:inline ${status.color}`}>
-                      {status.label}
-                    </span>
-                  )}
-                  <DealActions dealId={d.id} status={d.status} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </>
+  );
+
+  return (
+    <ProwizjePanel
+      transakcje={dane.transakcje}
+      oferty={dane.ofertyWybor}
+      klienci={dane.klienciWybor}
+      podpowiedzi={dane.podpowiedzi}
+      defaultSplit={user.default_split_pct ?? 50}
+      statystyki={statystyki}
+    />
   );
 }

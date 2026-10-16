@@ -93,8 +93,8 @@ export const ROLE: OpisRoli[] = [
   {
     id: "manager",
     nazwa: "Menedżer",
-    opis: "Prowadzi zespół agentów. Widzi ich pracę, ale nie kwoty cudzych prowizji.",
-    moduly: ["klienci", "nieruchomosci", "dokumenty", "zespol", "coach"],
+    opis: "Prowadzi zespół agentów i sam sprzedaje. Widzi ich pracę i swoje prowizje, ale nie kwoty cudzych.",
+    moduly: ["klienci", "nieruchomosci", "dokumenty", "prowizje", "zespol", "coach"],
     zakres: "zespol",
   },
   {

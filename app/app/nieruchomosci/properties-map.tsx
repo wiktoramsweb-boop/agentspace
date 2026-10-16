@@ -11,6 +11,12 @@ export type MapPoint = {
   lat: number;
   lng: number;
   kind?: string; // "sprzedaz" | "wynajem"
+  /** Opcjonalnie: własny kolor, napis na pinezce, podpis i link (np. mapa transakcji). */
+  color?: string;
+  label?: string;
+  subtitle?: string;
+  href?: string;
+  linkText?: string;
 };
 
 /** Krótka, czytelna cena na pinezce. */
@@ -70,7 +76,7 @@ function escapeHtml(s: string): string {
   );
 }
 
-export function PropertiesMap({ points }: { points: MapPoint[] }) {
+export function PropertiesMap({ points, height = 380 }: { points: MapPoint[]; height?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
 
@@ -89,19 +95,20 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
 
       const markers: any[] = [];
       for (const p of points) {
-        const color = p.kind === "wynajem" ? "#38bdf8" : "#34d399"; // sky / emerald
+        const color = p.color ?? (p.kind === "wynajem" ? "#38bdf8" : "#34d399"); // sky / emerald
         const icon = L.divIcon({
-          html: pinHtml(shortPrice(p.price, p.kind), color),
+          html: pinHtml(p.label ?? shortPrice(p.price, p.kind), color),
           className: "",
           iconSize: [0, 0],
           iconAnchor: [0, 0],
         });
         const m = L.marker([p.lat, p.lng], { icon }).addTo(map);
         const full = p.price != null ? new Intl.NumberFormat("pl-PL").format(p.price) + " zł" : "-";
+        const podpis = p.subtitle ?? `${p.kind === "wynajem" ? "Wynajem" : "Sprzedaż"} · ${full}${p.kind === "wynajem" ? "/mc" : ""}`;
         m.bindPopup(
           `<div style="min-width:150px"><strong>${escapeHtml(p.title)}</strong><br>` +
-            `<span style="color:#64748b">${p.kind === "wynajem" ? "Wynajem" : "Sprzedaż"} · ${full}${p.kind === "wynajem" ? "/mc" : ""}</span><br>` +
-            `<a href="/app/nieruchomosci/${p.id}">Otwórz ofertę →</a></div>`,
+            `<span style="color:#64748b">${escapeHtml(podpis)}</span><br>` +
+            `<a href="${p.href ?? `/app/nieruchomosci/${p.id}`}">${escapeHtml(p.linkText ?? "Otwórz ofertę")} →</a></div>`,
         );
         markers.push(m);
       }
@@ -124,5 +131,5 @@ export function PropertiesMap({ points }: { points: MapPoint[] }) {
 
   // `isolate` = własny kontekst warstw - trzyma wysokie z-index Leafletu wewnątrz,
   // żeby mapa nie przebijała okien modalnych (position:fixed).
-  return <div ref={ref} className="isolate h-[380px] w-full" style={{ background: "#eef2f7" }} />;
+  return <div ref={ref} className="isolate w-full" style={{ background: "#eef2f7", height }} />;
 }
