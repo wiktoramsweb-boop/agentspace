@@ -124,7 +124,9 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
   const najnowsze = [...sfinalizowane].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 2).map((o) => o.id);
   const transakcje = sfinalizowane.map((o, i) => {
     const prowizja = Math.round((o.price_pln * los.between(0.018, 0.028)) / 100) * 100;
-    const dlaAgenta = Math.round(prowizja * 0.5);
+    // Tak samo jak w formularzu: udział agenta od netto. Bez podziału na strony
+    // edycja transakcji demo nie miała czego wczytać.
+    const dlaAgenta = Math.round((prowizja / 1.23) * 0.5);
     return {
       agency_id: agencyId,
       agent_id: o.agent_id,
@@ -133,6 +135,7 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
       title: `[DEMO] ${o.title}`,
       transaction_value_pln: o.price_pln,
       commission_pln: prowizja,
+      commission_seller_pln: prowizja,
       agent_split_pct: 50,
       agent_earnings_pln: dlaAgenta,
       status: "zamkniety",

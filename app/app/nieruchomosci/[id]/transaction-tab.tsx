@@ -5,7 +5,7 @@ import { mergeCard } from "@/lib/transaction-card";
 import { DEAL_STATUSES } from "@/lib/types";
 import type { DealWithCard } from "@/lib/data-platform";
 import { TransactionCardEditor } from "../../prowizje/[id]/transaction-card-editor";
-import { NewDealButton } from "../../prowizje/deal-controls";
+import { NewDealButton, EdytujTransakcjeButton } from "../../prowizje/deal-controls";
 import { mozeEdytowacTransakcje, widziPieniadzeTransakcji, type Kto } from "@/lib/uprawnienia";
 
 /**
@@ -108,9 +108,18 @@ export function TransactionTab({
               )}
             </p>
           </div>
-          {status && (
-            <span className={`rounded-md px-2.5 py-1 text-xs font-medium ${status.color}`}>{status.label}</span>
-          )}
+          <div className="flex items-center gap-2">
+            {canEdit && canMoney && (
+              <EdytujTransakcjeButton
+                edycja={{ deal }}
+                oferty={[{ id: propertyId, tytul: propertyTitle, cena: propertyPrice }]}
+                defaultSplit={defaultSplit}
+              />
+            )}
+            {status && (
+              <span className={`rounded-md px-2.5 py-1 text-xs font-medium ${status.color}`}>{status.label}</span>
+            )}
+          </div>
         </div>
         {/* Kwoty widzi tylko opiekun transakcji i CEO, tak jak w Prowizjach. */}
         {canMoney ? (

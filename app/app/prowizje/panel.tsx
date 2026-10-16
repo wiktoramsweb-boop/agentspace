@@ -7,7 +7,14 @@ import { PropertiesMap, type MapPoint } from "../nieruchomosci/properties-map";
 import { formatPln, formatDateShort } from "@/lib/format";
 import { DEAL_STATUSES, type DealStatus } from "@/lib/types";
 import type { TransakcjaWidok, Podpowiedz } from "@/lib/data-prowizje";
-import { DealActions, NowaTransakcja, type OfertaDoWyboru, type KlientDoWyboru, type StartTransakcji } from "./deal-controls";
+import {
+  DealActions,
+  NowaTransakcja,
+  type EdycjaTransakcji,
+  type OfertaDoWyboru,
+  type KlientDoWyboru,
+  type StartTransakcji,
+} from "./deal-controls";
 
 const KOLOR_STATUSU: Record<DealStatus, string> = {
   w_toku: "#fbbf24",
@@ -36,6 +43,7 @@ export function ProwizjePanel({
   statystyki: ReactNode;
 }) {
   const [formularz, setFormularz] = useState<StartTransakcji | null>(null);
+  const [edycja, setEdycja] = useState<EdycjaTransakcji | null>(null);
   // Gdy nic nie jest w toku, od razu pokazujemy zakładkę, w której coś jest.
   const [zakladka, setZakladka] = useState<DealStatus>(
     () => (["w_toku", "zamkniety", "przepadl"] as const).find((s) => transakcje.some((t) => t.status === s)) ?? "w_toku",
@@ -43,7 +51,11 @@ export function ProwizjePanel({
   const [schowane, setSchowane] = useState<Set<string>>(new Set());
 
   const liczby = useMemo(() => {
-    const l: Record<DealStatus, number> = { w_toku: 0, zamkniety: 0, przepadl: 0 };
+    const l: Record<DealStatus, number> = {
+      w_toku: 0,
+      zamkniety: 0,
+      przepadl: 0,
+    };
     for (const t of transakcje) l[t.status] += 1;
     return l;
   }, [transakcje]);
@@ -95,7 +107,10 @@ export function ProwizjePanel({
           <h2 className="mb-3 text-sm font-semibold text-slate-900">Do zrobienia ({aktywnePodpowiedzi.length})</h2>
           <ul className="space-y-2">
             {aktywnePodpowiedzi.map((p) => (
-              <li key={p.id} className="flex flex-col gap-2 rounded-xl border border-amber-200 bg-white p-3 sm:flex-row sm:items-center">
+              <li
+                key={p.id}
+                className="flex flex-col gap-2 rounded-xl border border-amber-200 bg-white p-3 sm:flex-row sm:items-center"
+              >
                 <span className="text-lg leading-none" aria-hidden="true">
                   {p.rodzaj === "oferta" ? "🏠" : p.rodzaj === "klient" ? "🤝" : p.rodzaj === "termin" ? "⏰" : "📅"}
                 </span>
@@ -113,7 +128,12 @@ export function ProwizjePanel({
                     </Link>
                   ) : (
                     <button
-                      onClick={() => setFormularz({ ofertaId: p.ofertaId, klientId: p.klientId })}
+                      onClick={() =>
+                        setFormularz({
+                          ofertaId: p.ofertaId,
+                          klientId: p.klientId,
+                        })
+                      }
                       className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-400"
                     >
                       Załóż transakcję
@@ -173,7 +193,24 @@ export function ProwizjePanel({
             ) : (
               <div className="space-y-2.5">
                 {widoczne.map((t) => (
-                  <WierszTransakcji key={t.id} t={t} />
+                  <WierszTransakcji
+                    key={t.id}
+                    t={t}
+                    onEdytuj={() =>
+                      setEdycja({
+                        deal: t,
+                        oferta: t.oferta
+                          ? {
+                              id: t.oferta.id,
+                              tytul: t.oferta.adres,
+                              adres: t.oferta.adres,
+                              cena: null,
+                            }
+                          : null,
+                        klient: t.klient,
+                      })
+                    }
+                  />
                 ))}
               </div>
             )}
@@ -218,11 +255,20 @@ export function ProwizjePanel({
           onClose={() => setFormularz(null)}
         />
       )}
+      {edycja && (
+        <NowaTransakcja
+          oferty={oferty}
+          klienci={klienci}
+          defaultSplit={defaultSplit}
+          edycja={edycja}
+          onClose={() => setEdycja(null)}
+        />
+      )}
     </>
   );
 }
 
-function WierszTransakcji({ t }: { t: TransakcjaWidok }) {
+function WierszTransakcji({ t, onEdytuj }: { t: TransakcjaWidok; onEdytuj: () => void }) {
   const status = DEAL_STATUSES.find((s) => s.value === t.status);
   const termin =
     t.status === "zamkniety" && t.closed_at
@@ -231,27 +277,37 @@ function WierszTransakcji({ t }: { t: TransakcjaWidok }) {
         ? `plan: ${formatDateShort(t.expected_close)}`
         : null;
   return (
-    <div className="flex items-stretch gap-3 overflow-hidden rounded-2xl border border-slate-200 bg-white pr-3 transition hover:border-slate-300">
+    <div className="flex items-stretch overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-300">
       <span className={`w-1.5 flex-shrink-0 ${PASEK_STATUSU[t.status]}`} />
-      <Link href={`/app/prowizje/${t.id}`} className="min-w-0 flex-1 py-3">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="truncate font-semibold text-slate-900">{t.title}</p>
-          <p className="flex-shrink-0 text-base font-semibold text-emerald-600">{formatPln(t.agent_earnings_pln)}</p>
+      {/* Na telefonie przyciski schodzą pod treść, inaczej zostawało ~140 px na opis. */}
+      <div className="flex min-w-0 flex-1 flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:gap-3">
+        <Link href={`/app/prowizje/${t.id}`} className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="truncate font-semibold text-slate-900">{t.title}</p>
+            <p className="flex-shrink-0 text-base font-semibold text-emerald-600">{formatPln(t.agent_earnings_pln)}</p>
+          </div>
+          <p className="mt-0.5 truncate text-sm text-slate-500">
+            {[t.klient?.nazwa, t.oferta?.adres].filter(Boolean).join(" · ") || "Bez klienta i oferty"}
+          </p>
+          <p className="mt-0.5 text-xs text-slate-400">
+            {`biuro ${formatPln(t.commission_pln)} brutto`}
+            {t.agent_split_pct ? ` · Twój udział ${t.agent_split_pct}%` : ""}
+            {termin ? ` · ${termin}` : ""}
+          </p>
+        </Link>
+        <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
+          {status && (
+            <span className={`hidden rounded-md px-2 py-1 text-xs font-medium xl:inline ${status.color}`}>{status.label}</span>
+          )}
+          <button
+            type="button"
+            onClick={onEdytuj}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-emerald-300 hover:text-emerald-700"
+          >
+            Edytuj
+          </button>
+          <DealActions dealId={t.id} status={t.status} />
         </div>
-        <p className="mt-0.5 truncate text-sm text-slate-500">
-          {[t.klient?.nazwa, t.oferta?.adres].filter(Boolean).join(" · ") || "Bez klienta i oferty"}
-        </p>
-        <p className="mt-0.5 text-xs text-slate-400">
-          {`biuro ${formatPln(t.commission_pln)} brutto`}
-          {t.agent_split_pct ? ` · Twój udział ${t.agent_split_pct}%` : ""}
-          {termin ? ` · ${termin}` : ""}
-        </p>
-      </Link>
-      <div className="flex flex-shrink-0 items-center gap-2">
-        {status && (
-          <span className={`hidden rounded-md px-2 py-1 text-xs font-medium xl:inline ${status.color}`}>{status.label}</span>
-        )}
-        <DealActions dealId={t.id} status={t.status} />
       </div>
     </div>
   );

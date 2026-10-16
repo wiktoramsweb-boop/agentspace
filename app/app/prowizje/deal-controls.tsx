@@ -3,8 +3,8 @@
 import { SubmitButton } from "../components/submit-button";
 
 import { useMemo, useRef, useState } from "react";
-import { createDeal, setDealStatus, deleteDeal } from "./actions";
-import type { DealStatus } from "@/lib/types";
+import { createDeal, updateDeal, setDealStatus, deleteDeal } from "./actions";
+import type { Deal, DealStatus } from "@/lib/types";
 import { formatPln } from "@/lib/format";
 import { Modal } from "../components/modal";
 import { useToast } from "../components/toast";
@@ -20,6 +20,8 @@ export type OfertaDoWyboru = {
 };
 export type KlientDoWyboru = { id: string; nazwa: string; typ?: string };
 export type StartTransakcji = { ofertaId?: string; klientId?: string };
+/** Transakcja do poprawienia, z ofertą i klientem do pokazania, gdyby nie było ich na listach. */
+export type EdycjaTransakcji = { deal: Deal; oferta?: OfertaDoWyboru | null; klient?: KlientDoWyboru | null };
 
 type Mode = "pln" | "pct";
 type Party = { val: string; mode: Mode };
@@ -40,6 +42,61 @@ const POLE =
 /** Kwoty tolerują przecinek (klawiatura PL) i spacje. */
 function liczba(v: string): number {
   return parseFloat(v.replace(",", ".").replace(/\s/g, "")) || 0;
+}
+
+/**
+ * Zapisana kwota strony z powrotem do pola. W bazie trzymamy złotówki, ale
+ * jeśli to równy procent ceny (np. 2,5%), pokazujemy procent, bo tak agent ją wpisał.
+ */
+function poleStrony(kwota: number, cena: number, domyslny: Mode): Party {
+  if (!kwota) return { val: "", mode: domyslny };
+  if (cena > 0) {
+    const pct = Math.round((kwota / cena) * 10000) / 100;
+    if (pct > 0 && pct <= 10 && Math.round((cena * pct) / 100) === kwota) {
+      return { val: String(pct).replace(".", ","), mode: "pct" };
+    }
+  }
+  return { val: String(kwota), mode: "pln" };
+}
+
+/** Przycisk „Edytuj” otwierający formularz z wpisanymi danymi transakcji. */
+export function EdytujTransakcjeButton({
+  edycja,
+  oferty = [],
+  klienci = [],
+  defaultSplit = 50,
+  className,
+}: {
+  edycja: EdycjaTransakcji;
+  oferty?: OfertaDoWyboru[];
+  klienci?: KlientDoWyboru[];
+  defaultSplit?: number;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className={
+          className ??
+          "inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+        }
+      >
+        Edytuj
+      </button>
+      {open && (
+        <NowaTransakcja
+          oferty={oferty}
+          klienci={klienci}
+          defaultSplit={defaultSplit}
+          edycja={edycja}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
+  );
 }
 
 /** Przycisk otwierający formularz. Używany w karcie oferty i tam, gdzie nie ma panelu Prowizji. */
@@ -88,18 +145,85 @@ export function NowaTransakcja({
   klienci,
   defaultSplit,
   start,
+  edycja,
   onClose,
 }: {
   oferty: OfertaDoWyboru[];
   klienci: KlientDoWyboru[];
   defaultSplit: number;
   start?: StartTransakcji;
+  /** Gdy podane, formularz poprawia istniejącą transakcję zamiast dodawać nową. */
+  edycja?: EdycjaTransakcji;
+  onClose: () => void;
+}) {
+  // Obecna oferta i klient edytowanej transakcji muszą być do wyboru, inaczej zapis by je wyczyścił.
+  const ofertyLista = useMemo(
+    () => (edycja?.oferta && !oferty.some((o) => o.id === edycja.oferta!.id) ? [edycja.oferta, ...oferty] : oferty),
+    [oferty, edycja],
+  );
+  const klienciLista = useMemo(
+    () => (edycja?.klient && !klienci.some((k) => k.id === edycja.klient!.id) ? [edycja.klient, ...klienci] : klienci),
+    [klienci, edycja],
+  );
+  return (
+    <FormularzTransakcji
+      oferty={ofertyLista}
+      klienci={klienciLista}
+      defaultSplit={defaultSplit}
+      start={start}
+      edycja={edycja}
+      onClose={onClose}
+    />
+  );
+}
+
+function FormularzTransakcji({
+  oferty,
+  klienci,
+  defaultSplit,
+  start,
+  edycja,
+  onClose,
+}: {
+  oferty: OfertaDoWyboru[];
+  klienci: KlientDoWyboru[];
+  defaultSplit: number;
+  start?: StartTransakcji;
+  edycja?: EdycjaTransakcji;
   onClose: () => void;
 }) {
   const toast = useToast();
   const [saveError, setSaveError] = useState<string | null>(null);
   // Start z podpowiedzi albo z karty oferty: formularz od razu wypełniony.
   const [poczatek] = useState(() => {
+    if (edycja) {
+      const d = edycja.deal;
+      const cena = d.transaction_value_pln ?? 0;
+      const najem = d.commission_landlord_pln + d.commission_tenant_pln > 0;
+      const sprzedaz = d.commission_seller_pln + d.commission_buyer_pln > 0;
+      const o = oferty.find((x) => x.id === d.property_id);
+      const rodzaj: Rodzaj = najem ? "wynajem" : sprzedaz ? "sprzedaz" : o?.rodzaj ?? "sprzedaz";
+      // Starsze transakcje mają tylko łączną prowizję, bez podziału na strony.
+      // Wpisujemy ją do pierwszej strony, inaczej zapis wyzerowałby kwotę.
+      const bezStron = !najem && !sprzedaz && d.commission_pln > 0;
+      const seller = bezStron && rodzaj === "sprzedaz" ? d.commission_pln : d.commission_seller_pln;
+      const landlord = bezStron && rodzaj === "wynajem" ? d.commission_pln : d.commission_landlord_pln;
+      return {
+        ofertaId: d.property_id ?? "",
+        klientId: d.client_id ?? "",
+        rodzaj,
+        tx: d.transaction_value_pln != null ? String(d.transaction_value_pln) : "",
+        title: d.title,
+        split: String(d.agent_split_pct || defaultSplit),
+        extras: d.extras_pln ? String(d.extras_pln) : "",
+        parties: {
+          seller: poleStrony(seller, cena, "pct"),
+          buyer: poleStrony(d.commission_buyer_pln, cena, "pct"),
+          landlord: poleStrony(landlord, cena, "pln"),
+          tenant: poleStrony(d.commission_tenant_pln, cena, "pln"),
+        },
+      };
+    }
     const o = start?.ofertaId ? oferty.find((x) => x.id === start.ofertaId) : undefined;
     const r: Rodzaj = o?.rodzaj ?? "sprzedaz";
     const wlasc = o?.wlascicielId && klienci.some((k) => k.id === o.wlascicielId) ? o.wlascicielId : "";
@@ -109,22 +233,25 @@ export function NowaTransakcja({
       rodzaj: r,
       tx: o?.cena != null ? String(o.cena) : "",
       title: o ? `${r === "wynajem" ? "Najem" : "Sprzedaż"}: ${o.adres || o.tytul}` : "",
+      split: String(defaultSplit),
+      extras: "",
+      parties: {
+        seller: { val: "", mode: "pct" },
+        buyer: { val: "", mode: "pct" },
+        landlord: { val: "", mode: "pln" },
+        tenant: { val: "", mode: "pln" },
+      } as Record<PartyKey, Party>,
     };
   });
   const [title, setTitle] = useState(poczatek.title);
-  const tytulReczny = useRef(false);
+  const tytulReczny = useRef(!!edycja);
   const [ofertaId, setOfertaId] = useState(poczatek.ofertaId);
   const [klientId, setKlientId] = useState(poczatek.klientId);
   const [rodzaj, setRodzaj] = useState<Rodzaj>(poczatek.rodzaj);
   const [tx, setTx] = useState(poczatek.tx);
-  const [split, setSplit] = useState(String(defaultSplit));
-  const [extras, setExtras] = useState("");
-  const [parties, setParties] = useState<Record<PartyKey, Party>>({
-    seller: { val: "", mode: "pct" },
-    buyer: { val: "", mode: "pct" },
-    landlord: { val: "", mode: "pln" },
-    tenant: { val: "", mode: "pln" },
-  });
+  const [split, setSplit] = useState(poczatek.split);
+  const [extras, setExtras] = useState(poczatek.extras);
+  const [parties, setParties] = useState<Record<PartyKey, Party>>(poczatek.parties);
 
   const oferta = oferty.find((o) => o.id === ofertaId) ?? null;
   const klient = klienci.find((k) => k.id === klientId) ?? null;
@@ -170,13 +297,13 @@ export function NowaTransakcja({
   }
 
   return (
-    <Modal title="Nowa transakcja" onClose={onClose}>
+    <Modal title={edycja ? "Edytuj transakcję" : "Nowa transakcja"} onClose={onClose}>
       <form
         action={async (fd) => {
           setSaveError(null);
-          const res = await createDeal(fd);
+          const res = edycja ? await updateDeal(edycja.deal.id, fd) : await createDeal(fd);
           if (res.ok) {
-            toast("Transakcja dodana.");
+            toast(edycja ? "Zapisano zmiany." : "Transakcja dodana.");
             onClose();
           } else setSaveError(res.error);
         }}
@@ -318,7 +445,7 @@ export function NowaTransakcja({
           </div>
           {extrasNum > 0 && (
             <Labeled label="Za co dodatki (np. prowizja od doradcy kredytowego)">
-              <input name="extras_note" placeholder="Doradca kredytowy - Bartek" className={POLE} />
+              <input name="extras_note" defaultValue={edycja?.deal.extras_note ?? ""} placeholder="Doradca kredytowy - Bartek" className={POLE} />
             </Labeled>
           )}
 
@@ -336,7 +463,7 @@ export function NowaTransakcja({
           </div>
 
           <Labeled label="Planowane zamknięcie (wchodzi do prognozy)">
-            <input name="expectedClose" type="date" className={POLE} />
+            <input name="expectedClose" type="date" defaultValue={edycja?.deal.expected_close?.slice(0, 10) ?? ""} className={POLE} />
           </Labeled>
         </div>
 
@@ -348,10 +475,10 @@ export function NowaTransakcja({
 
         <div className="flex flex-shrink-0 gap-3 border-t border-slate-200 px-6 py-4">
           <SubmitButton
-            pendingText="Dodaję…"
+            pendingText={edycja ? "Zapisuję…" : "Dodaję…"}
             className="flex-1 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-400"
           >
-            Dodaj transakcję
+            {edycja ? "Zapisz zmiany" : "Dodaj transakcję"}
           </SubmitButton>
           <button
             type="button"

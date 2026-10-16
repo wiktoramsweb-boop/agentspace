@@ -8,6 +8,8 @@ import { DEAL_STATUSES } from "@/lib/types";
 import { PageHeader, Card } from "../../components/ui";
 import { formatPln } from "@/lib/format";
 import { TransactionCardEditor } from "./transaction-card-editor";
+import { daneProwizji } from "@/lib/data-prowizje";
+import { EdytujTransakcjeButton } from "../deal-controls";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,6 +23,9 @@ export default async function DealDetailPage({ params }: Props) {
   if (deal.agency_id !== user.agency_id || !mozeEdytowacTransakcje(user, deal)) redirect("/app/prowizje");
 
   const card = mergeCard(deal.transaction_card);
+  // Listy do wyboru bierzemy od opiekuna transakcji, także gdy poprawia ją CEO.
+  const dane = await daneProwizji(deal.agent_id, deal.agency_id);
+  const widok = dane.transakcje.find((t) => t.id === deal.id);
   const status = DEAL_STATUSES.find((s) => s.value === deal.status);
 
   return (
@@ -56,6 +61,19 @@ export default async function DealDetailPage({ params }: Props) {
 
       {/* Skrót finansowy */}
       <Card className="mb-6 !border-emerald-500/20 !bg-emerald-500/[0.04]">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-slate-900">Kwoty</p>
+          <EdytujTransakcjeButton
+            edycja={{
+              deal,
+              oferta: widok?.oferta ? { id: widok.oferta.id, tytul: widok.oferta.adres, adres: widok.oferta.adres, cena: null } : null,
+              klient: widok?.klient ?? null,
+            }}
+            oferty={dane.ofertyWybor}
+            klienci={dane.klienciWybor}
+            defaultSplit={deal.agent_split_pct || 50}
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <Fin label="Wartość transakcji" value={deal.transaction_value_pln != null ? formatPln(deal.transaction_value_pln) : "-"} />
           <Fin label="Prowizja biura (brutto)" value={formatPln(deal.commission_pln)} />
