@@ -109,3 +109,30 @@ Masz już 7 zdjęć w `public/zdjecia/nowe`, część z nich wykorzystamy ponown
 7. **Szlif**: wersja EN, wydajność, dostępność, SEO, zrzuty kontrolne, wdrożenie.
 
 Podstrony (`/produkt`, `/dla-agentow`, `/dla-wlascicieli`, `/cennik`) dostaną te same klocki w drugiej kolejności.
+
+## 6. Część druga: przebudowa samej aplikacji (na wzór panelu Estify)
+
+Co u nich działa lepiej i co przenosimy (po naszemu, w naszych kolorach):
+
+1. **Pulpit jako „Priorytety na dziś”**: pas 3-4 najważniejszych spraw z oceną klienta (pierścień 0-100,
+   gorący / ciepły / zimny), a pod nim panel wybranej sprawy: etapy lejka, zadania z podpowiedzią,
+   karta klienta i akcje (zadzwoń, WhatsApp, e-mail, notatka). Dziś nasz pulpit to kafelki z liczbami.
+2. **Zadania etapowe**: każdy etap transakcji ma swoją listę (wymagane / opcjonalne, „odblokuje się po”),
+   a domknięcie etapu proponuje przejście dalej albo przypomnienie za 3/7/14 dni.
+3. **Okno zadania zamiast przechodzenia między ekranami**: klik w zadanie otwiera okno z tym, co potrzebne
+   (umowa, termin w kalendarzu, oferty do wysłania), bez wychodzenia z pulpitu.
+4. **Asystent w każdym widoku**: pływający przycisk AI z kontekstem ekranu (klient, oferta), historia rozmów.
+5. **Pasek startu (onboarding)**: kroki konfiguracji z postępem i podpowiedziami, zwijany.
+6. **Porządek w menu**: grupy (Codziennie, AI, Sprzedaż, Oferty, Biuro, Szkolenia), mniej pozycji na wierzchu,
+   dolny pasek na telefonie z pięcioma pozycjami.
+7. **Spójny wygląd**: jeden zestaw kart, przycisków, odstępów i kolorów stanu na wszystkich ekranach.
+8. **Osiągnięcia**: mapa funkcji programu z punktami, żeby agent odkrywał moduły sam.
+
+Funkcje, których nie mamy, do decyzji osobno (każda to większy projekt):
+- sekretarka głosowa odbierająca nieodebrane telefony (ElevenLabs + numer telefonu),
+- link off-market do oferty ze śledzeniem wejść (mamy strony ofert, brakuje śledzenia i wyłączania),
+- eksport na portale (Otodom, OLX),
+- wycena na danych z Rejestru Cen Nieruchomości.
+
+Kolejność: najpierw 1-3 (pulpit, zadania etapowe, okna zadań), potem 6-7 (menu i wygląd), potem reszta.
+Po przebudowie robię zrzuty aplikacji od nowa i podmieniam je na stronie.
