@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BADGE_ICONS, FlameIcon, StarIcon, TrophyIcon } from "./icons";
 import type { GameData } from "@/lib/gamification";
 
@@ -77,8 +78,13 @@ export function BadgesCard({ game }: { game: GameData }) {
   return (
     <div className="rounded-2xl border border-slate-300 bg-white p-6">
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Osiągnięcia</h2>
-        <span className="text-sm text-slate-500">{unlocked}/{game.badges.length}</span>
+        <h2 className="text-lg font-semibold text-slate-900">Odznaki</h2>
+        <span className="flex items-center gap-3 text-sm text-slate-500">
+          {unlocked}/{game.badges.length}
+          <Link href="/app/osiagniecia" className="font-medium text-emerald-600 hover:text-emerald-700">
+            Mapa programu →
+          </Link>
+        </span>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {game.badges.map((b) => (

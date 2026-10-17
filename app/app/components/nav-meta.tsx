@@ -101,6 +101,7 @@ export const SECTIONS: NavSection[] = [
       { href: "/app/trening", label: "AI Coach", icon: <MicIcon />, color: "cyan", modul: "coach" },
       { href: "/app/cele", label: "Cele", icon: <TargetIcon />, color: "violet", modul: "coach" },
       { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate", modul: "coach" },
+      { href: "/app/osiagniecia", label: "Osiągnięcia", icon: <CompassIcon />, color: "amber" },
     ],
   },
   {
