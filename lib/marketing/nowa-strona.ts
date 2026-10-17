@@ -84,7 +84,7 @@ function pl(dni: number): NowaStrona {
       pod: "CRM dla biur nieruchomości. Cała codzienna praca w jednym programie.",
       lead: "Klienci, oferty, kalendarz, umowy, prowizje, wyceny z aktów notarialnych i trening rozmów z klientem AI. Agent nie skacze między pięcioma aplikacjami, a właściciel widzi całe biuro w jednym miejscu.",
       cta: `Wypróbuj ${dni} dni za darmo`,
-      cta2: "Zobacz, jak działa",
+      cta2: "Wejdź do demo",
       podCta: "Bez karty płatniczej. Pełny dostęp do wszystkich modułów.",
       rozmowa: { etykieta: "Trening z klientem AI", czas: "02:41", kto: "Właścicielka mieszkania", gdzie: "Podgórze, 3 pokoje" },
       ocena: {
@@ -123,7 +123,7 @@ function pl(dni: number): NowaStrona {
       lead: "AgentSpace to CRM dla biur nieruchomości zbudowany wokół codziennej pracy agenta: od pierwszego telefonu, przez prezentację i umowę, po prowizję i wynik biura. Bez Excela, bez kartek, bez dokupowania osobnych narzędzi.",
       rzedy: [
         ["CRM klientów", "Priorytety na dziś", "Oferty na mapie", "Kalendarz", "Leady z reklam", "Poszukiwania", "Szybki wpis głosem", "Czat zespołu", "Asystent AI"],
-        ["AI Coach", "Biblioteka technik", "Umowy i PDF", "Prowizje", "Wycena z RCN", "Dyżur AI", "Faktury", "Koszty i wynik", "Strona www biura"],
+        ["AI Coach", "Biblioteka technik", "Umowy i PDF", "Świadectwa energetyczne", "Prowizje", "Wycena z RCN", "Dyżur AI", "Faktury", "Koszty i wynik", "Strona www biura"],
       ],
       punkty: [
         { tytul: "Jedna baza", tekst: "Klient, oferta, rozmowa, umowa i prowizja są połączone. Nic nie przepisujesz dwa razy." },
@@ -240,6 +240,10 @@ function pl(dni: number): NowaStrona {
         { nazwa: "Leady", tytul: "Leady w jednej kolejce.", tekst: "Zgłoszenia z reklam, z widżetu wyceny i z rozmów. Widać, kto nie dostał jeszcze telefonu.", zrzut: "leady" },
         { nazwa: "Prowizje", tytul: "Prowizje z mapą transakcji.", tekst: "Transakcje w toku, zamknięte i przepadłe. Formularz podpowiada ofertę i klienta, a zarobek liczy się sam.", zrzut: "prowizje" },
         { nazwa: "Cele", tytul: "Cel roczny rozpisany na dziś.", tekst: "Ile telefonów, spotkań i umów potrzeba dziś, żeby dowieźć wynik roku.", zrzut: "cele" },
+        { nazwa: "Wycena z RCN", tytul: "Cena z aktów notarialnych, nie z ogłoszeń.", tekst: "Transakcje z Rejestru Cen Nieruchomości w okolicy, korekty za piętro, stan i budynek, a na koniec raport PDF dla właściciela.", zrzut: "wycena" },
+        { nazwa: "Biblioteka technik", tytul: "Techniki i skrypty z treningiem.", tekst: "36 technik rozmowy z przykładami z rynku i 10 skryptów krok po kroku. Każdą przećwiczysz z klientem AI jednym kliknięciem.", zrzut: "techniki" },
+        { nazwa: "Dyżur AI", tytul: "Telefon odebrany w czasie prezentacji.", tekst: "Asystentka głosowa odbiera połączenia, których agent nie odebrał, i zapisuje lead z notatką z rozmowy.", zrzut: "dyzur" },
+        { nazwa: "Świadectwa", tytul: "Świadectwo energetyczne z karty oferty.", tekst: "Formularz wypełnia się danymi nieruchomości, dodajesz zdjęcia budynku i wybierasz termin, nawet 6 godzin.", zrzut: "swiadectwa" },
       ],
     },
     liczby: {
@@ -336,7 +340,7 @@ function en(dni: number): NowaStrona {
       pod: "A CRM for real estate agencies. All daily work in one app.",
       lead: "Clients, listings, calendar, contracts, commissions, valuations from notarial deeds and call training with an AI client. Agents stop jumping between five apps, and owners see the whole agency in one place.",
       cta: `Try ${dni} days free`,
-      cta2: "See how it works",
+      cta2: "Open the demo",
       podCta: "No credit card. Full access to every module.",
       rozmowa: { etykieta: "Training with an AI client", czas: "02:41", kto: "Apartment owner", gdzie: "Podgórze, 3 rooms" },
       ocena: {
@@ -492,6 +496,10 @@ function en(dni: number): NowaStrona {
         { nazwa: "Leads", tytul: "Leads in one queue.", tekst: "Inquiries from ads, the valuation widget and calls. You see who hasn't been called yet.", zrzut: "leady" },
         { nazwa: "Commissions", tytul: "Commissions with a deal map.", tekst: "Deals in progress, closed and lost. The form suggests the listing and client, and earnings calculate themselves.", zrzut: "prowizje" },
         { nazwa: "Goals", tytul: "The yearly goal, broken down to today.", tekst: "How many calls, meetings and contracts you need today to hit the year.", zrzut: "cele" },
+        { nazwa: "Valuation", tytul: "Prices from notarial deeds, not listings.", tekst: "Transactions from the public price register nearby, adjustments for floor, condition and building, and a PDF report for the owner.", zrzut: "wycena" },
+        { nazwa: "Technique library", tytul: "Techniques and scripts with practice.", tekst: "36 conversation techniques with real estate examples and 10 step-by-step call scripts. Practise any of them with the AI client in one click.", zrzut: "techniki" },
+        { nazwa: "AI on call", tytul: "Calls answered during viewings.", tekst: "A voice assistant picks up calls the agent missed and saves a lead with a call summary.", zrzut: "dyzur" },
+        { nazwa: "Energy certificates", tytul: "Order an energy certificate from the listing.", tekst: "The form fills in from the property, you add building photos and pick a deadline, as fast as 6 hours.", zrzut: "swiadectwa" },
       ],
     },
     liczby: {

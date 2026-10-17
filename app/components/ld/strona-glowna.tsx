@@ -286,7 +286,7 @@ export function StronaGlowna({ lang }: { lang: string }) {
                   {t.hero.cta}
                   <Ikona nazwa="strzalka" />
                 </Link>
-                <a className="ld-btn ld-btn--duch ld-btn--duzy" href="#pulpit">
+                <a className="ld-btn ld-btn--duch ld-btn--duzy" href={`${href("/demo")}#wejdz`}>
                   {t.hero.cta2}
                 </a>
               </div>
