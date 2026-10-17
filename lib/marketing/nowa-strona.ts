@@ -25,7 +25,11 @@ export type NowaStrona = {
     podCta: string;
     rozmowa: { etykieta: string; czas: string; kto: string; gdzie: string };
     ocena: { tytul: string; wynik: string; obszary: [string, number][] };
+    /** Karty „Dziś rano” w hero: przykładowy widok pulpitu, nie dane klientów. */
+    priorytety: { tytul: string; karty: { wynik: number; temp: "goracy" | "cieply" | "zimny"; tempNazwa: string; kto: string; powod: string }[] };
   };
+  rozdzialy: [string, string, string, string, string];
+  pulpit: { etykieta: string; tytul: string; lead: string; punkty: { tytul: string; tekst: string }[] };
   manifest: string;
   coach: {
     etykieta: string;
@@ -92,6 +96,25 @@ function pl(dni: number): NowaStrona {
           ["Zamknięcie", 8],
         ],
       },
+      priorytety: {
+        tytul: "Dziś rano",
+        karty: [
+          { wynik: 82, temp: "goracy", tempNazwa: "Gorący", kto: "Pani Krystyna", powod: "Spotkanie dziś o 15:30" },
+          { wynik: 64, temp: "cieply", tempNazwa: "Ciepły", kto: "Pan Marek", powod: "Kontakt zaplanowany 2 dni temu" },
+          { wynik: 41, temp: "zimny", tempNazwa: "Zimny", kto: "Pani Ewa", powod: "Nowy kontakt z ogłoszenia" },
+        ],
+      },
+    },
+    rozdzialy: ["Pulpit", "AI Coach", "Teren", "Biuro", "Start"],
+    pulpit: {
+      etykieta: "Pulpit",
+      tytul: "Rano wiesz, do kogo dzwonić.",
+      lead: "Program sam układa sprawy dnia. Każdy klient dostaje ocenę od 0 do 100 z etapu, terminów i historii kontaktu, a obok powód, dlaczego akurat dziś.",
+      punkty: [
+        { tytul: "Ocena klienta", tekst: "Gorący, ciepły albo zimny, liczony z tego, co już jest w CRM." },
+        { tytul: "Kroki etapu", tekst: "Następny odblokowuje się po zrobieniu poprzedniego. Po domknięciu etapu program proponuje kolejny." },
+        { tytul: "Bez zmiany ekranu", tekst: "Telefon, WhatsApp, notatka, przypomnienie za 3, 7 albo 14 dni i spotkanie prosto z pulpitu." },
+      ],
     },
     manifest:
       "Agent, który nie ćwiczy rozmów, uczy się na prawdziwych klientach. Każda przegrana rozmowa to oferta, która trafia do biura obok. AgentSpace daje zespołowi trening z AI, plan dnia i porządek w dokumentach, zanim zadzwoni telefon.",
@@ -311,6 +334,25 @@ function en(dni: number): NowaStrona {
           ["Closing", 8],
         ],
       },
+      priorytety: {
+        tytul: "This morning",
+        karty: [
+          { wynik: 82, temp: "goracy", tempNazwa: "Hot", kto: "Mrs Krystyna", powod: "Meeting today at 3:30 pm" },
+          { wynik: 64, temp: "cieply", tempNazwa: "Warm", kto: "Mr Marek", powod: "Follow-up due 2 days ago" },
+          { wynik: 41, temp: "zimny", tempNazwa: "Cold", kto: "Mrs Ewa", powod: "New lead from a listing" },
+        ],
+      },
+    },
+    rozdzialy: ["Dashboard", "AI Coach", "Field", "Agency", "Start"],
+    pulpit: {
+      etykieta: "Dashboard",
+      tytul: "In the morning you know who to call.",
+      lead: "The app lines up the day for you. Every client gets a score from 0 to 100 based on stage, dates and contact history, with the reason it matters today.",
+      punkty: [
+        { tytul: "Client score", tekst: "Hot, warm or cold, calculated from what is already in the CRM." },
+        { tytul: "Stage steps", tekst: "The next step unlocks after the previous one. When a stage is done, the app suggests the next." },
+        { tytul: "Without leaving the screen", tekst: "Call, WhatsApp, note, reminder in 3, 7 or 14 days and meetings straight from the dashboard." },
+      ],
     },
     manifest:
       "An agent who never practices calls learns on real clients. Every lost conversation is a listing that goes to the agency next door. AgentSpace gives your team AI training, a daily plan and paperwork in order, before the phone rings.",

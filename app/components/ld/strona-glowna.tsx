@@ -11,6 +11,7 @@ import { PLANS } from "@/lib/marketing/plans";
 import { DNI_PROBNE } from "@/lib/abonament-cennik";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { Silnik } from "./silnik";
+import { Kafel, LdNav, LdStopka } from "./rama";
 
 /* ── Drobne klocki ─────────────────────────────────────────── */
 
@@ -38,27 +39,6 @@ function Ikona({ nazwa, className = "ic" }: { nazwa: "strzalka" | "ptaszek" | "t
     case "osoby":
       return <svg {...p} strokeWidth={1.8}><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.7 3 2.4 3.5 5.2" /></svg>;
   }
-}
-
-/** Znak marki: kafelek z gradientem i dom z kropką (ta sama geometria co w lib marki). */
-function Kafel({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="0 0 100 100" aria-hidden="true">
-      <defs>
-        <linearGradient id="ld-kafel" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#10b981" />
-          <stop offset="1" stopColor="#06b6d4" />
-        </linearGradient>
-      </defs>
-      <rect width="100" height="100" rx="22.6" fill="url(#ld-kafel)" />
-      <g transform="translate(50 50) scale(0.91) translate(-50 -50)">
-        <g transform="translate(0 -2.15)">
-          <path d="M 50 29.3 L 80.5 54 L 72.3 54 L 72.3 76.6 L 60.6 76.6 L 60.6 59.9 L 39.6 59.9 L 39.6 76.6 L 27.9 76.6 L 27.9 54 L 19.5 54 Z" fill="#0b1220" stroke="#0b1220" strokeWidth={6} strokeLinejoin="round" />
-          <circle cx="50" cy="27.6" r="2.9" fill="#ffffff" />
-        </g>
-      </g>
-    </svg>
-  );
 }
 
 /** Nagłówek odsłaniany słowo po słowie (słowa dzielimy po stronie serwera). */
@@ -118,18 +98,61 @@ function Wartosc({ v }: { v: string }) {
   return <span className="ld-czesc">{v}</span>;
 }
 
+
+/** Nagłówek rozdziału: duży numer, linia i nazwa. Numeracja to oś całej strony. */
+function Rozdzial({ nr, nazwa }: { nr: number; nazwa: string }) {
+  return (
+    <div className="lx-rozdzial" data-odslon-klasa aria-hidden="true">
+      <span className="lx-rozdzial__nr">{String(nr).padStart(2, "0")}</span>
+      <i />
+      <span className="lx-rozdzial__nazwa">{nazwa}</span>
+    </div>
+  );
+}
+
+const TEMP_KOLOR = { goracy: "#f43f5e", cieply: "#f59e0b", zimny: "#0ea5e9" } as const;
+
+function Pierscien({ wynik, temp }: { wynik: number; temp: keyof typeof TEMP_KOLOR }) {
+  const r = 22;
+  const obwod = 2 * Math.PI * r;
+  return (
+    <span className="lx-pierscien">
+      <svg viewBox="0 0 52 52" aria-hidden="true">
+        <circle cx="26" cy="26" r={r} fill="none" strokeWidth="5" stroke="rgba(148,163,184,0.25)" />
+        <circle cx="26" cy="26" r={r} fill="none" strokeWidth="5" strokeLinecap="round" stroke={TEMP_KOLOR[temp]} strokeDasharray={obwod} style={{ ["--do" as string]: obwod * (1 - wynik / 100), ["--od" as string]: obwod }} />
+      </svg>
+      <b>{wynik}</b>
+    </span>
+  );
+}
+
+/** Liczba z przedrostkiem i przyrostkiem, np. „0 zł”: silnik odlicza tylko cyfry. */
+function Licznik({ wartosc }: { wartosc: string }) {
+  const m = wartosc.match(/^(\D*)(\d+)(.*)$/);
+  if (!m) return <>{wartosc}</>;
+  return (
+    <>
+      {m[1]}
+      <span data-licznik={m[2]}>{m[2]}</span>
+      {m[3]}
+    </>
+  );
+}
+
 /* ── Strona ────────────────────────────────────────────────── */
 
 export function StronaGlowna({ lang }: { lang: string }) {
   const locale = toLocale(lang);
+  const en = locale === "en";
   const t = nowaStrona(locale, DNI_PROBNE);
   const dict = getDict(locale);
   const faq = trescStronyGlownej(locale, DNI_PROBNE).faq.pozycje;
   const plany = dict.pricingWidget.plans;
   const href = (p: string) => localeHref(locale, p);
   const signup = "/signup";
+  const kotwice = ["pulpit", "coach", "teren", "biuro", "start"];
 
-  const krokiCoach: ReactNode[] = [
+  const wizualeCoach: ReactNode[] = [
     <div className="ld-combo" key="tel">
       <div className="ld-tel" role="img" aria-label={`${t.coach.telefon.typ}: ${t.coach.telefon.kto}`}>
         <div className="ld-tel__ekran" aria-hidden="true">
@@ -206,12 +229,9 @@ export function StronaGlowna({ lang }: { lang: string }) {
     { rodzaj: "narozna", pora: "zmierzch" },
     { rodzaj: "ulica", pora: "noc" },
   ];
-  const krokiDnia = t.dzien.momenty.map((m, i) => (
-    <Ilustracja key={m.obraz} nazwa={m.obraz} rodzaj={scenyDnia[i].rodzaj} pora={scenyDnia[i].pora} ziarno={11 + i * 7} w={1600} h={2000} alt={m.tytul} sizes="(max-width: 960px) 100vw, 50vw" />
-  ));
 
   return (
-    <div className="ld" data-ld>
+    <div className="ld" data-ld id="top">
       <Silnik />
 
       <div className="ld-loader" data-loader aria-hidden="true">
@@ -223,136 +243,111 @@ export function StronaGlowna({ lang }: { lang: string }) {
       </div>
       <div className="ld-kursor" data-kursor aria-hidden="true" />
 
-      {/* ── Nawigacja ── */}
-      <header className="ld-nav" data-nav>
-        <Link href={href("/")} className="ld-logo" aria-label="AgentSpace">
-          <Kafel className="ld-logo__kafel" />
-          <span className="ld-logo__napis">AgentSpace</span>
-        </Link>
-        <nav className="ld-nav__linki" aria-label="Nawigacja">
-          {t.nav.linki.map((l) => (
-            <a key={l.href} href={l.href}>
-              {l.label}
-            </a>
-          ))}
-        </nav>
-        <div className="ld-nav__akcje">
-          <Link className="ld-nav__login" href="/login">
-            {t.nav.login}
-          </Link>
-          <Link className="ld-btn" data-magnes href={signup}>
-            {t.nav.cta}
-          </Link>
-          <button className="ld-burger" data-burger aria-label={t.nav.menu} data-label-otworz={t.nav.menu} data-label-zamknij={t.nav.zamknij} aria-expanded="false" aria-controls="ld-menu">
-            <Ikona nazwa="menu" className="ic" />
-          </button>
-        </div>
-      </header>
-      <div className="ld-menu" id="ld-menu" data-menu>
-        <nav aria-label="Menu">
-          {t.nav.linki.map((l) => (
-            <a key={l.href} href={l.href}>
-              {l.label}
-            </a>
-          ))}
-        </nav>
-        <div className="ld-menu__akcje">
-          <Link className="ld-btn ld-btn--duzy" href={signup}>
-            {t.hero.cta}
-          </Link>
-          <Link className="ld-btn ld-btn--duch ld-btn--duzy" href="/login">
-            {t.nav.login}
-          </Link>
-        </div>
-      </div>
+      <LdNav lang={locale} />
 
       <main>
-        {/* ── Hero ── */}
-        <section className="ld-hero" id="gora">
-          <div className="ld-hero__siatka">
-            <h1>
-              <span className="ld-linia">
-                <span style={{ transitionDelay: "0.05s" }}>{t.hero.linie[0]}</span>
-              </span>
-              <span className="ld-linia">
-                <span style={{ transitionDelay: "0.17s" }} className="ld-gradient">
-                  {t.hero.linie[1]}
+        {/* ── Okładka ── */}
+        <section className="lx-hero">
+          <div className="lx-hero__tlo" aria-hidden="true" data-paralaksa="0.18">
+            <Ilustracja nazwa="noc-panorama" rodzaj="panorama" ziarno={21} w={2100} h={900} pora="noc" alt="" sizes="100vw" />
+          </div>
+          <div className="lx-hero__siatka">
+            <div className="lx-hero__tekst">
+              <p className="lx-hero__pod ld-wjedz">
+                <span className="ld-kropka" />
+                {t.hero.pod}
+              </p>
+              <h1>
+                <span className="ld-linia">
+                  <span style={{ transitionDelay: "0.05s" }}>{t.hero.linie[0]}</span>
                 </span>
-              </span>
-            </h1>
-            <p className="ld-hero__pod">
-              <span className="ld-linia">
-                <span style={{ transitionDelay: "0.32s" }}>{t.hero.pod}</span>
-              </span>
-            </p>
-            <div className="ld-hero__bok">
-              <p className="ld-lead ld-wjedz" style={{ transitionDelay: "0.5s" }}>
+                <span className="ld-linia">
+                  <span style={{ transitionDelay: "0.17s" }} className="ld-gradient">
+                    {t.hero.linie[1]}
+                  </span>
+                </span>
+              </h1>
+              <p className="ld-lead ld-wjedz" style={{ transitionDelay: "0.4s" }}>
                 {t.hero.lead}
               </p>
-              <div className="ld-hero__cta ld-wjedz" style={{ transitionDelay: "0.62s" }}>
+              <div className="lx-hero__cta ld-wjedz" style={{ transitionDelay: "0.52s" }}>
                 <Link className="ld-btn ld-btn--duzy" data-magnes href={signup}>
                   {t.hero.cta}
                   <Ikona nazwa="strzalka" />
                 </Link>
-                <a className="ld-btn ld-btn--duch ld-btn--duzy" href="#coach">
+                <a className="ld-btn ld-btn--duch ld-btn--duzy" href="#pulpit">
                   {t.hero.cta2}
                 </a>
               </div>
-              <p className="ld-hero__drobne ld-wjedz" style={{ transitionDelay: "0.7s" }}>
+              <p className="lx-hero__drobne ld-wjedz" style={{ transitionDelay: "0.6s" }}>
                 {t.hero.podCta}
               </p>
             </div>
+
+            <div className="lx-dzis ld-wjedz" style={{ transitionDelay: "0.7s" }} data-plywa="1" aria-label={`${t.hero.priorytety.tytul}: ${t.pulpit.tytul}`} role="img">
+              <div className="lx-dzis__gora" aria-hidden="true">
+                <b>{t.hero.priorytety.tytul}</b>
+                <span>agentspace.pl/app</span>
+              </div>
+              {t.hero.priorytety.karty.map((k, i) => (
+                <div className="lx-dzis__karta" key={k.kto} style={{ transitionDelay: `${0.9 + i * 0.14}s` }} aria-hidden="true">
+                  <Pierscien wynik={k.wynik} temp={k.temp} />
+                  <div>
+                    <b>{k.kto}</b>
+                    <small>{k.powod}</small>
+                  </div>
+                  <em className={`lx-temp lx-temp--${k.temp}`}>{k.tempNazwa}</em>
+                </div>
+              ))}
+              <div className="lx-dzis__coach" aria-hidden="true">
+                <span className="ld-karta__ikona">
+                  <Ikona nazwa="mikrofon" />
+                </span>
+                <div>
+                  <b>{t.hero.rozmowa.etykieta}</b>
+                  <small>
+                    {t.hero.ocena.tytul}: {t.hero.ocena.wynik}/10
+                  </small>
+                </div>
+                <div className="ld-fala">
+                  {Array.from({ length: 10 }, (_, i) => (
+                    <i key={i} style={{ animationDelay: `${((i * 7) % 10) / 10}s` }} />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="ld-scena ld-wjedz" style={{ transitionDelay: "0.8s" }}>
-            <div className="ld-scena__pochyl" data-pochyl>
-              <div className="ld-skala" data-skala data-w="1400" data-h="780">
-                <div className="ld-skala__wnetrze" style={{ width: 1400, height: 780 }}>
-                  <div style={{ position: "absolute", left: 90, top: 20, width: 1220 }}>
-                    <Okno zrzut="tablica" alt="AgentSpace: klienci na tablicy etapów sprzedaży" priorytet />
-                  </div>
-                  <div className="ld-plywa ld-karta" data-plywa="1.1" style={{ left: 0, top: 500, width: 330 }} aria-hidden="true">
-                    <div className="ld-karta__gora">
-                      <b>
-                        <span className="ld-kropka" />
-                        {t.hero.rozmowa.etykieta}
-                      </b>
-                      {t.hero.rozmowa.czas}
-                    </div>
-                    <div className="ld-karta__kto">
-                      <span className="ld-karta__ikona">
-                        <Ikona nazwa="mikrofon" />
-                      </span>
-                      <div>
-                        <b>{t.hero.rozmowa.kto}</b>
-                        <small>{t.hero.rozmowa.gdzie}</small>
-                      </div>
-                    </div>
-                    <div className="ld-fala">
-                      {Array.from({ length: 16 }, (_, i) => (
-                        <i key={i} style={{ animationDelay: `${((i * 7) % 10) / 10}s` }} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="ld-plywa ld-karta" data-plywa="1.8" style={{ right: 0, top: 110, width: 300 }} aria-hidden="true">
-                    <div className="ld-karta__gora">
-                      <b>{t.hero.ocena.tytul}</b>
-                      AI Coach
-                    </div>
-                    <div className="ld-ocena__wynik">
-                      <b>{t.hero.ocena.wynik}</b>
-                      <span>/10</span>
-                    </div>
-                    {t.hero.ocena.obszary.map(([nazwa, v]) => (
-                      <div className="ld-pasek" key={nazwa}>
-                        <span>{nazwa}</span>
-                        <i>
-                          <em style={{ ["--v" as string]: `${v * 10}%` }} />
-                        </i>
-                        <b>{v}</b>
-                      </div>
-                    ))}
-                  </div>
+          <nav className="lx-spis ld-wjedz" style={{ transitionDelay: "0.85s" }} aria-label={en ? "Chapters" : "Rozdziały"}>
+            {t.rozdzialy.map((r, i) => (
+              <a key={r} href={`#${kotwice[i]}`}>
+                <span>{String(i + 1).padStart(2, "0")}</span>
+                {r}
+              </a>
+            ))}
+          </nav>
+        </section>
+
+        {/* ── 01 Pulpit: okno aplikacji wypłaszcza się przy przewijaniu ── */}
+        <section className="lx-pulpit" id="pulpit">
+          <div className="lx-pulpit__tor" data-plaszcz>
+            <div className="lx-pulpit__pin">
+              <div className="lx-pulpit__tekst">
+                <Rozdzial nr={1} nazwa={t.rozdzialy[0]} />
+                <Slowa tekst={t.pulpit.tytul} />
+                <p className="ld-lead">{t.pulpit.lead}</p>
+                <ol className="lx-pulpit__punkty">
+                  {t.pulpit.punkty.map((p, i) => (
+                    <li key={p.tytul} data-plaszcz-punkt={i}>
+                      <b>{p.tytul}</b>
+                      <span>{p.tekst}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <div className="lx-pulpit__scena">
+                <div className="lx-pulpit__okno" data-plaszcz-okno>
+                  <Okno zrzut="pulpit" alt={en ? "AgentSpace dashboard: today's priorities with client scores" : "Pulpit AgentSpace: priorytety na dziś z oceną klientów"} priorytet />
                 </div>
               </div>
             </div>
@@ -360,7 +355,7 @@ export function StronaGlowna({ lang }: { lang: string }) {
         </section>
 
         {/* ── Manifest ── */}
-        <section className="ld-manifest" aria-label="Dlaczego AgentSpace">
+        <section className="ld-manifest" aria-label={en ? "Why AgentSpace" : "Dlaczego AgentSpace"}>
           <p data-manifest>
             <span className="sr">{t.manifest}</span>
             {t.manifest.split(/\s+/).map((w, i) => (
@@ -371,224 +366,106 @@ export function StronaGlowna({ lang }: { lang: string }) {
           </p>
         </section>
 
-        {/* ── AI Coach ── */}
-        <section className="ld-historia" id="coach">
-          <div className="ld-glowka">
-            <div>
-              <span className="ld-pigulka">
-                <span className="ld-pigulka__ikona">
-                  <Ikona nazwa="iskra" />
-                </span>
-                {t.coach.etykieta}
-              </span>
-              <Slowa tekst={t.coach.tytul} />
-            </div>
+        {/* ── 02 AI Coach: przypięta scena z zakładkami etapów ── */}
+        <section className="lx-coach" id="coach">
+          <div className="lx-naglowek">
+            <Rozdzial nr={2} nazwa={t.rozdzialy[1]} />
+            <Slowa tekst={t.coach.tytul} />
             <p className="ld-lead">{t.coach.lead}</p>
           </div>
-          <div className="ld-hist" data-historia>
-            <div className="ld-hist__kroki">
-              {t.coach.kroki.map((k, i) => (
-                <article className="ld-krok" key={k.tytul}>
-                  <div className="ld-inline">
-                    <Ilustracja nazwa="coach-telefon-tlo" rodzaj="panorama" ziarno={7} w={1600} h={1250} pora="noc" alt="" className="ld-ilu ld-widok-tlo" sizes="(max-width: 960px) 100vw, 60vw" />
-                    <div className="ld-ekran">{krokiCoach[i]}</div>
-                  </div>
-                  <h3>{k.tytul}</h3>
-                  <p>{k.tekst}</p>
-                  {k.cytat && (
-                    <p className="ld-cytat">
-                      <b>{k.cytat.kto}</b>
-                      {k.cytat.tresc}
-                    </p>
-                  )}
-                  {k.dopisek && <p>{k.dopisek}</p>}
-                </article>
-              ))}
-            </div>
-            <div className="ld-hist__bok">
-              <div className="ld-hist__widok">
-                <Ilustracja nazwa="coach-telefon-tlo" rodzaj="panorama" ziarno={7} w={1600} h={1250} pora="noc" alt="" className="ld-ilu ld-widok-tlo" sizes="(max-width: 960px) 100vw, 60vw" />
-                {krokiCoach.map((w, i) => (
-                  <div className="ld-ekran" key={i} data-ekran>
-                    {w}
-                  </div>
-                ))}
-              </div>
-              <div className="ld-kropki">
+          <div className="lx-coach__tor" data-etapy>
+            <div className="lx-coach__pin">
+              <div className="lx-etapy" role="tablist" aria-label={t.coach.etykieta}>
                 {t.coach.kroki.map((k, i) => (
-                  <button key={i} aria-label={k.tytul} data-kropka={i}>
-                    <span />
+                  <button key={k.tytul} role="tab" className={i === 0 ? "on" : ""} aria-selected={i === 0} data-etap-tab={i}>
+                    <span>{String(i + 1).padStart(2, "0")}</span>
+                    {k.tytul}
+                    <i>
+                      <em />
+                    </i>
                   </button>
                 ))}
+              </div>
+              <div className="lx-coach__uklad">
+                <div className="lx-coach__scena">
+                  <Ilustracja nazwa="coach-telefon-tlo" rodzaj="panorama" ziarno={7} w={1600} h={1250} pora="noc" alt="" className="ld-ilu ld-widok-tlo" sizes="(max-width: 960px) 100vw, 60vw" />
+                  {wizualeCoach.map((w, i) => (
+                    <div className={`lx-coach__wizual${i === 0 ? " on" : ""}`} key={i} data-etap-wizual>
+                      {w}
+                    </div>
+                  ))}
+                </div>
+                <div className="lx-coach__teksty">
+                  {t.coach.kroki.map((k, i) => (
+                    <article key={k.tytul} className={`lx-coach__tekst${i === 0 ? " on" : ""}`} data-etap-tekst>
+                      <div className="lx-coach__inline">
+                        <Ilustracja nazwa="coach-telefon-tlo" rodzaj="panorama" ziarno={7} w={1600} h={1250} pora="noc" alt="" className="ld-ilu ld-widok-tlo" sizes="100vw" />
+                        <div className="lx-coach__wizual on">{wizualeCoach[i]}</div>
+                      </div>
+                      <h3>{k.tytul}</h3>
+                      <p>{k.tekst}</p>
+                      {k.cytat && (
+                        <p className="ld-cytat">
+                          <b>{k.cytat.kto}</b>
+                          {k.cytat.tresc}
+                        </p>
+                      )}
+                      {k.dopisek && <p className="lx-coach__dopisek">{k.dopisek}</p>}
+                    </article>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
           <div className="ld-liczby-pas">
             {t.coach.liczby.map((l) => (
               <div key={l.opis} data-odslon>
-                <b className="ld-gradient">{l.wartosc}</b>
+                <b className="ld-gradient">
+                  <Licznik wartosc={l.wartosc} />
+                </b>
                 <span>{l.opis}</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ── Dzień agenta ── */}
-        <section className="ld-historia ld-jasna ld-kurtyna" id="dzien" style={{ zIndex: 2 }}>
-          <div className="ld-glowka">
+        {/* ── 03 Teren: dzień agenta na poziomym torze ── */}
+        <section className="lx-teren ld-jasna" id="teren">
+          <div className="lx-naglowek lx-naglowek--rzad">
             <div>
-              <span className="ld-etykieta">{t.dzien.etykieta}</span>
+              <Rozdzial nr={3} nazwa={t.rozdzialy[2]} />
               <Slowa tekst={t.dzien.tytul} />
             </div>
             <p className="ld-lead">{t.dzien.lead}</p>
           </div>
-          <div className="ld-hist" data-historia>
-            <div className="ld-hist__kroki">
-              {t.dzien.momenty.map((m, i) => (
-                <article className="ld-krok" key={m.pora}>
-                  <div className="ld-inline">
-                    <div className="ld-ekran">{krokiDnia[i]}</div>
-                  </div>
-                  <span className="ld-krok__pora">{m.pora}</span>
-                  <h3>{m.tytul}</h3>
-                  <p>{m.tekst}</p>
-                  <ul className="ld-punkty">
-                    {m.punkty.map((p) => (
-                      <li key={p}>{p}</li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-            <div className="ld-hist__bok">
-              <div className="ld-hist__widok">
-                {krokiDnia.map((w, i) => (
-                  <div className="ld-ekran" key={i} data-ekran>
-                    {w}
-                  </div>
-                ))}
-              </div>
-              <div className="ld-kropki">
+          <div className="lx-teren__tor" data-poziomo>
+            <div className="lx-teren__pin">
+              <div className="lx-teren__szyna" data-poziomo-szyna>
                 {t.dzien.momenty.map((m, i) => (
-                  <button key={i} aria-label={`${m.pora} ${m.tytul}`} data-kropka={i}>
-                    <span />
-                  </button>
+                  <article className="lx-moment" key={m.pora}>
+                    <div className="lx-moment__obraz">
+                      <Ilustracja nazwa={m.obraz} rodzaj={scenyDnia[i].rodzaj} pora={scenyDnia[i].pora} ziarno={11 + i * 7} w={1600} h={2000} alt={m.tytul} sizes="(max-width: 960px) 100vw, 34vw" />
+                      <span className="lx-moment__pora">{m.pora}</span>
+                    </div>
+                    <div className="lx-moment__tekst">
+                      <h3>{m.tytul}</h3>
+                      <p>{m.tekst}</p>
+                      <ul className="ld-punkty">
+                        {m.punkty.map((p) => (
+                          <li key={p}>{p}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </article>
                 ))}
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Rozszerzające się ujęcie ── */}
-        <section className="ld-rozsz" data-rozsz aria-label={t.rozszerzenie.tytul} style={{ zIndex: 3 }}>
-          <div className="ld-rozsz__pin">
-            <div className="ld-rozsz__obraz" data-rozsz-obraz>
-              <Ilustracja nazwa="miasto-zmierzch" rodzaj="ulica" ziarno={7} w={1600} h={900} pora="zmierzch" alt="Kamienice w Krakowie o zmierzchu, w jednej świeci biuro" />
-              <div className="ld-rozsz__cien" />
-            </div>
-            <div className="ld-rozsz__tekst" data-rozsz-tekst>
-              <h2 className="ld-h2">{t.rozszerzenie.tytul}</h2>
-              <p className="ld-lead">{t.rozszerzenie.lead}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Właściciel ── */}
-        <section className="ld-wlasc ld-jasna" id="wlasciciel" style={{ position: "relative", zIndex: 4 }}>
-          <div className="ld-glowka">
-            <div>
-              <span className="ld-etykieta">{t.wlasciciel.etykieta}</span>
-              <Slowa tekst={t.wlasciciel.tytul} />
-            </div>
-            <p className="ld-lead">{t.wlasciciel.lead}</p>
-          </div>
-          <div className="ld-wlasc__siatka">
-            {t.wlasciciel.karty.map((k) => (
-              <Link href={href(k.href)} className="ld-wkarta" key={k.tytul} data-odslon-klasa>
-                <div className="ld-wkarta__obraz">
-                  <Image src={`/strona/zrzuty/${k.zrzut}.webp`} alt={k.tytul} width={2000} height={1250} sizes="(max-width: 960px) 100vw, 45vw" />
-                </div>
-                <h3>{k.tytul}</h3>
-                <p>{k.tekst}</p>
-                <span className="ld-wkarta__link">
-                  {locale === "en" ? "Learn more" : "Zobacz więcej"}
-                  <Ikona nazwa="strzalka" />
-                </span>
-              </Link>
-            ))}
-          </div>
-          <ul className="ld-wlasc__lista">
-            {t.wlasciciel.lista.map((l) => (
-              <li key={l.tytul} data-odslon>
-                <b>{l.tytul}</b>
-                <p>{l.tekst}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* ── Moduły ── */}
-        <section className="ld-mod ld-kurtyna" id="moduly">
-          <div className="ld-glowka">
-            <div>
-              <span className="ld-etykieta">{t.moduly.etykieta}</span>
-              <Slowa tekst={t.moduly.tytul} />
-            </div>
-          </div>
-          <div className="ld-mod__tor" data-mod>
-            <div className="ld-mod__pin">
-              <div className="ld-mod__zakladki" role="tablist" aria-label={t.moduly.etykieta}>
-                {t.moduly.lista.map((m, i) => (
-                  <button key={m.nazwa} role="tab" className={i === 0 ? "on" : ""} aria-selected={i === 0} data-zakladka={i}>
-                    {m.nazwa}
-                    <i />
-                  </button>
-                ))}
-              </div>
-              <div className="ld-mod__podpis" aria-live="polite">
-                {t.moduly.lista.map((m, i) => (
-                  <div key={m.nazwa} className={i === 0 ? "on" : ""}>
-                    <h3>{m.tytul}</h3>
-                    <p>{m.tekst}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="ld-mod__ramka">
-                <figure className="ld-okno">
-                  <div className="ld-okno__pasek" aria-hidden="true">
-                    <i />
-                    <i />
-                    <i />
-                    <span>agentspace.pl/app</span>
-                  </div>
-                  <div className="ld-mod__zrzuty">
-                    {t.moduly.lista.map((m, i) => (
-                      <Image key={m.nazwa} className={i === 0 ? "on" : ""} src={`/strona/zrzuty/${m.zrzut}.webp`} alt={`${m.nazwa}: ${m.tytul}`} width={2000} height={1250} sizes="(max-width: 960px) 100vw, 75vw" />
-                    ))}
-                  </div>
-                </figure>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Liczby ── */}
-        <section className="ld-dowod" aria-label={t.liczby.etykieta}>
-          <div className="ld-dowod__tor" data-dowod>
-            <div className="ld-dowod__pin">
-              <span className="ld-etykieta ld-dowod__etykieta">{t.liczby.etykieta}</span>
-              <div className="ld-dowod__slajdy">
-                {t.liczby.slajdy.map((s, i) => (
-                  <div key={s.wartosc} className={`ld-dowod__slajd${i === 0 ? " on" : ""}`}>
-                    <span className="ld-dowod__duza ld-gradient">{s.wartosc}</span>
-                    <span className="ld-dowod__opis">{s.opis}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="ld-dowod__nav" aria-hidden="true">
-                {t.liczby.slajdy.map((s) => (
-                  <span key={s.wartosc}>
-                    <i />
+              <div className="lx-zegar" aria-hidden="true">
+                <i>
+                  <em data-poziomo-pasek />
+                </i>
+                {t.dzien.momenty.map((m, i) => (
+                  <span key={m.pora} data-poziomo-znacznik={i} style={{ left: `${(i / (t.dzien.momenty.length - 1)) * 100}%` }}>
+                    {m.pora}
                   </span>
                 ))}
               </div>
@@ -596,34 +473,144 @@ export function StronaGlowna({ lang }: { lang: string }) {
           </div>
         </section>
 
-        {/* ── Dla kogo ── */}
-        <section className="ld-kogo ld-jasna ld-kurtyna">
-          <div className="ld-glowka">
+        {/* ── 04 Biuro: panorama z paralaksą i kafelki właściciela ── */}
+        <section className="lx-biuro" id="biuro">
+          <div className="lx-biuro__baner">
+            <div className="lx-biuro__foto" data-paralaksa="0.22">
+              <Ilustracja nazwa="miasto-zmierzch" rodzaj="ulica" ziarno={7} w={1600} h={900} pora="zmierzch" alt={en ? "Kraków tenements at dusk, an office light on" : "Kamienice w Krakowie o zmierzchu, w jednej świeci biuro"} />
+            </div>
+            <div className="lx-biuro__baner-tekst">
+              <Rozdzial nr={4} nazwa={t.rozdzialy[3]} />
+              <h2 className="ld-h2">{t.rozszerzenie.tytul}</h2>
+              <p className="ld-lead">{t.rozszerzenie.lead}</p>
+            </div>
+          </div>
+          <div className="lx-biuro__wnetrze ld-jasna">
+            <div className="lx-naglowek lx-naglowek--rzad">
+              <div>
+                <span className="ld-etykieta">{t.wlasciciel.etykieta}</span>
+                <Slowa tekst={t.wlasciciel.tytul} />
+              </div>
+              <p className="ld-lead">{t.wlasciciel.lead}</p>
+            </div>
+            <div className="lx-bento">
+              {t.wlasciciel.karty.map((k, i) => (
+                <Link href={href(k.href)} className={`lx-bento__karta lx-bento__karta--${i + 1}`} key={k.tytul} data-odslon-klasa>
+                  <div className="lx-bento__obraz">
+                    <Image src={`/strona/zrzuty/${k.zrzut}.webp`} alt={k.tytul} width={2000} height={1250} sizes="(max-width: 960px) 100vw, 60vw" />
+                  </div>
+                  <div className="lx-bento__tekst">
+                    <h3>{k.tytul}</h3>
+                    <p>{k.tekst}</p>
+                    <span className="ld-wkarta__link">
+                      {en ? "Learn more" : "Zobacz więcej"}
+                      <Ikona nazwa="strzalka" />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <ul className="lx-biuro__lista">
+              {t.wlasciciel.lista.map((l, i) => (
+                <li key={l.tytul} data-odslon>
+                  <span>{String(i + 1).padStart(2, "0")}</span>
+                  <b>{l.tytul}</b>
+                  <p>{l.tekst}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ── Indeks modułów: okno po lewej, spis po prawej ── */}
+        <section className="lx-indeks" id="moduly">
+          <div className="lx-naglowek">
+            <span className="ld-etykieta">{t.moduly.etykieta}</span>
+            <Slowa tekst={t.moduly.tytul} />
+          </div>
+          <div className="lx-indeks__uklad" data-historia>
+            <div className="lx-indeks__bok">
+              <div className="lx-indeks__okno">
+                <figure className="ld-okno">
+                  <div className="ld-okno__pasek" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                    <span>agentspace.pl/app</span>
+                  </div>
+                  <div className="lx-indeks__zrzuty">
+                    {t.moduly.lista.map((m) => (
+                      <div key={m.nazwa} className="lx-indeks__zrzut" data-ekran>
+                        <Image src={`/strona/zrzuty/${m.zrzut}.webp`} alt={`${m.nazwa}: ${m.tytul}`} width={2000} height={1250} sizes="(max-width: 960px) 100vw, 55vw" />
+                      </div>
+                    ))}
+                  </div>
+                </figure>
+              </div>
+            </div>
+            <ol className="lx-indeks__lista">
+              {t.moduly.lista.map((m, i) => (
+                <li className="ld-krok lx-indeks__poz" key={m.nazwa}>
+                  <div className="ld-inline lx-indeks__inline">
+                    <Okno zrzut={m.zrzut} alt={`${m.nazwa}: ${m.tytul}`} male />
+                  </div>
+                  <span className="lx-indeks__nr">{String(i + 1).padStart(2, "0")}</span>
+                  <h3>{m.nazwa}</h3>
+                  <p>
+                    <b>{m.tytul}</b> {m.tekst}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <Link className="lx-indeks__wiecej" href={href("/produkt")}>
+            {en ? "All modules" : "Wszystkie moduły"}
+            <Ikona nazwa="strzalka" />
+          </Link>
+        </section>
+
+        {/* ── Liczby: pas z odliczaniem ── */}
+        <section className="lx-liczby" aria-label={t.liczby.etykieta}>
+          <span className="lx-liczby__etykieta">{t.liczby.etykieta}</span>
+          <div className="lx-liczby__rzad">
+            {t.liczby.slajdy.map((s) => (
+              <div key={s.wartosc} data-odslon>
+                <b>
+                  <Licznik wartosc={s.wartosc} />
+                </b>
+                <span>{s.opis}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Dla kogo: rozwijane panele ── */}
+        <section className="lx-kogo ld-jasna">
+          <div className="lx-naglowek lx-naglowek--rzad">
             <div>
               <Slowa tekst={t.dlaKogo.tytul} />
             </div>
             <p className="ld-lead">{t.dlaKogo.lead}</p>
           </div>
-          <div className="ld-kogo__siatka">
+          <div className="lx-kogo__rzad">
             {t.dlaKogo.karty.map((k, i) => (
-              <article className="ld-kkarta" key={k.tytul} data-odslon-klasa>
-                <div className="ld-kkarta__obraz">
-                  <Ilustracja nazwa={k.obraz} rodzaj={(["narozna", "biurowiec", "agent"] as RodzajSceny[])[i]} ziarno={3 + i * 5} w={600} h={760} pora={i === 1 ? "noc" : "zmierzch"} alt={k.tytul} sizes="(max-width: 960px) 100vw, 33vw" />
+              <article className="lx-panel" key={k.tytul} tabIndex={0} data-odslon-klasa>
+                <Ilustracja nazwa={k.obraz} rodzaj={(["narozna", "biurowiec", "agent"] as RodzajSceny[])[i]} ziarno={3 + i * 5} w={600} h={760} pora={i === 1 ? "noc" : "zmierzch"} alt={k.tytul} sizes="(max-width: 960px) 100vw, 50vw" />
+                <div className="lx-panel__tekst">
+                  <span>{String(i + 1).padStart(2, "0")}</span>
+                  <h3>{k.tytul}</h3>
+                  <p>{k.tekst}</p>
                 </div>
-                <h3>{k.tytul}</h3>
-                <p>{k.tekst}</p>
               </article>
             ))}
           </div>
         </section>
 
         {/* ── Porównanie ── */}
-        <section className="ld-por ld-kurtyna" data-odslon-klasa>
-          <div className="ld-glowka">
-            <div>
-              <span className="ld-etykieta">{t.porownanie.etykieta}</span>
-              <Slowa tekst={t.porownanie.tytul} />
-            </div>
+        <section className="ld-por" data-odslon-klasa>
+          <div className="lx-naglowek lx-naglowek--srodek">
+            <span className="ld-etykieta">{t.porownanie.etykieta}</span>
+            <Slowa tekst={t.porownanie.tytul} />
             <p className="ld-lead">{t.porownanie.lead}</p>
           </div>
           <div className="ld-por__tabela">
@@ -631,7 +618,7 @@ export function StronaGlowna({ lang }: { lang: string }) {
               <thead>
                 <tr>
                   <th scope="col">
-                    <span className="sr">{locale === "en" ? "Feature" : "Funkcja"}</span>
+                    <span className="sr">{en ? "Feature" : "Funkcja"}</span>
                   </th>
                   <th scope="col">{t.porownanie.kolumny[0]}</th>
                   <th scope="col">{t.porownanie.kolumny[1]}</th>
@@ -662,12 +649,10 @@ export function StronaGlowna({ lang }: { lang: string }) {
         </section>
 
         {/* ── Cennik ── */}
-        <section className="ld-cennik ld-jasna ld-kurtyna" id="cennik">
-          <div className="ld-glowka">
-            <div>
-              <span className="ld-etykieta">{t.cennik.etykieta}</span>
-              <Slowa tekst={t.cennik.tytul} />
-            </div>
+        <section className="ld-cennik ld-jasna" id="cennik">
+          <div className="lx-naglowek lx-naglowek--srodek">
+            <span className="ld-etykieta">{t.cennik.etykieta}</span>
+            <Slowa tekst={t.cennik.tytul} />
             <p className="ld-lead">{t.cennik.lead}</p>
           </div>
           <div className="ld-plany">
@@ -699,116 +684,110 @@ export function StronaGlowna({ lang }: { lang: string }) {
               );
             })}
           </div>
-          <Link className="ld-cennik__pelny" href={href("/cennik")}>
-            {t.cennik.pelny}
-            <Ikona nazwa="strzalka" />
-          </Link>
+          <div className="lx-srodek">
+            <Link className="ld-cennik__pelny" href={href("/cennik")}>
+              {t.cennik.pelny}
+              <Ikona nazwa="strzalka" />
+            </Link>
+          </div>
         </section>
 
-        {/* ── Start ── */}
-        <section className="ld-start ld-kurtyna" id="start">
-          <div className="ld-glowka">
+        {/* ── 05 Start: oś z trzema krokami ── */}
+        <section className="lx-start" id="start">
+          <div className="lx-naglowek lx-naglowek--rzad">
             <div>
-              <span className="ld-etykieta">{t.start.etykieta}</span>
+              <Rozdzial nr={5} nazwa={t.rozdzialy[4]} />
               <Slowa tekst={t.start.tytul} />
             </div>
             <p className="ld-lead">{t.start.lead}</p>
           </div>
-          <div className="ld-stos" data-stos>
+          <div className="lx-os" data-linia>
+            <div className="lx-os__linia" aria-hidden="true">
+              <em data-linia-pasek />
+            </div>
             {t.start.kroki.map((k, i) => (
-              <article key={k.tytul} className={`ld-skarta ld-skarta--${i + 1}`} style={{ ["--i" as string]: i }}>
-                <div className="ld-skarta__tekst">
-                  <span className="ld-skarta__nr">{i + 1}</span>
-                  <div>
-                    <h3>{k.tytul}</h3>
-                    <p>{k.tekst}</p>
-                    {i === 0 && (
-                      <Link className="ld-btn ld-btn--ciemny" href={signup}>
-                        {t.start.cta}
-                      </Link>
-                    )}
-                  </div>
-                </div>
-                <div className="ld-skarta__ui" aria-hidden="true">
+              <article key={k.tytul} className="lx-os__krok" data-linia-wezel={i}>
+                <span className="lx-os__wezel">{i + 1}</span>
+                <h3>{k.tytul}</h3>
+                <p>{k.tekst}</p>
+                <div className="ld-skarta__ui lx-os__ui" aria-hidden="true">
                   {i === 0 && (
                     <>
                       <div className="ld-pole">
-                        <small>{locale === "en" ? "Agency name" : "Nazwa biura"}</small>
-                        <span>{locale === "en" ? "e.g. Spectra Real Estate" : "np. Spectra Nieruchomości"}</span>
+                        <small>{en ? "Agency name" : "Nazwa biura"}</small>
+                        <span>{en ? "e.g. Spectra Real Estate" : "np. Spectra Nieruchomości"}</span>
                       </div>
                       <div className="ld-pole ok">
-                        <small>{locale === "en" ? "Work email" : "E-mail służbowy"}</small>
+                        <small>{en ? "Work email" : "E-mail służbowy"}</small>
                         <span>biuro@twojebiuro.pl</span>
                         <Ikona nazwa="ptaszek" />
                       </div>
-                      <div className="ld-wiersz">
-                        <div className="ld-pole">
-                          <small>{locale === "en" ? "Password" : "Hasło"}</small>
-                          <span>••••••••••</span>
-                        </div>
-                        <div className="ld-pole ok">
-                          <small>{locale === "en" ? "Trial" : "Okres próbny"}</small>
-                          <span>{locale === "en" ? `${DNI_PROBNE} days` : `${DNI_PROBNE} dni`}</span>
-                          <Ikona nazwa="ptaszek" />
-                        </div>
+                      <div className="ld-pole ok">
+                        <small>{en ? "Trial" : "Okres próbny"}</small>
+                        <span>{en ? `${DNI_PROBNE} days` : `${DNI_PROBNE} dni`}</span>
+                        <Ikona nazwa="ptaszek" />
                       </div>
-                      <span className="ld-guzik-ui">{t.start.cta}</span>
                     </>
                   )}
-                  {i === 1 && (
-                    <>
-                      {[
-                        [locale === "en" ? "clients.xlsx" : "klienci.xlsx", locale === "en" ? "412 clients" : "412 klientów", 100],
-                        [locale === "en" ? "listings.csv" : "oferty.csv", locale === "en" ? "86 listings" : "86 ofert", 100],
-                        [locale === "en" ? "contacts.xlsx" : "kontakty.xlsx", locale === "en" ? "matching columns" : "dopasowanie kolumn", 62],
-                      ].map(([plik, opis, v]) => (
-                        <div className="ld-import" key={String(plik)}>
-                          <span className="ld-import__ikona">
-                            <Ikona nazwa="arkusz" />
-                          </span>
-                          <div>
-                            <b>{plik}</b>
-                            <small>{opis}</small>
-                            <i>
-                              <em style={{ ["--v" as string]: `${v}%` }} />
-                            </i>
-                          </div>
-                          {v === 100 ? <span className="ok">{locale === "en" ? "done" : "gotowe"}</span> : <small>{v}%</small>}
+                  {i === 1 &&
+                    [
+                      [en ? "clients.xlsx" : "klienci.xlsx", en ? "412 clients" : "412 klientów", 100],
+                      [en ? "listings.csv" : "oferty.csv", en ? "86 listings" : "86 ofert", 100],
+                      [en ? "contacts.xlsx" : "kontakty.xlsx", en ? "matching columns" : "dopasowanie kolumn", 62],
+                    ].map(([plik, opis, v]) => (
+                      <div className="ld-import" key={String(plik)}>
+                        <span className="ld-import__ikona">
+                          <Ikona nazwa="arkusz" />
+                        </span>
+                        <div>
+                          <b>{plik}</b>
+                          <small>{opis}</small>
+                          <i>
+                            <em style={{ ["--v" as string]: `${v}%` }} />
+                          </i>
                         </div>
-                      ))}
-                    </>
-                  )}
-                  {i === 2 && (
-                    <>
-                      {[
-                        ["ZM", "Zofia M.", locale === "en" ? "Manager" : "Menedżer", "#6ee7c8"],
-                        ["AW", "Adam W.", "Agent", "#67e8f9"],
-                        ["KS", "Klara S.", "Agent", "#a7f3d0"],
-                        ["EB", "Ewa B.", locale === "en" ? "Accountant" : "Księgowa", "#bae6fd"],
-                      ].map(([ini, kto, rola, kolor]) => (
-                        <div className="ld-osoba" key={kto}>
-                          <span className="ld-osoba__awatar" style={{ background: kolor }}>
-                            {ini}
-                          </span>
-                          <div>
-                            <b>{kto}</b>
-                            <small>{locale === "en" ? "invitation sent" : "zaproszenie wysłane"}</small>
-                          </div>
-                          <em>{rola}</em>
+                        {v === 100 ? <span className="ok">{en ? "done" : "gotowe"}</span> : <small>{v}%</small>}
+                      </div>
+                    ))}
+                  {i === 2 &&
+                    [
+                      ["ZM", "Zofia M.", en ? "Manager" : "Menedżer", "#6ee7c8"],
+                      ["AW", "Adam W.", "Agent", "#67e8f9"],
+                      ["EB", "Ewa B.", en ? "Accountant" : "Księgowa", "#bae6fd"],
+                    ].map(([ini, kto, rola, kolor]) => (
+                      <div className="ld-osoba" key={kto}>
+                        <span className="ld-osoba__awatar" style={{ background: kolor }}>
+                          {ini}
+                        </span>
+                        <div>
+                          <b>{kto}</b>
+                          <small>{en ? "invitation sent" : "zaproszenie wysłane"}</small>
                         </div>
-                      ))}
-                    </>
-                  )}
+                        <em>{rola}</em>
+                      </div>
+                    ))}
                 </div>
               </article>
             ))}
           </div>
+          <div className="lx-srodek">
+            <Link className="ld-btn ld-btn--duzy" data-magnes href={signup}>
+              {t.start.cta}
+              <Ikona nazwa="strzalka" />
+            </Link>
+          </div>
         </section>
 
         {/* ── FAQ ── */}
-        <section className="ld-faq ld-jasna ld-kurtyna" id="pytania">
+        <section className="ld-faq ld-jasna" id="pytania">
           <div className="ld-faq__siatka">
-            <Slowa tekst={t.faq.tytul} />
+            <div className="ld-faq__bok">
+              <Slowa tekst={t.faq.tytul} />
+              <p className="ld-lead">
+                {en ? "Something else? " : "Coś jeszcze? "}
+                <Link href={href("/kontakt")}>{en ? "Write to us" : "Napisz do nas"}</Link>
+              </p>
+            </div>
             <div className="ld-faq__lista">
               {faq.map((p, i) => (
                 <div className="ld-pyt" key={p.q} data-pyt>
@@ -831,71 +810,32 @@ export function StronaGlowna({ lang }: { lang: string }) {
           </div>
         </section>
 
-        {/* ── Koniec ── */}
-        <section className="ld-koniec" aria-label={t.koniec.tytul}>
-          <div className="ld-koniec__pudlo" data-koniec>
-            <Ilustracja nazwa="noc-panorama" rodzaj="panorama" ziarno={21} w={2100} h={900} pora="noc" alt="" />
-            <div>
-              <Slowa tekst={t.koniec.tytul} />
-              <p className="ld-lead">{t.koniec.lead}</p>
-            </div>
-            <form className="ld-koniec__form" action="/signup" method="get">
-              <label htmlFor="ld-email">{t.koniec.pole}</label>
-              <input id="ld-email" name="email" type="email" autoComplete="email" required placeholder="biuro@twojebiuro.pl" />
-              <button className="ld-btn ld-btn--duzy" type="submit" data-magnes style={{ alignSelf: "flex-start" }}>
+        {/* ── Koniec: pełny kadr z formularzem w jednej linii ── */}
+        <section className="lx-koniec" aria-label={t.koniec.tytul}>
+          <div className="lx-koniec__tlo" data-paralaksa="0.16" aria-hidden="true">
+            <Ilustracja nazwa="coach-telefon-tlo" rodzaj="panorama" ziarno={19} w={2000} h={1116} pora="noc" alt="" />
+          </div>
+          <div className="lx-koniec__tresc">
+            <Slowa tekst={t.koniec.tytul} />
+            <p className="ld-lead">{t.koniec.lead}</p>
+            <form className="lx-koniec__form" action="/signup" method="get">
+              <label htmlFor="ld-email" className="sr">
+                {t.koniec.pole}
+              </label>
+              <input id="ld-email" name="email" type="email" autoComplete="email" required placeholder={t.koniec.pole} />
+              <button className="ld-btn ld-btn--duzy" type="submit" data-magnes>
                 {t.koniec.przycisk}
                 <Ikona nazwa="strzalka" />
               </button>
-              <p className="ld-koniec__alt">
-                {t.koniec.alt} <Link href={href("/demo")}>{t.koniec.altLink}</Link>
-              </p>
             </form>
+            <p className="ld-koniec__alt">
+              {t.koniec.alt} <Link href={href("/demo")}>{t.koniec.altLink}</Link>
+            </p>
           </div>
         </section>
       </main>
 
-      {/* ── Stopka ── */}
-      <footer className="ld-stopka">
-        <div className="ld-stopka__gora">
-          <div>
-            <Link href={href("/")} className="ld-logo" aria-label="AgentSpace">
-              <Kafel className="ld-logo__kafel" />
-              <span className="ld-logo__napis">AgentSpace</span>
-            </Link>
-            <p>{dict.footer.tagline}</p>
-            <address className="ld-stopka__firma">
-              <b>Spectra Nieruchomości</b>
-              ul. Zbożowa 2/1, 30-002 Kraków
-              <br />
-              NIP 6772516327 · REGON 529666353
-              <br />
-              <a href="mailto:nieruchomoscispectra@gmail.com">nieruchomoscispectra@gmail.com</a>
-            </address>
-          </div>
-          {dict.footer.sections.map((s) => (
-            <div key={s.title}>
-              <h4>{s.title}</h4>
-              <ul>
-                {s.links.map((l) => (
-                  <li key={l.href}>
-                    <Link href={href(l.href)}>{l.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div className="ld-stopka__dol">
-          <span>© 2026 AgentSpace · agentspace.pl</span>
-          <span>{dict.footer.madeIn.before}{dict.footer.madeIn.company}{dict.footer.madeIn.after}</span>
-        </div>
-        <a className="ld-gora" href="#gora" aria-label={t.stopka.gora} data-magnes>
-          <Ikona nazwa="gora" className="ic" />
-        </a>
-        <span className="ld-stopka__napis" data-napis aria-hidden="true">
-          agentspace
-        </span>
-      </footer>
+      <LdStopka lang={locale} />
     </div>
   );
 }
