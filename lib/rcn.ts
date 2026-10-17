@@ -45,8 +45,9 @@ export function czytajGml(xml: string): TransakcjaRcn[] {
 async function pobierz(x: number, y: number, promien: number): Promise<TransakcjaRcn[]> {
   const bbox = [x - promien, y - promien, x + promien, y + promien].map((v) => v.toFixed(0)).join(",");
   // Oś x (północ) idzie pierwsza: tak usługa czyta EPSG:2180. Najnowsze akty pierwsze.
-  const url = `${USLUGA}?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=ms:lokale&COUNT=600&SORTBY=DOK_DATA%20DESC&BBOX=${bbox},urn:ogc:def:crs:EPSG::2180`;
-  const r = await fetch(url, { signal: AbortSignal.timeout(25000), next: { revalidate: 86400 } });
+  const url = `${USLUGA}?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=ms:lokale&COUNT=1000&SORTBY=DOK_DATA%20DESC&BBOX=${bbox},urn:ogc:def:crs:EPSG::2180`;
+  // Bez pamięci podręcznej Next: odpowiedź na 1000 aktów ma ok. 2,6 MB, a limit pamięci to 2 MB.
+  const r = await fetch(url, { signal: AbortSignal.timeout(25000), cache: "no-store" });
   if (!r.ok) throw new Error(`RCN odpowiedział ${r.status}`);
   return czytajGml(await r.text());
 }
@@ -57,12 +58,12 @@ export type WycenaRcn = { wynik: WynikWyceny | null; promien: number; pobrane: n
 export async function wycenaZRcn(lat: number, lng: number, cel: Omit<CelWyceny, "x" | "y">): Promise<WycenaRcn> {
   const { x, y } = doPuwg92(lat, lng);
   let ostatni: WycenaRcn = { wynik: null, promien: 0, pobrane: 0 };
-  for (const promien of [500, 1000, 2000]) {
+  for (const promien of [1000, 2000, 3500]) {
     try {
       const tr = await pobierz(x, y, promien);
       const wynik = wycenRcn(tr, { ...cel, x, y });
       ostatni = { wynik, promien, pobrane: tr.length };
-      if (wynik && wynik.liczba >= 10) return ostatni;
+      if (wynik && wynik.liczba >= 25) return ostatni;
     } catch (e) {
       return { ...ostatni, blad: e instanceof Error ? e.message : "Brak połączenia z RCN" };
     }

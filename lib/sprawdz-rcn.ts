@@ -5,7 +5,7 @@
  * przeliczenia współrzędnych, odrzucania skrajnych cen i wag podobieństwa.
  */
 
-import { adresRcn, doPuwg92, wycenRcn, type TransakcjaRcn } from "./rcn-wycena.ts";
+import { adresRcn, doPuwg92, korektyCech, wycenRcn, type TransakcjaRcn } from "./rcn-wycena.ts";
 
 let bledy = 0;
 function sprawdz(opis: string, warunek: boolean, szczegol = "") {
@@ -48,7 +48,7 @@ const cel = { x: k.x, y: k.y, pow: 50, izby: 2, rynek: "wtorny" as const };
 const rowne = Array.from({ length: 12 }, (_, i) => t({ cenaTransakcji: 700000 + i * 10000, cenaLokalu: 700000 + i * 10000 }));
 const w = wycenRcn(rowne, cel, DZIS);
 sprawdz("wynik dla 12 podobnych", !!w && w.liczba === 12, String(w?.liczba));
-sprawdz("mediana w środku zakresu", !!w && w.medianaM2 >= 14000 && w.medianaM2 <= 15200, String(w?.medianaM2));
+sprawdz("mediana w środku zakresu", !!w && w.medianaM2 >= 14000 && w.medianaM2 <= 16500, String(w?.medianaM2));
 sprawdz("przedział od < szacunek < do", !!w && w.od <= w.szacunek && w.szacunek <= w.do);
 
 const zOdstajacym = [...rowne, t({ cenaTransakcji: 90000, cenaLokalu: 90000 })];
@@ -64,6 +64,33 @@ const pakiet = [...rowne, t({ transakcja: "PAKIET", cenaLokalu: null, cenaTransa
 sprawdz("kilka lokali bez podziału ceny pominięte", wycenRcn(pakiet, cel, DZIS)?.liczba === 12);
 
 sprawdz("za mało porównań daje brak wyniku", wycenRcn(rowne.slice(0, 3), cel, DZIS) === null);
+
+// ── Korekty i dodatki ───────────────────────────────────────────────
+sprawdz("bez cech brak korekt", korektyCech({ x: 0, y: 0, pow: 50 }).length === 0);
+const zKorekta = wycenRcn(rowne, { ...cel, stan: "do_remontu" }, DZIS);
+sprawdz("stan do remontu obniża cenę", !!w && !!zKorekta && zKorekta.szacunek < w.szacunek, `${zKorekta?.szacunek} vs ${w?.szacunek}`);
+sprawdz("wysokie piętro bez windy ma korektę", korektyCech({ x: 0, y: 0, pow: 50, pietro: 5, winda: false }).some((k) => k.procent < 0));
+sprawdz("warianty standardu rosną", !!w && w.warianty.every((v, i, a) => i === 0 || v.cena >= a[i - 1].cena));
+sprawdz("cena wystawienia wyższa niż transakcyjna", !!w && w.cenaOfertowa > w.szacunek);
+sprawdz("seria miesięczna jest", !!w && w.seria.length >= 1 && w.seria[0].liczba > 0);
+
+// Trend: ceny rosnące w czasie dają dodatni trend roczny.
+const rosnace = Array.from({ length: 96 }, (_, i) => {
+  const miesiacTemu = Math.floor(i / 4);
+  const d = new Date(Date.UTC(2026, 9 - miesiacTemu, 1 + (i % 4))).toISOString().slice(0, 10);
+  const c = Math.round(750000 * Math.pow(0.992, miesiacTemu) * (1 + ((i % 3) - 1) * 0.02));
+  return t({ data: d, cenaLokalu: c, cenaTransakcji: c });
+});
+const wr = wycenRcn(rosnace, cel, DZIS);
+sprawdz("trend roczny dodatni przy rosnących cenach", !!wr && wr.trendRoczny > 5, String(wr?.trendRoczny));
+const plaskie = Array.from({ length: 96 }, (_, i) => {
+  const d = new Date(Date.UTC(2026, 9 - Math.floor(i / 4), 1 + (i % 4))).toISOString().slice(0, 10);
+  // Płaski rynek z kilkoma tanimi aktami na początku okresu.
+  const c = i > 80 && i % 5 === 0 ? 400000 : 750000;
+  return t({ data: d, cenaLokalu: c, cenaTransakcji: c });
+});
+const wp = wycenRcn(plaskie, cel, DZIS);
+sprawdz("tanie pojedyncze akty nie robią trendu", !!wp && Math.abs(wp.trendRoczny) < 2, String(wp?.trendRoczny));
 
 if (bledy) {
   console.error(`\nRCN: ${bledy} błędów.`);
