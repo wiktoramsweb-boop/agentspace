@@ -1013,8 +1013,98 @@ export const MODULES: ProductModule[] = [
       { q: "Czy agent widzi koszty biura?", a: "Nie. Finanse widzi właściciel, dyrektor i księgowa. Agent widzi swoje prowizje." },
     ],
   },
+  {
+    slug: "wycena-rcn",
+    name: "Wycena z aktów notarialnych",
+    headline: "Cena mieszkania z transakcji, a nie z ogłoszeń",
+    lead: "Wycena oparta na Rejestrze Cen Nieruchomości: ceny z aktów notarialnych w promieniu do 3,5 km, dopasowane do piętra, stanu i budynku. Raport PDF na spotkanie z właścicielem w minutę.",
+    seoTitle: "Wycena mieszkania z Rejestru Cen Nieruchomości (RCN) dla agenta | AgentSpace",
+    seoDescription: "Wycena mieszkania na podstawie cen transakcyjnych z RCN: porównania w okolicy, trend cen, korekty za piętro, stan i budynek, raport PDF dla właściciela.",
+    problem: "Właściciel wycenia mieszkanie po ogłoszeniu sąsiada, a ogłoszenie to cena, za którą ktoś chce sprzedać. Bez cen z aktów agent przegrywa rozmowę o cenie, zanim ją zacznie, a oferta wisi miesiącami.",
+    capabilities: [
+      { title: "Ceny z aktów notarialnych", body: "Transakcje lokali mieszkalnych z publicznego Rejestru Cen Nieruchomości. Program sam szuka w coraz szerszym promieniu, aż zbierze wystarczająco porównań." },
+      { title: "Korekty za to, co widać na oględzinach", body: "Piętro i winda, stan wykończenia, rodzaj i wiek budynku, balkon, taras, ogród, piwnica i miejsce parkingowe. Każda korekta jest pokazana osobno, bez czarnej skrzynki." },
+      { title: "Trend i widełki", body: "Ceny porównań przeliczone na dziś według trendu z kwartalnych median. Wynik to cena transakcyjna, widełki i sugerowana cena ofertowa z marginesem na negocjacje." },
+      { title: "Raport PDF dla właściciela", body: "Trzy strony: wynik i parametry, mapa i tabela porównań, wykres cen w okolicy z opisem metody. Gotowy do wysłania albo wydruku przed spotkaniem." },
+    ],
+    forWhom: "Dla agenta przed spotkaniem pozyskowym i przy rozmowie o obniżce ceny. Dla właściciela biura, który chce, żeby zespół rozmawiał o cenie na danych.",
+    photo: "/wzory/kamienica.jpg",
+    shot: "/strona/zrzuty/wycena.webp",
+    faq: [
+      { q: "Skąd są dane?", a: "Z Rejestru Cen Nieruchomości udostępnianego publicznie przez geoportal. To ceny z aktów notarialnych. Zasięg zależy od powiatu: nie każdy starosta publikuje rejestr w tej usłudze, w dużych miastach dane zwykle są." },
+      { q: "Czy to operat szacunkowy?", a: "Nie. To analiza porównawcza dla agenta i właściciela. Operat do banku albo sądu sporządza rzeczoznawca majątkowy." },
+      { q: "Ile porównań bierze pod uwagę?", a: "Zbiera do kilkuset aktów z okolicy, odrzuca skrajne ceny i przypisuje wagi według odległości, daty, metrażu, liczby pokoi, rynku i piętra. W raporcie widać najbliższe porównania z adresem i ceną za metr." },
+    ],
+  },
+  {
+    slug: "dyzur-ai",
+    name: "Dyżur AI",
+    headline: "Telefon odebrany, nawet gdy jesteś na prezentacji",
+    lead: "Głosowa asystentka biura odbiera połączenia, których agent nie odebrał. Rozmawia po polsku, pyta o potrzebę i kontakt, a z rozmowy robi lead w CRM.",
+    seoTitle: "Asystentka głosowa AI dla biura nieruchomości: odbieranie telefonów | AgentSpace",
+    seoDescription: "Dyżur AI odbiera nieodebrane telefony biura nieruchomości, rozmawia po polsku, zbiera dane dzwoniącego i zapisuje lead w CRM z notatką z rozmowy.",
+    problem: "Agent w trakcie prezentacji nie odbierze telefonu, a dzwoniący z ogłoszenia nie zostawia wiadomości: dzwoni do następnego biura. Nieodebrane połączenie to najdroższy lead, bo już zapłaciłeś za ogłoszenie, które go przyprowadziło.",
+    capabilities: [
+      { title: "Odbiera, gdy agent nie może", body: "Przekierowanie z komórki agenta na numer biura. Gdy agent nie odbierze, rozmowę przejmuje asystentka i przedstawia się nazwą Twojego biura." },
+      { title: "Rozmawia, a nie odtwarza nagranie", body: "Pyta, czego szuka dzwoniący, o jaką ofertę chodzi, jak się nazywa i kiedy oddzwonić. Odpowiada na pytania z informacji, które wpiszesz w ustawieniach." },
+      { title: "Lead w CRM z notatką", body: "Po rozmowie w Leadach pojawia się nowy kontakt z numerem, imieniem i streszczeniem rozmowy. Trafia do wskazanego opiekuna albo do puli biura." },
+      { title: "Próbna rozmowa przed włączeniem", body: "W ustawieniach przećwiczysz rozmowę z asystentką na czacie i poprawisz powitanie, zanim usłyszy je klient." },
+    ],
+    forWhom: "Dla biur, które dużo pokazują mieszkania w terenie i tracą telefony z ogłoszeń. Wymaga numeru telefonicznego u operatora Twilio, pomagamy go podłączyć.",
+    photo: "/wzory/miasto-noc.jpg",
+    shot: "/strona/zrzuty/dyzur.webp",
+    faq: [
+      { q: "Czy dzwoniący wie, że rozmawia z AI?", a: "Asystentka przedstawia się jako asystentka biura. Nie udaje agenta i nie składa obietnic w jego imieniu, zbiera informacje i umawia oddzwonienie." },
+      { q: "Ile to kosztuje?", a: "Każda tura rozmowy zużywa kredyty AI z pakietu biura. Do tego opłata operatora za numer i minuty połączeń, według cennika Twilio." },
+      { q: "Czy mogę ją wyłączyć?", a: "Tak, jednym przełącznikiem w ustawieniach. Wtedy połączenia idą jak dawniej na pocztę głosową operatora." },
+    ],
+  },
+  {
+    slug: "swiadectwa-energetyczne",
+    name: "Świadectwa energetyczne",
+    headline: "Świadectwo energetyczne zamówione z karty oferty",
+    lead: "Formularz zamówienia świadectwa charakterystyki energetycznej wypełnia się danymi oferty. Dodajesz zdjęcia budynku, wybierasz termin, a uprawniony audytor dostaje komplet od razu.",
+    seoTitle: "Zamówienie świadectwa charakterystyki energetycznej dla agenta | AgentSpace",
+    seoDescription: "Zamów świadectwo energetyczne mieszkania, domu albo lokalu prosto z CRM: formularz wypełniony danymi oferty, zdjęcia budynku, termin od 6 godzin.",
+    problem: "Bez świadectwa nie sprzedasz ani nie wynajmiesz mieszkania, a ogłoszenie musi podawać wskaźnik energii. Agent przepisuje dane z oferty do formularza audytora, dosyła zdjęcia mailem i dzwoni pytać, na jakim etapie jest zamówienie.",
+    capabilities: [
+      { title: "Dane z oferty, nie z pamięci", body: "Adres, metraż i rok budowy wskakują z karty nieruchomości. Agent dopisuje tylko to, czego oferta nie ma: ogrzewanie, wentylację, materiał ścian i izolację." },
+      { title: "Zdjęcia i rzuty w zamówieniu", body: "Zdjęcie budynku z zewnątrz, rzut mieszkania i świadectwo całego budynku, jeśli wspólnota je ma. Pliki idą razem z zamówieniem." },
+      { title: "Termin do wyboru", body: "Standard do 2 dni roboczych, Express w 24 godziny albo Superexpress w 6 godzin roboczych. Cenę netto i brutto widać przed wysłaniem." },
+      { title: "Historia zamówień", body: "Lista zamówień biura z kartą PDF każdego z nich. Agent widzi swoje, właściciel wszystkie." },
+    ],
+    forWhom: "Dla agentów przy każdej nowej ofercie bez świadectwa. Dla właściciela, który chce jednego sprawdzonego wykonawcy zamiast szukania audytora przy każdej transakcji.",
+    photo: "/wzory/dziedziniec.jpg",
+    shot: "/strona/zrzuty/swiadectwa.webp",
+    faq: [
+      { q: "Kto sporządza świadectwo?", a: "Osoba z uprawnieniami wpisana do centralnego rejestru charakterystyki energetycznej budynków. Świadectwo jest ważne 10 lat." },
+      { q: "Ile to kosztuje?", a: "Mieszkanie od 300 zł netto, dom i lokal użytkowy od 450 zł netto. Tryb Express i Superexpress to dopłata, widoczna w formularzu przed zamówieniem." },
+      { q: "Czy muszę mieć świadectwo przy sprzedaży?", a: "Tak, przy sprzedaży i najmie właściciel przekazuje świadectwo nabywcy albo najemcy, a ogłoszenie podaje wskaźnik zapotrzebowania na energię." },
+    ],
+  },
+  {
+    slug: "biblioteka-technik",
+    name: "Biblioteka technik",
+    headline: "Techniki rozmowy i skrypty, które od razu przećwiczysz",
+    lead: "Trzydzieści sześć technik negocjacji, perswazji i odpowiadania na obiekcje z przykładami z polskiego rynku, dziesięć skryptów rozmów krok po kroku i struktura dobrej rozmowy. Każdą technikę trenujesz z klientem AI jednym kliknięciem.",
+    seoTitle: "Techniki sprzedaży i skrypty rozmów dla agenta nieruchomości | AgentSpace",
+    seoDescription: "Biblioteka technik rozmowy dla agentów nieruchomości: SPIN, kotwiczenie, izolacja obiekcji, Voss, Cialdini. Skrypty zimnego telefonu, spotkania pozyskowego i negocjacji prowizji.",
+    problem: "Szkolenie sprzedażowe kończy się po dwóch dniach, a w poniedziałek agent dzwoni tak samo jak przed nim. Wiedza z książek nie zamienia się w nawyk bez przećwiczenia na konkretnej, trudnej rozmowie.",
+    capabilities: [
+      { title: "Techniki z przykładami z rynku", body: "Każda technika ma opis, kiedy działa i kiedy nie, kroki, dialogi z rozmów o mieszkaniach, najczęstsze błędy i sygnały, że ktoś używa jej na Tobie." },
+      { title: "Skrypty rozmów etap po etapie", body: "Zimny telefon do właściciela, oddzwonienie do leada, spotkanie pozyskowe, obniżka ceny, negocjacja prowizji. Kwestie, pytania i odpowiedzi na obiekcje." },
+      { title: "Trening jednym kliknięciem", body: "Przy technice wybierasz rozmowę z AI Coachem. Kroki techniki widzisz przez cały trening, a po rozmowie dostajesz ocenę." },
+      { title: "Struktura dobrej rozmowy", body: "Sześć etapów od otwarcia do zamknięcia, z typową pułapką każdego z nich. Wspólny język dla całego zespołu." },
+    ],
+    forWhom: "Dla agentów, którzy chcą lepiej rozmawiać, i dla właściciela, który wdraża nowe osoby. Część modułu AI Coach.",
+    photo: "/zdjecia/rozmowa-audyt.jpg",
+    shot: "/strona/zrzuty/techniki.webp",
+    faq: [
+      { q: "Czy techniki są etyczne?", a: "Tak. Przy technikach, które łatwo nadużyć, piszemy wprost, jak używać ich uczciwie. Uczymy też rozpoznawać manipulację po drugiej stronie." },
+      { q: "Czy trening kosztuje dodatkowo?", a: "Biblioteka jest w AI Coachu. Rozmowa treningowa zużywa kredyty AI z pakietu biura, tak jak każdy trening." },
+    ],
+  },
 ];
-
 /**
  * Moduł w danym języku. Slug jest wspólny dla obu wersji, więc adres strony
  * nie zmienia się przy przełączeniu języka - zmienia się tylko treść.
@@ -1063,7 +1153,7 @@ export const KATEGORIE_MODULOW: KategoriaModulow[] = [
     labelEn: "Sales and clients",
     opis: "Wszystko, co dzieje się między pierwszym telefonem a podpisaną umową.",
     opisEn: "Everything between the first phone call and a signed contract.",
-    slugs: ["crm", "leady", "poszukiwania", "dzialania", "tablica-transakcji", "automatyzacje"],
+    slugs: ["crm", "leady", "dyzur-ai", "poszukiwania", "dzialania", "tablica-transakcji", "automatyzacje"],
   },
   {
     id: "oferty",
@@ -1071,7 +1161,7 @@ export const KATEGORIE_MODULOW: KategoriaModulow[] = [
     labelEn: "Listings and marketing",
     opis: "Oferta biura w jednym miejscu i wszędzie tam, gdzie widzi ją klient.",
     opisEn: "Your listings in one place and everywhere the client sees them.",
-    slugs: ["nieruchomosci", "ofertowka", "strona-www", "kalkulatory", "kalkulator-remontu"],
+    slugs: ["nieruchomosci", "wycena-rcn", "ofertowka", "strona-www", "swiadectwa-energetyczne", "kalkulatory", "kalkulator-remontu"],
   },
   {
     id: "rozliczenia",
@@ -1087,7 +1177,7 @@ export const KATEGORIE_MODULOW: KategoriaModulow[] = [
     labelEn: "Team and results",
     opis: "Co robi zespół, ile dowozi i kto ma do czego dostęp.",
     opisEn: "What the team does, what it delivers and who can see what.",
-    slugs: ["cele", "panel-wlasciciela", "raporty", "ai-coach", "role-i-uprawnienia", "czat-zespolu", "urlopy-i-zastepstwa"],
+    slugs: ["cele", "panel-wlasciciela", "raporty", "ai-coach", "biblioteka-technik", "role-i-uprawnienia", "czat-zespolu", "urlopy-i-zastepstwa"],
   },
 ];
 

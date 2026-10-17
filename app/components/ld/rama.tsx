@@ -1,9 +1,11 @@
 import "./strona.css";
 import "./podstrony.css";
+import "./podstrona.css";
 import Link from "next/link";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { kategorieZModulami } from "@/lib/marketing/modules";
 import { NavRuch } from "./nav-ruch";
+import { RuchPodstrony } from "./ruch-podstrony";
 
 /**
  * Wspólna rama strony: nawigacja i stopka w nowym stylu.
@@ -195,6 +197,7 @@ export function LdStopka({ lang = "pl" }: { lang?: string }) {
 
   return (
     <footer className="ld-stopka">
+      <RuchPodstrony />
       <div className="ld-stopka__pas" aria-hidden="true">
         <div className="ld-stopka__tasma">
           {pas.map((s, i) => (

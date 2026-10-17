@@ -48,6 +48,11 @@ const MAKIETY: Record<string, (p: { lang?: string }) => React.ReactElement> = {
 };
 
 export function ShotFor({ shot, lang }: { shot: string; lang: string }) {
+  // Nowsze moduły pokazują prawdziwy zrzut ekranu aplikacji zamiast makiety.
+  if (shot.startsWith("/")) {
+    // eslint-disable-next-line @next/next/no-img-element -- zrzut skaluje się razem z ramką makiety, next/image wymagałby stałych wymiarów
+    return <img src={shot} alt="" className="block h-auto w-full" loading="lazy" />;
+  }
   const Makieta = MAKIETY[shot] ?? ShotPulpitFallback;
   return <Makieta lang={lang} />;
 }

@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
-import { PageHero } from "@/app/components/page-hero";
-import { FrameRule } from "@/app/components/mk/frame";
+import { PdHero, PdPas } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
+import { UKLADY } from "./uklady";
+import { CoachLive } from "@/app/components/mk/coach-live";
+import { TECHNIKI } from "@/lib/techniki/techniki";
+import { SKRYPTY } from "@/lib/techniki/skrypty";
 import { Card, Button, Section, SectionHead } from "@/app/components/mk/ui";
 import { MODULES, getModule, kategoriaModulu } from "@/lib/marketing/modules";
-import { BrowserShot } from "@/app/components/mk/showcase";
 import { ShotFor } from "@/app/components/mk/shot-for";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
@@ -62,6 +64,12 @@ export default async function ProduktPage({
     ].map((it, i) => ({ "@type": "ListItem", position: i + 1, name: it.name, item: it.url })),
   };
 
+  // Każdy moduł ma swój nagłówek i układ treści, dobierane po kolejności w katalogu.
+  const nr = Math.max(0, MODULES.findIndex((m) => m.slug === slug));
+  const wariant = (["pelny", "pas", "okno"] as const)[nr % 3];
+  const Uklad = UKLADY[nr % UKLADY.length];
+  const pl = locale === "pl";
+
   return (
     <div className="mk relative min-h-screen">
       <SiteNav lang={locale} />
@@ -73,151 +81,72 @@ export default async function ProduktPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(okruszki) }}
       />
 
-      <PageHero
+      <PdHero
+        wariant={wariant}
+        tlo={zdjecie(`naglowek-${slug}`)}
+        alt={mod.name}
         eyebrow={`${t.moduleLabel} · ${mod.name}`}
-        title={mod.headline}
-        description={mod.lead}
-      >
-        <div className="flex flex-wrap gap-3">
-          <Button href="/signup">{getDict(locale).nav.cta}</Button>
-          <Button href={href("/kontakt")} variant="ghost">{t.cta}</Button>
-        </div>
-      </PageHero>
-
-      {/* Okruszki. Na podstronie modułu łatwo stracić orientację, gdzie się jest
-          w produkcie, a to jedyna nawigacja prowadząca w górę do spisu. */}
-      <div className="mx-auto max-w-[1080px] px-6">
-        <nav aria-label={t.modules} className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-[var(--color-mk-muted)]">
-          <Link href={href("/")} className="transition-colors hover:text-[var(--color-mk-text)]">
-            {t.home}
-          </Link>
-          <span aria-hidden="true">/</span>
-          <Link href={href("/produkt")} className="transition-colors hover:text-[var(--color-mk-text)]">
-            {t.modules}
-          </Link>
-          <span aria-hidden="true">/</span>
-          <span className="text-[var(--color-mk-text)]">{mod.name}</span>
-        </nav>
-      </div>
-
-      {/* Ekran z aplikacji. Opis modułu bez obrazka nie mówi nic o tym,
-          jak to wygląda w pracy, a to pierwsze pytanie właściciela biura. */}
-      <Section className="pt-10">
-        <div className="mx-auto max-w-4xl">
-          <BrowserShot tilt fit>
-            <ShotFor shot={mod.shot} lang={locale} />
-          </BrowserShot>
-        </div>
-
-        {/* Trzy fakty o module. Czytelnik skanuje stronę, zanim ją przeczyta,
-            a sama makieta nie mówi, ile ten moduł właściwie potrafi. */}
-        <div className="mx-auto mt-10 grid max-w-4xl gap-px overflow-hidden rounded-[18px] border border-[var(--mk-hairline)] bg-[var(--mk-hairline)] sm:grid-cols-3">
-          <div className="bg-[var(--color-mk-bg)] px-6 py-5">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-[var(--color-mk-muted)]">
-              {t.capabilitiesEyebrow}
-            </p>
-            <p className="mt-1.5 text-[1.0625rem] text-[var(--color-mk-text)]">
-              {mod.capabilities.length} {t.capabilitiesLabel}
-            </p>
-          </div>
-          <div className="bg-[var(--color-mk-bg)] px-6 py-5">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-[var(--color-mk-muted)]">
-              {t.inGroup}
-            </p>
-            <p className="mt-1.5 text-[1.0625rem] text-[var(--color-mk-text)]">{grupa?.label ?? "-"}</p>
-          </div>
-          <div className="bg-[var(--color-mk-bg)] px-6 py-5">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-[var(--color-mk-muted)]">
-              {t.faqEyebrow}
-            </p>
-            <p className="mt-1.5 text-[1.0625rem] text-[var(--color-mk-text)]">{mod.faq.length}</p>
-          </div>
-        </div>
-      </Section>
-
-      <FrameRule />
-
-      {/* Problem */}
-      <Section>
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-16">
-          <div>
-            <SectionHead align="left" eyebrow={t.problemEyebrow} title={t.problemTitle} />
-            <p className="mt-8 text-lg leading-relaxed text-[var(--color-mk-text)]">
-              {mod.problem}
-            </p>
-          </div>
-          {/* Ilustracje mają prawie czarne kontury, a strona domyślnie jest
-              ciemna. Dlatego dostają własny jasny panel w obu motywach -
-              inaczej w ciemnym zostają z nich same kolorowe plamy. */}
-          <figure
-            className={`relative m-0 aspect-[4/3] overflow-hidden rounded-[24px] border border-[var(--mk-hairline)] ${
-              mod.ilustracja ? "bg-ilustracja" : ""
-            }`}
-          >
-            <Image
-              src={mod.ilustracja ?? mod.photo}
-              alt={`${mod.name} - ${t.moduleLabel.toLowerCase()} w systemie AgentSpace`}
-              fill
-              sizes="(max-width: 1024px) 100vw, 44vw"
-              className={mod.ilustracja ? "object-contain p-4 sm:p-6" : "object-cover"}
-            />
-          </figure>
-        </div>
-      </Section>
-
-      {/* Możliwości */}
-      <Section>
-        <SectionHead
-          eyebrow={t.capabilitiesEyebrow}
-          title={t.capabilitiesTitle.replace("{name}", mod.name)}
-        />
-
-        {/* Numerowana siatka. Pierwsza pozycja jest szersza, żeby sekcja nie
-            wyglądała jak tabela - oko ma gdzie zacząć. */}
-        <div className="mt-14 grid gap-px overflow-hidden rounded-[22px] border border-[var(--mk-hairline)] bg-[var(--mk-hairline)] md:grid-cols-2">
-          {mod.capabilities.map((cap, i) => {
-            const ile = mod.capabilities.length;
-            // Pierwsza pozycja jest szeroka. Jeśli po niej zostaje nieparzysta
-            // liczba kafelków, ostatni też musi być szeroki - inaczej siatka
-            // kończy się pustym polem w kolorze obramowania.
-            const szeroki = i === 0 || (i === ile - 1 && (ile - 1) % 2 === 1);
-            return (
-            <div
-              key={cap.title}
-              className={`group relative bg-[var(--color-mk-bg)] p-8 transition-colors hover:bg-[var(--mk-surface-2)] md:p-10 ${
-                szeroki ? "md:col-span-2" : ""
-              }`}
-            >
-              <span className="font-mono text-[11px] tabular-nums text-[var(--color-mk-accent)]">
-                {String(i + 1).padStart(2, "0")}
+        tytul={mod.headline}
+        opis={mod.lead}
+        dol={
+          <div className="flex flex-col gap-4">
+            <nav aria-label={t.modules} className="pm-okruszki">
+              <Link href={href("/")}>{t.home}</Link>
+              <span aria-hidden="true">/</span>
+              <Link href={href("/produkt")}>{t.modules}</Link>
+              <span aria-hidden="true">/</span>
+              <span className="text-white">{mod.name}</span>
+            </nav>
+            <p className="pm-fakty">
+              <span>
+                <b>{mod.capabilities.length}</b> {t.capabilitiesLabel}
               </span>
-              <h4 className="mb-3 mt-3">{cap.title}</h4>
-              <p className="max-w-[60ch] text-[0.9375rem] leading-relaxed text-[var(--color-mk-muted)]">
-                {cap.body}
-              </p>
-              <span
-                aria-hidden="true"
-                className="absolute inset-x-0 bottom-0 h-px scale-x-0 bg-[var(--color-mk-accent)] transition-transform duration-500 group-hover:scale-x-100"
-              />
-            </div>
-            );
-          })}
-        </div>
-      </Section>
-
-      {/* Dla kogo */}
-      <Section>
-        <div className="mx-auto max-w-3xl">
-          <Card accent className="p-8 md:p-12">
-            <p className="mk-eyebrow mb-5">{t.forWhom}</p>
-            <p className="text-lg leading-relaxed text-[var(--color-mk-text)]">
-              {mod.forWhom}
+              <span>
+                {t.inGroup}: <b>{grupa?.label ?? "-"}</b>
+              </span>
+              <span>
+                {t.faqEyebrow}: <b>{mod.faq.length}</b>
+              </span>
             </p>
-          </Card>
-        </div>
-      </Section>
+          </div>
+        }
+      >
+        <Button href="/signup">{getDict(locale).nav.cta}</Button>
+        <Button href={href("/kontakt")} variant="ghost">{t.cta}</Button>
+      </PdHero>
 
-      <FrameRule />
+      <Uklad mod={mod} lang={locale} scena={zdjecie(`scena-${slug}`)} t={t} />
+
+      {slug === "ai-coach" && pl && (
+        <>
+          <section className="pd-sekcja">
+            <div className="pd-ramka">
+              <div className="pd-glowa pd-glowa--srodek">
+                <p className="mk-eyebrow" data-pd="gora">Na żywo</p>
+                <h2 data-pd="gora">Tak wygląda rozmowa z klientem AI</h2>
+                <p data-pd="gora">Klient odpowiada jak prawdziwy właściciel albo kupujący: przerywa, wątpi, rzuca obiekcję. Po rozmowie dostajesz ocenę i konkretne poprawki.</p>
+              </div>
+              <div data-pd="skala">
+                <CoachLive t={getDict(locale).coach} />
+              </div>
+            </div>
+          </section>
+          <section className="pd-sekcja">
+            <div className="pd-ramka">
+              <div className="pd-glowa">
+                <p className="mk-eyebrow" data-pd="gora">Biblioteka technik</p>
+                <h2 data-pd="gora">{TECHNIKI.length} technik i {SKRYPTY.length} skryptów, każdy z treningiem</h2>
+                <p data-pd="gora">SPIN, kotwiczenie, izolacja obiekcji, pytania kalibrowane Vossa, reguły Cialdiniego. Każda technika ma dialogi z rynku nieruchomości i przycisk „trenuj teraz”.</p>
+              </div>
+            </div>
+            <PdPas hasla={TECHNIKI.slice(0, 18).map((x) => x.nazwa)} />
+            <PdPas hasla={TECHNIKI.slice(18).map((x) => x.nazwa)} odwrotnie />
+            <div className="pd-ramka mt-10 flex justify-center">
+              <Button href={href("/produkt/biblioteka-technik")} variant="ghost">Zobacz bibliotekę technik</Button>
+            </div>
+          </section>
+        </>
+      )}
 
       {/* Pytania o ten moduł */}
       {mod.faq.length > 0 && (
@@ -253,8 +182,6 @@ export default async function ProduktPage({
           </div>
         </Section>
       )}
-
-      <FrameRule />
 
       {/* Pozostałe moduły */}
       <Section>
