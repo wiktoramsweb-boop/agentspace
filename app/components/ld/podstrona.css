@@ -190,3 +190,63 @@ html .mk .pd-hero h1 { max-width: 15ch; }
 html .mk .ld-plan h3 { color: #0b1220; }
 html .mk .ld-plan--wyr h3 { color: #fff; }
 .pd-sekcja--ciasna { padding-top: 0; }
+
+/* ── O nas ── */
+.on-historia { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(30px, 6vw, 96px); align-items: center; }
+.on-historia__foto { aspect-ratio: 3 / 4; }
+.on-historia h2 { margin: 18px 0 26px; }
+.on-historia__tekst { display: flex; flex-direction: column; gap: 18px; }
+.on-historia__tekst p { margin: 0; font-size: 18px; line-height: 1.7; color: #c3cddb; }
+.on-historia__tekst p:first-child { font-size: clamp(20px, 1.7vw, 24px); line-height: 1.5; color: #fff; }
+
+/* Zasady: karty przyklejają się jedna na drugiej jak talia. */
+.on-zasady { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(30px, 5vw, 80px); align-items: start; }
+.on-zasady__glowa { position: sticky; top: 120px; display: flex; flex-direction: column; gap: 16px; }
+.on-karty { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 24px; }
+.on-karty li { position: sticky; top: calc(110px + var(--i) * 26px); min-height: 300px; display: flex; flex-direction: column; gap: 14px; padding: clamp(28px, 3.5vw, 48px); border-radius: 32px; background: linear-gradient(160deg, #15213a, #0e1628); box-shadow: inset 0 0 0 1px var(--mk-hairline), 0 -30px 60px -40px rgba(0, 0, 0, 0.9); }
+.on-karty li:nth-child(2n) { background: linear-gradient(160deg, #0f2a2a, #0c1a22); }
+.on-karty__nr { font-family: var(--font-sora); font-size: 64px; font-weight: 600; line-height: 1; letter-spacing: -0.05em; color: transparent; -webkit-text-stroke: 1.5px rgba(110, 231, 200, 0.6); }
+.on-karty p { margin: 0; font-size: 17px; line-height: 1.65; color: var(--color-mk-muted); }
+
+.on-dzis { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: clamp(30px, 5vw, 80px); align-items: center; }
+.on-dzis__lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.on-dzis__lista li { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 8px 24px; padding: 18px 0; border-top: 1px solid var(--mk-hairline); }
+.on-dzis__lista b { font-family: var(--font-sora); font-size: 18px; font-weight: 600; color: #fff; }
+.on-dzis__lista span { font-size: 15px; line-height: 1.6; color: var(--color-mk-muted); }
+.on-dzis__foto { aspect-ratio: 3 / 4; }
+@media (max-width: 899px) {
+  .on-historia, .on-zasady, .on-dzis, .on-dzis__lista li { grid-template-columns: 1fr; }
+  .on-zasady__glowa { position: relative; top: 0; }
+  .on-karty li { position: relative; top: 0; min-height: 0; }
+}
+
+/* ── Blog: tytuły mniejsze niż nagłówki sekcji strony ── */
+html .mk .bl-karta { font-size: clamp(19px, 1.5vw, 23px); line-height: 1.28; letter-spacing: -0.015em; }
+html .mk .bl-h1 { max-width: 22ch; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.1; letter-spacing: -0.035em; }
+html .mk .prose-blog h2 { font-size: clamp(24px, 2.1vw, 32px); line-height: 1.2; letter-spacing: -0.025em; margin-top: 2em; }
+html .mk .prose-blog h3 { font-size: clamp(19px, 1.6vw, 24px); line-height: 1.3; letter-spacing: -0.015em; }
+html .mk .pd-hero--pas h1 { font-size: clamp(38px, 4.6vw, 72px); }
+html .mk .wd-tytul { font-size: clamp(28px, 3vw, 44px); line-height: 1.08; }
+
+/* ── Podgląd wzorów stron ── */
+.wp__pasek { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+.wp__wzory { display: flex; flex-wrap: wrap; gap: 8px; }
+.wp__wzory button, .wp__widok button { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 1px var(--mk-hairline); color: #dbe3ee; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.3s, color 0.3s; }
+.wp__wzory button.on, .wp__widok button.on { background: #fff; color: #0b1220; }
+.wp__kropka { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); }
+.wp__widok { display: flex; gap: 6px; }
+.wp__scena { display: flex; flex-direction: column; align-items: center; }
+.wp__ramka { width: 100%; overflow: hidden; border-radius: 22px; background: #fff; box-shadow: 0 60px 120px -60px rgba(0, 0, 0, 0.9), inset 0 0 0 1px var(--mk-hairline); transition: width 0.7s var(--ease), border-radius 0.7s; }
+.wp__scena--tel .wp__ramka { width: 390px; max-width: 100%; border-radius: 40px; }
+.wp__belka { display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; background: #eef2f6; }
+.wp__belka span { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; }
+.wp__belka em { margin: 0 auto; padding: 3px 12px; border-radius: 6px; background: #fff; font-style: normal; font-size: 12px; color: #64748b; }
+.wp__okno { position: relative; height: min(72vh, 760px); background: #f1f5f9; }
+.wp__scena--tel .wp__okno { height: 720px; }
+.wp__okno iframe { width: 100%; height: 100%; border: 0; display: block; }
+.wp__start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; border: 0; background: radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.18), transparent 60%), #0f1729; color: #fff; cursor: pointer; text-align: center; }
+.wp__start b { font-family: var(--font-sora); font-size: clamp(22px, 2.4vw, 34px); letter-spacing: -0.02em; }
+.wp__start span { max-width: 46ch; font-size: 16px; color: var(--color-mk-muted); }
+.wp__opis { margin: 18px 0 0; max-width: 70ch; text-align: center; font-size: 15px; color: var(--color-mk-muted); }
+.wp__opis b { color: #fff; }
+.wp__opis a { color: var(--mieta); font-weight: 600; }

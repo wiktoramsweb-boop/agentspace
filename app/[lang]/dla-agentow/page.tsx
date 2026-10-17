@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/app/components/fade-in";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
@@ -31,11 +32,14 @@ export default async function DlaAgentow({ params }: { params: Promise<{ lang: s
     <>
       <SiteNav lang={locale} />
       <main className="mk relative min-h-screen">
-        <PageHero
+        <PdHero
+          wariant="pelny"
+          tlo={zdjecie("naglowek-dla-agentow")}
+          alt={t.hero.photoAlt}
           eyebrow={t.hero.eyebrow}
-          title={t.hero.title}
-          description={t.hero.description}
-          photo={{ src: "/wzory/salon.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
+          tytul={t.hero.title}
+          opis={t.hero.description}
+          podpis={t.hero.photoCaption}
         />
 
         {/* Benefits - grid z ikonami */}

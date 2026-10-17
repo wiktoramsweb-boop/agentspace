@@ -3,7 +3,8 @@ import Link from "next/link";
 import { getAllPostsMeta, formatDate } from "@/lib/blog";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { BlogVisual } from "@/app/components/blog-visual";
 import { StaggerContainer, StaggerItem } from "@/app/components/fade-in";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
@@ -30,11 +31,13 @@ export default async function BlogIndex({ params }: { params: Promise<{ lang: st
     <>
       <SiteNav lang={locale} />
       <main className="mk relative min-h-screen">
-        <PageHero
+        <PdHero
+          wariant="pas"
+          tlo={zdjecie("naglowek-blog")}
+          alt={""}
           eyebrow={t.hero.eyebrow}
-          title={t.hero.title}
-          description={t.hero.description}
-          compact
+          tytul={t.hero.title}
+          opis={t.hero.description}
         />
 
         {/* Artykuły powstają po polsku - mówimy o tym wprost, zamiast zostawiać
@@ -67,7 +70,7 @@ export default async function BlogIndex({ params }: { params: Promise<{ lang: st
                         {post.category}
                       </p>
 
-                      <h2 className="mb-3 text-xl font-semibold leading-tight text-[var(--color-mk-text)] transition group-hover:text-emerald-50 md:text-2xl">
+                      <h2 className="bl-karta mb-3 text-xl font-semibold leading-tight text-[var(--color-mk-text)] transition group-hover:text-emerald-50 md:text-2xl">
                         {post.title}
                       </h2>
 

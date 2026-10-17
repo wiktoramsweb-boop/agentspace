@@ -6,7 +6,8 @@ import { AiCoachMockup } from "@/app/components/mockups/ai-coach-mockup";
 import { AgentDashboardMockup } from "@/app/components/mockups/agent-dashboard-mockup";
 import { OwnerPanelMockup } from "@/app/components/mockups/owner-panel-mockup";
 import { CoachFlow } from "@/app/components/coach-flow";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { FadeIn } from "@/app/components/fade-in";
 import { TiltCard } from "@/app/components/effects/tilt-card";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
@@ -44,11 +45,14 @@ export default async function Demo({
     <>
       <SiteNav lang={locale} />
       <main className="mk relative min-h-screen">
-        <PageHero
+        <PdHero
+          wariant="okno"
+          tlo={zdjecie("naglowek-demo")}
+          alt={t.hero.photoAlt}
           eyebrow={t.hero.eyebrow}
-          title={t.hero.title}
-          description={t.hero.description}
-          photo={{ src: "/wzory/szklo.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
+          tytul={t.hero.title}
+          opis={t.hero.description}
+          podpis={t.hero.photoCaption}
         />
 
         <WejscieDemo blad={blad} en={locale === "en"} />

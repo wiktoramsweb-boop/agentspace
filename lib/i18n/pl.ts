@@ -653,7 +653,7 @@ export const pl = {
       hero: {
         eyebrow: "Demo",
         title: "Zobacz, jak wygląda AgentSpace od środka",
-        description: "Główne ekrany systemu. Chcesz zobaczyć go na żywo, na danych swojego biura - umów rozmowę.",
+        description: "Wejdź do działającej aplikacji na przykładowym biurze, bez rejestracji i bez karty. Chcesz zobaczyć system na danych swojego biura? Umów rozmowę.",
         photoAlt: "Nowoczesny budynek",
         photoCaption: "Zobacz system na żywo",
       },

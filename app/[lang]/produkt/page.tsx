@@ -3,9 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { Button, Section } from "@/app/components/mk/ui";
-import { kategorieZModulami } from "@/lib/marketing/modules";
+import { MODULES, kategorieZModulami } from "@/lib/marketing/modules";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
 
@@ -13,12 +14,12 @@ const META = {
   pl: {
     title: "Moduły systemu dla biura nieruchomości | AgentSpace",
     description:
-      "24 moduły w jednym systemie: CRM, leady, oferty, tablica transakcji, umowy i najem okazjonalny, prowizje, koszty biura, czat zespołu, AI Coach i strona biura. Zobacz, co robi każdy z nich.",
+      "28 modułów w jednym programie: CRM, leady, oferty, tablica transakcji, umowy i najem okazjonalny, prowizje, koszty biura, czat zespołu, AI Coach i strona biura. Zobacz, co robi każdy z nich.",
   },
   en: {
     title: "Modules of the real estate agency system | AgentSpace",
     description:
-      "Sixteen modules in one system: CRM, leads, listings, commissions, invoices, contracts, goals, reports and the agency website. See exactly what each one does.",
+      "28 modules in one system: CRM, leads, listings, commissions, invoices, contracts, goals, reports and the agency website. See exactly what each one does.",
   },
 } as const;
 
@@ -48,27 +49,20 @@ export default async function ProduktIndexPage({
     <div className="mk relative min-h-screen">
       <SiteNav lang={locale} />
 
-      <PageHero
+      <PdHero
+        wariant="okno"
+        tlo={zdjecie("naglowek-produkt")}
+        alt=""
         eyebrow={pl ? "Moduły" : "Modules"}
-        title={
-          pl ? (
-            <>
-              24 narzędzia biura, <span className="grad">jeden system</span>
-            </>
-          ) : (
-            <>
-              Sixteen agency tools, <span className="grad">one system</span>
-            </>
-          )
-        }
-        description={
+        tytul={pl ? `${MODULES.length} narzędzi biura, jeden program` : `${MODULES.length} agency tools, one system`}
+        opis={
           pl
             ? "Każdy moduł ma własną stronę z opisem, możliwościami i odpowiedziami na pytania, które padają najczęściej. Nie musisz wdrażać wszystkiego naraz."
             : "Every module has its own page with the details, the features and the questions people actually ask. You do not have to roll out everything at once."
         }
       >
         <Button href={href("/kontakt")}>{d.common.bookCall}</Button>
-      </PageHero>
+      </PdHero>
 
       {kategorie.map((k) => (
         <Section key={k.id}>

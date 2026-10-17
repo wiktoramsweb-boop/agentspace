@@ -3,7 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero, PdKroki } from "@/app/components/ld/podstrona";
+import { WzoryPodglad } from "@/app/components/ld/wzory-podglad";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { FrameRule } from "@/app/components/mk/frame";
 import { Card, Section, SectionHead } from "@/app/components/mk/ui";
 import { WZORY } from "@/lib/wzory/themes";
@@ -32,11 +34,57 @@ export default async function WzoryPage({ params }: { params: Promise<{ lang: st
     <div className="mk relative min-h-screen">
       <SiteNav lang={locale} />
 
-      <PageHero
+      <PdHero
+        wariant="pelny"
+        tlo={zdjecie("naglowek-wzory")}
+        alt=""
         eyebrow={t.hero.eyebrow}
-        title={t.hero.title}
-        description={t.hero.description}
+        tytul={t.hero.title}
+        opis={t.hero.description}
       />
+
+      {locale === "pl" && (
+        <>
+          <section className="pd-sekcja">
+            <div className="pd-ramka">
+              <div className="pd-glowa">
+                <p className="mk-eyebrow" data-pd="gora">Podgląd na żywo</p>
+                <h2 data-pd="gora">Przeklikaj każdy wzór, zanim wybierzesz</h2>
+                <p data-pd="gora">To nie zrzuty ekranu, tylko działające strony. Przełącz wzór, zobacz wersję na telefon, otwórz ofertę i formularz.</p>
+              </div>
+              <div data-pd="skala">
+                <WzoryPodglad wzory={WZORY.map((w) => ({ slug: w.slug, name: w.name, swatch: w.swatch, tagline: w.tagline }))} />
+              </div>
+            </div>
+          </section>
+
+          <section className="pd-sekcja">
+            <div className="pd-ramka">
+              <div className="pd-glowa">
+                <p className="mk-eyebrow" data-pd="gora">Co jest na stronie</p>
+                <h2 data-pd="gora">Strona, która pracuje na tej samej bazie co biuro</h2>
+              </div>
+              <PdKroki
+                kroki={[
+                  { tytul: "Oferty prosto z CRM", tekst: "Dodajesz nieruchomość w programie, a ona pojawia się na stronie ze zdjęciami, mapą i wyszukiwarką. Sprzedana znika sama.", obraz: WZORY[0] },
+                  { tytul: "Formularze, które robią leady", tekst: "Zapytanie o ofertę, zgłoszenie nieruchomości do sprzedaży i zlecenie poszukiwania trafiają do Leadów w programie, a nie na skrzynkę, której nikt nie czyta.", obraz: WZORY[1] },
+                  { tytul: "Zespół, poradnik i kalkulator", tekst: "Agenci z biura, wpisy poradnikowe i kalkulator kredytu. Treści edytujesz w ustawieniach strony bez programisty.", obraz: WZORY[2] },
+                  { tytul: "Czat AI na stronie", tekst: "Asystent odpowiada odwiedzającym na pytania o ofertę biura i zbiera kontakt do agenta.", obraz: WZORY[3] },
+                  { tytul: "Własna domena", tekst: "Strona działa pod adresem Twojego biura, domenę podpinamy razem z Tobą.", obraz: WZORY[4] },
+                ].map((k) => ({
+                  tytul: k.tytul,
+                  tekst: k.tekst,
+                  ekran: (
+                    <figure className="pd-zdjecie m-0 aspect-[16/10]">
+                      <Image src={k.obraz.preview} alt={`Wzór ${k.obraz.name}`} fill sizes="45vw" className="object-cover" />
+                    </figure>
+                  ),
+                }))}
+              />
+            </div>
+          </section>
+        </>
+      )}
 
       <FrameRule />
 

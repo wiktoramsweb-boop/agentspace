@@ -99,7 +99,7 @@ export default async function BlogPost({ params }: Props) {
               {post.category}
             </p>
 
-            <h1 className="mb-6 text-3xl font-semibold leading-[1.15] tracking-tight md:text-5xl">
+            <h1 className="bl-h1 mb-6 text-3xl font-semibold leading-[1.15] tracking-tight md:text-5xl">
               {post.title}
             </h1>
 
@@ -151,7 +151,7 @@ export default async function BlogPost({ params }: Props) {
                       <p className="mb-2 text-xs font-medium uppercase tracking-[0.15em] text-emerald-400">
                         {p.category}
                       </p>
-                      <h3 className="mb-2 text-lg font-semibold text-[var(--color-mk-text)] transition group-hover:text-emerald-50">
+                      <h3 className="bl-karta mb-2 text-lg font-semibold text-[var(--color-mk-text)] transition group-hover:text-emerald-50">
                         {p.title}
                       </h3>
                       <p className="flex-1 text-sm text-[var(--color-mk-muted)]">{p.description}</p>

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/app/components/fade-in";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
@@ -27,11 +28,14 @@ export default async function DlaWlascicieli({ params }: { params: Promise<{ lan
     <>
       <SiteNav lang={locale} />
       <main className="mk relative min-h-screen">
-        <PageHero
+        <PdHero
+          wariant="pelny"
+          tlo={zdjecie("naglowek-dla-wlascicieli")}
+          alt={t.hero.photoAlt}
           eyebrow={t.hero.eyebrow}
-          title={t.hero.title}
-          description={t.hero.description}
-          photo={{ src: "/wzory/wieza.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
+          tytul={t.hero.title}
+          opis={t.hero.description}
+          podpis={t.hero.photoCaption}
         />
 
         {/* Problemy z liczbami */}

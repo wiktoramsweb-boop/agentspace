@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
 import { ContactForm } from "@/app/components/contact-form";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { FadeIn } from "@/app/components/fade-in";
 import { getDict, toLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
@@ -27,12 +28,14 @@ export default async function Kontakt({ params }: { params: Promise<{ lang: stri
     <>
       <SiteNav lang={locale} />
       <main className="mk relative min-h-screen">
-        <PageHero
+        <PdHero
+          wariant="pas"
+          tlo={zdjecie("naglowek-kontakt")}
+          alt={t.hero.photoAlt}
           eyebrow={t.hero.eyebrow}
-          title={t.hero.title}
-          description={t.hero.description}
-          compact
-          photo={{ src: "/biuro/wejscie.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
+          tytul={t.hero.title}
+          opis={t.hero.description}
+          podpis={t.hero.photoCaption}
         />
 
         {/* Quick topics - co możesz napisać */}

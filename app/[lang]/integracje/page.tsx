@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { FrameRule } from "@/app/components/mk/frame";
 import { Card, Button, Section, SectionHead } from "@/app/components/mk/ui";
 import { listIntegrations, statusLabel } from "@/lib/marketing/integrations";
@@ -37,10 +38,13 @@ export default async function IntegracjePage({ params }: { params: Promise<{ lan
     <div className="mk relative min-h-screen">
       <SiteNav lang={locale} />
 
-      <PageHero
+      <PdHero
+        wariant="okno"
+        tlo={zdjecie("naglowek-integracje")}
+        alt=""
         eyebrow={t.hero.eyebrow}
-        title={t.hero.title}
-        description={t.hero.description}
+        tytul={t.hero.title}
+        opis={t.hero.description}
       />
 
       <FrameRule />

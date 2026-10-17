@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
-import { PageHero } from "@/app/components/page-hero";
+import { PdHero } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { FrameRule } from "@/app/components/mk/frame";
 import { Card, Button, Section, SectionHead, Tick } from "@/app/components/mk/ui";
 import {
@@ -57,10 +58,13 @@ export default async function IntegracjaPage({
     <div className="mk relative min-h-screen">
       <SiteNav lang={locale} />
 
-      <PageHero
+      <PdHero
+        wariant="pas"
+        tlo={zdjecie("naglowek-integracje")}
+        alt=""
         eyebrow={`${t.label} · ${statusLabel(integration.status, locale)}`}
-        title={`AgentSpace + ${integration.name}`}
-        description={integration.about}
+        tytul={`AgentSpace + ${integration.name}`}
+        opis={integration.about}
       />
 
       {/* Uczciwy komunikat o statusie - nie udajemy gotowej integracji. */}

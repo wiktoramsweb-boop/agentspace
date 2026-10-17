@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
+import Image from "next/image";
 import { PageHero } from "@/app/components/page-hero";
+import { PdHero, PdLiczby, PdRozwinKolo } from "@/app/components/ld/podstrona";
+import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
+import { MODULES } from "@/lib/marketing/modules";
+import { TECHNIKI } from "@/lib/techniki/techniki";
+import { SKRYPTY } from "@/lib/techniki/skrypty";
 import { Timeline } from "@/app/components/timeline";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/app/components/fade-in";
 import { TiltCard } from "@/app/components/effects/tilt-card";
@@ -25,6 +31,139 @@ export default async function ONas({ params }: { params: Promise<{ lang: string 
   const locale = toLocale(lang);
   const t = getDict(locale).pages.onas;
 
+  if (locale !== "pl") return <ONasStara t={t} locale={locale} />;
+
+  const dzialaDzis = [
+    { tytul: "CRM, oferty, leady i poszukiwania", tekst: "Jedna baza klientów i nieruchomości biura, leady z formularzy i portali, dopasowanie ofert do kupujących." },
+    { tytul: "Umowy, protokoły i świadectwa energetyczne", tekst: "Dokumenty z danych klienta i oferty w PDF, a świadectwo energetyczne zamawiasz prosto z karty nieruchomości." },
+    { tytul: "Wycena z aktów notarialnych", tekst: "Ceny transakcyjne z Rejestru Cen Nieruchomości z korektami za piętro, stan i budynek, z raportem PDF dla właściciela." },
+    { tytul: "AI Coach i biblioteka technik", tekst: `Trening rozmów z klientem AI głosem albo na piśmie, ${TECHNIKI.length} technik i ${SKRYPTY.length} skryptów rozmów z treningiem jednym kliknięciem.` },
+    { tytul: "Dyżur AI", tekst: "Asystentka głosowa odbiera telefony, których agent nie odebrał, i zapisuje lead z notatką z rozmowy." },
+    { tytul: "Prowizje, faktury i wynik biura", tekst: "Rozliczenie prowizji agentów, faktury, koszty i wynik miesiąca z paczką dla księgowej." },
+  ];
+
+  return (
+    <>
+      <SiteNav lang={locale} />
+      <main className="mk relative min-h-screen">
+        <PdHero wariant="pelny" tlo={zdjecie("naglowek-o-nas")} alt={t.hero.photoAlt} eyebrow={t.hero.eyebrow} tytul={t.hero.title} opis={t.hero.description} podpis={t.hero.photoCaption} />
+
+        <section className="pd-sekcja">
+          <div className="pd-ramka on-historia">
+            <figure className="pd-zdjecie on-historia__foto" data-pd="maska">
+              <div data-pd-paralaksa="0.08">
+                <Image src={zdjecie("o-nas-poczatek")} alt="Biuro Spectra Nieruchomości w Krakowie" fill sizes="(max-width: 900px) 100vw, 40vw" className="object-cover" />
+              </div>
+            </figure>
+            <div>
+              <p className="mk-eyebrow" data-pd="gora">{t.founderLabel} · {t.founderName}</p>
+              <h2 data-pd="gora" style={{ "--d": "0.08s" } as React.CSSProperties}>Program napisany w działającym biurze nieruchomości</h2>
+              <div className="on-historia__tekst">
+                {t.founderParagraphs.map((akapit, i) => (
+                  <p key={akapit.slice(0, 24)} data-pd="gora" style={{ "--d": `${0.12 + i * 0.08}s` } as React.CSSProperties}>
+                    {akapit}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="pd-sekcja pd-sekcja--ciasna">
+          <div className="pd-ramka">
+            <PdLiczby
+              liczby={[
+                { wartosc: MODULES.length, opis: "modułów w jednym programie" },
+                { wartosc: 24, opis: "scenariusze rozmów w AI Coachu" },
+                { wartosc: TECHNIKI.length, opis: "technik rozmowy z przykładami" },
+                { wartosc: 8, opis: "wzorów stron www dla biur" },
+              ]}
+            />
+          </div>
+        </section>
+
+        <PdRozwinKolo
+          src={zdjecie("rozwin-o-nas")}
+          alt="Zespół biura nieruchomości przy wspólnym stole"
+          lewa="Z biura"
+          prawa="dla biur"
+          cytat="Każda funkcja najpierw działa u nas, w Spectrze. Dopiero kiedy pomaga agentom w prawdziwej pracy, trafia do Ciebie."
+        />
+
+        <section className="pd-sekcja">
+          <div className="pd-ramka on-zasady">
+            <div className="on-zasady__glowa">
+              <p className="mk-eyebrow" data-pd="gora">{t.principles.eyebrow}</p>
+              <h2 data-pd="gora">{t.principles.title}</h2>
+            </div>
+            <ol className="on-karty">
+              {t.principles.items.map((z, i) => (
+                <li key={z.title} style={{ "--i": i } as React.CSSProperties}>
+                  <span className="on-karty__nr">{z.number}</span>
+                  <h3>{z.title}</h3>
+                  <p>{z.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="pd-sekcja">
+          <div className="pd-ramka on-dzis">
+            <div>
+              <div className="pd-glowa">
+                <p className="mk-eyebrow" data-pd="gora">Działa dziś</p>
+                <h2 data-pd="gora">Jeden program, w którym biuro ma wszystko w jednym miejscu</h2>
+                <p data-pd="gora">Nie zestaw aplikacji połączonych arkuszem, tylko jedna baza, jedno logowanie i jeden abonament.</p>
+              </div>
+              <ul className="on-dzis__lista">
+                {dzialaDzis.map((x, i) => (
+                  <li key={x.tytul} data-pd="lewo" style={{ "--d": `${i * 0.06}s` } as React.CSSProperties}>
+                    <b>{x.tytul}</b>
+                    <span>{x.tekst}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <figure className="pd-zdjecie on-dzis__foto" data-pd="skala">
+              <div data-pd-paralaksa="0.1">
+                <Image src={zdjecie("o-nas-dzis")} alt="Agent pokazuje klientce aplikację" fill sizes="(max-width: 900px) 100vw, 40vw" className="object-cover" />
+              </div>
+            </figure>
+          </div>
+        </section>
+
+        <section className="pd-sekcja">
+          <div className="pd-ramka" style={{ maxWidth: 900 }}>
+            <div className="pd-glowa">
+              <p className="mk-eyebrow" data-pd="gora">{t.roadmap.eyebrow}</p>
+              <h2 data-pd="gora">Następne w kolejce</h2>
+            </div>
+            <Timeline items={t.roadmap.items.filter((x) => x.period !== "Działa dziś")} />
+          </div>
+        </section>
+
+        <section className="pd-sekcja">
+          <div className="pd-ramka">
+            <div className="pm-dla" data-pd="skala">
+              <p className="mk-eyebrow">{t.cta.button.replace(" →", "")}</p>
+              <div>
+                <p className="pm-dla__tekst">{t.cta.title}. {t.cta.lead}</p>
+                <Link href={localeHref(locale, "/kontakt")} className="mk-btn mt-6">
+                  {t.cta.button}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <SiteFooter lang={locale} />
+    </>
+  );
+}
+
+/** Wersja angielska zostaje w dotychczasowym układzie: nowa treść jest na razie tylko po polsku. */
+function ONasStara({ t, locale }: { t: ReturnType<typeof getDict>["pages"]["onas"]; locale: "pl" | "en" }) {
   return (
     <>
       <SiteNav lang={locale} />
