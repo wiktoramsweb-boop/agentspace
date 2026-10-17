@@ -94,6 +94,7 @@ export const SECTIONS: NavSection[] = [
       { href: "/app/ofertowka", label: "Ofertówka", icon: <PhotoIcon />, color: "fuchsia", modul: "nieruchomosci" },
       { href: "/app/oferta-wspolpracy", label: "Oferta współpracy", icon: <HandshakeIcon />, color: "teal", modul: "dokumenty" },
       { href: "/app/kalkulatory", label: "Kalkulatory", icon: <CalcIcon />, color: "sky", modul: "nieruchomosci" },
+      { href: "/app/swiadectwa", label: "Świadectwa energetyczne", icon: <BoltIcon />, color: "green", modul: "nieruchomosci" },
     ],
   },
   {
