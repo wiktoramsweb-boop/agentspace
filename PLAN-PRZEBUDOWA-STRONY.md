@@ -142,5 +142,11 @@ Kolejność: najpierw 1-3 (pulpit, zadania etapowe, okna zadań), potem 6-7 (men
 6 (menu w grupach Dziś / Sprzedaż / Dokumenty i oferty / Rozwój / Biuro + dolny pasek na telefonie).
 7 częściowo (sortowanie obok filtrów na wszystkich listach, krótsze wiersze działań, miejsce pod przycisk asystenta).
 Zrzuty aplikacji na stronie zrobione od nowa 17.10 (demo ma już transakcje z bieżącego miesiąca i w toku).
-Zostaje 8 (osiągnięcia) i decyzje z listy „Funkcje, których nie mamy”.
+8 zrobione: /app/osiagniecia (mapa programu z punktami, lib/osiagniecia.ts).
+Z listy „Funkcje, których nie mamy”:
+- wycena z RCN: zrobiona, /app/wycena-rcn (usługa WFS GUGiK, lib/rcn.ts + lib/rcn-wycena.ts, test npm run test:rcn),
+- sekretarka głosowa: zrobiona jako „Dyżur AI”, /app/ustawienia/dyzur + webhook /api/dyzur/glos (Twilio, TwiML bez SDK,
+  test npm run test:dyzur). Do uruchomienia u biura: numer w Twilio, TWILIO_AUTH_TOKEN w Vercel, przekierowanie z komórki.
+Strona (17.10): własny układ zamiast kopii Estify (rozdziały 01-05), podstrony w tym samym stylu przez wspólne
+SiteNav/SiteFooter/PageHero (app/components/ld/rama.tsx, podstrony.css).
 Po przebudowie robię zrzuty aplikacji od nowa i podmieniam je na stronie.

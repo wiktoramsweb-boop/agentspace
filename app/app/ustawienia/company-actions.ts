@@ -1,5 +1,6 @@
 "use server";
 
+import { zDyzurem } from "@/lib/dyzur";
 import { revalidatePath } from "next/cache";
 import { requireOwner } from "@/lib/auth";
 import {
@@ -121,7 +122,8 @@ export async function saveOptions(formData: FormData): Promise<ActionResult> {
     match_area_plus: pct(formData, "match_area_plus", 10),
   };
 
-  const err = await saveAgencySettings(owner.agency_id, { options });
+  // Dyżur AI trzyma konfigurację w tych samych opcjach: nie kasujemy jej przy zapisie.
+  const err = await saveAgencySettings(owner.agency_id, { options: await zDyzurem(owner.agency_id, options) });
   if (err) return { ok: false, error: err };
   revalidateSettings();
   revalidatePath("/app", "layout");
