@@ -104,6 +104,7 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
+      data-mk="dark"
       suppressHydrationWarning
       className={`${interTight.variable} ${geistMono.variable} ${sora.variable} ${plex.variable} h-full antialiased`}
     >

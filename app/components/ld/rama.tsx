@@ -1,4 +1,5 @@
 import "./strona.css";
+import "./podstrony.css";
 import Link from "next/link";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { kategorieZModulami } from "@/lib/marketing/modules";

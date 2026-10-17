@@ -17,7 +17,7 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section id={id} className={`relative px-6 py-16 md:py-20 ${className}`}>
+    <section id={id} className={`mk-sekcja relative px-6 py-16 md:px-10 md:py-24 ${className}`}>
       <div className="mx-auto max-w-[1120px]">{children}</div>
     </section>
   );
@@ -80,23 +80,15 @@ type ButtonProps = {
   className?: string;
 };
 
-/**
- * Przycisk. Jednolity kolor marki, bez poświaty i połysku: główne wezwanie
- * ma się wyróżniać kontrastem i miejscem na stronie, nie efektem.
- */
+/** Przycisk marketingu: pigułka w kolorze marki z falą pod kursorem. */
 export function Button({
   href,
   children,
   variant = "primary",
   className = "",
 }: ButtonProps) {
-  const base =
-    "inline-flex h-12 items-center justify-center rounded-xl px-6 text-[1rem] font-semibold transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-mk-accent)]";
-  const styles =
-    variant === "primary"
-      ? "bg-[var(--color-mk-accent)] text-[var(--mk-on-accent)] hover:bg-[var(--mk-accent-text)]"
-      : "border border-[var(--mk-hairline-strong)] bg-[var(--mk-card-bg)] text-[var(--color-mk-text)] hover:border-[var(--color-mk-text)]";
-  const cls = `${base} ${styles} ${className}`;
+  // Ten sam przycisk co na stronie głównej (style w ld/podstrony.css).
+  const cls = `mk-btn${variant === "primary" ? "" : " mk-btn--duch"} ${className}`;
 
   if (href.startsWith("/")) {
     return (
