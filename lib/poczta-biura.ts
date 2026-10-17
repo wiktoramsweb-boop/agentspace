@@ -1,3 +1,4 @@
+import { gosciaBlokujemy } from "./demo/straz";
 import { escapeHtml } from "./html";
 import { getAgencySettings } from "./agency-settings";
 
@@ -42,6 +43,7 @@ function nazwaNadawcy(n: string): string {
 }
 
 export async function wyslijMailBiura(m: MailBiura): Promise<WynikWysylki> {
+  if (await gosciaBlokujemy()) return { ok: false, error: "Wersja demo: wysyłanie maili jest wyłączone." };
   const klucz = process.env.RESEND_API_KEY;
   if (!klucz) return { ok: false, error: "Wysyłka maili nie jest skonfigurowana (brak klucza Resend)." };
   const do_ = m.do.trim();

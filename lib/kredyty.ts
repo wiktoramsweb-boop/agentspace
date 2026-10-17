@@ -1,3 +1,4 @@
+import { gosciaBlokujemy } from "./demo/straz";
 import { stanDostepu } from "./abonament-cennik";
 import { createSupabaseAdmin } from "./supabase/admin";
 import { APP_TZ } from "./datetime";
@@ -126,6 +127,9 @@ export async function brakKredytow(
   kredyty?: number,
 ): Promise<boolean> {
   if (!user.agency_id) return false;
+  // Gość demo poza treningiem i asystentem nie uruchamia AI: jego zużycie i tak
+  // nie zapisałoby się w bazie, więc limit dzienny by go nie zatrzymał.
+  if (await gosciaBlokujemy()) return true;
   const koszt = kredyty ?? CENNIK_KREDYTOW[operacja];
   const admin = createSupabaseAdmin();
 

@@ -1,3 +1,4 @@
+import { gosciaBlokujemy } from "./demo/straz";
 import { escapeHtml } from "@/lib/html";
 import { Resend } from "resend";
 import { createSupabaseAdmin } from "./supabase/admin";
@@ -15,6 +16,7 @@ import { oprawaMaila } from "@/lib/mail";
  * Zwraca true jeśli wysłano.
  */
 export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean> {
+  if (await gosciaBlokujemy()) return false;
   const admin = createSupabaseAdmin();
 
   const { data: agency } = await admin

@@ -13,6 +13,9 @@ import { PasekAbonamentu } from "./pasek-abonamentu";
 import { BanerPowierzenia } from "./components/baner-powierzenia";
 import { stanPowierzenia } from "@/lib/powierzenie";
 import { getPrzewodnik } from "@/lib/data-przewodnik";
+import { DEMO_EMAIL } from "@/lib/demo/tryb";
+import { zPominieciemDemo } from "@/lib/demo/straz";
+import { TrybDemo } from "./components/tryb-demo";
 
 export const metadata: Metadata = {
   title: "Panel AgentSpace",
@@ -40,11 +43,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // miesiące, a kalendarz i statystyki mają wtedy wyglądać tak samo. Dotyczy
   // wyłącznie biur oznaczonych jako demo, więc zwykłych kont nie rusza.
   if (user.agency?.is_demo) {
-    await odswiezDemoJesliTrzeba({
-      id: user.agency_id,
-      is_demo: user.agency.is_demo,
-      demo_refreshed_at: user.agency.demo_refreshed_at,
-    });
+    // Odświeżenie robi system, nie gość, więc idzie obok blokady zapisu wersji demo.
+    const biuro = { id: user.agency_id, is_demo: user.agency.is_demo, demo_refreshed_at: user.agency.demo_refreshed_at };
+    await zPominieciemDemo(() => odswiezDemoJesliTrzeba(biuro));
   }
 
   // Przewodnik liczy się sam ze stanu bazy i pokazuje się w menu tylko, póki
@@ -52,6 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // a nie ten layout: layout obejmuje też /app/start, więc zapętliłby się na
   // stronie, na którą kieruje.
   const przewodnik = await getPrzewodnik(user);
+  const gosc = user.email?.toLowerCase() === DEMO_EMAIL;
 
   return (
     <ToastProvider>
@@ -71,10 +73,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           fullName={user.full_name ?? "Użytkownik"}
           agencyName={user.agency?.name ?? "Biuro"}
           avatarUrl={avatarUrl(user.avatar_path)}
+          demo={gosc}
         />
         <main className="min-w-0 flex-1 px-5 pt-8 pb-[calc(104px+env(safe-area-inset-bottom))] md:px-10 md:pt-10 md:pb-28">
           <div className="mx-auto max-w-6xl">
-            {user.role === "owner" && !powierzenie.zaakceptowana && (
+            {gosc && <TrybDemo />}
+            {user.role === "owner" && !gosc && !powierzenie.zaakceptowana && (
               <BanerPowierzenia nieaktualna={powierzenie.nieaktualna} />
             )}
             {dostep.ostrzegaj && (

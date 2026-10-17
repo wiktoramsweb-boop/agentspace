@@ -11,6 +11,7 @@ import { FadeIn } from "@/app/components/fade-in";
 import { TiltCard } from "@/app/components/effects/tilt-card";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
+import { WejscieDemo } from "@/app/components/wejscie-demo";
 
 export async function generateMetadata({
   params,
@@ -26,8 +27,15 @@ export async function generateMetadata({
 /** Makiety zostają w kodzie, opisy przychodzą ze słownika. */
 const DEMO_MOCKUPS = [AiCoachMockup, AgentDashboardMockup, OwnerPanelMockup];
 
-export default async function Demo({ params }: { params: Promise<{ lang: string }> }) {
+export default async function Demo({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<{ blad?: string }>;
+}) {
   const { lang } = await params;
+  const { blad } = await searchParams;
   const locale = toLocale(lang);
   const t = getDict(locale).pages.demo;
   const screens = t.screens.map((screen, i) => ({ ...screen, Mockup: DEMO_MOCKUPS[i] }));
@@ -42,6 +50,8 @@ export default async function Demo({ params }: { params: Promise<{ lang: string 
           description={t.hero.description}
           photo={{ src: "/wzory/szklo.jpg", alt: t.hero.photoAlt, caption: t.hero.photoCaption }}
         />
+
+        <WejscieDemo blad={blad} en={locale === "en"} />
 
         {/* Mockupy */}
         {screens.map((item, index) => (

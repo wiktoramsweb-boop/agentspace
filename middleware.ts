@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { isOwnHost, slugForDomain } from "@/lib/site/domains";
 import { MARKETING_EXACT, MARKETING_SEGMENTS, toPolishPath } from "@/lib/i18n/config";
+import { DEMO_EMAIL, KOMUNIKAT_DEMO, demoMozeZapisac, emailZCiasteczek } from "@/lib/demo/tryb";
 
 const AUTH_PATHS = ["/app", "/login", "/signup"];
 
@@ -35,6 +36,16 @@ export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const { pathname, search } = request.nextUrl;
 
+  // Gość wersji demo: w aplikacji i API zapis blokuje klient bazy (lib/demo/straz.ts)
+  // na podstawie nagłówka x-demo. Poza nimi (reset hasła, zaproszenia) gość
+  // nie ma czego wysyłać, więc odcinamy każdy POST od razu.
+  const demo = emailZCiasteczek(request.cookies.getAll()) === DEMO_EMAIL;
+  const dlaAplikacji: Record<string, string> = demo ? { "x-demo": demoMozeZapisac(pathname) ? "zapis" : "odczyt" } : {};
+  const aplikacja = pathname === "/app" || pathname.startsWith("/app/") || pathname.startsWith("/api/");
+  if (demo && !aplikacja && request.method !== "GET" && request.method !== "HEAD" && !demoMozeZapisac(pathname)) {
+    return NextResponse.json({ error: KOMUNIKAT_DEMO }, { status: 403 });
+  }
+
   // Własna domena biura: pokazujemy jego stronę, zachowując adres w pasku.
   if (host && !isOwnHost(host)) {
     const slug = await slugForDomain(host);
@@ -48,7 +59,16 @@ export async function middleware(request: NextRequest) {
   }
 
   if (AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
-    return await updateSession(request);
+    return await updateSession(request, dlaAplikacji);
+  }
+
+  // API nie przechodzi przez updateSession, ale strażnik zapisu też musi wiedzieć o gościu.
+  // Podrobiony x-demo z przeglądarki zawsze usuwamy.
+  if (pathname.startsWith("/api/")) {
+    const h = new Headers(request.headers);
+    h.delete("x-demo");
+    for (const [k, v] of Object.entries(dlaAplikacji)) h.set(k, v);
+    return NextResponse.next({ request: { headers: h } });
   }
 
   const target = marketingPath(pathname);

@@ -22,6 +22,7 @@ export function Sidebar({
   permissions,
   przewodnik,
   zablokowane,
+  demo,
   fullName,
   agencyName,
   avatarUrl,
@@ -34,6 +35,8 @@ export function Sidebar({
   przewodnik?: { zrobione: number; wszystkich: number } | null;
   /** Po wygaśnięciu dostępu moduły są zamknięte, zostają ustawienia. */
   zablokowane?: boolean;
+  /** Gość wersji demo: wylogowanie przez zwykły link, bo akcje POST są dla niego zablokowane. */
+  demo?: boolean;
   fullName: string;
   agencyName: string;
   avatarUrl?: string | null;
@@ -190,15 +193,26 @@ export function Sidebar({
       <div className="mb-1">
         <ThemeToggle />
       </div>
-      <form action={signOut}>
-        <button
-          type="submit"
+      {demo ? (
+        // eslint-disable-next-line @next/next/no-html-link-for-pages -- zwykły link: Link pobierałby adres z wyprzedzeniem, a to wylogowuje
+        <a
+          href="/demo-wyjdz"
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-white"
         >
           <LogoutIcon />
-          Wyloguj się
-        </button>
-      </form>
+          Zakończ demo
+        </a>
+      ) : (
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            <LogoutIcon />
+            Wyloguj się
+          </button>
+        </form>
+      )}
     </div>
   );
 

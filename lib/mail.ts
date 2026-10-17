@@ -1,3 +1,4 @@
+import { gosciaBlokujemy } from "./demo/straz";
 import { escapeHtml } from "./html";
 
 /**
@@ -83,6 +84,7 @@ function szablon(m: Mail): string {
 
 /** Zwraca true, gdy mail poszedł. Nigdy nie rzuca: brak poczty nie może wywrócić akcji. */
 export async function wyslijMail(m: Mail): Promise<boolean> {
+  if (await gosciaBlokujemy()) return false;
   const klucz = process.env.RESEND_API_KEY;
   if (!klucz) return false;
 

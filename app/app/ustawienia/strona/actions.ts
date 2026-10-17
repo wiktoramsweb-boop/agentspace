@@ -1,5 +1,6 @@
 "use server";
 
+import { gosciaBlokujemy } from "@/lib/demo/straz";
 import { todayPL } from "@/lib/datetime";
 import { escapeHtml } from "@/lib/html";
 import { revalidatePath } from "next/cache";
@@ -291,6 +292,7 @@ export async function deletePost(id: string): Promise<SiteResult> {
 export async function requestSiteAddon(): Promise<SiteResult> {
   const owner = await requireOwner();
   if (!owner.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
+  if (await gosciaBlokujemy()) return { ok: false, error: "Wersja demo: zgłoszenia są wyłączone." };
 
   const admin = createSupabaseAdmin();
   await admin

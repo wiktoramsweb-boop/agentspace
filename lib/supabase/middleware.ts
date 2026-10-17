@@ -6,8 +6,15 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config";
  * Odświeża sesję Supabase w middleware i chroni ścieżki /app.
  * Wywoływane z root middleware.ts.
  */
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+export async function updateSession(request: NextRequest, dodatkowe: Record<string, string> = {}) {
+  // Nagłówki dla aplikacji (np. x-demo) doklejamy do kopii, bo nagłówków zapytania nie wolno zmieniać.
+  const dalej = () => {
+    const h = new Headers(request.headers);
+    h.delete("x-demo");
+    for (const [k, v] of Object.entries(dodatkowe)) h.set(k, v);
+    return NextResponse.next({ request: { headers: h } });
+  };
+  let supabaseResponse = dalej();
 
   const supabase = createServerClient(
     SUPABASE_URL,
@@ -21,7 +28,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          supabaseResponse = NextResponse.next({ request });
+          supabaseResponse = dalej();
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           );
