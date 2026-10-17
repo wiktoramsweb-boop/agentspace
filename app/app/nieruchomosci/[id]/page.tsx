@@ -184,12 +184,22 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             <p className="text-slate-500">{property.address ?? property.city}</p>
           )}
         </div>
-        <PropertyWizard
-          property={property}
-          clients={allClients}
-          photoConfig={photoConfigFrom(settings)}
-          canEditSettings={user.role === "owner"}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          {property.property_type === "mieszkanie" && (
+            <Link
+              href={`/app/wycena-rcn?oferta=${property.id}`}
+              className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+            >
+              Ceny z RCN
+            </Link>
+          )}
+          <PropertyWizard
+            property={property}
+            clients={allClients}
+            photoConfig={photoConfigFrom(settings)}
+            canEditSettings={user.role === "owner"}
+          />
+        </div>
       </div>
 
       <div className="mb-6">

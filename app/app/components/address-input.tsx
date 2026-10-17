@@ -34,7 +34,8 @@ export function AddressInput({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
-  const skipRef = useRef(false); // po wyborze z listy nie odpalaj ponownie fetch
+  // Po wyborze z listy i przy adresie wpisanym z góry nie odpalaj podpowiedzi sam z siebie.
+  const skipRef = useRef(Boolean(defaultAddress));
 
   useEffect(() => {
     if (skipRef.current) {

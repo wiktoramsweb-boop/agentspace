@@ -79,6 +79,7 @@ export const SECTIONS: NavSection[] = [
       { href: "/app/leady", label: "Leady", icon: <LeadIcon />, color: "fuchsia", modul: "klienci" },
       { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon />, color: "rose", modul: "klienci" },
       { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue", modul: "nieruchomosci" },
+      { href: "/app/wycena-rcn", label: "Wycena z RCN", icon: <ScaleIcon />, color: "teal", modul: "nieruchomosci" },
       { href: "/app/poszukiwania", label: "Poszukiwania", icon: <SearchIcon />, color: "sky", modul: "klienci" },
       { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green", modul: "prowizje" },
     ],
