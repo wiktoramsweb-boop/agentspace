@@ -12,8 +12,9 @@ import { maV49 } from "@/lib/schemat";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { Select } from "../../components/select";
 import { adresZMiastem } from "@/lib/adres";
+import { technika as znajdzTechnike } from "@/lib/techniki/techniki";
 
-type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ oferta?: string; zadanie?: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ oferta?: string; zadanie?: string; technika?: string }> };
 
 /** Oferty do treningu: agent swoje, reszta zespołu wszystkie z biura. */
 async function ofertyDoTreningu(agencyId: string, userId: string, role: string) {
@@ -95,6 +96,7 @@ export default async function ScenarioSetupPage({ params, searchParams }: Props)
   if (!scenario) notFound();
 
   const glos = glosWlaczony();
+  const technika = sp.technika ? znajdzTechnike(sp.technika) : undefined;
   const v49 = await maV49();
   const oferty = user.agency_id && v49 ? await ofertyDoTreningu(user.agency_id, user.id, user.role) : [];
   const zadanie =
@@ -130,6 +132,27 @@ export default async function ScenarioSetupPage({ params, searchParams }: Props)
         <p className="leading-relaxed text-slate-800">{scenario!.brief}</p>
       </Card>
 
+      {technika && (
+        <Card className="mb-8 !border-slate-900 !bg-slate-900 text-white">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Ćwiczysz technikę</p>
+            <Link href={`/app/techniki/${technika.slug}`} className="text-xs text-slate-300 hover:text-white">
+              Pełny opis →
+            </Link>
+          </div>
+          <p className="mt-1 text-lg font-semibold">{technika.nazwa}</p>
+          <ol className="mt-3 grid gap-2 sm:grid-cols-2">
+            {technika.kroki.map((k, i) => (
+              <li key={k} className="flex gap-2 text-sm text-slate-200">
+                <span className="font-bold text-emerald-300">{i + 1}.</span>
+                {k}
+              </li>
+            ))}
+          </ol>
+          <p className="mt-3 text-xs text-slate-400">Kroki będą widoczne także w trakcie rozmowy.</p>
+        </Card>
+      )}
+
       {limitReached && (
         <Card className="mb-8 !border-amber-500/30 !bg-amber-500/10">
           <p className="font-semibold text-amber-700">Wykorzystałeś limit rozmów AI na ten tydzień.</p>
@@ -153,6 +176,7 @@ export default async function ScenarioSetupPage({ params, searchParams }: Props)
       <form action={startSession}>
         <input type="hidden" name="scenarioId" value={scenario!.id} />
         {zadanie && <input type="hidden" name="assignmentId" value={zadanie.id} />}
+        {technika && <input type="hidden" name="technika" value={technika.slug} />}
 
         {glos && (
           <>

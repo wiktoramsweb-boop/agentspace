@@ -1,0 +1,188 @@
+import Link from "next/link";
+import { requireModul } from "@/lib/auth";
+import { KATEGORIE, TECHNIKI, type Kategoria } from "@/lib/techniki/techniki";
+import { SKRYPTY, STRUKTURA } from "@/lib/techniki/skrypty";
+import { PageHeader } from "../components/page-header";
+import { KOLOR, POZIOM, Sila, Zakladki } from "./wspolne";
+
+export const metadata = { title: "Biblioteka technik" };
+
+type Props = { searchParams: Promise<{ widok?: string; k?: string; q?: string }> };
+
+const bezOgonkow = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
+
+export default async function TechnikiPage({ searchParams }: Props) {
+  await requireModul("coach");
+  const sp = await searchParams;
+  const widok = sp.widok === "skrypty" || sp.widok === "struktura" ? sp.widok : "techniki";
+  const kat = sp.k && sp.k in KATEGORIE ? (sp.k as Kategoria) : null;
+  const q = (sp.q ?? "").trim().slice(0, 60);
+
+  const lista = TECHNIKI.filter((t) => (!kat || t.kategoria === kat) && (!q || bezOgonkow(`${t.nazwa} ${t.skrot} ${t.zrodlo}`).includes(bezOgonkow(q))));
+
+  return (
+    <>
+      <PageHeader
+        title="Biblioteka technik"
+        subtitle="Techniki rozmowy, gotowe skrypty i struktura dobrej rozmowy. Każdą technikę od razu przećwiczysz z klientem AI."
+      />
+
+      <section className="mb-6 grid gap-3 sm:grid-cols-3">
+        {[
+          { liczba: TECHNIKI.length, opis: "technik z przykładami z polskiego rynku" },
+          { liczba: SKRYPTY.length, opis: "skryptów rozmów krok po kroku" },
+          { liczba: TECHNIKI.reduce((s, t) => s + t.przyklady.length, 0), opis: "przykładowych dialogów" },
+        ].map((x) => (
+          <div key={x.opis} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <b className="block text-3xl font-bold tabular-nums text-slate-900">{x.liczba}</b>
+            <span className="text-sm text-slate-500">{x.opis}</span>
+          </div>
+        ))}
+      </section>
+
+      <Zakladki aktywna={widok} />
+
+      {widok === "techniki" && (
+        <>
+          <form className="mb-4 flex gap-2" action="/app/techniki">
+            {kat && <input type="hidden" name="k" value={kat} />}
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Szukaj techniki, np. kotwica, Voss, cisza"
+              className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30"
+            />
+            <button className="rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800">Szukaj</button>
+          </form>
+
+          <div className="mb-6 flex flex-wrap gap-2">
+            <Link
+              href={q ? `/app/techniki?q=${encodeURIComponent(q)}` : "/app/techniki"}
+              scroll={false}
+              className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${!kat ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+            >
+              Wszystkie
+            </Link>
+            {(Object.keys(KATEGORIE) as Kategoria[]).map((k) => (
+              <Link
+                key={k}
+                href={`/app/techniki?k=${k}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
+                scroll={false}
+                className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+                  kat === k ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                }`}
+              >
+                <span className={`h-2 w-2 rounded-full ${KOLOR[k].kropka}`} />
+                {KATEGORIE[k].nazwa}
+              </Link>
+            ))}
+          </div>
+
+          {kat && <p className="mb-4 text-sm text-slate-500">{KATEGORIE[kat].opis}</p>}
+
+          {lista.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">Nic nie pasuje do „{q}”. Spróbuj innego słowa.</p>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {lista.map((t) => (
+                <Link
+                  key={t.slug}
+                  href={`/app/techniki/${t.slug}`}
+                  className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                >
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${KOLOR[t.kategoria].tlo} ${KOLOR[t.kategoria].tekst}`}>
+                      {KATEGORIE[t.kategoria].nazwa}
+                    </span>
+                    <Sila wartosc={t.sila} />
+                  </div>
+                  <h2 className="font-semibold text-slate-900 group-hover:text-emerald-700">{t.nazwa}</h2>
+                  <p className="mt-1 flex-1 text-sm leading-relaxed text-slate-500">{t.skrot}</p>
+                  <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
+                    <span>
+                      {t.zrodlo} · {POZIOM[t.poziom]}
+                    </span>
+                    {t.etyka === "ostroznie" && <span className="font-medium text-amber-600">używaj uczciwie</span>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {widok === "skrypty" && (
+        <div className="grid gap-3 md:grid-cols-2">
+          {SKRYPTY.map((s) => (
+            <Link
+              key={s.slug}
+              href={`/app/techniki/skrypty/${s.slug}`}
+              className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+            >
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold">
+                <span className={`rounded-full px-2.5 py-0.5 ${s.rodzaj === "telefon" ? "bg-cyan-50 text-cyan-700" : "bg-violet-50 text-violet-700"}`}>
+                  {s.rodzaj === "telefon" ? "Telefon" : "Spotkanie"}
+                </span>
+                <span className="text-slate-400">{s.czas}</span>
+              </div>
+              <h2 className="font-semibold text-slate-900 group-hover:text-emerald-700">{s.nazwa}</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                <b className="font-medium text-slate-700">Cel:</b> {s.cel}
+              </p>
+              <div className="mt-4 flex gap-1">
+                {s.etapy.map((e) => (
+                  <span key={e.nazwa} className="h-1.5 flex-1 rounded-full bg-emerald-200 transition group-hover:bg-emerald-400" title={e.nazwa} />
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-slate-400">
+                {s.etapy.length} etapów · {s.obiekcje.length} obiekcji z odpowiedziami
+              </p>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {widok === "struktura" && (
+        <section>
+          <div className="mb-6 rounded-3xl bg-slate-900 p-6 text-white">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Uniwersalna struktura</p>
+            <h2 className="mt-1 text-xl font-semibold">Każda dobra rozmowa ma sześć etapów</h2>
+            <p className="mt-1 max-w-2xl text-sm text-slate-300">
+              Telefon do właściciela, prezentacja, negocjacja: kolejność jest ta sama. Szerokość paska to orientacyjny udział etapu w czasie rozmowy.
+              Najwięcej czasu zajmuje diagnoza, czyli słuchanie.
+            </p>
+            <div className="mt-5 flex h-3 gap-0.5 overflow-hidden rounded-full">
+              {STRUKTURA.map((e, i) => (
+                <span key={e.nazwa} style={{ width: `${e.procent}%`, opacity: 0.45 + i * 0.11 }} className="bg-emerald-400" title={e.nazwa} />
+              ))}
+            </div>
+          </div>
+          <ol className="grid gap-3 md:grid-cols-2">
+            {STRUKTURA.map((e, i) => (
+              <li key={e.nazwa} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-xl bg-emerald-50 text-sm font-bold text-emerald-700">{i + 1}</span>
+                  <div>
+                    <h3 className="font-semibold text-slate-900">{e.nazwa}</h3>
+                    <p className="text-xs text-slate-400">ok. {e.procent}% rozmowy</p>
+                  </div>
+                </div>
+                <p className="mt-3 text-sm text-slate-700">{e.cel}</p>
+                <p className="mt-2 rounded-xl bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                  <b>Pułapka:</b> {e.pulapka}
+                </p>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-6 text-sm text-slate-500">
+            Gotowe rozmowy rozpisane według tej struktury znajdziesz w zakładce{" "}
+            <Link href="/app/techniki?widok=skrypty" className="font-semibold text-emerald-700 hover:underline">
+              Skrypty rozmów
+            </Link>
+            .
+          </p>
+        </section>
+      )}
+    </>
+  );
+}

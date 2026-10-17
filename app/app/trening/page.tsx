@@ -85,11 +85,16 @@ export default async function TreningPage({
         title="AI Coach"
         subtitle="Wybierz kategorię i scenariusz. Ćwicz rozmowę z AI klientem, dostań scoring i feedback."
         action={
-          zlecajacy ? (
-            <Link href="/app/trening/zadania" className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:border-slate-400">
-              Zadania dla zespołu
+          <div className="flex flex-wrap gap-2">
+            <Link href="/app/techniki" className="rounded-xl bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+              Biblioteka technik
             </Link>
-          ) : undefined
+            {zlecajacy && (
+              <Link href="/app/trening/zadania" className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:border-slate-400">
+                Zadania dla zespołu
+              </Link>
+            )}
+          </div>
         }
       />
 

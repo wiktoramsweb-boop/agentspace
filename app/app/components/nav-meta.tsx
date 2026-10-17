@@ -101,6 +101,7 @@ export const SECTIONS: NavSection[] = [
     title: "Rozwój",
     items: [
       { href: "/app/trening", label: "AI Coach", icon: <MicIcon />, color: "cyan", modul: "coach" },
+      { href: "/app/techniki", label: "Biblioteka technik", icon: <BookIcon />, color: "emerald", modul: "coach" },
       { href: "/app/cele", label: "Cele", icon: <TargetIcon />, color: "violet", modul: "coach" },
       { href: "/app/historia", label: "Historia sesji", icon: <ClockIcon />, color: "slate", modul: "coach" },
       { href: "/app/osiagniecia", label: "Osiągnięcia", icon: <CompassIcon />, color: "amber" },
@@ -232,6 +233,10 @@ function ChartIcon() {
 }
 function LeadIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-4.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" /></svg>;
+}
+
+function BookIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 5.25A2.25 2.25 0 0 1 6.75 3h12v15H6.75a2.25 2.25 0 0 0-2.25 2.25m0-15v15m0 0A2.25 2.25 0 0 0 6.75 22.5h12V18M9 7.5h6M9 10.5h4" /></svg>;
 }
 
 function CompassIcon() {

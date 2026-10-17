@@ -6,16 +6,17 @@ import { SessionChat } from "./chat";
 import { SessionResults } from "./results";
 import { glosWlaczony } from "@/lib/glos";
 import { plecZWyboru, scenariuszWPlci } from "@/lib/coach/scenariusz-plec";
+import { technika as znajdzTechnike } from "@/lib/techniki/techniki";
 
 // Scoring (endSession) potrafi trwać kilka-kilkanaście sekund - daj mu czas.
 export const maxDuration = 60;
 
-type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ tryb?: string; plec?: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ tryb?: string; plec?: string; technika?: string }> };
 
 export default async function SessionPage({ params, searchParams }: Props) {
   const user = await requireUser();
   const { id } = await params;
-  const { tryb, plec } = await searchParams;
+  const { tryb, plec, technika: slugTechniki } = await searchParams;
 
   const session = await getSessionWithScore(id);
   if (!session) notFound();
@@ -67,6 +68,10 @@ export default async function SessionPage({ params, searchParams }: Props) {
       glos={glosWlaczony()}
       trybGlosu={tryb === "glos" && glosWlaczony()}
       plec={plecSesji}
+      technika={(() => {
+        const t = slugTechniki ? znajdzTechnike(slugTechniki) : undefined;
+        return t ? { slug: t.slug, nazwa: t.nazwa, kroki: t.kroki } : null;
+      })()}
     />
   );
 }

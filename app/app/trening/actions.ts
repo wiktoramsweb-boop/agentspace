@@ -31,6 +31,7 @@ export async function startSession(formData: FormData): Promise<void> {
   // a nie cecha sesji, i nie ma po co trzymać go w kolumnie.
   const tryb = formData.get("tryb") === "glos" ? "glos" : "pisanie";
   const plecWybrana = String(formData.get("plec") ?? "auto");
+  const technika = String(formData.get("technika") ?? "");
   const plec = plecWybrana === "k" || plecWybrana === "m" ? plecWybrana : "";
 
   const v49 = await maV49();
@@ -88,7 +89,11 @@ export async function startSession(formData: FormData): Promise<void> {
     .single();
 
   if (!session) redirect("/app/trening");
-  const parametry = [tryb === "glos" ? "tryb=glos" : "", plec ? `plec=${plec}` : ""].filter(Boolean);
+  const parametry = [
+    tryb === "glos" ? "tryb=glos" : "",
+    plec ? `plec=${plec}` : "",
+    /^[a-z-]{2,40}$/.test(technika) ? `technika=${technika}` : "",
+  ].filter(Boolean);
   redirect(`/app/sesja/${session!.id}${parametry.length ? `?${parametry.join("&")}` : ""}`);
 }
 

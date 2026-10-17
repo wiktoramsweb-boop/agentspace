@@ -16,6 +16,7 @@ export function SessionChat({
   glos,
   trybGlosu,
   plec,
+  technika = null,
 }: {
   sessionId: string;
   initialTranscript: ChatMessage[];
@@ -28,6 +29,8 @@ export function SessionChat({
   trybGlosu: boolean;
   /** Wymuszony głos klienta. Bez tego dobieramy go po opisie scenariusza. */
   plec: "k" | "m" | null;
+  /** Technika z biblioteki, którą agent ćwiczy w tej rozmowie. */
+  technika?: { slug: string; nazwa: string; kroki: string[] } | null;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialTranscript);
   const [input, setInput] = useState("");
@@ -136,6 +139,21 @@ export function SessionChat({
           </p>
           <p className="text-sm leading-relaxed text-slate-800">{brief}</p>
         </div>
+      )}
+
+      {technika && (
+        <details className="mb-4 rounded-xl border border-slate-200 bg-slate-900 px-4 py-3 text-white" open>
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-emerald-300">
+            Ćwiczysz: <span className="normal-case tracking-normal text-white">{technika.nazwa}</span>
+          </summary>
+          <ol className="mt-2 grid gap-1 sm:grid-cols-2">
+            {technika.kroki.map((k, i) => (
+              <li key={k} className="text-xs leading-relaxed text-slate-300">
+                <b className="text-emerald-300">{i + 1}.</b> {k}
+              </li>
+            ))}
+          </ol>
+        </details>
       )}
 
       {/* Messages */}
