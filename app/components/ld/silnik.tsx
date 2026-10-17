@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Lenis from "lenis";
 
 /**
  * Silnik ruchu strony głównej: jedna pętla requestAnimationFrame dla
@@ -33,13 +32,8 @@ export function Silnik() {
     root.classList.add("js");
     if (RM) root.classList.add("statyczna");
 
-    /* Lenis tylko na komputerze: na telefonie przewijanie systemowe jest lepsze. */
-    let lenis: Lenis | null = null;
-    if (!RM && DOKLADNY) {
-      lenis = new Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
-    }
-    nasluch(window, "ld-menu", ((e: CustomEvent<boolean>) => (e.detail ? lenis?.stop() : lenis?.start())) as EventListener);
-    nasluch(window, "ld-gora", () => (lenis ? lenis.scrollTo(0) : scrollTo({ top: 0, behavior: RM ? "auto" : "smooth" })));
+    // Płynne przewijanie tworzy NavRuch (wspólne dla wszystkich stron): bierzemy je stamtąd w chwili użycia.
+    const L = () => window.__lenis ?? null;
 
     /* ── Loader ── */
     const loader = $("[data-loader]");
@@ -51,7 +45,6 @@ export function Silnik() {
     let widziany = false;
     try {
       widziany = sessionStorage.getItem("ld-intro") === "1";
-      sessionStorage.setItem("ld-intro", "1");
     } catch {}
     if (!loader || RM || widziany) {
       loader?.remove();
@@ -60,9 +53,13 @@ export function Silnik() {
       document.documentElement.classList.add("ld-blok");
       const t1 = window.setTimeout(() => {
         loader.classList.add("koniec");
+        // Znacznik dopiero po animacji: zapisany od razu psuł wejście, gdy efekt ruszał dwa razy.
+        try {
+          sessionStorage.setItem("ld-intro", "1");
+        } catch {}
         window.setTimeout(start, 220);
         window.setTimeout(() => loader.remove(), 1200);
-      }, 1050);
+      }, 1350);
       sprzatanie.push(() => window.clearTimeout(t1));
     }
 
@@ -74,7 +71,8 @@ export function Silnik() {
         const cel = document.querySelector<HTMLElement>(id);
         if (!cel) return;
         e.preventDefault();
-        if (lenis) lenis.scrollTo(cel, { offset: -10 });
+        const l = L();
+        if (l) l.scrollTo(cel, { offset: -10 });
         else cel.scrollIntoView({ behavior: RM ? "auto" : "smooth", block: "start" });
       }) as EventListener),
     );
@@ -142,7 +140,8 @@ export function Silnik() {
         }
         const gora = etapy.getBoundingClientRect().top + scrollY;
         const y = gora + ((etapy.offsetHeight - innerHeight) * (i + 0.5)) / ILE_ETAPOW;
-        if (lenis) lenis.scrollTo(y);
+        const l = L();
+        if (l) l.scrollTo(y);
         else scrollTo({ top: y, behavior: "smooth" });
       }),
     );
@@ -199,22 +198,13 @@ export function Silnik() {
         });
     });
 
-    /* ── Kursor i przyciski magnetyczne ── */
-    const kursor = $("[data-kursor]");
-    let mx = 0, my = 0, smx = 0, smy = 0, kx = -100, ky = -100, cx = -100, cy = -100;
-    if (DOKLADNY && kursor) {
+    /* ── Przyciski magnetyczne i ruch myszy dla pływających elementów ── */
+    let mx = 0, my = 0, smx = 0, smy = 0;
+    if (DOKLADNY) {
       nasluch(window, "mousemove", ((e: MouseEvent) => {
-        cx = e.clientX;
-        cy = e.clientY;
         mx = (e.clientX / innerWidth) * 2 - 1;
         my = (e.clientY / innerHeight) * 2 - 1;
-        kursor.classList.add("widoczny");
       }) as EventListener, { passive: true });
-      nasluch(document, "mouseover", ((e: MouseEvent) => {
-        const t = e.target as Element | null;
-        kursor.classList.toggle("duzy", !!t?.closest?.("a,button,input,.lx-panel"));
-      }) as EventListener);
-      nasluch(document.documentElement, "mouseleave", () => kursor.classList.remove("widoczny"));
       if (!RM)
         $$("[data-magnes]").forEach((b) => {
           nasluch(b, "mousemove", ((e: MouseEvent) => {
@@ -336,8 +326,7 @@ export function Silnik() {
     nasluch(window, "load", mierz);
 
     let raf = 0;
-    const petla = (czas: number) => {
-      lenis?.raf(czas);
+    const petla = () => {
       sy = scrollY;
       const dy = sy - ssy;
       ssy += dy * 0.12;
@@ -348,11 +337,6 @@ export function Silnik() {
         aktualizuj();
         brudne = false;
       }
-      if (DOKLADNY && kursor) {
-        kx += (cx - kx) * 0.22;
-        ky += (cy - ky) * 0.22;
-        kursor.style.transform = `translate3d(${kx.toFixed(1)}px, ${ky.toFixed(1)}px, 0)`;
-      }
       raf = requestAnimationFrame(petla);
     };
     mierz();
@@ -361,7 +345,6 @@ export function Silnik() {
     return () => {
       cancelAnimationFrame(raf);
       sprzatanie.forEach((f) => f());
-      lenis?.destroy();
       document.documentElement.classList.remove("ld-blok");
     };
   }, []);

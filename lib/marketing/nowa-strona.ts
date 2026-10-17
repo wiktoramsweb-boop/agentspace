@@ -30,6 +30,7 @@ export type NowaStrona = {
   };
   rozdzialy: [string, string, string, string, string];
   pulpit: { etykieta: string; tytul: string; lead: string; punkty: { tytul: string; tekst: string }[] };
+  wszystko: { etykieta: string; tytul: string; lead: string; rzedy: [string[], string[]]; punkty: { tytul: string; tekst: string }[] };
   manifest: string;
   coach: {
     etykieta: string;
@@ -80,8 +81,8 @@ function pl(dni: number): NowaStrona {
     },
     hero: {
       linie: ["Przygotowany agent", "sprzedaje więcej."],
-      pod: "Program dla biura nieruchomości z treningiem rozmów AI.",
-      lead: "Klient AI dzwoni, wątpi i odmawia, a agent ćwiczy, zanim zadzwoni prawdziwy. Do tego klienci, oferty, umowy, prowizje i wynik biura w jednym miejscu.",
+      pod: "CRM dla biur nieruchomości. Cała codzienna praca w jednym programie.",
+      lead: "Klienci, oferty, kalendarz, umowy, prowizje, wyceny z aktów notarialnych i trening rozmów z klientem AI. Agent nie skacze między pięcioma aplikacjami, a właściciel widzi całe biuro w jednym miejscu.",
       cta: `Wypróbuj ${dni} dni za darmo`,
       cta2: "Zobacz, jak działa",
       podCta: "Bez karty płatniczej. Pełny dostęp do wszystkich modułów.",
@@ -114,6 +115,20 @@ function pl(dni: number): NowaStrona {
         { tytul: "Ocena klienta", tekst: "Gorący, ciepły albo zimny, liczony z tego, co już jest w CRM." },
         { tytul: "Kroki etapu", tekst: "Następny odblokowuje się po zrobieniu poprzedniego. Po domknięciu etapu program proponuje kolejny." },
         { tytul: "Bez zmiany ekranu", tekst: "Telefon, WhatsApp, notatka, przypomnienie za 3, 7 albo 14 dni i spotkanie prosto z pulpitu." },
+      ],
+    },
+    wszystko: {
+      etykieta: "Jeden program",
+      tytul: "CRM, w którym jest wszystko. Nie potrzebujesz pięciu programów.",
+      lead: "AgentSpace to CRM dla biur nieruchomości zbudowany wokół codziennej pracy agenta: od pierwszego telefonu, przez prezentację i umowę, po prowizję i wynik biura. Bez Excela, bez kartek, bez dokupowania osobnych narzędzi.",
+      rzedy: [
+        ["CRM klientów", "Priorytety na dziś", "Oferty na mapie", "Kalendarz", "Leady z reklam", "Poszukiwania", "Szybki wpis głosem", "Czat zespołu", "Asystent AI"],
+        ["AI Coach", "Biblioteka technik", "Umowy i PDF", "Prowizje", "Wycena z RCN", "Dyżur AI", "Faktury", "Koszty i wynik", "Strona www biura"],
+      ],
+      punkty: [
+        { tytul: "Jedna baza", tekst: "Klient, oferta, rozmowa, umowa i prowizja są połączone. Nic nie przepisujesz dwa razy." },
+        { tytul: "Codzienna praca", tekst: "Pulpit mówi, do kogo dzwonić, kalendarz pilnuje terminów, a AI pisze i podpowiada." },
+        { tytul: "Całe biuro", tekst: "Role, uprawnienia, dziennik zdarzeń, koszty i wynik. Właściciel widzi wszystko na żywo." },
       ],
     },
     manifest:
@@ -264,8 +279,8 @@ function pl(dni: number): NowaStrona {
     },
     cennik: {
       etykieta: "Cennik",
-      tytul: "Ceny na stronie, bez „wyceny indywidualnej”.",
-      lead: `${dni} dni pełnego dostępu za darmo, bez karty. Ceny netto za miesiąc, taniej przy płatności za pół roku lub rok.`,
+      tytul: "Jeden abonament. Cały program.",
+      lead: `${dni} dni pełnego dostępu za darmo, bez karty. Wybierz okres płatności i zobacz, ile oszczędzasz przy płatności za pół roku albo za rok. Ceny netto.`,
       miesiac: "zł netto / mc",
       od: "od",
       polecany: "Najczęściej wybierany",
@@ -318,8 +333,8 @@ function en(dni: number): NowaStrona {
     },
     hero: {
       linie: ["A prepared agent", "sells more."],
-      pod: "Real estate agency software with AI call training.",
-      lead: "An AI client calls, doubts and says no, and your agent practices before the real one calls. Plus clients, listings, contracts, commissions and agency results in one place.",
+      pod: "A CRM for real estate agencies. All daily work in one app.",
+      lead: "Clients, listings, calendar, contracts, commissions, valuations from notarial deeds and call training with an AI client. Agents stop jumping between five apps, and owners see the whole agency in one place.",
       cta: `Try ${dni} days free`,
       cta2: "See how it works",
       podCta: "No credit card. Full access to every module.",
@@ -352,6 +367,20 @@ function en(dni: number): NowaStrona {
         { tytul: "Client score", tekst: "Hot, warm or cold, calculated from what is already in the CRM." },
         { tytul: "Stage steps", tekst: "The next step unlocks after the previous one. When a stage is done, the app suggests the next." },
         { tytul: "Without leaving the screen", tekst: "Call, WhatsApp, note, reminder in 3, 7 or 14 days and meetings straight from the dashboard." },
+      ],
+    },
+    wszystko: {
+      etykieta: "One app",
+      tytul: "A CRM with everything in it. You don't need five apps.",
+      lead: "AgentSpace is a CRM for real estate agencies built around an agent's daily work: from the first call, through viewings and contracts, to commissions and agency results. No spreadsheets, no paper, no extra tools to buy.",
+      rzedy: [
+        ["Client CRM", "Today's priorities", "Listings on a map", "Calendar", "Ad leads", "Buyer searches", "Voice notes", "Team chat", "AI assistant"],
+        ["AI Coach", "Technique library", "Contracts and PDF", "Commissions", "Valuation from deeds", "AI receptionist", "Invoices", "Costs and results", "Agency website"],
+      ],
+      punkty: [
+        { tytul: "One database", tekst: "Client, listing, call, contract and commission are linked. Nothing is typed twice." },
+        { tytul: "Daily work", tekst: "The dashboard tells you who to call, the calendar keeps dates, and AI writes and suggests." },
+        { tytul: "The whole agency", tekst: "Roles, permissions, audit log, costs and results. The owner sees everything live." },
       ],
     },
     manifest:
@@ -502,7 +531,7 @@ function en(dni: number): NowaStrona {
     },
     cennik: {
       etykieta: "Pricing",
-      tytul: "Prices on the page, no “custom quote”.",
+      tytul: "One subscription. The whole app.",
       lead: `${dni} days of full access for free, no card. Net prices per month, cheaper when paid for six months or a year.`,
       miesiac: "PLN net / mo",
       od: "from",

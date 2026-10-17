@@ -42,7 +42,7 @@ Lejek liczony wstecz: telefony → spotkania → umowy → klienci kupujący →
 Karta transakcji z pięcioma etapami (od rezerwacji do wypłaty) i kompletem dokumentów. Prowizja nalicza się automatycznie z wartości transakcji i ustalonego podziału. Cel miesięczny biura aktualizuje się na bieżąco. Umowa rezerwacyjna generuje się do pliku PDF z danych transakcji.
 
 ### AI Coach
-Trening rozmów sprzedażowych z klientem AI. Trzy kategorie: cold calling, spotkania pozyskowe, najem. Ponad 13 scenariuszy napisanych pod realia polskiego rynku. Dziewięć osobowości klienta, od życzliwego po agresywnego i zbywającego. Rozmowa prowadzona głosem, więc agent może trenować w aucie między spotkaniami. Po sesji: scoring w czterech kategoriach i konkretny feedback po polsku.
+Trening rozmów sprzedażowych z klientem AI. Trzy kategorie: cold calling, spotkania pozyskowe, najem. 24 scenariusze napisane pod realia polskiego rynku. Piętnaście charakterów klienta, od życzliwego po agresywnego i zbywającego. Rozmowa prowadzona głosem, więc agent może trenować w aucie między spotkaniami. Po sesji: scoring w czterech kategoriach i konkretny feedback po polsku.
 
 Ważne: AI Coach opiera się na symulacjach. System nie nagrywa ani nie analizuje rozmów z prawdziwymi klientami, więc nie generuje ryzyka RODO po stronie klientów biura.
 
@@ -53,7 +53,7 @@ Ranking agentów uwzględniający zarówno wyniki sprzedażowe, jak i realizacj�
 Trzy role: CEO, menedżer, agent. Menedżer prowadzi swoich agentów: widzi ich cele i wyniki treningów, ale nie widzi prowizji całego biura. Agenci nie widzą danych innych agentów poza rankingiem.
 
 ### Dodatkowe narzędzia
-Zadania i pulpit dnia z poranną odprawą, AI Asystent Dnia wskazujący trzy priorytety, asystent wiadomości (e-mail i SMS), gamifikacja (poziomy, passa dni, odznaki, wyzwanie tygodnia), onboarding pierwszego dnia, faktury, kalkulatory i moduł podatkowy.
+Zadania i pulpit dnia z poranną odprawą, pulpit „Priorytety na dziś” z oceną klienta 0-100, asystent AI na każdym ekranie, asystent wiadomości (e-mail i SMS), gamifikacja (poziomy, passa dni, odznaki, wyzwanie tygodnia), onboarding pierwszego dnia, faktury, kalkulatory i moduł podatkowy.
 
 ---
 
@@ -62,7 +62,7 @@ Zadania i pulpit dnia z poranną odprawą, AI Asystent Dnia wskazujący trzy pri
 | Pakiet | Cena netto / mc | Limit agentów | Zakres |
 |---|---|---|---|
 | Start | 299 zł | do 5 | CRM, baza nieruchomości, zadania, cele, prowizje |
-| Pro | 599 zł | do 15 | Start + AI Coach, panel właściciela, AI Asystent Dnia, raporty, karta transakcji |
+| Pro | 599 zł | do 15 | Start + AI Coach, panel właściciela, asystent AI, raporty, karta transakcji |
 | Biuro | od 999 zł | bez limitu | Pro + role, wielooddziałowość, wdrożenie 1:1, priorytetowe wsparcie |
 
 Bez umowy na czas określony. Rozliczenie miesięczne, półroczne (10% taniej) albo roczne (20% taniej). Nowe biuro ma 7 dni okresu próbnego. Brak dopłat za użytkownika dodanego w trakcie miesiąca. Przy rezygnacji biuro otrzymuje eksport całej bazy do plików.

@@ -13,7 +13,7 @@ Odbiorca decyzyjny: właściciel lub menedżer biura nieruchomości. Użytkownic
 - [CRM klientów](https://agentspace.pl/produkt/crm): Karty klientów z historią, notatkami i pipeline. Osobno sprzedający, kupujący, wynajmujący i najemcy - bo każdy z nich wymaga innej rozmowy.
 - [Cele i lejek](https://agentspace.pl/produkt/cele): Lejek od telefonu do sprzedaży, policzony wstecz. Agent wie, ile rozmów musi wykonać dziś, żeby dowieźć rok.
 - [Prowizje i transakcje](https://agentspace.pl/produkt/prowizje): Karta transakcji z pięcioma etapami i dokumentami. Cel miesięczny aktualizuje się przy każdym domknięciu - bez arkusza domykanego w niedzielę.
-- [AI Coach](https://agentspace.pl/produkt/ai-coach): 13 scenariuszy z polskiego rynku, 9 osobowości klienta, rozmowa głosem, scoring i feedback po polsku.
+- [AI Coach](https://agentspace.pl/produkt/ai-coach): 24 scenariusze z polskiego rynku, 15 charakterów klienta, rozmowa głosem, scoring i feedback po polsku.
 - [Panel właściciela](https://agentspace.pl/produkt/panel-wlasciciela): Ranking, mocne i słabe obszary zespołu, prowizje per agent, drill-down do pojedynczej osoby. Raport miesięczny przychodzi sam.
 - [Baza nieruchomości](https://agentspace.pl/produkt/nieruchomosci): Oferty widoczne dla zespołu, ze zdjęciami i statusem. Agent od kupującego widzi, co ma kolega od sprzedającego.
 - [Leady z reklam](https://agentspace.pl/produkt/leady): Wgrywasz plik z Meta Ads albo dodajesz kontakt ręcznie, a system sam rozpoznaje powtórki, przypisuje opiekuna i pilnuje etapu.

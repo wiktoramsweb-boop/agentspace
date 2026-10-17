@@ -106,6 +106,7 @@ export function LdNav({ lang = "pl" }: { lang?: string }) {
   return (
     <>
       <NavRuch />
+      <div className="ld-poswiata" data-poswiata aria-hidden="true" />
       <header className="ld-nav" data-nav>
         <Link href={href("/")} className="ld-logo" aria-label="AgentSpace">
           <Kafel className="ld-logo__kafel" />

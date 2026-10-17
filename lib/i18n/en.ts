@@ -140,7 +140,7 @@ export const en: Dict = {
         {
           slug: "ai-coach",
           name: "AI Coach",
-          body: "Agents rehearse with an AI client: cold calls, listing appointments, rentals. 13 scenarios, 9 client personalities, voice, scoring and written feedback.",
+          body: "Agents rehearse with an AI client: cold calls, listing appointments, rentals. 24 scenarios, 15 client personalities, voice, scoring and written feedback.",
         },
         {
           slug: "panel-wlasciciela",
@@ -397,7 +397,7 @@ export const en: Dict = {
     pick: "Pick the objection you are practising",
     scoreTitle: "Call score",
     points: [
-      { title: "13 scenarios", body: "Cold calls, prospecting, viewings, rentals and commission negotiation." },
+      { title: "24 scenarios", body: "Cold calls, prospecting, viewings, rentals and commission negotiation." },
       { title: "9 client types", body: "From monosyllabic to openly hostile. Each one reacts differently to the same argument." },
       { title: "Score and one tip", body: "Points for the opening, qualification, objections and the close, plus one thing to fix." },
     ],
@@ -932,9 +932,9 @@ export const en: Dict = {
         features: [
           "Up to 15 agents",
           "Everything in Start",
-          "AI Coach - 13+ scenarios, 9 client personalities",
+          "AI Coach: 24 call scenarios, 15 client personalities",
           "Owner dashboard - ranking, strong and weak areas",
-          "AI Daily Assistant and follow-up drafting",
+          "AI assistant on every screen and follow-up drafting",
           "Monthly reports by e-mail",
           "Deal records and reservation agreements (PDF)",
         ],

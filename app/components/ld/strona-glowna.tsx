@@ -12,6 +12,7 @@ import { DNI_PROBNE } from "@/lib/abonament-cennik";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { Silnik } from "./silnik";
 import { Kafel, LdNav, LdStopka } from "./rama";
+import { CennikPlany } from "./cennik-plany";
 
 /* ── Drobne klocki ─────────────────────────────────────────── */
 
@@ -234,14 +235,24 @@ export function StronaGlowna({ lang }: { lang: string }) {
     <div className="ld" data-ld id="top">
       <Silnik />
 
+      {/* Wejście: rysuje się dom z logo, a ekran otwiera się jak dwuskrzydłowe drzwi. */}
       <div className="ld-loader" data-loader aria-hidden="true">
-        <div className="ld-loader__pasek" />
+        <div className="ld-loader__skrzydlo ld-loader__skrzydlo--l" />
+        <div className="ld-loader__skrzydlo ld-loader__skrzydlo--p" />
         <div className="ld-loader__znak">
-          <Kafel className="ld-loader__kafel" />
-          <span className="ld-loader__napis">AgentSpace</span>
+          <svg viewBox="0 0 100 100" className="ld-loader__dom">
+            <path d="M 50 29.3 L 80.5 54 L 72.3 54 L 72.3 76.6 L 60.6 76.6 L 60.6 59.9 L 39.6 59.9 L 39.6 76.6 L 27.9 76.6 L 27.9 54 L 19.5 54 Z" pathLength={1} />
+            <circle cx="50" cy="22" r="3.2" />
+          </svg>
+          <span className="ld-loader__napis">
+            {"AgentSpace".split("").map((z, i) => (
+              <span key={i} style={{ animationDelay: `${0.45 + i * 0.035}s` }}>
+                {z}
+              </span>
+            ))}
+          </span>
         </div>
       </div>
-      <div className="ld-kursor" data-kursor aria-hidden="true" />
 
       <LdNav lang={locale} />
 
@@ -352,6 +363,34 @@ export function StronaGlowna({ lang }: { lang: string }) {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* ── Jeden program: wszystkie moduły w dwóch pasach ── */}
+        <section className="lx-wszystko" aria-labelledby="lx-wszystko-tytul">
+          <div className="lx-naglowek lx-naglowek--srodek">
+            <span className="ld-etykieta">{t.wszystko.etykieta}</span>
+            <Slowa tekst={t.wszystko.tytul} id="lx-wszystko-tytul" />
+            <p className="ld-lead">{t.wszystko.lead}</p>
+          </div>
+          <div className="lx-pasy" aria-hidden="true">
+            {t.wszystko.rzedy.map((rzad, r) => (
+              <div className={`lx-pas${r === 1 ? " lx-pas--wstecz" : ""}`} key={r}>
+                <div className="lx-pas__tasma">
+                  {[...rzad, ...rzad].map((m, i) => (
+                    <span key={i}>{m}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <ul className="lx-wszystko__punkty">
+            {t.wszystko.punkty.map((p, i) => (
+              <li key={p.tytul} data-odslon style={{ transitionDelay: `${i * 0.1}s` }}>
+                <b>{p.tytul}</b>
+                <span>{p.tekst}</span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* ── Manifest ── */}
@@ -655,35 +694,17 @@ export function StronaGlowna({ lang }: { lang: string }) {
             <Slowa tekst={t.cennik.tytul} />
             <p className="ld-lead">{t.cennik.lead}</p>
           </div>
-          <div className="ld-plany">
-            {PLANS.map((plan) => {
+          <CennikPlany
+            plany={PLANS.map((plan) => {
               const opis = plany.find((p) => p.id === plan.id) ?? plany[0];
-              const wyr = plan.id === "pro";
-              return (
-                <div className={`ld-plan${wyr ? " ld-plan--wyr" : ""}`} key={plan.id} data-odslon>
-                  {wyr && <span className="ld-plan__znaczek">{t.cennik.polecany}</span>}
-                  <h3>{opis.name}</h3>
-                  <p className="ld-plan__kto">{opis.tagline}</p>
-                  <div className="ld-plan__cena">
-                    {plan.priceFrom && <span className="od">{t.cennik.od}</span>}
-                    {plan.price}
-                    <small>{t.cennik.miesiac}</small>
-                  </div>
-                  <ul>
-                    {opis.features.map((f) => (
-                      <li key={f}>
-                        <Ikona nazwa="ptaszek" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link className={`ld-btn${wyr ? "" : " ld-btn--ciemny"}`} href={signup}>
-                    {t.cennik.wybierz}
-                  </Link>
-                </div>
-              );
+              return { id: plan.id, price: plan.price, priceFrom: plan.priceFrom, name: opis.name, tagline: opis.tagline, features: opis.features };
             })}
-          </div>
+            en={en}
+            polecany={t.cennik.polecany}
+            wybierz={t.cennik.wybierz}
+            miesiac={t.cennik.miesiac}
+            od={t.cennik.od}
+          />
           <div className="lx-srodek">
             <Link className="ld-cennik__pelny" href={href("/cennik")}>
               {t.cennik.pelny}

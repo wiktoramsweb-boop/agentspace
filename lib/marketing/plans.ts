@@ -48,9 +48,9 @@ export const PLANS: Plan[] = [
     features: [
       "Do 15 agentów",
       "Wszystko ze Start",
-      "AI Coach - 13+ scenariuszy, 9 osobowości klienta",
+      "AI Coach: 24 scenariusze rozmów, 15 charakterów klienta",
       "Panel właściciela - ranking, mocne i słabe obszary",
-      "AI Asystent Dnia i pisanie follow-upów",
+      "Asystent AI na każdym ekranie i pisanie follow-upów",
       "Raporty miesięczne na e-mail",
       "Karta transakcji i umowy rezerwacyjne (PDF)",
     ],

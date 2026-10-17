@@ -141,7 +141,7 @@ export const pl = {
         {
           slug: "ai-coach",
           name: "AI Coach",
-          body: "Agent trenuje rozmowy z klientem AI: cold call, spotkanie pozyskowe, najem. 13 scenariuszy, 9 osobowości klienta, głos, scoring i feedback po polsku.",
+          body: "Agent trenuje rozmowy z klientem AI: cold call, spotkanie pozyskowe, najem. 24 scenariusze, 15 charakterów klienta, głos, scoring i feedback po polsku.",
         },
         {
           slug: "panel-wlasciciela",
@@ -398,7 +398,7 @@ export const pl = {
     pick: "Wybierz obiekcję, którą trenujesz",
     scoreTitle: "Ocena rozmowy",
     points: [
-      { title: "13 scenariuszy", body: "Cold call, pozyskanie, prezentacja, najem i negocjacja prowizji." },
+      { title: "24 scenariusze", body: "Cold call, pozyskanie, prezentacja, najem i negocjacja prowizji." },
       { title: "9 typów klienta", body: "Od zdawkowego po agresywnego. Każdy reaguje inaczej na ten sam argument." },
       { title: "Ocena i wskazówka", body: "Punkty za otwarcie, kwalifikację, obiekcje i domknięcie, plus jedna rzecz do poprawy." },
     ],
@@ -932,9 +932,9 @@ export const pl = {
         features: [
           "Do 15 agentów",
           "Wszystko ze Start",
-          "AI Coach - 13+ scenariuszy, 9 osobowości klienta",
+          "AI Coach: 24 scenariusze rozmów, 15 charakterów klienta",
           "Panel właściciela - ranking, mocne i słabe obszary",
-          "AI Asystent Dnia i pisanie follow-upów",
+          "Asystent AI na każdym ekranie i pisanie follow-upów",
           "Raporty miesięczne na e-mail",
           "Karta transakcji i umowy rezerwacyjne (PDF)",
         ],

@@ -189,10 +189,10 @@ export const MODULES: ProductModule[] = [
     slug: "ai-coach",
     name: "AI Coach",
     headline: "Agent trenuje trudne rozmowy na AI, nie na Twoich klientach",
-    lead: "13 scenariuszy z polskiego rynku, 9 osobowości klienta, rozmowa głosem, scoring i feedback po polsku.",
+    lead: "24 scenariusze z polskiego rynku, 15 charakterów klienta, rozmowa głosem, scoring i feedback po polsku.",
     seoTitle: "Szkolenie agentów nieruchomości z AI Coachem | AgentSpace",
     seoDescription:
-      "Trening cold calli i spotkań pozyskowych z klientem AI. 13 scenariuszy, 9 osobowości, rozmowa głosem, scoring w czterech kategoriach i feedback po polsku.",
+      "Trening cold calli i spotkań pozyskowych z klientem AI. 24 scenariusze, 15 charakterów klienta, rozmowa głosem, scoring w czterech kategoriach i feedback po polsku.",
     problem:
       "Nowy agent uczy się na prawdziwych leadach. Każda źle poprowadzona rozmowa to spalony kontakt, którego nikt już nie odzyska - a właściciel dowiaduje się o tym po fakcie.",
     capabilities: [
@@ -396,7 +396,7 @@ export const MODULES: ProductModule[] = [
     lead: "Zadania, kalendarz i przypomnienia w jednym miejscu, a na górze trzy priorytety wybrane przez AI z Waszych danych.",
     seoTitle: "Plan dnia i zadania dla agenta nieruchomości | AgentSpace",
     seoDescription:
-      "Kalendarz, zadania i przypomnienia o kontakcie. AI Asystent Dnia podpowiada trzy priorytety z klientów, pipeline i terminów.",
+      "Kalendarz, zadania i przypomnienia o kontakcie. Pulpit „Priorytety na dziś” ocenia każdego klienta od 0 do 100 i pokazuje, do kogo zadzwonić najpierw.",
     problem:
       "Agent zaczyna dzień od przewijania telefonu i decyduje na wyczucie, do kogo zadzwonić. Klient, który czekał tydzień, czeka kolejny, bo nikt o nim nie pamiętał.",
     capabilities: [
