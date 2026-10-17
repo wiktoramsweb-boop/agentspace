@@ -35,9 +35,12 @@ function publicznyAdres(req: Request): string {
 }
 
 export async function POST(req: Request) {
-  const form = await req.formData();
   const params: Record<string, string> = {};
-  form.forEach((v, k) => (params[k] = String(v)));
+  try {
+    (await req.formData()).forEach((v, k) => (params[k] = String(v)));
+  } catch {
+    return new Response("Złe zapytanie", { status: 400 });
+  }
 
   const token = process.env.TWILIO_AUTH_TOKEN ?? "";
   const adres = publicznyAdres(req);
