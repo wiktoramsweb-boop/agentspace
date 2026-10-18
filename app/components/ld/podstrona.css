@@ -261,3 +261,14 @@ html .mk .wd-tytul { font-size: clamp(28px, 3vw, 44px); line-height: 1.08; }
 .wp__aktywuj span { padding: 10px 18px; border-radius: 999px; background: rgba(11, 18, 32, 0.88); color: #fff; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6); transition: transform 0.3s; }
 .wp__aktywuj:hover span { transform: translateY(-3px); }
 .wp__okno { height: min(64vh, 700px); overscroll-behavior: contain; }
+.wp-modal { position: fixed; inset: 0; z-index: 1000; font-family: var(--font-plex), system-ui, sans-serif; display: flex; flex-direction: column; background: rgba(7, 11, 20, 0.96); }
+.wp-modal__pasek { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--mk-hairline); color: #fff; }
+.wp-modal__pasek > b { font-family: var(--font-sora); font-size: 18px; white-space: nowrap; }
+.wp-modal__wzory { display: flex; gap: 6px; flex: 1; overflow-x: auto; }
+.wp-modal__wzory button { height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.06); color: #dbe3ee; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.wp-modal__wzory button.on { background: #fff; color: #0b1220; }
+.wp-modal__zamknij { width: 40px; height: 40px; flex-shrink: 0; border: 0; border-radius: 50%; background: #fff; color: #0b1220; font-size: 16px; font-weight: 700; cursor: pointer; }
+.wp-modal__ramka { flex: 1; display: flex; justify-content: center; padding: 14px; min-height: 0; }
+.wp-modal__ramka iframe { width: 100%; height: 100%; border: 0; border-radius: 14px; background: #fff; }
+.wp-modal__ramka--tel iframe { width: 390px; max-width: 100%; border-radius: 32px; }
+@media (max-width: 700px) { .wp-modal__pasek > b, .wp-modal__pasek .wp__otworz { display: none; } }

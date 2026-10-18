@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Wzor = { slug: string; name: string; swatch: string[]; tagline: string };
 
@@ -17,23 +18,22 @@ export function WzoryPodglad({ wzory }: { wzory: Wzor[] }) {
   // raz przewijało wzór, a raz stronę, zależnie od tego, gdzie był kursor.
   const [aktywny, setAktywny] = useState(false);
   const w = wzory.find((x) => x.slug === wybrany) ?? wzory[0];
-  const okno = useRef<HTMLDivElement>(null);
 
-  // Wyłączamy po kliknięciu poza ramką albo gdy ramka zniknie z ekranu.
-  // Nie po zjechaniu kursorem: wejście kursora do ramki przeglądarka zgłasza
-  // stronie jako wyjście, więc podgląd gasł w chwili, gdy miał zacząć działać.
+  // Przewijanie wzoru w ramce na stronie gryzło się z przewijaniem strony
+  // (płynne przewijanie, gładzik, przechwytywanie gestu). Dlatego klik otwiera
+  // wzór na pełnym ekranie, a strona pod spodem jest w tym czasie zablokowana.
   useEffect(() => {
-    if (!aktywny || !okno.current) return;
-    const kliknieciePoza = () => setAktywny(false);
-    const obs = new IntersectionObserver(([w]) => {
-      if (w.intersectionRatio < 0.35) setAktywny(false);
-    }, { threshold: [0, 0.35] });
-    obs.observe(okno.current);
-    const t = setTimeout(() => document.addEventListener("pointerdown", kliknieciePoza), 0);
+    if (!aktywny) return;
+    const html = document.documentElement;
+    const poprzedni = html.style.overflow;
+    html.style.overflow = "hidden";
+    window.__lenis?.stop();
+    const klawisz = (e: KeyboardEvent) => e.key === "Escape" && setAktywny(false);
+    addEventListener("keydown", klawisz);
     return () => {
-      clearTimeout(t);
-      obs.disconnect();
-      document.removeEventListener("pointerdown", kliknieciePoza);
+      html.style.overflow = poprzedni;
+      window.__lenis?.start();
+      removeEventListener("keydown", klawisz);
     };
   }, [aktywny]);
 
@@ -82,15 +82,13 @@ export function WzoryPodglad({ wzory }: { wzory: Wzor[] }) {
             <span />
             <em>twojebiuro.pl</em>
           </div>
-          <div className="wp__okno" ref={okno}>
+          <div className="wp__okno">
             {wlaczony ? (
               <>
-                <iframe key={w.slug} src={`/wzory/${w.slug}`} title={`Podgląd wzoru ${w.name}`} loading="lazy" className={aktywny ? "" : "wp__martwy"} />
-                {!aktywny && (
-                  <button type="button" className="wp__aktywuj" onClick={() => setAktywny(true)}>
-                    <span>Kliknij, żeby przewijać i klikać wzór. Kliknięcie obok ramki wraca do strony.</span>
-                  </button>
-                )}
+                <iframe key={w.slug} src={`/wzory/${w.slug}`} title={`Podgląd wzoru ${w.name}`} loading="lazy" tabIndex={-1} className="wp__martwy" />
+                <button type="button" className="wp__aktywuj" onClick={() => setAktywny(true)}>
+                  <span>Kliknij, żeby przewijać i klikać wzór na pełnym ekranie</span>
+                </button>
               </>
             ) : (
               <button type="button" className="wp__start" onClick={() => setWlaczony(true)}>
@@ -100,6 +98,30 @@ export function WzoryPodglad({ wzory }: { wzory: Wzor[] }) {
             )}
           </div>
         </div>
+        {aktywny && createPortal(
+          <div className="wp-modal" role="dialog" aria-modal="true" aria-label={`Wzór ${w.name}`}>
+            <div className="wp-modal__pasek">
+              <b>{w.name}</b>
+              <div className="wp-modal__wzory">
+                {wzory.map((x) => (
+                  <button key={x.slug} type="button" className={x.slug === w.slug ? "on" : ""} onClick={() => setWybrany(x.slug)}>
+                    {x.name}
+                  </button>
+                ))}
+              </div>
+              <a href={`/wzory/${w.slug}`} target="_blank" rel="noreferrer" className="wp__otworz">
+                Nowa karta ↗
+              </a>
+              <button type="button" className="wp-modal__zamknij" onClick={() => setAktywny(false)} aria-label="Zamknij podgląd" autoFocus>
+                ✕
+              </button>
+            </div>
+            <div className={`wp-modal__ramka${telefon ? " wp-modal__ramka--tel" : ""}`}>
+              <iframe key={`m-${w.slug}`} src={`/wzory/${w.slug}`} title={`Wzór ${w.name}`} />
+            </div>
+          </div>,
+          document.body,
+        )}
         <p className="wp__opis">
           <b>{w.name}.</b> {w.tagline}{" "}
           <a href={`/wzory/${w.slug}`} target="_blank" rel="noreferrer">
