@@ -80,7 +80,7 @@ export function PdHero({ tlo, alt, eyebrow, tytul, opis, children, wariant = "pe
         <div className="pd-ramka pd-hero__siatka">
           {tekst}
           <figure className="pd-hero__pas" data-pd="maska">
-            <Image src={tlo} alt={alt} fill priority sizes="(max-width: 900px) 100vw, 45vw" className="object-cover" />
+            <Image src={tlo} alt={alt} fill priority sizes="(max-width: 900px) 100vw, 45vw" className="object-cover object-[72%_50%]" />
             {podpis && <figcaption>{podpis}</figcaption>}
           </figure>
         </div>

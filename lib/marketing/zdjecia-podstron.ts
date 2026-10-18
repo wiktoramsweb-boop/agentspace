@@ -12,7 +12,28 @@ export type Zdjecie = {
 };
 
 /** Klucze zdjęć, które już leżą w public/strona/podstrony/<klucz>.webp. */
-const GOTOWE = new Set<string>([]);
+const GOTOWE = new Set<string>([
+  "naglowek-produkt",
+  "naglowek-cennik",
+  "naglowek-blog",
+  "naglowek-kontakt",
+  "naglowek-demo",
+  "naglowek-dla-agentow",
+  "naglowek-dla-wlascicieli",
+  "naglowek-integracje",
+  "naglowek-wzory",
+  "naglowek-crm",
+  "naglowek-cele",
+  "naglowek-prowizje",
+  "naglowek-ai-coach",
+  "naglowek-panel-wlasciciela",
+  "naglowek-nieruchomosci",
+  "naglowek-leady",
+  "naglowek-dzialania",
+  "naglowek-poszukiwania",
+  "naglowek-dokumenty",
+  "naglowek-ofertowka",
+]);
 
 const N = (klucz: string, gdzie: string, scena: string, zapas: string): Zdjecie => ({ klucz, gdzie, proporcje: "16:9", scena, zapas });
 const S = (klucz: string, gdzie: string, scena: string, zapas: string): Zdjecie => ({ klucz, gdzie, proporcje: "4:3", scena, zapas });
@@ -21,7 +42,7 @@ export const ZDJECIA: Zdjecie[] = [
   /* ── Nagłówki stron ogólnych ── */
   N("naglowek-produkt", "/produkt, tło nagłówka", "Szeroki kadr nowoczesnego biura nieruchomości nocą, wysoko nad miastem. Długi stół, na nim laptop z jasnym ekranem i telefon. Za szybą rozmyte światła Krakowa. Nikogo przy stole, miejsce czeka na pracę.", "/wzory/miasto-noc.jpg"),
   N("naglowek-cennik", "/cennik, tło nagłówka", "Spokojny kadr z góry na jasny dębowy stół: otwarty notes z odręcznymi liczbami, kubek kawy, klucze do mieszkania z zielonym brelokiem, telefon ekranem w dół. Miękkie poranne światło z okna, długie cienie.", "/zdjecia/poranek-przy-kawie.jpg"),
-  N("naglowek-o-nas", "/o-nas, tło nagłówka", "Brama krakowskiej kamienicy o zmierzchu, ciepłe światło z klatki schodowej, mokry bruk po deszczu odbija latarnie. Kadr z poziomu oczu, lekko z boku.", "/biuro/brama-szer.jpg"),
+  N("naglowek-o-nas", "/o-nas, tło nagłówka (zostaje zdjęcie bramy biura, bez generowania)", "Brama krakowskiej kamienicy o zmierzchu, ciepłe światło z klatki schodowej, mokry bruk po deszczu odbija latarnie. Kadr z poziomu oczu, lekko z boku.", "/biuro/brama-szer.jpg"),
   N("naglowek-blog", "/blog, tło nagłówka", "Biurko przy oknie w mieszkaniu w kamienicy, stos wydrukowanych umów, okulary, ołówek, tablet z wykresem. Wieczorne niebieskie światło z zewnątrz i ciepła lampka.", "/zdjecia/plan-dnia.jpg"),
   N("naglowek-kontakt", "/kontakt, tło nagłówka", "Dwie filiżanki kawy na marmurowym stoliku w kawiarni na krakowskim Kazimierzu, w tle rozmyte okno na ulicę i rower. Ktoś właśnie wstał, krzesło odsunięte.", "/zdjecia/miedzy-spotkaniami.jpg"),
   N("naglowek-demo", "/demo, tło nagłówka", "Dłoń trzymająca smartfon nad stołem, na ekranie rozmyty interfejs aplikacji w granacie i zieleni. W tle rozmyty salon mieszkania na sprzedaż w dziennym świetle.", "/zdjecia/nowe/dzien-teren.jpg"),
