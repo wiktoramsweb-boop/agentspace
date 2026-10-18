@@ -253,3 +253,11 @@ html .mk .wd-tytul { font-size: clamp(28px, 3vw, 44px); line-height: 1.08; }
 .pm-wielka-liczba--niska { aspect-ratio: 16 / 9; padding: 36px; font-size: clamp(70px, 8vw, 130px); }
 @media (max-width: 899px) { .pd-krok:not(:first-child) .pd-krok__ekran-tel { display: none; } }
 .pm-wielka-liczba--niska { align-items: center; justify-content: center; text-align: center; }
+.wp__prawa { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.wp__otworz { display: inline-flex; align-items: center; height: 40px; padding: 0 18px; border-radius: 999px; background: #10b981; color: #04170f; font-size: 14px; font-weight: 700; transition: background 0.3s; }
+.wp__otworz:hover { background: #6ee7c8; }
+.wp__martwy { pointer-events: none; }
+.wp__aktywuj { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 28px; border: 0; background: linear-gradient(to top, rgba(7, 11, 20, 0.35), transparent 30%); cursor: pointer; }
+.wp__aktywuj span { padding: 10px 18px; border-radius: 999px; background: rgba(11, 18, 32, 0.88); color: #fff; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6); transition: transform 0.3s; }
+.wp__aktywuj:hover span { transform: translateY(-3px); }
+.wp__okno { height: min(64vh, 700px); overscroll-behavior: contain; }
