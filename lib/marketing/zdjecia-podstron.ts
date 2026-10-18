@@ -168,3 +168,8 @@ export function zdjecie(klucz: string): string {
   if (!z) return "/wzory/miasto-noc.jpg";
   return GOTOWE.has(klucz) ? `/strona/podstrony/${klucz}.webp` : z.zapas;
 }
+
+/** Zdjęcie modułu do kafli i list. Strona www ma swój nagłówek pod /wzory. */
+export function zdjecieModulu(slug: string): string {
+  return zdjecie(slug === "strona-www" ? "naglowek-wzory" : `naglowek-${slug}`);
+}

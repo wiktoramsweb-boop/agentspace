@@ -66,17 +66,17 @@ export default async function WzoryPage({ params }: { params: Promise<{ lang: st
               </div>
               <PdKroki
                 kroki={[
-                  { tytul: "Oferty prosto z CRM", tekst: "Dodajesz nieruchomość w programie, a ona pojawia się na stronie ze zdjęciami, mapą i wyszukiwarką. Sprzedana znika sama.", obraz: WZORY[0] },
-                  { tytul: "Formularze, które robią leady", tekst: "Zapytanie o ofertę, zgłoszenie nieruchomości do sprzedaży i zlecenie poszukiwania trafiają do Leadów w programie, a nie na skrzynkę, której nikt nie czyta.", obraz: WZORY[1] },
-                  { tytul: "Zespół, poradnik i kalkulator", tekst: "Agenci z biura, wpisy poradnikowe i kalkulator kredytu. Treści edytujesz w ustawieniach strony bez programisty.", obraz: WZORY[2] },
-                  { tytul: "Czat AI na stronie", tekst: "Asystent odpowiada odwiedzającym na pytania o ofertę biura i zbiera kontakt do agenta.", obraz: WZORY[3] },
-                  { tytul: "Własna domena", tekst: "Strona działa pod adresem Twojego biura, domenę podpinamy razem z Tobą.", obraz: WZORY[4] },
+                  { tytul: "Oferty prosto z CRM", tekst: "Dodajesz nieruchomość w programie, a ona pojawia się na stronie ze zdjęciami, mapą i wyszukiwarką. Sprzedana znika sama.", obraz: "/strona/zrzuty/oferty.webp" },
+                  { tytul: "Formularze, które robią leady", tekst: "Zapytanie o ofertę, zgłoszenie nieruchomości do sprzedaży i zlecenie poszukiwania trafiają do Leadów w programie, a nie na skrzynkę, której nikt nie czyta.", obraz: "/strona/zrzuty/leady.webp" },
+                  { tytul: "Zespół, poradnik i kalkulator", tekst: "Agenci z biura, wpisy poradnikowe i kalkulator kredytu. Treści edytujesz w ustawieniach strony bez programisty.", obraz: "/strona/zrzuty/zespol.webp" },
+                  { tytul: "Czat AI na stronie", tekst: "Asystent odpowiada odwiedzającym na pytania o ofertę biura i zbiera kontakt do agenta.", obraz: zdjecie("naglowek-czat-zespolu") },
+                  { tytul: "Własna domena", tekst: "Strona działa pod adresem Twojego biura, domenę podpinamy razem z Tobą.", obraz: zdjecie("naglowek-integracje") },
                 ].map((k) => ({
                   tytul: k.tytul,
                   tekst: k.tekst,
                   ekran: (
                     <figure className="pd-zdjecie m-0 aspect-[16/10]">
-                      <Image src={k.obraz.preview} alt={`Wzór ${k.obraz.name}`} fill sizes="45vw" className="object-cover" />
+                      <Image src={k.obraz} alt="" fill sizes="45vw" className="object-cover object-top" />
                     </figure>
                   ),
                 }))}

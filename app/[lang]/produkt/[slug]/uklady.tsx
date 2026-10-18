@@ -123,7 +123,7 @@ export function UkladSiatka(p: Wspolne) {
 
 /** C: zygzak, każda możliwość na przemian z ekranem i zdjęciem, wjeżdża z boku. */
 export function UkladZygzak(p: Wspolne) {
-  const { mod, lang, scena, t } = p;
+  const { mod, lang, t } = p;
   return (
     <>
       <Problem {...p} odwroc />
@@ -139,12 +139,12 @@ export function UkladZygzak(p: Wspolne) {
                   <p>{c.body}</p>
                 </div>
                 <div data-pd={i % 2 ? "lewo" : "prawo"} style={d(0.12)}>
-                  {i % 2 === 0 ? (
+                  {i === 0 ? (
                     <Ekran mod={mod} lang={lang} />
                   ) : (
-                    <figure className="pd-zdjecie m-0 aspect-[16/10]">
-                      <Image src={scena} alt="" fill sizes="(max-width: 900px) 100vw, 45vw" className="object-cover" />
-                    </figure>
+                    <div className="pm-wielka-liczba pm-wielka-liczba--niska" aria-hidden="true">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
                   )}
                 </div>
               </div>

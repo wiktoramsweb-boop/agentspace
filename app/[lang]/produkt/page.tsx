@@ -4,7 +4,7 @@ import Image from "next/image";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
 import { PdHero } from "@/app/components/ld/podstrona";
-import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
+import { zdjecie, zdjecieModulu } from "@/lib/marketing/zdjecia-podstron";
 import { Button, Section } from "@/app/components/mk/ui";
 import { MODULES, kategorieZModulami } from "@/lib/marketing/modules";
 import { getDict, localeHref, toLocale } from "@/lib/i18n";
@@ -83,15 +83,13 @@ export default async function ProduktIndexPage({
                 href={adres(m.slug)}
                 className="group flex flex-col overflow-hidden rounded-[20px] border border-[var(--mk-hairline)] bg-[var(--mk-surface-2)] transition-colors hover:border-[var(--mk-hairline-strong)]"
               >
-                <div className="bg-ilustracja relative h-40 border-b border-[var(--mk-hairline)]">
+                <div className="relative h-44 overflow-hidden border-b border-[var(--mk-hairline)]">
                   <Image
-                    src={m.ilustracja ?? m.photo}
+                    src={zdjecieModulu(m.slug)}
                     alt=""
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className={`transition-transform duration-700 group-hover:scale-105 ${
-                      m.ilustracja ? "object-contain p-3" : "object-cover"
-                    }`}
+                    className="object-cover object-[75%_50%] transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
                 <div className="flex flex-1 flex-col p-6">

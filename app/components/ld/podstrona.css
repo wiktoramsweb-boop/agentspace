@@ -250,3 +250,6 @@ html .mk .wd-tytul { font-size: clamp(28px, 3vw, 44px); line-height: 1.08; }
 .wp__opis { margin: 18px 0 0; max-width: 70ch; text-align: center; font-size: 15px; color: var(--color-mk-muted); }
 .wp__opis b { color: #fff; }
 .wp__opis a { color: var(--mieta); font-weight: 600; }
+.pm-wielka-liczba--niska { aspect-ratio: 16 / 9; padding: 36px; font-size: clamp(70px, 8vw, 130px); }
+@media (max-width: 899px) { .pd-krok:not(:first-child) .pd-krok__ekran-tel { display: none; } }
+.pm-wielka-liczba--niska { align-items: center; justify-content: center; text-align: center; }

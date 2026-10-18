@@ -214,7 +214,7 @@ export const WZORY: Wzor[] = [
       "Pasek postępu budowy i harmonogram odbiorów",
     ],
     swatch: ["#070B18", "#EAF0FF", "#5B8CFF"],
-    preview: "/wzory/szklo.jpg",
+    preview: "/wzory/widok.jpg",
     root: "wz-hor",
     dark: true,
     fonts: "Unbounded + Figtree",

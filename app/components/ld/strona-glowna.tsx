@@ -834,7 +834,7 @@ export function StronaGlowna({ lang }: { lang: string }) {
         {/* ── Koniec: pełny kadr z formularzem w jednej linii ── */}
         <section className="lx-koniec" aria-label={t.koniec.tytul}>
           <div className="lx-koniec__tlo" data-paralaksa="0.16" aria-hidden="true">
-            <Ilustracja nazwa="coach-telefon-tlo" rodzaj="panorama" ziarno={19} w={2000} h={1116} pora="noc" alt="" />
+            <span className="ld-ilu"><Image src="/strona/podstrony/naglowek-produkt.webp" alt="" fill sizes="100vw" /></span>
           </div>
           <div className="lx-koniec__tresc">
             <Slowa tekst={t.koniec.tytul} />

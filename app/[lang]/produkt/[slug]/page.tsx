@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/app/components/site-nav";
 import { SiteFooter } from "@/app/components/site-footer";
 import { PdHero, PdPas } from "@/app/components/ld/podstrona";
-import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
+import { zdjecie, zdjecieModulu } from "@/lib/marketing/zdjecia-podstron";
 import { UKLADY } from "./uklady";
 import { CoachLive } from "@/app/components/mk/coach-live";
 import { TECHNIKI } from "@/lib/techniki/techniki";
@@ -195,10 +196,8 @@ export default async function ProduktPage({
           {others.map((other) => (
             <Link key={other.slug} href={href(innyHref(other.slug))} className="group/kafel">
               <Card className="h-full overflow-hidden p-0">
-                <div className="h-40 overflow-hidden border-b border-[var(--mk-hairline)] bg-slate-100">
-                  <div className="origin-top-left scale-[0.62] [width:161%]">
-                    <ShotFor shot={other.shot} lang={locale} />
-                  </div>
+                <div className="relative h-40 overflow-hidden border-b border-[var(--mk-hairline)]">
+                  <Image src={zdjecieModulu(other.slug)} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover object-[75%_50%] transition-transform duration-700 group-hover/kafel:scale-105" />
                 </div>
                 <div className="p-6">
                   <p className="mb-2 text-[1.1875rem] font-semibold tracking-tight text-[var(--color-mk-text)]">
