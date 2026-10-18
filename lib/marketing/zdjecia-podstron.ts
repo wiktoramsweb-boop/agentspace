@@ -73,6 +73,13 @@ const GOTOWE = new Set<string>([
   "scena-koszty-i-wynik",
   "scena-wycena-rcn",
   "scena-panel-wlasciciela",
+  "o-nas-dzis",
+  "o-nas-poczatek",
+  "rozwin-o-nas",
+  "rozwin-cennik",
+  "scena-biblioteka-technik",
+  "scena-swiadectwa-energetyczne",
+  "scena-dyzur-ai",
 ]);
 
 const N = (klucz: string, gdzie: string, scena: string, zapas: string): Zdjecie => ({ klucz, gdzie, proporcje: "16:9", scena, zapas });
