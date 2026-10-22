@@ -28,14 +28,33 @@ export function TrybDemo() {
       toast(KOMUNIKAT_DEMO, "info");
     };
 
+    // Akcje serwera wywoływane z kodu (przyciski, przełączniki) nie przechodzą
+    // przez submit. Blokadę i tak robi baza, tu tylko mówimy gościowi dlaczego.
+    const oryginal = window.fetch;
+    let ostatni = 0;
+    window.fetch = (wejscie, opcje) => {
+      const naglowki = new Headers(opcje?.headers ?? (wejscie instanceof Request ? wejscie.headers : undefined));
+      const url = typeof wejscie === "string" || wejscie instanceof URL ? String(wejscie) : wejscie.url;
+      if (naglowki.has("next-action") && zablokowane(url, opcje?.method ?? "POST")) {
+        document.documentElement.dataset.demoBlokada = String(Date.now());
+      }
+      if (naglowki.has("next-action") && zablokowane(url, opcje?.method ?? "POST") && Date.now() - ostatni > 3000) {
+        ostatni = Date.now();
+        document.documentElement.dataset.demoBlokada = String(ostatni);
+        toast(KOMUNIKAT_DEMO, "info");
+      }
+      return oryginal(wejscie, opcje);
+    };
+
     window.addEventListener("submit", naWysylke, true);
     return () => {
+      window.fetch = oryginal;
       window.removeEventListener("submit", naWysylke, true);
     };
   }, [toast]);
 
   return (
-    <div className="mb-6 flex flex-col gap-3 rounded-2xl bg-slate-900 px-4 py-3 text-white shadow-lg shadow-slate-900/20 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-6 flex md:sticky md:top-2 md:z-30 flex-col gap-3 rounded-2xl bg-slate-900 px-4 py-3 text-white shadow-lg shadow-slate-900/20 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm">
         <b className="mr-2 rounded-md bg-emerald-400 px-1.5 py-0.5 text-xs font-bold text-slate-900">DEMO</b>
         Oglądasz przykładowe biuro. Trening AI Coach i asystent działają, zapisywanie zmian jest wyłączone.

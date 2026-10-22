@@ -21,6 +21,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const push = useCallback((message: string, type: ToastType = "success") => {
+    // W demo zapis blokuje baza, a komponent i tak melduje sukces. Po komunikacie
+    // demo (znacznik ustawia TrybDemo) przez chwilę nie pokazujemy „zapisano”.
+    if (type === "success" && Date.now() - Number(document.documentElement.dataset.demoBlokada ?? 0) < 4000) return;
     const id = Date.now() + Math.random();
     setToasts((t) => [...t, { id, message, type }]);
     setTimeout(() => {

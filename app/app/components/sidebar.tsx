@@ -184,7 +184,10 @@ export function Sidebar({
           </div>
         )}
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-white">{fullName}</p>
+          <p className="truncate text-sm font-medium text-white">
+            {fullName}
+            {demo && <span className="ml-1.5 rounded bg-emerald-400 px-1.5 py-0.5 align-middle text-[10px] font-bold text-slate-900">DEMO</span>}
+          </p>
           <p className="truncate text-xs text-white/50">
             {ROLE_LABELS[role]} · {agencyName}
           </p>
@@ -222,6 +225,7 @@ export function Sidebar({
       <div className="app-sidebar print-hide sticky top-0 z-30 flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
         {brand}
         <div className="flex items-center gap-1">
+          {demo && <span className="mr-1 rounded-md bg-emerald-400 px-2 py-1 text-[11px] font-bold text-slate-900">WERSJA DEMO</span>}
           {userId && <Dzwonek userId={userId} rozwijaW="dol" />}
         {zablokowane && (
           <button

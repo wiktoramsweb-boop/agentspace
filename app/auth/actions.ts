@@ -209,6 +209,15 @@ export async function signIn(
  */
 export async function signOut() {
   const supabase = await createSupabaseServerClient();
+  const { cookies } = await import("next/headers");
+  const sloik = await cookies();
+  // Operator wszedł na cudze konto: wylogowanie globalne wyrzuciłoby tę osobę
+  // z jej własnych urządzeń, więc kończymy tylko sesję w tej przeglądarce.
+  if (sloik.get("as_operator_w")) {
+    await supabase.auth.signOut({ scope: "local" });
+    sloik.delete({ name: "as_operator_w", path: "/" });
+    redirect("/operator");
+  }
   await supabase.auth.signOut();
   redirect("/login");
 }

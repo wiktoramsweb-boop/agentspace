@@ -1,4 +1,5 @@
-import { biuraWPanelu, zamowieniaDoRozliczenia } from "@/lib/data-operator";
+import Link from "next/link";
+import { biuraWPanelu, zamowieniaDoRozliczenia, zdrowieSystemu } from "@/lib/data-operator";
 import { opisZamowienia } from "@/lib/data-abonament";
 import { PotwierdzWplate } from "./potwierdz";
 
@@ -43,7 +44,7 @@ function dni(iso: string | null): string {
  * od kont w aplikacji - patrz lib/operator-auth.ts.
  */
 export default async function OperatorPage() {
-  const [biura, zamowienia] = await Promise.all([biuraWPanelu(), zamowieniaDoRozliczenia()]);
+  const [biura, zamowienia, zdrowie] = await Promise.all([biuraWPanelu(), zamowieniaDoRozliczenia(), zdrowieSystemu()]);
 
   const aktywne = biura.filter((b) => b.dostep.aktywne && !b.demo).length;
   const wygasle = biura.filter((b) => !b.dostep.aktywne).length;
@@ -72,6 +73,39 @@ export default async function OperatorPage() {
           </div>
         ))}
       </div>
+
+      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-white">Zdrowie systemu</h2>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${zdrowie.bledy24h === 0 ? "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30" : zdrowie.bledy24h < 10 ? "bg-amber-500/15 text-amber-300 ring-amber-500/30" : CZERWONA}`}>
+            {zdrowie.bledy24h === 0 ? "Wszystko działa" : `${zdrowie.bledy24h} błędów w 24 h`}
+          </span>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-4">
+          {[
+            { e: "Błędy 7 dni", w: zdrowie.bledy7d },
+            { e: "Aktywni (7 dni)", w: zdrowie.aktywni7d },
+            { e: "Rozmowy AI Coach (7 dni)", w: zdrowie.rozmowy7d },
+            { e: "Kredyty AI (7 dni)", w: zdrowie.kredyty7d },
+          ].map((k) => (
+            <div key={k.e} className="rounded-xl bg-white/[0.03] p-3">
+              <p className="text-[11px] uppercase tracking-wider text-zinc-500">{k.e}</p>
+              <p className="mt-1 text-xl font-semibold tabular-nums text-white">{k.w.toLocaleString("pl-PL")}</p>
+            </div>
+          ))}
+        </div>
+        {zdrowie.ostatnieBledy.length > 0 && (
+          <ul className="mt-4 divide-y divide-white/5 text-sm">
+            {zdrowie.ostatnieBledy.map((b, i) => (
+              <li key={i} className="py-2">
+                <span className="font-mono text-xs text-zinc-500">{new Date(b.kiedy).toLocaleString("pl-PL")}</span>
+                <span className="ml-2 text-zinc-400">{b.gdzie}</span>
+                <p className="truncate text-zinc-200">{b.wiadomosc}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {zamowienia.length > 0 && (
         <section>
@@ -133,7 +167,7 @@ export default async function OperatorPage() {
                 return (
                   <tr key={b.id} className="text-zinc-300 transition-colors hover:bg-white/[0.02]">
                     <td className="px-4 py-3">
-                      <span className="font-medium text-white">{b.nazwa}</span>
+                      <Link href={`/operator/biuro/${b.id}`} className="font-medium text-white underline-offset-4 hover:text-emerald-300 hover:underline">{b.nazwa} →</Link>
                       {b.demo && (
                         <span className="ml-2 rounded-full bg-cyan-500/15 px-2 py-0.5 text-[11px] text-cyan-300">
                           demo

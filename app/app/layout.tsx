@@ -16,6 +16,8 @@ import { getPrzewodnik } from "@/lib/data-przewodnik";
 import { DEMO_EMAIL } from "@/lib/demo/tryb";
 import { zPominieciemDemo } from "@/lib/demo/straz";
 import { TrybDemo } from "./components/tryb-demo";
+import { BanerOperatora } from "./components/baner-operatora";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Panel AgentSpace",
@@ -54,6 +56,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // stronie, na którą kieruje.
   const przewodnik = await getPrzewodnik(user);
   const gosc = user.email?.toLowerCase() === DEMO_EMAIL;
+  const operator = (await cookies()).get("as_operator_w")?.value;
 
   return (
     <ToastProvider>
@@ -77,6 +80,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         />
         <main className="min-w-0 flex-1 px-5 pt-8 pb-[calc(104px+env(safe-area-inset-bottom))] md:px-10 md:pt-10 md:pb-28">
           <div className="mx-auto max-w-6xl">
+            {operator && <BanerOperatora opis={decodeURIComponent(operator).split("|").join(" · jako ")} />}
             {gosc && <TrybDemo />}
             {user.role === "owner" && !gosc && !powierzenie.zaakceptowana && (
               <BanerPowierzenia nieaktualna={powierzenie.nieaktualna} />
