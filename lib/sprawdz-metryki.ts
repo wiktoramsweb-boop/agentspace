@@ -4,7 +4,7 @@
  */
 
 import { indeksCytatu, metrykiRozmowy, ocenaUdzialu } from "./coach/metryki.ts";
-import { klientSieRozlaczyl, bezZnacznikaRozlaczenia, realizmScenariusza } from "./coach/realizm.ts";
+import { klientSieRozlaczyl, bezZnacznikaRozlaczenia, realizmScenariusza, wersjaGlosowa } from "./coach/realizm.ts";
 
 let bledy = 0;
 function sprawdz(opis: string, warunek: boolean, szczegol = "") {
@@ -51,6 +51,9 @@ sprawdz("cytat spoza rozmowy", indeksCytatu(rozmowa, "zupełnie inne zdanie o po
 sprawdz("znacznik rozłączenia", klientSieRozlaczyl("Do widzenia. [rozłącza się]"));
 sprawdz("czyszczenie znacznika", bezZnacznikaRozlaczenia("Do widzenia. [rozłącza się]") === "Do widzenia.");
 sprawdz("realia FSBO mają dopisek z ogłoszenia", realizmScenariusza("zimny-telefon-fsbo", "sredni").includes("bez pośredników"));
+const glosowy = wersjaGlosowa(realizmScenariusza("polecony-klient", "sredni"));
+sprawdz("głos: bez znacznika rozłączenia", !glosowy.includes("[rozłącza się]"));
+sprawdz("głos: reguła ciszy podmieniona", !glosowy.includes("„…”, samo „yyy”") && glosowy.includes("szum na linii"));
 sprawdz("realizm bez myślników", !realizmScenariusza("zimny-telefon-fsbo", "trudny").includes("—"));
 
 if (bledy) {

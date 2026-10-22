@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { dopiszKredyty, zwrocKredyty } from "@/lib/kredyty";
 import { kredytyZaRozmowe, kredytyZGory } from "@/lib/kredyty-cennik";
-import { bezZnacznikowMowy } from "@/lib/glos";
+import { bezZnacznikowMowy, toSzum } from "@/lib/coach/mowa";
 import type { ChatMessage } from "@/lib/types";
 
 /**
@@ -45,7 +45,7 @@ export async function zapiszRozmoweGlosowa(
     }))
     // Filtr po oczyszczeniu: wypowiedź złożona z samego znacznika emocji
     // zostaje pusta i nie ma czego zapisywać.
-    .filter((w) => w.content.length > 0);
+    .filter((w) => w.content.length > 0 && !toSzum(w.content));
 
   if (czyste.length > 0 && sesja.status === "in_progress") {
     const stary = (sesja.transcript ?? []) as ChatMessage[];

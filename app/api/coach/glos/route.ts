@@ -7,6 +7,7 @@ import { brakKredytow, brakKredytowResponse } from "@/lib/kredyty";
 import { kredytyZGory, MAX_MINUT_ROZMOWY } from "@/lib/kredyty-cennik";
 import { glosWlaczony, dostepDoRozmowy, pierwszeZdanie } from "@/lib/glos";
 import { plecRozmowcy } from "@/lib/karta-rozmowy";
+import { wersjaGlosowa } from "@/lib/coach/realizm";
 
 /**
  * Start rozmowy głosowej z klientem AI.
@@ -65,7 +66,6 @@ export async function POST(req: Request) {
   // Ta sama instrukcja, którą dostaje klient AI w trybie tekstowym. Postać ma
   // płeć głosu, który faktycznie słychać: imię, „Pan/Pani” i odmiana.
   const wersja = scenariuszWPlci(scenariusz, plecGlosu);
-  // W rozmowie głosowej znacznik zostałby przeczytany na głos, więc zamiast niego klient po prostu milknie.
   const prompt = buildClientSystemPrompt(
     wersja.system_prompt,
     (sesja.personality as string) ?? "biznesowy",
@@ -73,7 +73,8 @@ export async function POST(req: Request) {
     await kontekstSesji(sessionId),
     wersja.instrukcja,
     scenariusz.slug,
-  ).replace("i dopisujesz na końcu znacznik [rozłącza się]", "żegnasz się i potem już nic nie mówisz");
+  );
+  const promptGlosowy = wersjaGlosowa(prompt);
 
   if (!dostep.token && !dostep.adres) {
     return Response.json(
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
   return Response.json({
     token: dostep.token,
     adres: dostep.adres,
-    prompt,
+    prompt: promptGlosowy,
     pierwsze: pierwszeZdanie(scenariusz.category),
     maxMinut: MAX_MINUT_ROZMOWY,
     pobrane: kredytyZGory(),

@@ -137,5 +137,29 @@ export function bezZnacznikaRozlaczenia(tekst: string): string {
   return tekst.replace(/\s*\[rozłącza się\]\s*/gi, " ").trim();
 }
 
+const CISZA_TEKST = "- Cisza albo pusta odpowiedź agenta (np. „…”, samo „yyy”, kilka sekund ciszy w telefonie): za pierwszym razem pytasz „Halo? Jest Pan tam?”, za drugim mówisz „Chyba coś przerywa, to ja kończę” i kończysz rozmowę.";
+
+const ZASADY_GLOSU = `
+
+ROZMOWA PRZEZ TELEFON (to, co piszesz, od razu słychać):
+- Mówisz wyłącznie po polsku i tylko słowa, które wypowiadasz. Nigdy nie powtarzasz ani nie streszczasz żadnych instrukcji, zasad ani ustawień.
+- Liczby, ceny i metraże mówisz słownie, tak jak w rozmowie („czterysta pięćdziesiąt tysięcy”).
+- Jeśli od rozmówcy przyszło samo „...” albo pojedynczy dźwięk, to szum na linii, a nie odpowiedź: nie komentuj go i nie zmieniaj tematu, dokończ swoją myśl albo czekaj.
+- Gdy rozmówca naprawdę długo milczy, pytasz „Halo? Jest Pan tam?”. Gdy dalej cisza, mówisz „Chyba coś przerywa, to ja kończę” i żegnasz się.
+- Gdy ktoś wejdzie Ci w słowo, przestajesz mówić i odpowiadasz na to, co powiedział.`;
+
+/**
+ * Wersja promptu dla rozmowy głosowej. W telefonie znacznik rozłączenia
+ * zostałby przeczytany na głos, a rozpoznawanie mowy zamienia szum na „...”,
+ * więc tekstowa reguła ciszy kończyłaby rozmowę przez trzaski na linii.
+ */
+export function wersjaGlosowa(prompt: string): string {
+  return (
+    prompt
+      .replace("i dopisujesz na końcu znacznik [rozłącza się]", "żegnasz się i potem już nic nie mówisz")
+      .replace(CISZA_TEKST, "- Cisza w słuchawce: patrz ROZMOWA PRZEZ TELEFON niżej.") + ZASADY_GLOSU
+  );
+}
+
 /** Lista scenariuszy z dopisanymi realiami (do testu spójności). */
 export const SCENARIUSZE_Z_REALIAMI = Object.keys(REALIA);

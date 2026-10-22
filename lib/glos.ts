@@ -104,20 +104,3 @@ export function pierwszeZdanie(rodzaj: string | null | undefined): string {
     : "Słucham?";
 }
 
-/**
- * Czyszczenie wypowiedzi z znaczników emocji.
- *
- * Tryb ekspresyjny u dostawcy steruje barwą głosu wstawkami w nawiasach
- * kwadratowych: „[hesitant] Dzień dobry. [thoughtful] No wie pan...". W uchu
- * ich nie ma, ale w zapisanym tekście zostają i robią dwie szkody naraz:
- * transkrypt wygląda jak kod, a model oceniający liczy je jako wypowiedź
- * agenta i wytyka rzeczy, których nikt nie powiedział.
- *
- * Nawias kwadratowy nie pada w mowie, więc wycinamy go bez wyjątków.
- */
-export function bezZnacznikowMowy(tekst: string): string {
-  return tekst
-    .replace(/\[[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż ]{2,24}\]/g, " ")
-    .replace(/\s{2,}/g, " ")
-    .trim();
-}

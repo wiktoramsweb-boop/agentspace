@@ -1,5 +1,6 @@
 "use client";
 
+import { bezZnacznikowMowy, toSzum } from "@/lib/coach/mowa";
 import { ConversationProvider, useConversation } from "@elevenlabs/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -126,11 +127,13 @@ function PanelRozmowy({
     },
     onMessage: (m) => {
       if (!m?.message) return;
+      const tekst = bezZnacznikowMowy(m.message);
+      if (!tekst || toSzum(tekst)) return;
       // U nich „agent" to mówiący automat, u nas agent to człowiek. Stąd zamiana.
       const odCzlowieka = (m.role ?? m.source) === "user";
       const w: Wypowiedz = {
         role: odCzlowieka ? "agent" : "client",
-        content: m.message,
+        content: tekst,
         t: start.current ? Math.round((Date.now() - start.current) / 1000) : 0,
       };
       wypowiedzi.current.push(w);
