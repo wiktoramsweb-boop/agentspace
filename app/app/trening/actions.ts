@@ -10,6 +10,7 @@ import { migawkaOferty, type KontekstOferty } from "@/lib/ai/oferta-kontekst";
 import { maV49 } from "@/lib/schemat";
 import { powiadom } from "@/lib/powiadomienia";
 import type { ChatMessage } from "@/lib/types";
+import { lekcja as znajdzLekcje } from "@/lib/coach/sciezka";
 
 type Admin = ReturnType<typeof createSupabaseAdmin>;
 
@@ -32,6 +33,7 @@ export async function startSession(formData: FormData): Promise<void> {
   const tryb = formData.get("tryb") === "glos" ? "glos" : "pisanie";
   const plecWybrana = String(formData.get("plec") ?? "auto");
   const technika = String(formData.get("technika") ?? "");
+  const lekcjaId = String(formData.get("lekcja") ?? "");
   const plec = plecWybrana === "k" || plecWybrana === "m" ? plecWybrana : "";
 
   const v49 = await maV49();
@@ -55,6 +57,15 @@ export async function startSession(formData: FormData): Promise<void> {
 
   const scenario = await getScenarioById(scenarioId);
   if (!scenario || !user.agency_id) redirect("/app/trening");
+
+  // Lekcja ze ścieżki ustala poziom trudności i charakter klienta: zaliczenie
+  // ma znaczyć to samo dla każdego agenta w biurze.
+  const lekcja = !zadanie ? znajdzLekcje(lekcjaId) : null;
+  const lekcjaPasuje = lekcja && lekcja.scenariusz === scenario!.slug ? lekcja : null;
+  if (lekcjaPasuje) {
+    difficulty = lekcjaPasuje.poziomTrudnosci;
+    personality = lekcjaPasuje.charakter;
+  }
 
   // Tygodniowy limit rozmów AI (ustawiany przez CEO). null = bez limitu.
   if (user.weekly_ai_limit != null) {
@@ -80,7 +91,10 @@ export async function startSession(formData: FormData): Promise<void> {
             property_id: oferta?.propertyId ?? null,
             // Płeć klienta zapisujemy w sesji, a nie tylko w adresie: czat
             // tekstowy też musi wiedzieć, czy rozmawia Pani Krystyna, czy Pan Krzysztof.
-            context: oferta || plec ? { ...(oferta ? { oferta } : {}), ...(plec ? { plec } : {}) } : null,
+            context:
+              oferta || plec || lekcjaPasuje
+                ? { ...(oferta ? { oferta } : {}), ...(plec ? { plec } : {}), ...(lekcjaPasuje ? { lekcja: lekcjaPasuje.id } : {}) }
+                : null,
             assignment_id: zadanie,
           }
         : {}),
@@ -92,7 +106,7 @@ export async function startSession(formData: FormData): Promise<void> {
   const parametry = [
     tryb === "glos" ? "tryb=glos" : "",
     plec ? `plec=${plec}` : "",
-    /^[a-z-]{2,40}$/.test(technika) ? `technika=${technika}` : "",
+    /^[a-z-]{2,40}$/.test(technika) ? `technika=${technika}` : lekcjaPasuje ? `technika=${lekcjaPasuje.technika}` : "",
   ].filter(Boolean);
   redirect(`/app/sesja/${session!.id}${parametry.length ? `?${parametry.join("&")}` : ""}`);
 }
@@ -103,15 +117,27 @@ type Sesja = {
   agency_id: string;
   scenario_title: string | null;
   transcript: ChatMessage[] | null;
-  context?: { oferta?: KontekstOferty } | null;
+  scenario_id?: string;
+  context?: { oferta?: KontekstOferty; lekcja?: string; [k: string]: unknown } | null;
   assignment_id?: string | null;
 };
 
 /** Ocena sesji z zapisem. Kluczowe momenty zapisujemy tylko, gdy baza ma już kolumnę. */
 async function ocenISesje(admin: Admin, s: Sesja, nowePodejscie = true): Promise<number | null> {
   const transcript = (s.transcript ?? []) as ChatMessage[];
-  const result = await scoreSession(s.scenario_title ?? "Sesja", transcript, s.context?.oferta ?? null);
+  const lekcja = znajdzLekcje(s.context?.lekcja);
+  const scen = s.scenario_id ? await getScenarioById(s.scenario_id) : null;
+  const cel = lekcja ? lekcja.cel : (scen?.brief ?? null);
+  const result = await scoreSession(s.scenario_title ?? "Sesja", transcript, s.context?.oferta ?? null, cel);
   const v49 = await maV49();
+  // Pełna analiza idzie do kontekstu sesji: bez nowej kolumny i bez migracji.
+  if (v49) {
+    const { data: teraz } = await admin.from("training_sessions").select("context").eq("id", s.id).maybeSingle();
+    await admin
+      .from("training_sessions")
+      .update({ context: { ...((teraz?.context as Record<string, unknown> | null) ?? {}), analiza: result.analiza } })
+      .eq("id", s.id);
+  }
   const { error } = await admin.from("session_scores").insert({
     session_id: s.id,
     agent_id: s.agent_id,

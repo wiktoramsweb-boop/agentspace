@@ -1,5 +1,6 @@
 import { todayDatePL } from "./datetime";
 import { createSupabaseAdmin } from "./supabase/admin";
+import { postepSciezki } from "./data-sciezka";
 
 // XP za akcje
 const XP = {
@@ -109,10 +110,11 @@ export async function getGameData(
 ): Promise<GameData> {
   const admin = createSupabaseAdmin();
 
-  const [{ data: logs }, { data: sessions }, { data: scores }] = await Promise.all([
+  const [{ data: logs }, { data: sessions }, { data: scores }, sciezka] = await Promise.all([
     admin.from("daily_logs").select("*").eq("agent_id", agentId),
     admin.from("training_sessions").select("id, status").eq("agent_id", agentId),
     admin.from("session_scores").select("overall").eq("agent_id", agentId),
+    postepSciezki(agentId).catch(() => null),
   ]);
 
   const logsByDate = new Map<string, number>();
@@ -140,7 +142,8 @@ export async function getGameData(
     buyers * XP.buyer +
     sales * XP.sale +
     sessionCount * XP.session +
-    highScoreSessions * XP.highScore;
+    highScoreSessions * XP.highScore +
+    (sciezka?.xp ?? 0);
 
   const totals = {
     coldCalls, meetings, listings, buyers, sales,

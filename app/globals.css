@@ -1960,3 +1960,41 @@ html[data-mk="dark"] {
 @media (prefers-reduced-motion: reduce) {
   .mk *, .mk *::before, .mk *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* Ekran wyników AI Coacha: pierścień i pasek wyniku rosną przy wejściu. */
+.wyniki-pierscien { animation: wyniki-pierscien 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes wyniki-pierscien { from { stroke-dashoffset: var(--obwod); } }
+.wyniki-pasek { animation: wyniki-pasek 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: left; }
+@keyframes wyniki-pasek { from { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { .wyniki-pierscien, .wyniki-pasek { animation: none; } }
+
+/* Ścieżka nauki AI Coacha (app/app/trening/sciezka-nauki.tsx). */
+.sn-wezel { transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.sn-wezel:not(.sn-widac) { opacity: 0; transform: translate(-50%, -50%) scale(0.6) !important; }
+.sn-wezel.sn-widac { transform: translate(-50%, -50%); }
+.sn-przejechane { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sn-rysuj 2.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards; }
+@keyframes sn-rysuj { to { stroke-dashoffset: 0; } }
+.sn-przejechane-kreski { opacity: 0; animation: sn-pojaw 0.6s ease 2.2s forwards; }
+@keyframes sn-pojaw { to { opacity: 1; } }
+.sn-puls::after { content: ""; position: absolute; inset: -10px; border-radius: 9999px; box-shadow: 0 0 0 0 var(--puls); animation: sn-puls 1.8s ease-out infinite; }
+@keyframes sn-puls { 0% { box-shadow: 0 0 0 0 var(--puls); } 80%, 100% { box-shadow: 0 0 0 22px transparent; } }
+.sn-tujestes { animation: sn-podskok 1.6s ease-in-out infinite; }
+@keyframes sn-podskok { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -6px); } }
+.sn-skrzynia-otwarta .sn-wieko { transform-origin: 8px 28px; animation: sn-wieko 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both; }
+@keyframes sn-wieko { from { transform: rotate(0); } to { transform: rotate(-24deg) translate(-2px, -4px); } }
+.sn-iskry circle { animation: sn-iskra 1.6s ease-in-out infinite; }
+.sn-iskry circle:nth-child(2) { animation-delay: 0.4s; }
+.sn-iskry circle:nth-child(3) { animation-delay: 0.8s; }
+@keyframes sn-iskra { 0%, 100% { opacity: 0.2; transform: scale(0.6); } 50% { opacity: 1; transform: scale(1.2); } }
+.sn-iskry circle { transform-box: fill-box; transform-origin: center; }
+.sn-karta { animation: sn-karta 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes sn-karta { from { opacity: 0; transform: translateY(30px) scale(0.96); } }
+@media (prefers-reduced-motion: reduce) {
+  .sn-wezel, .sn-przejechane, .sn-przejechane-kreski, .sn-tujestes, .sn-karta, .sn-iskry circle, .sn-skrzynia-otwarta .sn-wieko { animation: none !important; transition: none !important; }
+  .sn-przejechane { stroke-dashoffset: 0; }
+  .sn-przejechane-kreski { opacity: 1; }
+  .sn-puls::after { display: none; }
+}
+.ranking-wjazd { animation: ranking-wjazd 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes ranking-wjazd { from { opacity: 0; transform: translateY(40px); } }
+@media (prefers-reduced-motion: reduce) { .ranking-wjazd { animation: none; } }

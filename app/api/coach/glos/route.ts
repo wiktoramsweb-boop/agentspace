@@ -65,13 +65,15 @@ export async function POST(req: Request) {
   // Ta sama instrukcja, którą dostaje klient AI w trybie tekstowym. Postać ma
   // płeć głosu, który faktycznie słychać: imię, „Pan/Pani” i odmiana.
   const wersja = scenariuszWPlci(scenariusz, plecGlosu);
+  // W rozmowie głosowej znacznik zostałby przeczytany na głos, więc zamiast niego klient po prostu milknie.
   const prompt = buildClientSystemPrompt(
     wersja.system_prompt,
     (sesja.personality as string) ?? "biznesowy",
     (sesja.difficulty as string) ?? "sredni",
     await kontekstSesji(sessionId),
     wersja.instrukcja,
-  );
+    scenariusz.slug,
+  ).replace("i dopisujesz na końcu znacznik [rozłącza się]", "żegnasz się i potem już nic nie mówisz");
 
   if (!dostep.token && !dostep.adres) {
     return Response.json(

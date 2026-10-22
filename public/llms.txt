@@ -17,7 +17,7 @@ Odbiorca decyzyjny: właściciel lub menedżer biura nieruchomości. Użytkownic
 - [Biblioteka technik](https://agentspace.pl/produkt/biblioteka-technik): 36 technik rozmowy z przykładami z rynku nieruchomości i 10 skryptów rozmów, każdą technikę można od razu przećwiczyć z klientem AI.
 - [Wycena z aktów notarialnych](https://agentspace.pl/produkt/wycena-rcn): Wycena mieszkania z cen transakcyjnych Rejestru Cen Nieruchomości z korektami za piętro, stan i budynek oraz raportem PDF.
 - [Dyżur AI](https://agentspace.pl/produkt/dyzur-ai): Głosowa asystentka odbiera nieodebrane telefony biura i zapisuje lead z notatką z rozmowy.
-- [Świadectwa energetyczne](https://agentspace.pl/produkt/swiadectwa-energetyczne): Zamówienie świadectwa charakterystyki energetycznej z karty oferty, ze zdjęciami budynku i terminem od 6 godzin.
+- [Świadectwa energetyczne](https://agentspace.pl/produkt/swiadectwa-energetyczne): Zamówienie świadectwa charakterystyki energetycznej z karty oferty, ze zdjęciami budynku i terminem od 24 godzin.
 - [Wersja demo](https://agentspace.pl/demo): Działająca aplikacja na przykładowym biurze, bez rejestracji.
 - [Panel właściciela](https://agentspace.pl/produkt/panel-wlasciciela): Ranking, mocne i słabe obszary zespołu, prowizje per agent, drill-down do pojedynczej osoby. Raport miesięczny przychodzi sam.
 - [Baza nieruchomości](https://agentspace.pl/produkt/nieruchomosci): Oferty widoczne dla zespołu, ze zdjęciami i statusem. Agent od kupującego widzi, co ma kolega od sprzedającego.

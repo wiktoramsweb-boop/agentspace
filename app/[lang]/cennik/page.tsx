@@ -4,6 +4,7 @@ import { SiteFooter } from "@/app/components/site-footer";
 import { Card, Button, Section, SectionHead } from "@/app/components/mk/ui";
 import { PLANS } from "@/lib/marketing/plans";
 import { CennikPlany } from "@/app/components/ld/cennik-plany";
+import { SoloBaner } from "@/app/components/ld/solo-baner";
 import { PdHero, PdRozwinOkno, PdPas } from "@/app/components/ld/podstrona";
 import { zdjecie } from "@/lib/marketing/zdjecia-podstron";
 import { CENNIK_KREDYTOW, KREDYTY_NA_AGENTA, NAZWY_OPERACJI, KREDYTY_ZA_MINUTE_GLOSU } from "@/lib/kredyty-cennik";
@@ -75,6 +76,7 @@ export default async function CennikPage({ params }: { params: Promise<{ lang: s
             miesiac={ns.cennik.miesiac}
             od={ns.cennik.od}
           />
+          <SoloBaner en={!pl} />
         </section>
       </div>
 

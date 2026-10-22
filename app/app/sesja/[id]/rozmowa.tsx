@@ -8,7 +8,8 @@ import { endSession } from "../../trening/actions";
 import { Dzwonek } from "@/lib/dzwonek";
 import { kartaRozmowy } from "@/lib/karta-rozmowy";
 
-type Wypowiedz = { role: "agent" | "client"; content: string };
+type Wypowiedz = { role: "agent" | "client"; content: string; t?: number };
+export type KartaBoczna = { oferta?: { tytul: string; dzielnica: string; miasto: string; cena: number | null; metraz: number | null; pokoje?: number | null; pietro?: number | null; rok?: number | null } | null; cel?: string | null };
 type Faza = "stop" | "laczenie" | "rozmowa" | "konczenie";
 type Sposob = "webrtc" | "websocket";
 type Dostep = { token: string | null; adres: string | null; prompt: string; pierwsze: string };
@@ -31,6 +32,7 @@ export function RozmowaGlosowa({
   brief,
   osobowosc,
   plec,
+  boczna = null,
 }: {
   sessionId: string;
   /** Opis zadania ze scenariusza. Wyciągamy z niego kartę kontaktu. */
@@ -38,10 +40,12 @@ export function RozmowaGlosowa({
   osobowosc: string;
   /** Wymuszony głos klienta albo null, gdy ma go dobrać scenariusz. */
   plec: "k" | "m" | null;
+  /** Karta oferty i cel rozmowy pokazywane obok telefonu. */
+  boczna?: KartaBoczna | null;
 }) {
   return (
     <ConversationProvider>
-      <PanelRozmowy sessionId={sessionId} brief={brief} osobowosc={osobowosc} plec={plec} />
+      <PanelRozmowy sessionId={sessionId} brief={brief} osobowosc={osobowosc} plec={plec} boczna={boczna} />
     </ConversationProvider>
   );
 }
@@ -51,11 +55,13 @@ function PanelRozmowy({
   brief,
   osobowosc,
   plec,
+  boczna,
 }: {
   sessionId: string;
   brief: string;
   osobowosc: string;
   plec: "k" | "m" | null;
+  boczna: KartaBoczna | null;
 }) {
   const karta = useMemo(() => kartaRozmowy(brief), [brief]);
   const router = useRouter();
@@ -65,6 +71,10 @@ function PanelRozmowy({
   const [limit, setLimit] = useState(5);
   const [wyciszony, setWyciszony] = useState(false);
   const [etap, setEtap] = useState("Zapisuję rozmowę...");
+  // Napisy na żywo obok telefonu. Osobny stan od refa z wypowiedziami, bo te
+  // chcemy pokazać na ekranie, a pełna lista idzie dopiero do zapisu.
+  const [napisy, setNapisy] = useState<Wypowiedz[]>([]);
+  const rozmowaId = useRef<string | null>(null);
 
   // Refy, a nie stan: wypowiedzi lecą w trakcie rozmowy i nie chcemy
   // przerysowywać ekranu przy każdym zdaniu.
@@ -99,7 +109,7 @@ function PanelRozmowy({
       rozliczone.current = true;
       const czas = polaczono && start.current ? Math.round((Date.now() - start.current) / 1000) : 0;
       const ile = wypowiedzi.current.length;
-      await zapiszRozmoweGlosowa(sessionId, wypowiedzi.current, czas, polaczono);
+      await zapiszRozmoweGlosowa(sessionId, wypowiedzi.current, czas, polaczono, rozmowaId.current);
       wypowiedzi.current = [];
       setSekundy(0);
       return ile;
@@ -108,7 +118,8 @@ function PanelRozmowy({
   );
 
   const rozmowa = useConversation({
-    onConnect: () => {
+    onConnect: (p) => {
+      rozmowaId.current = p?.conversationId ?? null;
       ciszej();
       start.current = Date.now();
       ustawFaze("rozmowa");
@@ -117,7 +128,13 @@ function PanelRozmowy({
       if (!m?.message) return;
       // U nich „agent" to mówiący automat, u nas agent to człowiek. Stąd zamiana.
       const odCzlowieka = (m.role ?? m.source) === "user";
-      wypowiedzi.current.push({ role: odCzlowieka ? "agent" : "client", content: m.message });
+      const w: Wypowiedz = {
+        role: odCzlowieka ? "agent" : "client",
+        content: m.message,
+        t: start.current ? Math.round((Date.now() - start.current) / 1000) : 0,
+      };
+      wypowiedzi.current.push(w);
+      setNapisy((n) => [...n.slice(-7), w]);
     },
     onDisconnect: (szczegoly) => {
       if (fazaRef.current === "rozmowa" || fazaRef.current === "konczenie") {
@@ -293,6 +310,8 @@ function PanelRozmowy({
 
       setLimit(dane.maxMinut ?? 5);
       wypowiedzi.current = [];
+      setNapisy([]);
+      rozmowaId.current = null;
       // Od tej chwili kredyty są pobrane i ktoś musi je rozliczyć.
       rozliczone.current = false;
       dostep.current = {
@@ -353,6 +372,8 @@ function PanelRozmowy({
           wyciszony={wyciszony}
           naMikrofon={przelaczMikrofon}
           naRozlacz={() => void zakoncz()}
+          boczna={boczna}
+          napisy={napisy}
         />
       )}
     </>
@@ -379,7 +400,11 @@ function EkranRozmowy({
   wyciszony,
   naMikrofon,
   naRozlacz,
+  boczna,
+  napisy,
 }: {
+  boczna: KartaBoczna | null;
+  napisy: Wypowiedz[];
   kto: string;
   szczegoly: string[];
   osobowosc: string;
@@ -424,9 +449,10 @@ function EkranRozmowy({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center gap-8 bg-slate-950/85 p-4 backdrop-blur-sm">
+      <PanelBoczny boczna={boczna} kto={kto} />
       <div
-        className="relative rounded-[3rem] border-[10px] border-slate-800 bg-slate-800 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10"
+        className="relative shrink-0 rounded-[3rem] border-[10px] border-slate-800 bg-slate-800 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10"
         style={{ height: "min(86vh, 760px)", aspectRatio: "9 / 19.5" }}
       >
         {/* Przyciski na krawędziach. Czysta dekoracja, ale bez nich to nie jest telefon. */}
@@ -527,7 +553,91 @@ function EkranRozmowy({
           />
         </div>
       </div>
+      <Napisy napisy={napisy} kto={kto} widoczne={polaczono} />
     </div>
+  );
+}
+
+const zlotych = (n: number) => new Intl.NumberFormat("pl-PL").format(n) + " zł";
+
+/** Karta obok telefonu: cel rozmowy i dane oferty, o której rozmawiacie. Tylko na szerokim ekranie. */
+function PanelBoczny({ boczna, kto }: { boczna: KartaBoczna | null; kto: string }) {
+  const o = boczna?.oferta;
+  if (!o && !boczna?.cel) return <span className="hidden w-72 xl:block" aria-hidden="true" />;
+  const wiersze: [string, string][] = [];
+  if (o?.metraz) wiersze.push(["Powierzchnia", `${o.metraz} m²`]);
+  if (o?.pokoje) wiersze.push(["Pokoje", String(o.pokoje)]);
+  if (o?.pietro != null) wiersze.push(["Piętro", o.pietro === 0 ? "parter" : String(o.pietro)]);
+  if (o?.rok) wiersze.push(["Rok budowy", String(o.rok)]);
+  return (
+    <aside className="hidden w-72 shrink-0 flex-col gap-4 xl:flex">
+      {o && (
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] text-white">
+          <div className="bg-gradient-to-br from-emerald-500/25 via-cyan-500/10 to-transparent px-5 pb-4 pt-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">Oferta w rozmowie</p>
+            <p className="mt-2 text-lg font-semibold leading-snug">{o.tytul || [o.dzielnica, o.miasto].filter(Boolean).join(", ")}</p>
+            <p className="text-sm text-white/55">{[o.dzielnica, o.miasto].filter(Boolean).join(", ")}</p>
+            {o.cena ? (
+              <p className="mt-3 text-2xl font-semibold tabular-nums">
+                {zlotych(o.cena)}
+                {o.metraz ? <span className="ml-2 text-sm font-normal text-white/50">{zlotych(Math.round(o.cena / o.metraz))}/m²</span> : null}
+              </p>
+            ) : null}
+          </div>
+          {wiersze.length > 0 && (
+            <dl className="divide-y divide-white/10 px-5 text-sm">
+              {wiersze.map(([k, v]) => (
+                <div key={k} className="flex justify-between py-2.5">
+                  <dt className="text-white/50">{k}</dt>
+                  <dd className="font-medium">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </div>
+      )}
+      {boczna?.cel && (
+        <div className="rounded-3xl border border-emerald-400/25 bg-emerald-400/[0.07] p-5 text-white">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">Twój cel</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/85">{boczna.cel}</p>
+          <p className="mt-3 text-xs text-white/40">Rozmawiasz z: {kto}</p>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+/** Napisy na żywo obok telefonu: ostatnie wypowiedzi obu stron. */
+function Napisy({ napisy, kto, widoczne }: { napisy: Wypowiedz[]; kto: string; widoczne: boolean }) {
+  const [schowane, setSchowane] = useState(false);
+  return (
+    <aside className="hidden w-80 shrink-0 self-center xl:block" aria-live="polite">
+      <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 text-white">
+        <div className="flex items-center justify-between">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">Transkrypcja na żywo</p>
+          <button type="button" onClick={() => setSchowane((x) => !x)} className="text-xs text-white/45 hover:text-white">
+            {schowane ? "Pokaż" : "Schowaj"}
+          </button>
+        </div>
+        {!schowane && (
+          <div className="mt-4 flex max-h-[52vh] flex-col gap-3 overflow-hidden">
+            {napisy.length === 0 ? (
+              <p className="text-sm text-white/35">{widoczne ? "Słucham. Napisy pojawią się, gdy ktoś coś powie." : "Łączę..."}</p>
+            ) : (
+              napisy.map((n, i) => (
+                <p key={i} className={`text-sm leading-relaxed ${i === napisy.length - 1 ? "text-white" : "text-white/55"}`}>
+                  <span className="mr-2 font-mono text-[11px] tabular-nums text-white/35">
+                    {String(Math.floor((n.t ?? 0) / 60)).padStart(2, "0")}:{String((n.t ?? 0) % 60).padStart(2, "0")}
+                  </span>
+                  <b className={n.role === "agent" ? "text-emerald-300" : "text-cyan-200"}>{n.role === "agent" ? "Ty" : kto}:</b>{" "}
+                  {n.content}
+                </p>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </aside>
   );
 }
 

@@ -7,6 +7,7 @@ import { SessionResults } from "./results";
 import { glosWlaczony } from "@/lib/glos";
 import { plecZWyboru, scenariuszWPlci } from "@/lib/coach/scenariusz-plec";
 import { technika as znajdzTechnike } from "@/lib/techniki/techniki";
+import { lekcja as znajdzLekcje } from "@/lib/coach/sciezka";
 
 // Scoring (endSession) potrafi trwać kilka-kilkanaście sekund - daj mu czas.
 export const maxDuration = 60;
@@ -41,9 +42,12 @@ export default async function SessionPage({ params, searchParams }: Props) {
   const isViewer = session.agent_id !== user.id;
 
   if (session.status === "completed" || isViewer) {
+    const sc = await getScenarioById(session.scenario_id);
     return (
       <SessionResults
         session={session}
+        slug={sc?.slug ?? null}
+        brief={sc?.brief ?? ""}
         backHref={isViewer ? `/app/zespol/${session.agent_id}` : "/app/historia"}
         backLabel={isViewer ? "← Wróć do agenta" : "← Historia sesji"}
         showTrainAgain={!isViewer}
@@ -68,6 +72,11 @@ export default async function SessionPage({ params, searchParams }: Props) {
       glos={glosWlaczony()}
       trybGlosu={tryb === "glos" && glosWlaczony()}
       plec={plecSesji}
+      oferta={session.context?.oferta ?? null}
+      lekcja={(() => {
+        const l = znajdzLekcje(session.context?.lekcja);
+        return l ? { id: l.id, tytul: l.tytul, cel: l.cel, prog: l.prog } : null;
+      })()}
       technika={(() => {
         const t = slugTechniki ? znajdzTechnike(slugTechniki) : undefined;
         return t ? { slug: t.slug, nazwa: t.nazwa, kroki: t.kroki } : null;

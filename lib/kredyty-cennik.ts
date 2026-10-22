@@ -132,6 +132,7 @@ export const NAZWY_OPERACJI: Record<Operacja, string> = {
  */
 export const KREDYTY_NA_AGENTA: Record<string, number> = {
   trial: 200,
+  solo: 1500,
   start: 120,
   pro: 250,
   biuro: 200,

@@ -2,7 +2,7 @@
 // Bez importów aplikacji, żeby formularz (przeglądarka) i serwer liczyły to samo.
 
 export type TypObiektu = "mieszkanie" | "dom" | "lokal";
-export type Tryb = "standard" | "express" | "superexpress";
+export type Tryb = "standard" | "express";
 
 /** Ceny netto w złotych. Zmieniasz cenę? Tylko tutaj. */
 export const CENY_OBIEKTU: Record<TypObiektu, { nazwa: string; opis: string; cena: number }> = {
@@ -14,7 +14,6 @@ export const CENY_OBIEKTU: Record<TypObiektu, { nazwa: string; opis: string; cen
 export const TRYBY: Record<Tryb, { nazwa: string; opis: string; doplata: number }> = {
   standard: { nazwa: "Standard", opis: "do 2 dni roboczych", doplata: 0 },
   express: { nazwa: "Express", opis: "24 godziny", doplata: 100 },
-  superexpress: { nazwa: "Superexpress", opis: "6 godzin roboczych", doplata: 200 },
 };
 
 export const VAT = 0.23;
@@ -154,7 +153,7 @@ export function oczyscZamowienie(z: Partial<Zamowienie>): Zamowienie {
   const zOpcji = (v: unknown, lista: readonly string[]) => (lista.includes(String(v)) ? String(v) : "");
   return {
     typ: (["mieszkanie", "dom", "lokal"] as const).includes(z.typ as TypObiektu) ? (z.typ as TypObiektu) : "mieszkanie",
-    tryb: (["standard", "express", "superexpress"] as const).includes(z.tryb as Tryb) ? (z.tryb as Tryb) : "standard",
+    tryb: (["standard", "express"] as const).includes(z.tryb as Tryb) ? (z.tryb as Tryb) : "standard",
     propertyId: z.propertyId && /^[0-9a-f-]{36}$/.test(z.propertyId) ? z.propertyId : null,
     ulica: t(z.ulica),
     nrBudynku: t(z.nrBudynku, 20),

@@ -243,7 +243,7 @@ function pl(dni: number): NowaStrona {
         { nazwa: "Wycena z RCN", tytul: "Cena z aktów notarialnych, nie z ogłoszeń.", tekst: "Transakcje z Rejestru Cen Nieruchomości w okolicy, korekty za piętro, stan i budynek, a na koniec raport PDF dla właściciela.", zrzut: "wycena" },
         { nazwa: "Biblioteka technik", tytul: "Techniki i skrypty z treningiem.", tekst: "36 technik rozmowy z przykładami z rynku i 10 skryptów krok po kroku. Każdą przećwiczysz z klientem AI jednym kliknięciem.", zrzut: "techniki" },
         { nazwa: "Dyżur AI", tytul: "Telefon odebrany w czasie prezentacji.", tekst: "Asystentka głosowa odbiera połączenia, których agent nie odebrał, i zapisuje lead z notatką z rozmowy.", zrzut: "dyzur" },
-        { nazwa: "Świadectwa", tytul: "Świadectwo energetyczne z karty oferty.", tekst: "Formularz wypełnia się danymi nieruchomości, dodajesz zdjęcia budynku i wybierasz termin, nawet 6 godzin.", zrzut: "swiadectwa" },
+        { nazwa: "Świadectwa", tytul: "Świadectwo energetyczne z karty oferty.", tekst: "Formularz wypełnia się danymi nieruchomości, dodajesz zdjęcia budynku i wybierasz termin, nawet 24 godziny.", zrzut: "swiadectwa" },
       ],
     },
     liczby: {
@@ -499,7 +499,7 @@ function en(dni: number): NowaStrona {
         { nazwa: "Valuation", tytul: "Prices from notarial deeds, not listings.", tekst: "Transactions from the public price register nearby, adjustments for floor, condition and building, and a PDF report for the owner.", zrzut: "wycena" },
         { nazwa: "Technique library", tytul: "Techniques and scripts with practice.", tekst: "36 conversation techniques with real estate examples and 10 step-by-step call scripts. Practise any of them with the AI client in one click.", zrzut: "techniki" },
         { nazwa: "AI on call", tytul: "Calls answered during viewings.", tekst: "A voice assistant picks up calls the agent missed and saves a lead with a call summary.", zrzut: "dyzur" },
-        { nazwa: "Energy certificates", tytul: "Order an energy certificate from the listing.", tekst: "The form fills in from the property, you add building photos and pick a deadline, as fast as 6 hours.", zrzut: "swiadectwa" },
+        { nazwa: "Energy certificates", tytul: "Order an energy certificate from the listing.", tekst: "The form fills in from the property, you add building photos and pick a deadline, as fast as 24 hours.", zrzut: "swiadectwa" },
       ],
     },
     liczby: {

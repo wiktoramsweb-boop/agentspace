@@ -89,6 +89,8 @@ export const SCENARIO_CATEGORIES: {
 export type ChatMessage = {
   role: "agent" | "client";
   content: string;
+  /** Sekunda rozmowy głosowej, w której padła wypowiedź. W rozmowie pisanej brak. */
+  t?: number;
 };
 
 export type TrainingSession = {
@@ -105,7 +107,16 @@ export type TrainingSession = {
   completed_at: string | null;
   // ── v49: trening na własnej ofercie i zadania od menedżera ──
   property_id?: string | null;
-  context?: { oferta?: { dzielnica: string; miasto: string; tytul: string; cena: number | null; metraz: number | null }; plec?: "k" | "m" } | null;
+  context?: {
+    oferta?: { dzielnica: string; miasto: string; tytul: string; cena: number | null; metraz: number | null; pokoje?: number | null; pietro?: number | null; rok?: number | null; rodzaj?: string; opis?: string };
+    plec?: "k" | "m";
+    /** Lekcja ze ścieżki nauki, z której wystartowała rozmowa. */
+    lekcja?: string;
+    /** Pełna analiza po ocenie (lib/ai/coach.ts, typ Analiza). */
+    analiza?: import("./ai/coach").Analiza;
+    /** Rozmowa głosowa: identyfikator u dostawcy (do nagrania) i długość. */
+    glos?: { rozmowa?: string; sekundy?: number };
+  } | null;
   assignment_id?: string | null;
 };
 

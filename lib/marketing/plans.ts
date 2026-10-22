@@ -76,6 +76,30 @@ export const PLANS: Plan[] = [
 ];
 
 /**
+ * Plan dla agenta, który pracuje sam albo chce trenować na własną rękę.
+ * Osobno od PLANS, bo cennik biur na stronie ma trzy kolumny i jedną logikę
+ * „za biuro”. Solo pokazujemy jako osobną ofertę obok.
+ */
+export const PLAN_SOLO: Plan = {
+  id: "solo",
+  name: "Solo",
+  price: 129,
+  maxAgents: 1,
+  tagline: "Dla agenta, który pracuje sam",
+  features: [
+    "1 osoba",
+    "AI Coach: ścieżka nauki, 24 rozmowy, 15 charakterów klienta",
+    "Rozmowa głosowa i analiza po każdej rozmowie",
+    "Biblioteka technik i skrypty rozmów",
+    "CRM klientów, oferty i kalendarz",
+    "1500 kredytów AI miesięcznie (około 60 minut rozmów głosowych)",
+  ],
+};
+
+/** Wszystkie plany, które da się zamówić: Solo i plany biur. */
+export const WSZYSTKIE_PLANY: Plan[] = [PLAN_SOLO, ...PLANS];
+
+/**
  * Miesięczna cena pakietu dla konkretnej liczby osób.
  *
  * Do piętnastu osób płaci się za biuro, powyżej dochodzi dopłata od głowy.

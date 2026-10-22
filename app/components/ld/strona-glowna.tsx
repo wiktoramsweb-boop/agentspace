@@ -13,6 +13,7 @@ import { getDict, localeHref, toLocale } from "@/lib/i18n";
 import { Silnik } from "./silnik";
 import { Kafel, LdNav, LdStopka } from "./rama";
 import { CennikPlany } from "./cennik-plany";
+import { SoloBaner } from "./solo-baner";
 
 /* ── Drobne klocki ─────────────────────────────────────────── */
 
@@ -705,6 +706,7 @@ export function StronaGlowna({ lang }: { lang: string }) {
             miesiac={t.cennik.miesiac}
             od={t.cennik.od}
           />
+          <SoloBaner en={en} />
           <div className="lx-srodek">
             <Link className="ld-cennik__pelny" href={href("/cennik")}>
               {t.cennik.pelny}

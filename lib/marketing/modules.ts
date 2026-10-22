@@ -1065,12 +1065,12 @@ export const MODULES: ProductModule[] = [
     headline: "Świadectwo energetyczne zamówione z karty oferty",
     lead: "Formularz zamówienia świadectwa charakterystyki energetycznej wypełnia się danymi oferty. Dodajesz zdjęcia budynku, wybierasz termin, a uprawniony audytor dostaje komplet od razu.",
     seoTitle: "Zamówienie świadectwa charakterystyki energetycznej dla agenta | AgentSpace",
-    seoDescription: "Zamów świadectwo energetyczne mieszkania, domu albo lokalu prosto z CRM: formularz wypełniony danymi oferty, zdjęcia budynku, termin od 6 godzin.",
+    seoDescription: "Zamów świadectwo energetyczne mieszkania, domu albo lokalu prosto z CRM: formularz wypełniony danymi oferty, zdjęcia budynku, termin od 24 godzin.",
     problem: "Bez świadectwa nie sprzedasz ani nie wynajmiesz mieszkania, a ogłoszenie musi podawać wskaźnik energii. Agent przepisuje dane z oferty do formularza audytora, dosyła zdjęcia mailem i dzwoni pytać, na jakim etapie jest zamówienie.",
     capabilities: [
       { title: "Dane z oferty, nie z pamięci", body: "Adres, metraż i rok budowy wskakują z karty nieruchomości. Agent dopisuje tylko to, czego oferta nie ma: ogrzewanie, wentylację, materiał ścian i izolację." },
       { title: "Zdjęcia i rzuty w zamówieniu", body: "Zdjęcie budynku z zewnątrz, rzut mieszkania i świadectwo całego budynku, jeśli wspólnota je ma. Pliki idą razem z zamówieniem." },
-      { title: "Termin do wyboru", body: "Standard do 2 dni roboczych, Express w 24 godziny albo Superexpress w 6 godzin roboczych. Cenę netto i brutto widać przed wysłaniem." },
+      { title: "Termin do wyboru", body: "Standard do 2 dni roboczych albo Express w 24 godziny. Cenę netto i brutto widać przed wysłaniem." },
       { title: "Historia zamówień", body: "Lista zamówień biura z kartą PDF każdego z nich. Agent widzi swoje, właściciel wszystkie." },
     ],
     forWhom: "Dla agentów przy każdej nowej ofercie bez świadectwa. Dla właściciela, który chce jednego sprawdzonego wykonawcy zamiast szukania audytora przy każdej transakcji.",
@@ -1078,7 +1078,7 @@ export const MODULES: ProductModule[] = [
     shot: "/strona/zrzuty/swiadectwa.webp",
     faq: [
       { q: "Kto sporządza świadectwo?", a: "Osoba z uprawnieniami wpisana do centralnego rejestru charakterystyki energetycznej budynków. Świadectwo jest ważne 10 lat." },
-      { q: "Ile to kosztuje?", a: "Mieszkanie od 300 zł netto, dom i lokal użytkowy od 450 zł netto. Tryb Express i Superexpress to dopłata, widoczna w formularzu przed zamówieniem." },
+      { q: "Ile to kosztuje?", a: "Mieszkanie od 300 zł netto, dom i lokal użytkowy od 450 zł netto. Tryb Express to dopłata, widoczna w formularzu przed zamówieniem." },
       { q: "Czy muszę mieć świadectwo przy sprzedaży?", a: "Tak, przy sprzedaży i najmie właściciel przekazuje świadectwo nabywcy albo najemcy, a ogłoszenie podaje wskaźnik zapotrzebowania na energię." },
     ],
   },

@@ -1,6 +1,6 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import { zapiszBlad } from "./blad";
-import { PLANS, planForAgents, cenaPakietu, type Plan } from "./marketing/plans";
+import { PLANS, WSZYSTKIE_PLANY, planForAgents, cenaPakietu, type Plan } from "./marketing/plans";
 import {
   PAKIETY_KREDYTOW,
   cenaOkresu,
@@ -66,7 +66,7 @@ export async function zlozZamowienie(params: {
   planId: string;
   okres: Okres;
 }): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
-  const plan = PLANS.find((p) => p.id === params.planId);
+  const plan = WSZYSTKIE_PLANY.find((p) => p.id === params.planId);
   if (!plan) return { ok: false, error: "Nieznany pakiet." };
 
   const admin = createSupabaseAdmin();
@@ -241,7 +241,7 @@ export function opisZamowienia(z: Zamowienie): string {
   if (z.kind === "strona") {
     return `Strona internetowa biura, ${opisOkresu(z.period).nazwa.toLowerCase()}, ${kwota}`;
   }
-  const plan = PLANS.find((p) => p.id === z.plan);
+  const plan = WSZYSTKIE_PLANY.find((p) => p.id === z.plan);
   return `${plan?.name ?? z.plan}, ${opisOkresu(z.period).nazwa.toLowerCase()}, ${kwota}`;
 }
 

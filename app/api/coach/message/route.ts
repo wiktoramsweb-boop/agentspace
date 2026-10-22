@@ -98,6 +98,7 @@ export async function POST(request: Request) {
     session.difficulty ?? "sredni",
     oferta,
     wersja.instrukcja,
+    sc?.slug ?? null,
   );
 
   let anthropic;

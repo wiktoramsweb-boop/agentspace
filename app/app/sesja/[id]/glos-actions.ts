@@ -17,17 +17,19 @@ import type { ChatMessage } from "@/lib/types";
  */
 export async function zapiszRozmoweGlosowa(
   sessionId: string,
-  wypowiedzi: { role: "agent" | "client"; content: string }[],
+  wypowiedzi: { role: "agent" | "client"; content: string; t?: number }[],
   sekundy: number,
   /** Czy połączenie w ogóle doszło do skutku. Jeśli nie, oddajemy całość. */
   polaczono = true,
+  /** Identyfikator rozmowy u dostawcy: po nim pobieramy nagranie do analizy. */
+  rozmowaId: string | null = null,
 ): Promise<{ ok: boolean }> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
 
   const { data: sesja } = await admin
     .from("training_sessions")
-    .select("id, agent_id, transcript, status")
+    .select("*")
     .eq("id", sessionId)
     .maybeSingle();
   if (!sesja || sesja.agent_id !== user.id) return { ok: false };
@@ -36,16 +38,28 @@ export async function zapiszRozmoweGlosowa(
   // które ktoś wypełnia świadomie.
   const czyste: ChatMessage[] = wypowiedzi
     .slice(0, 200)
-    .map((w) => ({ role: w.role, content: bezZnacznikowMowy(w.content).slice(0, 2000) }))
+    .map((w) => ({
+      role: w.role,
+      content: bezZnacznikowMowy(w.content).slice(0, 2000),
+      ...(typeof w.t === "number" && Number.isFinite(w.t) ? { t: Math.max(0, Math.round(w.t)) } : {}),
+    }))
     // Filtr po oczyszczeniu: wypowiedź złożona z samego znacznika emocji
     // zostaje pusta i nie ma czego zapisywać.
     .filter((w) => w.content.length > 0);
 
   if (czyste.length > 0 && sesja.status === "in_progress") {
     const stary = (sesja.transcript ?? []) as ChatMessage[];
+    const id = rozmowaId && /^[A-Za-z0-9_-]{6,80}$/.test(rozmowaId) ? rozmowaId : null;
+    // Kolumna context istnieje od v49; bez niej select("*") jej nie zwraca i zapisujemy sam transkrypt.
+    const maKontekst = "context" in sesja;
     await admin
       .from("training_sessions")
-      .update({ transcript: [...stary, ...czyste] })
+      .update({
+        transcript: [...stary, ...czyste],
+        ...(maKontekst
+          ? { context: { ...((sesja.context as Record<string, unknown> | null) ?? {}), glos: { ...(id ? { rozmowa: id } : {}), sekundy } } }
+          : {}),
+      })
       .eq("id", sessionId);
   }
 

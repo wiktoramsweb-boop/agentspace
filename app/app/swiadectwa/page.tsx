@@ -40,7 +40,7 @@ export default async function SwiadectwaPage() {
             <div key={t} className="rounded-2xl bg-slate-50 p-4">
               <p className="text-sm text-slate-500">{CENY_OBIEKTU[t].nazwa}</p>
               <p className="mt-1 text-2xl font-bold text-slate-900">{CENY_OBIEKTU[t].cena} zł</p>
-              <p className="text-xs text-slate-500">netto, tryb standard (do 2 dni). Express +{TRYBY.express.doplata} zł, superexpress +{TRYBY.superexpress.doplata} zł.</p>
+              <p className="text-xs text-slate-500">netto, tryb standard (do 2 dni). Express w 24 godziny +{TRYBY.express.doplata} zł.</p>
             </div>
           ))}
         </div>

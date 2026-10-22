@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { endSession } from "../../trening/actions";
-import type { ChatMessage } from "@/lib/types";
+import type { ChatMessage, TrainingSession } from "@/lib/types";
+import { kartaRozmowy } from "@/lib/karta-rozmowy";
+import { bezZnacznikaRozlaczenia, klientSieRozlaczyl } from "@/lib/coach/realizm";
 import { useSpeechRecognition } from "@/lib/use-speech-recognition";
 import { RozmowaGlosowa } from "./rozmowa";
 
@@ -17,6 +19,8 @@ export function SessionChat({
   trybGlosu,
   plec,
   technika = null,
+  oferta = null,
+  lekcja = null,
 }: {
   sessionId: string;
   initialTranscript: ChatMessage[];
@@ -31,6 +35,9 @@ export function SessionChat({
   plec: "k" | "m" | null;
   /** Technika z biblioteki, którą agent ćwiczy w tej rozmowie. */
   technika?: { slug: string; nazwa: string; kroki: string[] } | null;
+  oferta?: NonNullable<TrainingSession["context"]>["oferta"] | null;
+  /** Lekcja ze ścieżki nauki: tytuł, cel i próg zaliczenia. */
+  lekcja?: { id: string; tytul: string; cel: string; prog: number } | null;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialTranscript);
   const [input, setInput] = useState("");
@@ -119,40 +126,101 @@ export function SessionChat({
   );
 
   const agentTurns = messages.filter((m) => m.role === "agent").length;
+  const karta = kartaRozmowy(brief);
+  const rozlaczyl = messages.some((m) => m.role === "client" && klientSieRozlaczyl(m.content));
+  const zl = (n: number) => new Intl.NumberFormat("pl-PL").format(n) + " zł";
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col md:h-[calc(100vh-9rem)]">
+    <div className="grid h-[calc(100vh-8rem)] gap-5 md:h-[calc(100vh-9rem)] lg:grid-cols-[300px_minmax(0,1fr)]">
+      {/* Karta rozmowy: kto, po co, o czym. Na telefonie zwija się nad czatem. */}
+      <aside className="hidden min-h-0 flex-col gap-3 overflow-y-auto pr-1 lg:flex">
+        <div className="rounded-3xl bg-slate-900 p-5 text-white">
+          <div className="flex items-center gap-3">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-lg font-bold text-slate-900">
+              {karta.kto.replace(/^Pan[i]?\s+/, "").charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate font-semibold">{karta.kto}</p>
+              <p className="text-xs text-white/55">Charakter: {personality}</p>
+            </div>
+          </div>
+          {karta.szczegoly.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {karta.szczegoly.map((x) => (
+                <span key={x} className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/80">{x}</span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {lekcja && (
+          <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Lekcja {lekcja.id} · próg {lekcja.prog}</p>
+            <p className="mt-1 font-semibold text-slate-900">{lekcja.tytul}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">{lekcja.cel}</p>
+          </div>
+        )}
+
+        {brief && (
+          <div className="rounded-3xl border border-slate-200 bg-white p-5">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Twoje zadanie</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">{brief}</p>
+          </div>
+        )}
+
+        {oferta && (
+          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+            <div className="bg-gradient-to-br from-sky-50 to-white p-5">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-sky-700">Oferta w rozmowie</p>
+              <p className="mt-1 font-semibold text-slate-900">{oferta.tytul}</p>
+              <p className="text-sm text-slate-500">{[oferta.dzielnica, oferta.miasto].filter(Boolean).join(", ")}</p>
+              {oferta.cena ? <p className="mt-2 text-xl font-bold tabular-nums text-slate-900">{zl(oferta.cena)}</p> : null}
+            </div>
+            <dl className="divide-y divide-slate-100 px-5 text-sm">
+              {oferta.metraz ? <div className="flex justify-between py-2"><dt className="text-slate-500">Powierzchnia</dt><dd className="font-medium">{oferta.metraz} m²</dd></div> : null}
+              {oferta.pokoje ? <div className="flex justify-between py-2"><dt className="text-slate-500">Pokoje</dt><dd className="font-medium">{oferta.pokoje}</dd></div> : null}
+              {oferta.pietro != null ? <div className="flex justify-between py-2"><dt className="text-slate-500">Piętro</dt><dd className="font-medium">{oferta.pietro === 0 ? "parter" : oferta.pietro}</dd></div> : null}
+              {oferta.rok ? <div className="flex justify-between py-2"><dt className="text-slate-500">Rok budowy</dt><dd className="font-medium">{oferta.rok}</dd></div> : null}
+            </dl>
+          </div>
+        )}
+
+        {technika && (
+          <details className="rounded-3xl bg-slate-900 p-5 text-white" open>
+            <summary className="cursor-pointer text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+              Technika: <span className="normal-case tracking-normal text-white">{technika.nazwa}</span>
+            </summary>
+            <ol className="mt-3 space-y-1.5">
+              {technika.kroki.map((k, i) => (
+                <li key={k} className="text-xs leading-relaxed text-slate-300">
+                  <b className="text-emerald-300">{i + 1}.</b> {k}
+                </li>
+              ))}
+            </ol>
+          </details>
+        )}
+      </aside>
+
+      <div className="flex min-h-0 min-w-0 flex-col">
       {/* Header */}
       <div className="mb-4 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-lg font-semibold text-slate-900">{scenarioTitle}</h1>
-          <p className="text-sm text-slate-500">Klient: {personality}</p>
+          <p className="text-sm text-slate-500">
+            {karta.kto} · {personality}
+            {lekcja ? ` · lekcja ${lekcja.id}` : ""}
+          </p>
         </div>
         <EndSessionButton sessionId={sessionId} disabled={agentTurns === 0} />
       </div>
 
-      {/* Zadanie - WIDOCZNE cały czas, żeby nie zapomnieć adresu / celu */}
-      {brief && (
-        <div className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] px-4 py-3">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-emerald-600">
-            Twoje zadanie
-          </p>
-          <p className="text-sm leading-relaxed text-slate-800">{brief}</p>
-        </div>
-      )}
-
-      {technika && (
-        <details className="mb-4 rounded-xl border border-slate-200 bg-slate-900 px-4 py-3 text-white" open>
-          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-emerald-300">
-            Ćwiczysz: <span className="normal-case tracking-normal text-white">{technika.nazwa}</span>
+      {/* Na telefonie panel boczny jest schowany, więc cel i zadanie zostają nad rozmową. */}
+      {(lekcja || brief) && (
+        <details className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] px-4 py-3 lg:hidden">
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-emerald-700">
+            {lekcja ? `Lekcja ${lekcja.id}: ${lekcja.tytul}` : "Twoje zadanie"}
           </summary>
-          <ol className="mt-2 grid gap-1 sm:grid-cols-2">
-            {technika.kroki.map((k, i) => (
-              <li key={k} className="text-xs leading-relaxed text-slate-300">
-                <b className="text-emerald-300">{i + 1}.</b> {k}
-              </li>
-            ))}
-          </ol>
+          <p className="mt-2 text-sm leading-relaxed text-slate-800">{lekcja ? lekcja.cel : brief}</p>
         </details>
       )}
 
@@ -172,13 +240,25 @@ export function SessionChat({
             </div>
           </div>
         )}
+        {rozlaczyl && !streaming && (
+          <div className="mx-auto max-w-md rounded-2xl border border-rose-200 bg-rose-50 p-4 text-center">
+            <p className="font-semibold text-rose-800">Klient się rozłączył</p>
+            <p className="mt-1 text-sm text-rose-700">Tak kończy się prawdziwy telefon, gdy klient straci cierpliwość. Zakończ rozmowę i zobacz, w którym momencie to się stało.</p>
+          </div>
+        )}
       </div>
 
       {/* Input */}
       <div className="mt-4 border-t border-slate-200 pt-4">
         {glos && (
           <div className={trybGlosu ? "mb-2" : undefined}>
-            <RozmowaGlosowa sessionId={sessionId} brief={brief} osobowosc={personality} plec={plec} />
+            <RozmowaGlosowa
+              sessionId={sessionId}
+              brief={brief}
+              osobowosc={personality}
+              plec={plec}
+              boczna={{ oferta: oferta ?? null, cel: lekcja?.cel ?? brief }}
+            />
             {trybGlosu && !pokazPisanie && (
               <button
                 type="button"
@@ -226,7 +306,7 @@ export function SessionChat({
             maxLength={2000}
             onChange={(e) => setInput(e.target.value)}
             placeholder={listening ? "Mów..." : "Napisz albo powiedz co mówisz do klienta..."}
-            disabled={streaming}
+            disabled={streaming || rozlaczyl}
             className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-60"
           />
           <button
@@ -249,6 +329,7 @@ export function SessionChat({
             ikony mikrofonu na klawiaturze iOS. Na komputerze użyj Chrome.
           </p>
         )}
+      </div>
       </div>
     </div>
   );
@@ -299,7 +380,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             : "rounded-tl-sm bg-slate-100 text-slate-800"
         }`}
       >
-        {message.content}
+        {bezZnacznikaRozlaczenia(message.content)}
       </div>
     </div>
   );

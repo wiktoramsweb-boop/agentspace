@@ -10,6 +10,7 @@ import {
 } from "@/lib/data-abonament";
 import { stanKredytow } from "@/lib/kredyty";
 import { Zakupy } from "./zakupy";
+import { PLAN_SOLO } from "@/lib/marketing/plans";
 
 export const metadata = { title: "Abonament i płatności" };
 
@@ -57,7 +58,7 @@ export default async function AbonamentUstawieniaPage() {
       </div>
 
       <Zakupy
-        plany={PLANS}
+        plany={agentow <= 1 ? [PLAN_SOLO, ...PLANS] : PLANS}
         sugerowany={planForAgents(agentow).id}
         agentow={agentow}
         stronaMiesiecznie={SITE_ADDON.monthly}

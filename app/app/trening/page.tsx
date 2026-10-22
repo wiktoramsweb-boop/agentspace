@@ -5,6 +5,11 @@ import { SCENARIO_CATEGORIES, type ScenarioCategory } from "@/lib/types";
 import { PageHeader, EmptyState } from "../components/ui";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { maV49 } from "@/lib/schemat";
+import { postepSciezki, rankingTreningu } from "@/lib/data-sciezka";
+import { wynikSesji } from "@/lib/coach/sciezka";
+import { TECHNIKI } from "@/lib/techniki/techniki";
+import { kartaRozmowy } from "@/lib/karta-rozmowy";
+import { SciezkaNauki } from "./sciezka-nauki";
 
 type MojeZadanie = { id: string; scenario_id: string; difficulty: string; min_score: number | null; due_on: string | null; note: string | null; best_score: number | null; attempts: number };
 
@@ -19,6 +24,24 @@ async function mojeZadania(userId: string): Promise<MojeZadanie[]> {
     .order("due_on", { ascending: true, nullsFirst: false })
     .limit(10);
   return (data ?? []) as MojeZadanie[];
+}
+
+/** Najlepszy wynik (0-100) i liczba rozmów agenta w każdym scenariuszu. */
+async function rekordyAgenta(userId: string): Promise<Map<string, { najlepszy: number; ile: number }>> {
+  const { data } = await createSupabaseAdmin()
+    .from("training_sessions")
+    .select("scenario_id, context, score:session_scores(overall)")
+    .eq("agent_id", userId)
+    .eq("status", "completed")
+    .limit(1000);
+  const mapa = new Map<string, { najlepszy: number; ile: number }>();
+  for (const w of (data ?? []) as unknown as { scenario_id: string; context: { analiza?: { wynik?: number } } | null; score: { overall: number | null }[] | null }[]) {
+    const wynik = wynikSesji(w.context?.analiza?.wynik, Array.isArray(w.score) ? w.score[0]?.overall : null);
+    if (wynik === null) continue;
+    const b = mapa.get(w.scenario_id) ?? { najlepszy: 0, ile: 0 };
+    mapa.set(w.scenario_id, { najlepszy: Math.max(b.najlepszy, wynik), ile: b.ile + 1 });
+  }
+  return mapa;
 }
 
 // Kolory per kategoria - żeby karty się wyróżniały (pełne klasy dla Tailwind).
@@ -54,11 +77,19 @@ function CategoryIcon({ icon }: { icon: string }) {
 export default async function TreningPage({
   searchParams,
 }: {
-  searchParams: Promise<{ limit?: string }>;
+  searchParams: Promise<{ limit?: string; widok?: string; k?: string }>;
 }) {
   const user = await requireModul("coach");
-  const { limit: limitParam } = await searchParams;
-  const [scenarios, zadania] = await Promise.all([getScenarios(), mojeZadania(user.id)]);
+  const { limit: limitParam, widok: widokParam, k: katParam } = await searchParams;
+  const widok = widokParam === "rozmowy" || widokParam === "ranking" ? widokParam : "sciezka";
+  const [scenarios, zadania, sciezka, ranking, rekordy] = await Promise.all([
+    getScenarios(),
+    mojeZadania(user.id),
+    postepSciezki(user.id),
+    user.agency_id ? rankingTreningu(user.agency_id) : Promise.resolve([]),
+    rekordyAgenta(user.id),
+  ]);
+  const nazwyTechnik = Object.fromEntries(TECHNIKI.map((t) => [t.slug, t.nazwa]));
   const zlecajacy = ["owner", "director", "manager"].includes(user.role);
 
   // Tygodniowy limit rozmów AI (ustawiany przez CEO).
@@ -83,7 +114,7 @@ export default async function TreningPage({
     <>
       <PageHeader
         title="AI Coach"
-        subtitle="Wybierz kategorię i scenariusz. Ćwicz rozmowę z AI klientem, dostań scoring i feedback."
+        subtitle="Rozmowy z klientem AI, który zachowuje się jak prawdziwy: przerywa, wątpi i potrafi się rozłączyć. Po każdej rozmowie dokładna analiza."
         action={
           <div className="flex flex-wrap gap-2">
             <Link href="/app/techniki" className="rounded-xl bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white hover:bg-slate-800">
@@ -153,71 +184,198 @@ export default async function TreningPage({
         </div>
       )}
 
-      {/* Instrukcja - jak to działa */}
-      <div className="mb-8 grid gap-3 sm:grid-cols-3">
-        {[
-          { n: "1", t: "Wybierz scenariusz", d: "Z jednej z kategorii poniżej" },
-          { n: "2", t: "Ustaw klienta i poziom", d: "Typ klienta + trudność (łatwy → trudny)" },
-          { n: "3", t: "Rozmawiaj i oceń", d: "Na końcu scoring + wskazówki" },
-        ].map((s) => (
-          <div key={s.n} className="flex items-center gap-3 rounded-xl border border-slate-300 bg-white p-3">
-            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-100 font-bold text-emerald-700">
-              {s.n}
-            </span>
-            <div>
-              <p className="text-sm font-medium text-slate-900">{s.t}</p>
-              <p className="text-xs text-slate-500">{s.d}</p>
+      {/* Podsumowanie postępu */}
+      <section className="mb-6 grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+        <div className="relative overflow-hidden rounded-[28px] bg-slate-900 p-6 text-white">
+          <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-emerald-500/30 blur-3xl" aria-hidden="true" />
+          <div className="relative">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">Ścieżka nauki</p>
+            <p className="mt-2 text-3xl font-bold tabular-nums">
+              {sciezka.zaliczone}
+              <span className="text-lg font-semibold text-white/50">/{sciezka.wszystkie} lekcji</span>
+            </p>
+            <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
+              <div className="wyniki-pasek h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400" style={{ width: `${(sciezka.zaliczone / sciezka.wszystkie) * 100}%` }} />
             </div>
+            {sciezka.aktualna ? (
+              <Link href={`/app/trening/${sciezka.aktualna.scenariusz}?lekcja=${sciezka.aktualna.id}`} className="mt-5 inline-flex items-center gap-3 rounded-2xl bg-emerald-400 px-5 py-3 font-bold text-slate-900 shadow-[0_6px_0_#059669] transition active:translate-y-1 active:shadow-none">
+                <span>Dalej: {sciezka.aktualna.tytul}</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+            ) : (
+              <p className="mt-5 font-semibold text-emerald-300">Cała ścieżka ukończona. Mistrz.</p>
+            )}
           </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { w: sciezka.sredniWynik ?? "-", o: "średni wynik" },
+            { w: `${sciezka.xp}`, o: "XP ze ścieżki" },
+            { w: ranking.findIndex((r) => r.agentId === user.id) >= 0 ? `#${ranking.findIndex((r) => r.agentId === user.id) + 1}` : "-", o: "miejsce w tym tygodniu" },
+          ].map((x) => (
+            <div key={x.o} className="flex flex-col justify-center rounded-3xl border border-slate-200 bg-white p-4 text-center">
+              <b className="text-2xl font-bold tabular-nums text-slate-900">{x.w}</b>
+              <span className="mt-1 text-xs text-slate-500">{x.o}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Zakładki */}
+      <nav className="mb-8 flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
+        {[
+          { id: "sciezka", href: "/app/trening", nazwa: "Ścieżka nauki" },
+          { id: "rozmowy", href: "/app/trening?widok=rozmowy", nazwa: `Wszystkie rozmowy (${scenarios.length})` },
+          { id: "ranking", href: "/app/trening?widok=ranking", nazwa: "Ranking tygodnia" },
+        ].map((z) => (
+          <Link
+            key={z.id}
+            href={z.href}
+            scroll={false}
+            className={`flex-1 whitespace-nowrap rounded-xl px-4 py-2.5 text-center text-sm font-semibold transition ${widok === z.id ? "bg-slate-900 text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"}`}
+          >
+            {z.nazwa}
+          </Link>
         ))}
-      </div>
+      </nav>
 
-      {/* Kategorie */}
-      <div className="space-y-10">
-        {SCENARIO_CATEGORIES.map((cat) => {
-          // Fallback: scenariusze bez kategorii (przed SETUP-v3) traktuj jak cold_calling
-          const catScenarios = scenarios.filter(
-            (s) => (s.category ?? "cold_calling") === (cat.value as ScenarioCategory),
-          );
-          if (catScenarios.length === 0) return null;
-          const style = CAT_STYLE[cat.value] ?? CAT_STYLE.cold_calling;
-          return (
-            <section key={cat.value}>
-              <div className="mb-4 flex items-center gap-3">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${style.tile}`}>
-                  <CategoryIcon icon={cat.icon} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-slate-900">{cat.label}</h2>
-                  <p className="text-sm text-slate-500">{cat.description}</p>
-                </div>
-                <span className="ml-auto text-sm text-slate-500">{catScenarios.length} scenariuszy</span>
-              </div>
+      {widok === "sciezka" && <SciezkaNauki stan={sciezka} nazwyTechnik={nazwyTechnik} />}
 
-              <div className="grid gap-3 md:grid-cols-2">
-                {catScenarios.map((s) => (
-                  <Link
-                    key={s.id}
-                    href={`/app/trening/${s.slug}`}
-                    className={`group relative flex items-start gap-4 overflow-hidden rounded-2xl border border-slate-300 bg-white p-5 pl-4 transition-all hover:-translate-y-0.5 hover:bg-slate-100 ${style.hover}`}
-                  >
-                    <span className={`mt-0.5 h-12 w-1.5 flex-shrink-0 rounded-full ${style.bar}`} />
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-1.5 flex items-start justify-between gap-3">
-                        <h3 className="font-semibold text-slate-900">{s.title}</h3>
-                        <span className={`flex-shrink-0 text-sm font-medium opacity-0 transition group-hover:opacity-100 ${style.trenuj}`}>
-                          Trenuj →
-                        </span>
-                      </div>
-                      <p className="text-sm leading-relaxed text-slate-500">{s.description}</p>
+      {widok === "ranking" && <RankingTygodnia ranking={ranking} ja={user.id} />}
+
+      {widok === "rozmowy" && (
+        <>
+          <div className="mb-6 flex flex-wrap gap-2">
+            {[{ value: "", label: "Wszystkie" }, ...SCENARIO_CATEGORIES].map((c) => (
+              <Link
+                key={c.value}
+                href={c.value ? `/app/trening?widok=rozmowy&k=${c.value}` : "/app/trening?widok=rozmowy"}
+                scroll={false}
+                className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${(katParam ?? "") === c.value ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+              >
+                {c.label}
+              </Link>
+            ))}
+          </div>
+          <div className="space-y-10">
+            {SCENARIO_CATEGORIES.filter((cat) => !katParam || cat.value === katParam).map((cat) => {
+              const catScenarios = scenarios.filter((s) => (s.category ?? "cold_calling") === (cat.value as ScenarioCategory));
+              if (catScenarios.length === 0) return null;
+              const style = CAT_STYLE[cat.value] ?? CAT_STYLE.cold_calling;
+              return (
+                <section key={cat.value}>
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${style.tile}`}>
+                      <CategoryIcon icon={cat.icon} />
                     </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
+                    <div>
+                      <h2 className="text-xl font-semibold text-slate-900">{cat.label}</h2>
+                      <p className="text-sm text-slate-500">{cat.description}</p>
+                    </div>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {catScenarios.map((s) => {
+                      const karta = kartaRozmowy(s.brief);
+                      const rekord = rekordy.get(s.id);
+                      const kropki = s.difficulty === "hard" ? 3 : s.difficulty === "medium" ? 2 : 1;
+                      return (
+                        <Link
+                          key={s.id}
+                          href={`/app/trening/${s.slug}`}
+                          className={`group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-lg ${style.hover}`}
+                        >
+                          <div className={`relative flex items-center gap-3 px-5 pb-4 pt-5 ${style.tile}`}>
+                            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white text-lg font-bold text-slate-800 shadow-sm">
+                              {karta.kto.replace(/^Pan[i]?\s+/, "").charAt(0).toUpperCase()}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="truncate font-semibold text-slate-900">{karta.kto}</p>
+                              <p className="flex items-center gap-1 text-xs">
+                                {[1, 2, 3].map((n) => (
+                                  <span key={n} className={`h-1.5 w-4 rounded-full ${n <= kropki ? style.bar : "bg-white/70"}`} />
+                                ))}
+                                <span className="ml-1 opacity-80">{kropki === 3 ? "trudny" : kropki === 2 ? "średni" : "łatwy"}</span>
+                              </p>
+                            </div>
+                            {rekord && (
+                              <span className="absolute right-4 top-4 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-slate-900 shadow-sm">
+                                {rekord.najlepszy}/100
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex flex-1 flex-col p-5">
+                            <h3 className="font-semibold text-slate-900">{s.title}</h3>
+                            <p className="mt-1.5 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-500">{s.description}</p>
+                            {karta.szczegoly.length > 0 && (
+                              <div className="mt-3 flex flex-wrap gap-1.5">
+                                {karta.szczegoly.slice(0, 3).map((x) => (
+                                  <span key={x} className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">{x}</span>
+                                ))}
+                              </div>
+                            )}
+                            <span className={`mt-4 text-sm font-bold ${style.trenuj}`}>
+                              {rekord ? `Rozmowy: ${rekord.ile} · trenuj dalej →` : "Zacznij rozmowę →"}
+                            </span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        </>
+      )}
     </>
+  );
+}
+
+function RankingTygodnia({ ranking, ja }: { ranking: { agentId: string; imie: string; punkty: number; rozmowy: number; zaliczone: number }[]; ja: string }) {
+  if (ranking.length === 0) {
+    return (
+      <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
+        <p className="text-lg font-semibold text-slate-900">W tym tygodniu jeszcze nikt nie trenował</p>
+        <p className="mt-1 text-slate-500">Pierwsza rozmowa i jesteś na podium.</p>
+      </div>
+    );
+  }
+  const podium = [ranking[1], ranking[0], ranking[2]];
+  const wysokosc = ["h-36", "h-48", "h-28"];
+  const barwy = ["bg-slate-200 text-slate-700", "bg-emerald-400 text-slate-900", "bg-amber-200 text-amber-800"];
+  const miejsce = [2, 1, 3];
+  return (
+    <div>
+      <div className="mx-auto mb-8 grid max-w-2xl grid-cols-3 items-end gap-3">
+        {podium.map((r, i) =>
+          r ? (
+            <div key={r.agentId} className="ranking-wjazd flex flex-col items-center" style={{ animationDelay: `${[0.15, 0, 0.3][i]}s` }}>
+              <span className={`mb-2 grid h-16 w-16 place-items-center rounded-full border-4 bg-white text-xl font-bold text-slate-800 ${i === 1 ? "border-emerald-400" : i === 0 ? "border-slate-300" : "border-amber-300"}`}>
+                {r.imie.charAt(0).toUpperCase()}
+              </span>
+              <p className="mb-2 max-w-full truncate text-sm font-semibold text-slate-900">{r.imie}</p>
+              <div className={`flex w-full flex-col items-center justify-center rounded-t-2xl ${wysokosc[i]} ${barwy[i]}`}>
+                <b className="text-3xl font-bold tabular-nums">{r.punkty}</b>
+                <span className="text-[11px] font-bold uppercase tracking-wider">{miejsce[i]}. miejsce</span>
+              </div>
+            </div>
+          ) : (
+            <span key={i} />
+          ),
+        )}
+      </div>
+      <ol className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+        {ranking.map((r, i) => (
+          <li key={r.agentId} className={`flex items-center gap-4 border-b border-slate-100 px-5 py-3.5 last:border-0 ${r.agentId === ja ? "bg-emerald-50" : ""}`}>
+            <span className="w-6 text-sm font-bold tabular-nums text-slate-400">{i + 1}</span>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-sm font-bold text-slate-700">{r.imie.charAt(0).toUpperCase()}</span>
+            <span className="min-w-0 flex-1 truncate font-semibold text-slate-900">{r.imie}{r.agentId === ja ? " (Ty)" : ""}</span>
+            <span className="hidden text-xs text-slate-500 sm:inline">{r.zaliczone} zdane · {r.rozmowy} rozmów</span>
+            <b className="w-14 text-right tabular-nums text-slate-900">{r.punkty}</b>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-3 text-center text-xs text-slate-400">Punkty to suma wyników z rozmów od poniedziałku. Zdane: rozmowy z wynikiem od 60.</p>
+    </div>
   );
 }
