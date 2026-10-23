@@ -39,13 +39,10 @@ export default async function CelePage() {
           title="Twoje cele"
           subtitle="Ustaw cel, a rozbijemy go na konkretne działania każdego dnia."
         />
-        <Card className="max-w-2xl">
+        <Card>
           <div className="mb-6">
-            <h2 className="mb-2 text-lg font-semibold text-slate-900">Zacznij od celu finansowego</h2>
-            <p className="text-sm text-slate-500">
-              Powiedz ile chcesz zarobić w rok. Policzymy ile cold calli, spotkań i umów potrzebujesz -
-              dziennie, tygodniowo, miesięcznie.
-            </p>
+            <h2 className="mb-1 text-lg font-semibold text-slate-900">Ustawmy Twój cel na ten rok</h2>
+            <p className="text-sm text-slate-500">Cztery krótkie pytania. Z odpowiedzi policzymy, ile telefonów, spotkań i umów potrzebujesz każdego dnia.</p>
           </div>
           <GoalSetup goal={null} />
         </Card>
@@ -231,13 +228,19 @@ export default async function CelePage() {
       </div>
 
       {/* Edycja celu */}
-      <details className="mt-6">
-        <summary className="cursor-pointer text-sm text-slate-500 hover:text-slate-900">
-          Zmień cel lub współczynniki
+      <details id="zmien-cel" className="group mt-6 rounded-3xl border border-slate-200 bg-white">
+        <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 px-5 py-4">
+          <span className="text-sm text-slate-600">
+            Cel: <b className="text-slate-900">{formatPln(goal.annual_income_pln)}</b> rocznie, średnia prowizja {formatPln(goal.avg_commission_pln)}, {goal.workdays_per_week} dni w tygodniu
+          </span>
+          <span className="rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-semibold text-slate-700 transition group-open:bg-slate-900 group-open:text-white">
+            <span className="group-open:hidden">Zmień cel</span>
+            <span className="hidden group-open:inline">Zwiń</span>
+          </span>
         </summary>
-        <Card className="mt-4 max-w-2xl">
+        <div className="border-t border-slate-100 p-5">
           <GoalSetup goal={goal} />
-        </Card>
+        </div>
       </details>
     </>
   );
