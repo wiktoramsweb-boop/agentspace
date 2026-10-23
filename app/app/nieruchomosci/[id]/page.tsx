@@ -38,6 +38,9 @@ import { getActivitiesForProperty } from "@/lib/data-platform";
 import { getAgencyAgents } from "@/lib/data-activities";
 import { ActivityModal } from "../../dzialania/activity-modal";
 import { PropertyTabs, TABS, type TabKey } from "./property-tabs";
+import { OgloszeniaTab } from "./ogloszenia-tab";
+import { stanPolaczenia } from "@/lib/otodom/klient";
+import { ogloszenieOferty, STATUSY } from "@/lib/otodom/ogloszenia";
 import { TransactionTab } from "./transaction-tab";
 import { ActivitiesTab } from "./activities-tab";
 import { PortalTab } from "./portal-tab";
@@ -351,6 +354,21 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
       )}
 
       {tab === "dzialania" && <ActivitiesTab activities={activities} dodaj={dodajDzialanie} />}
+
+      {tab === "ogloszenia" && (await (async () => {
+        const [pol, ogl] = await Promise.all([stanPolaczenia(user.agency_id!), ogloszenieOferty(property.id)]);
+        return (
+          <OgloszeniaTab
+            propertyId={property.id}
+            polaczone={pol.polaczone}
+            tabele={pol.tabele}
+            test={pol.test}
+            ogloszenie={ogl}
+            statusy={STATUSY}
+            ceo={user.role === "owner"}
+          />
+        );
+      })())}
 
       {tab === "portal" && (
         <PortalTab

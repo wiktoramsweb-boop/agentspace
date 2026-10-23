@@ -13,18 +13,20 @@ import Link from "next/link";
  * a powrót strzałką przeglądarki wraca tam, gdzie agent był.
  */
 
-export type TabKey = "oferta" | "poszukiwania" | "dzialania" | "portal" | "dokumenty" | "transakcja";
+export type TabKey = "oferta" | "poszukiwania" | "dzialania" | "ogloszenia" | "portal" | "dokumenty" | "transakcja";
 
 export const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: "oferta", label: "Oferta", icon: "dom" },
   { key: "poszukiwania", label: "Poszukiwania", icon: "lupa" },
   { key: "dzialania", label: "Działania", icon: "blyskawica" },
+  { key: "ogloszenia", label: "Ogłoszenia", icon: "globus" },
   { key: "portal", label: "Portal klienta", icon: "telefon" },
   { key: "dokumenty", label: "Dokumenty", icon: "teczka" },
   { key: "transakcja", label: "Karta transakcji", icon: "podpis" },
 ];
 
 const PATHS: Record<string, string> = {
+  globus: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3 7.5 7.03 7.5 12s2.015 9 4.5 9Zm-8.716-6.747h17.432M3.284 9.747h17.432",
   dom: "m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75",
   lupa: "m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z",
   blyskawica: "m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z",
