@@ -32,6 +32,7 @@ export default async function KalkulatoryPage() {
           agency: settings.company.name ?? user.agency?.name ?? "Biuro nieruchomości",
           logoUrl: settings.logoUrl,
         }}
+        kolorBiura={settings.options.offer_color}
       />
     </>
   );

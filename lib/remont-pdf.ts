@@ -8,11 +8,11 @@ const ile = (n: number) => new Intl.NumberFormat("pl-PL", { maximumFractionDigit
 /** Kosztorys dla klienta: najpierw wynik, potem szczegóły per pomieszczenie. */
 export async function generujKosztorysPdf(
   k: Kosztorys,
-  biuro: { nazwa: string; agent: string; telefon?: string; email?: string },
+  biuro: { nazwa: string; agent: string; telefon?: string; email?: string; kolor?: string; logoUrl?: string | null },
   stopka?: string,
 ): Promise<Uint8Array> {
   const w = policz(k);
-  const a = await nowyDokument({ tytulPliku: k.tytul || "Kosztorys remontu", stopka });
+  const a = await nowyDokument({ tytulPliku: k.tytul || "Kosztorys remontu", stopka, akcent: biuro.kolor, logoUrl: biuro.logoUrl });
   const W = a.szerokosc;
 
   a.tytul(k.tytul || "Kosztorys remontu");

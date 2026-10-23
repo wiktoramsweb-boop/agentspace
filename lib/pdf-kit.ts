@@ -22,7 +22,13 @@ export const INK = rgb(0.094, 0.094, 0.106);
 export const SZARY = rgb(0.45, 0.45, 0.5);
 export const LINIA = rgb(0.82, 0.83, 0.85);
 export const TLO_NAGLOWKA = rgb(0.953, 0.957, 0.965);
-export const AKCENT = rgb(0.02, 0.59, 0.41);
+export const AKCENT_DOMYSLNY = rgb(0.02, 0.59, 0.41);
+export const AKCENT = AKCENT_DOMYSLNY;
+
+export function hexNaRgb(hex: string): RGB {
+  const n = parseInt(hex.slice(1), 16);
+  return rgb(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
+}
 
 type Run = { text: string; bold: boolean };
 type Token = { text: string; font: PDFFont; w: number; space: boolean };
@@ -48,6 +54,10 @@ export async function nowyDokument(opts: {
   stopka?: string;
   /** Margines strony. Mniejszy dla dokumentów, które mają zmieścić się na jednej kartce. */
   margines?: number;
+  /** Kolor biura (hex) zamiast domyślnej zieleni: linie, paski, wykresy. */
+  akcent?: string;
+  /** Logo biura w lewym górnym rogu pierwszej strony. */
+  logoUrl?: string | null;
 }) {
   const MARGIN = opts.margines ?? MARGIN_DOMYSLNY;
   const CONTENT_W = A4.w - 2 * MARGIN;
@@ -61,10 +71,22 @@ export async function nowyDokument(opts: {
   const bold = await pdf.embedFont(boldB, { subset: false });
   pdf.setTitle(opts.tytulPliku);
 
+  const AKCENT = opts.akcent && /^#[0-9a-f]{6}$/i.test(opts.akcent) ? hexNaRgb(opts.akcent) : AKCENT_DOMYSLNY;
+
   const strony: PDFPage[] = [];
   let page: PDFPage = pdf.addPage([A4.w, A4.h]);
   strony.push(page);
   let y = A4.h - MARGIN;
+
+  if (opts.logoUrl) {
+    const b = await loadBytes(opts.logoUrl).catch(() => null);
+    const img = b ? await (b[0] === 0x89 ? pdf.embedPng(b) : pdf.embedJpg(b)).catch(() => null) : null;
+    if (img) {
+      const sk = Math.min(96 / img.width, 30 / img.height);
+      page.drawImage(img, { x: MARGIN, y: y - img.height * sk, width: img.width * sk, height: img.height * sk });
+      y -= img.height * sk + 14;
+    }
+  }
 
   function nowaStrona() {
     page = pdf.addPage([A4.w, A4.h]);

@@ -14,9 +14,14 @@ const pct = (n: number) => n.toFixed(2).replace(".", ",") + " %";
 
 type Tab = "kredyt" | "koszty" | "najem";
 
-export function Calculators({ agent }: { agent: Agent }) {
+const KOLORY = ["#059669", "#1e3a8a", "#881337", "#1f2937", "#9a5b2b", "#0e7490"];
+
+export function Calculators({ agent, kolorBiura = "#059669" }: { agent: Agent; kolorBiura?: string }) {
   const [tab, setTab] = useState<Tab>("koszty");
   const [preview, setPreview] = useState(false);
+  const [kolor, setKolor] = useState(kolorBiura);
+  const [dla, setDla] = useState("");
+  const [notatka, setNotatka] = useState("");
 
   // Kredyt
   const [amount, setAmount] = useState(500000);
@@ -160,6 +165,9 @@ export function Calculators({ agent }: { agent: Agent }) {
       savings={sheet.savings}
       note={sheet.note}
       agent={agent}
+      kolor={kolor}
+      dla={dla}
+      notatka={notatka}
     />
   );
 
@@ -248,6 +256,18 @@ export function Calculators({ agent }: { agent: Agent }) {
               <Num label="Koszty miesięczne (zł)" value={rcost} onChange={setRcost} step={50} />
             </div>
           )}
+        </div>
+
+        <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">PDF dla klienta</p>
+          <input value={dla} onChange={(e) => setDla(e.target.value.slice(0, 80))} placeholder="Dla kogo, np. Pan Tomasz Nowak" className={inp} />
+          <textarea value={notatka} onChange={(e) => setNotatka(e.target.value.slice(0, 600))} rows={3} placeholder="Twój komentarz, np. przy tym budżecie warto rozważyć Ruczaj" className={inp} />
+          <div className="flex flex-wrap items-center gap-2">
+            {KOLORY.map((k) => (
+              <button key={k} type="button" aria-label={`Kolor ${k}`} onClick={() => setKolor(k)} className={`h-7 w-7 rounded-full ring-offset-2 transition hover:scale-110 ${kolor === k ? "ring-2 ring-slate-400" : ""}`} style={{ background: k }} />
+            ))}
+            <span className="text-xs text-slate-500">kolor biura ustawia CEO w Ofertówce</span>
+          </div>
         </div>
 
         <button

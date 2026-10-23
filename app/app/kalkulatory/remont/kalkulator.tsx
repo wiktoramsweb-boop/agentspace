@@ -33,7 +33,7 @@ export function KalkulatorRemontu({
   v49: boolean;
   wczytany: { id: string; dane: Kosztorys; propertyId: string | null } | null;
   startOferta?: string;
-  biuro: { nazwa: string; agent: string; telefon?: string; email?: string };
+  biuro: { nazwa: string; agent: string; telefon?: string; email?: string; kolor?: string; logoUrl?: string | null };
   stopka: string;
 }) {
   const router = useRouter();

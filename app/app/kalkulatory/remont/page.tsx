@@ -74,7 +74,7 @@ export default async function RemontPage({ searchParams }: { searchParams: Promi
         v49={v49}
         wczytany={wczytany}
         startOferta={sp.oferta && oferty.some((o) => o.id === sp.oferta) ? sp.oferta : undefined}
-        biuro={{ nazwa: c.name || user.agency?.name || "", agent: user.full_name ?? "", telefon: user.phone ?? c.phone ?? "", email: c.email ?? "" }}
+        biuro={{ nazwa: c.name || user.agency?.name || "", agent: user.full_name ?? "", telefon: user.phone ?? c.phone ?? "", email: c.email ?? "", kolor: settings.options.offer_color, logoUrl: settings.logoUrl }}
         stopka={[c.name, c.nip ? `NIP ${c.nip}` : "", c.phone, c.email].filter(Boolean).join(" · ")}
       />
     </>
