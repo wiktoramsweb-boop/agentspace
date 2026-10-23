@@ -78,8 +78,10 @@ export type AgencyOptions = {
   auto_numbering: boolean;
   /** Prefiks numeru oferty: SP → SP/2026/001. */
   offer_prefix: string;
-  /** Kolor biura na ofertówce (hex). Ustawia CEO w Ofertówce. */
+  /** Kolor biura na dokumentach (hex): ofertówka, oferta współpracy, kalkulatory. */
   offer_color?: string;
+  /** Teksty ogólnego wzoru oferty współpracy (lib/oferta-wzor.ts). */
+  oferta_wzor?: unknown;
   /** Zakres „prawie pasuje" w kojarzeniu ofert z poszukiwaniami (w %). */
   match_price_minus: number;
   match_price_plus: number;

@@ -133,6 +133,7 @@ export async function getAgencySettings(
       auto_numbering: op.auto_numbering ?? defaults.auto_numbering,
       offer_prefix: (op.offer_prefix ?? "").trim() || defaults.offer_prefix,
       offer_color: poprawnyKolor(op.offer_color),
+      oferta_wzor: op.oferta_wzor ?? null,
       match_price_minus: num(op.match_price_minus, 10, 0, 100),
       match_price_plus: num(op.match_price_plus, 10, 0, 100),
       match_area_minus: num(op.match_area_minus, 10, 0, 100),
