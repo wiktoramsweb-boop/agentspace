@@ -53,7 +53,9 @@ export async function POST(req: Request) {
       ? await admin.from("portal_listings").select("id, agency_id").eq("advert_uuid", uuid).maybeSingle()
       : { data: null };
     const blad = opisBledu(p);
-    const kod = p.data?.code || (blad ? "blad" : null);
+    // Błąd lokalizacji przychodzi obok udanej publikacji: ogłoszenie wisi, tylko bez dzielnicy.
+    const tylkoLokalizacja = /location_error/i.test(p.event_type ?? "");
+    const kod = tylkoLokalizacja ? null : p.data?.code || (blad ? "blad" : null);
 
     await admin.from("portal_events").insert({
       portal: "otodom",
@@ -73,7 +75,7 @@ export async function POST(req: Request) {
         .update({
           ...(kod ? { status: kod } : {}),
           ...(p.data?.url ? { url: p.data.url } : {}),
-          last_error: blad,
+          last_error: tylkoLokalizacja ? `Ogłoszenie wisi, ale Otodom nie przyjął lokalizacji: ${blad ?? ""}` : blad,
           updated_at: new Date().toISOString(),
         })
         .eq("id", wpis.id);

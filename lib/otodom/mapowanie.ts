@@ -291,8 +291,9 @@ export function budujOgloszenie(o: OfertaDoEksportu, kontakt: Kontakt, lok: Loka
       lat: o.lat,
       lon: o.lng,
       exact: lok.exact,
-      // Otodom chce najniższy znany poziom: dzielnicę, a gdy jej nie znamy, miasto.
-      custom_fields: { ...(lok.districtId ? { district_id: lok.districtId } : { city_id: lok.cityId }), ...(ulica ? { street_name: ulica } : {}) },
+      // OLX wymaga city_id zawsze, gdy idzie street_name (mail od integracji). Dzielnicę
+      // dokładamy, gdy ją znamy; zły numer nie blokuje ogłoszenia, wraca tylko advert_location_error.
+      custom_fields: { city_id: lok.cityId, ...(lok.districtId ? { district_id: lok.districtId } : {}), ...(ulica ? { street_name: ulica } : {}) },
     },
     images: zdjecia.slice(0, 40),
     attributes: attrs,

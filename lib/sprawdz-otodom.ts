@@ -127,7 +127,7 @@ sprawdz("pusty adres", ulicaZAdresu("") === null);
 sprawdz("adres z numerem na początku (Nominatim)", ulicaZAdresu("23, Sołtysowska, Łęg, Czyżyny, Kraków") === "Sołtysowska");
 sprawdz("adres z podpowiedzi", ulicaZAdresu("Sołtysowska 23, Czyżyny, Kraków") === "Sołtysowska");
 const zDzielnica = budujOgloszenie(oferta, kontakt, { ...lok, districtId: 777 }, taks, { test: false });
-sprawdz("dzielnica zamiast miasta", zDzielnica.ok && (zDzielnica.payload as any).location.custom_fields.district_id === 777 && !(zDzielnica.payload as any).location.custom_fields.city_id);
+sprawdz("dzielnica razem z miastem", zDzielnica.ok && (zDzielnica.payload as any).location.custom_fields.district_id === 777 && Boolean((zDzielnica.payload as any).location.custom_fields.city_id));
 
 if (bledy) {
   console.error(`\nOtodom: ${bledy} błędów.`);

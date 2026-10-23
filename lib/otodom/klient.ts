@@ -217,26 +217,33 @@ export async function idMiasta(agencyId: string, miasto: string): Promise<number
   return id;
 }
 
-type Dzielnica = { id: number; name: string; city_id?: number; city?: { id?: number }; parent_id?: number; parents?: { id?: number }[] };
 const pamiecDzielnic = new Map<string, number | null>();
 
+function znajdzDzielnice(w: unknown, wynik: { id?: number; name?: string }[] = []): { id?: number; name?: string }[] {
+  if (Array.isArray(w)) w.forEach((x) => znajdzDzielnice(x, wynik));
+  else if (w && typeof w === "object") {
+    for (const [k, v] of Object.entries(w)) {
+      if (k === "districts" && Array.isArray(v)) wynik.push(...(v as { id?: number; name?: string }[]));
+      else if (typeof v === "object") znajdzDzielnice(v, wynik);
+    }
+  }
+  return wynik;
+}
+
 /**
- * ID dzielnicy w słowniku Otodom. Szukamy po nazwie i bierzemy tylko trafienie
- * należące do tego miasta: „Śródmieście” jest w co drugim mieście. Gdy nie
- * jesteśmy pewni, zwracamy null i ogłoszenie idzie z samym miastem.
+ * ID dzielnicy w słowniku Otodom. Pytamy o dzielnice konkretnego miasta
+ * (cities?id=..&children=true), bo szukanie po samej nazwie miesza miasta:
+ * „Śródmieście” jest w co drugim. Bez pewnego trafienia zwracamy null.
  */
 export async function idDzielnicy(agencyId: string, cityId: number, nazwa: string): Promise<number | null> {
-  const n = nazwa.trim();
+  const n = nazwa.trim().toLowerCase();
   if (!n) return null;
-  const klucz = `${cityId}|${n.toLowerCase()}`;
+  const klucz = `${cityId}|${n}`;
   if (pamiecDzielnic.has(klucz)) return pamiecDzielnic.get(klucz)!;
-  const q = new URLSearchParams({ search: n, limit: "50" });
-  const d = await wywolaj<{ data?: Dzielnica[] } | Dzielnica[]>(agencyId, "GET", `/locations/v1/urn:site:otodompl/districts?${q}`).catch(() => null);
-  const lista = (Array.isArray(d) ? d : d?.data) ?? [];
-  const wMiescie = (x: Dzielnica) =>
-    x.city_id === cityId || x.city?.id === cityId || x.parent_id === cityId || (x.parents ?? []).some((p) => p.id === cityId);
-  const traf = lista.find((x) => wMiescie(x) && x.name?.toLowerCase() === n.toLowerCase()) ?? lista.find((x) => wMiescie(x));
-  const id = traf?.id ?? null;
+  const q = new URLSearchParams({ id: String(cityId), children: "true", limit: "200" });
+  const d = await wywolaj<unknown>(agencyId, "GET", `/locations/v1/urn:site:otodompl/cities?${q}`).catch(() => null);
+  const traf = znajdzDzielnice(d).find((x) => x.name?.trim().toLowerCase() === n);
+  const id = typeof traf?.id === "number" ? traf.id : null;
   pamiecDzielnic.set(klucz, id);
   return id;
 }
