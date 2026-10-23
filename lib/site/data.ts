@@ -1,3 +1,4 @@
+import { opisNaTekst } from "../opis-html";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { ASSET_BUCKET, publicAssetUrl } from "@/lib/storage";
 import type { DemoAgent, DemoArticle, DemoDeal, DemoKind, DemoOffer } from "@/lib/wzory/data";
@@ -45,8 +46,8 @@ function toOffer(p: Property, ownerName: string | null): DemoOffer {
     lat: p.lat ?? 50.0614,
     lng: p.lng ?? 19.9366,
     photos: photoUrls(p.photos),
-    lead: (p.description ?? "").split(/\n+/)[0]?.slice(0, 180) ?? "",
-    description: (p.description ?? "").split(/\n{2,}/).filter(Boolean),
+    lead: opisNaTekst(p.description).split(/\n+/)[0]?.slice(0, 180) ?? "",
+    description: opisNaTekst(p.description).split(/\n{2,}/).filter(Boolean),
     features: Object.entries(p.features ?? {})
       .filter(([, v]) => v)
       .map(([k]) => k.replace(/_/g, " "))

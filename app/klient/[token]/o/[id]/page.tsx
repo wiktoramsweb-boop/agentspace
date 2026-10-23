@@ -1,3 +1,4 @@
+import { opisNaTekst } from "@/lib/opis-html";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { dostepPoTokenie, ofertaDlaKupujacego } from "@/lib/data-portal";
@@ -69,7 +70,7 @@ export default async function KartaOferty({
         <section className="portal-sekcja">
           <h3>Opis</h3>
           <p style={{ whiteSpace: "pre-wrap", color: "var(--t2)", fontSize: 15, lineHeight: 1.6, margin: 0 }}>
-            {o.description}
+            {opisNaTekst(o.description)}
           </p>
         </section>
       )}

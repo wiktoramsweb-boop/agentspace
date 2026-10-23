@@ -13,13 +13,12 @@ import Link from "next/link";
  * a powrót strzałką przeglądarki wraca tam, gdzie agent był.
  */
 
-export type TabKey = "oferta" | "poszukiwania" | "dzialania" | "ogloszenia" | "portal" | "dokumenty" | "transakcja";
+export type TabKey = "oferta" | "poszukiwania" | "dzialania" | "portal" | "dokumenty" | "transakcja";
 
 export const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: "oferta", label: "Oferta", icon: "dom" },
   { key: "poszukiwania", label: "Poszukiwania", icon: "lupa" },
   { key: "dzialania", label: "Działania", icon: "blyskawica" },
-  { key: "ogloszenia", label: "Ogłoszenia", icon: "globus" },
   { key: "portal", label: "Portal klienta", icon: "telefon" },
   { key: "dokumenty", label: "Dokumenty", icon: "teczka" },
   { key: "transakcja", label: "Karta transakcji", icon: "podpis" },

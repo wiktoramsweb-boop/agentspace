@@ -73,6 +73,53 @@ const domOk = budujOgloszenie({ ...oferta, property_type: "dom", plot_area_m2: 6
 sprawdz("dom: działka, typ, pompa ciepła", domOk.ok && JSON.stringify((domOk.payload as any).attributes).includes("terrain-area-m2") && JSON.stringify((domOk.payload as any).attributes).includes("heat-pump") && JSON.stringify((domOk.payload as any).attributes).includes("detached"));
 sprawdz("najem mieszkania bez rynku obowiązkowego", kategoria({ property_type: "mieszkanie", deal_kind: "wynajem" }) === "apartments-for-rent");
 
+// Oferta zapisana przez kreator: etykiety zamiast kodów i pola w details (jak w zgłoszeniu z 23.10).
+const zKreatora = budujOgloszenie(
+  {
+    ...oferta,
+    market: "Wtórny",
+    ownership: "Pełna własność",
+    building_type: "Blok",
+    condition_std: "Do zamieszkania",
+    heating: "Miejskie",
+    floor: "3",
+    admin_fee_pln: 886,
+    features: {},
+    details: {
+      winda: "Tak",
+      okna: "Plastikowe",
+      material_budynku: "Wielka płyta",
+      balkon_m2: 4,
+      komorka: true,
+      wyposazenie: ["Meble", "Pralka", "Zmywarka", "Lodówka", "Piekarnik", "Telewizor", "Płyta indukcyjna"],
+      media_lokalu: ["Internet"],
+      energia_klasa: "B",
+    },
+  },
+  kontakt,
+  lok,
+  taks,
+  { test: false },
+);
+sprawdz("oferta z kreatora przechodzi", zKreatora.ok, zKreatora.ok ? "" : zKreatora.bledy.join("; "));
+if (zKreatora.ok) {
+  const p = zKreatora.payload as Record<string, any>;
+  const a = new Set((p.attributes as { urn: string; value: string }[]).map((x) => `${x.urn.replace("urn:concept:", "")}=${x.value.replace("urn:concept:", "")}`));
+  for (const oczekiwane of ["building-ownership=full-ownership", "status=ready-to-use", "heating=urban", "building-type=block", "floor=3rd-floor", "extras=lift", "extras=balcony", "extras=basement", "windows-type=plastic", "building-material=concrete-plate", "equipment-types=fridge", "equipment-types=stove", "media-types=internet", "energy-certificate=b", "market=secondary"]) {
+    sprawdz(`kreator: ${oczekiwane}`, a.has(oczekiwane), [...a].join(", "));
+  }
+  sprawdz("kreator: płyta indukcyjna nie dubluje kuchenki", [...a].filter((x) => x === "equipment-types=stove").length === 1);
+  sprawdz("kreator: czynsz administracyjny", p.rent_price?.value === 886);
+}
+const pietra = (f: string | number) => {
+  const r = budujOgloszenie({ ...oferta, floor: f }, kontakt, lok, taks, { test: false });
+  return r.ok ? (r.payload as any).attributes.find((x: any) => x.urn === "urn:concept:floor")?.value : null;
+};
+sprawdz("parter", pietra("Parter") === "urn:concept:ground-floor");
+sprawdz("> 10", pietra("> 10") === "urn:concept:11th-floor-and-above");
+sprawdz("10", pietra("10") === "urn:concept:10th-floor");
+sprawdz("poddasze", pietra("Poddasze") === "urn:concept:garret");
+
 sprawdz("bez krzyku", bezKrzyku("SUPER OKAZJA na Podgórzu") === "Super Okazja na Podgórzu");
 sprawdz("ulica z adresu", ulicaZAdresu("ul. Prądnicka 34/12, Kraków") === "Prądnicka");
 sprawdz("aleja", ulicaZAdresu("al. Pokoju 5") === "Pokoju");

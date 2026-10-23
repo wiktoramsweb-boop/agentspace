@@ -1,3 +1,4 @@
+import { opisNaTekst } from "./opis-html";
 import { createSupabaseAdmin } from "./supabase/admin";
 import { CLIENT_TYPE_LABELS } from "./types";
 import { ETAPY_LEJKA } from "./priorytety";
@@ -62,7 +63,7 @@ export async function kontekstAsystenta(user: Osoba, sciezka: string): Promise<s
       p.area_m2 ? `Metraż: ${p.area_m2} m².` : null,
       p.rooms ? `Pokoje: ${p.rooms}.` : null,
       p.floor != null ? `Piętro: ${p.floor}.` : null,
-      p.description ? `Opis: ${String(p.description).slice(0, 1500)}` : null,
+      p.description ? `Opis: ${opisNaTekst(p.description).slice(0, 1500)}` : null,
     ]
       .filter(Boolean)
       .join("\n");

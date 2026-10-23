@@ -1,3 +1,4 @@
+import { opisNaTekst } from "../opis-html";
 import { createSupabaseAdmin } from "../supabase/admin";
 
 /**
@@ -52,7 +53,7 @@ export async function migawkaOferty(agencyId: string, propertyId: string): Promi
     pietro: n(p.floor),
     rok: n(p.year_built),
     czynszAdm: n(p.admin_fee_pln),
-    opis: String(p.description ?? "").replace(/\s+/g, " ").trim().slice(0, 900),
+    opis: opisNaTekst(p.description).replace(/\s+/g, " ").trim().slice(0, 900),
   };
 }
 

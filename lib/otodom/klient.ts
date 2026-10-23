@@ -134,7 +134,7 @@ async function waznyToken(agencyId: string): Promise<string> {
     .eq("agency_id", agencyId)
     .eq("portal", PORTAL)
     .maybeSingle();
-  if (!data?.refresh_token_enc || data.revoked_at) throw new BladOtodom("Biuro nie jest połączone z Otodom. Połącz konto w Ustawieniach → Portale.", 0);
+  if (!data?.refresh_token_enc || data.revoked_at) throw new BladOtodom("Biuro nie jest połączone z Otodom. Połącz konto w Ustawieniach → Portale ogłoszeniowe.", 0);
   if (data.access_token_enc && data.expires_at && new Date(data.expires_at as string).getTime() > Date.now()) {
     return odszyfruj(data.access_token_enc as string);
   }

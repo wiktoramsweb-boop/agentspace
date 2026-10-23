@@ -17,7 +17,7 @@ export type OfertaDoEksportu = {
   area_m2: number | null;
   plot_area_m2?: number | null;
   rooms: number | null;
-  floor: number | null;
+  floor: number | string | null;
   floors_total?: number | null;
   year_built?: number | null;
   market?: string | null;
@@ -32,6 +32,10 @@ export type OfertaDoEksportu = {
   address: string | null;
   export_address_mode?: string | null;
   photos?: { url: string; export?: boolean; plan?: boolean }[] | null;
+  admin_fee_pln?: number | null;
+  deposit_pln?: number | null;
+  energy_cert_status?: string | null;
+  details?: Record<string, unknown> | null;
 };
 
 export type Kontakt = { name: string; email: string; phone?: string | null };
@@ -55,29 +59,76 @@ export function kategoria(o: Pick<OfertaDoEksportu, "property_type" | "deal_kind
   return (o.deal_kind === "wynajem" ? k?.wynajem : k?.sprzedaz) ?? null;
 }
 
-const BUDYNEK: Record<string, string> = {
-  blok: "block",
-  apartamentowiec: "apartment",
-  kamienica: "tenement",
-  wolnostojacy: "detached",
-  blizniak: "semi-detached",
-  szeregowy: "ribbon",
-};
-const STAN: Record<string, string> = {
-  do_wprowadzenia: "ready-to-use",
-  do_odswiezenia: "ready-to-use",
-  do_remontu: "in-renovation",
-  deweloperski: "to-complete",
-  w_budowie: "to-complete",
-};
-const WLASNOSC: Record<string, string> = { wlasnosc: "full-ownership", spoldzielcze: "limited-ownership", udzial: "shared", uzytkowanie: "usufruct" };
-const OGRZEWANIE: Record<string, string> = { miejskie: "urban", gazowe: "gas", elektryczne: "electrical", kominek: "tiled-stove", pompa: "other", inne: "other" };
-const OGRZEWANIE_DOM: Record<string, string> = { miejskie: "urban", gazowe: "gas", elektryczne: "electric", kominek: "fireplace", pompa: "heat-pump" };
-const DODATKI: Record<string, string> = { winda: "lift", balkon: "balcony", taras: "terrace", ogrodek: "garden", klimatyzacja: "air-conditioning", piwnica: "basement", garaz: "garage" };
-const BEZPIECZENSTWO: Record<string, string> = { alarm: "alarm", monitoring: "monitoring" };
-const WYPOSAZENIE: Record<string, string> = { meble: "furniture", zmywarka: "dishwasher", pralka: "washing-machine" };
+// Kreator zapisuje wartości pól wyboru jako etykiety („Pełna własność”,
+// „Miejskie”), a starsze oferty jako krótkie kody („wlasnosc”). Słowniki
+// przyjmują jedno i drugie: klucz to tekst po normalizacji (małe litery, bez ogonków).
+const norm = (v: unknown) =>
+  String(v ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ł/g, "l")
+    .replace(/[^a-z0-9+]+/g, " ")
+    .trim();
+const slownik = (pary: Record<string, string>) => Object.fromEntries(Object.entries(pary).map(([k, v]) => [norm(k), v]));
+const z = (s: Record<string, string>, v: unknown): string | undefined => s[norm(v)];
 
-function pietro(p: number): string {
+const BUDYNEK = slownik({
+  blok: "block", "niski blok (do 4 pieter)": "block", "wysoki blok": "block", kamienica: "tenement", apartamentowiec: "apartment",
+  plomba: "infill", szeregowiec: "ribbon", szeregowy: "ribbon", loft: "loft", "dom wolnostojacy": "house", "dom wielolokalowy": "house", "willa miejska": "house",
+});
+const TYP_DOMU = slownik({
+  wolnostojacy: "detached", blizniak: "semi-detached", "blizniak polowa": "semi-detached", "szeregowy skrajny": "ribbon", "szeregowy srodkowy": "ribbon",
+  segment: "ribbon", szeregowy: "ribbon", willa: "residence", rezydencja: "residence", dworek: "residence", kamienica: "tenement", gospodarstwo: "farm",
+});
+const STAN = slownik({
+  "do zamieszkania": "ready-to-use", "wysoki standard": "ready-to-use", "po remoncie": "ready-to-use", "pod klucz": "ready-to-use", "do odswiezenia": "ready-to-use",
+  do_wprowadzenia: "ready-to-use", do_odswiezenia: "ready-to-use", "do wykonczenia": "to-complete", "stan deweloperski": "to-complete", deweloperski: "to-complete",
+  "w budowie": "to-complete", w_budowie: "to-complete", "do remontu": "in-renovation", do_remontu: "in-renovation",
+});
+const WLASNOSC = slownik({
+  "pelna wlasnosc": "full-ownership", "wlasnosc z udzialem w gruncie": "full-ownership", wlasnosc: "full-ownership",
+  "spoldzielcze wl prawo do lokalu": "limited-ownership", "spoldzielcze wlasnosciowe z kw": "limited-ownership", "spoldzielcze lokatorskie": "limited-ownership", spoldzielcze: "limited-ownership",
+  "uzytkowanie wieczyste dzierzawa": "usufruct", uzytkowanie: "usufruct", udzial: "shared",
+});
+const OGRZEWANIE = slownik({
+  miejskie: "urban", gazowe: "gas", "gazowe kondensacyjne": "gas", "piece kaflowe": "tiled-stove", elektryczne: "electrical", kotlownia: "boiler-room",
+  inne: "other", "pompa ciepla": "other", "pompa ciepla powietrzna": "other", "pompa ciepla gruntowa": "other", pompa: "other", kominek: "tiled-stove",
+  "kominek z rozprowadzeniem": "other", "kociol na pellet": "other", "kociol na wegiel": "boiler-room", olejowe: "other", podlogowe: "other",
+});
+const OGRZEWANIE_DOM = slownik({
+  miejskie: "urban", gazowe: "gas", "gazowe kondensacyjne": "gas", elektryczne: "electric", "pompa ciepla": "heat-pump", "pompa ciepla powietrzna": "heat-pump",
+  "pompa ciepla gruntowa": "geothermal", pompa: "heat-pump", "kominek z rozprowadzeniem": "fireplace", kominek: "fireplace", "kociol na pellet": "biomass",
+  "kociol na wegiel": "coal", olejowe: "oil", "piece kaflowe": "stove",
+});
+const MATERIAL = slownik({
+  cegla: "brick", drewno: "wood", pustak: "breeze-block", keramzyt: "hydroton", "wielka plyta": "concrete-plate", beton: "concrete", silikat: "silicate",
+  "beton komorkowy": "cellular-concrete", zelbet: "reinforced-concrete", inne: "other", kamien: "other", prefabrykat: "concrete-plate", "szkielet drewniany": "wood",
+});
+const OKNA = slownik({ plastikowe: "plastic", drewniane: "wooden", aluminiowe: "aluminium", "drewno aluminium": "wooden" });
+const MEDIA = slownik({ internet: "internet", "telewizja kablowa": "cable-tv", telefon: "phone" });
+const WYPOSAZENIE = slownik({
+  meble: "furniture", pralka: "washing-machine", zmywarka: "dishwasher", lodowka: "fridge", kuchenka: "stove", "plyta indukcyjna": "stove", "plyta gazowa": "stove",
+  piekarnik: "oven", telewizor: "tv",
+});
+const ZABEZPIECZENIA = slownik({
+  "drzwi antywlamaniowe": "anti-burglary-door", "rolety antywlamaniowe": "roller-shutters", "system alarmowy": "alarm", monitoring: "monitoring",
+  domofon: "entryphone", wideofon: "entryphone", "teren ogrodzony": "closed-area", "osiedle zamkniete": "closed-area",
+});
+const KLASA = slownik({ "a+": "a-plus", a: "a", b: "b", c: "c", d: "d", e: "e", f: "f", g: "g" });
+// Stare flagi z kolumny features (kafelki udogodnień).
+const FLAGI_DODATKI: Record<string, string> = { winda: "lift", balkon: "balcony", taras: "terrace", ogrodek: "garden", klimatyzacja: "air-conditioning", piwnica: "basement", garaz: "garage" };
+const FLAGI_ZABEZPIECZENIA: Record<string, string> = { alarm: "alarm", monitoring: "monitoring" };
+const FLAGI_WYPOSAZENIE: Record<string, string> = { meble: "furniture", zmywarka: "dishwasher", pralka: "washing-machine" };
+
+function pietro(v: number | string): string | null {
+  if (String(v).includes(">")) return "11th-floor-and-above";
+  const t = norm(v);
+  if (t === "suterena") return "cellar";
+  if (t === "parter") return "ground-floor";
+  if (t === "poddasze") return "garret";
+  const p = typeof v === "number" ? v : Number(t);
+  if (!Number.isFinite(p)) return null;
   if (p < 0) return "cellar";
   if (p === 0) return "ground-floor";
   if (p >= 11) return "11th-floor-and-above";
@@ -122,9 +173,13 @@ export function budujOgloszenie(o: OfertaDoEksportu, kontakt: Kontakt, lok: Loka
   if (tytul.length > 70) tytul = tytul.slice(0, 70).replace(/\s+\S*$/, "").trim();
   if (tytul.length < 5) bledy.push("Tytuł ogłoszenia musi mieć co najmniej 5 znaków.");
 
-  const opisZrodlo = (o.description ?? "").replace(EMOJI, "").trim();
-  const opis = opcje.test ? OPIS_TESTOWY : opisZrodlo.replace(/\r?\n/g, "<br/>");
-  if (!opcje.test && opisZrodlo.length < 50) bledy.push("Opis musi mieć co najmniej 50 znaków.");
+  // Opis z edytora jest już HTML-em (akapity, pogrubienia, listy) i taki idzie na Otodom.
+  // Stary opis to zwykły tekst: zamieniamy złamania linii na <br/>.
+  const zrodlo = (o.description ?? "").replace(EMOJI, "").trim();
+  const html = /<\/?(p|br|strong|em|u|ul|ol|li)\b/i.test(zrodlo);
+  const opisTekst = html ? zrodlo.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : zrodlo;
+  const opis = opcje.test ? OPIS_TESTOWY : html ? zrodlo : zrodlo.replace(/\r?\n/g, "<br/>");
+  if (!opcje.test && opisTekst.length < 50) bledy.push("Opis musi mieć co najmniej 50 znaków.");
 
   if (!o.price_pln || o.price_pln <= 0) bledy.push("Uzupełnij cenę.");
   if (o.lat == null || o.lng == null) bledy.push("Brak położenia na mapie: wybierz adres z podpowiedzi w karcie oferty.");
@@ -158,24 +213,65 @@ export function budujOgloszenie(o: OfertaDoEksportu, kontakt: Kontakt, lok: Loka
     else dodaj("number-of-rooms", o.rooms > 10 ? "more" : String(o.rooms));
   }
   // Rynek jest obowiązkowy przy sprzedaży. Brak w ofercie = wtórny, jak domyślnie w API.
-  const rynek = o.market === "pierwotny" ? "primary" : "secondary";
+  const rynek = norm(o.market) === "pierwotny" ? "primary" : "secondary";
   dodaj("market", rynek);
 
-  if (o.floor != null && ma("floor")) dodaj("floor", pietro(o.floor));
+  const det = o.details ?? {};
+  const lista = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : []);
+  const liczba = (v: unknown) => Number(String(v ?? "").replace(",", ".")) || 0;
+
+  if (o.floor != null && o.floor !== "" && ma("floor")) dodaj("floor", pietro(o.floor));
   if (o.floors_total) dodaj("building-floors", String(o.floors_total));
   if (o.year_built && o.year_built > 1700 && o.year_built < 2100) dodaj("construction-year", String(o.year_built));
-  if (o.building_type) dodaj("building-type", BUDYNEK[o.building_type]);
-  if (o.condition_std) dodaj("status", STAN[o.condition_std]);
-  if (o.ownership) dodaj("building-ownership", WLASNOSC[o.ownership]);
+  if (kat?.startsWith("houses")) dodaj("building-type", z(TYP_DOMU, det.typ_domu) ?? z(TYP_DOMU, o.building_type));
+  else dodaj("building-type", z(BUDYNEK, o.building_type));
+  dodaj("status", z(STAN, o.condition_std));
+  dodaj("building-ownership", z(WLASNOSC, o.ownership));
   if (o.heating) {
-    dodaj("heating", OGRZEWANIE[o.heating]);
-    dodaj("heating-types", OGRZEWANIE_DOM[o.heating]);
+    dodaj("heating", z(OGRZEWANIE, o.heating));
+    dodaj("heating-types", z(OGRZEWANIE_DOM, o.heating));
   }
+  dodaj("building-material", z(MATERIAL, det.material_budynku ?? det.material_scian));
+  dodaj("windows-type", z(OKNA, det.okna));
   if (o.available_from && /^\d{4}-\d{2}-\d{2}/.test(o.available_from)) dodaj("free-from", o.available_from.slice(0, 10));
+  if (/zwolnion/i.test(o.energy_cert_status ?? "")) dodaj("energy-certificate", "exempt");
+  else dodaj("energy-certificate", z(KLASA, det.energia_klasa));
+
+  // Wiele wartości: zbieramy do zbiorów, żeby ta sama wartość nie poszła dwa razy.
+  const extras = new Set<string>();
+  const security = new Set<string>();
+  const equipment = new Set<string>();
+  const media = new Set<string>();
   const f = o.features ?? {};
-  for (const [k, v] of Object.entries(DODATKI)) if (f[k]) dodaj("extras", v);
-  for (const [k, v] of Object.entries(BEZPIECZENSTWO)) if (f[k]) dodaj("security", v);
-  for (const [k, v] of Object.entries(WYPOSAZENIE)) if (f[k]) dodaj("equipment-types", v);
+  for (const [k, v] of Object.entries(FLAGI_DODATKI)) if (f[k]) extras.add(v);
+  for (const [k, v] of Object.entries(FLAGI_ZABEZPIECZENIA)) if (f[k]) security.add(v);
+  for (const [k, v] of Object.entries(FLAGI_WYPOSAZENIE)) if (f[k]) equipment.add(v);
+  if (/tak|dwie/i.test(String(det.winda ?? ""))) extras.add("lift");
+  if (liczba(det.balkon_m2) > 0 || liczba(det.balkony) > 0) extras.add("balcony");
+  if (liczba(det.taras_m2) > 0) extras.add("terrace");
+  if (liczba(det.ogrodek_m2) > 0) extras.add("garden");
+  if (liczba(det.piwnica_m2) > 0 || det.komorka === true) extras.add("basement");
+  if (norm(det.kuchnia) === "osobna") extras.add("separate-kitchen");
+  if (det.parking_rodzaj && norm(det.parking_rodzaj) !== "brak") extras.add("garage");
+  if (det.klimatyzacja_dom === true) extras.add("air-conditioning");
+  for (const w of lista(det.wyposazenie)) {
+    const v = z(WYPOSAZENIE, w);
+    if (v) equipment.add(v);
+  }
+  for (const w of lista(det.bezpieczenstwo)) {
+    const v = z(ZABEZPIECZENIA, w);
+    if (v) security.add(v);
+  }
+  if (norm(det.drzwi_wejsciowe) === "antywlamaniowe") security.add("anti-burglary-door");
+  if (det.rolety === true) security.add("roller-shutters");
+  for (const w of lista(det.media_lokalu)) {
+    const v = z(MEDIA, w);
+    if (v) media.add(v);
+  }
+  extras.forEach((v) => dodaj("extras", v));
+  security.forEach((v) => dodaj("security", v));
+  equipment.forEach((v) => dodaj("equipment-types", v));
+  media.forEach((v) => dodaj("media-types", v));
 
   if (bledy.length) return { ok: false, bledy };
 
@@ -186,6 +282,9 @@ export function budujOgloszenie(o: OfertaDoEksportu, kontakt: Kontakt, lok: Loka
     title: tytul,
     description: opis,
     price: { value: Math.round(o.price_pln!), currency: "PLN" },
+    // Czynsz administracyjny przy sprzedaży, kaucja przy najmie (pola Otodom spoza taksonomii).
+    ...(o.deal_kind !== "wynajem" && o.admin_fee_pln ? { rent_price: { value: Math.round(o.admin_fee_pln), currency: "PLN" } } : {}),
+    ...(o.deal_kind === "wynajem" && o.deposit_pln ? { deposit_price: { value: Math.round(o.deposit_pln), currency: "PLN" } } : {}),
     location: {
       lat: o.lat,
       lon: o.lng,

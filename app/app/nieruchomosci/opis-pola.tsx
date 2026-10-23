@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EdytorOpisu } from "./edytor-opisu";
 
 /**
  * Opis oferty po polsku i po angielsku.
@@ -17,26 +18,11 @@ export function OpisPola({
   opis?: string | null;
   opisEn?: string | null;
 }) {
-  const [pl, setPl] = useState(opis ?? "");
   const [en, setEn] = useState(opisEn ?? "");
 
   return (
     <>
-      <div>
-        <div className="mb-1.5 flex items-center justify-between gap-2">
-          <label className="text-sm text-slate-500">Opis oferty</label>
-          <Licznik ile={pl.length} limit={8500} />
-        </div>
-        <textarea
-          name="description"
-          rows={10}
-          maxLength={8500}
-          value={pl}
-          onChange={(e) => setPl(e.target.value)}
-          placeholder="Rozkładowe, po remoncie, balkon, blisko tramwaju..."
-          className={inp}
-        />
-      </div>
+      <EdytorOpisu name="description" wartosc={opis} placeholder="Rozkładowe, po remoncie, balkon, blisko tramwaju..." />
 
       <div>
         <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">

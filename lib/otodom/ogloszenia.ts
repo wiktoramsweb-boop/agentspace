@@ -74,7 +74,7 @@ export async function publikujNaOtodom(agencyId: string, userId: string, propert
   const admin = createSupabaseAdmin();
   const pol = await stanPolaczenia(agencyId);
   if (!pol.tabele) return { ok: false, bledy: ["Brak tabel eksportu w bazie. Uruchom lib/SETUP-v50-portale.sql w Supabase."] };
-  if (!pol.polaczone) return { ok: false, bledy: ["Biuro nie jest połączone z Otodom. Połącz konto w Ustawieniach → Portale."] };
+  if (!pol.polaczone) return { ok: false, bledy: ["Biuro nie jest połączone z Otodom. Połącz konto w Ustawieniach → Portale ogłoszeniowe."] };
 
   const { data: o } = await admin.from("properties").select("*").eq("id", propertyId).eq("agency_id", agencyId).maybeSingle();
   if (!o) return { ok: false, bledy: ["Nie znaleziono oferty."] };

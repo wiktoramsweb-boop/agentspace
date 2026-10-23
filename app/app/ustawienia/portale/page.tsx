@@ -8,7 +8,7 @@ import { polaczOtodom, rozlaczOtodom, ustawTrybTestowy } from "./actions";
 export const metadata = { title: "Portale ogłoszeniowe" };
 
 const KOMUNIKATY: Record<string, { ok: boolean; t: string }> = {
-  polaczono: { ok: true, t: "Konto Otodom połączone. Oferty opublikujesz z karty nieruchomości, zakładka Ogłoszenia." },
+  polaczono: { ok: true, t: "Konto Otodom połączone. Oferty publikujesz w kreatorze oferty, w ostatnim kroku Publikacja." },
   anulowano: { ok: false, t: "Połączenie anulowane na Otodom." },
   "zly-stan": { ok: false, t: "Link autoryzacji wygasł albo był niepoprawny. Kliknij Połącz jeszcze raz." },
   blad: { ok: false, t: "Otodom nie wydał dostępu. Spróbuj jeszcze raz za chwilę." },
@@ -85,7 +85,7 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
       <section className="rounded-3xl border border-slate-200 bg-white">
         <h2 className="border-b border-slate-100 px-5 py-4 font-semibold text-slate-900">Oferty na Otodom ({wpisy?.length ?? 0})</h2>
         {!wpisy?.length ? (
-          <p className="px-5 py-6 text-sm text-slate-500">Żadna oferta nie jest jeszcze wysłana. Otwórz nieruchomość i wybierz zakładkę Ogłoszenia.</p>
+          <p className="px-5 py-6 text-sm text-slate-500">Żadna oferta nie jest jeszcze wysłana. Otwórz ofertę, kliknij Edytuj i w ostatnim kroku Publikacja zaznacz Otodom.</p>
         ) : (
           <ul className="divide-y divide-slate-100">
             {wpisy.map((w) => {
@@ -93,7 +93,7 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
               const tytul = (w.property as unknown as { title?: string } | null)?.title ?? "Oferta";
               return (
                 <li key={w.property_id as string} className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
-                  <Link href={`/app/nieruchomosci/${w.property_id}?z=ogloszenia`} className="min-w-0 flex-1 truncate font-medium text-slate-900 hover:text-emerald-700">
+                  <Link href={`/app/nieruchomosci/${w.property_id}`} className="min-w-0 flex-1 truncate font-medium text-slate-900 hover:text-emerald-700">
                     {tytul}
                   </Link>
                   <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${s.kolor}`}>{s.label}</span>

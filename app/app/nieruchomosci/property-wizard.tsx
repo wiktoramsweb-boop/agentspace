@@ -49,6 +49,7 @@ export function PropertyWizard({
   offerPrefix = "SP",
   canEditSettings = false,
   property,
+  otodom,
 }: {
   clients: ClientLite[];
   photoConfig: PhotoConfig;
@@ -56,6 +57,8 @@ export function PropertyWizard({
   canEditSettings?: boolean;
   /** Podana oferta = tryb edycji. */
   property?: Property;
+  /** Eksport na Otodom: połączenie biura i stan ogłoszenia tej oferty. */
+  otodom?: { polaczone: boolean; tabele: boolean; ceo: boolean; status: string | null; url: string | null; exact: boolean };
 }) {
   const editing = !!property;
   const router = useRouter();
@@ -131,6 +134,13 @@ export function PropertyWizard({
             const res = await updateProperty(p.id, fd);
             if (!res.ok) {
               setSaveError(res.error);
+              return;
+            }
+            // Oferta zapisana, ale portal odmówił: zostajemy na kroku Publikacja z listą braków.
+            if (res.portal && !res.portal.ok) {
+              setSaveError(`Zmiany zapisane, ale Otodom nie przyjął ogłoszenia: ${res.portal.teksty.join(" · ")}`);
+              setStep(5);
+              router.refresh();
               return;
             }
             setOpen(false);
@@ -299,15 +309,6 @@ export function PropertyWizard({
 
           {/* ── KROK 6: publikacja ────────────────────────────────── */}
           <div hidden={step !== 5} className="space-y-4">
-            <div className="rounded-2xl border border-amber-500/30 bg-amber-50 p-4 text-sm text-amber-800">
-              <p className="font-semibold">Eksport jeszcze nie wysyła ofert na zewnątrz.</p>
-              <p className="mt-1">
-                Strona biura działa dziś na zewnętrznej wtyczce, a portale wymagają osobnych
-                umów. Oznaczenia poniżej zbieramy już teraz, żeby po podłączeniu oferty poszły
-                bez uzupełniania danych od nowa.
-              </p>
-            </div>
-
             <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-300 p-4 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
               <input
                 type="checkbox"
@@ -318,28 +319,12 @@ export function PropertyWizard({
                 className="mt-0.5 h-4 w-4 accent-emerald-500"
               />
               <span>
-                <span className="font-medium text-slate-900">Eksport na stronę</span>
-                <span className="block text-sm text-slate-500">
-                  Oferta trafi na stronę biura, gdy podłączymy AgentSpace do witryny.
-                </span>
+                <span className="font-medium text-slate-900">Strona biura</span>
+                <span className="block text-sm text-slate-500">Oferta pokaże się na stronie www biura z AgentSpace.</span>
               </span>
             </label>
 
-            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-300 p-4 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
-              <input
-                type="checkbox"
-                name="export_to_portals"
-                value="1"
-                defaultChecked={!!p?.export_to_portals}
-                className="mt-0.5 h-4 w-4 accent-emerald-500"
-              />
-              <span>
-                <span className="font-medium text-slate-900">Eksport na portale</span>
-                <span className="block text-sm text-slate-500">
-                  Otodom, OLX i podobne. Wymaga umowy z portalem, na razie tylko oznaczenie.
-                </span>
-              </span>
-            </label>
+            <EksportOtodom otodom={otodom} />
 
             <p className="text-xs text-slate-400">
               {editing
@@ -487,6 +472,85 @@ function Select({
         defaultValue={value ?? (empty ? "" : options[0]?.value ?? "")}
         placeholder={empty ? "nie podano" : ""}
       />
+    </div>
+  );
+}
+
+const STATUS_OTODOM: Record<string, string> = {
+  wysylanie: "wysyłamy…",
+  active: "aktywne",
+  new: "czeka na publikację",
+  outdated: "nieaktywne",
+  inactive: "nieaktywne",
+  removed_by_user: "zdjęte",
+  moderated: "zatrzymane przez moderację",
+  blocked: "czeka na weryfikację",
+  unpaid: "brak opłaconego pakietu",
+  blad: "błąd publikacji",
+  usuniete: "usunięte",
+};
+
+/**
+ * Eksport na Otodom w kroku Publikacja. Zaznaczenie publikuje albo aktualizuje
+ * ogłoszenie przy zapisie oferty, odznaczenie aktywnego ogłoszenia je dezaktywuje.
+ */
+function EksportOtodom({ otodom }: { otodom?: { polaczone: boolean; tabele: boolean; ceo: boolean; status: string | null; url: string | null; exact: boolean } }) {
+  const aktywne = ["active", "new", "wysylanie"].includes(otodom?.status ?? "");
+  const [wlaczone, setWlaczone] = useState(aktywne);
+  const [exact, setExact] = useState(otodom?.exact ?? false);
+
+  if (!otodom?.tabele || !otodom.polaczone) {
+    return (
+      <div className="rounded-2xl border border-slate-200 p-4">
+        <p className="font-medium text-slate-900">Otodom</p>
+        <p className="mt-1 text-sm text-slate-500">
+          Biuro nie jest jeszcze połączone z Otodom.{" "}
+          {otodom?.ceo ? (
+            <a href="/app/ustawienia/portale" className="font-semibold text-emerald-700 hover:underline">
+              Połącz w Ustawieniach → Portale
+            </a>
+          ) : (
+            "Poproś CEO o połączenie konta w Ustawieniach."
+          )}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`rounded-2xl border p-4 ${wlaczone ? "border-emerald-500 bg-emerald-50" : "border-slate-300"}`}>
+      <input type="hidden" name="otodom_pole" value="1" />
+      <input type="hidden" name="export_to_portals" value={wlaczone ? "1" : ""} />
+      <label className="flex cursor-pointer items-start gap-3">
+        <input type="checkbox" name="export_otodom" value="1" checked={wlaczone} onChange={(e) => setWlaczone(e.target.checked)} className="mt-0.5 h-4 w-4 accent-emerald-500" />
+        <span className="min-w-0 flex-1">
+          <span className="font-medium text-slate-900">Publikuj na Otodom</span>
+          <span className="block text-sm text-slate-500">
+            {aktywne
+              ? "Przy zapisie zaktualizujemy ogłoszenie. Odznacz, żeby je dezaktywować."
+              : "Przy zapisie wyślemy ofertę na konto biura na Otodom. Kontakt w ogłoszeniu to agent prowadzący."}
+          </span>
+          {otodom.status && (
+            <span className="mt-1 block text-xs text-slate-600">
+              Teraz: <b>{STATUS_OTODOM[otodom.status] ?? otodom.status}</b>
+              {otodom.url && (
+                <>
+                  {" · "}
+                  <a href={otodom.url} target="_blank" rel="noreferrer" className="font-semibold text-emerald-700 hover:underline">
+                    zobacz na Otodom ↗
+                  </a>
+                </>
+              )}
+            </span>
+          )}
+        </span>
+      </label>
+      {wlaczone && (
+        <label className="mt-3 flex items-center gap-2 pl-7 text-sm text-slate-700">
+          <input type="checkbox" name="otodom_exact" value="1" checked={exact} onChange={(e) => setExact(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
+          Pokaż dokładną lokalizację na mapie
+        </label>
+      )}
     </div>
   );
 }

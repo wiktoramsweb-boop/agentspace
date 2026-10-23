@@ -1,3 +1,4 @@
+import { stanPolaczenia } from "@/lib/otodom/klient";
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireUser, requireModul } from "@/lib/auth";
 import { queryProperties } from "@/lib/data-lists";
@@ -69,6 +70,8 @@ async function mapData(agencyId: string) {
 
 export default async function NieruchomosciPage({ searchParams }: Props) {
   const user = await requireModul("nieruchomosci");
+  const polOtodom = await stanPolaczenia(user.agency_id ?? "");
+  const otodom = { polaczone: polOtodom.polaczone, tabele: polOtodom.tabele, ceo: user.role === "owner", status: null, url: null, exact: false };
   const agencyId = user.agency_id;
   const sp = await searchParams;
   const query = parseListQuery(sp, { sort: "nowe", dateField: "zmiana" });
@@ -92,6 +95,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
               photoConfig={photoConfigFrom(settings)}
               offerPrefix={settings.options.offer_prefix}
               canEditSettings={user.role === "owner"}
+              otodom={otodom}
             />
           }
         />
@@ -125,6 +129,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
             photoConfig={photoConfigFrom(settings)}
             offerPrefix={settings.options.offer_prefix}
             canEditSettings={user.role === "owner"}
+            otodom={otodom}
           />
         }
       />

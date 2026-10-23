@@ -1,3 +1,4 @@
+import { opisNaHtml } from "@/lib/opis-html";
 import { maskPhone } from "@/lib/format";
 import { mozeUsunac, ukryjKontakt } from "@/lib/uprawnienia";
 import Link from "next/link";
@@ -153,6 +154,8 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
     ),
   );
 
+  const [otodomPol, otodomOgl] = await Promise.all([stanPolaczenia(user.agency_id ?? ""), ogloszenieOferty(property.id)]);
+
   const liczniki = {
     poszukiwania: interested.length,
     dzialania: activities.length,
@@ -201,6 +204,14 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             clients={allClients}
             photoConfig={photoConfigFrom(settings)}
             canEditSettings={user.role === "owner"}
+            otodom={{
+              polaczone: otodomPol.polaczone,
+              tabele: otodomPol.tabele,
+              ceo: user.role === "owner",
+              status: otodomOgl?.status ?? null,
+              url: otodomOgl?.url ?? null,
+              exact: otodomOgl?.exact_location ?? false,
+            }}
           />
         </div>
       </div>
@@ -211,6 +222,20 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
       </div>
 
       <PropertyTabs propertyId={property.id} active={tab} liczniki={liczniki} />
+
+      {tab === "oferta" && otodomOgl && otodomOgl.status && (
+        <div className="mb-6">
+          <OgloszeniaTab
+            propertyId={property.id}
+            polaczone={otodomPol.polaczone}
+            tabele={otodomPol.tabele}
+            test={otodomPol.test}
+            ogloszenie={otodomOgl}
+            statusy={STATUSY}
+            ceo={user.role === "owner"}
+          />
+        </div>
+      )}
 
       {tab === "oferta" && (
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
@@ -253,7 +278,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             {property.description && (
               <Card>
                 <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">Opis</h2>
-                <p className="whitespace-pre-wrap text-sm text-slate-700">{property.description}</p>
+                <div className="opis-tresc text-sm leading-relaxed text-slate-700" dangerouslySetInnerHTML={{ __html: opisNaHtml(property.description) }} />
               </Card>
             )}
 
@@ -354,21 +379,6 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
       )}
 
       {tab === "dzialania" && <ActivitiesTab activities={activities} dodaj={dodajDzialanie} />}
-
-      {tab === "ogloszenia" && (await (async () => {
-        const [pol, ogl] = await Promise.all([stanPolaczenia(user.agency_id!), ogloszenieOferty(property.id)]);
-        return (
-          <OgloszeniaTab
-            propertyId={property.id}
-            polaczone={pol.polaczone}
-            tabele={pol.tabele}
-            test={pol.test}
-            ogloszenie={ogl}
-            statusy={STATUSY}
-            ceo={user.role === "owner"}
-          />
-        );
-      })())}
 
       {tab === "portal" && (
         <PortalTab

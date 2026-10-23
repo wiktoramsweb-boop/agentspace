@@ -1,5 +1,6 @@
 "use server";
 
+import { opisDoZapisu } from "@/lib/opis-html";
 import { idZBiura } from "@/lib/agency-ids";
 import { mozeUsunac } from "@/lib/uprawnienia";
 import { revalidatePath } from "next/cache";
@@ -56,7 +57,8 @@ function propertyFromForm(formData: FormData) {
     rooms: intOrNull(formData.get("rooms")),
     floor: pietroOrNull(formData.get("floor")),
     // 8500 znaków to limit, który przyjmują portale.
-    description: String(formData.get("description") ?? "").trim().slice(0, 8500) || null,
+    // Opis z edytora to HTML; czyścimy go tu drugi raz, bo formularz można wysłać z pominięciem edytora.
+    description: opisDoZapisu(String(formData.get("description") ?? "").slice(0, 60000)).slice(0, 20000) || null,
     owner_client_id: String(formData.get("owner_client_id") ?? "") || null,
   };
 }
@@ -179,7 +181,30 @@ function buildSlug(f: ReturnType<typeof propertyFromForm>, offerNo: string | nul
 }
 
 /** Wynik zapisu. Kreator zamyka się tylko przy powodzeniu. */
-export type SaveResult = { ok: true } | { ok: false; error: string };
+export type SaveResult = { ok: true; portal?: { ok: boolean; teksty: string[] } } | { ok: false; error: string };
+
+/**
+ * Eksport na portale przy zapisie oferty (krok Publikacja w kreatorze).
+ * Zaznaczone = publikuj albo zaktualizuj, odznaczone przy aktywnym ogłoszeniu
+ * = dezaktywuj. Pole `otodom_pole` mówi, że kreator pokazał tę opcję: bez niego
+ * (biuro niepołączone) niczego nie ruszamy.
+ */
+async function eksportPortali(user: { id: string; agency_id: string | null; role: string }, id: string, formData: FormData): Promise<{ ok: boolean; teksty: string[] } | undefined> {
+  if (formData.get("otodom_pole") !== "1" || !user.agency_id) return undefined;
+  const { publikujNaOtodom, zmienStanOtodom, ogloszenieOferty } = await import("@/lib/otodom/ogloszenia");
+  const chce = formData.get("export_otodom") === "1";
+  const obecne = await ogloszenieOferty(id);
+  if (chce) {
+    const r = await publikujNaOtodom(user.agency_id, user.id, id, formData.get("otodom_exact") === "1");
+    if (r.ok) await zapiszZdarzenie({ agencyId: user.agency_id, actorId: user.id, akcja: "portal_publikacja", rodzaj: "oferta", id, opis: "Wysłano na Otodom z kreatora oferty", meta: { portal: "otodom" } });
+    return r.ok ? { ok: true, teksty: [r.komunikat] } : { ok: false, teksty: r.bledy };
+  }
+  if (obecne?.advert_uuid && ["active", "new", "wysylanie"].includes(obecne.status ?? "")) {
+    const r = await zmienStanOtodom(user.agency_id, user.id, id, "deactivate");
+    return r.ok ? { ok: true, teksty: [r.komunikat] } : { ok: false, teksty: r.bledy };
+  }
+  return undefined;
+}
 
 /**
  * Świadectwo energetyczne (kolumny z v23). Zapisujemy je osobnym, opcjonalnym
@@ -297,6 +322,8 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
   await saveDetails(admin, data.id, user.agency_id, formData, fields.property_type, fields.deal_kind);
 
   const nowaId = data.id as string;
+  // Wynik eksportu nowej oferty widać na jej karcie (status i ewentualne braki).
+  await eksportPortali(user, nowaId, formData);
   after(() => poNowejOfercie(user, nowaId));
   revalidatePath("/app/nieruchomosci");
   redirect(`/app/nieruchomosci/${nowaId}`);
@@ -392,9 +419,11 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
     );
   }
 
+  const portal = await eksportPortali(user, id, formData);
+
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");
-  return { ok: true };
+  return { ok: true, portal };
 }
 
 export async function setPropertyStatus(
