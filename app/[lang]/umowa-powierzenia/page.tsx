@@ -18,7 +18,7 @@ import { pageMetadata } from "@/lib/i18n/metadata";
  * kolejnego dostawcy, który dotyka danych biur, dopisz go TUTAJ.
  */
 
-const UPDATED = "29 września 2026";
+const UPDATED = "23 października 2026";
 
 const SUBPROCESSORS = [
   {
@@ -124,6 +124,39 @@ export default async function UmowaPowierzenia({
               Usługi.
             </p>
             <p>
+              <strong>Rozdzielenie od działalności pośrednictwa.</strong> Operator prowadzi
+              także własne biuro nieruchomości. Dlatego Strony ustalają, że:
+            </p>
+            <ol>
+              <li>
+                pracownicy i współpracownicy biura nieruchomości Operatora nie mają dostępu do
+                Konta Administratora ani do danych w nim przetwarzanych, a konto biura
+                Operatora w Usłudze jest takim samym, odrębnym kontem jak konto każdego innego
+                Klienta,
+              </li>
+              <li>
+                Operator nie wykorzystuje danych Administratora, w szczególności danych
+                klientów, ofert, cen, prowizji, leadów i wyników pracy agentów, do własnej
+                działalności pośrednictwa, do kontaktu z klientami Administratora ani do
+                pozyskiwania jego ofert lub pracowników,
+              </li>
+              <li>
+                dostęp techniczny do Konta Administratora mają wyłącznie wyznaczone osoby
+                odpowiedzialne za utrzymanie Usługi, związane pisemnym zobowiązaniem do
+                poufności, i korzystają z niego tylko w zakresie niezbędnym do usunięcia
+                awarii, obsługi zgłoszenia Administratora lub wykonania obowiązku prawnego,
+              </li>
+              <li>
+                każde takie wejście jest rejestrowane wraz z datą i celem, a Operator
+                udostępnia ten rejestr Administratorowi na jego żądanie, w terminie 7 dni,
+              </li>
+              <li>
+                za każde naruszenie zobowiązań z pkt 1 lub 2 Operator zapłaci Administratorowi
+                karę umowną w wysokości 20 000 zł. Kara nie wyłącza prawa do odszkodowania
+                przewyższającego jej wysokość.
+              </li>
+            </ol>
+            <p>
               Przetwarzanie trwa przez czas obowiązywania Umowy głównej oraz przez okres
               wskazany w §7.
             </p>
@@ -196,7 +229,8 @@ export default async function UmowaPowierzenia({
               <li>regularne kopie zapasowe wraz z weryfikacją możliwości odtworzenia,</li>
               <li>
                 ograniczenie dostępu administracyjnego do danych produkcyjnych do osób,
-                którym jest on niezbędny.
+                którym jest on niezbędny, z rejestrem każdego wejścia do Konta biura
+                (zob. §2).
               </li>
             </ul>
 

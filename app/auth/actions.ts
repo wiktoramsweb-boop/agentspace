@@ -9,14 +9,15 @@ import { escapeHtml } from "@/lib/html";
 import { zapiszBlad } from "@/lib/blad";
 import { WERSJA_POWIERZENIA } from "@/lib/powierzenie";
 import { oprawaMaila } from "@/lib/mail";
+import { saveAgencySettings } from "@/lib/agency-settings";
 
 export type AuthResult = { error: string } | undefined;
 
 /**
  * Mail do operatora o nowym biurze.
  *
- * Rejestracja jest na kod, ale kod nie mówi, kto i kiedy go użył. Bez tego
- * maila pierwszą informacją o nowym koncie byłoby zużycie AI na rachunku.
+ * Rejestracja jest otwarta, więc bez tego maila pierwszą informacją
+ * o nowym koncie byłoby zużycie AI na rachunku.
  * Błąd wysyłki nie przerywa rejestracji - konto już istnieje.
  */
 async function powiadomONowymBiurze(dane: {
@@ -71,19 +72,9 @@ export async function signUpOwner(
   // Boty wypełniają ukryte pole. Udajemy błąd ogólny, żeby nie podpowiadać.
   if (String(formData.get("website") ?? "")) return { error: "Nie udało się utworzyć konta. Spróbuj ponownie." };
 
-  // Rejestracja na zaproszenie.
-  //
-  // Każde założone biuro dostaje pulę AI na koszt operatora, więc konto nie
-  // może powstawać bez jego wiedzy. Kod ustawiamy w zmiennej SIGNUP_CODE i
-  // podajemy biuru przy rozmowie. Bez ustawionej zmiennej rejestracja jest
-  // otwarta - tak zostaje w środowisku lokalnym i testowym.
-  const wymaganyKod = process.env.SIGNUP_CODE;
-  if (wymaganyKod) {
-    const podany = String(formData.get("inviteCode") ?? "").trim();
-    if (podany.toLowerCase() !== wymaganyKod.toLowerCase()) {
-      return { error: "Niepoprawny kod zaproszenia. Dostaniesz go od nas przy rozmowie." };
-    }
-  }
+  // Rejestracja jest otwarta. Kod zaproszenia odstraszał biura, które nie
+  // wiedziały, skąd go wziąć. Koszt AI trzyma w ryzach mała pula okresu
+  // próbnego (KREDYTY_NA_AGENTA.trial) i limit kont z jednego adresu niżej.
 
   // Każde konto dostaje AI na koszt operatora, więc ograniczamy zakładanie
   // biur z jednego adresu (np. bot w pętli).
@@ -167,6 +158,16 @@ export async function signUpOwner(
     return { error: "Nie udało się dokończyć rejestracji. Spróbuj ponownie." };
   }
 
+  // Dane z rejestru (NIP/KRS w formularzu) od razu do ustawień firmy, żeby
+  // ofertówka i faktury nie startowały z pustymi polami.
+  const nip = String(formData.get("nip") ?? "").replace(/\D/g, "").slice(0, 10);
+  if (nip) {
+    const pole = (k: string) => String(formData.get(k) ?? "").trim().slice(0, 120) || undefined;
+    await saveAgencySettings(agency.id, {
+      company: { name: agencyName, nip, street: pole("ulica"), postal_code: pole("kod"), city: pole("miasto"), country: "Polska", email, phone: phone || undefined },
+    });
+  }
+
   // 4. Powiadom operatora. Bez tego nowe biuro powstaje bez jego wiedzy,
   //    a to on płaci za zużycie AI i on wystawia fakturę.
   await powiadomONowymBiurze({ agencyName, fullName, email, phone });
@@ -176,7 +177,7 @@ export async function signUpOwner(
   const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
   if (signInErr) return { error: "Konto utworzone, ale logowanie nie powiodło się. Zaloguj się ręcznie." };
 
-  redirect("/app");
+  redirect("/witaj");
 }
 
 /**

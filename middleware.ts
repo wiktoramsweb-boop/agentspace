@@ -4,7 +4,7 @@ import { isOwnHost, slugForDomain } from "@/lib/site/domains";
 import { MARKETING_EXACT, MARKETING_SEGMENTS, toPolishPath } from "@/lib/i18n/config";
 import { DEMO_EMAIL, KOMUNIKAT_DEMO, demoMozeZapisac, emailZCiasteczek } from "@/lib/demo/tryb";
 
-const AUTH_PATHS = ["/app", "/login", "/signup"];
+const AUTH_PATHS = ["/app", "/login", "/signup", "/witaj"];
 
 /**
  * Adres widoczny w pasku -> ścieżka pliku strony.

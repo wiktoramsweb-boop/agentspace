@@ -23,6 +23,8 @@ export default async function OfertowkaPage() {
           agency: settings.company.name ?? user.agency?.name ?? "Biuro nieruchomości",
           logoUrl: settings.logoUrl,
         }}
+        kolorBiura={settings.options.offer_color ?? "#059669"}
+        mozeZmienicKolor={user.role === "owner"}
       />
     </>
   );

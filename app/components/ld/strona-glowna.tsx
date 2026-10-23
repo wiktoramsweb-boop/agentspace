@@ -287,9 +287,10 @@ export function StronaGlowna({ lang }: { lang: string }) {
                   {t.hero.cta}
                   <Ikona nazwa="strzalka" />
                 </Link>
-                <a className="ld-btn ld-btn--duch ld-btn--duzy" href={`${href("/demo")}#wejdz`}>
-                  {t.hero.cta2}
-                </a>
+                {/* Od razu do aplikacji demo, bez przystanku na stronie /demo. */}
+                <form action="/wejdz-demo" method="post" className="contents">
+                  <button className="ld-btn ld-btn--duch ld-btn--duzy">{t.hero.cta2}</button>
+                </form>
               </div>
               <p className="lx-hero__drobne ld-wjedz" style={{ transitionDelay: "0.6s" }}>
                 {t.hero.podCta}

@@ -35,8 +35,15 @@ export default async function BiuroOperatora({ params }: { params: Promise<{ id:
             Założone {data(b.created_at as string)} · {s.dostep.aktywne ? (s.dostep.probny ? "okres próbny" : "aktywny dostęp") : "dostęp wygasł"} · pakiet {(b.subscription_plan as string) ?? (b.plan as string) ?? "-"}
           </p>
         </div>
-        <form action={wejdzJako}>
+        <form action={wejdzJako} className="flex flex-wrap items-center gap-2">
           <input type="hidden" name="biuro" value={id} />
+          <select name="cel" required defaultValue="" className={pole} aria-label="Cel wejścia">
+            <option value="" disabled>Cel wejścia...</option>
+            <option value="zgloszenie">Zgłoszenie biura</option>
+            <option value="awaria">Awaria</option>
+            <option value="konfiguracja">Konfiguracja na prośbę biura</option>
+            <option value="prawo">Obowiązek prawny</option>
+          </select>
           <button className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-emerald-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-400">
             Wejdź do aplikacji jako CEO →
           </button>
@@ -63,9 +70,16 @@ export default async function BiuroOperatora({ params }: { params: Promise<{ id:
                   <p className="text-xs text-zinc-500">{o.email} · od {data(o.od).slice(0, 10)}</p>
                 </div>
                 <span className="text-xs text-zinc-400">{o.ostatnio ? `AI: ${data(o.ostatnio)}` : "brak AI w tym mies."} · {o.kredyty} kr.</span>
-                <form action={wejdzJako}>
+                <form action={wejdzJako} className="flex items-center gap-2">
                   <input type="hidden" name="biuro" value={id} />
                   <input type="hidden" name="osoba" value={o.id} />
+                  <select name="cel" required defaultValue="" className="rounded-lg border border-white/10 bg-zinc-900 px-2 py-1.5 text-xs text-white" aria-label="Cel wejścia">
+                    <option value="" disabled>cel...</option>
+                    <option value="zgloszenie">zgłoszenie</option>
+                    <option value="awaria">awaria</option>
+                    <option value="konfiguracja">konfiguracja</option>
+                    <option value="prawo">obowiązek prawny</option>
+                  </select>
                   <button className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-zinc-200 hover:border-emerald-400 hover:text-white">Wejdź jako</button>
                 </form>
               </li>
@@ -155,8 +169,19 @@ export default async function BiuroOperatora({ params }: { params: Promise<{ id:
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm">
             <h2 className="font-semibold text-white">Ustawienia biura</h2>
-            <p className="mt-1 text-zinc-400">Zapisane sekcje: {s.ustawienia.length ? s.ustawienia.join(", ") : "brak"}. Kolory ofertówki, dane firmy, stronę www i Dyżur AI zmienisz po wejściu do aplikacji (Ustawienia).</p>
-            <p className="mt-3 text-xs text-zinc-500">Twoje wejścia do tego biura: {s.wejscia.length ? s.wejscia.map((w) => data(w.kiedy)).join(", ") : "brak"}. Biuro ich nie widzi.</p>
+            <p className="mt-1 text-zinc-400">Zapisane sekcje: {s.ustawienia.length ? s.ustawienia.join(", ") : "brak"}. Kolor ofertówki zmienisz w Ofertówce, dane firmy, stronę www i Dyżur AI w Ustawieniach, po wejściu do aplikacji jako CEO.</p>
+            <div className="mt-3 text-xs text-zinc-500">
+              <p>Rejestr wejść (biuro może go zażądać, umowa powierzenia §2):</p>
+              {s.wejscia.length ? (
+                <ul className="mt-1 space-y-0.5">
+                  {s.wejscia.map((w, i) => (
+                    <li key={i}>{data(w.kiedy)} · {w.cel}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>brak wejść</p>
+              )}
+            </div>
           </div>
         </section>
       </div>

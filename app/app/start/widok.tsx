@@ -34,6 +34,16 @@ export function PrzewodnikWidok({ p, czyCeo }: { p: Przewodnik; czyCeo: boolean 
         }
       />
 
+      <Link
+        href="/witaj"
+        className="mb-6 flex items-center justify-between gap-3 rounded-2xl bg-emerald-50 px-5 py-4 text-sm text-emerald-900 ring-1 ring-emerald-600/20 transition hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-200"
+      >
+        <span>
+          <b>Pierwszy raz?</b> Samouczek pokaże cały system na jednej sprawie, w 2 minuty.
+        </span>
+        <span className="shrink-0 font-semibold">Obejrzyj →</span>
+      </Link>
+
       <div className="mb-8 flex flex-wrap items-center gap-4">
         <div className="h-2 min-w-[12rem] flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
           <div

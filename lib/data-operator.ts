@@ -150,6 +150,14 @@ export async function zamowieniaDoRozliczenia(): Promise<ZamowienieOperatora[]> 
 
 /* ───────────── Szczegóły biura i zdrowie systemu (panel operatora) ───────────── */
 
+/** Cel wejścia do konta biura. Rejestr z celami biuro może dostać na żądanie (umowa powierzenia, §2). */
+export const CELE_WEJSCIA: Record<string, string> = {
+  zgloszenie: "obsługa zgłoszenia biura",
+  awaria: "usunięcie awarii",
+  konfiguracja: "konfiguracja na prośbę biura",
+  prawo: "obowiązek prawny",
+};
+
 export type OsobaBiura = { id: string; imie: string; email: string | null; rola: string; od: string; ostatnio: string | null; kredyty: number };
 
 export type SzczegolyBiura = {
@@ -161,7 +169,7 @@ export type SzczegolyBiura = {
   zdarzenia: { kiedy: string; co: string; kto: string | null }[];
   zamowienia: { id: string; opis: string; status: string; kiedy: string; kwota: number }[];
   ustawienia: string[];
-  wejscia: { kiedy: string }[];
+  wejscia: { kiedy: string; cel: string }[];
 };
 
 /** Liczba wierszy tabeli dla biura. GET z limitem 1, bo HEAD na brakującej tabeli nie zwraca błędu. */
@@ -186,7 +194,7 @@ export async function szczegolyBiura(id: string): Promise<SzczegolyBiura | null>
     admin.from("audit_log").select("created_at, summary, actor_id").eq("agency_id", id).order("created_at", { ascending: false }).limit(15),
     admin.from("subscription_orders").select("id, kind, plan, period, credits, amount_grosz, status, created_at").eq("agency_id", id).order("created_at", { ascending: false }).limit(10),
     admin.from("agency_settings").select("options").eq("agency_id", id).maybeSingle(),
-    admin.from("rate_events").select("created_at").eq("key", `operator:wejscie:${id}`).order("created_at", { ascending: false }).limit(10),
+    admin.from("rate_events").select("created_at, key").like("key", `operator:wejscie:${id}%`).order("created_at", { ascending: false }).limit(50),
     Promise.all(
       [
         ["Klienci", "clients"],
@@ -238,7 +246,10 @@ export async function szczegolyBiura(id: string): Promise<SzczegolyBiura | null>
       kwota: Number(z.amount_grosz ?? 0) / 100,
     })),
     ustawienia: Object.keys((ust?.options as Record<string, unknown> | null) ?? {}),
-    wejscia: (wejscia ?? []).map((w) => ({ kiedy: w.created_at as string })),
+    wejscia: (wejscia ?? []).map((w) => ({
+      kiedy: w.created_at as string,
+      cel: CELE_WEJSCIA[String(w.key).split(":")[3] ?? ""] ?? "bez podanego celu",
+    })),
   };
 }
 

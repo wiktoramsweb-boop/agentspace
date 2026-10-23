@@ -10,7 +10,7 @@
  * mechanizm i dlatego wersja jest datą, a nie numerem: od razu widać,
  * czego dotyczy.
  */
-export const WERSJA_POWIERZENIA = "2026-10";
+export const WERSJA_POWIERZENIA = "2026-10-23";
 
 export type StanPowierzenia = {
   zaakceptowana: boolean;

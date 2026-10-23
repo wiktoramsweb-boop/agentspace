@@ -78,6 +78,8 @@ export type AgencyOptions = {
   auto_numbering: boolean;
   /** Prefiks numeru oferty: SP → SP/2026/001. */
   offer_prefix: string;
+  /** Kolor biura na ofertówce (hex). Ustawia CEO w Ofertówce. */
+  offer_color?: string;
   /** Zakres „prawie pasuje" w kojarzeniu ofert z poszukiwaniami (w %). */
   match_price_minus: number;
   match_price_plus: number;
@@ -107,6 +109,12 @@ export type PhotoConfig = {
   watermark: { url: string; opacity: number; scale: number; position: MarkPosition } | null;
   stamp: { url: string; scale: number; position: MarkPosition } | null;
 };
+
+export const KOLOR_OFERTOWKI = "#059669";
+
+export function poprawnyKolor(v: unknown): string {
+  return typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : KOLOR_OFERTOWKI;
+}
 
 export const DEFAULT_WATERMARK: WatermarkConfig = {
   path: null,

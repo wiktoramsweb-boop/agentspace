@@ -2,7 +2,8 @@
 
 import { Monogram } from "../components/monogram";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { zapiszKolorOfertowki } from "./actions";
 import { Select as SelectBox } from "@/app/app/components/select";
 
 type Agent = { name: string; email: string; phone?: string; agency: string; logoUrl?: string | null };
@@ -87,7 +88,13 @@ function paramDisplay(value: string, suffix?: string): string {
   return v + suffix;
 }
 
-export function OfferBuilder({ agent }: { agent: Agent }) {
+const KOLORY = ["#059669", "#1e3a8a", "#881337", "#1f2937", "#9a5b2b", "#0e7490"];
+
+export function OfferBuilder({ agent, kolorBiura, mozeZmienicKolor }: { agent: Agent; kolorBiura: string; mozeZmienicKolor: boolean }) {
+  const [kolor, setKolor] = useState(kolorBiura);
+  const [zapisany, setZapisany] = useState(kolorBiura);
+  const [zapisuje, startZapisu] = useTransition();
+  const [kolorBlad, setKolorBlad] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [location, setLocation] = useState("");
@@ -126,7 +133,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
   const priceShown = price.trim() ? (/zł|pln/i.test(price) ? price.trim() : `${price.trim()} zł`) : "";
 
   const sheetEl = (
-    <div className="print-sheet sheet-a4 mx-auto w-full max-w-[820px] rounded-2xl border-t-4 border-emerald-500 bg-white p-8 text-zinc-900 shadow-xl md:p-10">
+    <div style={{ borderTopColor: kolor }} className="print-sheet sheet-a4 mx-auto w-full max-w-[820px] rounded-2xl border-t-4 bg-white p-8 text-zinc-900 shadow-xl md:p-10">
       <div className="mb-4 flex items-center justify-between gap-4 border-b border-zinc-200 pb-4">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -137,7 +144,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
         )}
           <p className="text-sm font-semibold">{agent.agency}</p>
         </div>
-        <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">Oferta</span>
+        <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: kolor }}>Oferta</span>
       </div>
 
       {hero ? (
@@ -167,14 +174,14 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
             </p>
           )}
         </div>
-        {price && <p className="whitespace-nowrap text-2xl font-bold text-emerald-700">{priceShown}</p>}
+        {price && <p className="whitespace-nowrap text-2xl font-bold" style={{ color: kolor }}>{priceShown}</p>}
       </div>
 
       {filledParams.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
           {filledParams.map((p) => (
             <div key={p.key} className="flex items-center gap-2.5 rounded-lg bg-zinc-50 px-3 py-2">
-              <Icon name={p.icon} className="h-5 w-5 flex-shrink-0 text-emerald-600" />
+              <span className="flex-shrink-0" style={{ color: kolor }}><Icon name={p.icon} className="h-5 w-5" /></span>
               <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wide text-slate-500">{p.label}</p>
                 <p className="truncate text-sm font-semibold text-zinc-900">
@@ -197,7 +204,7 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
           <p className="font-semibold text-zinc-900">{agent.name}</p>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-slate-400">
             {agent.phone && (
-              <span className="flex items-center gap-1.5 font-medium text-emerald-700">
+              <span className="flex items-center gap-1.5 font-medium" style={{ color: kolor }}>
                 <Icon name="phone" className="h-4 w-4" /> {agent.phone}
               </span>
             )}
@@ -236,6 +243,48 @@ export function OfferBuilder({ agent }: { agent: Agent }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
       <div className="print-hide space-y-5">
+        <Section title="Kolor biura">
+          <div className="flex flex-wrap items-center gap-2.5">
+            {KOLORY.map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setKolor(k)}
+                aria-label={`Kolor ${k}`}
+                className={`h-9 w-9 rounded-full ring-offset-2 transition hover:scale-110 ${kolor === k ? "ring-2 ring-slate-400" : ""}`}
+                style={{ background: k }}
+              />
+            ))}
+            <label className="relative h-9 w-9 cursor-pointer overflow-hidden rounded-full border border-dashed border-slate-300 text-center text-lg leading-9 text-slate-400" title="Własny kolor">
+              +
+              <input type="color" value={kolor} onChange={(e) => setKolor(e.target.value)} className="absolute inset-0 cursor-pointer opacity-0" />
+            </label>
+          </div>
+          {mozeZmienicKolor ? (
+            kolor !== zapisany && (
+              <button
+                type="button"
+                disabled={zapisuje}
+                onClick={() =>
+                  startZapisu(async () => {
+                    const r = await zapiszKolorOfertowki(kolor);
+                    if (r.ok) {
+                      setZapisany(kolor);
+                      setKolorBlad(null);
+                    } else setKolorBlad(r.blad ?? "Nie udało się zapisać.");
+                  })
+                }
+                className="mt-3 text-sm font-semibold text-emerald-700 hover:text-emerald-600 disabled:opacity-50"
+              >
+                {zapisuje ? "Zapisuję..." : "Zapisz jako kolor biura dla wszystkich"}
+              </button>
+            )
+          ) : (
+            <p className="mt-2 text-xs text-slate-500">Kolor biura ustawia CEO. Tu możesz go zmienić tylko dla tej oferty.</p>
+          )}
+          {kolorBlad && <p className="mt-2 text-xs text-rose-600">{kolorBlad}</p>}
+        </Section>
+
         <Section title="Zdjęcia (3-8)">
           <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-slate-300 py-4 text-sm text-slate-500 transition hover:border-emerald-500 hover:text-emerald-600">
             + Dodaj zdjęcia z komputera

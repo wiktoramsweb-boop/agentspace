@@ -2,6 +2,7 @@ import { createSupabaseAdmin } from "./supabase/admin";
 import { publicAssetUrl } from "./storage";
 import {
   MARK_POSITIONS,
+  poprawnyKolor,
   PHOTO_SIZES,
   DEFAULT_WATERMARK,
   DEFAULT_STAMP,
@@ -131,6 +132,7 @@ export async function getAgencySettings(
       report_default: op.report_default ?? defaults.report_default,
       auto_numbering: op.auto_numbering ?? defaults.auto_numbering,
       offer_prefix: (op.offer_prefix ?? "").trim() || defaults.offer_prefix,
+      offer_color: poprawnyKolor(op.offer_color),
       match_price_minus: num(op.match_price_minus, 10, 0, 100),
       match_price_plus: num(op.match_price_plus, 10, 0, 100),
       match_area_minus: num(op.match_area_minus, 10, 0, 100),

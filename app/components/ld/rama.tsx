@@ -29,6 +29,7 @@ function teksty(lang: "pl" | "en") {
     wszystkie: en ? "All modules" : "Wszystkie moduły",
     login: en ? "Log in" : "Zaloguj się",
     cta: en ? "Try it free" : "Wypróbuj za darmo",
+    demo: en ? "Live demo" : "Zobacz demo",
     menu: en ? "Open menu" : "Otwórz menu",
     zamknij: en ? "Close menu" : "Zamknij menu",
     kolumny: [
@@ -151,6 +152,9 @@ export function LdNav({ lang = "pl" }: { lang?: string }) {
           ))}
         </nav>
         <div className="ld-nav__akcje">
+          <form action="/wejdz-demo" method="post" className="contents">
+            <button className="ld-nav__login ld-nav__demo">{t.demo}</button>
+          </form>
           <Link className="ld-nav__login" href="/login">
             {t.login}
           </Link>
@@ -178,6 +182,9 @@ export function LdNav({ lang = "pl" }: { lang?: string }) {
           <Link className="ld-btn ld-btn--duzy" href="/signup">
             {t.cta}
           </Link>
+          <form action="/wejdz-demo" method="post" className="contents">
+            <button className="ld-btn ld-btn--duch ld-btn--duzy">{t.demo}</button>
+          </form>
           <Link className="ld-btn ld-btn--duch ld-btn--duzy" href="/login">
             {t.login}
           </Link>

@@ -153,7 +153,9 @@ export async function wejdzJako(formData: FormData): Promise<void> {
   await wymagajOperatora();
   const id = uuid(formData.get("biuro"));
   const osoba = uuid(formData.get("osoba"));
-  if (!id) return;
+  const cel = String(formData.get("cel") ?? "");
+  // Bez celu nie wchodzimy: rejestr wejść to nasz dowód wobec biura (umowa powierzenia, §2).
+  if (!id || !["zgloszenie", "awaria", "konfiguracja", "prawo"].includes(cel)) return;
   const { createSupabaseAdmin } = await import("@/lib/supabase/admin");
   const { createSupabaseServerClient } = await import("@/lib/supabase/server");
   const admin = createSupabaseAdmin();
@@ -169,7 +171,7 @@ export async function wejdzJako(formData: FormData): Promise<void> {
   const { error: bladSesji } = await supabase.auth.verifyOtp({ type: "magiclink", token_hash: link.properties.hashed_token });
   if (bladSesji) return;
 
-  await admin.from("rate_events").insert({ key: `operator:wejscie:${id}`, agency_id: null, credits: 0 });
+  await admin.from("rate_events").insert({ key: `operator:wejscie:${id}:${cel}`, agency_id: null, credits: 0 });
   (await cookies()).set("as_operator_w", encodeURIComponent(`${b.name ?? "Biuro"}|${p.full_name ?? p.email}`), {
     httpOnly: true,
     sameSite: "lax",

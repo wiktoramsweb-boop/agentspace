@@ -6,13 +6,8 @@ export const metadata = {
   description: "Konto dla biura nieruchomości: pełny dostęp przez okres próbny, bez karty płatniczej.",
 };
 
-/**
- * Pole kodu pokazujemy tylko, gdy operator wymaga zaproszenia (SIGNUP_CODE).
- * Bez zmiennej rejestracja jest otwarta i pole tylko by myliło: wygląda jak
- * przeszkoda, której nie ma.
- */
 export default async function SignupPage({ searchParams }: { searchParams: Promise<{ email?: string }> }) {
   const { email } = await searchParams;
   const czysty = typeof email === "string" && /^[^\s@]{1,64}@[^\s@]{1,190}$/.test(email) ? email : "";
-  return <FormularzRejestracji wymagaKodu={!!process.env.SIGNUP_CODE} email={czysty} dniProbne={DNI_PROBNE} />;
+  return <FormularzRejestracji email={czysty} dniProbne={DNI_PROBNE} />;
 }

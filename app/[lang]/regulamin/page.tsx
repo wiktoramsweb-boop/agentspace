@@ -17,7 +17,7 @@ import { pageMetadata } from "@/lib/i18n/metadata";
  * ceny wymagałaby zmiany regulaminu i powiadamiania klientów.
  */
 
-const UPDATED = "2 października 2026";
+const UPDATED = "23 października 2026";
 
 export async function generateMetadata({
   params,
@@ -375,6 +375,13 @@ export default async function Regulamin({ params }: { params: Promise<{ lang: st
                 Umowa powierzenia przetwarzania danych osobowych
               </Link>
               , stanowiąca integralną część Umowy.
+            </p>
+            <p>
+              Operator prowadzi również biuro nieruchomości. Dane Klienta są oddzielone od tej
+              działalności: biuro Operatora nie ma do nich wglądu, a Operator nie wykorzystuje
+              ich do pośrednictwa ani do kontaktu z klientami Klienta. Dostęp techniczny służy
+              wyłącznie utrzymaniu Usługi i obsłudze zgłoszeń, każde wejście jest rejestrowane,
+              a szczegóły i kary umowne określa §2 Umowy powierzenia.
             </p>
             <p>
               Zasady przetwarzania danych osób odwiedzających serwis oraz danych kontaktowych

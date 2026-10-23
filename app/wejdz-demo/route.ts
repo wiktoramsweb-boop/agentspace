@@ -51,5 +51,5 @@ export async function POST(request: NextRequest) {
   const { error: bladSesji } = await supabase.auth.verifyOtp({ type: "magiclink", token_hash: link.properties.hashed_token });
   if (bladSesji) return wroc("niedostepne");
 
-  return NextResponse.redirect(new URL("/app", request.url), 303);
+  return NextResponse.redirect(new URL("/witaj", request.url), 303);
 }

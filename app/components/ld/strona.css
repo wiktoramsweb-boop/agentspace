@@ -82,6 +82,7 @@ html.ld-blok { overflow: hidden; }
 .ld-nav__akcje { display: flex; align-items: center; gap: 6px; }
 .ld-nav__login { padding: 12px 16px; font-size: 15px; color: #d6dde8; }
 .ld-nav__login:hover { color: #fff; }
+.ld-nav__demo { background: none; border: 0; cursor: pointer; font-family: inherit; color: #6ee7c8; font-weight: 600; }
 .ld-burger { display: none; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--linia-c); background: rgba(255, 255, 255, 0.04); place-items: center; cursor: pointer; }
 .ld-menu { position: fixed; inset: 0; z-index: 55; background: var(--noc-2); padding: 112px var(--pad) 40px; display: flex; flex-direction: column; justify-content: space-between; clip-path: inset(0 0 100% 0); visibility: hidden; transition: clip-path 0.65s var(--ease), visibility 0s 0.65s; }
 .ld-menu.otwarte { clip-path: inset(0); visibility: visible; transition: clip-path 0.65s var(--ease); }
