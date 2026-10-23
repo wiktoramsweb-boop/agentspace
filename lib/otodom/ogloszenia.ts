@@ -1,7 +1,7 @@
 import { createSupabaseAdmin } from "../supabase/admin";
 import { budujOgloszenie, ulicaZAdresu, type OfertaDoEksportu, type Taksonomia } from "./mapowanie";
 import taksonomia from "./taksonomia.json";
-import { BladOtodom, PORTAL, idMiasta, stanPolaczenia, wywolaj } from "./klient";
+import { BladOtodom, PORTAL, idDzielnicy, idMiasta, stanPolaczenia, wywolaj } from "./klient";
 
 export type OgloszenieOtodom = {
   advert_uuid: string | null;
@@ -80,11 +80,14 @@ export async function publikujNaOtodom(agencyId: string, userId: string, propert
   if (!o) return { ok: false, bledy: ["Nie znaleziono oferty."] };
   const { data: agent } = await admin.from("profiles").select("full_name, email, phone").eq("id", o.agent_id ?? userId).maybeSingle();
 
+  const det = (o.details ?? {}) as Record<string, unknown>;
   const cityId = o.city ? await idMiasta(agencyId, String(o.city)).catch(() => null) : null;
+  const districtId = cityId && det.dzielnica ? await idDzielnicy(agencyId, cityId, String(det.dzielnica)).catch(() => null) : null;
+  const ulica = (typeof det.adres_ulica === "string" && det.adres_ulica.trim()) || ulicaZAdresu(o.address as string | null);
   const wynik = budujOgloszenie(
     o as OfertaDoEksportu,
     { name: (agent?.full_name as string) ?? "", email: (agent?.email as string) ?? "", phone: (agent?.phone as string) ?? null },
-    { cityId, ulica: ulicaZAdresu(o.address as string | null), exact },
+    { cityId, districtId, ulica, exact },
     taksonomia as Taksonomia,
     { test: pol.test },
   );

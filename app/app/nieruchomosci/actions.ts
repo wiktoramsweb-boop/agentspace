@@ -129,6 +129,13 @@ function detailsFromForm(formData: FormData, type: PropertyType, dealKind: Prope
   // Opis), ale zapisujemy go razem z resztą pól zależnych od typu.
   const en = String(formData.get("description_en") ?? "").trim();
   if (en) out.opis_en = en.slice(0, 8500);
+  // Rozbicie adresu z podpowiedzi (lib/geocode.ts). Dzielnicę wpisujemy, gdy
+  // agent jej nie podał; ulica i numer osobno są potrzebne portalom.
+  const pole = (k: string) => String(formData.get(k) ?? "").trim().slice(0, 120);
+  if (!out.dzielnica && pole("district")) out.dzielnica = pole("district");
+  if (pole("street_name")) out.adres_ulica = pole("street_name");
+  if (pole("house_number")) out.adres_numer = pole("house_number");
+  if (pole("postcode")) out.adres_kod = pole("postcode");
   return out;
 }
 

@@ -39,7 +39,7 @@ export type OfertaDoEksportu = {
 };
 
 export type Kontakt = { name: string; email: string; phone?: string | null };
-export type Lokalizacja = { cityId: number | null; ulica: string | null; exact: boolean };
+export type Lokalizacja = { cityId: number | null; districtId?: number | null; ulica: string | null; exact: boolean };
 
 export const OPIS_TESTOWY =
   "Czasami musimy dodać takie ogłoszenie, żeby zweryfikować działanie niektórych funkcji systemu. Liczymy na Twoją wyrozumiałość :) Radzimy skorzystać ponownie z naszej wyszukiwarki ofert.<br/><br/> Powodzenia w dalszych poszukiwaniach!";
@@ -145,7 +145,9 @@ const EMOJI = /[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{FE0F}\u{200D}]/gu
 
 /** Ulica bez numeru budynku i lokalu, do location.custom_fields.street_name. */
 export function ulicaZAdresu(adres: string | null | undefined): string | null {
-  const a = String(adres ?? "").split(",")[0].trim();
+  const czesci = String(adres ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+  // Adres z Nominatim zaczyna się od numeru („23, Sołtysowska, Łęg, ...”): wtedy ulica jest druga.
+  const a = czesci[0] && /^\d+[a-z]?(\s*\/\s*\d+[a-z]?)?$/i.test(czesci[0]) ? (czesci[1] ?? "") : (czesci[0] ?? "");
   if (!a) return null;
   const bez = a
     .replace(/^(ul\.|ulica|al\.|aleja|os\.|osiedle|pl\.|plac)\s+/i, "")
@@ -289,7 +291,8 @@ export function budujOgloszenie(o: OfertaDoEksportu, kontakt: Kontakt, lok: Loka
       lat: o.lat,
       lon: o.lng,
       exact: lok.exact,
-      custom_fields: { city_id: lok.cityId, ...(ulica ? { street_name: ulica } : {}) },
+      // Otodom chce najniższy znany poziom: dzielnicę, a gdy jej nie znamy, miasto.
+      custom_fields: { ...(lok.districtId ? { district_id: lok.districtId } : { city_id: lok.cityId }), ...(ulica ? { street_name: ulica } : {}) },
     },
     images: zdjecia.slice(0, 40),
     attributes: attrs,

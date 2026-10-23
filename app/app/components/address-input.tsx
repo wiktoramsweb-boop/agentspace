@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Suggestion = { label: string; city: string | null; street: string | null; lat: number; lng: number };
+type Suggestion = { label: string; city: string | null; street: string | null; streetName?: string | null; number?: string | null; district?: string | null; postcode?: string | null; lat: number; lng: number };
 
 /**
- * Pole adresu z podpowiadaniem (darmowe OSM/Nominatim przez /api/geocode).
- * Zapisuje do formularza pola: address (widoczny tekst), city, street, lat, lng.
+ * Pole adresu z podpowiadaniem w trakcie pisania (lib/geocode.ts przez /api/geocode).
+ * Zapisuje do formularza pola: address (widoczny tekst), city, street, lat, lng,
+ * a po wyborze z listy także street_name, house_number, district i postcode.
  * Można wpisać dowolny tekst (zapisze się jako adres), a wybór z listy
  * dodatkowo ustawia miasto i współrzędne do mapy.
  */
@@ -28,6 +29,8 @@ export function AddressInput({
   const [query, setQuery] = useState(defaultAddress);
   const [city, setCity] = useState(defaultCity);
   const [street, setStreet] = useState("");
+  const [szczegoly, setSzczegoly] = useState({ streetName: "", number: "", district: "", postcode: "" });
+  const [aktywny, setAktywny] = useState(-1);
   const [lat, setLat] = useState(defaultLat);
   const [lng, setLng] = useState(defaultLng);
   const [items, setItems] = useState<Suggestion[]>([]);
@@ -76,6 +79,8 @@ export function AddressInput({
     setQuery(s.label);
     setCity(s.city ?? "");
     setStreet(s.street ?? "");
+    setSzczegoly({ streetName: s.streetName ?? "", number: s.number ?? "", district: s.district ?? "", postcode: s.postcode ?? "" });
+    setAktywny(-1);
     setLat(String(s.lat));
     setLng(String(s.lng));
     setItems([]);
@@ -84,9 +89,10 @@ export function AddressInput({
 
   function onType(v: string) {
     setQuery(v);
-    // Ręczna edycja adresu unieważnia poprzednie współrzędne.
+    // Ręczna edycja adresu unieważnia poprzednie współrzędne i rozbicie adresu.
     setLat("");
     setLng("");
+    setSzczegoly({ streetName: "", number: "", district: "", postcode: "" });
   }
 
   return (
@@ -96,6 +102,19 @@ export function AddressInput({
         value={query}
         onChange={(e) => onType(e.target.value)}
         onFocus={() => items.length > 0 && setOpen(true)}
+        onKeyDown={(e) => {
+          if (!open || !items.length) return;
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setAktywny((a) => Math.min(items.length - 1, a + 1));
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setAktywny((a) => Math.max(0, a - 1));
+          } else if (e.key === "Enter" && aktywny >= 0) {
+            e.preventDefault();
+            pick(items[aktywny]);
+          } else if (e.key === "Escape") setOpen(false);
+        }}
         autoComplete="off"
         placeholder={placeholder}
         className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
@@ -110,9 +129,17 @@ export function AddressInput({
               <button
                 type="button"
                 onClick={() => pick(s)}
-                className="block w-full px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700"
+                onMouseEnter={() => setAktywny(i)}
+                className={`flex w-full items-start gap-2.5 px-3 py-2.5 text-left text-sm transition ${i === aktywny ? "bg-emerald-50 text-emerald-800" : "text-slate-700"}`}
               >
-                {s.label}
+                <svg viewBox="0 0 24 24" className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+                  <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" />
+                  <circle cx="12" cy="9.5" r="2.5" />
+                </svg>
+                <span className="min-w-0">
+                  <span className="block font-medium">{[s.streetName, s.number].filter(Boolean).join(" ") || s.city || s.label}</span>
+                  <span className="block text-xs text-slate-500">{[s.district && s.district !== s.city ? s.district : null, s.city, s.postcode].filter(Boolean).join(" · ")}</span>
+                </span>
               </button>
             </li>
           ))}
@@ -124,6 +151,10 @@ export function AddressInput({
       <input type="hidden" name="street" value={street} />
       <input type="hidden" name="lat" value={lat} />
       <input type="hidden" name="lng" value={lng} />
+      <input type="hidden" name="street_name" value={szczegoly.streetName} />
+      <input type="hidden" name="house_number" value={szczegoly.number} />
+      <input type="hidden" name="district" value={szczegoly.district} />
+      <input type="hidden" name="postcode" value={szczegoly.postcode} />
     </div>
   );
 }

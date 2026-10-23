@@ -216,3 +216,27 @@ export async function idMiasta(agencyId: string, miasto: string): Promise<number
   pamiecMiast.set(klucz, id);
   return id;
 }
+
+type Dzielnica = { id: number; name: string; city_id?: number; city?: { id?: number }; parent_id?: number; parents?: { id?: number }[] };
+const pamiecDzielnic = new Map<string, number | null>();
+
+/**
+ * ID dzielnicy w słowniku Otodom. Szukamy po nazwie i bierzemy tylko trafienie
+ * należące do tego miasta: „Śródmieście” jest w co drugim mieście. Gdy nie
+ * jesteśmy pewni, zwracamy null i ogłoszenie idzie z samym miastem.
+ */
+export async function idDzielnicy(agencyId: string, cityId: number, nazwa: string): Promise<number | null> {
+  const n = nazwa.trim();
+  if (!n) return null;
+  const klucz = `${cityId}|${n.toLowerCase()}`;
+  if (pamiecDzielnic.has(klucz)) return pamiecDzielnic.get(klucz)!;
+  const q = new URLSearchParams({ search: n, limit: "50" });
+  const d = await wywolaj<{ data?: Dzielnica[] } | Dzielnica[]>(agencyId, "GET", `/locations/v1/urn:site:otodompl/districts?${q}`).catch(() => null);
+  const lista = (Array.isArray(d) ? d : d?.data) ?? [];
+  const wMiescie = (x: Dzielnica) =>
+    x.city_id === cityId || x.city?.id === cityId || x.parent_id === cityId || (x.parents ?? []).some((p) => p.id === cityId);
+  const traf = lista.find((x) => wMiescie(x) && x.name?.toLowerCase() === n.toLowerCase()) ?? lista.find((x) => wMiescie(x));
+  const id = traf?.id ?? null;
+  pamiecDzielnic.set(klucz, id);
+  return id;
+}

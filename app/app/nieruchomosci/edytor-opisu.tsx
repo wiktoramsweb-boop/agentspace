@@ -111,6 +111,14 @@ export function EdytorOpisu({ name, wartosc, limit = 8500, placeholder }: { name
           data-placeholder={placeholder}
           onInput={zapamietaj}
           onBlur={zapamietaj}
+          // Safari i część Chrome'ów na macOS nie robią ⌘B w contentEditable same z siebie.
+          onKeyDown={(e) => {
+            if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+            const cmd = ({ b: "bold", i: "italic", u: "underline" } as Record<string, string>)[e.key.toLowerCase()];
+            if (!cmd) return;
+            e.preventDefault();
+            wykonaj(cmd);
+          }}
           onPaste={(e) => {
             e.preventDefault();
             const wklejone = e.clipboardData.getData("text/html");
