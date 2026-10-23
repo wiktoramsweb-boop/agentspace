@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { NAZWA_PROBY, type RodzajProby, type StanProby } from "@/lib/proba";
 
@@ -18,9 +19,9 @@ function Dalej({ demo }: { demo: boolean }) {
       Załóż konto za darmo
     </a>
   ) : (
-    <a href="/app/ustawienia/abonament" className="inline-flex rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500">
+    <Link href="/app/ustawienia/abonament" className="inline-flex rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500">
       Wybierz pakiet
-    </a>
+    </Link>
   );
 }
 

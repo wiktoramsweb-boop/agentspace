@@ -32,7 +32,8 @@
     "test:automatyzacje": "node --experimental-strip-types --no-warnings lib/sprawdz-automatyzacje.mjs",
     "test:koszty": "node --experimental-strip-types --no-warnings lib/sprawdz-koszty.mjs",
     "test:plec": "node --experimental-strip-types --no-warnings lib/sprawdz-plec.mjs",
-    "test:podatki": "node --experimental-strip-types lib/sprawdz-podatki.ts"
+    "test:podatki": "node --experimental-strip-types lib/sprawdz-podatki.ts",
+    "test:wpis": "node --experimental-strip-types lib/sprawdz-wpis.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",
