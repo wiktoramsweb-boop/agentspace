@@ -3,7 +3,7 @@
 import { Monogram } from "../components/monogram";
 
 import { useState, useTransition } from "react";
-import { zapiszKolorOfertowki } from "./actions";
+import { importujOgloszenie, zapiszKolorOfertowki } from "./actions";
 import { Select as SelectBox } from "@/app/app/components/select";
 
 type Agent = { name: string; email: string; phone?: string; agency: string; logoUrl?: string | null };
@@ -100,7 +100,34 @@ export function OfferBuilder({ agent, kolorBiura, mozeZmienicKolor }: { agent: A
   const [location, setLocation] = useState("");
   const [params, setParams] = useState<Record<string, string>>({});
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [opis, setOpis] = useState("");
   const [preview, setPreview] = useState(false);
+  const [link, setLink] = useState("");
+  const [wklejka, setWklejka] = useState("");
+  const [trybTekstu, setTrybTekstu] = useState(false);
+  const [importuje, startImportu] = useTransition();
+  const [importInfo, setImportInfo] = useState<{ ok: boolean; tekst: string } | null>(null);
+
+  function importuj() {
+    setImportInfo(null);
+    startImportu(async () => {
+      const r = await importujOgloszenie(trybTekstu ? { tekst: wklejka } : { link });
+      if (!r.ok) {
+        setImportInfo({ ok: false, tekst: r.blad });
+        if (/wklej/i.test(r.blad)) setTrybTekstu(true);
+        return;
+      }
+      const d = r.dane;
+      if (d.tytul) setTitle(d.tytul);
+      if (d.cena) setPrice(d.cena);
+      if (d.lokalizacja) setLocation(d.lokalizacja);
+      if (d.opis) setOpis(d.opis);
+      setParams((p) => ({ ...p, ...d.parametry }));
+      if (d.zdjecia.length) setPhotos(d.zdjecia.slice(0, MAX_PHOTOS).map((url) => ({ id: crypto.randomUUID(), url })));
+      const ile = Object.keys(d.parametry).length;
+      setImportInfo({ ok: true, tekst: `Uzupełnione: tytuł, cena, ${ile} parametrów${d.zdjecia.length ? `, ${d.zdjecia.length} zdjęć` : ""}${d.opis ? ", opis" : ""}. Sprawdź i popraw, co trzeba.` });
+    });
+  }
 
   function setParam(k: string, v: string) {
     setParams((p) => ({ ...p, [k]: v }));
@@ -193,6 +220,8 @@ export function OfferBuilder({ agent, kolorBiura, mozeZmienicKolor }: { agent: A
         </div>
       )}
 
+      {opis.trim() && <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-700">{opis.trim()}</p>}
+
       <div className="mt-6 flex items-center gap-3 border-t border-zinc-200 pt-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {agent.logoUrl ? (
@@ -243,6 +272,42 @@ export function OfferBuilder({ agent, kolorBiura, mozeZmienicKolor }: { agent: A
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
       <div className="print-hide space-y-5">
+        <Section title="Uzupełnij z ogłoszenia">
+          {trybTekstu ? (
+            <textarea
+              value={wklejka}
+              onChange={(e) => setWklejka(e.target.value)}
+              rows={6}
+              placeholder="Wklej całą treść ogłoszenia: tytuł, cenę, parametry i opis"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
+            />
+          ) : (
+            <input
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), importuj())}
+              inputMode="url"
+              placeholder="https://www.otodom.pl/pl/oferta/..."
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
+            />
+          )}
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <button type="button" onClick={() => setTrybTekstu((v) => !v)} className="text-xs font-medium text-slate-500 hover:text-slate-800">
+              {trybTekstu ? "Mam link do ogłoszenia" : "Nie mam linku, wkleję treść"}
+            </button>
+            <button
+              type="button"
+              onClick={importuj}
+              disabled={importuje || (trybTekstu ? wklejka.trim().length < 40 : !link.trim())}
+              className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-40"
+            >
+              {importuje ? "Pobieram..." : "Uzupełnij dane"}
+            </button>
+          </div>
+          {importInfo && <p className={`mt-2 text-xs ${importInfo.ok ? "text-emerald-700" : "text-rose-600"}`}>{importInfo.tekst}</p>}
+          {!importInfo && <p className="mt-2 text-xs text-slate-500">Otodom, Morizon, Gratka, Nieruchomosci-online, Domiporta. Z OLX wklej treść.</p>}
+        </Section>
+
         <Section title="Kolor biura">
           <div className="flex flex-wrap items-center gap-2.5">
             {KOLORY.map((k) => (
@@ -315,6 +380,10 @@ export function OfferBuilder({ agent, kolorBiura, mozeZmienicKolor }: { agent: A
             <Field label="Cena" value={price} onChange={setPrice} placeholder="799 000 zł" />
             <Field label="Lokalizacja" value={location} onChange={setLocation} placeholder="Miasto, dzielnica" />
           </div>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-slate-500">Opis (krótko, na kartę)</span>
+            <textarea value={opis} onChange={(e) => setOpis(e.target.value.slice(0, 1500))} rows={4} placeholder="Najważniejsze atuty mieszkania" className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none" />
+          </label>
         </Section>
 
         <Section title="Parametry">

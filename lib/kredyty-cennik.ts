@@ -86,7 +86,8 @@ export type Operacja =
   | "czat_strony"
   | "dopasowanie_ai"
   | "asystent_czat"
-  | "dyzur_tura";
+  | "dyzur_tura"
+  | "import_ogloszenia";
 
 export const CENNIK_KREDYTOW: Record<Operacja, number> = {
   coach_tura: 1,
@@ -101,6 +102,7 @@ export const CENNIK_KREDYTOW: Record<Operacja, number> = {
   dopasowanie_ai: 3,
   asystent_czat: 1,
   dyzur_tura: 1,
+  import_ogloszenia: 2,
 };
 
 /** Nazwy po polsku na ekran zużycia. */
@@ -117,6 +119,7 @@ export const NAZWY_OPERACJI: Record<Operacja, string> = {
   dopasowanie_ai: "Dopasowanie ofert AI",
   asystent_czat: "Asystent AI (rozmowa)",
   dyzur_tura: "Dyżur AI (tura rozmowy)",
+  import_ogloszenia: "Import ogłoszenia do ofertówki",
 };
 
 /**
