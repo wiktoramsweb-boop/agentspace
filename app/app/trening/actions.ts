@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { stanProby, zuzyjProbe } from "@/lib/proba";
 import { requireUser } from "@/lib/auth";
 import { brakKredytow } from "@/lib/kredyty";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
@@ -73,6 +74,10 @@ export async function startSession(formData: FormData): Promise<void> {
     if (used >= user.weekly_ai_limit) redirect("/app/trening?limit=reached");
   }
 
+  // Okres próbny i demo: kilka rozmów na spróbowanie, reszta w abonamencie.
+  const proba = await stanProby(user, "coach");
+  if (proba.naProbie && proba.zostalo <= 0) redirect("/app/trening?proba=koniec");
+
   const oferta = v49 && propertyId ? await migawkaOferty(user.agency_id!, propertyId) : null;
 
   const { data: session } = await admin
@@ -103,6 +108,7 @@ export async function startSession(formData: FormData): Promise<void> {
     .single();
 
   if (!session) redirect("/app/trening");
+  await zuzyjProbe(user, "coach");
   const parametry = [
     tryb === "glos" ? "tryb=glos" : "",
     plec ? `plec=${plec}` : "",

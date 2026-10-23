@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { stanProby } from "@/lib/proba";
+import { LicznikProby } from "../components/proba";
 import { requireUser, requireModul } from "@/lib/auth";
 import { getScenarios, getWeeklySessionCount } from "@/lib/data";
 import { SCENARIO_CATEGORIES, type ScenarioCategory } from "@/lib/types";
@@ -89,6 +91,7 @@ export default async function TreningPage({
     user.agency_id ? rankingTreningu(user.agency_id) : Promise.resolve([]),
     rekordyAgenta(user.id),
   ]);
+  const proba = await stanProby(user, "coach");
   const nazwyTechnik = Object.fromEntries(TECHNIKI.map((t) => [t.slug, t.nazwa]));
   const zlecajacy = ["owner", "director", "manager"].includes(user.role);
 
@@ -128,6 +131,8 @@ export default async function TreningPage({
           </div>
         }
       />
+
+      <LicznikProby stan={proba} rodzaj="coach" />
 
       {zadania.length > 0 && (
         <section className="mb-8 rounded-2xl border border-violet-200 bg-violet-50 p-5">

@@ -1,4 +1,8 @@
 import Link from "next/link";
+import { createHash } from "node:crypto";
+import { juzLiczone, stanProby, zuzyjProbe } from "@/lib/proba";
+import { LicznikProby } from "../components/proba";
+import { Kompletnosc, OtworzEdycje } from "./kompletnosc";
 import { requireModul } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { geocodePl } from "@/lib/geocode";
@@ -116,14 +120,23 @@ export default async function WycenaRcnPage({ searchParams }: Props) {
   const kompletnosc = Math.round((pola.filter(Boolean).length / pola.length) * 100);
 
   const zapytano = Boolean(p("oferta") || p("address") || p("lat"));
+  // Okres próbny i demo: trzy wyceny. Ślad zapytania sprawia, że odświeżenie
+  // tej samej wyceny nie zabiera kolejnego podejścia.
+  let proba = await stanProby(user, "wycena");
+  const slad = createHash("sha1").update(JSON.stringify([adres, lat, lng, cel])).digest("hex").slice(0, 12);
+  const zablokowana = zapytano && proba.naProbie && proba.zostalo <= 0 && !(await juzLiczone(user, "wycena", slad));
   let wycena: WycenaRcn | null = null;
   let brak: string | null = null;
-  if (zapytano) {
+  if (zapytano && !zablokowana) {
     if (!lat || !lng) brak = "Nie udało się ustalić położenia. Wybierz adres z podpowiedzi albo uzupełnij współrzędne oferty.";
     else if (!cel.pow) brak = "Podaj metraż mieszkania.";
     else wycena = await wycenaZRcn(lat, lng, cel);
   }
   const w = wycena?.wynik ?? null;
+  if (w && proba.naProbie) {
+    await zuzyjProbe(user, "wycena", slad);
+    proba = await stanProby(user, "wycena");
+  }
   const cenaOferty = oferta?.deal_kind === "sprzedaz" ? oferta.price_pln : null;
   const roznica = w && cenaOferty ? Math.round(((cenaOferty - w.szacunek) / w.szacunek) * 100) : null;
 
@@ -157,11 +170,8 @@ export default async function WycenaRcnPage({ searchParams }: Props) {
         }
       : null;
 
-  return (
-    <>
-      <PageHeader title="Wycena mieszkania" subtitle="Ceny z aktów notarialnych z okolicy (Rejestr Cen Nieruchomości). Im więcej szczegółów, tym węższy przedział." />
-
-      <form method="get" className="mb-8 space-y-4">
+  const formularz = (
+      <form id="wycena-form" method="get" className="mb-8 space-y-4">
         <Sekcja tytul="Adres nieruchomości">
           <div className="grid gap-4 lg:grid-cols-2">
             <label className={etykieta}>
@@ -230,20 +240,21 @@ export default async function WycenaRcnPage({ searchParams }: Props) {
         </Sekcja>
 
         <div className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-          <div className="min-w-0 flex-1">
-            <p className="text-sm text-slate-500">
-              Kompletność danych <b className="ml-1 text-2xl text-slate-900">{zapytano ? kompletnosc : 0}%</b>
-            </p>
-            <div className="mt-2 h-2 max-w-md overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400" style={{ width: `${zapytano ? kompletnosc : 0}%` }} />
-            </div>
-            <p className="mt-1 text-xs text-slate-500">Metraż i adres wystarczą. Stan, piętro i budynek zawężają przedział.</p>
-          </div>
+          <Kompletnosc formId="wycena-form" />
           <SubmitButton className="rounded-xl bg-emerald-500 px-8 py-3 text-base font-semibold text-white hover:bg-emerald-400" pendingText="Liczę z aktów…">
             Wyceń mieszkanie
           </SubmitButton>
         </div>
       </form>
+  );
+
+  return (
+    <>
+      <PageHeader title="Wycena mieszkania" subtitle="Ceny z aktów notarialnych z okolicy (Rejestr Cen Nieruchomości). Im więcej szczegółów, tym węższy przedział." />
+
+      {!w && <LicznikProby stan={proba} rodzaj="wycena" />}
+
+      {!w && !(proba.naProbie && proba.zostalo <= 0) && formularz}
 
       {brak && <p className="mb-6 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">{brak}</p>}
 
@@ -257,6 +268,13 @@ export default async function WycenaRcnPage({ searchParams }: Props) {
 
       {w && wycena && daneRaportu && (
         <div className="space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm">
+            <p className="min-w-0 text-slate-600">
+              Raport: <b className="text-slate-900">{adres || "mieszkanie"}</b>, {cel.pow.toLocaleString("pl-PL")} m²
+              {proba.naProbie && <span className="ml-2 text-emerald-700">· wersja próbna, zostało wycen: {proba.zostalo}</span>}
+            </p>
+            <OtworzEdycje />
+          </div>
           <section className="grid gap-4 lg:grid-cols-[1.45fr_1fr]">
             <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-lg shadow-slate-900/20 sm:p-7">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -396,6 +414,14 @@ export default async function WycenaRcnPage({ searchParams }: Props) {
             </p>
           </section>
         </div>
+      )}
+      {w && (
+        <details id="edycja" className="group mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+          <summary className="cursor-pointer list-none text-base font-semibold text-slate-900">
+            <span className="mr-2 inline-block transition group-open:rotate-90">›</span>Edytuj dane i przelicz
+          </summary>
+          <div className="mt-4">{formularz}</div>
+        </details>
       )}
     </>
   );
