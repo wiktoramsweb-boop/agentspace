@@ -506,9 +506,9 @@ function EksportOtodom({ otodom }: { otodom?: { polaczone: boolean; tabele: bool
         <p className="mt-1 text-sm text-slate-500">
           Biuro nie jest jeszcze połączone z Otodom.{" "}
           {otodom?.ceo ? (
-            <a href="/app/ustawienia/portale" className="font-semibold text-emerald-700 hover:underline">
+            <Link href="/app/ustawienia/portale" className="font-semibold text-emerald-700 hover:underline">
               Połącz w Ustawieniach → Portale
-            </a>
+            </Link>
           ) : (
             "Poproś CEO o połączenie konta w Ustawieniach."
           )}
