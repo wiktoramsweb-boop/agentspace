@@ -137,6 +137,16 @@ export async function potwierdzWplate(orderId: string): Promise<string | null> {
     return null;
   }
 
+  // Świadectwo opłacone z góry: dopiero teraz zlecenie idzie do realizatora.
+  if (zam.kind === "swiadectwo") {
+    await admin
+      .from("subscription_orders")
+      .update({ status: "oplacone", paid_at: new Date().toISOString() })
+      .eq("id", orderId);
+    const { przekazDoRealizatora } = await import("./swiadectwa-realizacja");
+    return await przekazDoRealizatora(zam.agency_id as string, zam.plan as string);
+  }
+
   // Strona internetowa to osobna usługa: włącza ją operator w ustawieniach
   // biura, nie zmienia statusu abonamentu systemu.
   if (zam.kind === "strona") {
@@ -238,6 +248,9 @@ export function opisZamowienia(z: Zamowienie): string {
   if (z.kind === "kredyty") {
     return `${z.credits.toLocaleString("pl-PL")} kredytów AI, ${kwota}`;
   }
+  if (z.kind === "swiadectwo") {
+    return `Świadectwo energetyczne ${z.plan}, ${kwota}, płatne z góry`;
+  }
   if (z.kind === "strona") {
     return `Strona internetowa biura, ${opisOkresu(z.period).nazwa.toLowerCase()}, ${kwota}`;
   }
@@ -256,7 +269,7 @@ export { PAKIETY_KREDYTOW, SITE_ADDON };
  *
  * Błąd wysyłki nie przerywa zamówienia: wiersz i tak jest zapisany.
  */
-async function powiadomOZamowieniu(orderId: string, agencyId: string): Promise<void> {
+export async function powiadomOZamowieniu(orderId: string, agencyId: string): Promise<void> {
   const klucz = process.env.RESEND_API_KEY;
   if (!klucz) return;
 

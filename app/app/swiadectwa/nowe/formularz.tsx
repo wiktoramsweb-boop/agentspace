@@ -156,13 +156,15 @@ export function FormularzSwiadectwa({ oferty, start }: { oferty: OfertaDoSwiadec
   if (gotowe) {
     return (
       <div ref={gora} className="rounded-3xl bg-slate-900 p-8 text-white">
-        <p className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Zamówienie przyjęte</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Zamówienie przyjęte, czeka na wpłatę</p>
         <h2 className="mt-2 text-2xl font-semibold">Świadectwo dla: {`${z.ulica} ${z.nrBudynku}${z.nrLokalu ? `/${z.nrLokalu}` : ""}, ${z.miasto}`}</h2>
         <p className="mt-2 text-slate-300">
-          Numer {gotowe.numer}. Audytor skontaktuje się z: {z.imie}, {z.telefon}. Czas realizacji: {TRYBY[z.tryb].nazwa.toLowerCase()} ({TRYBY[z.tryb].opis}).
-          {!gotowe.wyslano && " Powiadomienie mailowe nie wyszło, ale zamówienie jest zapisane i widzimy je w panelu."}
+          Numer {gotowe.numer}. Po zaksięgowaniu wpłaty audytor skontaktuje się z: {z.imie}, {z.telefon}. Czas realizacji: {TRYBY[z.tryb].nazwa.toLowerCase()} ({TRYBY[z.tryb].opis}), liczony od wpłaty.
         </p>
-        <p className="mt-2 text-sm text-slate-400">Koszt {cena.netto} zł netto doliczymy do rozliczenia biura.</p>
+        <div className="mt-4 rounded-2xl bg-white/5 p-4 text-sm text-slate-200">
+          <p className="font-semibold text-white">Płatność: {cena.netto} zł netto ({cena.brutto} zł brutto)</p>
+          <p className="mt-1">W ciągu dnia roboczego wyślemy fakturę z danymi do przelewu na adres biura. W tytule przelewu wpisz numer {gotowe.numer}. Status zamówienia zobaczysz w „Moje zamówienia”.</p>
+        </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/app/swiadectwa" className="rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-bold text-slate-900 hover:bg-emerald-300">
             Moje zamówienia
@@ -364,7 +366,7 @@ export function FormularzSwiadectwa({ oferty, start }: { oferty: OfertaDoSwiadec
             <li>✓ Kontakt audytora z osobą wskazaną w formularzu</li>
           </ul>
           <div className="my-5 h-px bg-white/10" />
-          <p className="text-sm text-slate-300">Bez płatności teraz: koszt doliczymy do rozliczenia biura.</p>
+          <p className="text-sm text-slate-300">Płatne z góry: po zamówieniu dostaniesz fakturę z danymi do przelewu. Audytor rusza po zaksięgowaniu wpłaty.</p>
           <button type="button" onClick={zamow} disabled={czeka} className="mt-5 w-full rounded-xl bg-emerald-400 px-5 py-3 text-sm font-bold text-slate-900 transition hover:bg-emerald-300 disabled:opacity-60">
             {czeka ? postep ?? "Wysyłam…" : "Zamów świadectwo →"}
           </button>

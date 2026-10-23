@@ -148,4 +148,4 @@ export function pakietKredytow(id: string): PakietKredytow | undefined {
 }
 
 /** Rodzaje zakupów biura. Jedna lista zamówień, trzy produkty. */
-export type RodzajZakupu = "abonament" | "strona" | "kredyty";
+export type RodzajZakupu = "abonament" | "strona" | "kredyty" | "swiadectwo";

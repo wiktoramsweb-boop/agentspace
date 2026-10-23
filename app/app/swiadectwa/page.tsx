@@ -30,7 +30,7 @@ export default async function SwiadectwaPage() {
           <div>
             <h2 className="font-semibold text-slate-900">Wymagane prawnie przy sprzedaży i najmie</h2>
             <p className="mt-1 text-sm text-slate-600">
-              Od 28 kwietnia 2023 r. każde ogłoszenie sprzedaży lub najmu musi podawać wskaźnik EP ze świadectwa, a właściciel przekazuje świadectwo przy umowie. Zamawiasz tutaj, audytor kontaktuje się z
+              Od 28 kwietnia 2023 r. każde ogłoszenie sprzedaży lub najmu musi podawać wskaźnik EP ze świadectwa, a właściciel przekazuje świadectwo przy umowie. Zamawiasz tutaj i płacisz z góry przelewem. Po wpłacie audytor kontaktuje się z
               właścicielem, a gotowy PDF dostajesz zwykle w 2 dni robocze.
             </p>
           </div>
@@ -66,7 +66,11 @@ export default async function SwiadectwaPage() {
                   </p>
                 </div>
                 <div className="flex flex-shrink-0 items-center gap-2">
-                  <span className="rounded-lg bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">Przekazane audytorowi</span>
+                  {z.status === "czeka_na_wplate" ? (
+                    <span className="rounded-lg bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-700">Czeka na wpłatę</span>
+                  ) : (
+                    <span className="rounded-lg bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">Opłacone, u audytora</span>
+                  )}
                   <PobierzKarte numer={z.numer} />
                 </div>
               </li>

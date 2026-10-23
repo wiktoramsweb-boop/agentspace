@@ -12,6 +12,7 @@ import { zapiszBlad } from "@/lib/blad";
 import { zapiszZdarzenie } from "@/lib/dziennik";
 import { todayPL } from "@/lib/datetime";
 import { kartaZamowieniaPdf } from "@/lib/swiadectwa-pdf";
+import { powiadomOZamowieniu } from "@/lib/data-abonament";
 import {
   CENY_OBIEKTU,
   GRUPY_PLIKOW,
@@ -78,7 +79,7 @@ export async function zlozZamowienie(
   const zapis = {
     numer,
     data,
-    status: "przekazane",
+    status: "czeka_na_wplate",
     adres: adresZamowienia(z),
     typ: z.typ,
     tryb: z.tryb,
@@ -96,47 +97,29 @@ export async function zlozZamowienie(
   ]);
   if (up1.error || up2.error) return { ok: false, error: `Nie udało się zapisać zamówienia: ${(up1.error ?? up2.error)?.message}` };
 
-  // Mail do realizatora: karta PDF w załączniku i linki do zdjęć ważne 30 dni.
-  let wyslano = false;
-  const klucz = process.env.RESEND_API_KEY;
-  if (klucz) {
-    try {
-      const linki = await Promise.all(
-        swoje.map(async (p) => {
-          const { data: s } = await store.createSignedUrl(p.path, 60 * 60 * 24 * 30, { download: p.nazwa });
-          return { ...p, url: s?.signedUrl ?? null };
-        }),
-      );
-      const lista = (Object.keys(GRUPY_PLIKOW) as GrupaPlikow[])
-        .map((g) => {
-          const pl = linki.filter((l) => l.grupa === g && l.url);
-          if (!pl.length) return "";
-          return `<p style="margin:14px 0 4px;font-weight:600;color:#0b1220;">${escapeHtml(GRUPY_PLIKOW[g].nazwa)}</p>${pl.map((l) => `<a href="${escapeHtml(l.url)}" style="display:block;color:#047857;font-size:14px;">${escapeHtml(l.nazwa)}</a>`).join("")}`;
-        })
-        .join("");
-      const { Resend } = await import("resend");
-      await new Resend(klucz).emails.send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
-        to: process.env.SWIADECTWA_EMAIL ?? process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
-        replyTo: z.email,
-        subject: `Świadectwo energetyczne ${numer}: ${adresZamowienia(z)} (${TRYBY[z.tryb].nazwa})`,
-        attachments: [{ filename: `${numer}.pdf`, content: Buffer.from(pdf).toString("base64") }],
-        html: oprawaMaila(`
-          <div style="font-family:-apple-system,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;">
-            <h2 style="color:#0b1220;margin:0 0 8px;">Nowe zamówienie świadectwa energetycznego</h2>
-            <p style="font-size:15px;color:#3f3f46;margin:0 0 4px;"><strong>${escapeHtml(adresZamowienia(z))}</strong></p>
-            <p style="font-size:14px;color:#3f3f46;margin:0 0 12px;">${escapeHtml(CENY_OBIEKTU[z.typ].nazwa)} · ${escapeHtml(z.powierzchnia)} m² · ${escapeHtml(TRYBY[z.tryb].nazwa)} (${escapeHtml(TRYBY[z.tryb].opis)}) · ${cena.netto} zł netto</p>
-            <p style="font-size:14px;color:#3f3f46;margin:0 0 12px;">Kontakt w sprawie świadectwa: ${escapeHtml(z.imie)}, ${escapeHtml(z.telefon)}, ${escapeHtml(z.email)}</p>
-            <p style="font-size:14px;color:#3f3f46;margin:0 0 12px;">Zamawia: ${escapeHtml(user.full_name ?? "agent")}, ${escapeHtml(biuro)}. Pełna karta zamówienia w załączniku PDF.</p>
-            ${lista}
-            <p style="font-size:12px;color:#71717a;margin-top:18px;">Linki do plików są ważne 30 dni. Numer zamówienia: ${escapeHtml(numer)}.</p>
-          </div>`),
-      });
-      wyslano = true;
-    } catch (err) {
-      await zapiszBlad("swiadectwa/mail", err, { agencyId: user.agency_id });
-    }
+  // Świadectwo opłacamy z góry: realizator dostaje zlecenie dopiero po
+  // zaksięgowaniu wpłaty (potwierdzWplate w panelu operatora). Zamówienie
+  // trafia na tę samą listę rozliczeń co abonamenty, z fakturą i przelewem.
+  const { data: zam, error: bladZam } = await admin
+    .from("subscription_orders")
+    .insert({
+      agency_id: user.agency_id,
+      created_by: user.id,
+      kind: "swiadectwo",
+      plan: numer,
+      period: "jednorazowo",
+      agents: 1,
+      amount_grosz: Math.round(cena.netto * 100),
+      note: adresZamowienia(z).slice(0, 200),
+    })
+    .select("id")
+    .single();
+  if (bladZam || !zam) {
+    await zapiszBlad("swiadectwa/zamowienie", bladZam ?? new Error("brak wiersza"), { agencyId: user.agency_id });
+    return { ok: false, error: "Nie udało się zapisać zamówienia do rozliczenia. Spróbuj ponownie." };
   }
+  await powiadomOZamowieniu(zam.id as string, user.agency_id);
+  const wyslano = true;
 
   await zapiszZdarzenie({
     agencyId: user.agency_id,
