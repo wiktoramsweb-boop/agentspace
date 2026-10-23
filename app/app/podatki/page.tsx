@@ -9,7 +9,7 @@ export default async function PodatkiPage() {
     <>
       <PageHeader
         title="Kalkulator podatkowy"
-        subtitle="Porównaj formy opodatkowania, sprawdź kiedy kończy się mały ZUS, limity VAT i opłacalność spółki z o.o. Wszystko na Twoich liczbach."
+        subtitle="Forma opodatkowania, ZUS, VAT, spółka, koszt zatrudnienia agenta i podatki przy sprzedaży mieszkania. Na stawkach 2026, na Twoich liczbach."
       />
       <TaxCalculator />
     </>

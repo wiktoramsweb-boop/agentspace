@@ -19,8 +19,19 @@ export function zPominieciemDemo<T>(fn: () => Promise<T>): Promise<T> {
 export async function gosciaBlokujemy(): Promise<boolean> {
   if (pominiecie?.getStore()) return false;
   try {
-    const { headers } = await import("next/headers");
-    return (await headers()).get("x-demo") === "odczyt";
+    const { headers, cookies } = await import("next/headers");
+    const blokuj = (await headers()).get("x-demo") === "odczyt";
+    if (blokuj) {
+      // Znacznik dla przeglądarki: komunikat „w demo zapis jest wyłączony” ma
+      // się pokazać tylko wtedy, gdy zapis naprawdę zatrzymaliśmy, a nie przy
+      // każdej akcji serwera (część z nich tylko czyta).
+      try {
+        (await cookies()).set("as_demo_blok", String(Date.now()), { path: "/", maxAge: 30, sameSite: "lax" });
+      } catch {
+        // Podczas renderowania strony ciasteczek nie da się ustawić. Wtedy nic nie mówimy.
+      }
+    }
+    return blokuj;
   } catch {
     // Poza zapytaniem HTTP (cron, skrypt, test) nie ma gościa.
     return false;

@@ -34,16 +34,22 @@ export function TrybDemo() {
     let ostatni = 0;
     window.fetch = (wejscie, opcje) => {
       const naglowki = new Headers(opcje?.headers ?? (wejscie instanceof Request ? wejscie.headers : undefined));
-      const url = typeof wejscie === "string" || wejscie instanceof URL ? String(wejscie) : wejscie.url;
-      if (naglowki.has("next-action") && zablokowane(url, opcje?.method ?? "POST")) {
-        document.documentElement.dataset.demoBlokada = String(Date.now());
-      }
-      if (naglowki.has("next-action") && zablokowane(url, opcje?.method ?? "POST") && Date.now() - ostatni > 3000) {
-        ostatni = Date.now();
-        document.documentElement.dataset.demoBlokada = String(ostatni);
-        toast(KOMUNIKAT_DEMO, "info");
-      }
-      return oryginal(wejscie, opcje);
+      const odpowiedz = oryginal(wejscie, opcje);
+      if (!naglowki.has("next-action")) return odpowiedz;
+      // Sprawdzamy po odpowiedzi, zanim dostanie ją komponent: jego „zapisano”
+      // przyjdzie później i zdąży zostać wyciszone.
+      return odpowiedz.then((r) => {
+        const m = document.cookie.match(/(?:^|; )as_demo_blok=(\d+)/);
+        if (m) {
+          document.cookie = "as_demo_blok=; path=/; max-age=0";
+          document.documentElement.dataset.demoBlokada = String(Date.now());
+          if (Date.now() - ostatni > 3000) {
+            ostatni = Date.now();
+            toast(KOMUNIKAT_DEMO, "info");
+          }
+        }
+        return r;
+      });
     };
 
     window.addEventListener("submit", naWysylke, true);

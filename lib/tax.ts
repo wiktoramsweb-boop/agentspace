@@ -1,12 +1,13 @@
-// Kalkulator podatkowy dla biura (JDG: skala / liniowy / ryczałt, ZUS, VAT, sp. z o.o.).
+// Kalkulator podatkowy dla biura nieruchomości: forma opodatkowania JDG, ZUS,
+// VAT, sp. z o.o., koszt zatrudnienia agenta i podatki przy sprzedaży mieszkania.
 //
 // UWAGA: To narzędzie do modelowania i porównań, NIE porada podatkowa.
-// Stawki i kwoty ZUS na 2026 to szacunki (oficjalne kwoty ZUS 2026 ogłaszane są
-// pod koniec roku) - dlatego wszystkie stałe są edytowalne w panelu „Założenia".
-// Przed realną decyzją (zmiana formy, VAT, spółka) potwierdź u księgowej/doradcy.
+// Domyślne kwoty to obowiązujące w 2026 r. (ZUS, zdrowotna, limity PIT).
+// Wszystkie stałe są edytowalne w zakładce „Założenia", bo zmieniają się co rok.
+// Bez importów: liczy to przeglądarka i test (`npm run test:podatki`).
 
 export type TaxForm = "skala" | "liniowy" | "ryczalt";
-export type ZusStage = "ulga_start" | "preferencyjny" | "duzy";
+export type ZusStage = "ulga_start" | "preferencyjny" | "maly_plus" | "duzy";
 
 export const FORM_LABELS: Record<TaxForm, string> = {
   skala: "Skala podatkowa (12% / 32%)",
@@ -21,49 +22,62 @@ export const FORM_SHORT: Record<TaxForm, string> = {
 };
 
 export const ZUS_STAGE_LABELS: Record<ZusStage, string> = {
-  ulga_start: "Ulga na start (0 zł społecznych, tylko zdrowotna)",
-  preferencyjny: "Mały ZUS / preferencyjny (24 mies.)",
+  ulga_start: "Ulga na start (6 mies., 0 zł społecznych)",
+  preferencyjny: "Mały ZUS, preferencyjny (24 mies.)",
+  maly_plus: "Mały ZUS Plus (od dochodu)",
   duzy: "Duży ZUS (pełne składki)",
 };
 
 // ── Stałe (edytowalne w UI) ─────────────────────────────────────────────────
-// Domyślne wartości: reguły PIT są stabilne (2022→), kwoty ZUS/zdrowotnej to
-// szacunki na 2026 na bazie prognozowanego wzrostu wynagrodzeń.
 export type TaxConstants = {
   // PIT - skala
-  kwotaWolna: number; // 30 000
-  progSkali: number; // 120 000 - granica 12%/32%
-  stawkaSkala1: number; // 0.12
-  stawkaSkala2: number; // 0.32
-  kwotaZmniejszajaca: number; // 3 600 (12% z kwoty wolnej)
+  kwotaWolna: number;
+  progSkali: number;
+  stawkaSkala1: number;
+  stawkaSkala2: number;
+  kwotaZmniejszajaca: number;
   // PIT - liniowy
-  stawkaLiniowy: number; // 0.19
-  liniowyZdrowotnaOdliczenieLimit: number; // roczny limit odliczenia zdrowotnej od dochodu
-  // PIT - ryczałt (pośrednictwo w obrocie nieruchomościami = 15%)
-  stawkaRyczalt: number; // 0.15
+  stawkaLiniowy: number;
+  liniowyZdrowotnaOdliczenieLimit: number;
+  // PIT - ryczałt (pośrednictwo w obrocie nieruchomościami)
+  stawkaRyczalt: number;
   // Danina solidarnościowa (4% od dochodu > 1 mln)
-  daninaProg: number; // 1 000 000
-  daninaStawka: number; // 0.04
+  daninaProg: number;
+  daninaStawka: number;
   // Składka zdrowotna
-  zdrowotnaSkalaStawka: number; // 0.09 od dochodu (skala)
-  zdrowotnaLiniowyStawka: number; // 0.049 od dochodu (liniowy)
-  zdrowotnaMinMies: number; // minimalna miesięczna (9% płacy min.) - dla skali/liniowego
-  // Ryczałt - składka zdrowotna wg progów rocznego przychodu (miesięcznie)
-  ryczaltProg1: number; // 60 000 przychodu
-  ryczaltProg2: number; // 300 000 przychodu
-  zdrowotnaRyczalt1Mies: number; // przychód ≤ prog1
-  zdrowotnaRyczalt2Mies: number; // prog1 < przychód ≤ prog2
-  zdrowotnaRyczalt3Mies: number; // przychód > prog2
-  // ZUS społeczny (miesięcznie, z chorobowym; duży zawiera Fundusz Pracy)
-  zusPreferencyjnyMies: number;
-  zusDuzyMies: number;
+  zdrowotnaSkalaStawka: number;
+  zdrowotnaLiniowyStawka: number;
+  zdrowotnaMinMies: number;
+  ryczaltProg1: number;
+  ryczaltProg2: number;
+  zdrowotnaRyczalt1Mies: number;
+  zdrowotnaRyczalt2Mies: number;
+  zdrowotnaRyczalt3Mies: number;
+  // ZUS społeczny: podstawy i stawki
+  placaMinimalna: number;
+  podstawaDuzyZus: number;
+  podstawaMalyZus: number;
+  limitMalyZusPlus: number;
+  stawkaEmerytalna: number;
+  stawkaRentowa: number;
+  stawkaWypadkowa: number;
+  stawkaChorobowa: number;
+  stawkaFP: number;
   // VAT
-  limitVat: number; // 240 000 (od 2026)
-  stawkaVat: number; // 0.23
+  limitVat: number;
+  stawkaVat: number;
   // CIT (sp. z o.o.)
-  citMaly: number; // 0.09 (mały podatnik)
-  citStandard: number; // 0.19
-  stawkaDywidendy: number; // 0.19
+  citMaly: number;
+  citStandard: number;
+  stawkaDywidendy: number;
+  // Etat i zlecenie (koszt agenta)
+  pracownikSpoleczne: number;
+  pracodawcaSkladki: number;
+  kupEtatMies: number;
+  kwotaZmniejszajacaMies: number;
+  // Sprzedaż nieruchomości
+  stawkaPitSprzedaz: number;
+  stawkaPcc: number;
 };
 
 export const DEFAULT_CONSTANTS: TaxConstants = {
@@ -73,45 +87,93 @@ export const DEFAULT_CONSTANTS: TaxConstants = {
   stawkaSkala2: 0.32,
   kwotaZmniejszajaca: 3600,
   stawkaLiniowy: 0.19,
-  liniowyZdrowotnaOdliczenieLimit: 12900,
+  liniowyZdrowotnaOdliczenieLimit: 14100,
   stawkaRyczalt: 0.15,
   daninaProg: 1000000,
   daninaStawka: 0.04,
   zdrowotnaSkalaStawka: 0.09,
   zdrowotnaLiniowyStawka: 0.049,
-  zdrowotnaMinMies: 433, // ~9% z płacy minimalnej 2026 (szac. ~4806 zł)
+  zdrowotnaMinMies: 432.54,
   ryczaltProg1: 60000,
   ryczaltProg2: 300000,
-  zdrowotnaRyczalt1Mies: 485,
-  zdrowotnaRyczalt2Mies: 808,
-  zdrowotnaRyczalt3Mies: 1454,
-  zusPreferencyjnyMies: 456, // szac. 2026, z chorobowym
-  zusDuzyMies: 1930, // szac. 2026, z chorobowym + Fundusz Pracy
+  zdrowotnaRyczalt1Mies: 498.35,
+  zdrowotnaRyczalt2Mies: 830.58,
+  zdrowotnaRyczalt3Mies: 1495.04,
+  placaMinimalna: 4806,
+  podstawaDuzyZus: 5652,
+  podstawaMalyZus: 1441.8,
+  limitMalyZusPlus: 120000,
+  stawkaEmerytalna: 0.1952,
+  stawkaRentowa: 0.08,
+  stawkaWypadkowa: 0.0167,
+  stawkaChorobowa: 0.0245,
+  stawkaFP: 0.0245,
   limitVat: 240000,
   stawkaVat: 0.23,
   citMaly: 0.09,
   citStandard: 0.19,
   stawkaDywidendy: 0.19,
+  pracownikSpoleczne: 0.1371,
+  pracodawcaSkladki: 0.2048,
+  kupEtatMies: 250,
+  kwotaZmniejszajacaMies: 300,
+  stawkaPitSprzedaz: 0.19,
+  stawkaPcc: 0.02,
 };
 
-// ── Pomocnicze ──────────────────────────────────────────────────────────────
-function zusSpolecznyRoczny(stage: ZusStage, c: TaxConstants): number {
-  if (stage === "ulga_start") return 0;
-  if (stage === "preferencyjny") return c.zusPreferencyjnyMies * 12;
-  return c.zusDuzyMies * 12;
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
+// ── ZUS społeczny ───────────────────────────────────────────────────────────
+
+export type OpcjeZus = { chorobowe?: boolean; dochodPoprzedni?: number };
+
+/** Podstawa Małego ZUS Plus: połowa średniego miesięcznego dochodu z zeszłego roku, w widełkach. */
+export function podstawaMalyZusPlus(dochodPoprzedni: number, c: TaxConstants): number {
+  const polowa = Math.max(0, dochodPoprzedni) / 12 / 2;
+  return r2(Math.min(c.podstawaDuzyZus, Math.max(c.podstawaMalyZus, polowa)));
 }
 
-function zdrowotnaRyczaltRoczna(przychod: number, c: TaxConstants): number {
+export function podstawaZus(stage: ZusStage, c: TaxConstants, o: OpcjeZus = {}): number {
+  if (stage === "ulga_start") return 0;
+  if (stage === "preferencyjny") return c.podstawaMalyZus;
+  if (stage === "maly_plus") return podstawaMalyZusPlus(o.dochodPoprzedni ?? 0, c);
+  return c.podstawaDuzyZus;
+}
+
+export type ZusMies = { podstawa: number; emerytalna: number; rentowa: number; wypadkowa: number; chorobowa: number; fp: number; razem: number };
+
+/**
+ * Miesięczne składki społeczne przedsiębiorcy. Każdą składkę zaokrąglamy
+ * osobno, jak ZUS. Fundusz Pracy jest należny dopiero od podstawy
+ * co najmniej płacy minimalnej, więc przy małym ZUS go nie ma.
+ */
+export function zusMies(stage: ZusStage, c: TaxConstants, o: OpcjeZus = {}): ZusMies {
+  const podstawa = podstawaZus(stage, c, o);
+  const emerytalna = r2(podstawa * c.stawkaEmerytalna);
+  const rentowa = r2(podstawa * c.stawkaRentowa);
+  const wypadkowa = r2(podstawa * c.stawkaWypadkowa);
+  const chorobowa = o.chorobowe === false ? 0 : r2(podstawa * c.stawkaChorobowa);
+  const fp = podstawa >= c.placaMinimalna ? r2(podstawa * c.stawkaFP) : 0;
+  return { podstawa, emerytalna, rentowa, wypadkowa, chorobowa, fp, razem: r2(emerytalna + rentowa + wypadkowa + chorobowa + fp) };
+}
+
+/** Roczne składki społeczne. Fundusz Pracy nie obniża podatku, reszta tak. */
+function zusRoczny(stage: ZusStage, c: TaxConstants, o: OpcjeZus) {
+  const m = zusMies(stage, c, o);
+  return { razem: m.razem * 12, doOdliczenia: (m.razem - m.fp) * 12 };
+}
+
+function zdrowotnaRyczaltRoczna(przychodPoZus: number, c: TaxConstants): number {
   const mies =
-    przychod <= c.ryczaltProg1
+    przychodPoZus <= c.ryczaltProg1
       ? c.zdrowotnaRyczalt1Mies
-      : przychod <= c.ryczaltProg2
+      : przychodPoZus <= c.ryczaltProg2
         ? c.zdrowotnaRyczalt2Mies
         : c.zdrowotnaRyczalt3Mies;
   return mies * 12;
 }
 
-function pitSkala(podstawa: number, c: TaxConstants): number {
+export function pitSkala(podstawa: number, c: TaxConstants): number {
   const p = Math.max(0, podstawa);
   if (p <= c.progSkali) return Math.max(0, p * c.stawkaSkala1 - c.kwotaZmniejszajaca);
   const doProgu = c.progSkali * c.stawkaSkala1 - c.kwotaZmniejszajaca;
@@ -123,29 +185,38 @@ export type FormResult = {
   form: TaxForm;
   przychod: number;
   koszty: number;
-  dochod: number; // przychód − koszty (przed ZUS)
+  dochod: number;
   zusSpoleczny: number;
   zdrowotna: number;
-  podatek: number; // PIT lub ryczałt
-  danina: number; // danina solidarnościowa
+  podatek: number;
+  danina: number;
   podstawaOpodatkowania: number;
-  daniny: number; // podatek + zdrowotna + zus + danina (łączne obciążenie)
-  netto: number; // co zostaje „do kieszeni"
-  efektywna: number; // daniny / dochod
+  daniny: number;
+  netto: number;
+  nettoMies: number;
+  efektywna: number;
 };
 
 export type FormInput = {
   przychod: number;
   koszty: number;
   zusStage: ZusStage;
+  chorobowe?: boolean;
+  /** Dochód z zeszłego roku: podstawa Małego ZUS Plus. */
+  dochodPoprzedni?: number;
+  /** Dochód małżonka przy wspólnym rozliczeniu (tylko skala). */
+  dochodMalzonka?: number | null;
 };
 
 export function computeForm(form: TaxForm, input: FormInput, c: TaxConstants): FormResult {
   const przychod = Math.max(0, input.przychod);
   const koszty = Math.max(0, input.koszty);
   const dochod = przychod - koszty;
-  const zusSpoleczny = zusSpolecznyRoczny(input.zusStage, c);
+  const zus = zusRoczny(input.zusStage, c, { chorobowe: input.chorobowe, dochodPoprzedni: input.dochodPoprzedni });
+  const zusSpoleczny = zus.razem;
   const minZdrowotna = c.zdrowotnaMinMies * 12;
+  // Zdrowotną na skali i liniowym liczy się od dochodu pomniejszonego o składki społeczne.
+  const dochodPoZus = Math.max(0, dochod - zus.doOdliczenia);
 
   let zdrowotna = 0;
   let podatek = 0;
@@ -153,33 +224,35 @@ export function computeForm(form: TaxForm, input: FormInput, c: TaxConstants): F
   let danina = 0;
 
   if (form === "skala") {
-    // Zdrowotna 9% od dochodu, NIE odliczana od podatku.
-    zdrowotna = Math.max(minZdrowotna, Math.max(0, dochod) * c.zdrowotnaSkalaStawka);
-    // Składki społeczne ZUS odliczane od dochodu.
-    podstawaOpodatkowania = Math.max(0, dochod - zusSpoleczny);
-    podatek = pitSkala(podstawaOpodatkowania, c);
+    zdrowotna = Math.max(minZdrowotna, dochodPoZus * c.zdrowotnaSkalaStawka);
+    podstawaOpodatkowania = dochodPoZus;
+    const m = input.dochodMalzonka;
+    if (m != null && m >= 0) {
+      // Wspólne rozliczenie: podatek od połowy łącznej podstawy razy dwa.
+      // Tobie przypisujemy różnicę względem tego, co małżonek zapłaciłby sam.
+      podatek = Math.max(0, 2 * pitSkala((podstawaOpodatkowania + m) / 2, c) - pitSkala(m, c));
+    } else {
+      podatek = pitSkala(podstawaOpodatkowania, c);
+    }
   } else if (form === "liniowy") {
-    zdrowotna = Math.max(minZdrowotna, Math.max(0, dochod) * c.zdrowotnaLiniowyStawka);
+    zdrowotna = Math.max(minZdrowotna, dochodPoZus * c.zdrowotnaLiniowyStawka);
     const zdrowotnaOdliczenie = Math.min(zdrowotna, c.liniowyZdrowotnaOdliczenieLimit);
-    podstawaOpodatkowania = Math.max(0, dochod - zusSpoleczny - zdrowotnaOdliczenie);
+    podstawaOpodatkowania = Math.max(0, dochodPoZus - zdrowotnaOdliczenie);
     podatek = podstawaOpodatkowania * c.stawkaLiniowy;
   } else {
-    // Ryczałt - podatek od przychodu (koszty nie obniżają podatku).
-    zdrowotna = zdrowotnaRyczaltRoczna(przychod, c);
-    // Podstawę (przychód) pomniejsza się o składki społeczne i 50% zdrowotnej.
-    podstawaOpodatkowania = Math.max(0, przychod - zusSpoleczny - 0.5 * zdrowotna);
+    // Ryczałt od przychodu: koszty nie obniżają podatku. Próg zdrowotnej
+    // liczy się od przychodu po składkach społecznych.
+    zdrowotna = zdrowotnaRyczaltRoczna(Math.max(0, przychod - zus.doOdliczenia), c);
+    podstawaOpodatkowania = Math.max(0, przychod - zus.doOdliczenia - 0.5 * zdrowotna);
     podatek = podstawaOpodatkowania * c.stawkaRyczalt;
   }
 
-  // Danina solidarnościowa - od dochodu (skala/liniowy) ponad próg.
-  if (form !== "ryczalt" && dochod > c.daninaProg) {
-    danina = (dochod - c.daninaProg) * c.daninaStawka;
+  if (form !== "ryczalt" && podstawaOpodatkowania > c.daninaProg) {
+    danina = (podstawaOpodatkowania - c.daninaProg) * c.daninaStawka;
   }
 
   const daniny = podatek + zdrowotna + zusSpoleczny + danina;
-  const netto = dochod - podatek - zdrowotna - zusSpoleczny - danina;
-  const efektywna = dochod > 0 ? daniny / dochod : 0;
-
+  const netto = dochod - daniny;
   return {
     form,
     przychod,
@@ -192,11 +265,11 @@ export function computeForm(form: TaxForm, input: FormInput, c: TaxConstants): F
     podstawaOpodatkowania,
     daniny,
     netto,
-    efektywna,
+    nettoMies: netto / 12,
+    efektywna: dochod > 0 ? daniny / dochod : 0,
   };
 }
 
-// Porównanie wszystkich trzech form + wskazanie najtańszej.
 export function compareForms(input: FormInput, c: TaxConstants) {
   const forms: TaxForm[] = ["skala", "liniowy", "ryczalt"];
   const results = forms.map((f) => computeForm(f, input, c));
@@ -204,58 +277,49 @@ export function compareForms(input: FormInput, c: TaxConstants) {
   return { results, best };
 }
 
-// Punkt przełamania skala↔liniowy: dochód, przy którym liniowy zaczyna wygrywać.
-// Szukamy binarnie na dochodzie (dla ustalonych kosztów=0, zusStage).
-export function progSkalaLiniowy(zusStage: ZusStage, c: TaxConstants): number {
-  let lo = c.progSkali; // poniżej progu skala prawie zawsze wygrywa
-  let hi = 600000;
-  for (let i = 0; i < 40; i++) {
+/** Dochód, przy którym liniowy zaczyna wygrywać ze skalą (bez kosztów). */
+export function progSkalaLiniowy(zusStage: ZusStage, c: TaxConstants, o: OpcjeZus = {}): number {
+  let lo = 20000;
+  let hi = 1000000;
+  for (let i = 0; i < 50; i++) {
     const mid = (lo + hi) / 2;
-    const skala = computeForm("skala", { przychod: mid, koszty: 0, zusStage }, c);
-    const liniowy = computeForm("liniowy", { przychod: mid, koszty: 0, zusStage }, c);
+    const skala = computeForm("skala", { przychod: mid, koszty: 0, zusStage, ...o }, c);
+    const liniowy = computeForm("liniowy", { przychod: mid, koszty: 0, zusStage, ...o }, c);
     if (liniowy.netto >= skala.netto) hi = mid;
     else lo = mid;
   }
   return Math.round((lo + hi) / 2);
 }
 
-// ── ZUS - oś czasu (kiedy kończy się mały ZUS) ──────────────────────────────
+// ── ZUS - oś czasu ──────────────────────────────────────────────────────────
 export type ZusTimeline = {
   ulgaStartDo: Date | null;
   preferencyjnyOd: Date;
-  preferencyjnyDo: Date; // koniec małego ZUS
-  monthsLeft: number; // ile miesięcy do końca małego ZUS (od dziś)
-  skokMies: number; // wzrost składki po przejściu na duży (na osobę)
-  skokRoczny: number; // roczny skok na osobę
+  preferencyjnyDo: Date;
+  monthsLeft: number;
+  skokMies: number;
+  skokRoczny: number;
 };
 
-export function zusTimeline(
-  dataZalozenia: Date,
-  ulgaNaStart: boolean,
-  c: TaxConstants,
-  now = new Date(),
-): ZusTimeline {
-  const start = new Date(dataZalozenia);
+/**
+ * Ulga na start trwa 6 pełnych miesięcy po miesiącu założenia, potem 24
+ * miesiące małego ZUS. Liczymy od pierwszego dnia miesiąca po założeniu.
+ */
+export function zusTimeline(dataZalozenia: Date, ulgaNaStart: boolean, c: TaxConstants, now = new Date(), o: OpcjeZus = {}): ZusTimeline {
+  const start = addMonths(new Date(dataZalozenia.getFullYear(), dataZalozenia.getMonth(), 1), 1);
   let ulgaStartDo: Date | null = null;
-  let preferencyjnyOd: Date;
-
+  let preferencyjnyOd = start;
   if (ulgaNaStart) {
-    // Ulga na start: pełne 6 miesięcy po miesiącu rozpoczęcia.
     ulgaStartDo = addMonths(start, 6);
     preferencyjnyOd = ulgaStartDo;
-  } else {
-    preferencyjnyOd = start;
   }
   const preferencyjnyDo = addMonths(preferencyjnyOd, 24);
-
-  const monthsLeft = monthsBetween(now, preferencyjnyDo);
-  const skokMies = c.zusDuzyMies - c.zusPreferencyjnyMies;
-
+  const skokMies = zusMies("duzy", c, o).razem - zusMies("preferencyjny", c, o).razem;
   return {
     ulgaStartDo,
     preferencyjnyOd,
     preferencyjnyDo,
-    monthsLeft,
+    monthsLeft: monthsBetween(now, preferencyjnyDo),
     skokMies,
     skokRoczny: skokMies * 12,
   };
@@ -268,175 +332,251 @@ function addMonths(d: Date, m: number): Date {
 }
 
 function monthsBetween(from: Date, to: Date): number {
-  return (
-    (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth())
-  );
+  return (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
 }
 
-// ── VAT - pojemność 3 podmiotów + koszt utraty statusu ──────────────────────
+// ── VAT ─────────────────────────────────────────────────────────────────────
 export type VatSubject = { name: string; przychod: number };
 export type VatResult = {
-  subjects: { name: string; przychod: number; doLimitu: number; nadLimit: boolean }[];
+  subjects: { name: string; przychod: number; doLimitu: number; nadLimit: boolean; procent: number }[];
   limit: number;
-  pojemnosc: number; // łączna pojemność bez VAT (liczba podmiotów × limit)
+  pojemnosc: number;
   sumaPrzychodow: number;
-  nadPojemnosc: number; // ile ponad łączną pojemność (jeśli >0 → VAT nieunikniony)
-  // koszt utraty nie-VAT: VAT należny od prowizji minus VAT do odliczenia z kosztów
+  nadPojemnosc: number;
+  vatNalezny: number;
+  vatOdliczony: number;
   kosztUtratyNetto: number;
 };
 
-export function computeVat(
-  subjects: VatSubject[],
-  kosztyZVat: number, // roczne koszty z których można odliczyć VAT (netto podstawy)
-  c: TaxConstants,
-): VatResult {
+/**
+ * Limity zwolnienia z VAT dla podmiotów biura i koszt wejścia w VAT.
+ * Klienci biura to głównie osoby prywatne, więc VAT od prowizji jest dla
+ * biura kosztem: cena brutto zostaje ta sama, a 23% z niej idzie do urzędu.
+ */
+export function computeVat(subjects: VatSubject[], kosztyZVat: number, c: TaxConstants): VatResult {
   const rows = subjects.map((s) => ({
     name: s.name,
     przychod: s.przychod,
     doLimitu: c.limitVat - s.przychod,
     nadLimit: s.przychod > c.limitVat,
+    procent: c.limitVat > 0 ? s.przychod / c.limitVat : 0,
   }));
   const sumaPrzychodow = subjects.reduce((a, s) => a + s.przychod, 0);
   const pojemnosc = c.limitVat * subjects.length;
-  // VAT należny (metoda „w stu" - prowizja brutto zawiera VAT po wejściu w VAT):
   const vatNalezny = (sumaPrzychodow * c.stawkaVat) / (1 + c.stawkaVat);
-  const vatOdliczony = (kosztyZVat * c.stawkaVat) / (1 + c.stawkaVat);
+  const vatOdliczony = (Math.max(0, kosztyZVat) * c.stawkaVat) / (1 + c.stawkaVat);
   return {
     subjects: rows,
     limit: c.limitVat,
     pojemnosc,
     sumaPrzychodow,
     nadPojemnosc: Math.max(0, sumaPrzychodow - pojemnosc),
+    vatNalezny,
+    vatOdliczony,
     kosztUtratyNetto: Math.max(0, vatNalezny - vatOdliczony),
   };
 }
 
-// ── JDG (2× liniowy) vs sp. z o.o. ──────────────────────────────────────────
-export type SpzooResult = {
-  zyskFirmy: number;
-  // Sp. z o.o.
-  cit: number;
-  poCit: number;
-  dywidenda: number;
-  spzooNetto: number; // do podziału między wspólników po CIT i dywidendzie
-  spzooEfektywna: number;
-  citStawka: number;
-  // JDG - 2 wspólników na wybranej formie
-  jdgNetto: number;
-  jdgDaniny: number;
-  jdgEfektywna: number;
-  // Różnica (dodatnia = spółka lepsza)
-  roznica: number;
-};
-
-// Wypłata ze spółki przez wynagrodzenie z powołania (skala, bez ZUS społecznego,
-// ale ze składką zdrowotną 9%). Wynagrodzenie to KOSZT spółki → obniża CIT.
-// Reszta zysku (po wynagrodzeniach) idzie przez CIT → dywidendę.
+// ── JDG vs sp. z o.o. ───────────────────────────────────────────────────────
 export type SpzooPayout = {
-  zyskBrutto: number; // zysk firmy przed wynagrodzeniem zarządu
+  zyskBrutto: number;
+  wspolnikow: number;
   powolaniePerOsoba: number;
   powolanieRazem: number;
-  pitPowolaniePerOsoba: number; // PIT skala
-  zdrowotnaPowolaniePerOsoba: number; // 9%
-  nettoPowolanieRazem: number; // to trafia do prywatnej kieszeni
-  zyskPoWynagrodzeniach: number; // podstawa CIT
+  pitPowolaniePerOsoba: number;
+  zdrowotnaPowolaniePerOsoba: number;
+  zusJedynegoWspolnika: number;
+  nettoPowolanieRazem: number;
+  zyskPoWynagrodzeniach: number;
   cit: number;
-  poCit: number; // zysk po CIT
+  citStawka: number;
+  poCit: number;
   wyplacDywidende: boolean;
-  dywidendaPodatek: number; // 0 gdy zysk zostaje w spółce
-  nettoDywidenda: number; // wypłacona dywidenda netto (0 gdy zatrzymany)
-  zatrzymaneWSpolce: number; // zysk po CIT zostający w firmie (gdy bez dywidendy)
-  doKieszeni: number; // powołanie netto + ew. dywidenda netto
-  wartoscPoOpodatkowaniu: number; // do kieszeni + zatrzymane w spółce
-  daninyRazem: number; // wszystkie podatki/składki
-  efektywna: number; // daniny / zysk brutto
+  dywidendaPodatek: number;
+  nettoDywidenda: number;
+  zatrzymaneWSpolce: number;
+  doKieszeni: number;
+  wartoscPoOpodatkowaniu: number;
+  daninyRazem: number;
+  efektywna: number;
 };
 
+/**
+ * Spółka wypłaca wynagrodzenie z powołania (skala + zdrowotna 9%, bez ZUS
+ * społecznego), które jest jej kosztem. Resztę zysku obciąża CIT, a przy
+ * wypłacie dodatkowo dywidenda. Jedyny wspólnik płaci ZUS jak przedsiębiorca
+ * (duży ZUS i zdrowotną od płacy minimalnej), dwóch i więcej już nie.
+ */
 export function computeSpzooPayout(
   zyskBrutto: number,
   powolaniePerOsoba: number,
   malyPodatnikCit: boolean,
   wyplacDywidende: boolean,
   c: TaxConstants,
+  wspolnikow = 2,
 ): SpzooPayout {
+  const n = Math.max(1, Math.round(wspolnikow));
   const zysk = Math.max(0, zyskBrutto);
-  // Nie da się wypłacić więcej wynagrodzeń niż jest zysku.
-  const powPerOsoba = Math.max(0, Math.min(powolaniePerOsoba, zysk / 2));
-  const powolanieRazem = powPerOsoba * 2;
+  const zusJedynego = n === 1 ? (zusMies("duzy", c).razem + c.zdrowotnaMinMies) * 12 : 0;
+  const doPodzialu = Math.max(0, zysk - zusJedynego);
+  const powPerOsoba = Math.max(0, Math.min(powolaniePerOsoba, doPodzialu / n));
+  const powolanieRazem = powPerOsoba * n;
 
-  // Powołanie: PIT skala + zdrowotna 9% (bez odliczeń, bez ZUS społ.).
   const pitPow = pitSkala(powPerOsoba, c);
   const zdrowotnaPow = powPerOsoba * c.zdrowotnaSkalaStawka;
-  const nettoPowPerOsoba = powPerOsoba - pitPow - zdrowotnaPow;
-  const nettoPowolanieRazem = nettoPowPerOsoba * 2;
+  const nettoPowolanieRazem = (powPerOsoba - pitPow - zdrowotnaPow) * n;
 
-  // Reszta zysku przez spółkę → CIT. Dywidenda tylko jeśli wypłacamy.
-  const zyskPoWynagrodzeniach = zysk - powolanieRazem;
+  const zyskPoWynagrodzeniach = doPodzialu - powolanieRazem;
   const citStawka = malyPodatnikCit ? c.citMaly : c.citStandard;
   const cit = Math.max(0, zyskPoWynagrodzeniach) * citStawka;
   const poCit = zyskPoWynagrodzeniach - cit;
   const dywidendaPodatek = wyplacDywidende ? Math.max(0, poCit) * c.stawkaDywidendy : 0;
   const nettoDywidenda = wyplacDywidende ? poCit - dywidendaPodatek : 0;
   const zatrzymaneWSpolce = wyplacDywidende ? 0 : poCit;
-
   const doKieszeni = nettoPowolanieRazem + nettoDywidenda;
-  const wartoscPoOpodatkowaniu = doKieszeni + zatrzymaneWSpolce;
-  const daninyRazem = (pitPow + zdrowotnaPow) * 2 + cit + dywidendaPodatek;
+  const daninyRazem = (pitPow + zdrowotnaPow) * n + cit + dywidendaPodatek + zusJedynego;
 
   return {
     zyskBrutto: zysk,
+    wspolnikow: n,
     powolaniePerOsoba: powPerOsoba,
     powolanieRazem,
     pitPowolaniePerOsoba: pitPow,
     zdrowotnaPowolaniePerOsoba: zdrowotnaPow,
+    zusJedynegoWspolnika: zusJedynego,
     nettoPowolanieRazem,
     zyskPoWynagrodzeniach,
     cit,
+    citStawka,
     poCit,
     wyplacDywidende,
     dywidendaPodatek,
     nettoDywidenda,
     zatrzymaneWSpolce,
     doKieszeni,
-    wartoscPoOpodatkowaniu,
+    wartoscPoOpodatkowaniu: doKieszeni + zatrzymaneWSpolce,
     daninyRazem,
     efektywna: zysk > 0 ? daninyRazem / zysk : 0,
   };
 }
 
-export function compareSpzoo(
-  zyskFirmy: number,
-  jdgForma: TaxForm,
-  zusStage: ZusStage,
-  malyPodatnikCit: boolean,
+/** Te same pieniądze na JDG: zysk dzielony po równo, każdy na wybranej formie. */
+export function jdgDlaWspolnikow(zyskFirmy: number, forma: TaxForm, zusStage: ZusStage, c: TaxConstants, wspolnikow = 2) {
+  const n = Math.max(1, Math.round(wspolnikow));
+  const r = computeForm(forma, { przychod: zyskFirmy / n, koszty: 0, zusStage }, c);
+  return { netto: r.netto * n, daniny: r.daniny * n, efektywna: zyskFirmy > 0 ? (r.daniny * n) / zyskFirmy : 0 };
+}
+
+// ── Koszt agenta: etat, zlecenie, B2B ───────────────────────────────────────
+export type Umowa = "etat" | "zlecenie" | "b2b";
+
+export type KosztAgenta = {
+  umowa: Umowa;
+  brutto: number;
+  kosztBiura: number;
+  spoleczneAgenta: number;
+  zdrowotnaAgenta: number;
+  zaliczkaPit: number;
+  nettoAgenta: number;
+};
+
+/**
+ * Miesięczny koszt agenta dla biura i ile z tego dostaje agent.
+ * Etat: składki pracownika 13,71%, zdrowotna 9% od brutto po społecznych,
+ * koszty 250 zł, zaliczka 12% minus 300 zł (PIT-2). Pracodawca dokłada
+ * 20,48% (emerytalna, rentowa, wypadkowa, Fundusz Pracy, FGŚP).
+ * Zlecenie: te same składki (gdy to jedyny tytuł do ubezpieczeń), koszty 20%.
+ * Osoba do 26 lat na etacie lub zleceniu nie płaci PIT (ulga dla młodych),
+ * a student do 26 lat na zleceniu nie płaci też składek.
+ * B2B: biuro płaci fakturę, agent sam opłaca podatek i ZUS.
+ */
+export function kosztAgenta(
+  umowa: Umowa,
+  kwota: number,
   c: TaxConstants,
-): SpzooResult {
-  // Sp. z o.o. - zysk → CIT → dywidenda (19%). 2-osobowa: brak ZUS wspólników.
-  const citStawka = malyPodatnikCit ? c.citMaly : c.citStandard;
-  const cit = Math.max(0, zyskFirmy) * citStawka;
-  const poCit = zyskFirmy - cit;
-  const dywidenda = Math.max(0, poCit) * c.stawkaDywidendy;
-  const spzooNetto = poCit - dywidenda;
-  const spzooEfektywna = zyskFirmy > 0 ? (cit + dywidenda) / zyskFirmy : 0;
-
-  // JDG - zysk dzielony 50/50 na 2 wspólników, każdy rozlicza wybraną formą.
-  const perOsoba = zyskFirmy / 2;
-  const r = computeForm(jdgForma, { przychod: perOsoba, koszty: 0, zusStage }, c);
-  const jdgNetto = r.netto * 2;
-  const jdgDaniny = r.daniny * 2;
-  const jdgEfektywna = zyskFirmy > 0 ? jdgDaniny / zyskFirmy : 0;
-
+  o: { do26?: boolean; student?: boolean; chorobowe?: boolean; b2bForma?: TaxForm; b2bZus?: ZusStage; b2bKoszty?: number } = {},
+): KosztAgenta {
+  const brutto = Math.max(0, kwota);
+  if (umowa === "b2b") {
+    const r = computeForm(o.b2bForma ?? "ryczalt", { przychod: brutto * 12, koszty: (o.b2bKoszty ?? 0) * 12, zusStage: o.b2bZus ?? "duzy", chorobowe: o.chorobowe }, c);
+    return {
+      umowa,
+      brutto,
+      kosztBiura: brutto,
+      spoleczneAgenta: r.zusSpoleczny / 12,
+      zdrowotnaAgenta: r.zdrowotna / 12,
+      zaliczkaPit: (r.podatek + r.danina) / 12,
+      nettoAgenta: r.netto / 12,
+    };
+  }
+  const bezSkladek = umowa === "zlecenie" && o.student && o.do26;
+  const chorobowaPracownika = umowa === "zlecenie" && o.chorobowe === false ? c.stawkaChorobowa : 0;
+  const spoleczne = bezSkladek ? 0 : r2(brutto * (c.pracownikSpoleczne - chorobowaPracownika));
+  const zdrowotna = bezSkladek ? 0 : r2((brutto - spoleczne) * c.zdrowotnaSkalaStawka);
+  const kup = umowa === "etat" ? c.kupEtatMies : r2((brutto - spoleczne) * 0.2);
+  const podstawa = Math.max(0, Math.round(brutto - spoleczne - kup));
+  const zaliczkaPit = o.do26 ? 0 : Math.max(0, Math.round(podstawa * c.stawkaSkala1 - c.kwotaZmniejszajacaMies));
+  // Fundusz Pracy pracodawca płaci dopiero od wynagrodzenia co najmniej minimalnego.
+  const fp = brutto >= c.placaMinimalna ? 0 : c.stawkaFP;
+  const skladkiPracodawcy = bezSkladek ? 0 : r2(brutto * (c.pracodawcaSkladki - fp));
   return {
-    zyskFirmy,
-    cit,
-    poCit,
-    dywidenda,
-    spzooNetto,
-    spzooEfektywna,
-    citStawka,
-    jdgNetto,
-    jdgDaniny,
-    jdgEfektywna,
-    roznica: spzooNetto - jdgNetto,
+    umowa,
+    brutto,
+    kosztBiura: r2(brutto + skladkiPracodawcy),
+    spoleczneAgenta: spoleczne,
+    zdrowotnaAgenta: zdrowotna,
+    zaliczkaPit,
+    nettoAgenta: r2(brutto - spoleczne - zdrowotna - zaliczkaPit),
   };
+}
+
+// ── Sprzedaż nieruchomości: PIT sprzedającego i PCC kupującego ──────────────
+export type SprzedazInput = {
+  rokNabycia: number;
+  rokSprzedazy: number;
+  cenaSprzedazy: number;
+  kosztySprzedazy: number;
+  kosztNabycia: number;
+  naklady: number;
+  wydatkiMieszkaniowe: number;
+};
+
+export type SprzedazWynik = {
+  zwolnionaPo5Latach: boolean;
+  rokBezPodatku: number;
+  przychod: number;
+  dochod: number;
+  dochodZwolniony: number;
+  podatek: number;
+  terminWydatkow: number;
+  udzialWydatkow: number;
+};
+
+/**
+ * Podatek od sprzedaży mieszkania przed upływem pięciu lat.
+ * Pięć lat liczy się od końca roku nabycia, więc mieszkanie kupione
+ * w 2021 sprzedasz bez podatku od 1 stycznia 2027. Przy spadku liczy się
+ * rok nabycia przez spadkodawcę. Ulga mieszkaniowa zwalnia dochód w takiej
+ * części, w jakiej przychód wydasz na własne cele mieszkaniowe w ciągu
+ * trzech lat od końca roku sprzedaży.
+ */
+export function podatekOdSprzedazy(i: SprzedazInput, c: TaxConstants): SprzedazWynik {
+  const rokBezPodatku = i.rokNabycia + 6;
+  const zwolnionaPo5Latach = i.rokSprzedazy >= rokBezPodatku;
+  const przychod = Math.max(0, i.cenaSprzedazy - i.kosztySprzedazy);
+  const dochod = Math.max(0, przychod - i.kosztNabycia - i.naklady);
+  const udzialWydatkow = przychod > 0 ? Math.min(1, Math.max(0, i.wydatkiMieszkaniowe) / przychod) : 0;
+  const dochodZwolniony = zwolnionaPo5Latach ? dochod : dochod * udzialWydatkow;
+  const podatek = zwolnionaPo5Latach ? 0 : Math.round((dochod - dochodZwolniony) * c.stawkaPitSprzedaz);
+  return { zwolnionaPo5Latach, rokBezPodatku, przychod, dochod, dochodZwolniony, podatek, terminWydatkow: i.rokSprzedazy + 3, udzialWydatkow };
+}
+
+/**
+ * PCC płaci kupujący na rynku wtórnym. Od 2023 r. pierwsze mieszkanie
+ * (kupujący nigdy nie miał mieszkania ani domu) jest zwolnione. Na rynku
+ * pierwotnym w cenie jest VAT i PCC nie ma.
+ */
+export function pccKupujacego(cena: number, rynek: "wtorny" | "pierwotny", pierwszeMieszkanie: boolean, c: TaxConstants): number {
+  if (rynek === "pierwotny" || pierwszeMieszkanie) return 0;
+  return Math.round(Math.max(0, cena) * c.stawkaPcc);
 }
