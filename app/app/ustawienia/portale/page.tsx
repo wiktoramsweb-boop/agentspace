@@ -3,7 +3,8 @@ import { requireOwner } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { konfiguracjaOtodom, stanPolaczenia, PORTAL } from "@/lib/otodom/klient";
 import { STATUSY } from "@/lib/otodom/ogloszenia";
-import { polaczOtodom, rozlaczOtodom, ustawTrybTestowy } from "./actions";
+import { PORTALE_FTP } from "@/lib/ftp/portale";
+import { polaczOtodom, rozlaczOtodom, testujFtpAkcja, usunFtp, ustawTrybTestowy, zapiszFtp } from "./actions";
 
 export const metadata = { title: "Portale ogłoszeniowe" };
 
@@ -15,10 +16,28 @@ const KOMUNIKATY: Record<string, { ok: boolean; t: string }> = {
   "brak-konfiguracji": { ok: false, t: "Integracja z Otodom nie jest jeszcze skonfigurowana po stronie AgentSpace." },
 };
 
-export default async function PortalePage({ searchParams }: { searchParams: Promise<{ otodom?: string }> }) {
+const KOMUNIKATY_FTP: Record<string, { ok: boolean; t: string }> = {
+  zapisano: { ok: true, t: "Dane FTP zapisane. Wynik sprawdzenia połączenia widzisz przy portalu." },
+  sprawdzono: { ok: true, t: "Połączenie sprawdzone. Wynik widzisz przy portalu." },
+  usunieto: { ok: true, t: "Dane FTP usunięte." },
+  "brak-danych": { ok: false, t: "Podaj adres serwera i login." },
+  "brak-hasla": { ok: false, t: "Podaj hasło do FTP." },
+  "brak-tabeli": { ok: false, t: "Eksport przez FTP wymaga aktualizacji bazy: uruchom lib/SETUP-v51-portale-ftp.sql w Supabase." },
+  nieznany: { ok: false, t: "Nieznany portal." },
+  blad: { ok: false, t: "Nie udało się zapisać. Spróbuj jeszcze raz." },
+};
+
+type WpisFtp = { portal: string; host: string; port: number; login: string; katalog: string; secure: boolean; ostatni_test_at: string | null; ostatni_test_ok: boolean | null; ostatni_blad: string | null; ostatnia_wysylka_at: string | null; ostatnio_ofert: number | null };
+
+export default async function PortalePage({ searchParams }: { searchParams: Promise<{ otodom?: string; ftp?: string }> }) {
   const user = await requireOwner();
-  const { otodom } = await searchParams;
-  const komunikat = otodom ? KOMUNIKATY[otodom] : null;
+  const { otodom, ftp } = await searchParams;
+  const komunikat = otodom ? KOMUNIKATY[otodom] : ftp ? KOMUNIKATY_FTP[ftp] : null;
+  const { data: ftpDane, error: ftpBlad } = await createSupabaseAdmin()
+    .from("portal_ftp")
+    .select("portal, host, port, login, katalog, secure, ostatni_test_at, ostatni_test_ok, ostatni_blad, ostatnia_wysylka_at, ostatnio_ofert")
+    .eq("agency_id", user.agency_id);
+  const ftpWpisy = new Map(((ftpDane as WpisFtp[] | null) ?? []).map((w) => [w.portal, w]));
   const pol = await stanPolaczenia(user.agency_id!);
   const konf = konfiguracjaOtodom();
   const { data: wpisy } = pol.tabele
@@ -109,7 +128,81 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
         )}
       </section>
 
-      <p className="text-xs text-slate-500">Kolejne portale (Morizon-Gratka, Nieruchomosci-online i inne) dodamy tutaj, gdy portale przekażą nam swoje formaty wymiany ofert.</p>
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">Portale przez FTP</h2>
+          <p className="mt-1 max-w-2xl text-sm text-slate-600">
+            Część portali przyjmuje oferty plikiem wysyłanym na ich serwer. Po podpisaniu umowy portal daje biuru dane FTP: wpisz je tutaj, a AgentSpace sprawdzi połączenie.
+          </p>
+        </div>
+        {ftpBlad && <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">Eksport przez FTP wymaga aktualizacji bazy: uruchom plik <code>lib/SETUP-v51-portale-ftp.sql</code> w Supabase.</p>}
+        {PORTALE_FTP.map((p) => {
+          const w = ftpWpisy.get(p.id);
+          return (
+            <section key={p.id} id={`ftp-${p.id}`} className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold text-slate-900">{p.nazwa}</h3>
+                  <p className="mt-0.5 text-xs text-slate-500">Format pliku: {p.format}</p>
+                </div>
+                {w && (
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${w.ostatni_test_ok ? "bg-emerald-100 text-emerald-800" : w.ostatni_test_ok === false ? "bg-rose-100 text-rose-800" : "bg-slate-100 text-slate-600"}`}>
+                    {w.ostatni_test_ok ? "Połączenie działa" : w.ostatni_test_ok === false ? "Brak połączenia" : "Niesprawdzone"}
+                  </span>
+                )}
+              </div>
+              {!w && <p className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">{p.jakZdobyc}</p>}
+              {w?.ostatni_blad && <p className="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{w.ostatni_blad}</p>}
+              {w?.ostatni_test_at && (
+                <p className="mt-2 text-xs text-slate-500">
+                  Ostatnie sprawdzenie: {new Date(w.ostatni_test_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })}
+                  {w.ostatnia_wysylka_at && ` · ostatnia wysyłka: ${new Date(w.ostatnia_wysylka_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })} (${w.ostatnio_ofert ?? 0} ofert)`}
+                </p>
+              )}
+              <form action={zapiszFtp} className="mt-4 grid gap-3 sm:grid-cols-6">
+                <input type="hidden" name="portal" value={p.id} />
+                <label className="sm:col-span-4">
+                  <span className="text-xs text-slate-500">Serwer (host)</span>
+                  <input name="host" required defaultValue={w?.host ?? ""} placeholder="ftp.przyklad.pl" className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm" />
+                </label>
+                <label className="sm:col-span-2">
+                  <span className="text-xs text-slate-500">Port</span>
+                  <input name="port" inputMode="numeric" defaultValue={w?.port ?? 21} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm" />
+                </label>
+                <label className="sm:col-span-3">
+                  <span className="text-xs text-slate-500">Login</span>
+                  <input name="login" required autoComplete="off" defaultValue={w?.login ?? ""} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm" />
+                </label>
+                <label className="sm:col-span-3">
+                  <span className="text-xs text-slate-500">Hasło{w ? " (zostaw puste, żeby nie zmieniać)" : ""}</span>
+                  <input name="haslo" type="password" autoComplete="new-password" required={!w} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm" />
+                </label>
+                <label className="sm:col-span-3">
+                  <span className="text-xs text-slate-500">Katalog na serwerze</span>
+                  <input name="katalog" defaultValue={w?.katalog ?? "/"} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm" />
+                </label>
+                <label className="flex items-end gap-2 pb-2.5 text-sm text-slate-700 sm:col-span-3">
+                  <input type="checkbox" name="secure" value="1" defaultChecked={w?.secure ?? false} className="h-4 w-4 accent-emerald-600" />
+                  Szyfrowane połączenie (FTPS)
+                </label>
+                <div className="flex flex-wrap gap-2 sm:col-span-6">
+                  <button className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500">{w ? "Zapisz zmiany" : "Zapisz i sprawdź"}</button>
+                  {w && (
+                    <>
+                      <button formAction={testujFtpAkcja} formNoValidate className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                        Sprawdź połączenie
+                      </button>
+                      <button formAction={usunFtp} formNoValidate className="rounded-xl px-4 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50">
+                        Usuń dane FTP
+                      </button>
+                    </>
+                  )}
+                </div>
+              </form>
+            </section>
+          );
+        })}
+      </section>
     </div>
   );
 }

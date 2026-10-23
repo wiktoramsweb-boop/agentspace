@@ -6,6 +6,9 @@ import { requireOwner } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { adresAutoryzacji, konfiguracjaOtodom, stanAutoryzacji, PORTAL } from "@/lib/otodom/klient";
 import { zapiszZdarzenie } from "@/lib/dziennik";
+import { odszyfruj, zaszyfruj } from "@/lib/szyfr";
+import { testujFtp } from "@/lib/ftp/klient";
+import { portalFtp } from "@/lib/ftp/portale";
 
 /** Start połączenia: CEO loguje się na Otodom kontem biura i zgadza na dostęp. */
 export async function polaczOtodom(): Promise<void> {
@@ -34,4 +37,82 @@ export async function ustawTrybTestowy(formData: FormData): Promise<void> {
     .eq("agency_id", user.agency_id)
     .eq("portal", PORTAL);
   revalidatePath("/app/ustawienia/portale");
+}
+
+/* ───────────── portale przez FTP ───────────── */
+
+function daneFormularza(formData: FormData) {
+  const t = (k: string, max = 200) => String(formData.get(k) ?? "").trim().slice(0, max);
+  const port = Number(t("port", 6)) || 21;
+  return {
+    portal: t("portal", 60),
+    // Agent często wkleja adres z „ftp://” albo ukośnikiem na końcu.
+    host: t("host").replace(/^s?ftps?:\/\//i, "").replace(/\/.*$/, ""),
+    port: port > 0 && port < 65536 ? port : 21,
+    login: t("login"),
+    haslo: String(formData.get("haslo") ?? "").slice(0, 200),
+    katalog: t("katalog") || "/",
+    secure: formData.get("secure") === "1",
+  };
+}
+
+const wroc = (stan: string, portal: string) => redirect(`/app/ustawienia/portale?ftp=${stan}&portal=${encodeURIComponent(portal)}#ftp-${portal}`);
+
+export async function zapiszFtp(formData: FormData): Promise<void> {
+  const user = await requireOwner();
+  const d = daneFormularza(formData);
+  if (!portalFtp(d.portal)) wroc("nieznany", d.portal);
+  if (!d.host || !d.login) wroc("brak-danych", d.portal);
+  const admin = createSupabaseAdmin();
+  const { data: obecne } = await admin.from("portal_ftp").select("id").eq("agency_id", user.agency_id).eq("portal", d.portal).maybeSingle();
+  // Puste hasło przy edycji = zostaw stare. Przy pierwszym zapisie hasło jest wymagane.
+  if (!d.haslo && !obecne) wroc("brak-hasla", d.portal);
+  const { error } = await admin.from("portal_ftp").upsert(
+    {
+      agency_id: user.agency_id,
+      portal: d.portal,
+      host: d.host,
+      port: d.port,
+      login: d.login,
+      katalog: d.katalog,
+      secure: d.secure,
+      ...(d.haslo ? { haslo_enc: zaszyfruj(d.haslo) } : {}),
+      created_by: user.id,
+      updated_at: new Date().toISOString(),
+      ostatni_test_ok: null,
+      ostatni_blad: null,
+    },
+    { onConflict: "agency_id,portal" },
+  );
+  if (error) wroc(/portal_ftp/.test(error.message) ? "brak-tabeli" : "blad", d.portal);
+  await zapiszZdarzenie({ agencyId: user.agency_id!, actorId: user.id, akcja: "portal_ftp_zapisany", opis: `Zapisano dane FTP: ${portalFtp(d.portal)!.nazwa}`, meta: { portal: d.portal, host: d.host } });
+  await sprawdzFtp(user.agency_id!, d.portal);
+  wroc("zapisano", d.portal);
+}
+
+async function sprawdzFtp(agencyId: string, portal: string) {
+  const admin = createSupabaseAdmin();
+  const { data: w } = await admin.from("portal_ftp").select("host, port, login, haslo_enc, katalog, secure").eq("agency_id", agencyId).eq("portal", portal).maybeSingle();
+  if (!w) return;
+  const wynik = await testujFtp({ host: w.host, port: w.port, login: w.login, haslo: odszyfruj(w.haslo_enc), katalog: w.katalog, secure: w.secure });
+  await admin
+    .from("portal_ftp")
+    .update({ ostatni_test_at: new Date().toISOString(), ostatni_test_ok: wynik.ok, ostatni_blad: wynik.ok ? null : wynik.blad })
+    .eq("agency_id", agencyId)
+    .eq("portal", portal);
+}
+
+export async function testujFtpAkcja(formData: FormData): Promise<void> {
+  const user = await requireOwner();
+  const portal = String(formData.get("portal") ?? "");
+  await sprawdzFtp(user.agency_id!, portal);
+  wroc("sprawdzono", portal);
+}
+
+export async function usunFtp(formData: FormData): Promise<void> {
+  const user = await requireOwner();
+  const portal = String(formData.get("portal") ?? "");
+  await createSupabaseAdmin().from("portal_ftp").delete().eq("agency_id", user.agency_id).eq("portal", portal);
+  await zapiszZdarzenie({ agencyId: user.agency_id!, actorId: user.id, akcja: "portal_ftp_usuniety", opis: `Usunięto dane FTP: ${portalFtp(portal)?.nazwa ?? portal}`, meta: { portal } });
+  wroc("usunieto", portal);
 }
