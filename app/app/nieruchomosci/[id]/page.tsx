@@ -41,7 +41,7 @@ import { ActivityModal } from "../../dzialania/activity-modal";
 import { PropertyTabs, TABS, type TabKey } from "./property-tabs";
 import { OgloszeniaTab } from "./ogloszenia-tab";
 import { stanPolaczenia } from "@/lib/otodom/klient";
-import { ogloszenieOferty, STATUSY } from "@/lib/otodom/ogloszenia";
+import { historiaOtodom, ogloszenieOferty, STATUSY } from "@/lib/otodom/ogloszenia";
 import { TransactionTab } from "./transaction-tab";
 import { ActivitiesTab } from "./activities-tab";
 import { PortalTab } from "./portal-tab";
@@ -155,6 +155,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
   );
 
   const [otodomPol, otodomOgl] = await Promise.all([stanPolaczenia(user.agency_id ?? ""), ogloszenieOferty(property.id)]);
+  const otodomHistoria = tab === "oferta" ? await historiaOtodom(otodomOgl?.advert_uuid) : [];
 
   const liczniki = {
     poszukiwania: interested.length,
@@ -231,6 +232,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             tabele={otodomPol.tabele}
             test={otodomPol.test}
             ogloszenie={otodomOgl}
+            historia={otodomHistoria}
             statusy={STATUSY}
             ceo={user.role === "owner"}
           />

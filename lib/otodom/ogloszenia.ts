@@ -57,6 +57,20 @@ export async function ogloszenieOferty(propertyId: string): Promise<OgloszenieOt
   return o;
 }
 
+export type ZdarzenieOtodom = { event_type: string | null; code: string | null; message: string | null; created_at: string };
+
+/** Ostatnie powiadomienia z Otodom dla ogłoszenia: agent widzi, co i kiedy portal potwierdził. */
+export async function historiaOtodom(advertUuid: string | null | undefined, ile = 8): Promise<ZdarzenieOtodom[]> {
+  if (!advertUuid) return [];
+  const { data } = await createSupabaseAdmin()
+    .from("portal_events")
+    .select("event_type, code, message, created_at")
+    .eq("advert_uuid", advertUuid)
+    .order("created_at", { ascending: false })
+    .limit(ile);
+  return (data as ZdarzenieOtodom[] | null) ?? [];
+}
+
 async function zapiszStan(agencyId: string, propertyId: string, userId: string, zmiany: Record<string, unknown>) {
   await createSupabaseAdmin()
     .from("portal_listings")

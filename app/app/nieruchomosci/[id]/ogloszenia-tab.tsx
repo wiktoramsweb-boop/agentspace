@@ -7,6 +7,19 @@ import { odswiezOtodom, opublikujOtodom, zmienOtodom } from "./otodom-actions";
 
 type Ogloszenie = { advert_uuid: string | null; status: string | null; url: string | null; last_error: string | null; exact_location: boolean; updated_at: string | null } | null;
 type Status = { label: string; kolor: string };
+type Zdarzenie = { event_type: string | null; code: string | null; message: string | null; created_at: string };
+
+const ZDARZENIA: Record<string, string> = {
+  advert_posted_success: "Opublikowane",
+  advert_posted_error: "Publikacja odrzucona",
+  advert_put_success: "Zmiany przyjęte",
+  advert_put_error: "Zmiany odrzucone",
+  advert_activated_success: "Aktywowane",
+  advert_deactivated_success: "Dezaktywowane",
+  advert_deleted_success: "Usunięte",
+  advert_state_changed: "Zmiana statusu",
+  advert_location_error: "Lokalizacja nieprzyjęta",
+};
 
 /**
  * Publikacja oferty na portalach. Na razie Otodom; kolejne portale dojdą jako
@@ -18,6 +31,7 @@ export function OgloszeniaTab({
   tabele,
   test,
   ogloszenie,
+  historia = [],
   statusy,
   ceo,
 }: {
@@ -26,6 +40,7 @@ export function OgloszeniaTab({
   tabele: boolean;
   test: boolean;
   ogloszenie: Ogloszenie;
+  historia?: Zdarzenie[];
   statusy: Record<string, Status>;
   ceo: boolean;
 }) {
@@ -140,6 +155,25 @@ export function OgloszeniaTab({
               </>
             )}
           </div>
+        )}
+        {historia.length > 0 && (
+          <details className="mt-5 border-t border-slate-100 pt-4">
+            <summary className="cursor-pointer text-sm font-semibold text-slate-700">Historia z Otodom ({historia.length})</summary>
+            <ul className="mt-3 space-y-2">
+              {historia.map((z, i) => (
+                <li key={i} className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm">
+                  <span className="text-slate-800">
+                    {ZDARZENIA[z.event_type ?? ""] ?? z.event_type}
+                    {z.code && <span className="text-slate-500"> · {statusy[z.code]?.label ?? z.code}</span>}
+                    {z.message && <span className="block text-xs text-rose-600">{z.message}</span>}
+                  </span>
+                  <span className="text-xs tabular-nums text-slate-400">
+                    {new Date(z.created_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </details>
         )}
       </section>
     </div>
