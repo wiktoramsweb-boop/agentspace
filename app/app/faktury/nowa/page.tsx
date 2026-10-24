@@ -1,5 +1,5 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import { addDaysKey, todayPL } from "@/lib/datetime";
-import Link from "next/link";
 import { requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { sprzedawcy, type RodzajDokumentu } from "@/lib/invoice";
@@ -38,12 +38,7 @@ export default async function NowaFakturaPage({
 
   return (
     <>
-      <Link
-        href="/app/faktury"
-        className="print-hide mb-4 inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
-      >
-        ← Faktury
-      </Link>
+      <Wstecz href="/app/faktury">← Faktury</Wstecz>
       <div className="print-hide">
         <PageHeader
           title={korygowana ? `Korekta do faktury ${korygowana.number}` : rodzaj === "proforma" ? "Nowa proforma" : "Nowa faktura"}

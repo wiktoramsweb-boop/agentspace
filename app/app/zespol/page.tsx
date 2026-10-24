@@ -14,6 +14,7 @@ import {
 } from "@/lib/data";
 import { getAgencyCommissionByAgent } from "@/lib/data-platform";
 import { PageHeader, StatCard, Card, scoreColor } from "../components/ui";
+import { Zakladki, type Zakladka } from "../components/zakladki";
 import { formatPln } from "@/lib/format";
 import { FUNNEL_STAGES, type UserRole } from "@/lib/types";
 import { ROLE_LABELS } from "@/lib/role";
@@ -56,8 +57,15 @@ function TrendArrow({ trend }: { trend?: AgentTrend }) {
   return <span title="wynik stabilny" className="text-sm text-slate-500">→</span>;
 }
 
-export default async function ZespolPage() {
+const ZAKLADKI: Zakladka[] = [
+  { key: "zespol", label: "Zespół", ikona: "osoba" },
+  { key: "wyniki", label: "Wyniki", ikona: "blyskawica" },
+  { key: "zarzadzanie", label: "Zarządzanie", ikona: "tarcza" },
+];
+
+export default async function ZespolPage({ searchParams }: { searchParams: Promise<{ z?: string }> }) {
   const user = await requireManagerOrOwner();
+  const { z } = await searchParams;
   odetnijPoWygasnieciu(user);
   const agencyId = user.agency_id!;
   const isOwner = user.role === "owner";
@@ -118,6 +126,9 @@ export default async function ZespolPage() {
   })();
   const scopedSessionsWeek = ranking.reduce((a, r) => a + r.sessionsThisWeek, 0);
 
+  const zakladki = isOwner ? ZAKLADKI : ZAKLADKI.filter((t) => t.key !== "zarzadzanie");
+  const tab = zakladki.some((t) => t.key === z) ? (z as string) : "zespol";
+
   const strongest = categories[0];
   const weakest = categories[categories.length - 1];
 
@@ -127,8 +138,8 @@ export default async function ZespolPage() {
         title="Zespół"
         subtitle={
           isOwner
-            ? `${user.agency?.name ?? "Twoje biuro"} - dane, nie przeczucia.`
-            : "Twoi agenci - cele i wyniki AI."
+            ? `${user.agency?.name ?? "Twoje biuro"}: ludzie, ich wyniki i dostęp do aplikacji.`
+            : "Twoi agenci: cele, telefony i wyniki AI Coach."
         }
         action={
           isOwner ? (
@@ -168,21 +179,44 @@ export default async function ZespolPage() {
         )}
       </div>
 
-      {profiles.length > 0 && (
+      <Zakladki
+        zakladki={zakladki}
+        active={tab}
+        adres={(k) => (k === "zespol" ? "/app/zespol" : `/app/zespol?z=${k}`)}
+        liczniki={{ zespol: profiles.length, wyniki: insights.alerts.length || undefined, zarzadzanie: invitations.length || undefined }}
+        etykieta="Sekcje zespołu"
+      />
+
+      {tab === "zespol" && (
         <div className="mb-8">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">Ludzie w biurze</h2>
-              <p className="text-sm text-slate-500">
-                {isOwner
-                  ? "Wejdź w osobę, żeby zobaczyć jej wyniki, zmienić rolę albo usunąć ją z zespołu. Zdjęcie każdy wgrywa sobie sam."
-                  : "Twoi agenci: kontakt, specjalizacja i bieżące obciążenie."}
+          <p className="mb-4 text-sm text-slate-500">
+            {isOwner
+              ? "Kliknij osobę, żeby zobaczyć jej wyniki, cele i uprawnienia."
+              : "Kliknij osobę, żeby zobaczyć jej wyniki i cele."}
+          </p>
+          {profiles.length > 0 ? (
+            <TeamProfiles people={profiles} canEdit={isOwner} currentUserId={user.id} />
+          ) : (
+            <Card>
+              <p className="text-center text-sm text-slate-500">
+                {isOwner ? (
+                  <>
+                    W biurze nie ma jeszcze nikogo poza Tobą.{" "}
+                    <Link href="/app/zespol?z=zarzadzanie" className="font-semibold text-emerald-700 hover:underline">
+                      Zaproś pierwszą osobę →
+                    </Link>
+                  </>
+                ) : (
+                  "Nie masz jeszcze przypisanych agentów."
+                )}
               </p>
-            </div>
-          </div>
-          <TeamProfiles people={profiles} canEdit={isOwner} currentUserId={user.id} />
+            </Card>
+          )}
         </div>
       )}
+
+      {tab === "wyniki" && (
+      <>
 
       {/* Alerty proaktywne - kto wymaga uwagi */}
       {insights.alerts.length > 0 ? (
@@ -215,7 +249,7 @@ export default async function ZespolPage() {
       ) : (
         ranking.length > 0 && (
           <Card className="mb-8 !border-emerald-500/20 !bg-emerald-500/[0.04]">
-            <p className="text-sm text-emerald-700">Wszystko gra - brak sygnałów wymagających uwagi.</p>
+            <p className="text-sm text-emerald-700">Wszystko w porządku: nikt nie wymaga teraz Twojej uwagi.</p>
           </Card>
         )
       )}
@@ -224,7 +258,7 @@ export default async function ZespolPage() {
       {insights.weeklyActivity.some((w) => w.total > 0) && (
         <Card className="mb-8">
           <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">
-            Aktywność zespołu - telefony (4 tygodnie)
+            Telefony zespołu w ostatnich 4 tygodniach
           </h2>
           <div className="flex items-end gap-3">
             {insights.weeklyActivity.map((w, i) => {
@@ -271,8 +305,78 @@ export default async function ZespolPage() {
         </div>
       )}
 
+      {/* Ranking / lista agentów */}
+      <div>
+        <h2 className="mb-3 text-lg font-semibold text-slate-900">
+          Ranking wyników AI Coach
+        </h2>
+        {ranking.length === 0 ? (
+          <Card>
+            <p className="text-center text-sm text-slate-500">
+              {isOwner ? "Brak agentów. Zaproś kogoś w zakładce Zarządzanie." : "Nie masz jeszcze przypisanych agentów."}
+            </p>
+          </Card>
+        ) : (
+          <Card className="!p-0">
+            <div className="divide-y divide-slate-200">
+              {ranking.map((agent, i) => {
+                const fp = funnelByAgent[agent.id];
+                return (
+                  <Link
+                    key={agent.id}
+                    href={`/app/zespol/${agent.id}`}
+                    className="block px-6 py-4 transition hover:bg-slate-50"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex min-w-0 items-center gap-4">
+                        <span className="w-6 flex-shrink-0 text-center font-mono text-sm font-bold text-slate-500">
+                          {i + 1}
+                        </span>
+                        <Avatar name={agent.full_name ?? agent.email ?? "?"} path={agent.avatar_path} size={36} />
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-slate-900">
+                            {agent.full_name ?? agent.email}
+                            {agent.role === "manager" && (
+                              <span className="ml-2 rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700">
+                                Menedżer
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            {agent.sessionCount} sesji
+                            {isOwner && ` · ${formatPln(commissions[agent.id] ?? 0)} prowizji (mc)`}
+                            {agent.sessionsThisWeek === 0 && (
+                              <span className="ml-1 text-amber-600">· nie trenuje</span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <span className={`inline-flex items-center gap-1 font-mono text-lg font-semibold ${scoreColor(agent.avgScore)}`}>
+                            {agent.avgScore != null ? `${agent.avgScore}` : "-"}
+                            <TrendArrow trend={insights.trends[agent.id]} />
+                          </span>
+                          <span className="hidden text-xs text-slate-500 sm:block">wynik AI</span>
+                        </div>
+                        <svg className="h-4 w-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                    {fp && <FunnelChips stages={fp.stages} hasGoal={fp.hasGoal} />}
+                  </Link>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+      </div>
+      </>
+      )}
+
       {/* Zapraszanie + zarządzanie rolami - tylko CEO */}
-      {isOwner && (
+      {isOwner && tab === "zarzadzanie" && (
         <>
           <div className="mb-8">
             <h2 className="mb-3 text-lg font-semibold text-slate-900">Zaproś do zespołu</h2>
@@ -329,71 +433,6 @@ export default async function ZespolPage() {
         </>
       )}
 
-      {/* Ranking / lista agentów */}
-      <div>
-        <h2 className="mb-3 text-lg font-semibold text-slate-900">
-          {isOwner ? "Ranking agentów" : "Twoi agenci"}
-        </h2>
-        {ranking.length === 0 ? (
-          <Card>
-            <p className="text-center text-sm text-slate-500">
-              {isOwner ? "Brak agentów. Zaproś kogoś powyżej." : "Nie masz jeszcze przypisanych agentów."}
-            </p>
-          </Card>
-        ) : (
-          <Card className="!p-0">
-            <div className="divide-y divide-slate-200">
-              {ranking.map((agent, i) => {
-                const fp = funnelByAgent[agent.id];
-                return (
-                  <Link
-                    key={agent.id}
-                    href={`/app/zespol/${agent.id}`}
-                    className="block px-6 py-4 transition hover:bg-slate-50"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex min-w-0 items-center gap-4">
-                        <span className="w-6 flex-shrink-0 text-center font-mono text-sm font-bold text-slate-500">
-                          {i + 1}
-                        </span>
-                        <Avatar name={agent.full_name ?? agent.email ?? "?"} path={agent.avatar_path} size={36} />
-                        <div className="min-w-0">
-                          <p className="truncate font-medium text-slate-900">
-                            {agent.full_name ?? agent.email}
-                            {agent.role === "manager" && (
-                              <span className="ml-2 rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700">
-                                Menedżer
-                              </span>
-                            )}
-                          </p>
-                          <p className="text-sm text-slate-500">
-                            {agent.sessionCount} sesji
-                            {isOwner && ` · ${formatPln(commissions[agent.id] ?? 0)} prowizji (mc)`}
-                            {agent.sessionsThisWeek === 0 && (
-                              <span className="ml-1 text-amber-600">· nie trenuje</span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <span className={`inline-flex items-center gap-1 font-mono text-lg font-semibold ${scoreColor(agent.avgScore)}`}>
-                            {agent.avgScore != null ? `${agent.avgScore}` : "-"}
-                            <TrendArrow trend={insights.trends[agent.id]} />
-                          </span>
-                          <span className="hidden text-xs text-slate-500 sm:block">wynik AI</span>
-                        </div>
-                        <span className="text-xs text-emerald-400/70">Szczegóły →</span>
-                      </div>
-                    </div>
-                    {fp && <FunnelChips stages={fp.stages} hasGoal={fp.hasGoal} />}
-                  </Link>
-                );
-              })}
-            </div>
-          </Card>
-        )}
-      </div>
     </>
   );
 }

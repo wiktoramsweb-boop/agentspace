@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { klikKarty } from "../components/klik-karty";
+import { Avatar } from "../components/avatar";
 import { motion, useReducedMotion } from "motion/react";
 import type { ActivityRow } from "@/lib/data-lists";
 import type { ListQuery } from "@/lib/list-params";
@@ -65,6 +68,7 @@ export function ActivitiesBrowser({
   const reduce = useReducedMotion();
   const selection = useSelection();
   const [pending, start] = useTransition();
+  const router = useRouter();
   const [followUp, setFollowUp] = useState<ThreadParent | null>(null);
   const pageIds = rows.map((r) => r.id);
   const allOnPage = pageIds.length > 0 && pageIds.every((id) => selection.has(id));
@@ -120,7 +124,8 @@ export function ActivitiesBrowser({
                 initial={reduce ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: reduce ? 0 : Math.min(0.2, i * 0.015), duration: 0.25 }}
-                className={`group flex items-stretch gap-2 overflow-hidden rounded-2xl border bg-white transition hover:shadow-sm ${
+                onClick={(e) => klikKarty(e, `/app/dzialania/${a.id}`, router.push)}
+                className={`group flex cursor-pointer items-stretch gap-2 overflow-hidden rounded-2xl border bg-white transition hover:shadow-sm ${
                   picked ? "border-emerald-400 ring-1 ring-emerald-300" : "border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -174,7 +179,20 @@ export function ActivitiesBrowser({
                     </Row>
 
                     {a.purpose && <Row label="Cel">{PURPOSE_MAP[a.purpose] ?? a.purpose}</Row>}
-                    <Row label="Agent">{a.assigneeNames.join(", ") || "-"}</Row>
+                    <Row label="Agent">
+                      {a.assigneeNames.length ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="flex -space-x-1.5">
+                            {a.assigneeNames.slice(0, 3).map((n, k) => (
+                              <Avatar key={k} name={n} path={a.assigneeAvatars?.[k]} size={20} ring />
+                            ))}
+                          </span>
+                          {a.assigneeNames.join(", ")}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
+                    </Row>
                     {/* Puste pola pomijamy: wiersz z czterema kreskami czytało się gorzej niż krótki. */}
                     {a.contact_phone && (
                       <Row label="Telefon">
@@ -226,12 +244,6 @@ export function ActivitiesBrowser({
                   >
                     + Rozmowa
                   </button>
-                  <Link
-                    href={`/app/dzialania/${a.id}`}
-                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:text-emerald-600"
-                  >
-                    Szczegóły →
-                  </Link>
                   {a.status !== "wykonane" ? (
                     <button
                       onClick={() => start(() => setActivityStatus(a.id, "wykonane"))}

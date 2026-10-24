@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Avatar } from "../components/avatar";
 import { motion, useReducedMotion } from "motion/react";
 import type { CSSProperties } from "react";
 import {
@@ -240,14 +241,12 @@ export function PropertiesBrowser({
 
                       <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-3">
                         <span className="flex items-center gap-2 text-xs text-slate-500">
-                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 text-[10px] font-bold text-white">
-                            {(p.opiekunName ?? "?").charAt(0).toUpperCase()}
-                          </span>
+                          <Avatar name={p.opiekunName ?? "?"} path={p.opiekunAvatar} size={24} />
                           {mine ? "Ty" : p.opiekunName ?? "-"}
                         </span>
-                        <span className="text-xs font-medium text-emerald-400/80 opacity-0 transition group-hover:opacity-100">
-                          Otwórz →
-                        </span>
+                        <svg className="h-4 w-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                        </svg>
                       </div>
                     </div>
                   </div>

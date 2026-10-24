@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Avatar } from "../components/avatar";
 import { motion, useReducedMotion } from "motion/react";
 import { BellIcon } from "../components/icons";
 import { ListToolbar, ServerPagination } from "../components/list-controls";
@@ -157,8 +158,9 @@ export function ClientsBrowser({
                       </p>
                     </div>
                     <div className="hidden min-w-0 text-sm sm:block">
-                      <p className="truncate text-slate-500">
-                        <span className="text-slate-400">Opiekun: </span>
+                      <p className="flex items-center gap-1.5 truncate text-slate-500">
+                        <span className="text-slate-400">Opiekun:</span>
+                        {c.opiekunName && <Avatar name={c.opiekunName} path={c.opiekunAvatar} size={20} />}
                         {c.opiekunName ?? "-"}
                       </p>
                       <p className="truncate text-xs text-slate-500">{daysAgo(c.last_contact_at)}</p>

@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import { formatDateTimePL, todayDatePL } from "@/lib/datetime";
 import { formatPhone } from "@/lib/format";
 import Link from "next/link";
@@ -81,12 +82,7 @@ export default async function RaportDzialanPage({ searchParams }: Props) {
 
   return (
     <>
-      <Link
-        href="/app/dzialania"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
-      >
-        ← Działania
-      </Link>
+      <Wstecz href="/app/dzialania">← Działania</Wstecz>
 
       <PageHeader
         title="Raport działań"

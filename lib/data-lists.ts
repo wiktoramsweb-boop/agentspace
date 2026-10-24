@@ -32,7 +32,7 @@ function empty<T>(_per: number): Page<T> {
   return { rows: [], total: 0, pages: 1 };
 }
 
-export type ClientRow = Client & { opiekunName: string | null };
+export type ClientRow = Client & { opiekunName: string | null; opiekunAvatar?: string | null };
 
 const CLIENT_SORTS: Record<string, { column: string; asc: boolean; nullsFirst?: boolean }> = {
   nowe: { column: "created_at", asc: false },
@@ -85,19 +85,20 @@ export async function queryClients(agencyId: string, q: ListQuery, userId: strin
   const rows = (data ?? []) as Client[];
   const ids = [...new Set(rows.map((r) => r.agent_id).filter(Boolean))] as string[];
   const { data: people } = ids.length
-    ? await admin.from("profiles").select("id, full_name").in("id", ids)
-    : { data: [] as { id: string; full_name: string | null }[] };
+    ? await admin.from("profiles").select("id, full_name, avatar_path").in("id", ids)
+    : { data: [] as { id: string; full_name: string | null; avatar_path: string | null }[] };
   const names = new Map((people ?? []).map((p) => [p.id, p.full_name]));
+  const awatary = new Map((people ?? []).map((p) => [p.id, (p.avatar_path as string | null) ?? null]));
 
   const total = count ?? rows.length;
   return {
-    rows: rows.map((c) => ({ ...c, opiekunName: c.agent_id ? names.get(c.agent_id) ?? null : null })),
+    rows: rows.map((c) => ({ ...c, opiekunName: c.agent_id ? names.get(c.agent_id) ?? null : null, opiekunAvatar: c.agent_id ? awatary.get(c.agent_id) ?? null : null })),
     total,
     pages: Math.max(1, Math.ceil(total / q.per)),
   };
 }
 
-export type PropertyRow = Property & { opiekunName: string | null };
+export type PropertyRow = Property & { opiekunName: string | null; opiekunAvatar?: string | null };
 
 const PROPERTY_SORTS: Record<string, { column: string; asc: boolean }> = {
   nowe: { column: "created_at", asc: false },
@@ -145,13 +146,14 @@ export async function queryProperties(agencyId: string, q: ListQuery, userId: st
   const rows = (data ?? []) as Property[];
   const ids = [...new Set(rows.map((r) => r.agent_id).filter(Boolean))] as string[];
   const { data: people } = ids.length
-    ? await admin.from("profiles").select("id, full_name").in("id", ids)
-    : { data: [] as { id: string; full_name: string | null }[] };
+    ? await admin.from("profiles").select("id, full_name, avatar_path").in("id", ids)
+    : { data: [] as { id: string; full_name: string | null; avatar_path: string | null }[] };
   const names = new Map((people ?? []).map((p) => [p.id, p.full_name]));
+  const awatary = new Map((people ?? []).map((p) => [p.id, (p.avatar_path as string | null) ?? null]));
 
   const total = count ?? rows.length;
   return {
-    rows: rows.map((p) => ({ ...p, opiekunName: p.agent_id ? names.get(p.agent_id) ?? null : null })),
+    rows: rows.map((p) => ({ ...p, opiekunName: p.agent_id ? names.get(p.agent_id) ?? null : null, opiekunAvatar: p.agent_id ? awatary.get(p.agent_id) ?? null : null })),
     total,
     pages: Math.max(1, Math.ceil(total / q.per)),
   };
@@ -161,6 +163,8 @@ export type ActivityRow = Activity & {
   clientName: string | null;
   propertyTitle: string | null;
   assigneeNames: string[];
+  /** Ścieżki zdjęć w tej samej kolejności co assigneeNames. */
+  assigneeAvatars?: (string | null)[];
   /** Ile rozmów ma wątek (1 = pojedyncze działanie). */
   threadCount: number;
   /** Termin ostatniej rozmowy w wątku. */
@@ -224,7 +228,7 @@ export async function queryActivities(
   const [clients, properties, profiles, children] = await Promise.all([
     clientIds.length ? admin.from("clients").select("id, name").in("id", clientIds) : Promise.resolve({ data: [] }),
     propertyIds.length ? admin.from("properties").select("id, title").in("id", propertyIds) : Promise.resolve({ data: [] }),
-    userIds.length ? admin.from("profiles").select("id, full_name").in("id", userIds) : Promise.resolve({ data: [] }),
+    userIds.length ? admin.from("profiles").select("id, full_name, avatar_path").in("id", userIds) : Promise.resolve({ data: [] }),
     opts.threads && ids.length
       ? admin.from("activities").select("parent_id, due_at").in("parent_id", ids)
       : Promise.resolve({ data: [] as { parent_id: string; due_at: string | null }[] }),
@@ -234,6 +238,9 @@ export async function queryActivities(
   const pMap = new Map((properties.data ?? []).map((p: { id: string; title: string }) => [p.id, p.title]));
   const uMap = new Map(
     (profiles.data ?? []).map((u: { id: string; full_name: string | null }) => [u.id, u.full_name ?? "Agent"]),
+  );
+  const uAv = new Map(
+    (profiles.data ?? []).map((u: { id: string; avatar_path?: string | null }) => [u.id, u.avatar_path ?? null]),
   );
   const thread = new Map<string, { count: number; last: string | null }>();
   for (const ch of (children.data ?? []) as { parent_id: string; due_at: string | null }[]) {
@@ -252,6 +259,7 @@ export async function queryActivities(
         clientName: r.client_id ? cMap.get(r.client_id) ?? null : null,
         propertyTitle: r.property_id ? pMap.get(r.property_id) ?? null : null,
         assigneeNames: (r.assignee_ids ?? []).map((id) => uMap.get(id) ?? "Agent"),
+        assigneeAvatars: (r.assignee_ids ?? []).map((id) => uAv.get(id) ?? null),
         threadCount: 1 + (t?.count ?? 0),
         lastAt: t?.last && r.due_at && t.last > r.due_at ? t.last : r.due_at,
       };
