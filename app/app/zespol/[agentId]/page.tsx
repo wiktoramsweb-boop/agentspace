@@ -8,6 +8,7 @@ import { formatPln } from "@/lib/format";
 import { formatDate } from "@/lib/blog";
 import { FUNNEL_STAGES } from "@/lib/types";
 import { ROLE_LABELS } from "@/lib/role";
+import { Avatar } from "../../components/avatar";
 import { computeFunnel } from "@/lib/funnel";
 import { buildMonthCalendar } from "@/lib/goal-calendar";
 import { MonthCalendarView } from "../../cele/month-calendar";
@@ -79,8 +80,13 @@ export default async function AgentDetailPage({ params }: Props) {
       </Wstecz>
 
       <PageHeader
-        title={profile.full_name ?? profile.email ?? "Agent"}
-        subtitle={`${ROLE_LABELS[profile.role]}${
+        title={
+          <span className="flex items-center gap-3">
+            <Avatar name={profile.full_name ?? profile.email ?? "Agent"} path={profile.avatar_path} size={52} ring />
+            {profile.full_name ?? profile.email ?? "Agent"}
+          </span>
+        }
+        subtitle={`${profile.job_title || ROLE_LABELS[profile.role]}${
           profile.phone ? ` · tel. ${profile.phone}` : ""
         }${profile.email ? ` · ${profile.email}` : ""}`}
       />
