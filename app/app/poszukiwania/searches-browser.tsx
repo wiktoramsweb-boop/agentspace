@@ -3,10 +3,13 @@
 import { formatDatePL } from "@/lib/datetime";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { klikKarty } from "../components/klik-karty";
 import type { SearchRich } from "@/lib/data-searches";
 import { PROPERTY_ICONS } from "../components/icons";
 import { BulkBar, SelectBox, useSelection } from "../components/bulk-bar";
 import { PROPERTY_TYPES, SEARCH_STATUSES } from "@/lib/types";
+import { Select } from "../components/select";
 
 const STATUS_MAP = Object.fromEntries(SEARCH_STATUSES.map((s) => [s.value, s]));
 const TYPE_MAP = Object.fromEntries(PROPERTY_TYPES.map((t) => [t.value, t.label]));
@@ -37,16 +40,49 @@ export function SearchesBrowser({
   canDelete: boolean;
 }) {
   const selection = useSelection();
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string>("aktualne");
   const [scope, setScope] = useState<"all" | "mine">("all");
+  const [pokazFiltry, setPokazFiltry] = useState(false);
+  const PUSTE = { agent: "", transakcja: "", typ: "", miejsce: "", budzetOd: "", budzetDo: "", pokoje: "", dopasowania: "", sort: "nowe" };
+  const [f, setF] = useState(PUSTE);
+  const ustaw = (k: keyof typeof PUSTE) => (e: { target: { value: string } }) => setF((x) => ({ ...x, [k]: e.target.value }));
+  const ileFiltrow = (Object.keys(PUSTE) as (keyof typeof PUSTE)[]).filter((k) => k !== "sort" && f[k]).length;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const qd = query.replace(/\D/g, "");
-    return searches.filter((s) => {
+    const liczba = (v: string) => Number(v.replace(/\s/g, "").replace(",", ".")) || 0;
+    const od = liczba(f.budzetOd);
+    const doK = liczba(f.budzetDo);
+    const miejsce = f.miejsce.trim().toLowerCase();
+    const wynik = searches.filter((s) => {
       if (status && s.status !== status) return false;
       if (scope === "mine" && s.agent_id !== currentUserId) return false;
+      if (f.agent && s.agent_id !== f.agent) return false;
+      if (f.transakcja && s.deal_kind !== f.transakcja) return false;
+      if (f.typ && !s.property_types.includes(f.typ as (typeof s.property_types)[number])) return false;
+      if (miejsce && !s.locations.join(" ").toLowerCase().includes(miejsce)) return false;
+      // Budżet klienta to przedział: pasuje, gdy zachodzi na przedział z filtra.
+      if (od && s.price_max != null && s.price_max < od) return false;
+      if (doK && s.price_min != null && s.price_min > doK) return false;
+      if (f.pokoje && s.rooms_max != null && s.rooms_max < liczba(f.pokoje)) return false;
+      const dop = matchCounts[s.id]?.fits ?? 0;
+      if (f.dopasowania === "tak" && dop === 0) return false;
+      if (f.dopasowania === "nie" && dop > 0) return false;
+      return true;
+    });
+    const sortowane = [...wynik].sort((a, b) =>
+      f.sort === "stare"
+        ? a.created_at.localeCompare(b.created_at)
+        : f.sort === "budzet"
+          ? (b.price_max ?? b.price_min ?? 0) - (a.price_max ?? a.price_min ?? 0)
+          : f.sort === "dopasowania"
+            ? (matchCounts[b.id]?.fits ?? 0) - (matchCounts[a.id]?.fits ?? 0)
+            : b.created_at.localeCompare(a.created_at),
+    );
+    return sortowane.filter((s) => {
       if (!q) return true;
       if (qd.length >= 3 && (s.clientPhone ?? "").replace(/\D/g, "").includes(qd)) return true;
       return (
@@ -56,7 +92,7 @@ export function SearchesBrowser({
         s.locations.join(" ").toLowerCase().includes(q)
       );
     });
-  }, [searches, query, status, scope, currentUserId]);
+  }, [searches, query, status, scope, currentUserId, f, matchCounts]);
 
   const mineCount = searches.filter((s) => s.agent_id === currentUserId).length;
   const pageIds = filtered.map((s) => s.id);
@@ -71,6 +107,34 @@ export function SearchesBrowser({
           placeholder="Szukaj po kliencie, numerze telefonu, lokalizacji…"
           className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
         />
+        <button
+          type="button"
+          onClick={() => setPokazFiltry((v) => !v)}
+          aria-expanded={pokazFiltry}
+          className={`inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
+            ileFiltrow > 0 ? "border-emerald-500 bg-emerald-50 text-emerald-800" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+          }`}
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M7 12h10M10 18h4" />
+          </svg>
+          Filtry
+          {ileFiltrow > 0 && <span className="rounded-full bg-emerald-500 px-1.5 text-xs font-bold text-white">{ileFiltrow}</span>}
+        </button>
+        <div className="sm:w-52">
+          <Select
+            aria-label="Sortowanie"
+            value={f.sort}
+            onChange={ustaw("sort")}
+            options={[
+              { value: "nowe", label: "Najnowsze" },
+              { value: "stare", label: "Najstarsze" },
+              { value: "dopasowania", label: "Najwięcej dopasowań" },
+              { value: "budzet", label: "Najwyższy budżet" },
+            ]}
+            placeholder=""
+          />
+        </div>
         <div className="flex rounded-xl border border-slate-300 bg-white p-1">
           <Scope active={scope === "all"} onClick={() => setScope("all")}>
             Wszystkie ({searches.length})
@@ -80,6 +144,40 @@ export function SearchesBrowser({
           </Scope>
         </div>
       </div>
+
+      {pokazFiltry && (
+        <div className="mb-4 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Pole etykieta="Agent">
+            <Select value={f.agent} onChange={ustaw("agent")} options={agents.map((a) => ({ value: a.id, label: a.name }))} placeholder="Wszyscy" />
+          </Pole>
+          <Pole etykieta="Transakcja">
+            <Select value={f.transakcja} onChange={ustaw("transakcja")} options={[{ value: "sprzedaz", label: "Kupno" }, { value: "wynajem", label: "Najem" }]} placeholder="Kupno i najem" />
+          </Pole>
+          <Pole etykieta="Rodzaj nieruchomości">
+            <Select value={f.typ} onChange={ustaw("typ")} options={PROPERTY_TYPES.map((t) => ({ value: t.value, label: t.label }))} placeholder="Każdy" />
+          </Pole>
+          <Pole etykieta="Dopasowania">
+            <Select value={f.dopasowania} onChange={ustaw("dopasowania")} options={[{ value: "tak", label: "Mają pasujące oferty" }, { value: "nie", label: "Bez pasujących ofert" }]} placeholder="Wszystkie" />
+          </Pole>
+          <Pole etykieta="Lokalizacja">
+            <input value={f.miejsce} onChange={ustaw("miejsce")} placeholder="np. Podgórze" className={pole} />
+          </Pole>
+          <Pole etykieta="Budżet od (zł)">
+            <input value={f.budzetOd} onChange={ustaw("budzetOd")} inputMode="numeric" placeholder="np. 400 000" className={pole} />
+          </Pole>
+          <Pole etykieta="Budżet do (zł)">
+            <input value={f.budzetDo} onChange={ustaw("budzetDo")} inputMode="numeric" placeholder="np. 700 000" className={pole} />
+          </Pole>
+          <Pole etykieta="Pokoje (co najmniej)">
+            <input value={f.pokoje} onChange={ustaw("pokoje")} inputMode="numeric" placeholder="np. 3" className={pole} />
+          </Pole>
+          {ileFiltrow > 0 && (
+            <button type="button" onClick={() => setF((x) => ({ ...PUSTE, sort: x.sort }))} className="text-left text-sm font-medium text-slate-500 hover:text-slate-900 sm:col-span-2 lg:col-span-4">
+              Wyczyść filtry
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="mb-5 flex flex-wrap gap-2">
         <Chip active={status === ""} onClick={() => setStatus("")}>
@@ -119,7 +217,8 @@ export function SearchesBrowser({
             return (
               <div
                 key={s.id}
-                className={`flex items-stretch gap-2 overflow-hidden rounded-2xl border bg-white transition hover:shadow-sm ${
+                onClick={(e) => klikKarty(e, `/app/poszukiwania/${s.id}`, router.push)}
+                className={`group flex cursor-pointer items-stretch gap-2 overflow-hidden rounded-2xl border bg-white transition hover:shadow-sm ${
                   picked ? "border-emerald-400 ring-1 ring-emerald-300" : "border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -200,12 +299,9 @@ export function SearchesBrowser({
                 </div>
 
                 <div className="flex flex-shrink-0 items-center pr-4">
-                  <Link
-                    href={`/app/poszukiwania/${s.id}`}
-                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:text-emerald-600"
-                  >
-                    Dopasowania →
-                  </Link>
+                  <svg className="h-5 w-5 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                  </svg>
                 </div>
               </div>
             );
@@ -222,6 +318,17 @@ export function SearchesBrowser({
         noun={["poszukiwanie", "poszukiwania", "poszukiwań"]}
       />
     </div>
+  );
+}
+
+const pole = "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
+
+function Pole({ etykieta, children }: { etykieta: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-slate-500">{etykieta}</span>
+      {children}
+    </label>
   );
 }
 

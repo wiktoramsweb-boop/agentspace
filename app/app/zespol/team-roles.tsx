@@ -59,9 +59,9 @@ export function TeamRoles({
                     {wyjatki > 0 && " · zmieniane ręcznie"}
                   </p>
                 </div>
-                <span aria-hidden="true" className="text-slate-400">
-                  →
-                </span>
+                <svg className="h-4 w-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                </svg>
               </div>
             </Link>
           </li>

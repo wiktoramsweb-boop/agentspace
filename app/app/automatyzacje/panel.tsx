@@ -240,8 +240,10 @@ export function PanelAutomatyzacji({
           </p>
         ) : (
           <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            {uruchomienia.map((u) => (
-              <li key={u.id} className="flex flex-wrap items-start gap-3 px-5 py-3.5 text-sm">
+            {uruchomienia.map((u) => {
+              const cel = u.entity_type && u.entity_id && ADRES[u.entity_type] ? `${ADRES[u.entity_type]}${u.entity_id}` : null;
+              const tresc = (
+                <>
                 <span
                   className={`mt-1 h-2 w-2 flex-shrink-0 rounded-full ${u.status === "ok" ? "bg-emerald-500" : u.status === "w_toku" ? "bg-slate-300" : "bg-amber-500"}`}
                   aria-label={u.status === "ok" ? "udane" : "częściowo"}
@@ -250,16 +252,29 @@ export function PanelAutomatyzacji({
                   <p className="font-medium text-slate-900">{nazwyRegul.get(u.rule_id) ?? "Usunięta reguła"}</p>
                   {u.detail && <p className="mt-0.5 text-slate-500">{u.detail}</p>}
                 </div>
-                <div className="flex items-center gap-3 text-xs text-slate-400">
-                  {u.entity_type && u.entity_id && ADRES[u.entity_type] && (
-                    <Link href={`${ADRES[u.entity_type]}${u.entity_id}`} className="font-medium text-emerald-700 hover:underline">
-                      Otwórz
-                    </Link>
-                  )}
+                <div className="flex items-center gap-2 text-xs text-slate-400">
                   <span>{kiedy(u.created_at)}</span>
+                  {cel && (
+                    <svg className="h-4 w-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                    </svg>
+                  )}
                 </div>
-              </li>
-            ))}
+                </>
+              );
+              const klasa = "flex flex-wrap items-start gap-3 px-5 py-3.5 text-sm";
+              return (
+                <li key={u.id}>
+                  {cel ? (
+                    <Link href={cel} className={`${klasa} transition hover:bg-slate-50`}>
+                      {tresc}
+                    </Link>
+                  ) : (
+                    <div className={klasa}>{tresc}</div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

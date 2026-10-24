@@ -132,7 +132,14 @@ export function LeadyLista({
                 zaznaczone.has(l.id) ? "border-emerald-500" : "border-slate-200"
               }`}
             >
-              <div className="flex flex-wrap items-center gap-3 p-4">
+              <div
+                className="flex cursor-pointer flex-wrap items-center gap-3 p-4"
+                onClick={(e) => {
+                  // Kliknięcie w wiersz rozwija szczegóły, jak w innych listach; pola wyboru działają po swojemu.
+                  if ((e.target as HTMLElement).closest("a, button, input, select, textarea, label, [role=combobox], [role=listbox], [role=option]")) return;
+                  setRozwiniety(otwarty ? null : l.id);
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={zaznaczone.has(l.id)}
