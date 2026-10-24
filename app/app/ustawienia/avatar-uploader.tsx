@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { extFor, uploadToSignedUrl } from "@/lib/photo-process";
 import { setAvatar, signAvatarUpload } from "./actions";
+import { KadrowanieZdjecia } from "./kadrowanie-zdjecia";
 
 /**
- * Zdjęcie profilowe agenta. Trzymamy oryginał bez przeróbek, bo zdjęcia
- * z telefonu są już przycięte, a kadrowanie w przeglądarce psułoby twarze.
+ * Zdjęcie profilowe agenta. Przed wgraniem agent ustawia kwadratowy kadr:
+ * zdjęcia biznesowe są pionowe, a środek kwadratu ucinał czoło i włosy.
  */
 export function AvatarUploader({ name, currentUrl }: { name: string; currentUrl: string | null }) {
   const router = useRouter();
@@ -17,19 +18,25 @@ export function AvatarUploader({ name, currentUrl }: { name: string; currentUrl:
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [doKadru, setDoKadru] = useState<File | null>(null);
 
   const shown = preview ?? currentUrl;
 
-  async function upload(file: File) {
+  function wybrano(file: File) {
     setError(null);
     if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
       setError("Wybierz zdjęcie PNG, JPG albo WEBP.");
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      setError("Zdjęcie jest większe niż 10 MB.");
+    if (file.size > 15 * 1024 * 1024) {
+      setError("Zdjęcie jest większe niż 15 MB.");
       return;
     }
+    setDoKadru(file);
+  }
+
+  async function upload(file: Blob) {
+    setError(null);
     setBusy(true);
     setProgress(0);
     setPreview(URL.createObjectURL(file));
@@ -99,7 +106,7 @@ export function AvatarUploader({ name, currentUrl }: { name: string; currentUrl:
           hidden
           onChange={(e) => {
             const f = e.target.files?.[0];
-            if (f) void upload(f);
+            if (f) wybrano(f);
             e.target.value = "";
           }}
         />
@@ -124,10 +131,20 @@ export function AvatarUploader({ name, currentUrl }: { name: string; currentUrl:
           )}
         </div>
         <p className="mt-1.5 text-xs text-slate-500">
-          Widoczne w zespole, na karcie klienta i w materiałach dla klienta. Najlepiej kwadratowe, twarz na środku.
+          Widoczne w zespole, na karcie klienta i w materiałach dla klienta. Po wybraniu ustawisz kadr.
         </p>
         {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
       </div>
+      {doKadru && (
+        <KadrowanieZdjecia
+          plik={doKadru}
+          onAnuluj={() => setDoKadru(null)}
+          onGotowe={(b) => {
+            setDoKadru(null);
+            void upload(b);
+          }}
+        />
+      )}
     </div>
   );
 }

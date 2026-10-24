@@ -54,7 +54,8 @@ export function Avatar({
         src={src}
         alt={name}
         style={style}
-        className={`flex-shrink-0 rounded-full object-cover ${box}`}
+        // Starsze zdjęcia bywają pionowe: przycinamy od góry, żeby nie uciąć czoła.
+        className={`flex-shrink-0 rounded-full object-cover object-[50%_15%] ${box}`}
       />
     );
   }

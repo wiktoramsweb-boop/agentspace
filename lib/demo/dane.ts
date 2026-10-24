@@ -35,11 +35,12 @@ const NOTATKI = [
  * i niepotrzebnie ujawnia, kto pracuje w biurze.
  */
 export const ZESPOL = [
-  { imie: "Zofia", nazwisko: "Malinowska", rola: "manager", celMiesieczny: 18000 },
-  { imie: "Adam", nazwisko: "Wróbel", rola: "agent", celMiesieczny: 14000 },
-  { imie: "Klara", nazwisko: "Sikorska", rola: "agent", celMiesieczny: 12000 },
-  { imie: "Bartosz", nazwisko: "Lis", rola: "agent", celMiesieczny: 11000 },
-  { imie: "Emilia", nazwisko: "Rutkowska", rola: "agent", celMiesieczny: 9000 },
+  // Numery z puli 500 100 2xx: wyglądają jak prawdziwe, ale nikt pod nimi nie odbierze telefonu klienta z pokazu.
+  { imie: "Zofia", nazwisko: "Malinowska", rola: "manager", celMiesieczny: 18000, stanowisko: "Menedżerka sprzedaży", telefon: "+48 500 100 201" },
+  { imie: "Adam", nazwisko: "Wróbel", rola: "agent", celMiesieczny: 14000, stanowisko: "Starszy doradca nieruchomości", telefon: "+48 500 100 202" },
+  { imie: "Klara", nazwisko: "Sikorska", rola: "agent", celMiesieczny: 12000, stanowisko: "Doradczyni ds. najmu", telefon: "+48 500 100 203" },
+  { imie: "Bartosz", nazwisko: "Lis", rola: "agent", celMiesieczny: 11000, stanowisko: "Doradca nieruchomości", telefon: "+48 500 100 204" },
+  { imie: "Emilia", nazwisko: "Rutkowska", rola: "agent", celMiesieczny: 9000, stanowisko: "Młodsza doradczyni nieruchomości", telefon: "+48 500 100 205" },
 ];
 
 /* ── losowość powtarzalna ─────────────────────────────────── */

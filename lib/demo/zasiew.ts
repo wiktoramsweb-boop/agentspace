@@ -402,6 +402,8 @@ export async function utworzZespolDemo(
       email,
       role: os.rola,
       monthly_goal_pln: os.celMiesieczny,
+      job_title: os.stanowisko,
+      phone: os.telefon,
     });
 
     if (profilErr) {
