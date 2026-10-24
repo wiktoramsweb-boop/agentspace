@@ -1,36 +1,64 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
-import { rescoreSession } from "../../trening/actions";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export function RescoreButton({ sessionId }: { sessionId: string }) {
-  return (
-    <form action={rescoreSession.bind(null, sessionId)}>
-      <Inner />
-    </form>
-  );
-}
+/**
+ * Ocena rozmowy po jej zakończeniu. Rusza sama po wejściu na wyniki,
+ * a przy błędzie pokazuje komunikat i przycisk zamiast strony błędu.
+ */
+export function RescoreButton({ sessionId, auto = true }: { sessionId: string; auto?: boolean }) {
+  const router = useRouter();
+  const [stan, setStan] = useState<"czeka" | "trwa" | "blad">(auto ? "trwa" : "czeka");
+  const [blad, setBlad] = useState<string | null>(null);
+  const ruszyla = useRef(false);
 
-function Inner() {
-  const { pending } = useFormStatus();
+  const ocen = useCallback(async () => {
+    setStan("trwa");
+    setBlad(null);
+    for (let proba = 0; proba < 40; proba++) {
+      try {
+        const r = await fetch("/api/coach/ocena", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId }) });
+        const d = (await r.json().catch(() => ({}))) as { ok?: boolean; trwa?: boolean; error?: string };
+        if (d.ok) return router.refresh();
+        // Ocena już leci z innej karty albo sprzed odświeżenia: czekamy na nią.
+        if (d.trwa) {
+          await new Promise((res) => setTimeout(res, 4000));
+          continue;
+        }
+        throw new Error(d.error ?? "Nie udało się ocenić rozmowy.");
+      } catch (e) {
+        setBlad(e instanceof Error && e.message !== "Failed to fetch" ? e.message : "Brak połączenia. Sprawdź internet i spróbuj jeszcze raz.");
+        setStan("blad");
+        return;
+      }
+    }
+    setBlad("Ocena trwa wyjątkowo długo. Odśwież stronę za chwilę.");
+    setStan("blad");
+  }, [router, sessionId]);
+
+  useEffect(() => {
+    if (!auto || ruszyla.current) return;
+    ruszyla.current = true;
+    void ocen();
+  }, [auto, ocen]);
+
+  if (stan === "trwa") {
+    return (
+      <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+        <span className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-600" />
+        <span>
+          <b>AI ocenia Twoją rozmowę…</b> Przy dłuższej rozmowie to do minuty, nie zamykaj strony.
+        </span>
+      </div>
+    );
+  }
   return (
-    <>
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
-      >
-        {pending ? "Oceniam..." : "Oceń tę rozmowę"}
+    <div className="space-y-3">
+      {blad && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{blad}</p>}
+      <button type="button" onClick={() => void ocen()} className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400">
+        {blad ? "Spróbuj ocenić jeszcze raz" : "Oceń tę rozmowę"}
       </button>
-      {pending && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="text-center">
-            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-400" />
-            <p className="font-medium text-slate-900">AI ocenia Twoją rozmowę...</p>
-            <p className="mt-1 text-sm text-slate-500">To potrwa kilka sekund.</p>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }

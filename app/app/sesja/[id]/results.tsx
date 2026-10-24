@@ -69,8 +69,13 @@ export function SessionResults({
         </Link>
         <h1 className="mb-4 text-2xl font-semibold tracking-tight text-slate-900">{session.scenario_title ?? "Sesja treningowa"}</h1>
         <div className="mb-8 rounded-3xl border border-slate-200 bg-white p-6">
-          <p className="mb-4 text-slate-600">Ta rozmowa nie została jeszcze oceniona. Kliknij, żeby AI ją przeanalizowało.</p>
-          {transkrypt.some((m) => m.role === "agent") ? <RescoreButton sessionId={session.id} /> : <p className="text-sm text-slate-500">W rozmowie nie padło żadne Twoje zdanie, więc nie ma czego oceniać.</p>}
+          {!transkrypt.some((m) => m.role === "agent") ? (
+            <p className="text-sm text-slate-500">W rozmowie nie padło żadne Twoje zdanie, więc nie ma czego oceniać.</p>
+          ) : showTrainAgain ? (
+            <RescoreButton sessionId={session.id} />
+          ) : (
+            <p className="text-sm text-slate-500">Ta rozmowa nie ma jeszcze oceny. Agent zobaczy ją po otwarciu rozmowy.</p>
+          )}
         </div>
       </>
     );
