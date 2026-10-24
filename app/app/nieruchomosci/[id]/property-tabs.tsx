@@ -9,8 +9,7 @@ import Link from "next/link";
  * swoją zakładkę, a transakcja siedzi przy ofercie, której dotyczy.
  *
  * Zakładkę trzymamy w adresie (`?z=`), a nie w stanie komponentu: dzięki temu
- * da się wysłać komuś link prosto do dokumentów albo do karty transakcji,
- * a powrót strzałką przeglądarki wraca tam, gdzie agent był.
+ * da się wysłać komuś link prosto do dokumentów albo do karty transakcji.
  */
 
 export type TabKey = "oferta" | "poszukiwania" | "dzialania" | "portal" | "dokumenty" | "transakcja";
@@ -58,6 +57,8 @@ export function PropertyTabs({
               <Link
                 href={t.key === "oferta" ? `/app/nieruchomosci/${propertyId}` : `/app/nieruchomosci/${propertyId}?z=${t.key}`}
                 scroll={false}
+                // Zakładka podmienia wpis w historii: „wstecz” ma wyjść z karty, a nie przewijać zakładki.
+                replace
                 aria-current={on ? "page" : undefined}
                 className={`relative flex items-center gap-2 whitespace-nowrap rounded-t-xl px-3.5 py-3 text-sm font-medium transition sm:px-4 ${
                   on ? "text-emerald-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"

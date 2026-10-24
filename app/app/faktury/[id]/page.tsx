@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireModul } from "@/lib/auth";
@@ -50,12 +51,12 @@ export default async function InvoiceViewPage({ params }: Props) {
   return (
     <>
       <div className="print-hide mb-5 flex items-center justify-between gap-4">
-        <Link
+        <Wstecz
           href="/app/faktury"
           className="inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
         >
           ← Faktury
-        </Link>
+        </Wstecz>
         <div className="flex items-center gap-3">
           <Link
             href={`/app/faktury/${inv.id}/edytuj`}

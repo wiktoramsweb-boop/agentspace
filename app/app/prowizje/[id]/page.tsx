@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import { mozeEdytowacTransakcje } from "@/lib/uprawnienia";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -30,9 +31,9 @@ export default async function DealDetailPage({ params }: Props) {
 
   return (
     <>
-      <Link href="/app/prowizje" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
+      <Wstecz href="/app/prowizje" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Prowizje
-      </Link>
+      </Wstecz>
 
       <PageHeader
         title={deal.title}

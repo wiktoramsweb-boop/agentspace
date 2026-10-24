@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireModul } from "@/lib/auth";
@@ -23,9 +24,9 @@ export default async function SkryptPage({ params }: Props) {
 
   return (
     <>
-      <Link href="/app/techniki?widok=skrypty" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
+      <Wstecz href="/app/techniki?widok=skrypty" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Skrypty rozmów
-      </Link>
+      </Wstecz>
 
       <header className="mb-8">
         <div className="mb-3 flex flex-wrap items-center gap-2 text-xs font-semibold">

@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireManagerOrOwner } from "@/lib/auth";
@@ -73,9 +74,9 @@ export default async function AgentDetailPage({ params }: Props) {
 
   return (
     <>
-      <Link href="/app/zespol" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
+      <Wstecz href="/app/zespol" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Zespół
-      </Link>
+      </Wstecz>
 
       <PageHeader
         title={profile.full_name ?? profile.email ?? "Agent"}

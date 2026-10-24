@@ -25,6 +25,7 @@ export function PrzelacznikWidoku({
   const przycisk = (widok: "lista" | "tablica", etykieta: string, d: string) => (
     <Link
       href={z(widok)}
+      replace
       aria-current={aktywny === widok ? "page" : undefined}
       className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
         aktywny === widok ? "bg-slate-900 text-white" : "text-slate-500 hover:text-slate-900"

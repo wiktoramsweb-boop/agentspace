@@ -52,6 +52,8 @@ export function Zakladki({
               <Link
                 href={adres(t.key)}
                 scroll={false}
+                // Zakładka podmienia wpis w historii: „wstecz” ma wyjść z karty, a nie przewijać zakładki.
+                replace
                 aria-current={on ? "page" : undefined}
                 className={`relative flex items-center gap-2 whitespace-nowrap rounded-t-xl px-3.5 py-3 text-sm font-medium transition sm:px-4 ${
                   on ? "text-emerald-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"

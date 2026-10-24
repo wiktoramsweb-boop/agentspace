@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireModul } from "@/lib/auth";
@@ -45,9 +46,9 @@ export default async function TechnikaPage({ params }: Props) {
 
   return (
     <>
-      <Link href={`/app/techniki?k=${t.kategoria}`} className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
+      <Wstecz href={`/app/techniki?k=${t.kategoria}`} className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← {KATEGORIE[t.kategoria].nazwa}
-      </Link>
+      </Wstecz>
 
       <header className="mb-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div>

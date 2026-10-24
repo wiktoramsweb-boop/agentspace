@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -123,9 +124,9 @@ export default async function ScenarioSetupPage({ params, searchParams }: Props)
 
   return (
     <>
-      <Link href="/app/trening" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
+      <Wstecz href="/app/trening" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Wszystkie scenariusze
-      </Link>
+      </Wstecz>
 
       <section className="relative mb-8 overflow-hidden rounded-[28px] bg-slate-900 p-6 text-white md:p-8">
         <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-emerald-500/25 blur-3xl" aria-hidden="true" />

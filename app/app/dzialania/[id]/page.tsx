@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { formatDateTimePL } from "@/lib/datetime";
 import { formatPhone } from "@/lib/format";
@@ -107,12 +108,12 @@ export default async function ActivityDetailPage({ params }: Props) {
 
   return (
     <>
-      <Link
+      <Wstecz
         href="/app/dzialania"
         className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
       >
         ← Działania
-      </Link>
+      </Wstecz>
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">

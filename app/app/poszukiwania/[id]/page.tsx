@@ -1,5 +1,5 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import { mozeUsunac } from "@/lib/uprawnienia";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getSearch, getActiveProperties, getMatchStatuses } from "@/lib/data-searches";
@@ -90,12 +90,12 @@ export default async function SearchDetailPage({ params }: Props) {
 
   return (
     <>
-      <Link
+      <Wstecz
         href="/app/poszukiwania"
         className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
       >
         ← Poszukiwania
-      </Link>
+      </Wstecz>
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>

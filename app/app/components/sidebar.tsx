@@ -56,6 +56,28 @@ export function Sidebar({
     }
   }, []);
 
+  // Otwarte menu na telefonie blokuje przewijanie strony pod spodem. Samo
+  // overflow:hidden na body iOS ignoruje, dlatego przypinamy body w miejscu
+  // i po zamknięciu wracamy do tej samej pozycji.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const y = window.scrollY;
+    const b = document.body.style;
+    const poprzednie = { position: b.position, top: b.top, left: b.left, right: b.right, overflow: b.overflow };
+    Object.assign(b, { position: "fixed", top: `-${y}px`, left: "0", right: "0", overflow: "hidden" });
+    return () => {
+      Object.assign(b, poprzednie);
+      window.scrollTo(0, y);
+    };
+  }, [mobileOpen]);
+
+  // Przejście na inną stronę zamyka menu (także przez wstecz w przeglądarce).
+  const [sciezka, setSciezka] = useState(pathname);
+  if (sciezka !== pathname) {
+    setSciezka(pathname);
+    setMobileOpen(false);
+  }
+
   function toggleSection(title: string) {
     setCollapsed((prev) => {
       const next = prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title];
@@ -72,7 +94,7 @@ export function Sidebar({
     href === "/app" ? pathname === "/app" : pathname.startsWith(href);
 
   const nav = (
-    <nav className="sidebar-nav flex min-h-0 flex-1 flex-col overflow-y-auto">
+    <nav className="sidebar-nav flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
       <GlobalSearch />
       {/* Przewodnik nie jest stałą pozycją menu: znika, gdy biuro jest
           ustawione, bo po roku pracy „Jak zacząć” tylko zajmuje miejsce. */}
@@ -253,7 +275,7 @@ export function Sidebar({
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="app-sidebar fixed inset-0 z-20 flex flex-col px-4 pb-[calc(88px+env(safe-area-inset-bottom))] pt-20 md:hidden">
+        <div className="app-sidebar fixed inset-0 z-20 flex flex-col overscroll-contain px-4 pb-[calc(88px+env(safe-area-inset-bottom))] pt-20 md:hidden">
           {nav}
           {account}
         </div>

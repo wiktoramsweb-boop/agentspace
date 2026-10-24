@@ -57,6 +57,7 @@ export function Zakladki({ aktywna }: { aktywna: "techniki" | "skrypty" | "struk
         <Link
           key={x.id}
           href={x.href}
+          replace
           scroll={false}
           className={`flex-1 whitespace-nowrap rounded-xl px-4 py-2 text-center text-sm font-semibold transition ${
             x.id === aktywna ? "bg-slate-900 text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"

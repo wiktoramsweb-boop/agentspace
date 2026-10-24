@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Wstecz } from "@/app/app/components/wstecz";
 import { notFound } from "next/navigation";
 import { requireModul } from "@/lib/auth";
 import { getAgencySettings } from "@/lib/agency-settings";
@@ -76,9 +76,9 @@ export default async function WzorPage({
         title={w.nazwa}
         subtitle={w.opis}
         action={
-          <Link href="/app/dokumenty" className="text-sm font-medium text-slate-500 hover:text-slate-800">
+          <Wstecz href="/app/dokumenty" className="text-sm font-medium text-slate-500 hover:text-slate-800">
             ← Wszystkie dokumenty
-          </Link>
+          </Wstecz>
         }
       />
       <Generator

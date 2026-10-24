@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import Link from "next/link";
 import type { SessionWithScore } from "@/lib/data";
 import type { Analiza, KategoriaOceny, Moment } from "@/lib/ai/coach";
@@ -64,9 +65,9 @@ export function SessionResults({
   if (!score) {
     return (
       <>
-        <Link href={backHref} className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
+        <Wstecz href={backHref} className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
           {backLabel}
-        </Link>
+        </Wstecz>
         <h1 className="mb-4 text-2xl font-semibold tracking-tight text-slate-900">{session.scenario_title ?? "Sesja treningowa"}</h1>
         <div className="mb-8 rounded-3xl border border-slate-200 bg-white p-6">
           {!transkrypt.some((m) => m.role === "agent") ? (
@@ -103,9 +104,9 @@ export function SessionResults({
 
   return (
     <div className="pb-28">
-      <Link href={backHref} className="mb-5 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
+      <Wstecz href={backHref} className="mb-5 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         {backLabel}
-      </Link>
+      </Wstecz>
 
       {/* Werdykt */}
       <section className="relative mb-5 overflow-hidden rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">

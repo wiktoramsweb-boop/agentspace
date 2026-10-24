@@ -1,3 +1,4 @@
+import { Wstecz } from "@/app/app/components/wstecz";
 import { todayPL } from "@/lib/datetime";
 import { mozeUsunac } from "@/lib/uprawnienia";
 import { maskPhone } from "@/lib/format";
@@ -159,9 +160,9 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
 
   return (
     <>
-      <Link href="/app/klienci" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
+      <Wstecz href="/app/klienci" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
         ← Wszyscy klienci
-      </Link>
+      </Wstecz>
 
       {urlopOpiekuna && (
         <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-sky-500/30 bg-sky-100 px-4 py-3 text-sm">
