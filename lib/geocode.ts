@@ -156,3 +156,25 @@ export async function geocodePl(query: string, limit = 6): Promise<GeoResult[]> 
     return [];
   }
 }
+
+export type JednostkiUrzedowe = { wojewodztwo: string | null; powiat: string | null; gmina: string | null };
+
+/**
+ * Województwo, powiat i gmina dla punktu na mapie (Nominatim, geokodowanie
+ * odwrotne). Portale z eksportem plikowym ich wymagają, a agent wpisuje tylko adres.
+ * W miastach na prawach powiatu (Kraków, Gdynia) powiat i gmina to samo miasto.
+ */
+export async function jednostkiUrzedowe(lat: number, lng: number): Promise<JednostkiUrzedowe | null> {
+  const url =
+    "https://nominatim.openstreetmap.org/reverse?" +
+    new URLSearchParams({ format: "jsonv2", lat: String(lat), lon: String(lng), zoom: "18", addressdetails: "1", "accept-language": "pl" }).toString();
+  const res = await fetch(url, { headers: UA, next: { revalidate: 86400 * 30 }, signal: AbortSignal.timeout(8000) });
+  if (!res.ok) return null;
+  const a = ((await res.json()) as { address?: Record<string, string> }).address ?? {};
+  if (a.country_code && a.country_code !== "pl") return null;
+  const miasto = a.city ?? a.town ?? a.village ?? null;
+  const bez = (s: string | undefined, prefiks: RegExp) => (s ? s.replace(prefiks, "").trim() : null);
+  const powiat = bez(a.county, /^powiat\s+/i) ?? (a.city ? a.city : null);
+  const gmina = bez(a.municipality, /^gmina\s+/i) ?? miasto;
+  return { wojewodztwo: bez(a.state, /^wojew[oó]dztwo\s+/i), powiat, gmina };
+}

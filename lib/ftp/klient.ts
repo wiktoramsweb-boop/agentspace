@@ -48,3 +48,24 @@ export async function wyslijPlikFtp(d: DaneFtp, nazwa: string, dane: Buffer): Pr
     await c.rename(tymczasowa, nazwa);
   });
 }
+
+/** Kilka plików jednym połączeniem: zdjęcia ofert idą w jednej sesji FTP, a nie po jednej na plik. */
+export async function wyslijPlikiFtp(d: DaneFtp, pliki: { nazwa: string; dane: () => Promise<Buffer | null> }[], poKazdym?: (nazwa: string) => void): Promise<{ wyslane: string[]; nieudane: string[] }> {
+  const wyslane: string[] = [];
+  const nieudane: string[] = [];
+  await zPolaczeniem(d, async (c) => {
+    for (const p of pliki) {
+      const dane = await p.dane().catch(() => null);
+      if (!dane) {
+        nieudane.push(p.nazwa);
+        continue;
+      }
+      const tymczasowa = `${p.nazwa}.part`;
+      await c.uploadFrom(Readable.from(dane), tymczasowa);
+      await c.rename(tymczasowa, p.nazwa);
+      wyslane.push(p.nazwa);
+      poKazdym?.(p.nazwa);
+    }
+  });
+  return { wyslane, nieudane };
+}

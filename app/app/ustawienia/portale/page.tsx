@@ -4,7 +4,10 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { konfiguracjaOtodom, stanPolaczenia, PORTAL } from "@/lib/otodom/klient";
 import { STATUSY } from "@/lib/otodom/ogloszenia";
 import { PORTALE_FTP } from "@/lib/ftp/portale";
-import { polaczOtodom, rozlaczOtodom, testujFtpAkcja, usunFtp, ustawTrybTestowy, zapiszFtp } from "./actions";
+import { polaczOtodom, rozlaczOtodom, testujFtpAkcja, usunFtp, ustawTrybTestowy, wyslijFtpTeraz, zapiszFtp } from "./actions";
+
+// „Wyślij teraz” wgrywa zdjęcia wszystkich ofert, przy pierwszej wysyłce to potrafi potrwać.
+export const maxDuration = 300;
 
 export const metadata = { title: "Portale ogłoszeniowe" };
 
@@ -20,6 +23,9 @@ const KOMUNIKATY_FTP: Record<string, { ok: boolean; t: string }> = {
   zapisano: { ok: true, t: "Dane FTP zapisane. Wynik sprawdzenia połączenia widzisz przy portalu." },
   sprawdzono: { ok: true, t: "Połączenie sprawdzone. Wynik widzisz przy portalu." },
   usunieto: { ok: true, t: "Dane FTP usunięte." },
+  wyslano: { ok: true, t: "Plik z ofertami wysłany. Portal zwykle pokazuje oferty po około 20 minutach i przysyła raport mailem." },
+  trwa: { ok: true, t: "Wysyłka już trwa. Odśwież stronę za chwilę, żeby zobaczyć wynik." },
+  "blad-wysylki": { ok: false, t: "Wysyłka się nie udała. Powód widzisz przy portalu." },
   "brak-danych": { ok: false, t: "Podaj adres serwera i login." },
   "brak-hasla": { ok: false, t: "Podaj hasło do FTP." },
   "brak-tabeli": { ok: false, t: "Eksport przez FTP wymaga aktualizacji bazy: uruchom lib/SETUP-v51-portale-ftp.sql w Supabase." },
@@ -27,7 +33,7 @@ const KOMUNIKATY_FTP: Record<string, { ok: boolean; t: string }> = {
   blad: { ok: false, t: "Nie udało się zapisać. Spróbuj jeszcze raz." },
 };
 
-type WpisFtp = { portal: string; host: string; port: number; login: string; katalog: string; secure: boolean; ostatni_test_at: string | null; ostatni_test_ok: boolean | null; ostatni_blad: string | null; ostatnia_wysylka_at: string | null; ostatnio_ofert: number | null };
+type WpisFtp = { portal: string; host: string; port: number; login: string; katalog: string; secure: boolean; ostatni_test_at: string | null; ostatni_test_ok: boolean | null; ostatni_blad: string | null; ostatnia_wysylka_at: string | null; ostatnio_ofert: number | null; ostatnie_bledy?: { id: string; tytul: string; bledy: string[] }[] | null; wysylka_start?: string | null };
 
 export default async function PortalePage({ searchParams }: { searchParams: Promise<{ otodom?: string; ftp?: string }> }) {
   const user = await requireOwner();
@@ -35,7 +41,8 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
   const komunikat = otodom ? KOMUNIKATY[otodom] : ftp ? KOMUNIKATY_FTP[ftp] : null;
   const { data: ftpDane, error: ftpBlad } = await createSupabaseAdmin()
     .from("portal_ftp")
-    .select("portal, host, port, login, katalog, secure, ostatni_test_at, ostatni_test_ok, ostatni_blad, ostatnia_wysylka_at, ostatnio_ofert")
+    // Gwiazdka: kolumny z v52 mogą jeszcze nie istnieć, a wtedy lista konkretnych pól dawałaby błąd.
+    .select("*")
     .eq("agency_id", user.agency_id);
   const ftpWpisy = new Map(((ftpDane as WpisFtp[] | null) ?? []).map((w) => [w.portal, w]));
   const pol = await stanPolaczenia(user.agency_id!);
@@ -158,6 +165,30 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
                   Ostatnie sprawdzenie: {new Date(w.ostatni_test_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })}
                   {w.ostatnia_wysylka_at && ` · ostatnia wysyłka: ${new Date(w.ostatnia_wysylka_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })} (${w.ostatnio_ofert ?? 0} ofert)`}
                 </p>
+              )}
+              {w && (
+                <form action={wyslijFtpTeraz} className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+                  <input type="hidden" name="portal" value={p.id} />
+                  <p className="min-w-0 flex-1 text-sm text-slate-600">
+                    Oferty wybierasz w kreatorze oferty, w ostatnim kroku Publikacja. Po każdym zapisie wysyłamy plik sami, a tu możesz wysłać go od razu.
+                  </p>
+                  <button className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">Wyślij oferty teraz</button>
+                </form>
+              )}
+              {w?.ostatnie_bledy && w.ostatnie_bledy.length > 0 && (
+                <details className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
+                  <summary className="cursor-pointer font-semibold text-amber-900">Nie poszło w ostatniej wysyłce: {w.ostatnie_bledy.length}</summary>
+                  <ul className="mt-2 space-y-2">
+                    {w.ostatnie_bledy.map((b) => (
+                      <li key={b.id}>
+                        <Link href={`/app/nieruchomosci/${b.id}`} className="font-medium text-amber-900 hover:underline">
+                          {b.tytul}
+                        </Link>
+                        <span className="block text-amber-800">{b.bledy.join(" ")}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               )}
               <form action={zapiszFtp} className="mt-4 grid gap-3 sm:grid-cols-6">
                 <input type="hidden" name="portal" value={p.id} />

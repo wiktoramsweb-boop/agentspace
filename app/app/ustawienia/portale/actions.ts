@@ -116,3 +116,11 @@ export async function usunFtp(formData: FormData): Promise<void> {
   await zapiszZdarzenie({ agencyId: user.agency_id!, actorId: user.id, akcja: "portal_ftp_usuniety", opis: `Usunięto dane FTP: ${portalFtp(portal)?.nazwa ?? portal}`, meta: { portal } });
   wroc("usunieto", portal);
 }
+
+export async function wyslijFtpTeraz(formData: FormData): Promise<void> {
+  const user = await requireOwner();
+  const portal = String(formData.get("portal") ?? "");
+  const { wyslijNaPortalFtp } = await import("@/lib/ftp/eksport");
+  const r = await wyslijNaPortalFtp(user.agency_id!, portal, user.id);
+  wroc(r.ok ? "wyslano" : /już trwa/.test(r.blad) ? "trwa" : "blad-wysylki", portal);
+}

@@ -1,4 +1,8 @@
 import { stanPolaczenia } from "@/lib/otodom/klient";
+import { portaleFtpBiura } from "@/lib/ftp/eksport";
+
+// Zapis oferty wysyła po odpowiedzi plik na portale FTP (ze zdjęciami), to trwa.
+export const maxDuration = 300;
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireUser, requireModul } from "@/lib/auth";
 import { queryProperties } from "@/lib/data-lists";
@@ -70,7 +74,7 @@ async function mapData(agencyId: string) {
 
 export default async function NieruchomosciPage({ searchParams }: Props) {
   const user = await requireModul("nieruchomosci");
-  const polOtodom = await stanPolaczenia(user.agency_id ?? "");
+  const [polOtodom, portaleFtp] = await Promise.all([stanPolaczenia(user.agency_id ?? ""), portaleFtpBiura(user.agency_id)]);
   const otodom = { polaczone: polOtodom.polaczone, tabele: polOtodom.tabele, ceo: user.role === "owner", status: null, url: null, exact: false };
   const agencyId = user.agency_id;
   const sp = await searchParams;
@@ -96,6 +100,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
               offerPrefix={settings.options.offer_prefix}
               canEditSettings={user.role === "owner"}
               otodom={otodom}
+              portaleFtp={portaleFtp}
             />
           }
         />
@@ -130,6 +135,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
             offerPrefix={settings.options.offer_prefix}
             canEditSettings={user.role === "owner"}
             otodom={otodom}
+            portaleFtp={portaleFtp}
           />
         }
       />

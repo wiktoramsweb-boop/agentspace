@@ -35,7 +35,8 @@
     "test:podatki": "node --experimental-strip-types lib/sprawdz-podatki.ts",
     "test:wpis": "node --experimental-strip-types lib/sprawdz-wpis.ts",
     "test:otodom": "node --experimental-strip-types lib/sprawdz-otodom.ts",
-    "test:opis": "node --experimental-strip-types lib/sprawdz-opis.ts"
+    "test:opis": "node --experimental-strip-types lib/sprawdz-opis.ts",
+    "test:noe": "node --experimental-strip-types lib/sprawdz-noe.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",

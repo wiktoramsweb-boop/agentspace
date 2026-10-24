@@ -43,6 +43,10 @@ import { PropertyTabs, TABS, type TabKey } from "./property-tabs";
 import { OgloszeniaTab } from "./ogloszenia-tab";
 import { stanPolaczenia } from "@/lib/otodom/klient";
 import { historiaOtodom, ogloszenieOferty, STATUSY } from "@/lib/otodom/ogloszenia";
+import { portaleFtpBiura } from "@/lib/ftp/eksport";
+
+// Zapis oferty wysyła po odpowiedzi plik na portale FTP (ze zdjęciami), to trwa.
+export const maxDuration = 300;
 import { TransactionTab } from "./transaction-tab";
 import { ActivitiesTab } from "./activities-tab";
 import { PortalTab } from "./portal-tab";
@@ -155,7 +159,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
     ),
   );
 
-  const [otodomPol, otodomOgl] = await Promise.all([stanPolaczenia(user.agency_id ?? ""), ogloszenieOferty(property.id)]);
+  const [otodomPol, otodomOgl, portaleFtp] = await Promise.all([stanPolaczenia(user.agency_id ?? ""), ogloszenieOferty(property.id), portaleFtpBiura(user.agency_id)]);
   const otodomHistoria = tab === "oferta" ? await historiaOtodom(otodomOgl?.advert_uuid) : [];
 
   const liczniki = {
@@ -214,6 +218,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
               url: otodomOgl?.url ?? null,
               exact: otodomOgl?.exact_location ?? false,
             }}
+            portaleFtp={portaleFtp}
           />
         </div>
       </div>

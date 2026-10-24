@@ -1,5 +1,7 @@
 "use server";
 
+import { portalFtp } from "@/lib/ftp/portale";
+import { wyslijNaPortalFtp } from "@/lib/ftp/eksport";
 import { opisDoZapisu } from "@/lib/opis-html";
 import { idZBiura } from "@/lib/agency-ids";
 import { mozeUsunac } from "@/lib/uprawnienia";
@@ -133,6 +135,9 @@ function detailsFromForm(formData: FormData, type: PropertyType, dealKind: Prope
   // agent jej nie podał; ulica i numer osobno są potrzebne portalom.
   const pole = (k: string) => String(formData.get(k) ?? "").trim().slice(0, 120);
   if (!out.dzielnica && pole("district")) out.dzielnica = pole("district");
+  if (formData.get("portale_ftp_pole") === "1") {
+    out.portale_ftp = formData.getAll("portal_ftp").map(String).filter((p) => portalFtp(p)).slice(0, 10);
+  }
   if (pole("street_name")) out.adres_ulica = pole("street_name");
   if (pole("house_number")) out.adres_numer = pole("house_number");
   if (pole("postcode")) out.adres_kod = pole("postcode");
@@ -196,6 +201,18 @@ export type SaveResult = { ok: true; portal?: { ok: boolean; teksty: string[] } 
  * = dezaktywuj. Pole `otodom_pole` mówi, że kreator pokazał tę opcję: bez niego
  * (biuro niepołączone) niczego nie ruszamy.
  */
+/**
+ * Portale przez FTP dostają pełny plik biura, więc po zapisie oferty wysyłamy
+ * go na nowo do każdego portalu, na którym oferta była albo ma być. Wysyłka
+ * trwa (zdjęcia), dlatego idzie po odpowiedzi, a agent nie czeka.
+ */
+function eksportFtp(agencyId: string | null, userId: string, formData: FormData) {
+  if (!agencyId || formData.get("portale_ftp_pole") !== "1") return;
+  const przed = String(formData.get("portale_ftp_przed") ?? "").split(",").filter(Boolean);
+  const portale = new Set([...przed, ...formData.getAll("portal_ftp").map(String)].filter((p) => portalFtp(p)));
+  for (const p of portale) after(() => wyslijNaPortalFtp(agencyId, p, userId).then(() => undefined));
+}
+
 async function eksportPortali(user: { id: string; agency_id: string | null; role: string }, id: string, formData: FormData): Promise<{ ok: boolean; teksty: string[] } | undefined> {
   if (formData.get("otodom_pole") !== "1" || !user.agency_id) return undefined;
   const { publikujNaOtodom, zmienStanOtodom, ogloszenieOferty } = await import("@/lib/otodom/ogloszenia");
@@ -331,6 +348,7 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
   const nowaId = data.id as string;
   // Wynik eksportu nowej oferty widać na jej karcie (status i ewentualne braki).
   await eksportPortali(user, nowaId, formData);
+  eksportFtp(user.agency_id, user.id, formData);
   after(() => poNowejOfercie(user, nowaId));
   revalidatePath("/app/nieruchomosci");
   redirect(`/app/nieruchomosci/${nowaId}`);
@@ -427,6 +445,7 @@ export async function updateProperty(id: string, formData: FormData): Promise<Sa
   }
 
   const portal = await eksportPortali(user, id, formData);
+  eksportFtp(user.agency_id, user.id, formData);
 
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");
@@ -439,11 +458,19 @@ export async function setPropertyStatus(
 ): Promise<void> {
   const user = await requireUser();
   const admin = createSupabaseAdmin();
-  await admin
+  const { data: zmieniona } = await admin
     .from("properties")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id)
-    .eq("agency_id", user.agency_id);
+    .eq("agency_id", user.agency_id)
+    .select("details")
+    .maybeSingle();
+  // Sprzedana albo zarchiwizowana oferta znika z portali FTP przy następnym pliku.
+  const portaleFtp = (zmieniona?.details as Record<string, unknown> | null)?.portale_ftp;
+  if (user.agency_id && Array.isArray(portaleFtp)) {
+    const agencyId = user.agency_id;
+    for (const p of portaleFtp.map(String).filter((x) => portalFtp(x))) after(() => wyslijNaPortalFtp(agencyId, p, user.id).then(() => undefined));
+  }
   revalidatePath(`/app/nieruchomosci/${id}`);
   revalidatePath("/app/nieruchomosci");
 }

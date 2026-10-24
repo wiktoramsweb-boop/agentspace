@@ -302,6 +302,17 @@ export async function odswiezDemoJesliTrzeba(agency: {
   const ostatnio = agency.demo_refreshed_at ? new Date(agency.demo_refreshed_at).getTime() : 0;
   if (Date.now() - ostatnio < SWIEZOSC_H * 3600 * 1000) return false;
 
+  // Demo podłączone do portalu (konto testowe OLX) nie może się zerować: kasowanie
+  // ofert gubiło powiązanie z ogłoszeniem, które dalej wisiało na portalu.
+  const { data: portal } = await createSupabaseAdmin()
+    .from("portal_connections")
+    .select("id")
+    .eq("agency_id", agency.id)
+    .is("revoked_at", null)
+    .limit(1)
+    .maybeSingle();
+  if (portal) return false;
+
   try {
     await zasiejDemo(agency.id);
     return true;

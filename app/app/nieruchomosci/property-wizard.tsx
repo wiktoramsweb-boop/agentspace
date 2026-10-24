@@ -51,6 +51,7 @@ export function PropertyWizard({
   canEditSettings = false,
   property,
   otodom,
+  portaleFtp = [],
 }: {
   clients: ClientLite[];
   photoConfig: PhotoConfig;
@@ -60,6 +61,8 @@ export function PropertyWizard({
   property?: Property;
   /** Eksport na Otodom: połączenie biura i stan ogłoszenia tej oferty. */
   otodom?: { polaczone: boolean; tabele: boolean; ceo: boolean; status: string | null; url: string | null; exact: boolean };
+  /** Portale z eksportem przez FTP, które biuro ma skonfigurowane. */
+  portaleFtp?: { id: string; nazwa: string }[];
 }) {
   const editing = !!property;
   const router = useRouter();
@@ -326,6 +329,7 @@ export function PropertyWizard({
             </label>
 
             <EksportOtodom otodom={otodom} />
+            <EksportFtp portale={portaleFtp} zaznaczone={(property?.details as Record<string, unknown> | null | undefined)?.portale_ftp} />
 
             <p className="text-xs text-slate-400">
               {editing
@@ -495,6 +499,28 @@ const STATUS_OTODOM: Record<string, string> = {
  * Eksport na Otodom w kroku Publikacja. Zaznaczenie publikuje albo aktualizuje
  * ogłoszenie przy zapisie oferty, odznaczenie aktywnego ogłoszenia je dezaktywuje.
  */
+function EksportFtp({ portale, zaznaczone }: { portale: { id: string; nazwa: string }[]; zaznaczone: unknown }) {
+  const przed = Array.isArray(zaznaczone) ? zaznaczone.map(String) : [];
+  if (!portale.length) return null;
+  return (
+    <>
+      <input type="hidden" name="portale_ftp_pole" value="1" />
+      <input type="hidden" name="portale_ftp_przed" value={przed.join(",")} />
+      {portale.map((p) => (
+        <label key={p.id} className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-300 p-4 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+          <input type="checkbox" name="portal_ftp" value={p.id} defaultChecked={przed.includes(p.id)} className="mt-0.5 h-4 w-4 accent-emerald-500" />
+          <span>
+            <span className="font-medium text-slate-900">{p.nazwa}</span>
+            <span className="block text-sm text-slate-500">
+              {przed.includes(p.id) ? "Przy zapisie zaktualizujemy ofertę na portalu. Odznacz, żeby ją zdjąć." : "Przy zapisie wyślemy ofertę na portal. Pojawi się tam zwykle po około 20 minutach."}
+            </span>
+          </span>
+        </label>
+      ))}
+    </>
+  );
+}
+
 function EksportOtodom({ otodom }: { otodom?: { polaczone: boolean; tabele: boolean; ceo: boolean; status: string | null; url: string | null; exact: boolean } }) {
   const aktywne = ["active", "new", "wysylanie"].includes(otodom?.status ?? "");
   const [wlaczone, setWlaczone] = useState(aktywne);
