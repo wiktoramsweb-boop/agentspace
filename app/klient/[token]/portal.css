@@ -63,9 +63,10 @@
 }
 .portal-marka img,
 .portal-marka .portal-inicjal {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--linia);
   flex: none;
   object-fit: contain;
 }
@@ -830,4 +831,125 @@
   border-color: var(--t);
   color: #fff;
   font-weight: 560;
+}
+
+/* ── Rozmowa: nagłówek z agentem i pole pisania nad zakładkami ───────── */
+.portal-rozmowca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 18px;
+}
+.portal-rozmowca img,
+.portal-rozmowca > span {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 15%;
+  flex: none;
+}
+.portal-rozmowca > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--akcent-tlo);
+  color: var(--akcent);
+  font-weight: 650;
+  font-size: 18px;
+}
+.portal-rozmowca b {
+  display: block;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.portal-rozmowca small {
+  color: var(--t3);
+  font-size: 13px;
+}
+.portal-pisz {
+  position: sticky;
+  bottom: calc(68px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 8px 0;
+  background: var(--tlo, #fff);
+}
+.portal-pisz textarea {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--linia);
+  border-radius: 22px;
+  padding: 11px 16px;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.35;
+  max-height: 140px;
+  background: #fff;
+  color: var(--t);
+}
+.portal-pisz textarea:focus {
+  outline: 2px solid var(--akcent);
+  outline-offset: -1px;
+}
+.portal-pisz button {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: none;
+  border-radius: 50%;
+  background: var(--akcent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.portal-pisz button:disabled {
+  opacity: 0.4;
+}
+.portal-krecik {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  animation: portal-obrot 0.8s linear infinite;
+}
+@keyframes portal-obrot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.portal-zacheta-push {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: var(--akcent-tlo);
+  border-radius: 14px;
+  padding: 10px 12px 10px 14px;
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--t);
+}
+.portal-zacheta-push span {
+  flex: 1;
+  min-width: 180px;
+}
+.portal-zacheta-push button {
+  border: none;
+  border-radius: 10px;
+  background: var(--akcent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 14px;
+}
+.portal-zacheta-push small {
+  flex-basis: 100%;
+  color: var(--czerwien);
 }

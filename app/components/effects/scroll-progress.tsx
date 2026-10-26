@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { motion, useScroll, useSpring } from "motion/react";
 
 /**
@@ -13,6 +14,9 @@ export function ScrollProgress() {
     damping: 30,
     restDelta: 0.001,
   });
+
+  // Portal klienta to osobna, spokojna aplikacja biura: bez naszych ozdobników.
+  if (usePathname()?.startsWith("/klient/")) return null;
 
   return (
     <motion.div

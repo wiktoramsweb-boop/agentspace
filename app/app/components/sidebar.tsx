@@ -13,6 +13,7 @@ import { maModul, type Uprawnienia } from "@/lib/role";
 import { Logo } from "@/app/components/marka";
 import { Dzwonek } from "./dzwonek";
 import { LicznikCzatu } from "./licznik-czatu";
+import { LicznikKlientow } from "./licznik-klientow";
 
 const COLLAPSE_KEY = "as_nav_collapsed";
 
@@ -177,6 +178,7 @@ export function Sidebar({
                     </span>
                     {item.label}
                     {item.licznik === "czat" && userId && <LicznikCzatu userId={userId} />}
+                    {item.licznik === "klienci" && userId && <LicznikKlientow />}
                   </Link>
                 );
               })}

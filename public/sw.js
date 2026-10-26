@@ -7,7 +7,7 @@
 // To są dane zalogowanego człowieka, a z jednego telefonu potrafi korzystać
 // więcej niż jedna osoba. Cache'ujemy wyłącznie rzeczy publiczne i niezmienne.
 
-const VERSION = "v2";
+const VERSION = "v3";
 const STATIC_CACHE = `as-static-${VERSION}`;
 const OFFLINE_URL = "/offline";
 
@@ -95,7 +95,8 @@ self.addEventListener("push", (event) => {
   const title = data.title || "AgentSpace";
   const options = {
     body: data.body || "",
-    icon: "/icon-192.png",
+    // Klient biura dostaje ikonę swojego biura, nie AgentSpace.
+    icon: data.icon || "/icon-192.png",
     badge: "/icon-192.png",
     // Powiadomienia o tym samym zdarzeniu mają się podmieniać, a nie mnożyć.
     tag: data.tag || undefined,
@@ -112,8 +113,11 @@ self.addEventListener("notificationclick", (event) => {
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       // Apka już otwarta: przenosimy ją na właściwy ekran, zamiast otwierać drugą.
+      // Portal klienta i aplikacja agenta to dwie różne apki na tym samym adresie:
+      // przejmujemy okno tej, do której prowadzi powiadomienie.
+      const prefiks = url.startsWith("/klient/") ? url.split("/").slice(0, 3).join("/") : "/app";
       for (const client of list) {
-        if (client.url.includes("/app") && "focus" in client) {
+        if (new URL(client.url).pathname.startsWith(prefiks) && "focus" in client) {
           if ("navigate" in client) client.navigate(url).catch(() => {});
           return client.focus();
         }

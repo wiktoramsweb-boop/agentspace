@@ -65,8 +65,9 @@ export default async function PortalLayout({
       <header className="portal-marka">
         <div>
           {biuro.logoUrl ? (
+            // Znak z logo przycięty jak na ikonie aplikacji: szerokie logo w kwadracie 30 px było nieczytelne.
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={biuro.logoUrl} alt="" />
+            <img src={`/klient/${token}/ikona?r=192`} alt="" />
           ) : (
             <span className="portal-inicjal" aria-hidden="true">
               {biuro.inicjal}

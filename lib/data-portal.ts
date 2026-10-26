@@ -228,7 +228,10 @@ export async function dostepnoscKupujacego(d: DostepKlienta) {
 /* ─────────────── Marka biura ─────────────── */
 
 export type BrandingBiura = {
+  /** Nazwa handlowa, krótka: nagłówek, ikona, baner instalacji. */
   nazwa: string;
+  /** Pełna nazwa firmy z danych biura (np. spółka cywilna ze wspólnikami): strona Biuro. */
+  pelnaNazwa: string;
   logoUrl: string | null;
   telefon: string | null;
   email: string | null;
@@ -252,10 +255,14 @@ export async function brandingBiura(agencyId: string): Promise<BrandingBiura> {
   ]);
 
   const firma = ((ust?.company ?? {}) as Record<string, string | undefined>) ?? {};
-  const nazwa = (firma.name || (agencja?.name as string | undefined) || "Twoje biuro").trim();
+  const pelnaNazwa = (firma.name || (agencja?.name as string | undefined) || "Twoje biuro").trim();
+  // Nazwa konta biura jest zwykle handlowa („Spectra Nieruchomości”), a dane
+  // firmy prawne („Agencja … s.c. Wiktor Szostek, …”), za długie na nagłówek.
+  const nazwa = ((agencja?.name as string | undefined) || pelnaNazwa).trim();
 
   return {
     nazwa,
+    pelnaNazwa,
     logoUrl: ust?.logo_path ? publicAssetUrl("agency-assets", ust.logo_path as string) : null,
     telefon: firma.phone?.trim() || null,
     email: firma.email?.trim() || null,
@@ -265,7 +272,7 @@ export async function brandingBiura(agencyId: string): Promise<BrandingBiura> {
 }
 
 /** Agent prowadzący sprawę: klient ma wiedzieć, do kogo dzwonić. */
-export async function opiekunKlienta(d: DostepKlienta): Promise<{ imie: string; telefon: string | null } | null> {
+export async function opiekunKlienta(d: DostepKlienta): Promise<{ imie: string; telefon: string | null; zdjecie: string | null } | null> {
   const admin = createSupabaseAdmin();
   const { data: klient } = await admin
     .from("clients")
@@ -277,12 +284,16 @@ export async function opiekunKlienta(d: DostepKlienta): Promise<{ imie: string; 
 
   const { data: profil } = await admin
     .from("profiles")
-    .select("full_name, phone")
+    .select("full_name, phone, avatar_path")
     .eq("id", klient.agent_id)
     .maybeSingle();
   if (!profil) return null;
 
-  return { imie: (profil.full_name as string | null) ?? "Twój agent", telefon: (profil.phone as string | null) ?? null };
+  return {
+    imie: (profil.full_name as string | null) ?? "Twój agent",
+    telefon: (profil.phone as string | null) ?? null,
+    zdjecie: profil.avatar_path ? publicAssetUrl("agency-assets", profil.avatar_path as string) : null,
+  };
 }
 
 /* ─────────────── Kalendarz ─────────────── */
@@ -326,6 +337,16 @@ export type WiadomoscPortalu = {
   tresc: string;
   created_at: string;
 };
+
+/** Klient otworzył rozmowę: odpowiedzi biura oznaczamy jako przeczytane (agent widzi „przeczytane”). */
+export async function oznaczPrzeczytaneKlienta(d: DostepKlienta): Promise<void> {
+  await createSupabaseAdmin()
+    .from("client_portal_messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("access_id", d.id)
+    .eq("autor", "agent")
+    .is("read_at", null);
+}
 
 export async function wiadomosciKlienta(d: DostepKlienta): Promise<{ ready: boolean; lista: WiadomoscPortalu[] }> {
   const admin = createSupabaseAdmin();

@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { dostepPoTokenie, brandingBiura } from "@/lib/data-portal";
+import { logoDoIkony, naDataUrl } from "@/lib/logo-ikona";
 
 /**
  * Ikona aplikacji na ekranie telefonu klienta.
@@ -21,8 +22,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ token: s
   const url = new URL(req.url);
   const rozmiar = url.searchParams.get("r") === "192" ? 192 : 512;
   const maskable = url.searchParams.get("m") === "1";
-  // Bezpieczny obszar maski to ok. 80% szerokości.
-  const zapas = maskable ? Math.round(rozmiar * 0.18) : Math.round(rozmiar * 0.08);
+  // Bezpieczny obszar maski to ok. 80% szerokości. Znak dostaje więcej
+  // powietrza niż napis, bo jest zwarty i inaczej dotykałby krawędzi.
+  const logo = biuro.logoUrl ? await logoDoIkony(biuro.logoUrl) : null;
+  const obraz = logo ? naDataUrl(logo.znak ?? logo.cale) : biuro.logoUrl;
+  const zapas = Math.round(rozmiar * (maskable ? 0.22 : logo?.znak ? 0.16 : 0.08));
 
   return new ImageResponse(
     (
@@ -40,7 +44,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ token: s
         {biuro.logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={biuro.logoUrl}
+            src={obraz!}
             alt=""
             width={rozmiar - zapas * 2}
             height={rozmiar - zapas * 2}

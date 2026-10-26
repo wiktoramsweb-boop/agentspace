@@ -136,6 +136,13 @@ export function DostepPortal({
               {link(d.token)}
             </p>
 
+            <a
+              href={`/app/wiadomosci?w=${d.id}`}
+              className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
+            >
+              Wiadomości z klientem
+            </a>
+
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
               <button
                 type="button"

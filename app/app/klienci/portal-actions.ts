@@ -1,6 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { mozeOdpisac } from "@/lib/wiadomosci-klientow";
+import { wyslijPushDoKlienta } from "@/lib/push";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { nowyToken, type RodzajDostepu } from "@/lib/portal-klienta";
@@ -104,9 +107,30 @@ export async function udostepnijZdarzenie(
     .eq("id", activityId)
     .eq("agency_id", user.agency_id);
 
+  if (widoczne) {
+    const { data: zd } = await admin.from("activities").select("property_id").eq("id", activityId).eq("agency_id", user.agency_id).maybeSingle();
+    if (zd?.property_id) {
+      const propertyId = zd.property_id as string;
+      const opis = opisDlaKlienta.trim().slice(0, 140);
+      after(async () => {
+        const { powiadomKlientowONieruchomosci } = await import("@/lib/push");
+        await powiadomKlientowONieruchomosci(propertyId, { title: "Nowość w Twojej sprawie", body: opis || "Biuro dodało nowy wpis.", tag: `oferta-${propertyId}` });
+      });
+    }
+  }
+
   revalidatePath("/app/dzialania");
   revalidatePath("/app/nieruchomosci", "layout");
   revalidatePath("/app/klienci", "layout");
+}
+
+/** Push do konkretnego klienta, z linkiem w jego portal. Po odpowiedzi serwera, żeby agent nie czekał. */
+function pushDoKlienta(accessId: string, title: string, body: string, sciezka = "") {
+  after(async () => {
+    const { data } = await createSupabaseAdmin().from("client_portal_access").select("token, revoked_at").eq("id", accessId).maybeSingle();
+    if (!data?.token || data.revoked_at) return;
+    await wyslijPushDoKlienta(accessId, { title, body, url: `/klient/${data.token}${sciezka}`, tag: `portal-${accessId}-${sciezka || "start"}`, icon: `/klient/${data.token}/ikona?r=192` });
+  });
 }
 
 /* ─────────────── Praca z portalem przy nieruchomości ─────────────── */
@@ -220,6 +244,8 @@ export async function zaproponujCene(
     };
   }
 
+  pushDoKlienta(accessId, "Propozycja nowej ceny", `Biuro proponuje ${Math.round(cena).toLocaleString("pl-PL")} zł. Potrzebna Twoja decyzja.`);
+
   revalidatePath(`/app/nieruchomosci/${propertyId}`);
   return { ok: true };
 }
@@ -238,11 +264,11 @@ export async function odpowiedzKlientowi(
   const admin = createSupabaseAdmin();
   const { data: dostep } = await admin
     .from("client_portal_access")
-    .select("id, client_id")
+    .select("id, client_id, token")
     .eq("id", accessId)
     .eq("agency_id", user.agency_id)
     .maybeSingle();
-  if (!dostep) return { ok: false, error: "Nie ma takiego dostępu." };
+  if (!dostep || !(await mozeOdpisac(user, accessId))) return { ok: false, error: "Nie ma takiego dostępu." };
 
   const { error } = await admin
     .from("client_portal_messages")
@@ -256,7 +282,20 @@ export async function odpowiedzKlientowi(
     };
   }
 
+  // Push na telefon klienta: tylko tyle, że biuro odpisało. Treść zostaje w portalu.
+  const imie = (user.full_name ?? "").split(" ")[0] || "Biuro";
+  after(() =>
+    wyslijPushDoKlienta(dostep.id as string, {
+      title: `Nowa wiadomość od: ${imie}`,
+      body: czysta.length > 120 ? `${czysta.slice(0, 117)}…` : czysta,
+      url: `/klient/${dostep.token}/wiadomosci`,
+      tag: `wiadomosc-${dostep.id}`,
+      icon: `/klient/${dostep.token}/ikona?r=192`,
+    }).then(() => undefined),
+  );
+
   revalidatePath(`/app/klienci/${dostep.client_id}`);
+  revalidatePath("/app/wiadomosci");
   return { ok: true };
 }
 
@@ -283,6 +322,7 @@ export async function przypiszNieruchomosc(
     await admin
       .from("client_portal_properties")
       .upsert({ access_id: accessId, property_id: propertyId }, { onConflict: "access_id,property_id" });
+    pushDoKlienta(accessId, "Nowa nieruchomość w Twoim portalu", "Biuro dodało nieruchomość do Twojego podglądu. Zajrzyj.");
   } else {
     await admin
       .from("client_portal_properties")

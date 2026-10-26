@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { powiadomOpiekuna, powiadomOWiadomosciKlienta } from "@/lib/wiadomosci-klientow";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { dostepPoTokenie } from "@/lib/data-portal";
 import { todayPL } from "@/lib/datetime";
@@ -60,6 +61,18 @@ export async function oznaczOferte(
     .update({ status: reakcja === "lubi" ? "zainteresowany" : "odrzucone" })
     .eq("id", dopasowanie.id);
 
+  if (reakcja === "lubi") {
+    const { data: oferta } = await admin.from("properties").select("title").eq("id", propertyId).maybeSingle();
+    after(() =>
+      powiadomOpiekuna(dostep.id, {
+        tytul: (k) => `${k} jest zainteresowany ofertą`,
+        tresc: `Polubił(a) w portalu: ${oferta?.title ?? "oferta"}. Dobry moment na telefon i prezentację.`,
+        adres: (c) => `/app/klienci/${c}`,
+        znacznik: `reakcja-${dostep.id}-${propertyId}`,
+      }),
+    );
+  }
+
   revalidatePath(`/klient/${token}`);
   return { ok: true };
 }
@@ -87,6 +100,16 @@ export async function dodajTermin(
       { access_id: dostep.id, dzien, od, do_godz: doGodz },
       { onConflict: "access_id,dzien,od,do_godz" },
     );
+
+  const kiedy = `${dzien.split("-").reverse().join(".")}, ${od}–${doGodz}`;
+  after(() =>
+    powiadomOpiekuna(dostep.id, {
+      tytul: (k) => `${k} podał termin na prezentację`,
+      tresc: `Może oglądać: ${kiedy}.`,
+      adres: (c) => `/app/klienci/${c}`,
+      znacznik: `termin-${dostep.id}`,
+    }),
+  );
 
   revalidatePath(`/klient/${token}/terminy`);
   return { ok: true };
@@ -119,6 +142,7 @@ export async function wyslijWiadomosc(token: string, tresc: string): Promise<Wyn
 
   if (error) return { ok: false, error: "Nie udało się wysłać. Spróbuj za chwilę." };
 
+  after(() => powiadomOWiadomosciKlienta(dostep.id, czysta));
   revalidatePath(`/klient/${token}/wiadomosci`);
   return { ok: true };
 }
@@ -202,6 +226,16 @@ export async function decyzjaOCenie(
         });
       });
     }
+  } else {
+    const propertyId = prop.property_id as string;
+    after(() =>
+      powiadomOpiekuna(dostep.id, {
+        tytul: (k) => `${k} nie zgodził(a) się na nową cenę`,
+        tresc: `Propozycja ${Number(prop.cena_proponowana).toLocaleString("pl-PL")} zł odrzucona w portalu.`,
+        adres: () => `/app/nieruchomosci/${propertyId}`,
+        pilne: true,
+      }),
+    );
   }
 
   revalidatePath(`/klient/${token}/n/${prop.property_id}`);

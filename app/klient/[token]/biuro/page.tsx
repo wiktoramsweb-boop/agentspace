@@ -18,7 +18,15 @@ export default async function BiuroKlienta({ params }: { params: Promise<{ token
       <div className="portal-top">
         <h1>Biuro</h1>
       </div>
-      <p className="portal-sub">Twoją sprawę prowadzi {biuro.nazwa}.</p>
+      <p className="portal-sub">
+        Twoją sprawę prowadzi {biuro.nazwa}.
+        {biuro.pelnaNazwa !== biuro.nazwa && (
+          <>
+            <br />
+            <span style={{ fontSize: 13 }}>{biuro.pelnaNazwa}</span>
+          </>
+        )}
+      </p>
 
       <div className="portal-info">
         <h3>Kontakt</h3>

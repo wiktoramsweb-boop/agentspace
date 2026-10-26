@@ -22,6 +22,8 @@ export type PushPayload = {
   tag?: string;
   /** Zostaje na ekranie, dopóki agent go nie dotknie. Dla leadów i pilnych zadań. */
   important?: boolean;
+  /** Ikona powiadomienia (dla klientów: ikona ich biura). */
+  icon?: string;
 };
 
 export type WebPushSubscription = {
@@ -204,6 +206,6 @@ export async function powiadomKlientowONieruchomosci(
     .is("revoked_at", null);
 
   for (const d of (dostepy ?? []) as { id: string; token: string }[]) {
-    await wyslijPushDoKlienta(d.id, { ...payload, url: `/klient/${d.token}` });
+    await wyslijPushDoKlienta(d.id, { ...payload, url: `/klient/${d.token}`, icon: `/klient/${d.token}/ikona?r=192` });
   }
 }

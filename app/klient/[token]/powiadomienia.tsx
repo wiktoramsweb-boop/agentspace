@@ -11,7 +11,7 @@ import { wlaczPowiadomienia, wylaczPowiadomienia } from "./actions";
  * mówimy wprost, co trzeba zrobić: klient, który nie wie dlaczego nie działa,
  * uzna, że aplikacja jest zepsuta.
  */
-export function PrzelacznikPowiadomien({ token }: { token: string }) {
+export function PrzelacznikPowiadomien({ token, zacheta }: { token: string; zacheta?: string }) {
   const [stan, setStan] = useState<"sprawdzam" | "brak" | "wylaczone" | "wlaczone" | "odmowa">("sprawdzam");
   const [pracuje, setPracuje] = useState(false);
   const [blad, setBlad] = useState<string | null>(null);
@@ -84,6 +84,20 @@ export function PrzelacznikPowiadomien({ token }: { token: string }) {
   }
 
   if (stan === "sprawdzam") return null;
+
+  // Wersja „zachęta” (np. nad rozmową): tylko gdy da się włączyć, a jeszcze nie włączono.
+  if (zacheta) {
+    if (stan !== "wylaczone") return null;
+    return (
+      <div className="portal-zacheta-push">
+        <span>{zacheta}</span>
+        <button type="button" disabled={pracuje} onClick={() => void wlacz()}>
+          {pracuje ? "…" : "Włącz"}
+        </button>
+        {blad && <small>{blad}</small>}
+      </div>
+    );
+  }
 
   if (stan === "brak") {
     return (
