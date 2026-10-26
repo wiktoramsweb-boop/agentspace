@@ -136,24 +136,25 @@ export function WyborTerminu({
 
       {!bezGodziny && (
         <div>
+          <p className="mb-1 text-xs text-slate-400">godzina</p>
           <div className="flex flex-wrap gap-1">
             {GODZINY.map((h) => {
               const t = String(h).padStart(2, "0");
               return (
-                <button key={h} type="button" onClick={() => ustaw(d, `${t}:${mm ?? "00"}`)} className={`w-11 rounded-lg py-1.5 text-sm tabular-nums transition ${hh === t ? "bg-emerald-600 font-semibold text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
-                  {h}
+                <button key={h} type="button" onClick={() => ustaw(d, `${t}:${mm ?? "00"}`)} className={`w-14 rounded-lg py-1.5 text-[13px] tabular-nums transition ${hh === t ? "bg-emerald-600 font-semibold text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+                  {h}:00
                 </button>
               );
             })}
           </div>
-          <div className="mt-1.5 flex items-center gap-1">
+          <div className="mt-2 flex flex-wrap items-center gap-1">
             <span className="mr-1 text-xs text-slate-400">minuty</span>
             {MINUTY.map((m) => (
               <button key={m} type="button" onClick={() => ustaw(d, `${hh ?? "09"}:${m}`)} className={`w-11 rounded-lg py-1 text-sm tabular-nums transition ${mm === m ? "bg-emerald-600 font-semibold text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
                 :{m}
               </button>
             ))}
-            <span className="ml-2 text-sm font-semibold tabular-nums text-slate-900">
+            <span className="ml-auto rounded-lg bg-emerald-50 px-2.5 py-1 text-sm font-semibold tabular-nums text-emerald-900">
               {ladnie(d)}, {g}
             </span>
           </div>
