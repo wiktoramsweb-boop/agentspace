@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { createSupabaseAdmin } from "./supabase/admin";
 import { publicAssetUrl } from "./storage";
 import { todayPL, addDaysKey } from "./datetime";
@@ -55,17 +56,23 @@ export async function dostepPoTokenie(token: string): Promise<DostepKlienta | nu
   const admin = createSupabaseAdmin();
   const { data } = await admin
     .from("client_portal_access")
-    .select("id, agency_id, client_id, rodzaj, expires_at, revoked_at")
+    .select("id, agency_id, client_id, rodzaj, expires_at, revoked_at, last_seen_at")
     .eq("token", token)
     .maybeSingle();
 
   if (!stanDostepu(data, todayPL()).aktywny) return null;
 
   // Ślad ostatniego wejścia: agent widzi, czy klient w ogóle zagląda.
-  void admin
-    .from("client_portal_access")
-    .update({ last_seen_at: new Date().toISOString() })
-    .eq("id", (data as DostepKlienta).id);
+  // Zapytanie Supabase rusza dopiero przy await/then: samo `void` go nie wysyłało,
+  // więc przez długi czas żaden klient nie miał zapisanego wejścia. Zapis po
+  // odpowiedzi, żeby nie spowalniał strony; najwyżej raz na 5 minut.
+  const ostatnio = (data as { last_seen_at?: string | null }).last_seen_at;
+  if (!ostatnio || Date.now() - Date.parse(ostatnio) > 5 * 60_000) {
+    const id = (data as DostepKlienta).id;
+    after(async () => {
+      await admin.from("client_portal_access").update({ last_seen_at: new Date().toISOString() }).eq("id", id);
+    });
+  }
 
   return data as DostepKlienta;
 }
