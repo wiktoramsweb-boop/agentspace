@@ -1,4 +1,5 @@
 import { after } from "next/server";
+import { cookies } from "next/headers";
 import { createSupabaseAdmin } from "./supabase/admin";
 import { publicAssetUrl } from "./storage";
 import { todayPL, addDaysKey } from "./datetime";
@@ -67,7 +68,9 @@ export async function dostepPoTokenie(token: string): Promise<DostepKlienta | nu
   // więc przez długi czas żaden klient nie miał zapisanego wejścia. Zapis po
   // odpowiedzi, żeby nie spowalniał strony; najwyżej raz na 5 minut.
   const ostatnio = (data as { last_seen_at?: string | null }).last_seen_at;
-  if (!ostatnio || Date.now() - Date.parse(ostatnio) > 5 * 60_000) {
+  // Podgląd z aplikacji agenta (zalogowana sesja w tej samej przeglądarce) to nie wejście klienta.
+  const agent = (await cookies()).getAll().some((c) => c.name.startsWith("sb-") && c.name.includes("auth-token"));
+  if (!agent && (!ostatnio || Date.now() - Date.parse(ostatnio) > 5 * 60_000)) {
     const id = (data as DostepKlienta).id;
     after(async () => {
       await admin.from("client_portal_access").update({ last_seen_at: new Date().toISOString() }).eq("id", id);
