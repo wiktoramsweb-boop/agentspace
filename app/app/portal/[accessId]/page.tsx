@@ -57,8 +57,8 @@ export default async function PortalJednegoKlienta({ params }: { params: Promise
         </div>
       </div>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[1.25fr_1fr]">
-        <div className="space-y-6">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+        <div className="min-w-0 space-y-6">
           <section className="rounded-2xl border border-slate-200 bg-white p-5">
             <h2 className="font-semibold text-slate-900">{kupujacy ? "Napisz do klienta" : "Daj znać, co się dzieje"}</h2>
             <p className="mb-4 mt-0.5 text-sm text-slate-500">
@@ -162,7 +162,7 @@ export default async function PortalJednegoKlienta({ params }: { params: Promise
           )}
         </div>
 
-        <section id="wiadomosci" className="scroll-mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white lg:sticky lg:top-6">
+        <section id="wiadomosci" className="min-w-0 scroll-mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white lg:sticky lg:top-6">
           <div className="border-b border-slate-100 px-4 py-3">
             <h2 className="font-semibold text-slate-900">Wiadomości</h2>
           </div>
