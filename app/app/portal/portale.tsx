@@ -88,6 +88,19 @@ function OknoQr({ accessId, klient, onZamknij }: { accessId: string; klient: str
   );
 }
 
+/** Przycisk „Kod QR” z oknem, do użycia poza listą (strona jednego portalu). */
+export function PrzyciskQr({ accessId, klient }: { accessId: string; klient: string }) {
+  const [otwarte, setOtwarte] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOtwarte(true)} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-slate-400">
+        Kod QR
+      </button>
+      {otwarte && <OknoQr accessId={accessId} klient={klient} onZamknij={() => setOtwarte(false)} />}
+    </>
+  );
+}
+
 export function PortaleLista({ portale, baza }: { portale: PortalKlienta[]; baza: string }) {
   const [szukaj, setSzukaj] = useState("");
   const [qr, setQr] = useState<{ id: string; klient: string } | null>(null);
@@ -124,7 +137,7 @@ export function PortaleLista({ portale, baza }: { portale: PortalKlienta[]; baza
           const kiedy = ileTemu(p.ostatnioWPortalu);
           return (
             <div key={p.accessId} className={`rounded-2xl border bg-white p-4 transition hover:shadow-md ${p.nieprzeczytane ? "border-sky-300" : "border-slate-200"}`}>
-              <div className="flex items-center gap-3">
+              <Link href={`/app/portal/${p.accessId}`} className="group flex items-center gap-3">
                 <span className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-base font-bold text-white ${kolor(p.klient)}`}>
                   {p.klient.charAt(0).toUpperCase()}
                 </span>
@@ -140,14 +153,17 @@ export function PortaleLista({ portale, baza }: { portale: PortalKlienta[]; baza
                 {p.nieprzeczytane > 0 && (
                   <span className="rounded-full bg-sky-500 px-2 py-0.5 text-xs font-bold text-white">{p.nieprzeczytane} nowe</span>
                 )}
-              </div>
+                <svg className="h-5 w-5 flex-shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                </svg>
+              </Link>
 
               <div className="mt-4 grid grid-cols-4 gap-1.5">
-                <a href={`${baza}/klient/${p.token}`} target="_blank" rel="noopener noreferrer" className={przycisk(true)}>
-                  <Ikona d={I.otworz} />
-                  Otwórz
-                </a>
-                <Link href={`/app/wiadomosci?w=${p.accessId}`} className={przycisk(false, p.nieprzeczytane > 0)}>
+                <Link href={`/app/portal/${p.accessId}`} className={przycisk(true)}>
+                  <Ikona d={I.plus} />
+                  Wpis
+                </Link>
+                <Link href={`/app/portal/${p.accessId}#wiadomosci`} className={przycisk(false, p.nieprzeczytane > 0)}>
                   <Ikona d={I.czat} />
                   Czat
                 </Link>
@@ -155,10 +171,10 @@ export function PortaleLista({ portale, baza }: { portale: PortalKlienta[]; baza
                   <Ikona d={I.qr} />
                   QR
                 </button>
-                <Link href={`/app/klienci/${p.clientId}?z=portal`} className={przycisk(false)}>
-                  <Ikona d={I.osoba} />
-                  Klient
-                </Link>
+                <a href={`${baza}/klient/${p.token}`} target="_blank" rel="noopener noreferrer" className={przycisk(false)}>
+                  <Ikona d={I.otworz} />
+                  Jak klient
+                </a>
               </div>
             </div>
           );

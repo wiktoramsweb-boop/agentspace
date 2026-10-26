@@ -213,3 +213,64 @@ export async function portaleKlientow(u: Kto): Promise<PortalKlienta[]> {
     }))
     .sort((a, b) => b.nieprzeczytane - a.nieprzeczytane || (b.ostatnioWPortalu ?? b.utworzony).localeCompare(a.ostatnioWPortalu ?? a.utworzony));
 }
+
+export type SprawaPortalu = {
+  dostep: DostepWidoczny;
+  nieruchomosci: {
+    id: string;
+    title: string;
+    price_pln: number | null;
+    zdjecie: string | null;
+    process_stage: string | null;
+    wpisy: { id: string; tekst: string; kiedy: string | null; kind: string }[];
+    oczekujacaCena: number | null;
+  }[];
+  doDodania: { id: string; title: string }[];
+  reakcje: { tytul: string; reakcja: string; created_at: string }[];
+};
+
+/**
+ * Wszystko, czym agent zarządza w portalu jednego klienta: jego nieruchomości
+ * z tym, co klient widzi na osi czasu, oczekujące propozycje ceny i reakcje
+ * kupującego na wysłane oferty.
+ */
+export async function sprawaPortalu(u: Kto, accessId: string): Promise<SprawaPortalu | null> {
+  const dostep = (await dostepyWidoczne(u)).find((x) => x.id === accessId);
+  if (!dostep) return null;
+  const admin = createSupabaseAdmin();
+  const { data: przyp } = await admin.from("client_portal_properties").select("property_id").eq("access_id", accessId);
+  const ids = (przyp ?? []).map((p) => p.property_id as string);
+
+  const [{ data: props }, { data: zd }, { data: prop }, { data: wlasne }, { data: fb }] = await Promise.all([
+    ids.length ? admin.from("properties").select("id, title, price_pln, photos, process_stage").in("id", ids).eq("agency_id", u.agency_id!) : Promise.resolve({ data: [] }),
+    ids.length
+      ? admin.from("activities").select("id, property_id, client_note, subject, due_at, kind").in("property_id", ids).eq("client_visible", true).order("due_at", { ascending: false }).limit(200)
+      : Promise.resolve({ data: [] }),
+    admin.from("client_price_proposals").select("property_id, cena_proponowana, status").eq("access_id", accessId).eq("status", "oczekuje"),
+    admin.from("properties").select("id, title").eq("agency_id", u.agency_id!).eq("owner_client_id", dostep.client_id).limit(50),
+    admin.from("client_offer_feedback").select("property_id, reakcja, created_at").eq("access_id", accessId).order("created_at", { ascending: false }).limit(30),
+  ]);
+
+  const fbIds = [...new Set(((fb ?? []) as { property_id: string }[]).map((f) => f.property_id))];
+  const { data: fbProps } = fbIds.length ? await admin.from("properties").select("id, title").in("id", fbIds) : { data: [] };
+  const tytuly = new Map(((fbProps ?? []) as { id: string; title: string }[]).map((p) => [p.id, p.title]));
+
+  const pierwsze = (photos: unknown) => (Array.isArray(photos) ? ((photos.find((p) => p && typeof (p as { url?: string }).url === "string") as { url: string } | undefined)?.url ?? null) : null);
+  return {
+    dostep,
+    nieruchomosci: ((props ?? []) as { id: string; title: string; price_pln: number | null; photos: unknown; process_stage: string | null }[]).map((p) => ({
+      id: p.id,
+      title: p.title,
+      price_pln: p.price_pln,
+      zdjecie: pierwsze(p.photos),
+      process_stage: p.process_stage,
+      wpisy: ((zd ?? []) as { id: string; property_id: string; client_note: string | null; subject: string | null; due_at: string | null; kind: string }[])
+        .filter((a) => a.property_id === p.id)
+        .slice(0, 12)
+        .map((a) => ({ id: a.id, tekst: a.client_note || a.subject || "Wpis", kiedy: a.due_at, kind: a.kind })),
+      oczekujacaCena: ((prop ?? []) as { property_id: string; cena_proponowana: number }[]).find((x) => x.property_id === p.id)?.cena_proponowana ?? null,
+    })),
+    doDodania: ((wlasne ?? []) as { id: string; title: string }[]).filter((p) => !ids.includes(p.id)),
+    reakcje: ((fb ?? []) as { property_id: string; reakcja: string; created_at: string }[]).map((f) => ({ tytul: tytuly.get(f.property_id) ?? "Oferta", reakcja: f.reakcja, created_at: f.created_at })),
+  };
+}
