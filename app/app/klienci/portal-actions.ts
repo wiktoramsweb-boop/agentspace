@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { warsawToIso } from "@/lib/datetime";
 import { after } from "next/server";
 import { mozeOdpisac } from "@/lib/wiadomosci-klientow";
 import { wyslijPushDoKlienta } from "@/lib/push";
@@ -135,69 +136,6 @@ function pushDoKlienta(accessId: string, title: string, body: string, sciezka = 
 }
 
 /* ─────────────── Praca z portalem przy nieruchomości ─────────────── */
-
-/**
- * Wpis „co się dzieje" pisany wprost do klienta.
- *
- * Skrót zamiast pełnego okna działania: agent w terenie ma napisać jedno zdanie
- * i wrócić do roboty. Zapisujemy to jako zwykłe działanie biura, żeby nie
- * powstała druga, równoległa historia sprawy.
- */
-export async function wpisDlaKlienta(
-  propertyId: string,
-  tresc: string,
-  kiedy: string | null,
-): Promise<{ ok: true } | { ok: false; error: string }> {
-  const user = await requireUser();
-  if (!user.agency_id) return { ok: false, error: "Brak biura." };
-
-  const czysta = tresc.trim().slice(0, 300);
-  if (czysta.length < 2) return { ok: false, error: "Napisz, co chcesz przekazać klientowi." };
-
-  const admin = createSupabaseAdmin();
-  const czyNasza = await idZBiura(admin, "properties", propertyId, user.agency_id);
-  if (!czyNasza) return { ok: false, error: "Nie ma takiej nieruchomości." };
-
-  const { data, error } = await admin
-    .from("activities")
-    .insert({
-      agency_id: user.agency_id,
-      created_by: user.id,
-      kind: "wydarzenie",
-      // Temat to kopia treści, bo ta akurat była pisana z myślą o kliencie.
-      subject: czysta,
-      status: "wykonane",
-      priority: "normalny",
-      due_at: kiedy ?? new Date().toISOString(),
-      completed_at: new Date().toISOString(),
-      property_id: propertyId,
-      assignee_ids: [user.id],
-    })
-    .select("id")
-    .single();
-
-  if (error || !data) return { ok: false, error: "Nie udało się zapisać wpisu." };
-
-  // Osobnym zapytaniem, bo kolumny z v46 mogą jeszcze nie istnieć - wtedy wpis
-  // i tak powstanie, tylko nie będzie widoczny w portalu.
-  const { error: blad } = await admin
-    .from("activities")
-    .update({ client_visible: true, client_note: czysta })
-    .eq("id", data.id);
-  if (blad) return { ok: false, error: "Wpis zapisany, ale portal wymaga migracji v46." };
-
-  // Klient dowiaduje się od razu, a nie przy następnym wejściu do portalu.
-  // Treść to dokładnie to, co i tak zobaczy, więc nie ma tu czego przycinać.
-  const { powiadomKlientowONieruchomosci } = await import("@/lib/push");
-  await powiadomKlientowONieruchomosci(propertyId, {
-    title: "Nowa informacja w Twojej sprawie",
-    body: czysta,
-    tag: `oferta-${propertyId}`,
-  });
-
-  revalidatePath(`/app/nieruchomosci/${propertyId}`);
-  return { ok: true };
-}
 
 /** Propozycja nowej ceny ofertowej do zatwierdzenia przez właściciela. */
 export async function zaproponujCene(
@@ -334,4 +272,95 @@ export async function przypiszNieruchomosc(
 
   revalidatePath(`/app/nieruchomosci/${propertyId}`);
   revalidatePath(`/app/klienci/${dostep.client_id}`);
+}
+
+export type RodzajDzialaniaPortalu = "prezentacja" | "telefon" | "spotkanie" | "zadanie" | "informacja";
+
+const MAPA_RODZAJU: Record<RodzajDzialaniaPortalu, { kind: string; purpose: string | null; temat: string }> = {
+  prezentacja: { kind: "spotkanie", purpose: "prezentacja", temat: "Prezentacja nieruchomości" },
+  telefon: { kind: "polaczenie", purpose: "rozmowa_aktualizacyjna", temat: "Rozmowa z klientem" },
+  spotkanie: { kind: "spotkanie", purpose: null, temat: "Spotkanie z klientem" },
+  zadanie: { kind: "zadanie", purpose: null, temat: "Zadanie w sprawie" },
+  informacja: { kind: "wydarzenie", purpose: null, temat: "Informacja dla klienta" },
+};
+
+/**
+ * Działanie dodane z portalu klienta: prawdziwe działanie biura (z typem,
+ * statusem i terminem), przypięte do nieruchomości i klienta. Opis dla klienta
+ * i widoczność decydują, co klient zobaczy w swojej aplikacji.
+ */
+export async function dodajDzialaniePortalu(
+  accessId: string,
+  d: {
+    propertyId: string | null;
+    rodzaj: RodzajDzialaniaPortalu;
+    status: "zaplanowane" | "wykonane";
+    data: string;
+    godzina: string;
+    temat: string;
+    opisDlaKlienta: string;
+    widoczne: boolean;
+  },
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const user = await requireUser();
+  if (!user.agency_id) return { ok: false, error: "Brak biura." };
+  const mapa = MAPA_RODZAJU[d.rodzaj];
+  if (!mapa) return { ok: false, error: "Nieznany rodzaj działania." };
+  if (!(await mozeOdpisac(user, accessId))) return { ok: false, error: "Nie ma takiego portalu." };
+
+  const admin = createSupabaseAdmin();
+  const { data: dostep } = await admin.from("client_portal_access").select("client_id").eq("id", accessId).maybeSingle();
+  if (!dostep) return { ok: false, error: "Nie ma takiego portalu." };
+  if (d.propertyId) {
+    const { data: przyp } = await admin.from("client_portal_properties").select("property_id").eq("access_id", accessId).eq("property_id", d.propertyId).maybeSingle();
+    if (!przyp) return { ok: false, error: "Ta nieruchomość nie jest w portalu klienta." };
+  }
+
+  const opis = d.opisDlaKlienta.trim().slice(0, 300);
+  const temat = (d.temat.trim() || opis || mapa.temat).slice(0, 200);
+  const kiedy = warsawToIso(d.data, d.godzina) ?? new Date().toISOString();
+  const widoczne = d.widoczne && opis.length >= 2;
+
+  const { data: nowe, error } = await admin
+    .from("activities")
+    .insert({
+      agency_id: user.agency_id,
+      created_by: user.id,
+      kind: mapa.kind,
+      purpose: mapa.purpose,
+      subject: temat,
+      status: d.status,
+      priority: "normalny",
+      due_at: kiedy,
+      completed_at: d.status === "wykonane" ? new Date().toISOString() : null,
+      property_id: d.propertyId,
+      client_id: dostep.client_id,
+      assignee_ids: [user.id],
+    })
+    .select("id")
+    .single();
+  if (error || !nowe) return { ok: false, error: "Nie udało się zapisać działania." };
+
+  if (widoczne) {
+    await admin.from("activities").update({ client_visible: true, client_note: opis }).eq("id", nowe.id);
+    pushDoKlienta(accessId, d.status === "zaplanowane" ? "Nowy termin w Twojej sprawie" : "Nowość w Twojej sprawie", opis);
+  }
+
+  revalidatePath(`/app/portal/${accessId}`);
+  revalidatePath("/app/dzialania");
+  if (d.propertyId) revalidatePath(`/app/nieruchomosci/${d.propertyId}`);
+  return { ok: true };
+}
+
+/** Zmiana statusu działania z poziomu portalu (np. zaplanowana prezentacja się odbyła). */
+export async function statusDzialaniaPortalu(accessId: string, activityId: string, status: "wykonane" | "zaplanowane" | "anulowane"): Promise<void> {
+  const user = await requireUser();
+  if (!user.agency_id || !(await mozeOdpisac(user, accessId))) return;
+  await createSupabaseAdmin()
+    .from("activities")
+    .update({ status, completed_at: status === "wykonane" ? new Date().toISOString() : null })
+    .eq("id", activityId)
+    .eq("agency_id", user.agency_id);
+  revalidatePath(`/app/portal/${accessId}`);
+  revalidatePath("/app/dzialania");
 }

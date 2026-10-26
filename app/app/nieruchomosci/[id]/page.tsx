@@ -228,7 +228,15 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
         <StatusBar propertyId={property.id} status={property.status} />
       </div>
 
-      <PropertyTabs propertyId={property.id} active={tab} liczniki={liczniki} />
+      <PropertyTabs
+        propertyId={property.id}
+        active={tab}
+        liczniki={liczniki}
+        portalHref={(() => {
+          const d = dostepyPortalu.find((x) => !x.revoked_at && x.rodzaj === "sprzedajacy");
+          return d ? `/app/portal/${d.id}` : null;
+        })()}
+      />
 
       {tab === "oferta" && otodomOgl && otodomOgl.status && (
         <div className="mb-6">

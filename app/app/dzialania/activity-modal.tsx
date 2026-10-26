@@ -1,5 +1,6 @@
 "use client";
 
+import { WyborTerminu } from "../components/wybor-terminu";
 import { useEffect, useState } from "react";
 import { formatPhone } from "@/lib/format";
 import { Modal } from "../components/modal";
@@ -453,15 +454,9 @@ function ActivityForm({
                 </Select>
               </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <Label>Data</Label>
-                <input type="date" name="due_date" defaultValue={today} className={inp} />
-              </div>
-              <div>
-                <Label>Godzina</Label>
-                <input type="time" name="due_time" defaultValue={nowTime} className={inp} />
-              </div>
+            <div>
+              <Label>Termin</Label>
+              <WyborTerminu key={`${today}-${nowTime}`} name="due" data={today} godzina={nowTime} />
             </div>
           </Section>
 

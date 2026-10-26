@@ -37,9 +37,12 @@ export function PropertyTabs({
   propertyId,
   active,
   liczniki,
+  portalHref,
 }: {
   propertyId: string;
   active: TabKey;
+  /** Gdy klient ma już portal, zakładka prowadzi prosto na jego stronę w „Portalu klienta”. */
+  portalHref?: string | null;
   /** Liczba pozycji przy nazwie: od razu widać, gdzie coś jest, a gdzie pusto. */
   liczniki: Partial<Record<TabKey, number>>;
 }) {
@@ -55,10 +58,10 @@ export function PropertyTabs({
           return (
             <li key={t.key}>
               <Link
-                href={t.key === "oferta" ? `/app/nieruchomosci/${propertyId}` : `/app/nieruchomosci/${propertyId}?z=${t.key}`}
+                href={t.key === "portal" && portalHref ? portalHref : t.key === "oferta" ? `/app/nieruchomosci/${propertyId}` : `/app/nieruchomosci/${propertyId}?z=${t.key}`}
                 scroll={false}
                 // Zakładka podmienia wpis w historii: „wstecz” ma wyjść z karty, a nie przewijać zakładki.
-                replace
+                replace={!(t.key === "portal" && portalHref)}
                 aria-current={on ? "page" : undefined}
                 className={`relative flex items-center gap-2 whitespace-nowrap rounded-t-xl px-3.5 py-3 text-sm font-medium transition sm:px-4 ${
                   on ? "text-emerald-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"

@@ -1,71 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { wpisDlaKlienta, zaproponujCene } from "../../klienci/portal-actions";
+import { zaproponujCene } from "../../klienci/portal-actions";
 import { formatPln } from "@/lib/format";
-
-/** Jedno zdanie do klienta, pisane wprost z karty oferty. */
-export function WpisDlaKlienta({ propertyId }: { propertyId: string }) {
-  const [tekst, setTekst] = useState("");
-  const [info, setInfo] = useState<string | null>(null);
-  const [blad, setBlad] = useState<string | null>(null);
-  const [pending, start] = useTransition();
-
-  const gotowce = [
-    "Oferta trafiła na portale ogłoszeniowe.",
-    "Dziś była prezentacja, zainteresowanie umiarkowane.",
-    "Mamy zapytanie o oglądanie w tym tygodniu.",
-    "Zrobiliśmy nowe zdjęcia oferty.",
-  ];
-
-  return (
-    <div>
-      <div className="mb-2 flex flex-wrap gap-2">
-        {gotowce.map((g) => (
-          <button
-            key={g}
-            type="button"
-            onClick={() => setTekst(g)}
-            className="rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-600 transition hover:border-emerald-400 hover:text-emerald-700"
-          >
-            {g}
-          </button>
-        ))}
-      </div>
-      <textarea
-        value={tekst}
-        onChange={(e) => setTekst(e.target.value)}
-        rows={2}
-        maxLength={300}
-        placeholder="Np. Dziś oglądało mieszkanie małżeństwo z Krakowa, wracają z decyzją w tygodniu."
-        className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
-      />
-      <div className="mt-2 flex items-center gap-3">
-        <button
-          type="button"
-          disabled={pending || tekst.trim().length < 2}
-          onClick={() => {
-            setBlad(null);
-            setInfo(null);
-            start(async () => {
-              const w = await wpisDlaKlienta(propertyId, tekst, null);
-              if (w.ok) {
-                setTekst("");
-                setInfo("Klient to widzi.");
-              } else setBlad(w.error);
-            });
-          }}
-          className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:opacity-50"
-        >
-          {pending ? "Zapisuję..." : "Pokaż klientowi"}
-        </button>
-        <span className="text-xs text-slate-400">{tekst.length}/300</span>
-        {info && <span className="text-sm text-emerald-700">{info}</span>}
-        {blad && <span className="text-sm text-red-600">{blad}</span>}
-      </div>
-    </div>
-  );
-}
 
 /** Propozycja nowej ceny ofertowej do zatwierdzenia przez właściciela. */
 export function PropozycjaCeny({

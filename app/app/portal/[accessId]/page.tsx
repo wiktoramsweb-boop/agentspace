@@ -8,7 +8,7 @@ import { formatPln } from "@/lib/format";
 import { Wstecz } from "@/app/app/components/wstecz";
 import { Rozmowa } from "../../wiadomosci/rozmowa";
 import { PropozycjaCeny } from "../../nieruchomosci/[id]/portal-panel";
-import { NowyWpis, PrzypnijNieruchomosc, UkryjWpis } from "./panel";
+import { ListaDzialan, NoweDzialanie, PrzypnijNieruchomosc } from "./panel";
 import { PrzyciskQr } from "../portale";
 
 export const dynamic = "force-dynamic";
@@ -60,13 +60,11 @@ export default async function PortalJednegoKlienta({ params }: { params: Promise
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-6">
           <section className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h2 className="font-semibold text-slate-900">{kupujacy ? "Napisz do klienta" : "Daj znać, co się dzieje"}</h2>
+            <h2 className="font-semibold text-slate-900">Dodaj działanie</h2>
             <p className="mb-4 mt-0.5 text-sm text-slate-500">
-              {kupujacy
-                ? "Wybierz sytuację i gotowe zdanie, popraw je i wyślij. Klient dostanie powiadomienie na telefon."
-                : "Wybierz sytuację, kliknij gotowy wpis i popraw go. Klient zobaczy go na osi czasu i dostanie powiadomienie."}
+              Zaplanuj prezentację, telefon albo zadanie, albo zapisz, że coś się odbyło. Decydujesz, czy klient to zobaczy, i dostajesz gotowe zdania do opisu.
             </p>
-            <NowyWpis accessId={accessId} rodzaj={dostep.rodzaj} nieruchomosci={nieruchomosci.map((n) => ({ id: n.id, title: n.title }))} />
+            <NoweDzialanie accessId={accessId} rodzajDostepu={dostep.rodzaj} nieruchomosci={nieruchomosci.map((n) => ({ id: n.id, title: n.title }))} />
           </section>
 
           {!kupujacy &&
@@ -99,23 +97,8 @@ export default async function PortalJednegoKlienta({ params }: { params: Promise
                   </div>
 
                   <div className="p-4">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Klient widzi na osi czasu</p>
-                    {n.wpisy.length === 0 ? (
-                      <p className="text-sm text-slate-500">Nic jeszcze nie udostępniono. Dodaj pierwszy wpis powyżej.</p>
-                    ) : (
-                      <ul className="space-y-1.5">
-                        {n.wpisy.map((w) => (
-                          <li key={w.id} className="flex items-start gap-3 rounded-xl bg-slate-50 px-3 py-2">
-                            <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-emerald-500" />
-                            <span className="min-w-0 flex-1 text-sm text-slate-800">
-                              {w.tekst}
-                              <span className="block text-xs text-slate-400">{kiedy(w.kiedy)}</span>
-                            </span>
-                            <UkryjWpis id={w.id} />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <p className="mb-2 text-sm font-semibold text-slate-900">Działania przy tej nieruchomości</p>
+                    <ListaDzialan accessId={accessId} dzialania={n.dzialania} zWidocznoscia />
 
                     <details className="group mt-4 rounded-xl border border-slate-200">
                       <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-700">
@@ -138,6 +121,13 @@ export default async function PortalJednegoKlienta({ params }: { params: Promise
                   <PrzypnijNieruchomosc key={p.id} accessId={accessId} propertyId={p.id} przypnij etykieta={`+ ${p.title}`} />
                 ))}
               </div>
+            </section>
+          )}
+
+          {kupujacy && (
+            <section className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="mb-3 font-semibold text-slate-900">Działania z klientem</h2>
+              <ListaDzialan accessId={accessId} dzialania={sprawa.dzialaniaKlienta} zWidocznoscia={false} />
             </section>
           )}
 

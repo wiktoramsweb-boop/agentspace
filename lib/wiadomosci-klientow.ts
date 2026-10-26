@@ -214,6 +214,17 @@ export async function portaleKlientow(u: Kto): Promise<PortalKlienta[]> {
     .sort((a, b) => b.nieprzeczytane - a.nieprzeczytane || (b.ostatnioWPortalu ?? b.utworzony).localeCompare(a.ostatnioWPortalu ?? a.utworzony));
 }
 
+export type DzialaniePortalu = {
+  id: string;
+  kind: string;
+  purpose: string | null;
+  temat: string;
+  status: string;
+  kiedy: string | null;
+  widoczne: boolean;
+  opisDlaKlienta: string | null;
+};
+
 export type SprawaPortalu = {
   dostep: DostepWidoczny;
   nieruchomosci: {
@@ -222,11 +233,13 @@ export type SprawaPortalu = {
     price_pln: number | null;
     zdjecie: string | null;
     process_stage: string | null;
-    wpisy: { id: string; tekst: string; kiedy: string | null; kind: string }[];
+    dzialania: DzialaniePortalu[];
     oczekujacaCena: number | null;
   }[];
   doDodania: { id: string; title: string }[];
   reakcje: { tytul: string; reakcja: string; created_at: string }[];
+  /** Działania kupującego (bez nieruchomości). */
+  dzialaniaKlienta: DzialaniePortalu[];
 };
 
 /**
@@ -244,12 +257,28 @@ export async function sprawaPortalu(u: Kto, accessId: string): Promise<SprawaPor
   const [{ data: props }, { data: zd }, { data: prop }, { data: wlasne }, { data: fb }] = await Promise.all([
     ids.length ? admin.from("properties").select("id, title, price_pln, photos, process_stage").in("id", ids).eq("agency_id", u.agency_id!) : Promise.resolve({ data: [] }),
     ids.length
-      ? admin.from("activities").select("id, property_id, client_note, subject, due_at, kind").in("property_id", ids).eq("client_visible", true).order("due_at", { ascending: false }).limit(200)
+      ? admin.from("activities").select("id, property_id, client_note, client_visible, subject, due_at, kind, purpose, status").in("property_id", ids).eq("agency_id", u.agency_id!).order("due_at", { ascending: false }).limit(300)
       : Promise.resolve({ data: [] }),
     admin.from("client_price_proposals").select("property_id, cena_proponowana, status").eq("access_id", accessId).eq("status", "oczekuje"),
     admin.from("properties").select("id, title").eq("agency_id", u.agency_id!).eq("owner_client_id", dostep.client_id).limit(50),
     admin.from("client_offer_feedback").select("property_id, reakcja, created_at").eq("access_id", accessId).order("created_at", { ascending: false }).limit(30),
   ]);
+
+  type Wiersz = { id: string; property_id: string | null; client_note: string | null; client_visible: boolean | null; subject: string | null; due_at: string | null; kind: string; purpose: string | null; status: string };
+  const naDzialanie = (a: Wiersz): DzialaniePortalu => ({
+    id: a.id,
+    kind: a.kind,
+    purpose: a.purpose,
+    temat: a.subject || a.client_note || "Działanie",
+    status: a.status,
+    kiedy: a.due_at,
+    widoczne: Boolean(a.client_visible),
+    opisDlaKlienta: a.client_note,
+  });
+  const { data: klientowe } =
+    dostep.rodzaj === "kupujacy"
+      ? await admin.from("activities").select("id, property_id, client_note, client_visible, subject, due_at, kind, purpose, status").eq("agency_id", u.agency_id!).eq("client_id", dostep.client_id).order("due_at", { ascending: false }).limit(40)
+      : { data: [] };
 
   const fbIds = [...new Set(((fb ?? []) as { property_id: string }[]).map((f) => f.property_id))];
   const { data: fbProps } = fbIds.length ? await admin.from("properties").select("id, title").in("id", fbIds) : { data: [] };
@@ -264,13 +293,11 @@ export async function sprawaPortalu(u: Kto, accessId: string): Promise<SprawaPor
       price_pln: p.price_pln,
       zdjecie: pierwsze(p.photos),
       process_stage: p.process_stage,
-      wpisy: ((zd ?? []) as { id: string; property_id: string; client_note: string | null; subject: string | null; due_at: string | null; kind: string }[])
-        .filter((a) => a.property_id === p.id)
-        .slice(0, 12)
-        .map((a) => ({ id: a.id, tekst: a.client_note || a.subject || "Wpis", kiedy: a.due_at, kind: a.kind })),
+      dzialania: ((zd ?? []) as Wiersz[]).filter((a) => a.property_id === p.id).slice(0, 40).map(naDzialanie),
       oczekujacaCena: ((prop ?? []) as { property_id: string; cena_proponowana: number }[]).find((x) => x.property_id === p.id)?.cena_proponowana ?? null,
     })),
     doDodania: ((wlasne ?? []) as { id: string; title: string }[]).filter((p) => !ids.includes(p.id)),
+    dzialaniaKlienta: ((klientowe ?? []) as Wiersz[]).map(naDzialanie),
     reakcje: ((fb ?? []) as { property_id: string; reakcja: string; created_at: string }[]).map((f) => ({ tytul: tytuly.get(f.property_id) ?? "Oferta", reakcja: f.reakcja, created_at: f.created_at })),
   };
 }
