@@ -213,9 +213,9 @@ export function NowyPortal({ klienci }: { klienci: { id: string; nazwa: string; 
         <button
           type="button"
           onClick={() => setOtwarte(true)}
-          className="flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 p-4 text-left text-white shadow-sm transition hover:shadow-md"
+          className="flex w-full items-center gap-3 rounded-2xl bg-slate-900 p-4 text-left text-white shadow-sm transition hover:shadow-md"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white">
             <Ikona d={I.plus} className="h-5 w-5" />
           </span>
           <span className="flex-1">
