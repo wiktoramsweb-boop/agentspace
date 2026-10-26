@@ -336,6 +336,7 @@ export type WiadomoscPortalu = {
   autor: "klient" | "agent";
   tresc: string;
   created_at: string;
+  read_at?: string | null;
 };
 
 /** Klient otworzył rozmowę: odpowiedzi biura oznaczamy jako przeczytane (agent widzi „przeczytane”). */
@@ -352,7 +353,7 @@ export async function wiadomosciKlienta(d: DostepKlienta): Promise<{ ready: bool
   const admin = createSupabaseAdmin();
   const { data, error } = await admin
     .from("client_portal_messages")
-    .select("id, autor, tresc, created_at")
+    .select("id, autor, tresc, created_at, read_at")
     .eq("access_id", d.id)
     .order("created_at", { ascending: true })
     .limit(200);

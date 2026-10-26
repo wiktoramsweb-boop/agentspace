@@ -1,7 +1,6 @@
-import { formatMoney } from "@/lib/invoice";
 import { PROCESS_STAGES } from "@/lib/types";
 import type { procesNieruchomosci } from "@/lib/data-portal";
-import { Zdarzenie, kiedy, opisNieruchomosci } from "./wspolne";
+import { Zdarzenie, kiedy, opisNieruchomosci, kwota } from "./wspolne";
 import { Galeria } from "./galeria";
 import { DecyzjaOCenie } from "./cena";
 
@@ -30,8 +29,8 @@ export function PanelNieruchomosci({ token, dane }: { token: string; dane: Dane 
       <h2 style={{ fontSize: 20, fontWeight: 650, margin: "14px 0 2px", letterSpacing: "-0.02em" }}>
         {n.title}
       </h2>
-      <p className="portal-meta">{opisNieruchomosci(n) || "-"}</p>
-      {n.price_pln != null && <p className="portal-cena">{formatMoney(n.price_pln)} zł</p>}
+      {opisNieruchomosci(n, n.title) && <p className="portal-meta">{opisNieruchomosci(n, n.title)}</p>}
+      {n.price_pln != null && <p className="portal-cena">{kwota(n.price_pln)} zł</p>}
 
       {etap && (
         <>
@@ -93,9 +92,15 @@ export function PanelNieruchomosci({ token, dane }: { token: string; dane: Dane 
         <h3>Co się działo</h3>
         {minione.length === 0 ? (
           <div className="portal-pusto">
-            Jeszcze nic tu nie ma.
-            <br />
-            Gdy biuro umówi prezentację, zobaczysz ją tutaj.
+            {p.prezentacje > 0 || p.kontakty > 0 ? (
+              <>Szczegóły prezentacji i rozmów pojawią się tutaj, gdy biuro je opisze.</>
+            ) : (
+              <>
+                Jeszcze nic tu nie ma.
+                <br />
+                Gdy biuro umówi prezentację, zobaczysz ją tutaj.
+              </>
+            )}
           </div>
         ) : (
           minione.map((z) => <Zdarzenie key={z.id} z={z} />)
@@ -117,7 +122,7 @@ export function PanelNieruchomosci({ token, dane }: { token: string; dane: Dane 
                 <div>
                   <b>
                     {x.status === "zaakceptowana" ? "Zgoda na cenę" : "Cena bez zmian"}{" "}
-                    {formatMoney(x.cena_proponowana)} zł
+                    {kwota(x.cena_proponowana)} zł
                   </b>
                   <div className="portal-kiedy">{kiedy(x.decided_at ?? x.created_at)}</div>
                 </div>

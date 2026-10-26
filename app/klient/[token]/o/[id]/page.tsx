@@ -2,11 +2,10 @@ import { opisNaTekst } from "@/lib/opis-html";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { dostepPoTokenie, ofertaDlaKupujacego } from "@/lib/data-portal";
-import { formatMoney } from "@/lib/invoice";
 import { PROPERTY_TYPES } from "@/lib/types";
 import { Galeria } from "../../galeria";
 import { ReakcjaOferty } from "../../reakcja";
-import { opisNieruchomosci } from "../../wspolne";
+import { opisNieruchomosci, kwota } from "../../wspolne";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +32,7 @@ export default async function KartaOferty({
     { label: "Piętro", value: o.floor == null ? null : o.floor === 0 ? "parter" : String(o.floor) },
     { label: "Rok budowy", value: o.year_built ? String(o.year_built) : null },
     { label: "Rodzaj", value: typ ?? null },
-    { label: "Cena za m²", value: cenaZaMetr ? `${formatMoney(cenaZaMetr)} zł` : null },
+    { label: "Cena za m²", value: cenaZaMetr ? `${kwota(cenaZaMetr)} zł` : null },
   ].filter((p) => p.value);
 
   return (
@@ -51,7 +50,7 @@ export default async function KartaOferty({
         {o.title}
       </h2>
       <p className="portal-meta">{opisNieruchomosci(o)}</p>
-      {o.price_pln != null && <p className="portal-cena">{formatMoney(o.price_pln)} zł</p>}
+      {o.price_pln != null && <p className="portal-cena">{kwota(o.price_pln)} zł</p>}
 
       <ReakcjaOferty token={token} propertyId={o.id} reakcja={o.reakcja} />
 

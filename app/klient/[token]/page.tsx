@@ -6,10 +6,9 @@ import {
   ofertyKupujacego,
   procesNieruchomosci,
 } from "@/lib/data-portal";
-import { formatMoney } from "@/lib/invoice";
 import { ReakcjaOferty } from "./reakcja";
 import { PanelNieruchomosci } from "./nieruchomosc";
-import { Foto, opisNieruchomosci } from "./wspolne";
+import { Foto, opisNieruchomosci, kwota } from "./wspolne";
 
 export const dynamic = "force-dynamic";
 
@@ -91,7 +90,7 @@ export default async function PortalStart({
                 </div>
                 <h2>{o.title}</h2>
                 <p className="portal-meta">{opisNieruchomosci(o)}</p>
-                {o.price_pln != null && <p className="portal-cena">{formatMoney(o.price_pln)} zł</p>}
+                {o.price_pln != null && <p className="portal-cena">{kwota(o.price_pln)} zł</p>}
               </Link>
               <ReakcjaOferty token={token} propertyId={o.id} reakcja={o.reakcja} />
             </div>
@@ -146,7 +145,7 @@ export default async function PortalStart({
           <Foto url={n.zdjecie} alt={n.title} />
           <h2>{n.title}</h2>
           <p className="portal-meta">{opisNieruchomosci(n)}</p>
-          {n.price_pln != null && <p className="portal-cena">{formatMoney(n.price_pln)} zł</p>}
+          {n.price_pln != null && <p className="portal-cena">{kwota(n.price_pln)} zł</p>}
         </Link>
       ))}
     </>

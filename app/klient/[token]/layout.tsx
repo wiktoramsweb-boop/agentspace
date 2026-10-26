@@ -56,9 +56,8 @@ export default async function PortalLayout({
     wiadomosciKlienta(dostep),
   ]);
 
-  // Kropka przy zakładce, gdy agent odpisał po ostatniej wiadomości klienta.
-  const ostatnia = wiadomosci.lista[wiadomosci.lista.length - 1];
-  const nowaOdAgenta = Boolean(ostatnia && ostatnia.autor === "agent");
+  // Kropka przy zakładce, gdy biuro napisało coś, czego klient jeszcze nie otworzył.
+  const nowaOdAgenta = wiadomosci.lista.some((w) => w.autor === "agent" && !w.read_at);
 
   return (
     <div className="portal">

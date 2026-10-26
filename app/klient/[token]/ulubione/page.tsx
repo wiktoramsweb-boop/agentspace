@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { dostepPoTokenie, ofertyKupujacego } from "@/lib/data-portal";
-import { formatMoney } from "@/lib/invoice";
-import { Foto, opisNieruchomosci } from "../wspolne";
+import { Foto, opisNieruchomosci, kwota } from "../wspolne";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +36,7 @@ export default async function UlubioneKupujacego({
             <Foto url={o.zdjecie} alt={o.title} />
             <h2>{o.title}</h2>
             <p className="portal-meta">{opisNieruchomosci(o)}</p>
-            {o.price_pln != null && <p className="portal-cena">{formatMoney(o.price_pln)} zł</p>}
+            {o.price_pln != null && <p className="portal-cena">{kwota(o.price_pln)} zł</p>}
           </Link>
         ))
       )}

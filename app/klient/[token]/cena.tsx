@@ -1,8 +1,8 @@
 "use client";
 
+import { kwota } from "./wspolne";
 import { useState, useTransition } from "react";
 import { decyzjaOCenie } from "./actions";
-import { formatMoney } from "@/lib/invoice";
 import { opisPropozycjiCeny } from "@/lib/portal-klienta";
 
 /**
@@ -31,7 +31,7 @@ export function DecyzjaOCenie({
 
   function zdecyduj(zgoda: boolean) {
     const pytanie = zgoda
-      ? `Zgadzasz się na cenę ${formatMoney(proponowana)} zł? Oferta zostanie od razu zmieniona.`
+      ? `Zgadzasz się na cenę ${kwota(proponowana)} zł? Oferta zostanie od razu zmieniona.`
       : "Nie zgadzasz się na tę zmianę? Cena zostanie bez zmian.";
     if (!confirm(pytanie)) return;
     setBlad(null);
@@ -45,12 +45,12 @@ export function DecyzjaOCenie({
     <div className="portal-propozycja">
       <h4>Biuro proponuje {opis.kierunek === "obnizka" ? "obniżkę" : "podwyżkę"} ceny</h4>
       <div className="kwoty">
-        {obecna != null && <span className="stara">{formatMoney(obecna)} zł</span>}
-        <span className="nowa">{formatMoney(proponowana)} zł</span>
+        {obecna != null && <span className="stara">{kwota(obecna)} zł</span>}
+        <span className="nowa">{kwota(proponowana)} zł</span>
       </div>
       {obecna != null && (
         <p>
-          {opis.kierunek === "obnizka" ? "Mniej o" : "Więcej o"} {formatMoney(opis.roznica)} zł
+          {opis.kierunek === "obnizka" ? "Mniej o" : "Więcej o"} {kwota(opis.roznica)} zł
           {opis.procent != null && ` (${String(opis.procent).replace(".", ",")}%)`}.
         </p>
       )}

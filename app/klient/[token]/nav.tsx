@@ -39,7 +39,7 @@ export function PortalNav({
         {pozycje.map((p) => (
           <Link key={p.href} href={p.href} aria-current={sciezka === p.href ? "page" : undefined}>
             {p.ikona}
-            {p.kropka && <span className="kropka" aria-hidden="true" />}
+            {p.kropka && sciezka !== p.href && <span className="kropka" aria-hidden="true" />}
             {p.label}
           </Link>
         ))}

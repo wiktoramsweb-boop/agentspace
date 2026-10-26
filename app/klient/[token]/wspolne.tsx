@@ -84,15 +84,25 @@ export function Foto({ url, alt, ile }: { url: string | null; alt: string; ile?:
   );
 }
 
-export function opisNieruchomosci(n: {
-  area_m2: number | null;
-  rooms: number | null;
-  city: string | null;
-}): string {
+/** Cena dla klienta: pełne złote, bez „,00”. */
+export function kwota(n: number): string {
+  return Math.round(n).toLocaleString("pl-PL");
+}
+
+export function opisNieruchomosci(
+  n: {
+    area_m2: number | null;
+    rooms: number | null;
+    city: string | null;
+  },
+  /** Tytuł oferty: czego już w nim jest (pokoje, metraż), nie powtarzamy pod spodem. */
+  tytul?: string,
+): string {
+  const t = (tytul ?? "").toLowerCase();
   return [
-    n.rooms ? `${n.rooms} ${n.rooms === 1 ? "pokój" : n.rooms < 5 ? "pokoje" : "pokoi"}` : null,
-    n.area_m2 ? `${n.area_m2} m²` : null,
-    n.city,
+    n.rooms && !new RegExp(`\\b${n.rooms}\\s*pok`).test(t) ? `${n.rooms} ${n.rooms === 1 ? "pokój" : n.rooms < 5 ? "pokoje" : "pokoi"}` : null,
+    n.area_m2 && !t.includes(`${n.area_m2} m`) ? `${n.area_m2} m²` : null,
+    n.city && !t.includes(n.city.toLowerCase()) ? n.city : null,
   ]
     .filter(Boolean)
     .join(" · ");
