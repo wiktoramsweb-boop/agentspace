@@ -13,6 +13,18 @@ type Kto = { id: string; agency_id: string | null; role: string };
 
 const widziWszystkie = (u: Kto) => u.role === "owner" || u.role === "director" || u.role === "manager";
 
+export type DostepWidoczny = {
+  id: string;
+  client_id: string;
+  revoked_at: string | null;
+  expires_at: string | null;
+  token: string;
+  rodzaj: string;
+  last_seen_at: string | null;
+  created_at: string;
+  client: { name: string | null; agent_id: string | null; phone: string | null } | null;
+};
+
 export type Watek = {
   accessId: string;
   clientId: string;
@@ -25,15 +37,15 @@ export type Watek = {
 
 export type WiadomoscWatku = { id: string; autor: "klient" | "agent"; tresc: string; created_at: string; read_at: string | null };
 
-async function dostepyWidoczne(u: Kto) {
+export async function dostepyWidoczne(u: Kto) {
   if (!u.agency_id) return [];
   const admin = createSupabaseAdmin();
   const { data } = await admin
     .from("client_portal_access")
-    .select("id, client_id, revoked_at, expires_at, client:clients(name, agent_id)")
+    .select("id, client_id, revoked_at, expires_at, token, rodzaj, last_seen_at, created_at, client:clients(name, agent_id, phone)")
     .eq("agency_id", u.agency_id)
     .limit(1000);
-  return ((data ?? []) as unknown as { id: string; client_id: string; revoked_at: string | null; expires_at: string | null; client: { name: string | null; agent_id: string | null } | null }[]).filter(
+  return ((data ?? []) as unknown as DostepWidoczny[]).filter(
     (d) => widziWszystkie(u) || d.client?.agent_id === u.id,
   );
 }
@@ -151,4 +163,53 @@ export function powiadomOWiadomosciKlienta(accessId: string, tresc: string): Pro
     adres: () => `/app/wiadomosci?w=${accessId}`,
     znacznik: `portal-${accessId}`,
   });
+}
+
+export type PortalKlienta = {
+  accessId: string;
+  clientId: string;
+  klient: string;
+  telefon: string | null;
+  rodzaj: string;
+  token: string;
+  ostatnioWPortalu: string | null;
+  utworzony: string;
+  nieruchomosci: number;
+  nieprzeczytane: number;
+  ostatniaWiadomosc: string | null;
+};
+
+/** Aktywne portale klientów do jednego ekranu „Portal klienta”: kto ma dostęp, kto zagląda, gdzie czekają wiadomości. */
+export async function portaleKlientow(u: Kto): Promise<PortalKlienta[]> {
+  const dostepy = (await dostepyWidoczne(u)).filter((d) => !d.revoked_at && (!d.expires_at || d.expires_at >= new Date().toISOString().slice(0, 10)));
+  if (!dostepy.length) return [];
+  const admin = createSupabaseAdmin();
+  const ids = dostepy.map((d) => d.id);
+  const [{ data: wiad }, { data: przyp }] = await Promise.all([
+    admin.from("client_portal_messages").select("access_id, autor, read_at, created_at").in("access_id", ids).order("created_at", { ascending: false }).limit(2000),
+    admin.from("client_portal_properties").select("access_id").in("access_id", ids),
+  ]);
+  const nowe = new Map<string, number>();
+  const ostatnia = new Map<string, string>();
+  for (const w of (wiad ?? []) as { access_id: string; autor: string; read_at: string | null; created_at: string }[]) {
+    if (!ostatnia.has(w.access_id)) ostatnia.set(w.access_id, w.created_at);
+    if (w.autor === "klient" && !w.read_at) nowe.set(w.access_id, (nowe.get(w.access_id) ?? 0) + 1);
+  }
+  const ileNier = new Map<string, number>();
+  for (const p of (przyp ?? []) as { access_id: string }[]) ileNier.set(p.access_id, (ileNier.get(p.access_id) ?? 0) + 1);
+  return dostepy
+    .map((d) => ({
+      accessId: d.id,
+      clientId: d.client_id,
+      klient: d.client?.name ?? "Klient",
+      telefon: d.client?.phone ?? null,
+      rodzaj: d.rodzaj,
+      token: d.token,
+      ostatnioWPortalu: d.last_seen_at,
+      utworzony: d.created_at,
+      nieruchomosci: ileNier.get(d.id) ?? 0,
+      nieprzeczytane: nowe.get(d.id) ?? 0,
+      ostatniaWiadomosc: ostatnia.get(d.id) ?? null,
+    }))
+    .sort((a, b) => b.nieprzeczytane - a.nieprzeczytane || (b.ostatnioWPortalu ?? b.utworzony).localeCompare(a.ostatnioWPortalu ?? a.utworzony));
 }

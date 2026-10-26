@@ -17,7 +17,7 @@ import { idZBiura } from "@/lib/agency-ids";
  * wyciekły link pokazywałby wszystko.
  */
 
-export type WynikDostepu = { ok: true; token: string } | { ok: false; error: string };
+export type WynikDostepu = { ok: true; token: string; id: string } | { ok: false; error: string };
 
 export async function utworzDostepKlienta(
   clientId: string,
@@ -70,7 +70,8 @@ export async function utworzDostepKlienta(
   }
 
   revalidatePath(`/app/klienci/${clientId}`);
-  return { ok: true, token };
+  revalidatePath("/app/portal");
+  return { ok: true, token, id: data.id as string };
 }
 
 export async function odwolajDostepKlienta(accessId: string, clientId: string): Promise<void> {

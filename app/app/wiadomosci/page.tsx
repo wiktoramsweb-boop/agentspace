@@ -25,7 +25,15 @@ export default async function WiadomosciKlientow({ searchParams }: { searchParam
 
   return (
     <>
-      <PageHeader title="Wiadomości od klientów" subtitle="Rozmowy z klientami, którzy mają dostęp do portalu. Odpowiedź od razu trafia na ich telefon." />
+      <PageHeader
+        title="Wiadomości od klientów"
+        subtitle="Rozmowy z klientami, którzy mają dostęp do portalu. Odpowiedź od razu trafia na ich telefon."
+        action={
+          <Link href="/app/portal" className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400">
+            Wszystkie portale
+          </Link>
+        }
+      />
 
       {!ready ? (
         <Card>

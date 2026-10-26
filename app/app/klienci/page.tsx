@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { todayPL } from "@/lib/datetime";
 import { requireUser, requireModul } from "@/lib/auth";
 import { queryClients } from "@/lib/data-lists";
@@ -60,7 +61,17 @@ export default async function KlienciPage({ searchParams }: Props) {
         <PageHeader
           title="Klienci"
           subtitle={`${stats.active} aktywnych · ${stats.all} w biurze · przeciągnij kartę, żeby zmienić etap`}
-          action={<NewClientForm existingPhones={[]} />}
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              <Link href="/app/portal" className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400">
+                <svg className="h-4 w-4 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                </svg>
+                Portal klienta
+              </Link>
+              <NewClientForm existingPhones={[]} />
+            </div>
+          }
         />
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <PrzelacznikWidoku sciezka="/app/klienci" aktywny="tablica" agent={query.agent} />
@@ -106,7 +117,17 @@ export default async function KlienciPage({ searchParams }: Props) {
       <PageHeader
         title="Klienci"
         subtitle={`${stats.active} aktywnych · ${stats.all} w biurze${stats.due > 0 ? ` · ${stats.due} do kontaktu` : ""}`}
-        action={<NewClientForm existingPhones={[]} />}
+        action={
+            <div className="flex flex-wrap items-center gap-2">
+              <Link href="/app/portal" className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400">
+                <svg className="h-4 w-4 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                </svg>
+                Portal klienta
+              </Link>
+              <NewClientForm existingPhones={[]} />
+            </div>
+          }
       />
 
       {stats.all > 0 && (

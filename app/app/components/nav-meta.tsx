@@ -79,6 +79,7 @@ export const SECTIONS: NavSection[] = [
     items: [
       { href: "/app/leady", label: "Leady", icon: <LeadIcon />, color: "fuchsia", modul: "klienci" },
       { href: "/app/klienci", label: "Klienci", icon: <UserCircleIcon />, color: "rose", modul: "klienci" },
+      { href: "/app/portal", label: "Portal klienta", icon: <PhonePortalIcon />, color: "cyan", modul: "klienci" },
       { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue", modul: "nieruchomosci" },
       { href: "/app/wycena-rcn", label: "Wycena z RCN", icon: <ScaleIcon />, color: "teal", modul: "nieruchomosci" },
       { href: "/app/poszukiwania", label: "Poszukiwania", icon: <SearchIcon />, color: "sky", modul: "klienci" },
@@ -255,6 +256,10 @@ function AutomationIcon() {
 
 function PlaneIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" /></svg>;
+}
+
+function PhonePortalIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>;
 }
 
 function InboxIcon() {
