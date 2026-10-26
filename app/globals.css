@@ -886,6 +886,27 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .btn-ink:hover {
   background-color: #ffffff !important;
 }
 
+/* Grafitowe przyciski i plakietki (bg-slate-900 z białym napisem) w ciemnym
+   motywie zostawały granatowe na prawie czarnym tle: słabo widoczne i nieczytelne.
+   Odwracamy je jak .btn-ink: jasne tło, ciemny napis. Półprzezroczyste tła okien
+   (bg-slate-900/40 itp.) to inne klasy i zostają ciemne. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-slate-900:not(.app-sidebar *),
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-slate-800.text-white:not(.app-sidebar *) {
+  background-color: #e4e4e7 !important;
+  color: #09090b !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.bg-slate-900, .bg-slate-800.text-white):not(.app-sidebar *) :is(.text-white, [class*="text-white/"], .text-slate-100, .text-slate-200, .text-slate-300) {
+  color: #09090b !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.bg-slate-900, .bg-slate-800.text-white):not(.app-sidebar *) [class*="text-white/"] {
+  color: rgba(9, 9, 11, 0.62) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.hover\:bg-slate-800, .hover\:bg-slate-700):not(.app-sidebar *):hover {
+  background-color: #ffffff !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .from-slate-900:not(.app-sidebar *) { --tw-gradient-from: #e4e4e7 !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .to-slate-800:not(.app-sidebar *) { --tw-gradient-to: #d4d4d8 !important; }
+
 /* Połysk przesuwający się po pasku postępu wgrywania zdjęć. Samo przesuwanie
    paska przy wolnym łączu wygląda jak zawieszenie; połysk pokazuje, że praca trwa. */
 .shimmer-bar {
