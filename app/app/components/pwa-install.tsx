@@ -117,7 +117,7 @@ export function PwaInstall() {
   if (!visible) return null;
 
   return (
-    <div className="print-hide fixed inset-x-3 bottom-[calc(84px+env(safe-area-inset-bottom))] z-[90] md:bottom-3 mx-auto max-w-md md:left-auto md:right-4 md:mx-0">
+    <div className="baner-instalacji print-hide fixed inset-x-3 bottom-[calc(84px+env(safe-area-inset-bottom))] z-[90] md:bottom-3 mx-auto max-w-md md:left-auto md:right-4 md:mx-0">
       <div className="rounded-2xl border border-slate-300 bg-white p-4 shadow-2xl shadow-black/50 backdrop-blur">
         {!showIOSHelp ? (
           <div className="flex items-center gap-3">

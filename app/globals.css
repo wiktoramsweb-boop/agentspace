@@ -3608,3 +3608,6 @@ html[data-theme="dark"] .app-shell svg path[stroke="#e2e8f0"] { stroke: #27272a;
 html[data-theme="dark"] .app-shell svg path[stroke="#ffffff"][stroke-dasharray] { stroke: #3f3f46; }
 html[data-theme="dark"] .app-shell .sn-wezel button[style*="rgb(241, 245, 249)"] { background: #232328 !important; box-shadow: 0 6px 0 #111114, inset 0 0 0 3px #3f3f46 !important; }
 html[data-theme="dark"] .app-shell .sn-wezel div[style*="rgb(203, 213, 225)"] { background: #3f3f46 !important; }
+
+/* Z lekcji Akademii pasek powrotu ma pierwszeństwo przed banerem instalacji aplikacji. */
+body:has(.pasek-akademii) .baner-instalacji { display: none; }
