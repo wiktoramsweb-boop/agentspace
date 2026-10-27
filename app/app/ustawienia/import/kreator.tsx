@@ -10,6 +10,7 @@ import {
 } from "@/lib/import-mapowanie";
 import { Select } from "../../components/select";
 import { importujKlientow, importujOferty, type WynikImportu } from "./actions";
+import { PobieranieZdjec } from "./pobieranie-zdjec";
 
 type Rodzaj = "klienci" | "oferty";
 
@@ -30,6 +31,7 @@ export function KreatorImportu() {
   const [blad, setBlad] = useState<string | null>(null);
   const [wynik, setWynik] = useState<WynikImportu | null>(null);
   const [pending, start] = useTransition();
+  const [aktywne, setAktywne] = useState(false);
 
   const pola: Pole[] = rodzaj === "klienci" ? POLA_KLIENTA : POLA_NIERUCHOMOSCI;
 
@@ -81,7 +83,7 @@ export function KreatorImportu() {
   function importuj() {
     setBlad(null);
     start(async () => {
-      const w = rodzaj === "klienci" ? await importujKlientow(gotowe) : await importujOferty(gotowe);
+      const w = rodzaj === "klienci" ? await importujKlientow(gotowe) : await importujOferty(gotowe, { aktywne });
       setWynik(w);
     });
   }
@@ -222,6 +224,16 @@ export function KreatorImportu() {
             {gotowe.length > 2000 && " Za jednym razem zapiszę pierwsze 2000."}
           </p>
 
+          {rodzaj === "oferty" && (
+            <label className="mt-4 flex items-start gap-2 text-sm text-slate-700">
+              <input type="checkbox" checked={aktywne} onChange={(e) => setAktywne(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600" />
+              <span>
+                Oferty bez kolumny statusu zapisz od razu jako <strong>aktywne</strong>.
+                <span className="block text-xs text-slate-500">Bez zaznaczenia trafią do archiwum, żeby agent je przejrzał przed publikacją.</span>
+              </span>
+            </label>
+          )}
+
           <button
             type="button"
             onClick={importuj}
@@ -250,11 +262,16 @@ export function KreatorImportu() {
               ))}
             </ul>
           )}
-          {rodzaj === "oferty" && wynik.dodane > 0 && (
+          {rodzaj === "oferty" && wynik.dodane > 0 && !aktywne && (
             <p className="mt-2 text-sm text-emerald-800">
-              Oferty trafiły do archiwum. Przejrzyj je i zmień status tym, które mają wrócić
+              Oferty bez statusu w pliku trafiły do archiwum. Przejrzyj je i zmień status tym, które mają wrócić
               do sprzedaży.
             </p>
+          )}
+          {rodzaj === "oferty" && (wynik.zdjecDoPobrania ?? 0) > 0 && (
+            <div className="mt-4">
+              <PobieranieZdjec naStart={wynik.zdjecDoPobrania ?? 0} auto />
+            </div>
           )}
         </div>
       )}

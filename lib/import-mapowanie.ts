@@ -27,6 +27,8 @@ export const POLA_KLIENTA: Pole[] = [
   { klucz: "budget_pln", nazwa: "Budżet", warianty: ["budzet", "budżet", "kwota", "cena", "budget"] },
   { klucz: "notes", nazwa: "Notatki", warianty: ["notatki", "notatka", "uwagi", "opis", "komentarz", "informacje"] },
   { klucz: "source", nazwa: "Źródło", warianty: ["zrodlo", "źródło", "source", "pochodzenie"] },
+  { klucz: "agent", nazwa: "Opiekun (agent)", warianty: ["opiekun", "agent", "pośrednik", "posrednik", "handlowiec", "doradca", "email agenta", "opiekun oferty"] },
+  { klucz: "external_id", nazwa: "ID w poprzednim systemie", warianty: ["id klienta", "id kontaktu", "external id", "identyfikator", "id"] },
 ];
 
 export const POLA_NIERUCHOMOSCI: Pole[] = [
@@ -40,8 +42,67 @@ export const POLA_NIERUCHOMOSCI: Pole[] = [
   { klucz: "property_type", nazwa: "Typ nieruchomości", warianty: ["typ", "rodzaj", "typ nieruchomosci", "kategoria"] },
   { klucz: "deal_kind", nazwa: "Sprzedaż czy wynajem", warianty: ["rodzaj transakcji", "transakcja", "sprzedaz wynajem", "oferta typ"] },
   { klucz: "description", nazwa: "Opis", warianty: ["opis", "opis oferty", "description", "uwagi"] },
-  { klucz: "offer_no", nazwa: "Numer oferty", warianty: ["numer", "nr oferty", "numer oferty", "symbol", "id"] },
+  { klucz: "offer_no", nazwa: "Numer oferty", warianty: ["numer", "nr oferty", "numer oferty", "symbol", "sygnatura"] },
+  { klucz: "status", nazwa: "Status oferty", warianty: ["status", "status oferty", "stan oferty", "aktywna"] },
+  { klucz: "agent", nazwa: "Opiekun (agent)", warianty: ["opiekun", "agent", "pośrednik", "posrednik", "handlowiec", "email agenta", "opiekun oferty"] },
+  { klucz: "photos", nazwa: "Zdjęcia (linki)", warianty: ["zdjecia", "zdjęcia", "foto", "zdjecia url", "photos", "images", "linki do zdjec", "galeria"] },
+  { klucz: "external_id", nazwa: "ID w poprzednim systemie", warianty: ["id oferty", "external id", "identyfikator", "id"] },
 ];
+
+/** Typ klienta z cudzego słownika: „Sprzedający”, „S”, „kupno”, „Najemca”… */
+export function typKlienta(surowy: string): "sprzedajacy" | "kupujacy" | "wynajmujacy" | "najemca" | "inny" {
+  const t = uprosc(surowy ?? "");
+  if (!t) return "inny";
+  if (/najemc|szuka najmu|wynajmie od/.test(t)) return "najemca";
+  if (/wynajmuj|wynajem|landlord/.test(t)) return "wynajmujacy";
+  if (/sprzedaj|sprzedaz|zbywc|seller|^s$/.test(t)) return "sprzedajacy";
+  if (/kupuj|kupno|nabywc|poszukuj|buyer|^k$/.test(t)) return "kupujacy";
+  return "inny";
+}
+
+/**
+ * Status oferty z cudzego pliku. Bez kolumny statusu (albo z czymś
+ * nierozpoznanym) zwracamy `domyslny`, czyli to, co biuro wybrało w kreatorze.
+ */
+export function statusOferty(surowy: string, domyslny: "aktywna" | "archiwum"): "aktywna" | "zarezerwowana" | "sfinalizowana" | "archiwum" {
+  const t = uprosc(surowy ?? "");
+  if (!t) return domyslny;
+  if (/rezerw/.test(t)) return "zarezerwowana";
+  if (/sprzedan|wynajet|zrealizow|zamknie|sfinaliz/.test(t)) return "sfinalizowana";
+  if (/archiw|wycofan|nieaktyw|zawieszon|wygasl/.test(t)) return "archiwum";
+  if (/aktywn|w sprzedazy|opublikow|^tak$|^1$/.test(t)) return "aktywna";
+  return domyslny;
+}
+
+/** Linki do zdjęć z jednej komórki: oddzielone spacją, przecinkiem, średnikiem, kreską albo nową linią. */
+export function linkiZdjec(surowe: string, maks = 30): string[] {
+  const out: string[] = [];
+  for (const kawalek of (surowe ?? "").split(/[\s,;|]+/)) {
+    const u = kawalek.trim();
+    if (!/^https?:\/\/[^\s]+$/i.test(u) || out.includes(u)) continue;
+    out.push(u);
+    if (out.length >= maks) break;
+  }
+  return out;
+}
+
+/**
+ * Opiekun z pliku: e-mail albo imię i nazwisko osoby z zespołu. Bez trafienia
+ * `null`, a rekord dostaje osoba, która robi import.
+ */
+export function dopasujOsobe(surowy: string, osoby: { id: string; email: string | null; full_name: string | null }[]): string | null {
+  const t = (surowy ?? "").trim().toLowerCase();
+  if (!t) return null;
+  const mail = osoby.find((o) => o.email && o.email.toLowerCase() === t);
+  if (mail) return mail.id;
+  const prosty = uprosc(t);
+  const slowa = prosty.split(" ").sort().join(" ");
+  const trafienie = osoby.find((o) => {
+    const n = uprosc(o.full_name ?? "");
+    return n && (n === prosty || n.split(" ").sort().join(" ") === slowa);
+  });
+  return trafienie?.id ?? null;
+}
 
 /** Nagłówek sprowadzony do postaci porównywalnej: bez ogonków, znaków i wielkości liter. */
 export function uprosc(naglowek: string): string {
