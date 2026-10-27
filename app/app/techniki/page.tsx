@@ -4,6 +4,8 @@ import { KATEGORIE, TECHNIKI, type Kategoria } from "@/lib/techniki/techniki";
 import { SKRYPTY, STRUKTURA } from "@/lib/techniki/skrypty";
 import { PageHeader } from "../components/page-header";
 import { KOLOR, POZIOM, Sila, Zakladki } from "./wspolne";
+import { OBIEKCJE } from "@/lib/techniki/obiekcje";
+import { BankObiekcji } from "./bank-obiekcji";
 
 export const metadata = { title: "Biblioteka technik" };
 
@@ -14,7 +16,7 @@ const bezOgonkow = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-
 export default async function TechnikiPage({ searchParams }: Props) {
   await requireModul("coach");
   const sp = await searchParams;
-  const widok = sp.widok === "skrypty" || sp.widok === "struktura" ? sp.widok : "techniki";
+  const widok = sp.widok === "skrypty" || sp.widok === "struktura" || sp.widok === "obiekcje" || sp.widok === "akademia" ? sp.widok : "techniki";
   const kat = sp.k && sp.k in KATEGORIE ? (sp.k as Kategoria) : null;
   const q = (sp.q ?? "").trim().slice(0, 60);
 
@@ -31,7 +33,7 @@ export default async function TechnikiPage({ searchParams }: Props) {
         {[
           { liczba: TECHNIKI.length, opis: "technik z przykładami z polskiego rynku" },
           { liczba: SKRYPTY.length, opis: "skryptów rozmów krok po kroku" },
-          { liczba: TECHNIKI.reduce((s, t) => s + t.przyklady.length, 0), opis: "przykładowych dialogów" },
+          { liczba: OBIEKCJE.length, opis: "obiekcji z trzema wersjami odpowiedzi" },
         ].map((x) => (
           <div key={x.opis} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <b className="block text-3xl font-bold tabular-nums text-slate-900">{x.liczba}</b>
@@ -110,6 +112,8 @@ export default async function TechnikiPage({ searchParams }: Props) {
           )}
         </>
       )}
+
+      {widok === "obiekcje" && <BankObiekcji lista={OBIEKCJE} nazwyTechnik={Object.fromEntries(TECHNIKI.map((t) => [t.slug, t.nazwa]))} />}
 
       {widok === "skrypty" && (
         <div className="grid gap-3 md:grid-cols-2">

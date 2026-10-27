@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Kategoria, Wypowiedz } from "@/lib/techniki/techniki";
 
 export const KOLOR: Record<Kategoria, { tlo: string; tekst: string; kropka: string }> = {
+  cold: { tlo: "bg-cyan-50", tekst: "text-cyan-700", kropka: "bg-cyan-500" },
   pytania: { tlo: "bg-sky-50", tekst: "text-sky-700", kropka: "bg-sky-500" },
   obiekcje: { tlo: "bg-amber-50", tekst: "text-amber-700", kropka: "bg-amber-500" },
   negocjacje: { tlo: "bg-violet-50", tekst: "text-violet-700", kropka: "bg-violet-500" },
@@ -45,10 +46,12 @@ export function Sila({ wartosc }: { wartosc: number }) {
   );
 }
 
-export function Zakladki({ aktywna }: { aktywna: "techniki" | "skrypty" | "struktura" }) {
+export function Zakladki({ aktywna }: { aktywna: "techniki" | "skrypty" | "obiekcje" | "struktura" | "akademia" }) {
   const z = [
+    { id: "akademia", href: "/app/techniki?widok=akademia", nazwa: "Akademia dla nowych" },
     { id: "techniki", href: "/app/techniki", nazwa: "Techniki" },
     { id: "skrypty", href: "/app/techniki?widok=skrypty", nazwa: "Skrypty rozmów" },
+    { id: "obiekcje", href: "/app/techniki?widok=obiekcje", nazwa: "Bank obiekcji" },
     { id: "struktura", href: "/app/techniki?widok=struktura", nazwa: "Struktura rozmowy" },
   ] as const;
   return (

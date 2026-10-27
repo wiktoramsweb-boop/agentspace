@@ -6,6 +6,7 @@
 import { TECHNIKI, KATEGORIE } from "./techniki/techniki.ts";
 import { SKRYPTY, STRUKTURA } from "./techniki/skrypty.ts";
 import { ROZMOWY } from "./techniki/rozmowy.ts";
+import { OBIEKCJE } from "./techniki/obiekcje.ts";
 
 // Aktywne scenariusze z tabeli scenarios (stan z października 2026).
 const SCENARIUSZE = new Set([
@@ -62,7 +63,13 @@ for (const [slug, d] of Object.entries(ROZMOWY)) {
   for (const id of Object.keys(d.wezly)) sprawdz(`rozmowa ${slug}: węzeł ${id} jest osiągalny`, osiagalne.has(id));
 }
 
-const caly = JSON.stringify([TECHNIKI, SKRYPTY, STRUKTURA, ROZMOWY]);
+sprawdz("unikalne id obiekcji", new Set(OBIEKCJE.map((o) => o.id)).size === OBIEKCJE.length);
+for (const o of OBIEKCJE) {
+  sprawdz(`obiekcja ${o.id}: technika ${o.technika} istnieje`, slugi.has(o.technika));
+  sprawdz(`obiekcja ${o.id}: trzy style odpowiedzi`, new Set(o.odpowiedzi.map((x) => x.styl)).size === 3);
+}
+
+const caly = JSON.stringify([TECHNIKI, SKRYPTY, STRUKTURA, ROZMOWY, OBIEKCJE]);
 sprawdz("bez długich myślników w treściach", !caly.includes("—"));
 
 if (bledy) {

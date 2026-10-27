@@ -2,7 +2,7 @@
 // Każda technika ma przykłady z polskiego rynku i link do treningu z AI Coachem
 // (pole `scenariusze` to slugi scenariuszy z tabeli scenarios).
 
-export type Kategoria = "negocjacje" | "perswazja" | "obiekcje" | "pytania" | "zamykanie" | "retoryka";
+export type Kategoria = "cold" | "negocjacje" | "perswazja" | "obiekcje" | "pytania" | "zamykanie" | "retoryka";
 export type Wypowiedz = { kto: "agent" | "klient"; tekst: string };
 
 export type Technika = {
@@ -19,6 +19,8 @@ export type Technika = {
   kiedyNie: string[];
   kroki: string[];
   przyklady: { sytuacja: string; rozmowa: Wypowiedz[] }[];
+  /** Gotowe zdania do powiedzenia własnymi słowami. */
+  zwroty?: string[];
   bledy: string[];
   sygnaly: string[];
   kontra: string[];
@@ -28,6 +30,7 @@ export type Technika = {
 };
 
 export const KATEGORIE: Record<Kategoria, { nazwa: string; opis: string }> = {
+  cold: { nazwa: "Cold calling", opis: "Pierwsze sekundy zimnego telefonu: otwarcie, powód, zgoda na rozmowę i umówienie spotkania." },
   pytania: { nazwa: "Pytania i słuchanie", opis: "Jak dowiedzieć się, czego klient naprawdę chce, zanim zaczniesz cokolwiek proponować." },
   obiekcje: { nazwa: "Obiekcje", opis: "Jak odpowiadać na „za drogo”, „muszę pomyśleć” i „sprzedam sam”, nie wchodząc w kłótnię." },
   negocjacje: { nazwa: "Negocjacje", opis: "Cena, prowizja i warunki: jak ustępować mądrze i trzymać pozycję." },
@@ -47,6 +50,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 1,
     sila: 70,
     skrot: "Pytasz tak, żeby klient opowiadał, a nie odpowiadał „tak” albo „nie”.",
+    zwroty: ["Co sprawiło, że zatrzymał się Pan akurat przy tym mieszkaniu?", "Jak Pani widzi kolejny rok, gdy mieszkanie już się sprzeda?", "Proszę opowiedzieć, jak wygląda Państwa idealne mieszkanie."],
     jakDziala:
       "Pytania zaczynające się od „co”, „jak”, „dlaczego”, „opowie mi Pan” zmuszają rozmówcę do zbudowania odpowiedzi. Klient mówi więcej, sam ujawnia motywację i ograniczenia, a Ty słuchasz zamiast przekonywać. Kto więcej mówi, ten czuje, że rozmowa była dobra.",
     kiedy: ["Na początku każdej rozmowy kwalifikującej", "Gdy klient jest zdawkowy i odpowiada jednym słowem", "Przy pierwszym spotkaniu z właścicielem"],
@@ -157,6 +161,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 1,
     sila: 65,
     skrot: "Pokazujesz, że słyszysz: krótkie potwierdzenia, dopytanie i podsumowanie własnymi słowami.",
+    zwroty: ["Mhm, rozumiem, proszę mówić dalej.", "Wspomniał Pan o szkole. Co jeszcze jest dla Was ważne w okolicy?", "Zanotuję to, żeby niczego nie pominąć."],
     jakDziala:
       "Człowiek, który czuje się wysłuchany, przestaje się bronić. Podsumowanie co kilka minut porządkuje rozmowę, wyłapuje nieporozumienia i daje Ci naturalne przejście do kolejnego etapu. Klient słyszy swoje potrzeby ułożone lepiej, niż sam je powiedział.",
     kiedy: ["Długie spotkanie pozyskowe", "Klient zdenerwowany albo rozczarowany", "Przed przejściem do propozycji"],
@@ -189,6 +194,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 2,
     sila: 80,
     skrot: "Sprawdzasz, czy to jedyna przeszkoda, zanim zaczniesz na nią odpowiadać.",
+    zwroty: ["Jeśli ustalimy kwestię prowizji, czy coś jeszcze stoi na przeszkodzie?", "Załóżmy, że ten problem rozwiążemy. Podpisujemy dziś?", "Czy to jedyna rzecz, która Panią powstrzymuje?"],
     jakDziala:
       "Klienci często podają wymówkę zamiast prawdziwego powodu. Pytanie „gdyby nie X, czy ruszylibyśmy?” oddziela prawdziwą przeszkodę od zasłony dymnej. Jeśli klient mówi „tak”, rozwiązujesz jedną rzecz i masz zgodę. Jeśli „nie”, dowiadujesz się, o co naprawdę chodzi.",
     kiedy: ["„Prowizja jest za wysoka”", "„Muszę się zastanowić”", "Każda obiekcja, która brzmi jak wymówka"],
@@ -221,6 +227,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 1,
     sila: 60,
     skrot: "Rozumiem, co Pan czuje. Inni czuli to samo. Okazało się, że...",
+    zwroty: ["Rozumiem, jak się Pani czuje. Inni właściciele czuli to samo, a potem odkryli, że wyłączność daje im więcej spokoju.", "Wiele osób na początku tak to widzi. Po pierwszym raporcie zwykle zmieniają zdanie."],
     jakDziala:
       "Trzy zdania: przyznajesz emocję (klient nie musi jej bronić), pokazujesz, że nie jest sam (normalizacja), i dajesz fakt z doświadczenia innych klientów (dowód). Most od emocji do argumentu bez kłótni.",
     kiedy: ["Lęk przed wyłącznością", "Obawa przed obcymi w mieszkaniu", "Złe doświadczenie z innym biurem"],
@@ -251,6 +258,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 1,
     sila: 70,
     skrot: "Zamiast odpowiadać na obiekcję, pytasz, co za nią stoi.",
+    zwroty: ["Mogę zapytać, co sprawiło, że podjęła Pani taką decyzję?", "Co konkretnie budzi Pana wątpliwości?", "Skąd taka opinia o biurach? Coś się wydarzyło?"],
     jakDziala:
       "„Za drogo” może znaczyć: nie stać mnie, nie widzę wartości, muszę zapytać męża albo widziałem taniej. Każde wymaga innej odpowiedzi. Jedno pytanie oszczędza Ci pięciu niepotrzebnych argumentów.",
     kiedy: ["Każda ogólna obiekcja", "Gdy nie wiesz, o co chodzi klientowi"],
@@ -312,6 +320,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 2,
     sila: 70,
     skrot: "Pokazujesz, że powód odmowy jest w rzeczywistości powodem, żeby się zgodzić.",
+    zwroty: ["Właśnie dlatego, że ma Pani mało czasu, warto, żebym to ja odbierał telefony od kupujących.", "Właśnie przez to, że rynek jest trudny, dobra prezentacja robi różnicę."],
     jakDziala: "Obiekcja zawiera często ziarno argumentu za. „Nie mam czasu” to dokładnie powód, żeby oddać sprzedaż profesjonaliście. Odwrócenie działa, bo używasz logiki klienta, a nie własnej.",
     kiedy: ["„Nie mam czasu”", "„Rynek jest słaby”", "„Sprzedam sam, bo chcę zaoszczędzić”"],
     kiedyNie: ["Gdy obiekcja dotyczy realnego braku pieniędzy albo zdrowia: odwracanie brzmi wtedy cynicznie"],
@@ -341,6 +350,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 1,
     sila: 50,
     skrot: "Obiekcję zapisujesz i wracasz do niej w lepszym momencie, nie gubiąc jej.",
+    zwroty: ["Do kwoty dojdziemy, najpierw chcę zrozumieć, czego Pani potrzebuje.", "Odpowiem na to za chwilę, gdy zobaczymy dane. Zgoda?"],
     jakDziala: "Pytanie o prowizję w pierwszej minucie spotkania to pytanie bez kontekstu: klient nie zna jeszcze wartości usługi. Zaparkowanie z obietnicą powrotu (i dotrzymanie jej) daje Ci czas na pokazanie wartości.",
     kiedy: ["Pytanie o cenę na samym początku", "Obiekcja, na którą odpowie dalsza część prezentacji"],
     kiedyNie: ["Gdy klient wraca z pytaniem drugi raz: odpowiedz od razu", "Gdy obiekcja blokuje całą rozmowę"],
@@ -372,6 +382,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 2,
     sila: 85,
     skrot: "Pierwsza liczba w rozmowie ustawia punkt odniesienia dla wszystkich kolejnych.",
+    zwroty: ["Mieszkania w tym budynku sprzedawały się od 790 do 840 tysięcy.", "Proponuję start od 829, żeby zostało miejsce na negocjację."],
     jakDziala:
       "Ludzie oceniają liczby względem pierwszej, którą usłyszą, nawet jeśli wiedzą, że była przypadkowa. Kto pierwszy poda uzasadnioną kwotę, ten ustawia pole negocjacji. Kotwica musi mieć uzasadnienie, inaczej traci wiarygodność.",
     kiedy: ["Ustalanie ceny ofertowej z właścicielem", "Negocjacja prowizji", "Przekazanie oferty kupującego"],
@@ -408,6 +419,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 2,
     sila: 80,
     skrot: "Nie dajesz nic za darmo: każde ustępstwo jest wymianą „zrobię X, jeśli Pan zrobi Y”.",
+    zwroty: ["Mogę zejść o pół procenta, jeśli podpiszemy wyłączność na cztery miesiące.", "Jeśli ustąpię w tym, potrzebuję czegoś w zamian: dłuższego terminu wydania."],
     jakDziala:
       "Ustępstwo bez warunku uczy drugą stronę, że naciskanie działa, i zaprasza do kolejnego. Ustępstwo warunkowe chroni wartość i daje coś w zamian. Kolejne ustępstwa powinny być coraz mniejsze: to sygnał, że zbliżasz się do granicy.",
     kiedy: ["Negocjacja prowizji", "Warunki umowy (czas trwania, marketing)", "Przekazywanie ofert między kupującym a sprzedającym"],
@@ -497,6 +509,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 2,
     sila: 75,
     skrot: "Po ważnym pytaniu albo kwocie zamilkniesz i czekasz. Kto pierwszy przerwie ciszę, często ustępuje.",
+    zwroty: ["(po podaniu ceny albo pytaniu o decyzję: policz w myślach do pięciu)", "(po obiekcji: kiwnij głową i poczekaj, aż klient doda coś od siebie)"],
     jakDziala: "Cisza jest niewygodna, więc ludzie wypełniają ją: dopowiadają, łagodzą, ustępują. Agent, który po podaniu prowizji zaczyna się tłumaczyć, sam ją obniża. Agent, który milczy, daje klientowi przestrzeń na decyzję.",
     kiedy: ["Po podaniu ceny albo prowizji", "Po pytaniu zamykającym", "Po niskiej ofercie drugiej strony"],
     kiedyNie: ["Przez telefon dłużej niż 4-5 sekund: rozmówca pomyśli, że zerwało połączenie"],
@@ -527,6 +540,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 2,
     sila: 75,
     skrot: "Nazywasz emocję rozmówcy: „Wygląda na to, że...”. Napięcie spada, rozmowa rusza.",
+    zwroty: ["Wygląda na to, że poprzednia sprzedaż mocno Panią rozczarowała.", "Słyszę, że najważniejszy jest dla Pana spokój, a nie ostatni tysiąc złotych.", "Brzmi, jakby ta przeprowadzka była dla Was dużą zmianą."],
     jakDziala: "Nazwana emocja traci siłę: rozmówca czuje się zrozumiany i przestaje jej bronić. Formuła „wygląda na to, że” (a nie „czuje Pan”) jest bezpieczna, bo nie twierdzisz, tylko obserwujesz.",
     kiedy: ["Zdenerwowany klient", "Nieufność wobec agentów", "Zawahanie przed decyzją"],
     kiedyNie: ["Nadużywane w każdym zdaniu brzmi jak terapia"],
@@ -557,6 +571,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 3,
     sila: 80,
     skrot: "Sam wypowiadasz zarzuty, które klient ma w głowie, zanim on je rzuci.",
+    zwroty: ["Pewnie pomyśli Pani, że to kolejny agent, który będzie namawiał na umowę.", "Może Pan uważać, że prowizja to pieniądze za nic. Rozumiem to.", "Pewnie ma Pani dość telefonów od biur."],
     jakDziala: "Klient przychodzi z gotowymi zarzutami wobec agentów (biorą prowizję za nic, wciskają umowy). Gdy usłyszy je z Twoich ust, nie ma już czego atakować, a Ty pokazujesz, że znasz jego punkt widzenia.",
     kiedy: ["Zimny telefon do FSBO", "Spotkanie z nieufnym właścicielem", "Prośba o wyłączność"],
     kiedyNie: ["Klient pozytywnie nastawiony: nie podsuwaj mu zarzutów"],
@@ -586,6 +601,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 3,
     sila: 80,
     skrot: "Pytania „jak” i „co”, po których druga strona sama szuka rozwiązania Twojego problemu.",
+    zwroty: ["Co musiałoby się wydarzyć, żeby ta decyzja była łatwa?", "Jak mogę pomóc, żeby to miało dla Pani sens?", "Co jest dla Pana najważniejsze przy wyborze biura?"],
     jakDziala: "„Jak mam to zrobić?” albo „Co możemy zrobić, żeby...?” przenosi ciężar problemu na rozmówcę i daje mu poczucie kontroli. Zamiast mówić „nie”, pytasz, jak to osiągnąć.",
     kiedy: ["Nierealne żądanie klienta", "Kupujący chce za dużo", "Utknięta negocjacja"],
     kiedyNie: ["Gdy pytanie brzmi sarkastycznie"],
@@ -928,6 +944,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 1,
     sila: 75,
     skrot: "Dajesz wybór między dwiema opcjami, z których obie oznaczają „tak”.",
+    zwroty: ["Pasuje Pani bardziej czwartek o 17 czy sobota o 11?", "Podpisujemy na trzy czy na cztery miesiące?", "Zdjęcia robimy we wtorek czy w środę?"],
     jakDziala: "„Wtorek czy czwartek?” jest łatwiejsze niż „czy możemy się spotkać?”. Klient decyduje o szczególe, a decyzja główna zapada naturalnie. Działa uczciwie, gdy klient wcześniej wyraził zainteresowanie.",
     kiedy: ["Umawianie spotkania", "Termin sesji zdjęciowej", "Wybór dnia podpisania umowy"],
     kiedyNie: ["Gdy klient wyraźnie odmówił: wtedy wybór jest manipulacją"],
@@ -949,6 +966,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 2,
     sila: 75,
     skrot: "Zbierasz wszystkie ustalenia i potrzeby klienta, a na końcu prosisz o decyzję.",
+    zwroty: ["Podsumuję: trzy pokoje, do 780 tysięcy, kredyt jest. Pokazuję dwa mieszkania w sobotę, tak?", "Czyli cena 799, zdjęcia we wtorek, raport co piątek. Zgadza się?"],
     jakDziala: "Klient słyszy w jednym miejscu: czego chciał, co mu zaproponowałeś i jak rozwiązałeś obawy. Prośba o decyzję jest wtedy logicznym zakończeniem, a nie nagłym atakiem.",
     kiedy: ["Koniec spotkania pozyskowego", "Decyzja o wyłączności"],
     kiedyNie: ["Gdy zostały nierozwiązane obiekcje: wróć do nich"],
@@ -975,6 +993,7 @@ export const TECHNIKI: Technika[] = [
     poziom: 1,
     sila: 80,
     skrot: "Nie kończysz rozmowy bez konkretnej daty i działania. „Zdzwonimy się” to porażka.",
+    zwroty: ["Ustalmy, co dalej: ja przygotuję raport do środy, a w czwartek spotykamy się na 20 minut.", "Zanim się rozłączymy: kiedy dzwonię z odpowiedzią właściciela?"],
     jakDziala: "Rackham rozróżnia „kontynuację” (miło było, odezwiemy się) od „postępu” (konkretny krok z datą). Rozmowy bez postępu to najczęstszy powód, dla którego leady przepadają.",
     kiedy: ["Koniec każdej rozmowy"],
     kiedyNie: [],
@@ -1051,6 +1070,364 @@ export const TECHNIKI: Technika[] = [
     powiazane: ["zamkniecie-podsumowujace"],
     scenariusze: ["follow-up-po-ogledzinach", "prezentacja-uslugi"],
     cwiczenie: "Dla jednej oferty wypisz trzy argumenty dla rodziny z dziećmi i trzy dla inwestora.",
+  },
+  /* ── Cold calling ────────────────────────────────────────── */
+  {
+    slug: "otwarcie-z-pozwoleniem",
+    nazwa: "Otwarcie z prośbą o pozwolenie",
+    kategoria: "cold",
+    zrodlo: "Sprzedaż telefoniczna B2B",
+    etyka: "etyczna",
+    poziom: 1,
+    sila: 75,
+    skrot: "W pierwszych sekundach pytasz, czy możesz zająć chwilę. Kto dał zgodę, ten słucha.",
+    jakDziala:
+      "Rozmówca w zimnym telefonie jest w trybie obrony: nie zna Cię i nie prosił o telefon. Pytanie o zgodę oddaje mu kontrolę, więc obrona słabnie. Krótka i konkretna prośba („dwie minuty, jedno pytanie”) jest łatwa do przyjęcia, a człowiek, który powiedział „dobrze”, chce być konsekwentny i słucha dalej.",
+    kiedy: ["Każdy zimny telefon do właściciela", "Telefon do osoby, która Cię nie zna", "Oddzwonienie po długiej przerwie"],
+    kiedyNie: ["Gdy klient sam do Ciebie dzwoni albo czeka na telefon", "Gdy rozmówca od razu pyta o konkret: wtedy odpowiedz na pytanie"],
+    kroki: ["Przedstaw się imieniem i nazwą biura w jednym zdaniu", "Powiedz, w jakiej sprawie dzwonisz (ogłoszenie, adres)", "Poproś o konkretny, krótki czas: „dwie minuty”", "Zamilknij i poczekaj na odpowiedź"],
+    zwroty: [
+      "Dzień dobry, [imię] z [biuro]. Dzwonię w sprawie ogłoszenia na [ulica]. Ma Pani dwie minuty?",
+      "Zajmę dosłownie chwilę, mam jedno pytanie. Może być?",
+      "Złapałem Pana w dobrym momencie, czy lepiej oddzwonić?",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Zimny telefon do właściciela z OLX",
+        rozmowa: [
+          { kto: "agent", tekst: "Dzień dobry, Marek z biura Spectra. Dzwonię w sprawie mieszkania na Kalwaryjskiej. Ma Pani dwie minuty?" },
+          { kto: "klient", tekst: "No... dwie minuty mogę." },
+          { kto: "agent", tekst: "Dziękuję. Jak idzie sprzedaż od wystawienia ogłoszenia?" },
+        ],
+      },
+    ],
+    bledy: ["„Czy mogę zająć Panu chwilę?” bez powodu telefonu", "Długi wstęp o biurze, zanim padnie pytanie o zgodę", "Mówienie dalej, zanim rozmówca odpowie"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["audyt-oskarzen", "konkretny-powod-telefonu", "umow-oddzwonienie"],
+    scenariusze: ["zimny-telefon-fsbo", "zimny-telefon-wygasle"],
+    cwiczenie: "Nagraj swoje otwarcie na dyktafon. Ma trwać najwyżej 10 sekund i kończyć się pytaniem o zgodę.",
+  },
+  {
+    slug: "przerwanie-schematu",
+    nazwa: "Przerwanie schematu",
+    kategoria: "cold",
+    zrodlo: "Psychologia uwagi",
+    etyka: "etyczna",
+    poziom: 2,
+    sila: 70,
+    skrot: "Mówisz coś, czego rozmówca nie spodziewa się po agencie, więc przestaje odpowiadać z automatu.",
+    jakDziala:
+      "Właściciele z ogłoszeń dostają po kilka telefonów od agentów dziennie i mają gotową formułkę: „nie współpracuję z biurami”. Jeśli Twoje pierwsze zdanie brzmi jak wszystkie inne, dostajesz formułkę. Szczere, nieoczekiwane zdanie („pewnie ma Pani dość agentów”) wybija z rytmu i daje kilka sekund prawdziwej uwagi.",
+    kiedy: ["Właściciel z ogłoszenia, który wisi długo", "Gdy słyszysz zmęczenie w głosie", "Telefon do wygasłej oferty"],
+    kiedyNie: ["Rozmówca jest otwarty i życzliwy: nie ma czego przerywać", "Żarty i sztuczki: przerwanie ma być szczere, nie cwaniackie"],
+    kroki: ["Nazwij to, co rozmówca myśli o telefonie od agenta", "Powiedz, czego nie zrobisz (nie będę namawiał na umowę)", "Zadaj jedno konkretne pytanie"],
+    zwroty: [
+      "Pewnie to dziś trzeci telefon od agenta, więc będę krótko.",
+      "Nie dzwonię namawiać na umowę. Mam jedno pytanie o cenę.",
+      "Wiem, że nie czekała Pani na mój telefon.",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Ogłoszenie wisi od dwóch miesięcy",
+        rozmowa: [
+          { kto: "agent", tekst: "Pewnie ma Pan już dość telefonów od biur, więc nie będę namawiał. Jedno pytanie: dlaczego Pan zdecydował się sprzedawać sam?" },
+          { kto: "klient", tekst: "Bo agenci tylko obiecują. Ale sam też nie bardzo mi idzie." },
+        ],
+      },
+    ],
+    bledy: ["„Nie jestem typowym agentem” (dokładnie tak mówi każdy agent)", "Przerwanie, po którym nie ma pytania: rozmówca nie wie, co odpowiedzieć"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["audyt-oskarzen", "otwarcie-z-pozwoleniem"],
+    scenariusze: ["zimny-telefon-fsbo", "obiekcja-zadnych-umow"],
+    cwiczenie: "Wypisz trzy formułki, które słyszysz najczęściej w zimnych telefonach, i do każdej napisz zdanie, które ją wyprzedza.",
+  },
+  {
+    slug: "konkretny-powod-telefonu",
+    nazwa: "Konkretny powód telefonu",
+    kategoria: "cold",
+    zrodlo: "Sprzedaż doradcza",
+    etyka: "etyczna",
+    poziom: 1,
+    sila: 80,
+    skrot: "Dzwonisz z powodu, który dotyczy rozmówcy, a nie Twojego biura.",
+    jakDziala:
+      "„Dzwonię, bo szukamy mieszkań” to powód agenta. „Dzwonię, bo Pani mieszkanie jest wystawione powyżej ostatnich transakcji w budynku” to powód właściciela. Ludzie słuchają rozmów o sobie. Prawdziwy, konkretny powód (dane, kupujący z bazy, zmiana na rynku) daje Ci prawo do kolejnych dwóch minut.",
+    kiedy: ["Każdy zimny telefon", "Telefon do właściciela wygasłej oferty", "Kontakt po długiej przerwie z dawnym klientem"],
+    kiedyNie: ["Gdy powód jest wymyślony: zmyślony kupujący wychodzi przy pierwszym pytaniu i zabija zaufanie"],
+    kroki: ["Przed telefonem znajdź jeden fakt o tej ofercie albo okolicy", "Powiedz go w jednym zdaniu z liczbą", "Połącz fakt z pytaniem do rozmówcy"],
+    zwroty: [
+      "Przygotowuję zestawienie cen z aktów notarialnych z [dzielnica]. Pani mieszkanie jest wystawione wyżej, więc chciałem zapytać, jak idzie sprzedaż.",
+      "Mam w bazie dwie rodziny z decyzją kredytową, które szukają trzech pokoi w Pani okolicy.",
+      "W Pani budynku sprzedało się w tym miesiącu mieszkanie, chciałem podzielić się ceną.",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Telefon do właściciela z ogłoszenia",
+        rozmowa: [
+          { kto: "agent", tekst: "Dzwonię, bo w Pani budynku w zeszłym miesiącu sprzedało się podobne mieszkanie za 712 tysięcy. Pani jest wystawiona za 789. Chciałem zapytać, jak wygląda zainteresowanie." },
+          { kto: "klient", tekst: "Za 712? Nie wiedziałam. Dzwoni mało osób." },
+        ],
+      },
+    ],
+    bledy: ["Powód o biurze („rozszerzamy działalność na Państwa dzielnicę”)", "Zmyślony kupujący", "Fakt bez liczby („ceny się zmieniają”)"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["obiektywne-kryteria", "otwarcie-z-pozwoleniem", "sprzedaj-spotkanie"],
+    scenariusze: ["zimny-telefon-fsbo", "zimny-telefon-wygasle", "monitoring-rynku-sprzedaz"],
+    cwiczenie: "Przed jutrzejszymi telefonami do każdego ogłoszenia dopisz jeden fakt z liczbą. Bez faktu nie dzwonisz.",
+  },
+  {
+    slug: "sprzedaj-spotkanie",
+    nazwa: "Sprzedaj spotkanie, nie usługę",
+    kategoria: "cold",
+    zrodlo: "Sprzedaż telefoniczna",
+    etyka: "etyczna",
+    poziom: 2,
+    sila: 80,
+    skrot: "Celem zimnego telefonu jest 20 minut przy mieszkaniu, a nie podpis. Nie wyjaśniaj wszystkiego przez telefon.",
+    jakDziala:
+      "Przez telefon nie da się sprzedać umowy pośrednictwa: nie widać Ciebie, mieszkania ani danych. Każda dodatkowa minuta tłumaczenia daje rozmówcy kolejny powód do odmowy. Proponujesz mały, konkretny i bezpieczny krok (omówienie raportu cen), a wszystko inne zostawiasz na spotkanie.",
+    kiedy: ["Rozmówca zaczyna pytać o szczegóły umowy i prowizji", "Telefon trwa już ponad 5 minut", "Masz jasny powód do spotkania (raport, wycena)"],
+    kiedyNie: ["Gdy klient nie ma żadnego zamiaru sprzedaży: spotkanie na siłę to strata czasu obu stron"],
+    kroki: ["Nazwij korzyść ze spotkania w jednym zdaniu", "Powiedz, ile potrwa i co rozmówca dostanie", "Zaproponuj dwa terminy", "Szczegóły odłóż: „to pokażę na miejscu”"],
+    zwroty: [
+      "To pokażę na miejscu, przy mieszkaniu wyjdzie dokładniej niż przez telefon.",
+      "Omówienie zajmuje 20 minut i nic Pani nie zobowiązuje.",
+      "Przyniosę raport, a Pani sama oceni, czy jest o czym rozmawiać.",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Właściciel dopytuje o umowę",
+        rozmowa: [
+          { kto: "klient", tekst: "A jaka to umowa, na ile miesięcy, co w niej jest?" },
+          { kto: "agent", tekst: "Zanim w ogóle będziemy mówić o umowie, chcę pokazać dane cen i zobaczyć mieszkanie. To 20 minut. Czwartek o 17 czy sobota o 11?" },
+        ],
+      },
+    ],
+    bledy: ["Wysyłanie wzoru umowy mailem po pierwszym telefonie", "Przedstawianie całej oferty biura przez telefon", "Brak konkretnego terminu na koniec"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["zamkniecie-alternatywne", "odroczenie", "konkretny-powod-telefonu"],
+    scenariusze: ["zimny-telefon-fsbo", "monitoring-rynku-sprzedaz"],
+    cwiczenie: "W pięciu kolejnych telefonach zakończ rozmowę propozycją spotkania przed 4. minutą. Zapisz, ile się udało.",
+  },
+  {
+    slug: "umow-oddzwonienie",
+    nazwa: "„Nie mam czasu”: oddzwonienie z godziną",
+    kategoria: "cold",
+    zrodlo: "Praktyka cold callingu",
+    etyka: "etyczna",
+    poziom: 1,
+    sila: 70,
+    skrot: "Na „nie mam teraz czasu” nie przekonujesz, tylko umawiasz konkretną godzinę telefonu.",
+    jakDziala:
+      "„Nie mam czasu” to najczęściej prawda albo grzeczna odmowa. W obu przypadkach przekonywanie („to tylko minuta”) pogarsza sprawę. Propozycja dwóch konkretnych godzin sprawdza, która to wersja: kto naprawdę jest zajęty, wybierze godzinę; kto odmawia, powie to wprost i oszczędzicie sobie czasu.",
+    kiedy: ["„Nie mam teraz czasu”, „jestem w pracy”, „prowadzę”", "Słyszysz w tle hałas albo pośpiech"],
+    kiedyNie: ["Gdy rozmówca mówi „proszę nie dzwonić”: to nie brak czasu, tylko odmowa"],
+    kroki: ["Przeproś krótko i nie przekonuj", "Zaproponuj dwie konkretne pory", "Powtórz ustaloną godzinę", "Zadzwoń punktualnie co do minuty"],
+    zwroty: [
+      "Jasne, nie zatrzymuję. Pasuje dziś po 18 czy jutro przed 10?",
+      "Zapisuję jutro 9:30. Zadzwonię punktualnie.",
+      "Rozumiem. Lepiej SMS czy telefon wieczorem?",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Właściciel odbiera w pracy",
+        rozmowa: [
+          { kto: "klient", tekst: "Nie mam teraz czasu, jestem w pracy." },
+          { kto: "agent", tekst: "Jasne, przepraszam. Dziś po 17 czy jutro rano będzie lepiej?" },
+          { kto: "klient", tekst: "Po 17." },
+          { kto: "agent", tekst: "Zapisuję 17:15. Zadzwonię punktualnie, do usłyszenia." },
+        ],
+      },
+    ],
+    bledy: ["„To zajmie tylko minutę” (rozmówca właśnie powiedział, że nie ma minuty)", "„To kiedy mogę zadzwonić?” bez propozycji", "Oddzwonienie 20 minut później niż ustalone"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["zamkniecie-alternatywne", "otwarcie-z-pozwoleniem"],
+    scenariusze: ["zimny-telefon-fsbo", "lead-z-otodom"],
+    cwiczenie: "Przez tydzień zapisuj każde „nie mam czasu” i sprawdź, ile umówionych oddzwonień doszło do rozmowy.",
+  },
+  {
+    slug: "male-tak",
+    nazwa: "Małe „tak” po drodze",
+    kategoria: "cold",
+    zrodlo: "Cialdini, zaangażowanie i konsekwencja",
+    etyka: "etyczna",
+    poziom: 2,
+    sila: 65,
+    skrot: "Prowadzisz rozmowę przez kilka łatwych zgód, zanim poprosisz o tę ważną.",
+    jakDziala:
+      "Każde „tak” na drobne, prawdziwe stwierdzenie („zależy Pani na czasie, dobrze rozumiem?”) buduje poczucie zgody i wspólnego kierunku. Gdy przychodzi propozycja spotkania, jest naturalnym następnym krokiem, a nie nagłym żądaniem. Działa tylko na prawdziwych potwierdzeniach, a nie na pytaniach podchwytliwych.",
+    kiedy: ["Diagnoza w zimnym telefonie", "Podsumowanie przed propozycją spotkania", "Spotkanie pozyskowe przed umową"],
+    kiedyNie: ["Seria oczywistych pytań („chce Pani sprzedać drogo, prawda?”): to manipulacja i klient ją czuje"],
+    kroki: ["Parafrazuj to, co klient powiedział, i zapytaj o potwierdzenie", "Zbierz dwie, trzy zgody o sytuacji", "Zaproponuj krok, który z nich wynika"],
+    zwroty: [
+      "Czyli najważniejszy jest dla Pani termin, dobrze rozumiem?",
+      "Mówiła Pani, że telefony są, ale nikt nie przychodzi. Tak?",
+      "Skoro termin jest ważny i chce Pani uniknąć oglądających bez kredytu, to spotkajmy się na 20 minut.",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Przed propozycją spotkania",
+        rozmowa: [
+          { kto: "agent", tekst: "Czyli przeprowadzka w marcu i nie chce Pani tracić czasu na osoby bez finansowania. Dobrze rozumiem?" },
+          { kto: "klient", tekst: "Dokładnie tak." },
+          { kto: "agent", tekst: "To pokażę, jak to robimy. Czwartek o 17 czy sobota o 11?" },
+        ],
+      },
+    ],
+    bledy: ["Pytania z oczywistą odpowiedzią", "Zbieranie zgód bez słuchania odpowiedzi", "Za dużo potwierdzeń: brzmi jak przesłuchanie"],
+    sygnaly: ["Ktoś zadaje Ci serię pytań „prawda, że...?”: zatrzymaj się i odpowiedz własnymi słowami"],
+    kontra: ["parafraza"],
+    powiazane: ["zaangazowanie-konsekwencja", "zamkniecie-podsumowujace", "parafraza"],
+    scenariusze: ["zimny-telefon-fsbo", "na-wylacznosc"],
+    cwiczenie: "W najbliższej rozmowie przed propozycją spotkania zbierz dwa prawdziwe potwierdzenia od klienta.",
+  },
+  {
+    slug: "wiadomosc-po-nieodebranym",
+    nazwa: "SMS po nieodebranym telefonie",
+    kategoria: "cold",
+    zrodlo: "Praktyka biur nieruchomości",
+    etyka: "etyczna",
+    poziom: 1,
+    sila: 60,
+    skrot: "Gdy nikt nie odbiera, wysyłasz krótką wiadomość z powodem telefonu. Oddzwania więcej osób niż na nieznany numer.",
+    jakDziala:
+      "Nieodebrane połączenie z nieznanego numeru to dla wielu osób spam. Krótki SMS z imieniem, powodem i konkretem zmienia Cię z „kolejnego numeru” w osobę z jasną sprawą. Rozmówca może zdecydować w spokoju i oddzwonić wtedy, kiedy mu pasuje.",
+    kiedy: ["Pierwszy telefon do leada z portalu nie został odebrany", "Właściciel z ogłoszenia nie odbiera", "Oddzwonienie umówione, a klient nie odebrał"],
+    kiedyNie: ["Seria SMS-ów jeden po drugim: jeden wystarczy, drugi najwcześniej następnego dnia"],
+    kroki: ["Imię i biuro", "Jedno zdanie powodu z konkretem", "Jedno pytanie albo propozycja godziny", "Bez linków i reklamy"],
+    zwroty: [
+      "Dzień dobry, [imię] z [biuro]. Dzwoniłem w sprawie mieszkania na [ulica]: mam dla Pani ceny z ostatnich transakcji w budynku. Kiedy mogę oddzwonić?",
+      "Dzień dobry, pytał Pan o mieszkanie na [ulica]. Jest aktualne, możemy obejrzeć jutro po 17. Proszę o informację, czy pasuje.",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Lead z portalu nie odebrał",
+        rozmowa: [
+          { kto: "agent", tekst: "(SMS) Dzień dobry, Anna z Spectra. Pytał Pan o 3 pokoje na Ruczaju. Mieszkanie jest aktualne, mogę pokazać jutro o 17:30 albo w sobotę o 10. Która pora pasuje?" },
+          { kto: "klient", tekst: "(SMS) Sobota o 10 pasuje." },
+        ],
+      },
+    ],
+    bledy: ["„Proszę o kontakt” bez powodu", "Długa wiadomość z opisem biura", "Wysyłanie linku do strony biura w pierwszym SMS-ie"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["konkretny-powod-telefonu", "zamkniecie-alternatywne"],
+    scenariusze: ["lead-z-otodom", "lead-najem-telefon"],
+    cwiczenie: "Napisz trzy szablony SMS: do leada z portalu, do właściciela z ogłoszenia i po umówionym oddzwonieniu, które nie doszło do skutku.",
+  },
+  {
+    slug: "telefon-z-wartoscia",
+    nazwa: "Kolejny telefon z nową wartością",
+    kategoria: "cold",
+    zrodlo: "Sprzedaż doradcza",
+    etyka: "etyczna",
+    poziom: 2,
+    sila: 70,
+    skrot: "Każdy kolejny kontakt przynosi coś nowego: cenę, kupującego, informację. Nigdy „dzwonię zapytać, czy coś się zmieniło”.",
+    jakDziala:
+      "Większość umów pośrednictwa podpisuje się po kilku kontaktach, a nie po pierwszym. Telefon „czy coś się zmieniło?” jest dla klienta przypomnieniem, że czegoś od niego chcesz. Telefon z nową transakcją w okolicy albo z kupującym z bazy jest dla niego informacją. Za piątym razem dzwonisz jako ekspert, a nie jako natręt.",
+    kiedy: ["Właściciel powiedział „nie teraz”", "Klient po prezentacji „musi pomyśleć”", "Wygasła oferta, z którą rozmawiałeś miesiąc temu"],
+    kiedyNie: ["Gdy klient wyraźnie poprosił, żeby nie dzwonić"],
+    kroki: ["Zanotuj po rozmowie, co może zainteresować klienta", "Przed kolejnym telefonem znajdź jedną nowość", "Zacznij od nowości, dopiero potem pytanie"],
+    zwroty: [
+      "Dzwonię, bo w Pani okolicy sprzedało się właśnie mieszkanie, które było wystawione obok Pani.",
+      "Mam nowego kupującego z decyzją kredytową, który szuka dokładnie takiego metrażu.",
+      "Obiecałem odezwać się z cenami z kwartału. Mam je, chce Pani usłyszeć?",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Trzeci kontakt z właścicielem po miesiącu",
+        rozmowa: [
+          { kto: "agent", tekst: "Dzień dobry, obiecałem dać znać, gdy coś się ruszy na Pani ulicy. Mieszkanie spod 14 poszło za 735 tysięcy po trzech tygodniach." },
+          { kto: "klient", tekst: "Szybko. A moje dalej wisi." },
+        ],
+      },
+    ],
+    bledy: ["„Dzwonię zapytać, czy coś się zmieniło”", "Kolejny telefon bez ustalonego wcześniej powodu", "Zbyt częste telefony: raz na 2-3 tygodnie wystarczy"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["wzajemnosc", "konkretny-powod-telefonu", "koszt-zwloki"],
+    scenariusze: ["zimny-telefon-wygasle", "monitoring-rynku-sprzedaz", "follow-up-po-ogledzinach"],
+    cwiczenie: "Dla trzech klientów, którzy powiedzieli „nie teraz”, zapisz w CRM, z jaką nowością zadzwonisz za dwa tygodnie.",
+  },
+
+  /* ── Obiekcje: dodatkowe ─────────────────────────────────── */
+  {
+    slug: "zgoda-czesciowa",
+    nazwa: "Zgoda częściowa: „ma Pani rację, że...”",
+    kategoria: "obiekcje",
+    zrodlo: "Techniki odpowiadania na obiekcje",
+    etyka: "etyczna",
+    poziom: 1,
+    sila: 70,
+    skrot: "Zgadzasz się z prawdziwą częścią obiekcji i od niej przechodzisz do swojego argumentu.",
+    jakDziala:
+      "Obiekcja prawie zawsze ma w sobie ziarno prawdy: prowizja to duża kwota, agenci bywają nierzetelni. Gdy zaprzeczasz, klient broni swojego zdania mocniej. Gdy przyznajesz mu rację w tym, co prawdziwe, rozmowa przestaje być sporem, a Ty możesz pokazać drugą stronę bez kłótni.",
+    kiedy: ["„Agenci tylko wstawiają ogłoszenie”", "„Prowizja jest za wysoka”", "„Sam sprzedam taniej”"],
+    kiedyNie: ["Gdy obiekcja jest nieprawdziwa w całości: nie zgadzaj się z fałszem tylko dla atmosfery"],
+    kroki: ["Znajdź prawdziwą część obiekcji", "Powiedz to wprost: „ma Pani rację, że...”", "Dodaj „i właśnie dlatego” zamiast „ale”", "Podaj jeden konkretny argument"],
+    zwroty: [
+      "Ma Pani rację, że wielu agentów tylko wstawia ogłoszenie. I właśnie dlatego co tydzień dostaje Pani ode mnie raport.",
+      "Zgadzam się, prowizja to duża kwota. Dlatego płaci ją Pani dopiero przy akcie, gdy pieniądze są już na koncie.",
+      "Rzeczywiście, sam też może Pan sprzedać. Pytanie, ile kosztuje Pana każdy miesiąc czekania.",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Właściciel po złym doświadczeniu",
+        rozmowa: [
+          { kto: "klient", tekst: "Poprzedni agent nic nie robił przez trzy miesiące." },
+          { kto: "agent", tekst: "Ma Pan rację, że to częste. I właśnie dlatego proponuję prawo wypowiedzenia po miesiącu, jeśli nie dowiozę planu." },
+        ],
+      },
+    ],
+    bledy: ["„Tak, ale...”: słowo „ale” kasuje całą zgodę", "Zgoda bez argumentu: klient zostaje przy obiekcji"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["czuje-czuli-odkryli", "bumerang", "izolacja-obiekcji"],
+    scenariusze: ["obiekcja-zadnych-umow", "obiekcja-nie-place-prowizji", "obiekcja-tylko-wylacznosc"],
+    cwiczenie: "Do pięciu najczęstszych obiekcji w Twoim biurze dopisz zdanie „ma Pani rację, że...” i jeden argument po „i właśnie dlatego”.",
+  },
+  {
+    slug: "obiekcja-w-pytanie",
+    nazwa: "Zamiana obiekcji w pytanie",
+    kategoria: "obiekcje",
+    zrodlo: "Sprzedaż doradcza",
+    etyka: "etyczna",
+    poziom: 2,
+    sila: 75,
+    skrot: "„Za drogo” zamieniasz w pytanie, na które razem szukacie odpowiedzi: „czyli pytanie brzmi, czy to się Pani opłaci”.",
+    jakDziala:
+      "Obiekcja brzmi jak wyrok („nie zapłacę tyle”). Przeformułowana na pytanie („czyli chodzi o to, czy ta kwota się zwróci”) staje się problemem do rozwiązania wspólnie. Klient zgadza się z nową wersją, bo to on ją wypowiedział, a Ty odpowiadasz na pytanie, a nie walczysz z odmową.",
+    kiedy: ["„Za drogo”", "„Nie mam czasu na prezentacje”", "„Nie chcę wiązać się umową”"],
+    kiedyNie: ["Gdy obiekcja to grzeczna odmowa całej rozmowy: przeformułowanie nie zmieni braku zamiaru"],
+    kroki: ["Wysłuchaj obiekcji do końca", "Przeformułuj ją na pytanie zaczynające się od „czyli pytanie brzmi...”", "Poczekaj na potwierdzenie", "Odpowiedz na to pytanie liczbami albo przykładem"],
+    zwroty: [
+      "Czyli pytanie brzmi, czy z biurem sprzeda Pani na tyle lepiej, żeby prowizja się zwróciła. Dobrze rozumiem?",
+      "Czyli chodzi o to, żeby nie tracić wieczorów na oglądających bez kredytu?",
+      "Czyli najważniejsze jest, żeby mógł Pan wycofać się, jeśli nie będzie efektów?",
+    ],
+    przyklady: [
+      {
+        sytuacja: "Obiekcja o prowizji",
+        rozmowa: [
+          { kto: "klient", tekst: "Nie dam 20 tysięcy prowizji, to szaleństwo." },
+          { kto: "agent", tekst: "Rozumiem. Czyli pytanie brzmi, czy sprzedając z biurem dostanie Pan na koncie więcej niż sam. Tak?" },
+          { kto: "klient", tekst: "No tak, o to chodzi." },
+          { kto: "agent", tekst: "To policzmy na ostatnich trzech transakcjach z Pana okolicy." },
+        ],
+      },
+    ],
+    bledy: ["Przeformułowanie, które zmienia sens obiekcji na wygodny dla Ciebie", "Brak pauzy na potwierdzenie"],
+    sygnaly: [],
+    kontra: [],
+    powiazane: ["parafraza", "izolacja-obiekcji", "pytania-kalibrowane"],
+    scenariusze: ["obiekcja-nie-place-prowizji", "obiekcja-musze-pomyslec", "negocjacja-prowizji"],
+    cwiczenie: "Przećwicz z klientem AI obiekcję o prowizji i za każdym razem zacznij odpowiedź od „czyli pytanie brzmi...”.",
   },
 ];
 

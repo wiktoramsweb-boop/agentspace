@@ -115,6 +115,20 @@ export default async function TechnikaPage({ params }: Props) {
         </ol>
       </section>
 
+      {t.zwroty && t.zwroty.length > 0 && (
+        <section className="mb-8 rounded-3xl border border-emerald-200 bg-emerald-50/60 p-5">
+          <h2 className="mb-1 text-lg font-semibold text-slate-900">Gotowe zwroty</h2>
+          <p className="mb-3 text-sm text-slate-500">Zdania, od których możesz zacząć. Powiedz je swoimi słowami, w nawiasy wstaw dane klienta.</p>
+          <ul className="grid gap-2 md:grid-cols-2">
+            {t.zwroty.map((z) => (
+              <li key={z} className="rounded-2xl rounded-tl-sm border border-emerald-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-800">
+                {z}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold text-slate-900">Przykłady z rynku</h2>
         <div className="grid gap-3 lg:grid-cols-2">
