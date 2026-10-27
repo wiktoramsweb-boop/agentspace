@@ -175,6 +175,12 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
           isOwner ? (
             <div className="flex flex-wrap items-center gap-2">
               <Link
+                href="/app/techniki/akademia/zespol"
+                className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:border-slate-400"
+              >
+                Szkolenie (Akademia)
+              </Link>
+              <Link
                 href="/app/zespol/dziennik"
                 className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:border-slate-400"
               >

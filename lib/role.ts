@@ -23,7 +23,8 @@ export type Modul =
   | "ustawienia"
   | "abonament"
   | "coach"
-  | "kredyty";
+  | "kredyty"
+  | "szkolenie";
 
 export type OpisModulu = { id: Modul; nazwa: string; opis: string };
 
@@ -39,6 +40,7 @@ export const MODULY: OpisModulu[] = [
   { id: "abonament", nazwa: "Abonament", opis: "Zakup i przedłużanie abonamentu." },
   { id: "coach", nazwa: "AI Coach i cele", opis: "Trening rozmów, historia sesji, cele osobiste." },
   { id: "kredyty", nazwa: "Kredyty", opis: "Sprawy kredytowe klientów: przekazanie doradcy, etap, dokumenty." },
+  { id: "szkolenie", nazwa: "Szkolenie zespołu", opis: "Postępy ludzi w Akademii: przerobione lekcje, wyniki sprawdzianów i podejścia." },
 ];
 
 /** Jak szeroko dana osoba widzi dane biura. */

@@ -7,6 +7,7 @@ import { TECHNIKI, KATEGORIE } from "./techniki/techniki.ts";
 import { SKRYPTY, STRUKTURA } from "./techniki/skrypty.ts";
 import { ROZMOWY } from "./techniki/rozmowy.ts";
 import { OBIEKCJE } from "./techniki/obiekcje.ts";
+import { MODULY_AKADEMII, WSZYSTKIE_LEKCJE, WSZYSTKIE_SPRAWDZIANY, ocen, stanAkademii } from "./techniki/akademia.ts";
 
 // Aktywne scenariusze z tabeli scenarios (stan z października 2026).
 const SCENARIUSZE = new Set([
@@ -69,7 +70,42 @@ for (const o of OBIEKCJE) {
   sprawdz(`obiekcja ${o.id}: trzy style odpowiedzi`, new Set(o.odpowiedzi.map((x) => x.styl)).size === 3);
 }
 
-const caly = JSON.stringify([TECHNIKI, SKRYPTY, STRUKTURA, ROZMOWY, OBIEKCJE]);
+/* ── Akademia ── */
+sprawdz("unikalne id lekcji", new Set(WSZYSTKIE_LEKCJE.map((l) => l.id)).size === WSZYSTKIE_LEKCJE.length);
+for (const l of WSZYSTKIE_LEKCJE) {
+  if (l.rodzaj === "technika") sprawdz(`lekcja ${l.id}: technika istnieje`, slugi.has(l.slug));
+  if (l.rodzaj === "skrypt") sprawdz(`lekcja ${l.id}: skrypt istnieje`, SKRYPTY.some((s) => s.slug === l.slug));
+}
+for (const s of WSZYSTKIE_SPRAWDZIANY) {
+  sprawdz(`${s.id}: próg nie większy niż liczba pytań`, s.prog > 0 && s.prog <= s.pytania.length);
+  s.pytania.forEach((p, i) => {
+    sprawdz(`${s.id}/${i}: poprawna odpowiedź istnieje`, p.poprawna >= 0 && p.poprawna < p.odpowiedzi.length);
+    sprawdz(`${s.id}/${i}: odpowiedzi różne`, new Set(p.odpowiedzi).size === p.odpowiedzi.length);
+    if (p.technika) sprawdz(`${s.id}/${i}: technika ${p.technika} istnieje`, slugi.has(p.technika));
+  });
+}
+{
+  const pusty = stanAkademii([]);
+  sprawdz("akademia: na start otwarty tylko moduł 1", pusty.moduly[0].otwarty && !pusty.moduly[1].otwarty);
+  sprawdz("akademia: na start sprawdzian zamknięty", !pusty.moduly[0].sprawdzian.dostepny);
+  sprawdz("akademia: aktualna jest pierwsza lekcja", pusty.aktualne === MODULY_AKADEMII[0].lekcje[0].id);
+  const teraz = new Date().toISOString();
+  const lekcje1 = MODULY_AKADEMII[0].lekcje.map((l) => ({ item: l.id, passed: true, best: null, attempts: 0, updated: teraz }));
+  const poLekcjach = stanAkademii(lekcje1);
+  sprawdz("akademia: po lekcjach otwiera się sprawdzian", poLekcjach.moduly[0].sprawdzian.dostepny && poLekcjach.aktualne === "sprawdzian-1");
+  sprawdz("akademia: moduł 2 dalej zamknięty bez sprawdzianu", !poLekcjach.moduly[1].otwarty);
+  const zdany = stanAkademii([...lekcje1, { item: "sprawdzian-1", passed: true, best: 5, attempts: 2, updated: teraz }]);
+  sprawdz("akademia: zdany sprawdzian otwiera moduł 2", zdany.moduly[1].otwarty && zdany.moduly[0].ukonczony);
+  sprawdz("akademia: średnia z najlepszego wyniku", zdany.srednia === Math.round((5 / 6) * 100));
+  const s1 = MODULY_AKADEMII[0].sprawdzian;
+  sprawdz("ocena: wszystkie dobre", ocen(s1, s1.pytania.map((p) => p.poprawna)).wynik === s1.pytania.length);
+  const dwieZle = s1.pytania.map((p, i) => (i < 2 ? (p.poprawna + 1) % p.odpowiedzi.length : p.poprawna));
+  sprawdz("ocena: dwie złe = próg 4/6 zaliczony", ocen(s1, dwieZle).zaliczony && ocen(s1, dwieZle).bledne.length === 2);
+  const trzyZle = s1.pytania.map((p, i) => (i < 3 ? (p.poprawna + 1) % p.odpowiedzi.length : p.poprawna));
+  sprawdz("ocena: trzy złe = niezaliczony", !ocen(s1, trzyZle).zaliczony);
+}
+
+const caly = JSON.stringify([TECHNIKI, SKRYPTY, STRUKTURA, ROZMOWY, OBIEKCJE, MODULY_AKADEMII, WSZYSTKIE_SPRAWDZIANY]);
 sprawdz("bez długich myślników w treściach", !caly.includes("—"));
 
 if (bledy) {

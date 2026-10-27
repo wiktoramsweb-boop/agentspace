@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { requireModul } from "@/lib/auth";
+import { maModul } from "@/lib/role";
+import { postepAkademii } from "@/lib/data-akademia";
+import { stanAkademii } from "@/lib/techniki/akademia";
+import { SciezkaAkademii } from "./akademia/sciezka-akademii";
 import { KATEGORIE, TECHNIKI, type Kategoria } from "@/lib/techniki/techniki";
 import { SKRYPTY, STRUKTURA } from "@/lib/techniki/skrypty";
 import { PageHeader } from "../components/page-header";
@@ -14,7 +18,7 @@ type Props = { searchParams: Promise<{ widok?: string; k?: string; q?: string }>
 const bezOgonkow = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
 
 export default async function TechnikiPage({ searchParams }: Props) {
-  await requireModul("coach");
+  const user = await requireModul("coach");
   const sp = await searchParams;
   const widok = sp.widok === "skrypty" || sp.widok === "struktura" || sp.widok === "obiekcje" || sp.widok === "akademia" ? sp.widok : "techniki";
   const kat = sp.k && sp.k in KATEGORIE ? (sp.k as Kategoria) : null;
@@ -113,6 +117,8 @@ export default async function TechnikiPage({ searchParams }: Props) {
         </>
       )}
 
+      {widok === "akademia" && <Akademia user={user} />}
+
       {widok === "obiekcje" && <BankObiekcji lista={OBIEKCJE} nazwyTechnik={Object.fromEntries(TECHNIKI.map((t) => [t.slug, t.nazwa]))} />}
 
       {widok === "skrypty" && (
@@ -187,6 +193,63 @@ export default async function TechnikiPage({ searchParams }: Props) {
           </p>
         </section>
       )}
+    </>
+  );
+}
+
+async function Akademia({ user }: { user: Awaited<ReturnType<typeof requireModul>> }) {
+  const { ready, wpisy } = await postepAkademii(user.agency_id, user.id);
+  const widziZespol = maModul({ id: user.id, role: user.role, permissions: user.permissions }, "szkolenie");
+  if (!ready) {
+    return (
+      <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+        Akademia wymaga migracji <code>lib/SETUP-v56-akademia.sql</code> w Supabase.
+      </p>
+    );
+  }
+  const stan = stanAkademii(wpisy);
+  const procent = Math.round((stan.lekcjiZrobionych / stan.lekcjiWszystkich) * 100);
+  return (
+    <>
+      <section className="mb-8 grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <div className="relative overflow-hidden rounded-[28px] bg-slate-900 p-6 text-white">
+          <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-amber-400/25 blur-3xl" aria-hidden="true" />
+          <div className="relative">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-300">Akademia dla nowych</p>
+            <p className="mt-2 max-w-md text-lg font-semibold leading-snug">
+              {stan.ukonczona
+                ? "Akademia ukończona. Teraz trenuj z klientem AI i wracaj do technik, kiedy chcesz."
+                : "Sześć modułów od pierwszej rozmowy do negocjacji. Lekcja, krótki sprawdzian, następny moduł."}
+            </p>
+            <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/15">
+              <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-300 transition-all" style={{ width: `${procent}%` }} />
+            </div>
+            <p className="mt-2 text-sm text-slate-300">
+              {stan.lekcjiZrobionych}/{stan.lekcjiWszystkich} lekcji · {stan.zaliczonych}/{stan.sprawdzianow} sprawdzianów
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-5">
+            <p className="text-3xl font-bold tabular-nums text-slate-900">{stan.srednia !== null ? `${stan.srednia}%` : "–"}</p>
+            <p className="text-sm text-slate-500">średni wynik sprawdzianów</p>
+          </div>
+          <div className="rounded-[28px] border border-slate-200 bg-white p-5">
+            <p className="text-3xl font-bold tabular-nums text-slate-900">{stan.moduly.filter((m) => m.ukonczony).length}/6</p>
+            <p className="text-sm text-slate-500">ukończonych modułów</p>
+          </div>
+          {widziZespol && (
+            <Link href="/app/techniki/akademia/zespol" className="col-span-2 flex items-center justify-between rounded-[28px] border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:shadow-md">
+              <span>
+                <span className="block font-semibold text-slate-900">Postępy zespołu</span>
+                <span className="text-sm text-slate-500">Kto gdzie jest, wyniki sprawdzianów, podejścia</span>
+              </span>
+              <span className="text-slate-400">→</span>
+            </Link>
+          )}
+        </div>
+      </section>
+      <SciezkaAkademii stan={stan} />
     </>
   );
 }
