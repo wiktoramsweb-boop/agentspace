@@ -12,7 +12,7 @@
 
 **⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić w Supabase SQL Editor pliki `lib/SETUP-*.sql` po kolei - v1 ✅ uruchomione; **v2 (platforma), v3 (kategorie+cele), v4 (łatwe scenariusze) prawdopodobnie do uruchomienia - POTWIERDZIĆ Z USEREM**. Kod odporny na brak tabel (puste, nie crashuje).
 
-**Migracje:** v36, v37, v38 ✅ uruchomione. **v49 (`lib/SETUP-v49-rozbudowa.sql`) DO URUCHOMIENIA** - czat, automatyzacje, urlopy, RODO, historia cen, koszty, dziennik, zadania AI Coach (szczegóły: PROJEKT-STATUS.md, „Wielka rozbudowa”). **Do uruchomienia: v39** (kolumny `kind` i `credits` w `subscription_orders` - doszły do v37 już po tym, jak została uruchomiona, a `create table if not exists` ich nie dokłada).
+**Migracje:** v36, v37, v38 ✅ uruchomione. **v54 (`lib/SETUP-v54-oddzialy-prowizje.sql`) DO URUCHOMIENIA** - oddziały, zasady prowizji, współagenci, kolejka zdjęć z importu, zgłoszenia migracji. Kod działa bez niej (sekcje pokazują prośbę o migrację). **v49 (`lib/SETUP-v49-rozbudowa.sql`) DO URUCHOMIENIA** - czat, automatyzacje, urlopy, RODO, historia cen, koszty, dziennik, zadania AI Coach (szczegóły: PROJEKT-STATUS.md, „Wielka rozbudowa”). **Do uruchomienia: v39** (kolumny `kind` i `credits` w `subscription_orders` - doszły do v37 już po tym, jak została uruchomiona, a `create table if not exists` ich nie dokłada).
 
 **Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa - portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`. **`CRON_SECRET` jest WYMAGANY** - bez niego crony odmawiają (`lib/cron-auth.ts`). Limity AI: system kredytów (v35, `lib/kredyty-cennik.ts`) - pula miesięczna biura z pakietu, plus dzienny bezpiecznik na osobę `AI_DAILY_CREDITS_USER` (domyślnie 120 kredytów).
 
