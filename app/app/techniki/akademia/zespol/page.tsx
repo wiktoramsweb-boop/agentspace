@@ -3,12 +3,12 @@ import { requireModul } from "@/lib/auth";
 import { ROLE_LABELS } from "@/lib/role";
 import { postepZespolu } from "@/lib/data-akademia";
 import { ludzieSzkolenia } from "@/lib/szkolenie-zakres";
-import { stanAkademii } from "@/lib/techniki/akademia";
+import { nazwaAkademii, stanAkademii } from "@/lib/techniki/akademia";
 import { PageHeader } from "../../../components/page-header";
 import { Avatar } from "../../../components/avatar";
 import { Wstecz } from "../../../components/wstecz";
 
-export const metadata = { title: "Postępy zespołu w Akademii" };
+export const metadata = { title: "Postępy zespołu w szkoleniu" };
 
 const KOLOR_MODULU = { zielony: "#10b981", turkus: "#06b6d4", fiolet: "#8b5cf6", zloto: "#f59e0b" } as const;
 
@@ -25,6 +25,7 @@ function kiedy(iso: string | null): string {
 export default async function PostepyZespoluPage() {
   const user = await requireModul("szkolenie");
   const ludzie = await ludzieSzkolenia(user);
+  const nazwa = nazwaAkademii(user.agency_id).krotka;
   const { ready, wgOsoby } = await postepZespolu(user.agency_id!, ludzie.map((l) => l.id));
 
   const wiersze = ludzie.map((l) => {
@@ -41,9 +42,9 @@ export default async function PostepyZespoluPage() {
   return (
     <>
       <Wstecz href="/app/techniki?widok=akademia" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
-        ← Akademia
+        ← {nazwa}
       </Wstecz>
-      <PageHeader title="Postępy zespołu w Akademii" subtitle="Kto na jakim etapie, wyniki sprawdzianów i kiedy ostatnio się uczył. Kliknij osobę, żeby zobaczyć szczegóły." />
+      <PageHeader title={`Postępy zespołu: ${nazwa}`} subtitle="Kto na jakim etapie, wyniki sprawdzianów i kiedy ostatnio się uczył. Kliknij osobę, żeby zobaczyć szczegóły." />
 
       {!ready ? (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
@@ -55,7 +56,7 @@ export default async function PostepyZespoluPage() {
             {[
               { l: ludzie.length, o: "osób w zespole" },
               { l: zaczelo, o: "zaczęło naukę" },
-              { l: ukonczylo, o: "ukończyło Akademię" },
+              { l: ukonczylo, o: `ukończyło: ${nazwa}` },
               { l: stoja, o: "bez postępu od tygodnia", uwaga: stoja > 0 },
             ].map((x) => (
               <div key={x.o} className={`rounded-2xl border p-4 ${x.uwaga ? "border-amber-200 bg-amber-50" : "border-slate-200 bg-white"}`}>
@@ -100,7 +101,7 @@ export default async function PostepyZespoluPage() {
                     </span>
                   </div>
                   <div className="w-full text-sm sm:w-48 sm:text-right">
-                    <p className="font-semibold text-slate-900">{stan.ukonczona ? "Akademia ukończona" : aktualnyModul ? `Moduł ${aktualnyModul.nr}: ${aktualnyModul.nazwa}` : "Egzamin końcowy"}</p>
+                    <p className="font-semibold text-slate-900">{stan.ukonczona ? `${nazwa}: ukończona` : aktualnyModul ? `Moduł ${aktualnyModul.nr}: ${aktualnyModul.nazwa}` : "Egzamin końcowy"}</p>
                     <p className="text-xs text-slate-500">
                       {stan.lekcjiZrobionych}/{stan.lekcjiWszystkich} lekcji · średnio {stan.srednia !== null ? `${stan.srednia}%` : "–"}
                     </p>

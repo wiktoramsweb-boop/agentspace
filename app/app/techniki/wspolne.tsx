@@ -46,9 +46,9 @@ export function Sila({ wartosc }: { wartosc: number }) {
   );
 }
 
-export function Zakladki({ aktywna }: { aktywna: "techniki" | "skrypty" | "obiekcje" | "struktura" | "akademia" }) {
+export function Zakladki({ aktywna, nazwaAkademii = "Akademia dla nowych" }: { aktywna: "techniki" | "skrypty" | "obiekcje" | "struktura" | "akademia"; nazwaAkademii?: string }) {
   const z = [
-    { id: "akademia", href: "/app/techniki?widok=akademia", nazwa: "Akademia dla nowych" },
+    { id: "akademia", href: "/app/techniki?widok=akademia", nazwa: nazwaAkademii },
     { id: "techniki", href: "/app/techniki", nazwa: "Techniki" },
     { id: "skrypty", href: "/app/techniki?widok=skrypty", nazwa: "Skrypty rozmów" },
     { id: "obiekcje", href: "/app/techniki?widok=obiekcje", nazwa: "Bank obiekcji" },

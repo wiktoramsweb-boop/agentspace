@@ -34,7 +34,7 @@ const IKONY: Record<StanLekcjiAkademii["rodzaj"], string> = {
  * mechanika co ścieżka AI Coacha (wjazd węzłów, rysowanie przejechanej drogi,
  * „Tu jesteś”), żeby nowa osoba od razu wiedziała, jak tego używać.
  */
-export function SciezkaAkademii({ stan }: { stan: StanAkademii }) {
+export function SciezkaAkademii({ stan, nazwa = "Akademia" }: { stan: StanAkademii; nazwa?: string }) {
   const [otwarta, setOtwarta] = useState<string | null>(null);
   const kontener = useRef<HTMLDivElement>(null);
 
@@ -160,7 +160,7 @@ export function SciezkaAkademii({ stan }: { stan: StanAkademii }) {
                 </button>
                 <div className={`${opis} ${poLewej ? "!right-28" : "!left-28"}`}>
                   <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{w.egzamin ? "Egzamin końcowy" : "Sprawdzian"}</p>
-                  <p className={`font-bold leading-snug ${s.dostepny || s.zaliczony ? "text-slate-900" : "text-slate-400"}`}>{w.egzamin ? "Certyfikat Akademii" : `${s.ile} pytań`}</p>
+                  <p className={`font-bold leading-snug ${s.dostepny || s.zaliczony ? "text-slate-900" : "text-slate-400"}`}>{w.egzamin ? `Certyfikat: ${nazwa}` : `${s.ile} pytań`}</p>
                   <p className="text-xs font-semibold" style={{ color: s.zaliczony ? k.tekst : s.najlepszy !== null ? "#b45309" : "#94a3b8" }}>
                     {s.najlepszy !== null ? `Najlepszy wynik ${s.najlepszy}/${s.ile} · próg ${s.prog}` : s.dostepny ? `Próg ${s.prog}/${s.ile}` : "po lekcjach z modułu"}
                   </p>

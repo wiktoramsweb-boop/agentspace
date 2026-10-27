@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { requireModul } from "@/lib/auth";
 import { postepAkademii } from "@/lib/data-akademia";
-import { sprawdzian, stanAkademii } from "@/lib/techniki/akademia";
+import { nazwaAkademii, sprawdzian, stanAkademii } from "@/lib/techniki/akademia";
 import { TECHNIKI } from "@/lib/techniki/techniki";
 import { Wstecz } from "../../../components/wstecz";
 import { Sprawdzian } from "./sprawdzian";
@@ -50,12 +50,12 @@ export default async function SprawdzianPage({ params }: Props) {
   return (
     <>
       <Wstecz href="/app/techniki?widok=akademia" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
-        ← Akademia
+        ← {nazwaAkademii(user.agency_id).krotka}
       </Wstecz>
       <Sprawdzian
         id={id}
-        tytul={s.tytul}
-        podtytul={modul ? `Moduł ${modul.nr}: ${modul.nazwa}` : "Wszystkie moduły Akademii"}
+        tytul={s.id === "egzamin" ? `Egzamin końcowy: ${nazwaAkademii(user.agency_id).krotka}` : s.tytul}
+        podtytul={modul ? `Moduł ${modul.nr}: ${modul.nazwa}` : `Wszystkie moduły: ${nazwaAkademii(user.agency_id).krotka}`}
         prog={s.prog}
         pytania={pytania}
         najlepszy={st.najlepszy}

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { requireModul } from "@/lib/auth";
 import { maModul } from "@/lib/role";
 import { postepAkademii } from "@/lib/data-akademia";
-import { stanAkademii } from "@/lib/techniki/akademia";
+import { nazwaAkademii, stanAkademii } from "@/lib/techniki/akademia";
+import { PowrotDoAkademii } from "./akademia/powrot";
 import { SciezkaAkademii } from "./akademia/sciezka-akademii";
 import { KATEGORIE, TECHNIKI, type Kategoria } from "@/lib/techniki/techniki";
 import { SKRYPTY, STRUKTURA } from "@/lib/techniki/skrypty";
@@ -13,7 +14,7 @@ import { BankObiekcji } from "./bank-obiekcji";
 
 export const metadata = { title: "Biblioteka technik" };
 
-type Props = { searchParams: Promise<{ widok?: string; k?: string; q?: string }> };
+type Props = { searchParams: Promise<{ widok?: string; k?: string; q?: string; akademia?: string }> };
 
 const bezOgonkow = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
 
@@ -46,7 +47,7 @@ export default async function TechnikiPage({ searchParams }: Props) {
         ))}
       </section>
 
-      <Zakladki aktywna={widok} />
+      <Zakladki aktywna={widok} nazwaAkademii={nazwaAkademii(user.agency_id).pelna} />
 
       {widok === "techniki" && (
         <>
@@ -118,6 +119,7 @@ export default async function TechnikiPage({ searchParams }: Props) {
       )}
 
       {widok === "akademia" && <Akademia user={user} />}
+      {(widok === "obiekcje" || widok === "struktura") && <PowrotDoAkademii user={user} lekcjaId={sp.akademia} />}
 
       {widok === "obiekcje" && <BankObiekcji lista={OBIEKCJE} nazwyTechnik={Object.fromEntries(TECHNIKI.map((t) => [t.slug, t.nazwa]))} />}
 
@@ -208,6 +210,7 @@ async function Akademia({ user }: { user: Awaited<ReturnType<typeof requireModul
     );
   }
   const stan = stanAkademii(wpisy);
+  const nazwa = nazwaAkademii(user.agency_id);
   const procent = Math.round((stan.lekcjiZrobionych / stan.lekcjiWszystkich) * 100);
   return (
     <>
@@ -215,10 +218,10 @@ async function Akademia({ user }: { user: Awaited<ReturnType<typeof requireModul
         <div className="relative overflow-hidden rounded-[28px] bg-slate-900 p-6 text-white">
           <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-amber-400/25 blur-3xl" aria-hidden="true" />
           <div className="relative">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-300">Akademia dla nowych</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-300">{nazwa.pelna}</p>
             <p className="mt-2 max-w-md text-lg font-semibold leading-snug">
               {stan.ukonczona
-                ? "Akademia ukończona. Teraz trenuj z klientem AI i wracaj do technik, kiedy chcesz."
+                ? `${nazwa.krotka} ukończona. Teraz trenuj z klientem AI i wracaj do technik, kiedy chcesz.`
                 : "Sześć modułów od pierwszej rozmowy do negocjacji. Lekcja, krótki sprawdzian, następny moduł."}
             </p>
             <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/15">
@@ -249,7 +252,7 @@ async function Akademia({ user }: { user: Awaited<ReturnType<typeof requireModul
           )}
         </div>
       </section>
-      <SciezkaAkademii stan={stan} />
+      <SciezkaAkademii stan={stan} nazwa={nazwa.krotka} />
     </>
   );
 }

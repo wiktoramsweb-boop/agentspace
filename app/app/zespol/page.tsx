@@ -28,6 +28,7 @@ import { TeamProfiles, type TeamProfile } from "./team-profiles";
 import { Avatar, avatarUrl } from "../components/avatar";
 import { APP_URL } from "@/lib/supabase/config";
 import { ludzieKierownika, oddzialyBiura } from "@/lib/oddzialy";
+import { nazwaAkademii } from "@/lib/techniki/akademia";
 import { OddzialyPanel, type WynikOddzialuWiersz } from "./oddzialy-panel";
 
 // Krótkie etykiety etapów lejka (klucz DB → skrót).
@@ -178,7 +179,7 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
                 href="/app/techniki/akademia/zespol"
                 className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:border-slate-400"
               >
-                Szkolenie (Akademia)
+                Szkolenie ({nazwaAkademii(agencyId).krotka})
               </Link>
               <Link
                 href="/app/zespol/dziennik"

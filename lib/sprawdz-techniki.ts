@@ -78,10 +78,14 @@ for (const l of WSZYSTKIE_LEKCJE) {
 }
 for (const s of WSZYSTKIE_SPRAWDZIANY) {
   sprawdz(`${s.id}: próg nie większy niż liczba pytań`, s.prog > 0 && s.prog <= s.pytania.length);
+  sprawdz(`${s.id}: próg co najmniej 70%`, s.prog / s.pytania.length >= 0.7);
   s.pytania.forEach((p, i) => {
     sprawdz(`${s.id}/${i}: poprawna odpowiedź istnieje`, p.poprawna >= 0 && p.poprawna < p.odpowiedzi.length);
     sprawdz(`${s.id}/${i}: odpowiedzi różne`, new Set(p.odpowiedzi).size === p.odpowiedzi.length);
     if (p.technika) sprawdz(`${s.id}/${i}: technika ${p.technika} istnieje`, slugi.has(p.technika));
+    // Dobrej odpowiedzi nie da się zgadnąć po długości: najwyżej o 15% dłuższa od najdłuższej złej.
+    const zle = p.odpowiedzi.filter((_, j) => j !== p.poprawna).map((o) => o.length);
+    sprawdz(`${s.id}/${i}: poprawna nie wyróżnia się długością (${p.odpowiedzi[p.poprawna].length} vs ${Math.max(...zle)})`, p.odpowiedzi[p.poprawna].length <= Math.max(...zle) * 1.15);
   });
 }
 {
@@ -96,11 +100,11 @@ for (const s of WSZYSTKIE_SPRAWDZIANY) {
   sprawdz("akademia: moduł 2 dalej zamknięty bez sprawdzianu", !poLekcjach.moduly[1].otwarty);
   const zdany = stanAkademii([...lekcje1, { item: "sprawdzian-1", passed: true, best: 5, attempts: 2, updated: teraz }]);
   sprawdz("akademia: zdany sprawdzian otwiera moduł 2", zdany.moduly[1].otwarty && zdany.moduly[0].ukonczony);
-  sprawdz("akademia: średnia z najlepszego wyniku", zdany.srednia === Math.round((5 / 6) * 100));
+  sprawdz("akademia: średnia z najlepszego wyniku", zdany.srednia === Math.round((5 / MODULY_AKADEMII[0].sprawdzian.pytania.length) * 100));
   const s1 = MODULY_AKADEMII[0].sprawdzian;
   sprawdz("ocena: wszystkie dobre", ocen(s1, s1.pytania.map((p) => p.poprawna)).wynik === s1.pytania.length);
   const dwieZle = s1.pytania.map((p, i) => (i < 2 ? (p.poprawna + 1) % p.odpowiedzi.length : p.poprawna));
-  sprawdz("ocena: dwie złe = próg 4/6 zaliczony", ocen(s1, dwieZle).zaliczony && ocen(s1, dwieZle).bledne.length === 2);
+  sprawdz("ocena: dwie złe = próg 5/7 zaliczony", ocen(s1, dwieZle).zaliczony && ocen(s1, dwieZle).bledne.length === 2);
   const trzyZle = s1.pytania.map((p, i) => (i < 3 ? (p.poprawna + 1) % p.odpowiedzi.length : p.poprawna));
   sprawdz("ocena: trzy złe = niezaliczony", !ocen(s1, trzyZle).zaliczony);
 }

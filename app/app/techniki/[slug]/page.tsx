@@ -6,8 +6,9 @@ import { getScenarios } from "@/lib/data";
 import { KATEGORIE, TECHNIKI, technika } from "@/lib/techniki/techniki";
 import { SKRYPTY } from "@/lib/techniki/skrypty";
 import { KOLOR, POZIOM, Rozmowa, Sila } from "../wspolne";
+import { PowrotDoAkademii } from "../akademia/powrot";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ akademia?: string }> };
 
 export async function generateMetadata({ params }: Props) {
   const t = technika((await params).slug);
@@ -33,8 +34,9 @@ function Lista({ tytul, punkty, styl }: { tytul: string; punkty: string[]; styl:
   );
 }
 
-export default async function TechnikaPage({ params }: Props) {
-  await requireModul("coach");
+export default async function TechnikaPage({ params, searchParams }: Props) {
+  const user = await requireModul("coach");
+  const { akademia } = await searchParams;
   const t = technika((await params).slug);
   if (!t) notFound();
 
@@ -207,6 +209,7 @@ export default async function TechnikaPage({ params }: Props) {
           </div>
         </section>
       )}
+      <PowrotDoAkademii user={user} lekcjaId={akademia} />
     </>
   );
 }

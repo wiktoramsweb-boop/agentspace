@@ -7,16 +7,18 @@ import { TECHNIKI } from "@/lib/techniki/techniki";
 import { skrypt } from "@/lib/techniki/skrypty";
 import { rozmowa } from "@/lib/techniki/rozmowy";
 import { RozmowaInteraktywna } from "./rozmowa-interaktywna";
+import { PowrotDoAkademii } from "../../akademia/powrot";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ akademia?: string }> };
 
 export async function generateMetadata({ params }: Props) {
   const s = skrypt((await params).slug);
   return { title: s ? s.nazwa : "Skrypt rozmowy" };
 }
 
-export default async function SkryptPage({ params }: Props) {
-  await requireModul("coach");
+export default async function SkryptPage({ params, searchParams }: Props) {
+  const user = await requireModul("coach");
+  const { akademia } = await searchParams;
   const s = skrypt((await params).slug);
   if (!s) notFound();
 
@@ -145,6 +147,7 @@ export default async function SkryptPage({ params }: Props) {
           </div>
         </div>
       </section>
+      <PowrotDoAkademii user={user} lekcjaId={akademia} />
     </>
   );
 }
