@@ -2,6 +2,7 @@ import { maV49 } from "../schemat";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { ZESPOL } from "./dane";
 import { zasiejKredytyDemo } from "./kredyty";
+import { zasiejPortalDemo } from "./portal";
 import { dateKeyPL } from "@/lib/datetime";
 import {
   generujCele,
@@ -265,7 +266,8 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
     .update({ is_demo: true, demo_refreshed_at: new Date().toISOString() })
     .eq("id", agencyId);
 
-  // Sprawy kredytowe (v53): nie mogą wywrócić odświeżenia demo.
+  // Portal klienta i sprawy kredytowe: nie mogą wywrócić odświeżenia demo.
+  await zasiejPortalDemo(agencyId, now).catch(() => null);
   await zasiejKredytyDemo(agencyId, now).catch(() => 0);
 
   return {
