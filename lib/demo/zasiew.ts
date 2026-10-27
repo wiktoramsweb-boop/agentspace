@@ -3,6 +3,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { ZESPOL } from "./dane";
 import { zasiejKredytyDemo } from "./kredyty";
 import { zasiejPortalDemo } from "./portal";
+import { zasiejOddzialyDemo } from "./oddzialy";
 import { dateKeyPL } from "@/lib/datetime";
 import {
   generujCele,
@@ -268,6 +269,7 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
 
   // Portal klienta i sprawy kredytowe: nie mogą wywrócić odświeżenia demo.
   await zasiejPortalDemo(agencyId, now).catch(() => null);
+  await zasiejOddzialyDemo(agencyId).catch(() => false);
   await zasiejKredytyDemo(agencyId, now).catch(() => 0);
 
   return {
