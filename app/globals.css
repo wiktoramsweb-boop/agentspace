@@ -3580,3 +3580,9 @@ html[data-theme="dark"] .animate-toast-in .bg-cyan-100 { background-color: rgba(
 html[data-theme="dark"] .animate-toast-in .text-emerald-600 { color: #34d399 !important; }
 html[data-theme="dark"] .animate-toast-in .text-red-600 { color: #f87171 !important; }
 html[data-theme="dark"] .animate-toast-in .text-cyan-600 { color: #22d3ee !important; }
+
+/* Rozmowa z rozgałęzieniami: każdy nowy krok i wynik wjeżdża od dołu. */
+.rozmowa-krok { animation: rozmowa-wjazd 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.rozmowa-wynik { animation: rozmowa-wjazd 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both; }
+@keyframes rozmowa-wjazd { from { opacity: 0; transform: translateY(12px); } }
+@media (prefers-reduced-motion: reduce) { .rozmowa-krok, .rozmowa-wynik { animation: none; } }

@@ -5,6 +5,7 @@
 
 import { TECHNIKI, KATEGORIE } from "./techniki/techniki.ts";
 import { SKRYPTY, STRUKTURA } from "./techniki/skrypty.ts";
+import { ROZMOWY } from "./techniki/rozmowy.ts";
 
 // Aktywne scenariusze z tabeli scenarios (stan z października 2026).
 const SCENARIUSZE = new Set([
@@ -42,7 +43,26 @@ for (const s of SKRYPTY) {
   for (const sc of s.scenariusze) sprawdz(`${s.slug}: scenariusz ${sc} istnieje`, SCENARIUSZE.has(sc));
 }
 
-const caly = JSON.stringify([TECHNIKI, SKRYPTY, STRUKTURA]);
+for (const [slug, d] of Object.entries(ROZMOWY)) {
+  sprawdz(`rozmowa ${slug}: skrypt istnieje`, SKRYPTY.some((s) => s.slug === slug));
+  sprawdz(`rozmowa ${slug}: start istnieje`, Boolean(d.wezly[d.start]));
+  const osiagalne = new Set<string>();
+  const kolejka = [d.start];
+  while (kolejka.length) {
+    const id = kolejka.pop()!;
+    if (osiagalne.has(id)) continue;
+    osiagalne.add(id);
+    const w = d.wezly[id];
+    sprawdz(`rozmowa ${slug}: węzeł ${id} istnieje`, Boolean(w));
+    if (!w) continue;
+    sprawdz(`rozmowa ${slug}/${id}: ma odpowiedzi albo koniec`, Boolean(w.koniec) !== Boolean(w.opcje?.length));
+    if (w.technika) sprawdz(`rozmowa ${slug}/${id}: technika ${w.technika} istnieje`, slugi.has(w.technika));
+    for (const o of w.opcje ?? []) kolejka.push(o.dalej);
+  }
+  for (const id of Object.keys(d.wezly)) sprawdz(`rozmowa ${slug}: węzeł ${id} jest osiągalny`, osiagalne.has(id));
+}
+
+const caly = JSON.stringify([TECHNIKI, SKRYPTY, STRUKTURA, ROZMOWY]);
 sprawdz("bez długich myślników w treściach", !caly.includes("—"));
 
 if (bledy) {

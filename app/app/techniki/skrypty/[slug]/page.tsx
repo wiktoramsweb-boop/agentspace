@@ -5,6 +5,8 @@ import { requireModul } from "@/lib/auth";
 import { getScenarios } from "@/lib/data";
 import { TECHNIKI } from "@/lib/techniki/techniki";
 import { skrypt } from "@/lib/techniki/skrypty";
+import { rozmowa } from "@/lib/techniki/rozmowy";
+import { RozmowaInteraktywna } from "./rozmowa-interaktywna";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -51,6 +53,11 @@ export default async function SkryptPage({ params }: Props) {
         </p>
       </header>
 
+      {rozmowa(s.slug) && (
+        <RozmowaInteraktywna drzewo={rozmowa(s.slug)!} nazwyTechnik={Object.fromEntries(TECHNIKI.map((t) => [t.slug, t.nazwa]))} />
+      )}
+
+      <h2 className="mb-4 text-lg font-semibold text-slate-900">Skrypt etap po etapie</h2>
       <ol className="relative mb-10 space-y-4 border-l-2 border-emerald-200 pl-6 md:pl-8">
         {s.etapy.map((e, i) => (
           <li key={e.nazwa} className="relative">
