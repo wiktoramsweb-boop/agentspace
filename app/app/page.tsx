@@ -28,6 +28,7 @@ import { stanDostepu } from "@/lib/abonament-cennik";
 import { DostepWstrzymany } from "./dostep-wstrzymany";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { ZastepstwoKarta } from "./zastepstwo-karta";
+import { PulpitWlasciciela } from "./components/pulpit-wlasciciela";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -101,6 +102,9 @@ export default async function DashboardPage() {
 
       {/* Przewodnik dla nowego biura (znika po domknięciu kroków niezbędnych) */}
       <BanerPrzewodnika przewodnik={przewodnik} />
+
+      {/* CEO i dyrektor: stan biura zanim zejdą do własnych spraw */}
+      {(user.role === "owner" || user.role === "director") && user.agency_id && <PulpitWlasciciela agencyId={user.agency_id} />}
 
       {/* Zastępstwo: sprawy osoby na urlopie, które przejmuję dziś */}
       {user.agency_id && <ZastepstwoKarta agencyId={user.agency_id} userId={user.id} />}
