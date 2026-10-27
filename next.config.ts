@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async redirects() {
+    // Dyżur AI zdjęty z oferty: stary adres prowadzi do listy narzędzi.
+    return [
+      { source: "/produkt/dyzur-ai", destination: "/produkt", permanent: false },
+      { source: "/en/produkt/dyzur-ai", destination: "/en/produkt", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

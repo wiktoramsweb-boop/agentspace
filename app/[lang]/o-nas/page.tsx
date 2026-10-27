@@ -38,7 +38,7 @@ export default async function ONas({ params }: { params: Promise<{ lang: string 
     { tytul: "Umowy, protokoły i świadectwa energetyczne", tekst: "Dokumenty z danych klienta i oferty w PDF, a świadectwo energetyczne zamawiasz prosto z karty nieruchomości." },
     { tytul: "Wycena z aktów notarialnych", tekst: "Ceny transakcyjne z Rejestru Cen Nieruchomości z korektami za piętro, stan i budynek, z raportem PDF dla właściciela." },
     { tytul: "AI Coach i biblioteka technik", tekst: `Trening rozmów z klientem AI głosem albo na piśmie, ${TECHNIKI.length} technik i ${SKRYPTY.length} skryptów rozmów z treningiem jednym kliknięciem.` },
-    { tytul: "Dyżur AI", tekst: "Asystentka głosowa odbiera telefony, których agent nie odebrał, i zapisuje lead z notatką z rozmowy." },
+    { tytul: "Portal klienta i doradca kredytowy", tekst: "Klient widzi w telefonie postęp sprzedaży i rozmawia z opiekunem, a kupujący z kredytem trafia do doradcy biura jednym kliknięciem." },
     { tytul: "Prowizje, faktury i wynik biura", tekst: "Rozliczenie prowizji agentów, faktury, koszty i wynik miesiąca z paczką dla księgowej." },
   ];
 

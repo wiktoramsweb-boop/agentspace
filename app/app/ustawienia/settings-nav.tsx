@@ -11,7 +11,6 @@ const COMPANY: Item[] = [
   { href: "/app/ustawienia/firma", label: "Dane firmy" },
   { href: "/app/ustawienia/znak-wodny", label: "Znak wodny i stemple" },
   { href: "/app/ustawienia/portale", label: "Portale ogłoszeniowe" },
-  { href: "/app/ustawienia/dyzur", label: "Dyżur AI (telefon)" },
   { href: "/app/ustawienia/kredyty", label: "Zużycie AI" },
   { href: "/app/ustawienia/import", label: "Import danych" },
   { href: "/app/ustawienia/eksport", label: "Eksport danych" },

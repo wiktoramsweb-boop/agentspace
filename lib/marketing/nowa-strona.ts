@@ -123,7 +123,7 @@ function pl(dni: number): NowaStrona {
       lead: "AgentSpace to CRM dla biur nieruchomości zbudowany wokół codziennej pracy agenta: od pierwszego telefonu, przez prezentację i umowę, po prowizję i wynik biura. Bez Excela, bez kartek, bez dokupowania osobnych narzędzi.",
       rzedy: [
         ["CRM klientów", "Priorytety na dziś", "Oferty na mapie", "Kalendarz", "Leady z reklam", "Poszukiwania", "Szybki wpis głosem", "Czat zespołu", "Asystent AI"],
-        ["AI Coach", "Biblioteka technik", "Umowy i PDF", "Świadectwa energetyczne", "Prowizje", "Wycena z RCN", "Dyżur AI", "Faktury", "Koszty i wynik", "Strona www biura"],
+        ["AI Coach", "Biblioteka technik", "Umowy i PDF", "Świadectwa energetyczne", "Prowizje", "Wycena z RCN", "Portal klienta", "Doradca kredytowy", "Faktury", "Koszty i wynik", "Strona www biura"],
       ],
       punkty: [
         { tytul: "Jedna baza", tekst: "Klient, oferta, rozmowa, umowa i prowizja są połączone. Nic nie przepisujesz dwa razy." },
@@ -242,7 +242,8 @@ function pl(dni: number): NowaStrona {
         { nazwa: "Cele", tytul: "Cel roczny rozpisany na dziś.", tekst: "Ile telefonów, spotkań i umów potrzeba dziś, żeby dowieźć wynik roku.", zrzut: "cele" },
         { nazwa: "Wycena z RCN", tytul: "Cena z aktów notarialnych, nie z ogłoszeń.", tekst: "Transakcje z Rejestru Cen Nieruchomości w okolicy, korekty za piętro, stan i budynek, a na koniec raport PDF dla właściciela.", zrzut: "wycena" },
         { nazwa: "Biblioteka technik", tytul: "Techniki i skrypty z treningiem.", tekst: "36 technik rozmowy z przykładami z rynku i 10 skryptów krok po kroku. Każdą przećwiczysz z klientem AI jednym kliknięciem.", zrzut: "techniki" },
-        { nazwa: "Dyżur AI", tytul: "Telefon odebrany w czasie prezentacji.", tekst: "Asystentka głosowa odbiera połączenia, których agent nie odebrał, i zapisuje lead z notatką z rozmowy.", zrzut: "dyzur" },
+        { nazwa: "Portal klienta", tytul: "Klient widzi postęp, zamiast dzwonić.", tekst: "Sprzedający dostaje portal z logo biura: status oferty, prezentacje, wiadomości z opiekunem i powiadomienia na telefon.", zrzut: "portal" },
+        { nazwa: "Doradca kredytowy", tytul: "Kredyt kupującego pod kontrolą.", tekst: "Agent przekazuje klienta doradcy z karty klienta. Etapy, lista dokumentów i status kredytu widoczny także w portalu klienta.", zrzut: "kredyty" },
         { nazwa: "Świadectwa", tytul: "Świadectwo energetyczne z karty oferty.", tekst: "Formularz wypełnia się danymi nieruchomości, dodajesz zdjęcia budynku i wybierasz termin, nawet 24 godziny.", zrzut: "swiadectwa" },
       ],
     },
@@ -498,7 +499,8 @@ function en(dni: number): NowaStrona {
         { nazwa: "Goals", tytul: "The yearly goal, broken down to today.", tekst: "How many calls, meetings and contracts you need today to hit the year.", zrzut: "cele" },
         { nazwa: "Valuation", tytul: "Prices from notarial deeds, not listings.", tekst: "Transactions from the public price register nearby, adjustments for floor, condition and building, and a PDF report for the owner.", zrzut: "wycena" },
         { nazwa: "Technique library", tytul: "Techniques and scripts with practice.", tekst: "36 conversation techniques with real estate examples and 10 step-by-step call scripts. Practise any of them with the AI client in one click.", zrzut: "techniki" },
-        { nazwa: "AI on call", tytul: "Calls answered during viewings.", tekst: "A voice assistant picks up calls the agent missed and saves a lead with a call summary.", zrzut: "dyzur" },
+        { nazwa: "Client portal", tytul: "Clients see progress instead of calling.", tekst: "Sellers get a portal with your logo: listing status, viewings, messages with their agent and phone notifications.", zrzut: "portal" },
+        { nazwa: "Mortgage advisor", tytul: "The buyer's mortgage under control.", tekst: "Agents hand clients to the advisor from the client card. Stages, a document checklist and loan status in the client portal.", zrzut: "kredyty" },
         { nazwa: "Energy certificates", tytul: "Order an energy certificate from the listing.", tekst: "The form fills in from the property, you add building photos and pick a deadline, as fast as 24 hours.", zrzut: "swiadectwa" },
       ],
     },

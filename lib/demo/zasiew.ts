@@ -1,6 +1,7 @@
 import { maV49 } from "../schemat";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { ZESPOL } from "./dane";
+import { zasiejKredytyDemo } from "./kredyty";
 import { dateKeyPL } from "@/lib/datetime";
 import {
   generujCele,
@@ -86,7 +87,8 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
     .select("id, full_name, role, monthly_goal_pln")
     .eq("agency_id", agencyId);
 
-  const zespol = (profile ?? []) as { id: string; full_name: string | null; role: string; monthly_goal_pln: number | null }[];
+  // Doradca kredytowy nie prowadzi klientów ani ofert, dostaje tylko sprawy kredytowe.
+  const zespol = ((profile ?? []) as { id: string; full_name: string | null; role: string; monthly_goal_pln: number | null }[]).filter((p) => p.role !== "credit_advisor");
   if (zespol.length === 0) throw new Error("To biuro nie ma żadnego użytkownika.");
 
   // Dane dostają WSZYSCY, razem z właścicielem.
@@ -262,6 +264,9 @@ export async function zasiejDemo(agencyId: string, now = new Date()): Promise<Wy
     .from("agencies")
     .update({ is_demo: true, demo_refreshed_at: new Date().toISOString() })
     .eq("id", agencyId);
+
+  // Sprawy kredytowe (v53): nie mogą wywrócić odświeżenia demo.
+  await zasiejKredytyDemo(agencyId, now).catch(() => 0);
 
   return {
     brakMigracji: Boolean(znacznikErr),

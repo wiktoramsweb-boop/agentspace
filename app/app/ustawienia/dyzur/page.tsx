@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { requireOwner } from "@/lib/auth";
 import { getDyzur } from "@/lib/dyzur";
 import { getAgencyAgents } from "@/lib/data-activities";
@@ -11,6 +12,8 @@ export const metadata = { title: "Dyżur AI" };
 const pole = "mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/15";
 
 export default async function DyzurPage() {
+  // Dyżur AI jest na razie wyłączony z produktu; kod zostaje na później.
+  if (process.env.DYZUR_WLACZONY !== "1") redirect("/app/ustawienia");
   const owner = await requireOwner();
   const cfg = await getDyzur(owner.agency_id!);
   const agenci = await getAgencyAgents(owner.agency_id!);

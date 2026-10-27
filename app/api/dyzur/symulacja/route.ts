@@ -9,6 +9,7 @@ export const maxDuration = 30;
 type Wiadomosc = { role: "user" | "assistant"; content: string };
 
 export async function POST(req: Request) {
+  if (process.env.DYZUR_WLACZONY !== "1") return Response.json({ error: "Dyżur AI jest wyłączony" }, { status: 404 });
   const user = await getCurrentUser();
   if (!user?.agency_id) return Response.json({ error: "Nie zalogowano" }, { status: 401 });
   let body: { wiadomosci?: unknown };

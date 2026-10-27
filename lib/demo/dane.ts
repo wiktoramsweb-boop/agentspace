@@ -41,6 +41,7 @@ export const ZESPOL = [
   { imie: "Klara", nazwisko: "Sikorska", rola: "agent", celMiesieczny: 12000, stanowisko: "Doradczyni ds. najmu", telefon: "+48 500 100 203" },
   { imie: "Bartosz", nazwisko: "Lis", rola: "agent", celMiesieczny: 11000, stanowisko: "Doradca nieruchomości", telefon: "+48 500 100 204" },
   { imie: "Emilia", nazwisko: "Rutkowska", rola: "agent", celMiesieczny: 9000, stanowisko: "Młodsza doradczyni nieruchomości", telefon: "+48 500 100 205" },
+  { imie: "Marta", nazwisko: "Kowalczyk", rola: "credit_advisor", celMiesieczny: 0, stanowisko: "Doradczyni kredytowa", telefon: "+48 500 100 206" },
 ];
 
 /* ── losowość powtarzalna ─────────────────────────────────── */

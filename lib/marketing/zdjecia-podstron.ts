@@ -46,7 +46,6 @@ const GOTOWE = new Set<string>([
   "naglowek-rodo",
   "naglowek-koszty-i-wynik",
   "naglowek-wycena-rcn",
-  "naglowek-dyzur-ai",
   "naglowek-swiadectwa-energetyczne",
   "naglowek-biblioteka-technik",
   "scena-crm",
@@ -79,7 +78,6 @@ const GOTOWE = new Set<string>([
   "rozwin-cennik",
   "scena-biblioteka-technik",
   "scena-swiadectwa-energetyczne",
-  "scena-dyzur-ai",
 ]);
 
 const N = (klucz: string, gdzie: string, scena: string, zapas: string): Zdjecie => ({ klucz, gdzie, proporcje: "16:9", scena, zapas });
@@ -123,7 +121,8 @@ export const ZDJECIA: Zdjecie[] = [
   N("naglowek-rodo", "/produkt/rodo", "Zamknięta na klucz szafa na dokumenty w biurze, mosiężny zamek w ostrości, reszta rozmyta.", "/wzory/schody.jpg"),
   N("naglowek-koszty-i-wynik", "/produkt/koszty-i-wynik", "Zbliżenie na wykres liniowy na ekranie laptopa (rozmyty), obok paragon i długopis. Granatowe tło, zielona linia.", "/zdjecia/wnetrze-biura.jpg"),
   N("naglowek-wycena-rcn", "/produkt/wycena-rcn", "Widok z góry (dron) na kwartał krakowskich kamienic i nowego budynku, miękkie wieczorne światło, wyraźne dachy i podwórka.", "/wzory/kamienica.jpg"),
-  N("naglowek-dyzur-ai", "/produkt/dyzur-ai", "Telefon biurowy na pustym biurku wieczorem, ekran świeci przychodzącym połączeniem, krzesło puste. Za oknem ciemne miasto.", "/wzory/miasto-noc.jpg"),
+  N("naglowek-portal-klienta", "/produkt/portal-klienta", "Dłoń trzyma telefon nad stołem w jasnym mieszkaniu, na ekranie (rozmyty) widok statusu sprzedaży, obok klucze i kubek kawy.", "/zdjecia/odbior-kluczy.jpg"),
+  N("naglowek-kredyty", "/produkt/kredyty", "Para przy stole z doradcą, na stole teczka z dokumentami i laptop (ekran rozmyty). Ciepłe, dzienne światło, kadr zza ramienia.", "/zdjecia/transakcja.jpg"),
   N("naglowek-swiadectwa-energetyczne", "/produkt/swiadectwa-energetyczne", "Elewacja ocieplonego bloku z nowymi oknami w słońcu, kadr od dołu, czyste niebo, energooszczędny charakter.", "/wzory/dziedziniec.jpg"),
   N("naglowek-biblioteka-technik", "/produkt/biblioteka-technik", "Półka z kilkoma książkami o negocjacjach (grzbiety bez czytelnych napisów), na niej słuchawki i karteczki z notatkami. Ciepłe światło.", "/zdjecia/rozmowa-audyt.jpg"),
 
@@ -152,7 +151,8 @@ export const ZDJECIA: Zdjecie[] = [
   S("scena-rodo", "/produkt/rodo, sekcja problemu", "Pendrive leżący na ławce w parku, obok kubek kawy na wynos.", "/wzory/park.jpg"),
   S("scena-koszty-i-wynik", "/produkt/koszty-i-wynik, sekcja problemu", "Właściciel biura liczy na kalkulatorze przy stole z rachunkami za najem, prąd i reklamy.", "/zdjecia/plan-dnia.jpg"),
   S("scena-wycena-rcn", "/produkt/wycena-rcn, sekcja problemu", "Właścicielka mieszkania pokazuje agentowi na telefonie ogłoszenie sąsiada z wysoką ceną, agent trzyma teczkę.", "/zdjecia/rozmowa-audyt.jpg"),
-  S("scena-dyzur-ai", "/produkt/dyzur-ai, sekcja problemu", "Agent na prezentacji mieszkania, w kieszeni wibruje telefon, którego nie może odebrać.", "/zdjecia/prezentacja.jpg"),
+  S("scena-portal-klienta", "/produkt/portal-klienta, sekcja problemu", "Sprzedająca siedzi na kanapie i patrzy w telefon bez nowych wiadomości, za nią zdjęte już obrazy oparte o ścianę.", "/zdjecia/miedzy-spotkaniami.jpg"),
+  S("scena-kredyty", "/produkt/kredyty, sekcja problemu", "Kupujący przegląda stos zaświadczeń z banku przy kuchennym stole, wieczór, lampka.", "/zdjecia/pierwsze-wnioski.jpg"),
   S("scena-swiadectwa-energetyczne", "/produkt/swiadectwa-energetyczne, sekcja problemu", "Agent fotografuje elewację bloku telefonem, w drugiej ręce kartka z listą danych budynku.", "/biuro/budynek.jpg"),
   S("scena-biblioteka-technik", "/produkt/biblioteka-technik, sekcja problemu", "Dwie osoby przy stole negocjują, jedna przesuwa kartkę z liczbą w stronę drugiej. Kadr na dłonie.", "/zdjecia/pozyskanie.jpg"),
 
