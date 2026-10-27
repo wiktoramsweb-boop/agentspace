@@ -22,7 +22,8 @@ export type Modul =
   | "zespol"
   | "ustawienia"
   | "abonament"
-  | "coach";
+  | "coach"
+  | "kredyty";
 
 export type OpisModulu = { id: Modul; nazwa: string; opis: string };
 
@@ -37,6 +38,7 @@ export const MODULY: OpisModulu[] = [
   { id: "ustawienia", nazwa: "Ustawienia firmy", opis: "Dane firmy, logo, strona www, opcje biura." },
   { id: "abonament", nazwa: "Abonament", opis: "Zakup i przedłużanie abonamentu." },
   { id: "coach", nazwa: "AI Coach i cele", opis: "Trening rozmów, historia sesji, cele osobiste." },
+  { id: "kredyty", nazwa: "Kredyty", opis: "Sprawy kredytowe klientów: przekazanie doradcy, etap, dokumenty." },
 ];
 
 /** Jak szeroko dana osoba widzi dane biura. */
@@ -56,7 +58,8 @@ export type UserRole =
   | "assistant"
   | "accountant"
   | "coordinator"
-  | "trainee";
+  | "trainee"
+  | "credit_advisor";
 
 export type OpisRoli = {
   id: UserRole;
@@ -94,21 +97,21 @@ export const ROLE: OpisRoli[] = [
     id: "manager",
     nazwa: "Menedżer",
     opis: "Prowadzi zespół agentów i sam sprzedaje. Widzi ich pracę i swoje prowizje, ale nie kwoty cudzych.",
-    moduly: ["klienci", "nieruchomosci", "dokumenty", "prowizje", "zespol", "coach"],
+    moduly: ["klienci", "nieruchomosci", "dokumenty", "prowizje", "zespol", "coach", "kredyty"],
     zakres: "zespol",
   },
   {
     id: "agent",
     nazwa: "Agent",
     opis: "Pracuje na swoich klientach i ofertach.",
-    moduly: ["klienci", "nieruchomosci", "dokumenty", "prowizje", "coach"],
+    moduly: ["klienci", "nieruchomosci", "dokumenty", "prowizje", "coach", "kredyty"],
     zakres: "wlasne",
   },
   {
     id: "assistant",
     nazwa: "Asystent biura",
     opis: "Wprowadza dane i obsługuje dokumenty dla całego zespołu. Bez dostępu do pieniędzy.",
-    moduly: ["klienci", "nieruchomosci", "dokumenty"],
+    moduly: ["klienci", "nieruchomosci", "dokumenty", "kredyty"],
     zakres: "wszystko",
   },
   {
@@ -132,6 +135,13 @@ export const ROLE: OpisRoli[] = [
     moduly: ["nieruchomosci", "coach"],
     zakres: "wlasne",
   },
+  {
+    id: "credit_advisor",
+    nazwa: "Doradca kredytowy",
+    opis: "Prowadzi kredyty klientów przekazanych przez agentów. Widzi tylko swoje sprawy kredytowe, bez bazy klientów i ofert biura.",
+    moduly: ["kredyty", "coach"],
+    zakres: "wlasne",
+  },
 ];
 
 export const ROLE_LABELS: Record<UserRole, string> = Object.fromEntries(
@@ -139,7 +149,8 @@ export const ROLE_LABELS: Record<UserRole, string> = Object.fromEntries(
 ) as Record<UserRole, string>;
 
 export function opisRoli(role: string | null | undefined): OpisRoli {
-  return ROLE.find((r) => r.id === role) ?? ROLE[ROLE.length - 1];
+  // Nieznana rola dostaje najwęższy zestaw (stażysta), a nie ostatnią z listy.
+  return ROLE.find((r) => r.id === role) ?? ROLE.find((r) => r.id === "trainee")!;
 }
 
 /**

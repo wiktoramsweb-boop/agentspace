@@ -3,6 +3,10 @@ import { todayPL } from "@/lib/datetime";
 import { mozeUsunac } from "@/lib/uprawnienia";
 import { maskPhone } from "@/lib/format";
 import Link from "next/link";
+import { KredytKlienta } from "./kredyt-klienta";
+import { sprawyKlienta, doradcyBiura } from "@/lib/data-kredyty";
+import { etapKredytu } from "@/lib/kredyt-etapy";
+import { maModul } from "@/lib/role";
 import { BellIcon } from "../../components/icons";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -158,6 +162,11 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
     dokumenty: documents.docs.length,
   };
 
+  // Kredyt: tylko dla osób z modułem „Kredyty” (agent, menedżer, CEO).
+  const kredyt = maModul(user, "kredyty")
+    ? { sprawy: await sprawyKlienta(user, client.id), doradcy: (await doradcyBiura(user.agency_id)).map((d) => ({ id: d.id, name: d.name })) }
+    : null;
+
   return (
     <>
       <Wstecz href="/app/klienci" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-emerald-600">
@@ -254,6 +263,25 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
               <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-slate-500">Status</h2>
               <StatusChanger clientId={client.id} current={client.status} />
             </Card>
+
+            {kredyt && (
+              <Card>
+                <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">Kredyt</h2>
+                <KredytKlienta
+                  clientId={client.id}
+                  doradcy={kredyt.doradcy}
+                  sprawy={kredyt.sprawy.map((k) => ({
+                    id: k.id,
+                    etap: etapKredytu(k.stage).nazwa,
+                    kolor: etapKredytu(k.stage).kolor,
+                    kwota: k.amount_pln ? formatPln(k.amount_pln) : "kwota do ustalenia",
+                    bank: k.bank,
+                    doradca: k.doradca?.name ?? null,
+                    dokumenty: `${k.documents.filter((d) => d.jest).length}/${k.documents.length}`,
+                  }))}
+                />
+              </Card>
+            )}
 
             <ClientDetails client={contact} />
 

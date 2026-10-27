@@ -107,3 +107,41 @@ export function opisNieruchomosci(
     .filter(Boolean)
     .join(" · ");
 }
+
+/** Karta „Twój kredyt” na starcie portalu: etap, brakujące dokumenty, telefon do doradcy. */
+export function KartaKredytu({ k }: { k: { etap: string; opis: string; numer: number; z: number; brakuje: string[]; doradca: string | null; telefon: string | null } | null }) {
+  if (!k) return null;
+  return (
+    <div className="portal-kredyt">
+      <div className="portal-kredyt-gora">
+        <b>Twój kredyt</b>
+        <span>
+          etap {k.numer} z {k.z}
+        </span>
+      </div>
+      <div className="portal-etapy" aria-hidden="true">
+        {Array.from({ length: k.z }, (_, i) => (
+          <span key={i} className={i < k.numer ? "za-nami" : undefined} />
+        ))}
+      </div>
+      <p className="portal-kredyt-etap">{k.etap}</p>
+      <p className="portal-kredyt-opis">{k.opis}</p>
+      {k.brakuje.length > 0 && (
+        <div className="portal-kredyt-docs">
+          <small>Do dostarczenia</small>
+          <ul>
+            {k.brakuje.slice(0, 8).map((d) => (
+              <li key={d}>{d}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {k.doradca && (
+        <a className="portal-kredyt-kontakt" href={k.telefon ? `tel:${k.telefon}` : undefined}>
+          {k.doradca}
+          <span>{k.telefon ? "Twój doradca kredytowy · zadzwoń" : "Twój doradca kredytowy"}</span>
+        </a>
+      )}
+    </div>
+  );
+}

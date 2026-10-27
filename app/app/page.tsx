@@ -31,6 +31,8 @@ import { ZastepstwoKarta } from "./zastepstwo-karta";
 
 export default async function DashboardPage() {
   const user = await requireUser();
+  // Doradca kredytowy nie ma telefonów, ofert ani celów agenta: jego pulpitem jest tablica kredytów.
+  if (user.role === "credit_advisor") redirect("/app/kredyty");
   const firstName = (user.full_name ?? "").split(" ")[0] || "Cześć";
 
   const przewodnik = await getPrzewodnik(user);

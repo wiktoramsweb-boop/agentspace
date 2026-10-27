@@ -33,6 +33,7 @@ const ROLE_BADGE: Record<UserRole, string> = {
   accountant: "bg-emerald-100 text-emerald-700",
   coordinator: "bg-teal-100 text-teal-700",
   trainee: "bg-zinc-100 text-zinc-600",
+  credit_advisor: "bg-sky-100 text-sky-700",
 };
 
 /**

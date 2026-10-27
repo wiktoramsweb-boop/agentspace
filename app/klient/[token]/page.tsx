@@ -5,10 +5,11 @@ import {
   nieruchomosciKlienta,
   ofertyKupujacego,
   procesNieruchomosci,
+  kredytKlienta,
 } from "@/lib/data-portal";
 import { ReakcjaOferty } from "./reakcja";
 import { PanelNieruchomosci } from "./nieruchomosc";
-import { Foto, opisNieruchomosci, kwota } from "./wspolne";
+import { Foto, opisNieruchomosci, kwota, KartaKredytu } from "./wspolne";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,7 @@ export default async function PortalStart({
   const { f } = await searchParams;
   const dostep = await dostepPoTokenie(token);
   if (!dostep) notFound();
+  const kredyt = await kredytKlienta(dostep);
 
   /* ── Kupujący: oferty dobrane przez agenta ── */
   if (dostep.rodzaj === "kupujacy") {
@@ -47,6 +49,7 @@ export default async function PortalStart({
         <div className="portal-top">
           <h1>Oferty dla Ciebie</h1>
         </div>
+        <KartaKredytu k={kredyt} />
         <p className="portal-sub">
           {wszystkie.length > 0
             ? "Zaznacz, które Ci się podobają. Agent zobaczy to od razu."
@@ -109,6 +112,7 @@ export default async function PortalStart({
         <div className="portal-top">
           <h1>Twoja sprawa</h1>
         </div>
+        <KartaKredytu k={kredyt} />
         <div className="portal-pusto">
           Nie ma jeszcze przypisanej nieruchomości.
           <br />
@@ -128,6 +132,7 @@ export default async function PortalStart({
         <div className="portal-top">
           <h1>Twoja nieruchomość</h1>
         </div>
+        <KartaKredytu k={kredyt} />
         <PanelNieruchomosci token={token} dane={dane} />
       </>
     );
@@ -138,6 +143,7 @@ export default async function PortalStart({
       <div className="portal-top">
         <h1>Twoje nieruchomości</h1>
       </div>
+        <KartaKredytu k={kredyt} />
       <p className="portal-sub">Tu zobaczysz, co dzieje się w każdej ze spraw.</p>
 
       {lista.map((n) => (

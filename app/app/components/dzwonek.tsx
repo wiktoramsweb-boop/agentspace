@@ -199,6 +199,7 @@ const KOLOR: Record<string, string> = {
   trening: "bg-cyan-500/20 text-cyan-300",
   cena: "bg-emerald-500/20 text-emerald-300",
   portal: "bg-rose-500/20 text-rose-300",
+  kredyt: "bg-blue-500/20 text-blue-300",
 };
 
 const SCIEZKA: Record<string, string> = {
@@ -211,6 +212,7 @@ const SCIEZKA: Record<string, string> = {
   trening: "M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z",
   cena: "M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941",
   portal: "M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3",
+  kredyt: "M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z",
 };
 
 function Ikona({ kind }: { kind: string }) {

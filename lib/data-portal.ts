@@ -440,3 +440,41 @@ export async function ofertaDlaKupujacego(d: DostepKlienta, propertyId: string):
     year_built: (data as { year_built?: number | null } | null)?.year_built ?? null,
   };
 }
+
+/* ─────────────── Kredyt klienta (doradca kredytowy biura) ─────────────── */
+
+export type KredytDlaKlienta = { etap: string; opis: string; numer: number; z: number; brakuje: string[]; doradca: string | null; telefon: string | null } | null;
+
+/**
+ * Najnowsza otwarta sprawa kredytowa klienta, przycięta do tego, co klient
+ * może zobaczyć: etap, brakujące dokumenty i kontakt do doradcy. Bez kwot
+ * prowizji i notatek biura. Brak tabeli (przed v53) = brak karty.
+ */
+export async function kredytKlienta(d: DostepKlienta): Promise<KredytDlaKlienta> {
+  const { ETAPY_KREDYTU } = await import("./kredyt-etapy");
+  const admin = createSupabaseAdmin();
+  const { data, error } = await admin
+    .from("credit_cases")
+    .select("stage, documents, advisor_id")
+    .eq("agency_id", d.agency_id)
+    .eq("client_id", d.client_id)
+    .neq("stage", "odrzucone")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error || !data) return null;
+  const glowne = ETAPY_KREDYTU.filter((e) => e.id !== "odrzucone");
+  const i = glowne.findIndex((e) => e.id === data.stage);
+  const etap = glowne[Math.max(0, i)];
+  const docs = (Array.isArray(data.documents) ? data.documents : []) as { nazwa: string; jest: boolean }[];
+  const { data: dor } = data.advisor_id ? await admin.from("profiles").select("full_name, phone").eq("id", data.advisor_id).maybeSingle() : { data: null };
+  return {
+    etap: etap.nazwa,
+    opis: etap.dlaKlienta,
+    numer: Math.max(0, i) + 1,
+    z: glowne.length,
+    brakuje: docs.filter((x) => !x.jest).map((x) => x.nazwa),
+    doradca: (dor?.full_name as string | null) ?? null,
+    telefon: (dor?.phone as string | null) ?? null,
+  };
+}

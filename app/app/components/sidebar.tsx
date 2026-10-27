@@ -317,7 +317,7 @@ function DolnyPasek({
     return i && (!i.modul || maModul({ id: "", role, permissions }, i.modul)) ? i : null;
   };
   // Osoba bez dostępu do klientów (np. sama księgowość) dostaje zamienniki.
-  const lewe = [dostepne("/app"), dostepne("/app/klienci") ?? dostepne("/app/dzialania")];
+  const lewe = [dostepne("/app"), dostepne("/app/klienci") ?? dostepne("/app/kredyty") ?? dostepne("/app/dzialania")];
   const prawe = [dostepne("/app/kalendarz") ?? dostepne("/app/trening")];
   const srodek = dostepne("/app/szybki-wpis");
 

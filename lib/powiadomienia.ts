@@ -20,7 +20,8 @@ export type RodzajPowiadomienia =
   | "zastepstwo"
   | "trening"
   | "cena"
-  | "portal";
+  | "portal"
+  | "kredyt";
 
 export type Powiadomienie = {
   rodzaj?: RodzajPowiadomienia;
