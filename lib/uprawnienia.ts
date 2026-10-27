@@ -38,6 +38,9 @@ export function mozeEdytowacTransakcje(user: Kto, deal: ZOpiekunem): boolean {
   return user.role === "owner" || deal.agent_id === user.id;
 }
 
+/** Kto widzi rozliczenie prowizji całego biura (kwoty wszystkich osób). */
+export const ROZLICZAJACY = ["owner", "director", "accountant"];
+
 /** Raporty finansowe całego biura. */
 export function widziRaportyBiura(user: Kto): boolean {
   return user.role === "owner";

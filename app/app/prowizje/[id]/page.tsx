@@ -11,6 +11,9 @@ import { formatPln } from "@/lib/format";
 import { TransactionCardEditor } from "./transaction-card-editor";
 import { daneProwizji } from "@/lib/data-prowizje";
 import { EdytujTransakcjeButton } from "../deal-controls";
+import { podzialyTransakcji } from "@/lib/data-zasady-prowizji";
+import { getAgencyMembers } from "@/lib/data";
+import { PodzialProwizji } from "./podzial-prowizji";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -28,6 +31,7 @@ export default async function DealDetailPage({ params }: Props) {
   const dane = await daneProwizji(deal.agent_id, deal.agency_id);
   const widok = dane.transakcje.find((t) => t.id === deal.id);
   const status = DEAL_STATUSES.find((s) => s.value === deal.status);
+  const [podzialy, czlonkowie] = await Promise.all([podzialyTransakcji(deal.agency_id, deal.id), getAgencyMembers(deal.agency_id)]);
 
   return (
     <>
@@ -82,6 +86,21 @@ export default async function DealDetailPage({ params }: Props) {
           <Fin label="Twój zarobek" value={formatPln(deal.agent_earnings_pln)} accent />
         </div>
       </Card>
+
+      {podzialy.ready && (
+        <Card className="mb-6">
+          <p className="mb-1 text-sm font-semibold text-slate-900">Podział prowizji</p>
+          <p className="mb-3 text-sm text-slate-500">Współagent, agent drugiej strony albo osoba, która poleciła klienta. Liczone od prowizji netto biura.</p>
+          <PodzialProwizji
+            dealId={deal.id}
+            lista={podzialy.lista}
+            udzialAgenta={deal.agent_split_pct ?? 0}
+            osoby={czlonkowie
+              .filter((m) => m.id !== deal.agent_id && m.role !== "accountant")
+              .map((m) => ({ id: m.id, name: m.full_name ?? m.email ?? "Osoba" }))}
+          />
+        </Card>
+      )}
 
       <TransactionCardEditor dealId={deal.id} initial={card} />
     </>

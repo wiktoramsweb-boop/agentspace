@@ -4,16 +4,51 @@ import { daneProwizji } from "@/lib/data-prowizje";
 import { StatCard } from "../components/ui";
 import { formatPln } from "@/lib/format";
 import { ProwizjePanel } from "./panel";
+import Link from "next/link";
+import { ROZLICZAJACY } from "@/lib/uprawnienia";
+import { domyslnyUdzial, getZasadyProwizji } from "@/lib/data-zasady-prowizji";
+import { nastepnyProg } from "@/lib/zasady-prowizji";
 
 export default async function ProwizjePage() {
   const user = await requireModul("prowizje");
-  const [stats, dane] = await Promise.all([getCommissionStats(user.id), daneProwizji(user.id, user.agency_id)]);
+  const [stats, dane, udzial, { zasady }] = await Promise.all([
+    getCommissionStats(user.id),
+    daneProwizji(user.id, user.agency_id),
+    domyslnyUdzial(user),
+    getZasadyProwizji(user.agency_id),
+  ]);
+  const nastepny = udzial.zProgu ? nastepnyProg(zasady.progi, udzial.neto) : null;
+  const rozlicza = ROZLICZAJACY.includes(user.role);
 
   const goal = user.monthly_goal_pln ?? 0;
   const progress = goal > 0 ? Math.min(100, Math.round((stats.monthClosed / goal) * 100)) : 0;
 
   const statystyki = (
     <>
+      {(udzial.zProgu || rozlicza) && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
+          {udzial.zProgu ? (
+            <p className="text-sm text-slate-700">
+              Twój udział z progów biura: <strong className="text-slate-900">{udzial.pct}%</strong>
+              {nastepny ? (
+                <span className="text-slate-500">
+                  {" "}
+                  · do {nastepny.pct}% brakuje {formatPln(nastepny.brakuje)} prowizji netto
+                </span>
+              ) : (
+                <span className="text-slate-500"> · najwyższy próg</span>
+              )}
+            </p>
+          ) : (
+            <p className="text-sm text-slate-500">Podział prowizji między agentów, menedżerów i sieć.</p>
+          )}
+          {rozlicza && (
+            <Link href="/app/prowizje/rozliczenie" className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">
+              Rozliczenie miesiąca →
+            </Link>
+          )}
+        </div>
+      )}
       {goal > 0 && (
         <div className="hero-goal mb-4 rounded-2xl border border-slate-200 bg-white p-5">
           <div className="mb-2 flex items-end justify-between gap-3">
@@ -62,7 +97,7 @@ export default async function ProwizjePage() {
       oferty={dane.ofertyWybor}
       klienci={dane.klienciWybor}
       podpowiedzi={dane.podpowiedzi}
-      defaultSplit={user.default_split_pct ?? 50}
+      defaultSplit={udzial.pct}
       statystyki={statystyki}
     />
   );

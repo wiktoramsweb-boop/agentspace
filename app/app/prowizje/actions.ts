@@ -9,6 +9,8 @@ import type { DealStatus } from "@/lib/types";
 import { after } from "next/server";
 import { poZamknieciuTransakcji } from "@/lib/zdarzenia";
 import { zapiszZdarzenie } from "@/lib/dziennik";
+import { domyslnyUdzial } from "@/lib/data-zasady-prowizji";
+import { netto, podzialMiesciSie } from "@/lib/zasady-prowizji";
 
 function num(v: FormDataEntryValue | null): number {
   const n = parseInt(String(v ?? "0").replace(/\s/g, ""), 10);
@@ -66,7 +68,7 @@ export async function createDeal(formData: FormData): Promise<SaveResult> {
     title,
     property_id: propertyId,
     client_id: clientId,
-    ...kwotyZFormularza(formData, user.default_split_pct ?? 50),
+    ...kwotyZFormularza(formData, (await domyslnyUdzial(user)).pct),
     status: "w_toku",
   });
 
@@ -109,6 +111,7 @@ export async function updateDeal(dealId: string, formData: FormData): Promise<Sa
   const { error } = await admin.from("deals").update(zmiany).eq("id", dealId).eq("agency_id", user.agency_id);
   if (error) return { ok: false, error: `Nie udało się zapisać zmian: ${error.message}` };
 
+  if (deal.commission_pln !== zmiany.commission_pln) await przeliczPodzialy(admin, dealId, Number(zmiany.commission_pln) || 0);
   if (user.agency_id && deal.commission_pln !== zmiany.commission_pln) {
     await zapiszZdarzenie({
       agencyId: user.agency_id,
@@ -183,4 +186,70 @@ export async function updateTransactionCard(
   if (!count) return { error: "Nie zapisano: nie znaleziono transakcji." };
   revalidatePath(`/app/prowizje/${dealId}`);
   return {};
+}
+
+const ROLE_PODZIALU = ["wspolagent", "polecajacy", "inny"];
+
+/** Kwoty współagentów liczone od aktualnej prowizji transakcji. */
+async function przeliczPodzialy(admin: ReturnType<typeof createSupabaseAdmin>, dealId: string, commissionPln: number) {
+  const { data } = await admin.from("deal_splits").select("id, pct").eq("deal_id", dealId);
+  for (const s of (data ?? []) as { id: string; pct: number }[]) {
+    await admin.from("deal_splits").update({ kwota_pln: Math.round((netto(commissionPln) * Number(s.pct)) / 100) }).eq("id", s.id);
+  }
+}
+
+/** Współagent albo polecający dostaje procent prowizji netto biura z tej transakcji. */
+export async function dodajPodzial(dealId: string, profileId: string, rola: string, pct: number): Promise<SaveResult> {
+  const user = await requireUser();
+  const admin = createSupabaseAdmin();
+  const { data: deal } = await admin
+    .from("deals")
+    .select("agent_id, agency_id, title, commission_pln, agent_split_pct")
+    .eq("id", dealId)
+    .eq("agency_id", user.agency_id)
+    .maybeSingle();
+  if (!deal || !mozeEdytowacTransakcje(user, deal)) return { ok: false, error: "Podział ustala opiekun transakcji albo CEO." };
+  if (profileId === deal.agent_id) return { ok: false, error: "Prowadzący agent ma już swój udział w kwotach transakcji." };
+  const osoba = await idZBiura(admin, "profiles", profileId, user.agency_id);
+  if (!osoba) return { ok: false, error: "Tej osoby nie ma w biurze." };
+  const procent = Math.round(Number(pct) * 100) / 100;
+  if (!(procent > 0 && procent <= 100)) return { ok: false, error: "Podaj procent od 1 do 100." };
+
+  const { data: obecne, error: bladOdczytu } = await admin.from("deal_splits").select("profile_id, pct").eq("deal_id", dealId);
+  if (bladOdczytu) return { ok: false, error: "Podział prowizji wymaga migracji lib/SETUP-v54-oddzialy-prowizje.sql." };
+  const pozostale = ((obecne ?? []) as { profile_id: string; pct: number }[]).filter((s) => s.profile_id !== profileId).map((s) => ({ pct: Number(s.pct) }));
+  if (!podzialMiesciSie(deal.agent_split_pct ?? 0, [...pozostale, { pct: procent }])) {
+    return { ok: false, error: `Razem z udziałem prowadzącego (${deal.agent_split_pct}%) wychodzi ponad 100% prowizji netto.` };
+  }
+
+  const { error } = await admin.from("deal_splits").upsert(
+    {
+      deal_id: dealId,
+      agency_id: user.agency_id,
+      profile_id: profileId,
+      rola: ROLE_PODZIALU.includes(rola) ? rola : "wspolagent",
+      pct: procent,
+      kwota_pln: Math.round((netto(deal.commission_pln ?? 0) * procent) / 100),
+    },
+    { onConflict: "deal_id,profile_id" },
+  );
+  if (error) return { ok: false, error: error.message };
+  await zapiszZdarzenie({ agencyId: user.agency_id!, actorId: user.id, akcja: "podzial_prowizji", rodzaj: "transakcja", id: dealId, opis: `Podział prowizji ${deal.title}: ${procent}% dla osoby ${profileId}` });
+  revalidatePath(`/app/prowizje/${dealId}`);
+  revalidatePath("/app/prowizje/rozliczenie");
+  return { ok: true };
+}
+
+export async function usunPodzial(dealId: string, splitId: string): Promise<SaveResult> {
+  const user = await requireUser();
+  const admin = createSupabaseAdmin();
+  const { data: deal } = await admin.from("deals").select("agent_id, title").eq("id", dealId).eq("agency_id", user.agency_id).maybeSingle();
+  if (!deal || !mozeEdytowacTransakcje(user, deal)) return { ok: false, error: "Podział ustala opiekun transakcji albo CEO." };
+  const { data } = await admin.from("deal_splits").delete().eq("id", splitId).eq("deal_id", dealId).select("pct");
+  if (data?.length) {
+    await zapiszZdarzenie({ agencyId: user.agency_id!, actorId: user.id, akcja: "podzial_prowizji", rodzaj: "transakcja", id: dealId, opis: `Usunięto podział ${data[0].pct}% z transakcji ${deal.title}` });
+  }
+  revalidatePath(`/app/prowizje/${dealId}`);
+  revalidatePath("/app/prowizje/rozliczenie");
+  return { ok: true };
 }
