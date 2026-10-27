@@ -191,7 +191,7 @@ export async function wyslijTydzienBiura(agencyId: string, tylkoDo?: string): Pr
 
   const t = await tydzienBiura(agencyId);
   const resend = new Resend(key);
-  let ile = 0;
+  let wyslane = 0;
   for (const to of adresy) {
     const { error } = await resend.emails.send({
       from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
@@ -199,7 +199,7 @@ export async function wyslijTydzienBiura(agencyId: string, tylkoDo?: string): Pr
       subject: `Tydzień w biurze: ${ag.name}${doUwagi(t).length ? ` · ${ile(doUwagi(t).length, ["sprawa", "sprawy", "spraw"])} do uwagi` : ""}`,
       html: html(ag.name as string, t),
     });
-    if (!error) ile++;
+    if (!error) wyslane++;
   }
-  return ile;
+  return wyslane;
 }
