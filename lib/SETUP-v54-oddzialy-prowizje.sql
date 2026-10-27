@@ -82,3 +82,4 @@ create table if not exists public.migration_requests (
   created_at timestamptz not null default now()
 );
 alter table public.migration_requests enable row level security;
+

@@ -352,13 +352,13 @@ export function FormularzSwiadectwa({ oferty, start }: { oferty: OfertaDoSwiadec
         <div className="rounded-3xl bg-slate-900 p-6 text-white">
           <p className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Twoje zamówienie</p>
           <p className="mt-2 text-lg font-semibold">{CENY_OBIEKTU[z.typ].nazwa}</p>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-300">
             {TRYBY[z.tryb].nazwa}, {TRYBY[z.tryb].opis}
           </p>
           <p className="mt-4 text-3xl font-bold tabular-nums">{cena.netto} zł</p>
-          <p className="text-sm text-slate-400">netto ({cena.brutto} zł brutto)</p>
+          <p className="text-sm text-slate-300">netto ({cena.brutto} zł brutto)</p>
           <div className="my-5 h-px bg-white/10" />
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Co otrzymasz</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-300">Co otrzymasz</p>
           <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
             <li>✓ PDF świadectwa z podpisem kwalifikowanym</li>
             <li>✓ Wpis do centralnego rejestru (CEEB)</li>
@@ -370,7 +370,7 @@ export function FormularzSwiadectwa({ oferty, start }: { oferty: OfertaDoSwiadec
           <button type="button" onClick={zamow} disabled={czeka} className="mt-5 w-full rounded-xl bg-emerald-400 px-5 py-3 text-sm font-bold text-slate-900 transition hover:bg-emerald-300 disabled:opacity-60">
             {czeka ? postep ?? "Wysyłam…" : "Zamów świadectwo →"}
           </button>
-          <p className="mt-3 text-xs text-slate-500">Świadectwo przygotowuje uprawniony audytor energetyczny współpracujący z AgentSpace.</p>
+          <p className="mt-3 text-xs text-slate-400">Świadectwo przygotowuje uprawniony audytor energetyczny współpracujący z AgentSpace.</p>
         </div>
       </aside>
     </div>

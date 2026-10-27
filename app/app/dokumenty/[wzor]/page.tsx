@@ -9,6 +9,7 @@ import type { Kontekst } from "@/lib/dokumenty/silnik";
 import { PageHeader } from "../../components/ui";
 import { Generator, type Rekord } from "./generator";
 import { klientDoDokumentu, ofertaDoDokumentu } from "../wzory-actions";
+import { szkic as wczytajSzkic, szkiceOsoby } from "@/lib/data-szkice";
 
 function adresZMiastem(adres: string | null, miasto: string | null): string {
   const a = (adres ?? "").trim();
@@ -27,7 +28,7 @@ export default async function WzorPage({
   searchParams,
 }: {
   params: Promise<{ wzor: string }>;
-  searchParams: Promise<{ klient?: string; oferta?: string }>;
+  searchParams: Promise<{ klient?: string; oferta?: string; szkic?: string }>;
 }) {
   const [{ wzor: id }, sp] = await Promise.all([params, searchParams]);
   const w = wzor(id);
@@ -36,7 +37,7 @@ export default async function WzorPage({
   const user = await requireModul("dokumenty");
   const agencyId = user.agency_id;
   const admin = createSupabaseAdmin();
-  const [settings, klienciRes, ofertyRes] = await Promise.all([
+  const [settings, klienciRes, ofertyRes, szkicStart, szkice] = await Promise.all([
     getAgencySettings(agencyId, user.agency?.name),
     w.poleKlienta && agencyId
       ? admin.from("clients").select("id, name, city").eq("agency_id", agencyId).order("updated_at", { ascending: false }).limit(800)
@@ -44,6 +45,8 @@ export default async function WzorPage({
     w.zOferty && agencyId
       ? admin.from("properties").select("id, title, address, city, offer_no").eq("agency_id", agencyId).order("updated_at", { ascending: false }).limit(800)
       : Promise.resolve({ data: [] as { id: string; title: string; address: string | null; city: string | null; offer_no?: string | null }[] }),
+    sp.szkic ? wczytajSzkic(agencyId, user.id, sp.szkic) : Promise.resolve(null),
+    szkiceOsoby(agencyId, user.id),
   ]);
 
   const c = settings.company;
@@ -93,6 +96,8 @@ export default async function WzorPage({
         startStrona={zKlienta?.ok ? zKlienta.strona : undefined}
         startUkryte={zKlienta?.ok ? zKlienta.ukryte : false}
         startPola={zOferty?.ok ? zOferty.pola : undefined}
+        startSzkic={szkicStart && szkicStart.wzorId === w.id ? szkicStart : null}
+        szkiceDzialaja={szkice.ready}
       />
     </>
   );

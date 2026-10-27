@@ -1,5 +1,7 @@
 "use client";
 
+import { PasekSzkicu } from "../dokumenty/pasek-szkicu";
+
 import { useState } from "react";
 import { Select } from "../components/select";
 import { Pole, Sekcja, PrzyciskDodaj, PrzyciskUsun, PasekAkcji, pole } from "../dokumenty-wzory/klocki";
@@ -48,6 +50,7 @@ export function ProtokolCreator({ city, stopka }: { city: string; stopka?: strin
 
   return (
     <div className="space-y-5">
+      <PasekSzkicu wzorId="protokol" tytul="Protokół zdawczo-odbiorczy" dane={d} onWczytaj={setD} />
       <Sekcja tytul="Podstawa" opis="Dane, które trafią do pierwszego akapitu protokołu.">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>

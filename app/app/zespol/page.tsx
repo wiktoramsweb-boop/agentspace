@@ -79,8 +79,9 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
     oddzialyBiura(agencyId),
   ]);
   const funnelByAgent = await getTeamFunnelProgress(ranking.map((a) => a.id));
+  // Doradca kredytowy nie dzwoni z celem telefonów, więc alerty o braku telefonów go nie dotyczą.
   const insights = await getTeamInsights(
-    ranking.map((a) => ({ id: a.id, name: a.full_name ?? a.email ?? "Agent" })),
+    ranking.filter((a) => a.role !== "credit_advisor").map((a) => ({ id: a.id, name: a.full_name ?? a.email ?? "Agent" })),
   );
 
   // Dane tylko dla CEO.

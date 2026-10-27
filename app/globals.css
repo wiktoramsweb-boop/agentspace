@@ -886,26 +886,33 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .btn-ink:hover {
   background-color: #ffffff !important;
 }
 
-/* Grafitowe przyciski i plakietki (bg-slate-900 z białym napisem) w ciemnym
-   motywie zostawały granatowe na prawie czarnym tle: słabo widoczne i nieczytelne.
-   Odwracamy je jak .btn-ink: jasne tło, ciemny napis. Półprzezroczyste tła okien
-   (bg-slate-900/40 itp.) to inne klasy i zostają ciemne. */
-html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-slate-900:not(.app-sidebar *),
-html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-slate-800.text-white:not(.app-sidebar *) {
+/* Grafitowe elementy (bg-slate-900) w ciemnym motywie.
+   Małe przyciski i plakietki odwracamy jak .btn-ink (jasne tło, ciemny napis),
+   bo granat na prawie czarnym tle ginął. Duże panele (karta „Ścieżka nauki”,
+   podsumowanie zamówienia, struktura rozmowy) zostają ciemne, tylko o stopień
+   jaśniejsze od karty, z delikatną krawędzią: odwrócone na jasno świeciły na
+   ciemnym ekranie, a ich zielone i szare napisy znikały. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(a, button, span, b, label, summary).bg-slate-900:not(.app-sidebar *, :is(.p-5, .p-6, .p-7, .p-8, .rounded-3xl, [class*="rounded-[2"], [class*="rounded-[3"])),
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(a, button, span, b, label).bg-slate-800.text-white:not(.app-sidebar *, :is(.p-5, .p-6, .p-7, .p-8, .rounded-3xl, [class*="rounded-[2"], [class*="rounded-[3"])) {
   background-color: #e4e4e7 !important;
   color: #09090b !important;
 }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.bg-slate-900, .bg-slate-800.text-white):not(.app-sidebar *) :is(.text-white, [class*="text-white/"], .text-slate-100, .text-slate-200, .text-slate-300) {
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(a, button, span, b, label, summary):is(.bg-slate-900, .bg-slate-800.text-white):not(.app-sidebar *, :is(.p-5, .p-6, .p-7, .p-8, .rounded-3xl, [class*="rounded-[2"], [class*="rounded-[3"])) :is(.text-white, .text-slate-100, .text-slate-200, .text-slate-300) {
   color: #09090b !important;
 }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.bg-slate-900, .bg-slate-800.text-white):not(.app-sidebar *) [class*="text-white/"] {
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(a, button, span, b, label, summary):is(.bg-slate-900, .bg-slate-800.text-white):not(.app-sidebar *, :is(.p-5, .p-6, .p-7, .p-8, .rounded-3xl, [class*="rounded-[2"], [class*="rounded-[3"])) [class*="text-white/"] {
   color: rgba(9, 9, 11, 0.62) !important;
 }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.hover\:bg-slate-800, .hover\:bg-slate-700):not(.app-sidebar *):hover {
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(a, button):is(.hover\:bg-slate-800, .hover\:bg-slate-700):not(.app-sidebar *):hover {
   background-color: #ffffff !important;
 }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) .from-slate-900:not(.app-sidebar *) { --tw-gradient-from: #e4e4e7 !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) .to-slate-800:not(.app-sidebar *) { --tw-gradient-to: #d4d4d8 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(:not(a, button, span, b, label, summary), :is(.p-5, .p-6, .p-7, .p-8, .rounded-3xl, [class*="rounded-[2"], [class*="rounded-[3"])).bg-slate-900:not(.app-sidebar *),
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(:not(a, button, span, b, label), :is(.p-5, .p-6, .p-7, .p-8, .rounded-3xl, [class*="rounded-[2"], [class*="rounded-[3"])).bg-slate-800:not(.app-sidebar *) {
+  background-color: #1d1d22 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .from-slate-900:not(.app-sidebar *) { --tw-gradient-from: #1d1d22 !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .to-slate-800:not(.app-sidebar *) { --tw-gradient-to: #232329 !important; }
 
 /* Połysk przesuwający się po pasku postępu wgrywania zdjęć. Samo przesuwanie
    paska przy wolnym łączu wygląda jak zawieszenie; połysk pokazuje, że praca trwa. */
@@ -970,6 +977,1490 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) {
     radial-gradient(900px 500px at -8% 108%, rgba(56, 189, 248, 0.06), transparent 62%),
     #09090b !important;
   color: #e4e4e7 !important;
+}
+
+
+/* ── Ciemny motyw: reguły ogólne dla wszystkich kolorów ──
+   Wcześniej ciemny motyw nadpisywał klasy pojedynczo i każda nowa klasa
+   (np. bg-emerald-50/50, bg-slate-100/70) zostawała jasną plamą z jasnym
+   tekstem. Tu zamieniamy całe rodziny kolorów: jasne tła (50–200, także
+   z przezroczystością) na przyciemnione odcienie tego samego koloru, a ciemne
+   napisy (600–950) na jasne. Szczegółowe nadpisania niżej mają pierwszeństwo,
+   bo stoją później w pliku. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-red-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-red-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-red-50/"] {
+  background-color: rgba(239,68,68, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-red-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-red-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-red-100/"] {
+  background-color: rgba(239,68,68, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-red-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-red-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-red-200/"] {
+  background-color: rgba(239,68,68, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-red-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-red-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-red-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-red-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-red-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-red-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-red-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-red-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-red-300/"] {
+  border-color: rgba(239,68,68, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-red-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-red-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-red-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-red-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-red-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-red-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-red-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-red-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-red-300/"] {
+  --tw-ring-color: rgba(239,68,68, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-red-600"] {
+  color: #f87171 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-red-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-red-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-red-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-red-950"] {
+  color: #fca5a5 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-red-50"] {
+  --tw-gradient-from: rgba(239,68,68, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-red-50"] {
+  --tw-gradient-via: rgba(239,68,68, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-red-50"] {
+  --tw-gradient-to: rgba(239,68,68, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-red-100"] {
+  --tw-gradient-from: rgba(239,68,68, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-red-100"] {
+  --tw-gradient-via: rgba(239,68,68, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-red-100"] {
+  --tw-gradient-to: rgba(239,68,68, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-red-200"] {
+  --tw-gradient-from: rgba(239,68,68, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-red-200"] {
+  --tw-gradient-via: rgba(239,68,68, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-red-200"] {
+  --tw-gradient-to: rgba(239,68,68, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-orange-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-orange-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-orange-50/"] {
+  background-color: rgba(249,115,22, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-orange-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-orange-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-orange-100/"] {
+  background-color: rgba(249,115,22, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-orange-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-orange-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-orange-200/"] {
+  background-color: rgba(249,115,22, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-orange-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-orange-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-orange-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-orange-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-orange-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-orange-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-orange-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-orange-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-orange-300/"] {
+  border-color: rgba(249,115,22, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-orange-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-orange-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-orange-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-orange-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-orange-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-orange-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-orange-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-orange-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-orange-300/"] {
+  --tw-ring-color: rgba(249,115,22, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-orange-600"] {
+  color: #fb923c !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-orange-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-orange-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-orange-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-orange-950"] {
+  color: #fdba74 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-orange-50"] {
+  --tw-gradient-from: rgba(249,115,22, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-orange-50"] {
+  --tw-gradient-via: rgba(249,115,22, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-orange-50"] {
+  --tw-gradient-to: rgba(249,115,22, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-orange-100"] {
+  --tw-gradient-from: rgba(249,115,22, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-orange-100"] {
+  --tw-gradient-via: rgba(249,115,22, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-orange-100"] {
+  --tw-gradient-to: rgba(249,115,22, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-orange-200"] {
+  --tw-gradient-from: rgba(249,115,22, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-orange-200"] {
+  --tw-gradient-via: rgba(249,115,22, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-orange-200"] {
+  --tw-gradient-to: rgba(249,115,22, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-amber-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-amber-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-amber-50/"] {
+  background-color: rgba(245,158,11, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-amber-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-amber-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-amber-100/"] {
+  background-color: rgba(245,158,11, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-amber-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-amber-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-amber-200/"] {
+  background-color: rgba(245,158,11, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-amber-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-amber-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-amber-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-amber-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-amber-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-amber-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-amber-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-amber-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-amber-300/"] {
+  border-color: rgba(245,158,11, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-amber-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-amber-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-amber-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-amber-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-amber-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-amber-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-amber-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-amber-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-amber-300/"] {
+  --tw-ring-color: rgba(245,158,11, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-amber-600"] {
+  color: #fbbf24 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-amber-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-amber-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-amber-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-amber-950"] {
+  color: #fcd34d !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-amber-50"] {
+  --tw-gradient-from: rgba(245,158,11, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-amber-50"] {
+  --tw-gradient-via: rgba(245,158,11, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-amber-50"] {
+  --tw-gradient-to: rgba(245,158,11, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-amber-100"] {
+  --tw-gradient-from: rgba(245,158,11, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-amber-100"] {
+  --tw-gradient-via: rgba(245,158,11, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-amber-100"] {
+  --tw-gradient-to: rgba(245,158,11, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-amber-200"] {
+  --tw-gradient-from: rgba(245,158,11, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-amber-200"] {
+  --tw-gradient-via: rgba(245,158,11, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-amber-200"] {
+  --tw-gradient-to: rgba(245,158,11, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-yellow-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-yellow-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-yellow-50/"] {
+  background-color: rgba(234,179,8, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-yellow-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-yellow-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-yellow-100/"] {
+  background-color: rgba(234,179,8, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-yellow-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-yellow-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-yellow-200/"] {
+  background-color: rgba(234,179,8, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-yellow-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-yellow-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-yellow-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-yellow-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-yellow-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-yellow-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-yellow-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-yellow-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-yellow-300/"] {
+  border-color: rgba(234,179,8, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-yellow-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-yellow-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-yellow-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-yellow-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-yellow-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-yellow-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-yellow-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-yellow-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-yellow-300/"] {
+  --tw-ring-color: rgba(234,179,8, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-yellow-600"] {
+  color: #facc15 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-yellow-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-yellow-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-yellow-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-yellow-950"] {
+  color: #fde047 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-yellow-50"] {
+  --tw-gradient-from: rgba(234,179,8, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-yellow-50"] {
+  --tw-gradient-via: rgba(234,179,8, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-yellow-50"] {
+  --tw-gradient-to: rgba(234,179,8, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-yellow-100"] {
+  --tw-gradient-from: rgba(234,179,8, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-yellow-100"] {
+  --tw-gradient-via: rgba(234,179,8, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-yellow-100"] {
+  --tw-gradient-to: rgba(234,179,8, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-yellow-200"] {
+  --tw-gradient-from: rgba(234,179,8, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-yellow-200"] {
+  --tw-gradient-via: rgba(234,179,8, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-yellow-200"] {
+  --tw-gradient-to: rgba(234,179,8, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-lime-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-lime-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-lime-50/"] {
+  background-color: rgba(132,204,22, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-lime-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-lime-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-lime-100/"] {
+  background-color: rgba(132,204,22, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-lime-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-lime-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-lime-200/"] {
+  background-color: rgba(132,204,22, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-lime-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-lime-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-lime-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-lime-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-lime-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-lime-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-lime-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-lime-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-lime-300/"] {
+  border-color: rgba(132,204,22, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-lime-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-lime-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-lime-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-lime-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-lime-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-lime-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-lime-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-lime-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-lime-300/"] {
+  --tw-ring-color: rgba(132,204,22, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-lime-600"] {
+  color: #a3e635 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-lime-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-lime-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-lime-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-lime-950"] {
+  color: #bef264 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-lime-50"] {
+  --tw-gradient-from: rgba(132,204,22, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-lime-50"] {
+  --tw-gradient-via: rgba(132,204,22, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-lime-50"] {
+  --tw-gradient-to: rgba(132,204,22, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-lime-100"] {
+  --tw-gradient-from: rgba(132,204,22, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-lime-100"] {
+  --tw-gradient-via: rgba(132,204,22, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-lime-100"] {
+  --tw-gradient-to: rgba(132,204,22, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-lime-200"] {
+  --tw-gradient-from: rgba(132,204,22, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-lime-200"] {
+  --tw-gradient-via: rgba(132,204,22, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-lime-200"] {
+  --tw-gradient-to: rgba(132,204,22, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-green-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-green-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-green-50/"] {
+  background-color: rgba(34,197,94, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-green-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-green-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-green-100/"] {
+  background-color: rgba(34,197,94, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-green-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-green-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-green-200/"] {
+  background-color: rgba(34,197,94, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-green-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-green-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-green-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-green-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-green-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-green-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-green-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-green-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-green-300/"] {
+  border-color: rgba(34,197,94, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-green-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-green-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-green-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-green-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-green-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-green-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-green-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-green-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-green-300/"] {
+  --tw-ring-color: rgba(34,197,94, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-green-600"] {
+  color: #4ade80 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-green-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-green-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-green-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-green-950"] {
+  color: #86efac !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-green-50"] {
+  --tw-gradient-from: rgba(34,197,94, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-green-50"] {
+  --tw-gradient-via: rgba(34,197,94, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-green-50"] {
+  --tw-gradient-to: rgba(34,197,94, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-green-100"] {
+  --tw-gradient-from: rgba(34,197,94, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-green-100"] {
+  --tw-gradient-via: rgba(34,197,94, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-green-100"] {
+  --tw-gradient-to: rgba(34,197,94, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-green-200"] {
+  --tw-gradient-from: rgba(34,197,94, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-green-200"] {
+  --tw-gradient-via: rgba(34,197,94, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-green-200"] {
+  --tw-gradient-to: rgba(34,197,94, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-emerald-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-emerald-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-emerald-50/"] {
+  background-color: rgba(16,185,129, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-emerald-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-emerald-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-emerald-100/"] {
+  background-color: rgba(16,185,129, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-emerald-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-emerald-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-emerald-200/"] {
+  background-color: rgba(16,185,129, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-emerald-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-emerald-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-emerald-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-emerald-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-emerald-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-emerald-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-emerald-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-emerald-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-emerald-300/"] {
+  border-color: rgba(16,185,129, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-emerald-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-emerald-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-emerald-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-emerald-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-emerald-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-emerald-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-emerald-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-emerald-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-emerald-300/"] {
+  --tw-ring-color: rgba(16,185,129, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-emerald-600"] {
+  color: #34d399 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-emerald-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-emerald-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-emerald-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-emerald-950"] {
+  color: #6ee7b7 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-emerald-50"] {
+  --tw-gradient-from: rgba(16,185,129, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-emerald-50"] {
+  --tw-gradient-via: rgba(16,185,129, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-emerald-50"] {
+  --tw-gradient-to: rgba(16,185,129, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-emerald-100"] {
+  --tw-gradient-from: rgba(16,185,129, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-emerald-100"] {
+  --tw-gradient-via: rgba(16,185,129, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-emerald-100"] {
+  --tw-gradient-to: rgba(16,185,129, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-emerald-200"] {
+  --tw-gradient-from: rgba(16,185,129, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-emerald-200"] {
+  --tw-gradient-via: rgba(16,185,129, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-emerald-200"] {
+  --tw-gradient-to: rgba(16,185,129, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-teal-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-teal-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-teal-50/"] {
+  background-color: rgba(20,184,166, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-teal-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-teal-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-teal-100/"] {
+  background-color: rgba(20,184,166, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-teal-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-teal-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-teal-200/"] {
+  background-color: rgba(20,184,166, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-teal-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-teal-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-teal-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-teal-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-teal-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-teal-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-teal-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-teal-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-teal-300/"] {
+  border-color: rgba(20,184,166, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-teal-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-teal-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-teal-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-teal-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-teal-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-teal-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-teal-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-teal-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-teal-300/"] {
+  --tw-ring-color: rgba(20,184,166, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-teal-600"] {
+  color: #2dd4bf !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-teal-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-teal-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-teal-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-teal-950"] {
+  color: #5eead4 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-teal-50"] {
+  --tw-gradient-from: rgba(20,184,166, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-teal-50"] {
+  --tw-gradient-via: rgba(20,184,166, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-teal-50"] {
+  --tw-gradient-to: rgba(20,184,166, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-teal-100"] {
+  --tw-gradient-from: rgba(20,184,166, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-teal-100"] {
+  --tw-gradient-via: rgba(20,184,166, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-teal-100"] {
+  --tw-gradient-to: rgba(20,184,166, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-teal-200"] {
+  --tw-gradient-from: rgba(20,184,166, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-teal-200"] {
+  --tw-gradient-via: rgba(20,184,166, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-teal-200"] {
+  --tw-gradient-to: rgba(20,184,166, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-cyan-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-cyan-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-cyan-50/"] {
+  background-color: rgba(6,182,212, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-cyan-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-cyan-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-cyan-100/"] {
+  background-color: rgba(6,182,212, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-cyan-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-cyan-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-cyan-200/"] {
+  background-color: rgba(6,182,212, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-cyan-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-cyan-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-cyan-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-cyan-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-cyan-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-cyan-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-cyan-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-cyan-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-cyan-300/"] {
+  border-color: rgba(6,182,212, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-cyan-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-cyan-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-cyan-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-cyan-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-cyan-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-cyan-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-cyan-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-cyan-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-cyan-300/"] {
+  --tw-ring-color: rgba(6,182,212, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-cyan-600"] {
+  color: #22d3ee !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-cyan-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-cyan-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-cyan-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-cyan-950"] {
+  color: #67e8f9 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-cyan-50"] {
+  --tw-gradient-from: rgba(6,182,212, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-cyan-50"] {
+  --tw-gradient-via: rgba(6,182,212, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-cyan-50"] {
+  --tw-gradient-to: rgba(6,182,212, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-cyan-100"] {
+  --tw-gradient-from: rgba(6,182,212, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-cyan-100"] {
+  --tw-gradient-via: rgba(6,182,212, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-cyan-100"] {
+  --tw-gradient-to: rgba(6,182,212, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-cyan-200"] {
+  --tw-gradient-from: rgba(6,182,212, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-cyan-200"] {
+  --tw-gradient-via: rgba(6,182,212, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-cyan-200"] {
+  --tw-gradient-to: rgba(6,182,212, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-sky-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-sky-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-sky-50/"] {
+  background-color: rgba(14,165,233, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-sky-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-sky-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-sky-100/"] {
+  background-color: rgba(14,165,233, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-sky-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-sky-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-sky-200/"] {
+  background-color: rgba(14,165,233, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-sky-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-sky-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-sky-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-sky-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-sky-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-sky-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-sky-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-sky-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-sky-300/"] {
+  border-color: rgba(14,165,233, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-sky-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-sky-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-sky-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-sky-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-sky-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-sky-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-sky-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-sky-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-sky-300/"] {
+  --tw-ring-color: rgba(14,165,233, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-sky-600"] {
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-sky-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-sky-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-sky-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-sky-950"] {
+  color: #7dd3fc !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-sky-50"] {
+  --tw-gradient-from: rgba(14,165,233, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-sky-50"] {
+  --tw-gradient-via: rgba(14,165,233, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-sky-50"] {
+  --tw-gradient-to: rgba(14,165,233, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-sky-100"] {
+  --tw-gradient-from: rgba(14,165,233, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-sky-100"] {
+  --tw-gradient-via: rgba(14,165,233, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-sky-100"] {
+  --tw-gradient-to: rgba(14,165,233, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-sky-200"] {
+  --tw-gradient-from: rgba(14,165,233, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-sky-200"] {
+  --tw-gradient-via: rgba(14,165,233, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-sky-200"] {
+  --tw-gradient-to: rgba(14,165,233, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-blue-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-blue-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-blue-50/"] {
+  background-color: rgba(59,130,246, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-blue-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-blue-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-blue-100/"] {
+  background-color: rgba(59,130,246, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-blue-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-blue-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-blue-200/"] {
+  background-color: rgba(59,130,246, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-blue-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-blue-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-blue-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-blue-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-blue-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-blue-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-blue-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-blue-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-blue-300/"] {
+  border-color: rgba(59,130,246, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-blue-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-blue-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-blue-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-blue-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-blue-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-blue-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-blue-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-blue-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-blue-300/"] {
+  --tw-ring-color: rgba(59,130,246, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-blue-600"] {
+  color: #60a5fa !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-blue-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-blue-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-blue-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-blue-950"] {
+  color: #93c5fd !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-blue-50"] {
+  --tw-gradient-from: rgba(59,130,246, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-blue-50"] {
+  --tw-gradient-via: rgba(59,130,246, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-blue-50"] {
+  --tw-gradient-to: rgba(59,130,246, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-blue-100"] {
+  --tw-gradient-from: rgba(59,130,246, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-blue-100"] {
+  --tw-gradient-via: rgba(59,130,246, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-blue-100"] {
+  --tw-gradient-to: rgba(59,130,246, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-blue-200"] {
+  --tw-gradient-from: rgba(59,130,246, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-blue-200"] {
+  --tw-gradient-via: rgba(59,130,246, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-blue-200"] {
+  --tw-gradient-to: rgba(59,130,246, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-indigo-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-indigo-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-indigo-50/"] {
+  background-color: rgba(99,102,241, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-indigo-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-indigo-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-indigo-100/"] {
+  background-color: rgba(99,102,241, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-indigo-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-indigo-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-indigo-200/"] {
+  background-color: rgba(99,102,241, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-indigo-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-indigo-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-indigo-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-indigo-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-indigo-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-indigo-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-indigo-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-indigo-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-indigo-300/"] {
+  border-color: rgba(99,102,241, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-indigo-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-indigo-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-indigo-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-indigo-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-indigo-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-indigo-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-indigo-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-indigo-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-indigo-300/"] {
+  --tw-ring-color: rgba(99,102,241, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-indigo-600"] {
+  color: #818cf8 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-indigo-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-indigo-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-indigo-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-indigo-950"] {
+  color: #a5b4fc !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-indigo-50"] {
+  --tw-gradient-from: rgba(99,102,241, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-indigo-50"] {
+  --tw-gradient-via: rgba(99,102,241, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-indigo-50"] {
+  --tw-gradient-to: rgba(99,102,241, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-indigo-100"] {
+  --tw-gradient-from: rgba(99,102,241, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-indigo-100"] {
+  --tw-gradient-via: rgba(99,102,241, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-indigo-100"] {
+  --tw-gradient-to: rgba(99,102,241, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-indigo-200"] {
+  --tw-gradient-from: rgba(99,102,241, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-indigo-200"] {
+  --tw-gradient-via: rgba(99,102,241, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-indigo-200"] {
+  --tw-gradient-to: rgba(99,102,241, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-violet-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-violet-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-violet-50/"] {
+  background-color: rgba(139,92,246, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-violet-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-violet-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-violet-100/"] {
+  background-color: rgba(139,92,246, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-violet-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-violet-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-violet-200/"] {
+  background-color: rgba(139,92,246, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-violet-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-violet-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-violet-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-violet-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-violet-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-violet-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-violet-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-violet-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-violet-300/"] {
+  border-color: rgba(139,92,246, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-violet-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-violet-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-violet-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-violet-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-violet-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-violet-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-violet-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-violet-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-violet-300/"] {
+  --tw-ring-color: rgba(139,92,246, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-violet-600"] {
+  color: #a78bfa !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-violet-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-violet-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-violet-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-violet-950"] {
+  color: #c4b5fd !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-violet-50"] {
+  --tw-gradient-from: rgba(139,92,246, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-violet-50"] {
+  --tw-gradient-via: rgba(139,92,246, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-violet-50"] {
+  --tw-gradient-to: rgba(139,92,246, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-violet-100"] {
+  --tw-gradient-from: rgba(139,92,246, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-violet-100"] {
+  --tw-gradient-via: rgba(139,92,246, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-violet-100"] {
+  --tw-gradient-to: rgba(139,92,246, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-violet-200"] {
+  --tw-gradient-from: rgba(139,92,246, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-violet-200"] {
+  --tw-gradient-via: rgba(139,92,246, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-violet-200"] {
+  --tw-gradient-to: rgba(139,92,246, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-purple-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-purple-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-purple-50/"] {
+  background-color: rgba(168,85,247, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-purple-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-purple-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-purple-100/"] {
+  background-color: rgba(168,85,247, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-purple-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-purple-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-purple-200/"] {
+  background-color: rgba(168,85,247, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-purple-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-purple-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-purple-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-purple-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-purple-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-purple-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-purple-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-purple-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-purple-300/"] {
+  border-color: rgba(168,85,247, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-purple-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-purple-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-purple-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-purple-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-purple-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-purple-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-purple-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-purple-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-purple-300/"] {
+  --tw-ring-color: rgba(168,85,247, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-purple-600"] {
+  color: #c084fc !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-purple-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-purple-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-purple-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-purple-950"] {
+  color: #d8b4fe !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-purple-50"] {
+  --tw-gradient-from: rgba(168,85,247, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-purple-50"] {
+  --tw-gradient-via: rgba(168,85,247, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-purple-50"] {
+  --tw-gradient-to: rgba(168,85,247, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-purple-100"] {
+  --tw-gradient-from: rgba(168,85,247, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-purple-100"] {
+  --tw-gradient-via: rgba(168,85,247, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-purple-100"] {
+  --tw-gradient-to: rgba(168,85,247, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-purple-200"] {
+  --tw-gradient-from: rgba(168,85,247, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-purple-200"] {
+  --tw-gradient-via: rgba(168,85,247, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-purple-200"] {
+  --tw-gradient-to: rgba(168,85,247, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-fuchsia-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-fuchsia-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-fuchsia-50/"] {
+  background-color: rgba(217,70,239, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-fuchsia-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-fuchsia-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-fuchsia-100/"] {
+  background-color: rgba(217,70,239, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-fuchsia-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-fuchsia-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-fuchsia-200/"] {
+  background-color: rgba(217,70,239, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-fuchsia-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-fuchsia-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-fuchsia-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-fuchsia-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-fuchsia-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-fuchsia-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-fuchsia-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-fuchsia-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-fuchsia-300/"] {
+  border-color: rgba(217,70,239, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-fuchsia-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-fuchsia-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-fuchsia-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-fuchsia-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-fuchsia-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-fuchsia-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-fuchsia-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-fuchsia-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-fuchsia-300/"] {
+  --tw-ring-color: rgba(217,70,239, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-fuchsia-600"] {
+  color: #e879f9 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-fuchsia-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-fuchsia-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-fuchsia-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-fuchsia-950"] {
+  color: #f0abfc !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-fuchsia-50"] {
+  --tw-gradient-from: rgba(217,70,239, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-fuchsia-50"] {
+  --tw-gradient-via: rgba(217,70,239, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-fuchsia-50"] {
+  --tw-gradient-to: rgba(217,70,239, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-fuchsia-100"] {
+  --tw-gradient-from: rgba(217,70,239, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-fuchsia-100"] {
+  --tw-gradient-via: rgba(217,70,239, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-fuchsia-100"] {
+  --tw-gradient-to: rgba(217,70,239, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-fuchsia-200"] {
+  --tw-gradient-from: rgba(217,70,239, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-fuchsia-200"] {
+  --tw-gradient-via: rgba(217,70,239, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-fuchsia-200"] {
+  --tw-gradient-to: rgba(217,70,239, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-pink-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-pink-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-pink-50/"] {
+  background-color: rgba(236,72,153, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-pink-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-pink-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-pink-100/"] {
+  background-color: rgba(236,72,153, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-pink-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-pink-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-pink-200/"] {
+  background-color: rgba(236,72,153, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-pink-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-pink-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-pink-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-pink-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-pink-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-pink-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-pink-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-pink-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-pink-300/"] {
+  border-color: rgba(236,72,153, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-pink-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-pink-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-pink-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-pink-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-pink-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-pink-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-pink-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-pink-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-pink-300/"] {
+  --tw-ring-color: rgba(236,72,153, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-pink-600"] {
+  color: #f472b6 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-pink-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-pink-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-pink-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-pink-950"] {
+  color: #f9a8d4 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-pink-50"] {
+  --tw-gradient-from: rgba(236,72,153, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-pink-50"] {
+  --tw-gradient-via: rgba(236,72,153, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-pink-50"] {
+  --tw-gradient-to: rgba(236,72,153, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-pink-100"] {
+  --tw-gradient-from: rgba(236,72,153, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-pink-100"] {
+  --tw-gradient-via: rgba(236,72,153, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-pink-100"] {
+  --tw-gradient-to: rgba(236,72,153, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-pink-200"] {
+  --tw-gradient-from: rgba(236,72,153, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-pink-200"] {
+  --tw-gradient-via: rgba(236,72,153, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-pink-200"] {
+  --tw-gradient-to: rgba(236,72,153, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-rose-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-rose-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-rose-50/"] {
+  background-color: rgba(244,63,94, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-rose-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-rose-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-rose-100/"] {
+  background-color: rgba(244,63,94, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-rose-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-rose-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-rose-200/"] {
+  background-color: rgba(244,63,94, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-rose-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-rose-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-rose-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-rose-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-rose-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-rose-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-rose-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-rose-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-rose-300/"] {
+  border-color: rgba(244,63,94, 0.32) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-rose-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-rose-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-rose-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-rose-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-rose-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-rose-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="ring-rose-300"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" ring-rose-300/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="ring-rose-300/"] {
+  --tw-ring-color: rgba(244,63,94, 0.35) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-rose-600"] {
+  color: #fb7185 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-rose-700"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-rose-800"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-rose-900"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="text-rose-950"] {
+  color: #fda4af !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-rose-50"] {
+  --tw-gradient-from: rgba(244,63,94, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-rose-50"] {
+  --tw-gradient-via: rgba(244,63,94, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-rose-50"] {
+  --tw-gradient-to: rgba(244,63,94, 0.1) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-rose-100"] {
+  --tw-gradient-from: rgba(244,63,94, 0.18000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-rose-100"] {
+  --tw-gradient-via: rgba(244,63,94, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-rose-100"] {
+  --tw-gradient-to: rgba(244,63,94, 0.14) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-rose-200"] {
+  --tw-gradient-from: rgba(244,63,94, 0.24000000000000002) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-rose-200"] {
+  --tw-gradient-via: rgba(244,63,94, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-rose-200"] {
+  --tw-gradient-to: rgba(244,63,94, 0.2) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-slate-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-slate-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-slate-50/"] {
+  background-color: rgba(39, 39, 42, 0.45) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-slate-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-slate-50"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-slate-50"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-slate-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-slate-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-slate-100/"] {
+  background-color: rgba(39, 39, 42, 0.9) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-slate-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-slate-100"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-slate-100"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-slate-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-slate-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-slate-200/"] {
+  background-color: rgba(63, 63, 70, 0.85) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-slate-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-slate-200"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-slate-200"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-slate-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-slate-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-slate-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-slate-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-slate-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-slate-200/"] {
+  border-color: #2a2a2f !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-gray-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-gray-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-gray-50/"] {
+  background-color: rgba(39, 39, 42, 0.45) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-gray-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-gray-50"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-gray-50"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-gray-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-gray-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-gray-100/"] {
+  background-color: rgba(39, 39, 42, 0.9) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-gray-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-gray-100"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-gray-100"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-gray-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-gray-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-gray-200/"] {
+  background-color: rgba(63, 63, 70, 0.85) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-gray-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-gray-200"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-gray-200"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-gray-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-gray-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-gray-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-gray-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-gray-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-gray-200/"] {
+  border-color: #2a2a2f !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-zinc-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-zinc-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-zinc-50/"] {
+  background-color: rgba(39, 39, 42, 0.45) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-zinc-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-zinc-50"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-zinc-50"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-zinc-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-zinc-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-zinc-100/"] {
+  background-color: rgba(39, 39, 42, 0.9) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-zinc-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-zinc-100"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-zinc-100"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-zinc-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-zinc-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-zinc-200/"] {
+  background-color: rgba(63, 63, 70, 0.85) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-zinc-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-zinc-200"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-zinc-200"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-zinc-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-zinc-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-zinc-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-zinc-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-zinc-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-zinc-200/"] {
+  border-color: #2a2a2f !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-neutral-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-neutral-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-neutral-50/"] {
+  background-color: rgba(39, 39, 42, 0.45) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-neutral-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-neutral-50"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-neutral-50"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-neutral-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-neutral-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-neutral-100/"] {
+  background-color: rgba(39, 39, 42, 0.9) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-neutral-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-neutral-100"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-neutral-100"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-neutral-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-neutral-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-neutral-200/"] {
+  background-color: rgba(63, 63, 70, 0.85) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-neutral-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-neutral-200"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-neutral-200"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-neutral-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-neutral-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-neutral-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-neutral-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-neutral-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-neutral-200/"] {
+  border-color: #2a2a2f !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-stone-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-stone-50/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-stone-50/"] {
+  background-color: rgba(39, 39, 42, 0.45) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-stone-50"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-stone-50"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-stone-50"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-stone-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-stone-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-stone-100/"] {
+  background-color: rgba(39, 39, 42, 0.9) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-stone-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-stone-100"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-stone-100"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-stone-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-stone-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-stone-200/"] {
+  background-color: rgba(63, 63, 70, 0.85) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-stone-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-stone-200"] {
+  --tw-gradient-from: #1f1f23 !important; --tw-gradient-via: #1f1f23 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-stone-200"] {
+  --tw-gradient-to: #1c1c21 !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-stone-100"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-stone-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-stone-100/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="border-stone-200"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" border-stone-200/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="border-stone-200/"] {
+  border-color: #2a2a2f !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="to-white"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="via-white"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="from-white"] {
+  --tw-gradient-to: #18181b !important; --tw-gradient-via: #18181b !important; --tw-gradient-from: #18181b !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class~="bg-white"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class*=" bg-white/"],
+html[data-theme="dark"] :is(.app-shell, .portal-dark) [class^="bg-white/"] {
+  background-color: rgba(24, 24, 27, 0.9) !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is([class~="bg-emerald-300"],[class~="bg-emerald-400"],[class~="bg-green-300"],[class~="bg-green-400"],[class~="bg-teal-300"],[class~="bg-teal-400"],[class~="bg-cyan-300"],[class~="bg-cyan-400"],[class~="bg-sky-300"],[class~="bg-sky-400"],[class~="bg-lime-300"],[class~="bg-lime-400"],[class~="bg-yellow-300"],[class~="bg-yellow-400"],[class~="bg-amber-300"],[class~="bg-amber-400"],[class~="bg-orange-300"],[class~="bg-orange-400"]):is(.text-slate-900, .text-slate-950, .text-slate-800, .text-black),
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is([class~="bg-emerald-300"],[class~="bg-emerald-400"],[class~="bg-green-300"],[class~="bg-green-400"],[class~="bg-teal-300"],[class~="bg-teal-400"],[class~="bg-cyan-300"],[class~="bg-cyan-400"],[class~="bg-sky-300"],[class~="bg-sky-400"],[class~="bg-lime-300"],[class~="bg-lime-400"],[class~="bg-yellow-300"],[class~="bg-yellow-400"],[class~="bg-amber-300"],[class~="bg-amber-400"],[class~="bg-orange-300"],[class~="bg-orange-400"]) :is(.text-slate-900, .text-slate-950, .text-slate-800, .text-black) {
+  color: #0a0a0c !important;
 }
 
 /* Powierzchnie */
@@ -2045,3 +3536,47 @@ html[data-mk="dark"] {
 .opis-edytor ul, .opis-tresc ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.75em; }
 .opis-edytor ol, .opis-tresc ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.75em; }
 .opis-edytor strong, .opis-tresc strong { font-weight: 700; color: rgb(15 23 42); }
+
+
+/* ─────────────────────────────────────────────────────────────
+   Poprawki z audytu kolorów obu motywów (wszystkie ekrany aplikacji).
+   Ten blok musi zostać na końcu pliku, bo poprawia reguły powyżej.
+   ───────────────────────────────────────────────────────────── */
+
+/* Biały napis na emerald-500 miał 2,5:1 w obu motywach. Przyciski i plakietki
+   dostają o stopień ciemniejszą zieleń (3,8:1), także po najechaniu, bo
+   hover:bg-emerald-400 robił z napisu jeszcze słabszy kontrast. */
+:is(.app-shell, .portal-dark) :is(button, a, span, label).bg-emerald-500.text-white { background-color: #059669; }
+:is(.app-shell, .portal-dark) :is(button, a, label).bg-emerald-500.text-white:hover:not(:disabled) { background-color: #047857; }
+
+/* Jasny motyw: szare podpisy na grafitowych panelach. Ogólne przyciemnienie
+   slate-400/500 (dla białych kart) robiło z nich 3:1 na ciemnym tle. */
+html:not([data-theme="dark"]) :is(.app-shell, .portal-dark) :is(.bg-slate-900, .bg-slate-800) :is(.text-slate-400, .text-slate-500) { color: #a3acba; }
+
+/* Ciemny motyw: jasne przyciski i statusy (np. etap oferty na bursztynowym
+   tle) z ciemnym napisem w tym samym kolorze. Ogólna reguła rozjaśniała
+   napis i znikał na jasnym tle. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is([class~="bg-red-300"],[class~="bg-red-400"],[class~="bg-orange-300"],[class~="bg-orange-400"],[class~="bg-amber-300"],[class~="bg-amber-400"],[class~="bg-yellow-300"],[class~="bg-yellow-400"],[class~="bg-lime-300"],[class~="bg-lime-400"],[class~="bg-green-300"],[class~="bg-green-400"],[class~="bg-emerald-300"],[class~="bg-emerald-400"],[class~="bg-teal-300"],[class~="bg-teal-400"],[class~="bg-cyan-300"],[class~="bg-cyan-400"],[class~="bg-sky-300"],[class~="bg-sky-400"],[class~="bg-blue-300"],[class~="bg-blue-400"],[class~="bg-indigo-300"],[class~="bg-indigo-400"],[class~="bg-violet-300"],[class~="bg-violet-400"],[class~="bg-purple-300"],[class~="bg-purple-400"],[class~="bg-fuchsia-300"],[class~="bg-fuchsia-400"],[class~="bg-pink-300"],[class~="bg-pink-400"],[class~="bg-rose-300"],[class~="bg-rose-400"]):is([class~="text-red-700"],[class~="text-red-800"],[class~="text-red-900"],[class~="text-red-950"],[class~="text-orange-700"],[class~="text-orange-800"],[class~="text-orange-900"],[class~="text-orange-950"],[class~="text-amber-700"],[class~="text-amber-800"],[class~="text-amber-900"],[class~="text-amber-950"],[class~="text-yellow-700"],[class~="text-yellow-800"],[class~="text-yellow-900"],[class~="text-yellow-950"],[class~="text-lime-700"],[class~="text-lime-800"],[class~="text-lime-900"],[class~="text-lime-950"],[class~="text-green-700"],[class~="text-green-800"],[class~="text-green-900"],[class~="text-green-950"],[class~="text-emerald-700"],[class~="text-emerald-800"],[class~="text-emerald-900"],[class~="text-emerald-950"],[class~="text-teal-700"],[class~="text-teal-800"],[class~="text-teal-900"],[class~="text-teal-950"],[class~="text-cyan-700"],[class~="text-cyan-800"],[class~="text-cyan-900"],[class~="text-cyan-950"],[class~="text-sky-700"],[class~="text-sky-800"],[class~="text-sky-900"],[class~="text-sky-950"],[class~="text-blue-700"],[class~="text-blue-800"],[class~="text-blue-900"],[class~="text-blue-950"],[class~="text-indigo-700"],[class~="text-indigo-800"],[class~="text-indigo-900"],[class~="text-indigo-950"],[class~="text-violet-700"],[class~="text-violet-800"],[class~="text-violet-900"],[class~="text-violet-950"],[class~="text-purple-700"],[class~="text-purple-800"],[class~="text-purple-900"],[class~="text-purple-950"],[class~="text-fuchsia-700"],[class~="text-fuchsia-800"],[class~="text-fuchsia-900"],[class~="text-fuchsia-950"],[class~="text-pink-700"],[class~="text-pink-800"],[class~="text-pink-900"],[class~="text-pink-950"],[class~="text-rose-700"],[class~="text-rose-800"],[class~="text-rose-900"],[class~="text-rose-950"]),
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is([class~="bg-red-300"],[class~="bg-red-400"],[class~="bg-orange-300"],[class~="bg-orange-400"],[class~="bg-amber-300"],[class~="bg-amber-400"],[class~="bg-yellow-300"],[class~="bg-yellow-400"],[class~="bg-lime-300"],[class~="bg-lime-400"],[class~="bg-green-300"],[class~="bg-green-400"],[class~="bg-emerald-300"],[class~="bg-emerald-400"],[class~="bg-teal-300"],[class~="bg-teal-400"],[class~="bg-cyan-300"],[class~="bg-cyan-400"],[class~="bg-sky-300"],[class~="bg-sky-400"],[class~="bg-blue-300"],[class~="bg-blue-400"],[class~="bg-indigo-300"],[class~="bg-indigo-400"],[class~="bg-violet-300"],[class~="bg-violet-400"],[class~="bg-purple-300"],[class~="bg-purple-400"],[class~="bg-fuchsia-300"],[class~="bg-fuchsia-400"],[class~="bg-pink-300"],[class~="bg-pink-400"],[class~="bg-rose-300"],[class~="bg-rose-400"]) :is([class~="text-red-700"],[class~="text-red-800"],[class~="text-red-900"],[class~="text-red-950"],[class~="text-orange-700"],[class~="text-orange-800"],[class~="text-orange-900"],[class~="text-orange-950"],[class~="text-amber-700"],[class~="text-amber-800"],[class~="text-amber-900"],[class~="text-amber-950"],[class~="text-yellow-700"],[class~="text-yellow-800"],[class~="text-yellow-900"],[class~="text-yellow-950"],[class~="text-lime-700"],[class~="text-lime-800"],[class~="text-lime-900"],[class~="text-lime-950"],[class~="text-green-700"],[class~="text-green-800"],[class~="text-green-900"],[class~="text-green-950"],[class~="text-emerald-700"],[class~="text-emerald-800"],[class~="text-emerald-900"],[class~="text-emerald-950"],[class~="text-teal-700"],[class~="text-teal-800"],[class~="text-teal-900"],[class~="text-teal-950"],[class~="text-cyan-700"],[class~="text-cyan-800"],[class~="text-cyan-900"],[class~="text-cyan-950"],[class~="text-sky-700"],[class~="text-sky-800"],[class~="text-sky-900"],[class~="text-sky-950"],[class~="text-blue-700"],[class~="text-blue-800"],[class~="text-blue-900"],[class~="text-blue-950"],[class~="text-indigo-700"],[class~="text-indigo-800"],[class~="text-indigo-900"],[class~="text-indigo-950"],[class~="text-violet-700"],[class~="text-violet-800"],[class~="text-violet-900"],[class~="text-violet-950"],[class~="text-purple-700"],[class~="text-purple-800"],[class~="text-purple-900"],[class~="text-purple-950"],[class~="text-fuchsia-700"],[class~="text-fuchsia-800"],[class~="text-fuchsia-900"],[class~="text-fuchsia-950"],[class~="text-pink-700"],[class~="text-pink-800"],[class~="text-pink-900"],[class~="text-pink-950"],[class~="text-rose-700"],[class~="text-rose-800"],[class~="text-rose-900"],[class~="text-rose-950"]) { color: rgba(9, 9, 11, 0.88) !important; }
+
+/* Ciemny motyw: arkusze „na papierze” (faktura, umowa, ofertówka, kalkulator)
+   zostają białe, więc wszystkie kolory w środku wracają do wartości z jasnego
+   motywu. revert-layer cofa nadpisania ciemnego motywu do klas Tailwinda. */
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) :is([class*="text-"], [class*="bg-"], [class*="border-"], [class*="from-"], [class*="via-"], [class*="to-"]) {
+  color: revert-layer !important;
+  background-color: revert-layer !important;
+  border-color: revert-layer !important;
+  --tw-gradient-from: revert-layer !important;
+  --tw-gradient-via: revert-layer !important;
+  --tw-gradient-to: revert-layer !important;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet) :is(.text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500, .text-gray-400, .text-gray-500) { color: #5a6473 !important; }
+
+/* Powiadomienie (toast) jest poza .app-shell, więc ciemny motyw go omijał. */
+html[data-theme="dark"] .animate-toast-in { background-color: #18181b !important; color: #e4e4e7 !important; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important; }
+html[data-theme="dark"] .animate-toast-in .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.16) !important; }
+html[data-theme="dark"] .animate-toast-in .bg-red-100 { background-color: rgba(239, 68, 68, 0.16) !important; }
+html[data-theme="dark"] .animate-toast-in .bg-cyan-100 { background-color: rgba(6, 182, 212, 0.16) !important; }
+html[data-theme="dark"] .animate-toast-in .text-emerald-600 { color: #34d399 !important; }
+html[data-theme="dark"] .animate-toast-in .text-red-600 { color: #f87171 !important; }
+html[data-theme="dark"] .animate-toast-in .text-cyan-600 { color: #22d3ee !important; }

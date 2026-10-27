@@ -1,5 +1,7 @@
 "use client";
 
+import { PasekSzkicu } from "../dokumenty/pasek-szkicu";
+
 import { useState } from "react";
 import { Select } from "../components/select";
 import { Pole, Sekcja, PrzyciskDodaj, PrzyciskUsun, PasekAkcji, pole } from "../dokumenty-wzory/klocki";
@@ -63,6 +65,7 @@ export function AneksCreator({
 
   return (
     <div className="space-y-5">
+      <PasekSzkicu wzorId="aneks" tytul={`Aneks${d.umowaNr ? ` do umowy ${d.umowaNr}` : ""}`} dane={d} onWczytaj={setD} />
       <Sekcja tytul="Umowa, której dotyczy aneks">
         <div className="grid gap-4 sm:grid-cols-2">
           <Pole label="Numer umowy" value={d.umowaNr} onChange={(v) => set("umowaNr", v)} placeholder="12/09/2026" />

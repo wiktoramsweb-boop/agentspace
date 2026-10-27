@@ -3,6 +3,10 @@ import { KATEGORIE, WZORY } from "@/lib/dokumenty";
 import type { Kategoria } from "@/lib/dokumenty/silnik";
 import { PageHeader } from "../components/ui";
 import { Katalog, type PozycjaKatalogu } from "./katalog";
+import { SzkiceLista } from "./szkice-lista";
+import { szkiceOsoby } from "@/lib/data-szkice";
+import { wzor } from "@/lib/dokumenty";
+import { KREATORY_SZKICOW } from "@/lib/kreatory-szkicow";
 
 export const metadata = { title: "Dokumenty i umowy" };
 
@@ -41,7 +45,8 @@ const OSOBNE: (PozycjaKatalogu & { kategoria: Kategoria })[] = [
 ];
 
 export default async function DokumentyPage() {
-  await requireModul("dokumenty");
+  const user = await requireModul("dokumenty");
+  const { lista: szkice } = await szkiceOsoby(user.agency_id, user.id);
 
   const pozycje = [
     ...WZORY.map((w) => ({ href: `/app/dokumenty/${w.id}`, nazwa: w.nazwa, opis: w.opis, kategoria: w.kategoria })),
@@ -53,7 +58,10 @@ export default async function DokumentyPage() {
     <>
       <PageHeader
         title="Dokumenty i umowy"
-        subtitle="Wybierz wzór, uzupełnij z bazy klientów i ofert, pobierz PDF albo zapisz go od razu w karcie klienta."
+        subtitle="Wybierz wzór, uzupełnij z bazy klientów i ofert, pobierz PDF albo zapisz go od razu w karcie klienta. Niedokończony dokument zapiszesz jako szkic i wrócisz do niego później."
+      />
+      <SzkiceLista
+        szkice={szkice.map((s) => ({ id: s.id, href: `${KREATORY_SZKICOW[s.wzorId]?.adres ?? `/app/dokumenty/${s.wzorId}`}?szkic=${s.id}`, tytul: s.tytul, wzor: wzor(s.wzorId)?.nazwa ?? KREATORY_SZKICOW[s.wzorId]?.nazwa ?? "Dokument", zmieniony: s.zmieniony }))}
       />
       <Katalog grupy={grupy} />
     </>

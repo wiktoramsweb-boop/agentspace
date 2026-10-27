@@ -1,5 +1,7 @@
 "use client";
 
+import { PasekSzkicu } from "../dokumenty/pasek-szkicu";
+
 import { todayPL } from "@/lib/datetime";
 import { useState } from "react";
 import { SparkIcon } from "../components/icons";
@@ -186,6 +188,13 @@ export function ReservationCreator({ city }: { city: string }) {
   }
 
   return (
+    <div className="space-y-5">
+    <PasekSzkicu
+      wzorId="rezerwacja"
+      tytul={`Umowa rezerwacyjna${d.propAddress ? ` - ${d.propAddress}` : ""}`}
+      dane={d}
+      onWczytaj={setD}
+    />
     <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_1fr]">
       {/* FORMULARZ */}
       <div className="print-hide space-y-5">
@@ -337,6 +346,7 @@ export function ReservationCreator({ city }: { city: string }) {
         <p className="mb-2 text-xs uppercase tracking-wider text-slate-500">Podgląd umowy</p>
         {sheetEl}
       </div>
+    </div>
     </div>
   );
 }

@@ -10,6 +10,8 @@ import { pobierzPdf, drukujPdf } from "@/lib/pdf-kit";
 import { uploadToSignedUrl } from "@/lib/photo-process";
 import { signDocumentUploads, registerDocuments } from "../actions";
 import { klientDoDokumentu, ofertaDoDokumentu, oznaczWzor } from "../wzory-actions";
+import { zapiszSzkic, usunSzkic } from "../szkice-actions";
+import type { Szkic } from "@/lib/data-szkice";
 
 export type Rekord = { id: string; nazwa: string; opis?: string };
 
@@ -50,7 +52,7 @@ function Bogaty({ t }: { t: string }) {
 }
 
 export function Generator({
-  wzorId, kontekst, stopka, dzis, klienci, oferty, startKlient, startOferta, startStrona, startUkryte, startPola,
+  wzorId, kontekst, stopka, dzis, klienci, oferty, startKlient, startOferta, startStrona, startUkryte, startPola, startSzkic, szkiceDzialaja = false,
 }: {
   wzorId: string;
   kontekst: Kontekst;
@@ -63,19 +65,26 @@ export function Generator({
   startStrona?: Strona;
   startUkryte?: boolean;
   startPola?: Record<string, string>;
+  /** Szkic otwarty z listy „Twoje szkice” (v54). */
+  startSzkic?: Szkic | null;
+  szkiceDzialaja?: boolean;
 }) {
   const w = znajdzWzor(wzorId)!;
   const kluczSzkicu = `agentspace:wzor:${wzorId}`;
 
   const [d, setD] = useState<Dane>(() => {
     const start = daneStartowe(w, dzis);
+    if (startSzkic) return { ...start, ...startSzkic.dane };
     if (!start.miasto && w.grupy.some((g) => g.pola.some((p) => p.k === "miasto"))) start.miasto = kontekst.miasto;
     if (startStrona && w.poleKlienta) start[w.poleKlienta] = [startStrona];
     if (startPola) Object.assign(start, polaZOferty(w, startPola, start));
     return start;
   });
-  const [klient, setKlient] = useState(startKlient ?? "");
-  const [oferta, setOferta] = useState(startOferta ?? "");
+  const [klient, setKlient] = useState(startSzkic?.klientId ?? startKlient ?? "");
+  const [oferta, setOferta] = useState(startSzkic?.ofertaId ?? startOferta ?? "");
+  const [szkicId, setSzkicId] = useState<string | null>(startSzkic?.id ?? null);
+  const [szkicZapisany, setSzkicZapisany] = useState<string | null>(startSzkic?.zmieniony ?? null);
+  const [szkicStan, setSzkicStan] = useState<"" | "zapisuje" | "blad">("");
   const [info, setInfo] = useState<string | null>(
     startUkryte ? "Biuro ukrywa dane klientów innych agentów, więc wpisałem tylko imię i nazwisko. PESEL i adres uzupełnij z klientem." : null,
   );
@@ -90,7 +99,7 @@ export function Generator({
   // Szkic w przeglądarce: agent zaczyna umowę u klienta, kończy w biurze.
   // To tylko wygoda, więc każdy błąd dostępu do pamięci pomijamy.
   useEffect(() => {
-    if (startKlient || startOferta) return;
+    if (startKlient || startOferta || startSzkic) return;
     try {
       const raw = localStorage.getItem(kluczSzkicu);
       if (raw) setSzkic(JSON.parse(raw) as Dane);
@@ -107,6 +116,59 @@ export function Generator({
     return () => clearTimeout(t);
   }, [d, kluczSzkicu]);
 
+  // Zapisany szkic aktualizuje się sam po każdej zmianie, żeby po powrocie
+  // nie było niespodzianki, że ostatnie poprawki zostały tylko na ekranie.
+  const daneSzkicu = useRef({ d, klient, oferta });
+  daneSzkicu.current = { d, klient, oferta };
+  async function zapiszSzkicTeraz(id: string | null = szkicId) {
+    setSzkicStan("zapisuje");
+    const { d: dane, klient: k, oferta: o } = daneSzkicu.current;
+    const osoba = w.poleKlienta && Array.isArray(dane[w.poleKlienta]) ? (dane[w.poleKlienta] as Strona[])[0]?.imie : "";
+    const r = await zapiszSzkic({
+      id,
+      wzorId,
+      tytul: `${w.nazwa}${osoba ? ` - ${osoba}` : klienci.find((x) => x.id === k)?.nazwa ? ` - ${klienci.find((x) => x.id === k)!.nazwa}` : ""}`,
+      dane,
+      klientId: k || null,
+      ofertaId: o || null,
+    }).catch(() => null);
+    if (!r || !r.ok) {
+      setSzkicStan("blad");
+      if (r && !r.ok) setBlad(r.error);
+      return;
+    }
+    setSzkicStan("");
+    setSzkicZapisany(r.kiedy);
+    if (r.id !== szkicId) {
+      setSzkicId(r.id);
+      try {
+        const u = new URL(window.location.href);
+        u.searchParams.set("szkic", r.id);
+        window.history.replaceState(null, "", u.toString());
+      } catch {}
+    }
+  }
+
+  useEffect(() => {
+    if (!szkicId || !zmieniono.current) return;
+    const t = setTimeout(() => void zapiszSzkicTeraz(szkicId), 2500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [d, klient, oferta, szkicId]);
+
+  async function usunTenSzkic() {
+    if (!szkicId || !confirm("Usunąć ten szkic? Formularz na ekranie zostanie.")) return;
+    const r = await usunSzkic(szkicId);
+    if (!r.ok) return setBlad(r.error);
+    setSzkicId(null);
+    setSzkicZapisany(null);
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.delete("szkic");
+      window.history.replaceState(null, "", u.toString());
+    } catch {}
+  }
+
   function set(k: string, v: Dane[string]) {
     zmieniono.current = true;
     setD((p) => ({ ...p, [k]: v }));
@@ -114,6 +176,7 @@ export function Generator({
   }
 
   async function wczytajKlienta(id: string) {
+    zmieniono.current = true;
     setKlient(id);
     setInfo(null);
     if (!id || !w.poleKlienta) return;
@@ -284,6 +347,28 @@ export function Generator({
       <PasekAkcji onZapisz={() => zrob("zapis")} onDrukuj={() => zrob("druk")} pracuje={pracuje} blad={blad} gotowe={gotowe} />
 
       <div className="flex flex-wrap items-center gap-3 text-sm">
+        {szkiceDzialaja && (
+          <span className="inline-flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void zapiszSzkicTeraz()}
+              disabled={szkicStan === "zapisuje"}
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-800 transition hover:border-slate-400 disabled:opacity-60"
+            >
+              {szkicStan === "zapisuje" ? "Zapisuję szkic…" : szkicId ? "Zapisz szkic teraz" : "Zapisz jako szkic"}
+            </button>
+            {szkicId && szkicZapisany && szkicStan !== "blad" && (
+              <span className="text-xs text-slate-500">
+                Szkic zapisany {new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit" }).format(new Date(szkicZapisany))}, zmiany zapisują się same
+              </span>
+            )}
+            {szkicId && (
+              <button type="button" onClick={() => void usunTenSzkic()} className="rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-red-50 hover:text-red-600">
+                Usuń szkic
+              </button>
+            )}
+          </span>
+        )}
         {(klient || oferta) && (
           <button
             type="button"
