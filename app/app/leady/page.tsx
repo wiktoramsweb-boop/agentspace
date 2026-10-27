@@ -8,9 +8,10 @@ import { LeadyLista } from "./leady-lista";
 import { ImportLeadow } from "./import-leadow";
 import { NowyLead } from "./nowy-lead";
 import { FiltryLeadow } from "./filtry";
+import { oddzialyBiura } from "@/lib/oddzialy";
 
 type Props = {
-  searchParams: Promise<{ status?: string; agent?: string; source?: string; q?: string }>;
+  searchParams: Promise<{ status?: string; agent?: string; source?: string; q?: string; oddzial?: string }>;
 };
 
 /**
@@ -22,10 +23,11 @@ export default async function LeadyPage({ searchParams }: Props) {
   const agencyId = user.agency_id;
   const f = await searchParams;
 
-  const [leady, staty, agenci] = await Promise.all([
+  const [leady, staty, agenci, oddzialy] = await Promise.all([
     agencyId ? getLeady(agencyId, f) : Promise.resolve([]),
     agencyId ? getStatystykiLeadow(agencyId) : Promise.resolve(null),
     agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
+    oddzialyBiura(agencyId),
   ]);
 
   return (
@@ -84,7 +86,7 @@ export default async function LeadyPage({ searchParams }: Props) {
       )}
 
       <div className="mb-5">
-        <FiltryLeadow agenci={agenci} zrodla={LEAD_SOURCES} biezace={f} />
+        <FiltryLeadow agenci={agenci} zrodla={LEAD_SOURCES} oddzialy={oddzialy.lista.map((o) => ({ value: o.id, label: o.name }))} biezace={f} />
       </div>
 
       <LeadyLista leady={leady} agenci={agenci} mozeUsuwac={user.role !== "agent"} />

@@ -1,3 +1,4 @@
+import { ludzieKierownika } from "@/lib/oddzialy";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireModul } from "@/lib/auth";
@@ -25,7 +26,7 @@ export default async function ZadaniaPage() {
   }
   const admin = createSupabaseAdmin();
   let ludzieQ = admin.from("profiles").select("id, full_name, role, manager_id").eq("agency_id", user.agency_id).order("full_name");
-  if (user.role === "manager") ludzieQ = ludzieQ.eq("manager_id", user.id);
+  if (user.role === "manager") ludzieQ = ludzieQ.in("id", await ludzieKierownika(user.agency_id!, user.id));
   let zadaniaQ = admin
     .from("training_assignments")
     .select("id, agent_id, scenario_id, difficulty, min_score, due_on, note, status, best_score, attempts, created_at, completed_at, assigned_by")

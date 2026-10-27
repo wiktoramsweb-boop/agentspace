@@ -13,7 +13,7 @@ import { createSupabaseAdmin } from "./supabase/admin";
 
 export type RodzajZdarzenia =
   | "klient" | "oferta" | "transakcja" | "faktura" | "koszt" | "osoba" | "dokument" | "automatyzacja"
-  | "eksport" | "ustawienia" | "lead" | "poszukiwanie" | "dzialanie";
+  | "eksport" | "ustawienia" | "lead" | "poszukiwanie" | "dzialanie" | "oddzial";
 
 export type Zdarzenie = {
   agencyId: string;

@@ -1,5 +1,7 @@
 "use server";
 
+import { ludzieKierownika } from "@/lib/oddzialy";
+
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
@@ -18,8 +20,8 @@ async function dozwoleniAgenci(user: { id: string; role: string; agency_id: stri
   const admin = createSupabaseAdmin();
   const zBiura = [...(await idsZBiura(admin, "profiles", ids, user.agency_id))];
   if (user.role !== "manager") return zBiura;
-  const { data } = await admin.from("profiles").select("id").in("id", zBiura).eq("manager_id", user.id);
-  return (data ?? []).map((p) => p.id as string);
+  const moi = new Set(user.agency_id ? await ludzieKierownika(user.agency_id, user.id) : []);
+  return zBiura.filter((id) => moi.has(id));
 }
 
 export async function zlecTrening(f: FormData): Promise<Wynik> {

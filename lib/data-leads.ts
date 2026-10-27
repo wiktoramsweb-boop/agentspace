@@ -8,6 +8,8 @@ export type FiltrLeadow = {
   agent?: string;
   source?: string;
   q?: string;
+  /** Oddział: leady z jego puli i leady jego ludzi. */
+  oddzial?: string;
 };
 
 export type StatystykiLeadow = {
@@ -25,6 +27,11 @@ export async function getLeady(agencyId: string, f: FiltrLeadow = {}): Promise<L
 
   if (f.status) sel = sel.eq("status", f.status);
   if (f.source) sel = sel.eq("source", f.source);
+  if (f.oddzial && /^[0-9a-f-]{36}$/.test(f.oddzial)) {
+    const { data: ludzie } = await admin.from("profiles").select("id").eq("agency_id", agencyId).eq("branch_id", f.oddzial);
+    const ids = ((ludzie ?? []) as { id: string }[]).map((p) => p.id);
+    sel = ids.length ? sel.or(`branch_id.eq.${f.oddzial},agent_id.in.(${ids.join(",")})`) : sel.eq("branch_id", f.oddzial);
+  }
   if (f.agent === "bez") sel = sel.is("agent_id", null);
   else if (f.agent) sel = sel.eq("agent_id", f.agent);
   if (f.q) {

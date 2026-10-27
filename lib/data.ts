@@ -139,7 +139,7 @@ export type RankedAgent = Profile & {
 
 export async function getTeamRanking(
   agencyId: string,
-  opts?: { managerId?: string },
+  opts?: { managerId?: string; ids?: string[] },
 ): Promise<RankedAgent[]> {
   const admin = createSupabaseAdmin();
 
@@ -150,7 +150,8 @@ export async function getTeamRanking(
     .order("created_at");
 
   // Menedżer widzi tylko swoich przypisanych agentów.
-  if (opts?.managerId) agentsQuery = agentsQuery.eq("manager_id", opts.managerId);
+  if (opts?.ids) agentsQuery = agentsQuery.in("id", opts.ids.length ? opts.ids : ["00000000-0000-0000-0000-000000000000"]);
+  else if (opts?.managerId) agentsQuery = agentsQuery.eq("manager_id", opts.managerId);
 
   const { data: agents } = await agentsQuery;
 

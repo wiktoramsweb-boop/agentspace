@@ -8,11 +8,13 @@ import { Select } from "../components/select";
 export function FiltryLeadow({
   agenci,
   zrodla,
+  oddzialy = [],
   biezace,
 }: {
   agenci: { id: string; name: string }[];
   zrodla: { value: string; label: string }[];
-  biezace: { status?: string; agent?: string; source?: string; q?: string };
+  oddzialy?: { value: string; label: string }[];
+  biezace: { status?: string; agent?: string; source?: string; q?: string; oddzial?: string };
 }) {
   const router = useRouter();
   const [q, setQ] = useState(biezace.q ?? "");
@@ -41,6 +43,18 @@ export function FiltryLeadow({
         />
       </form>
 
+      {oddzialy.length > 0 && (
+        <div className="w-48">
+          <Select
+            aria-label="Oddział"
+            value={biezace.oddzial ?? ""}
+            onChange={(e) => idz({ oddzial: e.target.value })}
+            options={oddzialy}
+            placeholder="Wszystkie oddziały"
+          />
+        </div>
+      )}
+
       <div className="w-48">
         <Select
           aria-label="Opiekun"
@@ -61,7 +75,7 @@ export function FiltryLeadow({
         />
       </div>
 
-      {(biezace.status || biezace.agent || biezace.source || biezace.q) && (
+      {(biezace.status || biezace.agent || biezace.source || biezace.q || biezace.oddzial) && (
         <button
           type="button"
           onClick={() => router.push("/app/leady")}

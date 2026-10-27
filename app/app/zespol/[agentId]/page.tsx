@@ -1,3 +1,4 @@
+import { ludzieKierownika } from "@/lib/oddzialy";
 import { Wstecz } from "@/app/app/components/wstecz";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -49,7 +50,7 @@ export default async function AgentDetailPage({ params }: Props) {
   } = detail;
 
   // Menedżer widzi tylko swoich przypisanych agentów.
-  if (!isOwner && profile.manager_id !== user.id) notFound();
+  if (!isOwner && !(await ludzieKierownika(user.agency_id!, user.id)).includes(profile.id)) notFound();
 
   // Pod sekcję usuwania: ile ta osoba trzyma i kto może to przejąć.
   const dorobek = isOwner && profile.role !== "owner" ? await policzDorobek(agentId) : { klienci: 0, oferty: 0, transakcje: 0, zadania: 0 };

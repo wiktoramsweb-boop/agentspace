@@ -33,6 +33,8 @@ export type Profile = {
   default_split_pct: number;
   phone: string | null;
   manager_id: string | null;
+  /** v54: oddział biura. */
+  branch_id?: string | null;
   weekly_ai_limit: number | null; // null = bez limitu; liczba = maks. rozmów AI/tydzień
   // v24: profil agenta widoczny w zespole i w materiałach dla klienta
   avatar_path?: string | null;

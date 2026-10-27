@@ -27,6 +27,8 @@ import { ManagerTeams } from "./manager-teams";
 import { TeamProfiles, type TeamProfile } from "./team-profiles";
 import { Avatar, avatarUrl } from "../components/avatar";
 import { APP_URL } from "@/lib/supabase/config";
+import { ludzieKierownika, oddzialyBiura } from "@/lib/oddzialy";
+import { OddzialyPanel, type WynikOddzialuWiersz } from "./oddzialy-panel";
 
 // Krótkie etykiety etapów lejka (klucz DB → skrót).
 const STAGE_SHORT: Record<string, string> = Object.fromEntries(
@@ -60,18 +62,22 @@ function TrendArrow({ trend }: { trend?: AgentTrend }) {
 const ZAKLADKI: Zakladka[] = [
   { key: "zespol", label: "Zespół", ikona: "osoba" },
   { key: "wyniki", label: "Wyniki", ikona: "blyskawica" },
+  { key: "oddzialy", label: "Oddziały", ikona: "dom" },
   { key: "zarzadzanie", label: "Zarządzanie", ikona: "tarcza" },
 ];
 
-export default async function ZespolPage({ searchParams }: { searchParams: Promise<{ z?: string }> }) {
+export default async function ZespolPage({ searchParams }: { searchParams: Promise<{ z?: string; oddzial?: string }> }) {
   const user = await requireManagerOrOwner();
-  const { z } = await searchParams;
+  const { z, oddzial } = await searchParams;
   odetnijPoWygasnieciu(user);
   const agencyId = user.agency_id!;
   const isOwner = user.role === "owner";
 
-  // Zakres: CEO widzi całą agencję; menedżer tylko swoich agentów.
-  const ranking = await getTeamRanking(agencyId, isOwner ? undefined : { managerId: user.id });
+  // Zakres: CEO widzi całą agencję; menedżer swoich agentów i ludzi z oddziałów, którymi kieruje.
+  const [ranking, oddzialy] = await Promise.all([
+    isOwner ? getTeamRanking(agencyId) : ludzieKierownika(agencyId, user.id).then((ids) => getTeamRanking(agencyId, { ids })),
+    oddzialyBiura(agencyId),
+  ]);
   const funnelByAgent = await getTeamFunnelProgress(ranking.map((a) => a.id));
   const insights = await getTeamInsights(
     ranking.map((a) => ({ id: a.id, name: a.full_name ?? a.email ?? "Agent" })),
@@ -89,7 +95,8 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
     : [null, [], [], {} as Record<string, number>, []];
 
   // Karty zespołu: CEO widzi całe biuro, menedżer swoich agentów.
-  const cardPeople = isOwner ? members : ranking;
+  const wybranyOddzial = oddzialy.lista.find((o) => o.id === oddzial) ?? null;
+  const cardPeople = (isOwner ? members : ranking).filter((m) => !wybranyOddzial || m.branch_id === wybranyOddzial.id);
   const workload = await getTeamWorkload(agencyId, cardPeople.map((m) => m.id));
   const profiles: TeamProfile[] = cardPeople.map((m) => ({
     id: m.id,
@@ -126,8 +133,30 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
   })();
   const scopedSessionsWeek = ranking.reduce((a, r) => a + r.sessionsThisWeek, 0);
 
-  const zakladki = isOwner ? ZAKLADKI : ZAKLADKI.filter((t) => t.key !== "zarzadzanie");
+  const zakladki = isOwner
+    ? ZAKLADKI.filter((t) => t.key !== "oddzialy" || oddzialy.ready)
+    : ZAKLADKI.filter((t) => t.key !== "zarzadzanie" && t.key !== "oddzialy");
   const tab = zakladki.some((t) => t.key === z) ? (z as string) : "zespol";
+
+  // Porównanie oddziałów liczymy z tych samych liczb co karty osób.
+  const wynikiOddzialow: WynikOddzialuWiersz[] = [];
+  if (isOwner && tab === "oddzialy") {
+    const zaladunek = await getTeamWorkload(agencyId, members.map((m) => m.id));
+    const grupy = [...oddzialy.lista.map((o) => ({ id: o.id as string | null, nazwa: o.name })), { id: null, nazwa: "Bez oddziału" }];
+    for (const g of grupy) {
+      const ludzie = members.filter((m) => (m.branch_id ?? null) === g.id && m.role !== "credit_advisor");
+      if (!g.id && ludzie.length === 0) continue;
+      wynikiOddzialow.push({
+        id: g.id,
+        nazwa: g.nazwa,
+        ludzie: ludzie.length,
+        telefony: ludzie.reduce((a, m) => a + (zaladunek[m.id]?.callsWeek ?? 0), 0),
+        oferty: ludzie.reduce((a, m) => a + (zaladunek[m.id]?.activeOffers ?? 0), 0),
+        klienci: ludzie.reduce((a, m) => a + (zaladunek[m.id]?.clients ?? 0), 0),
+        prowizje: ludzie.reduce((a, m) => a + (commissions[m.id] ?? 0), 0),
+      });
+    }
+  }
 
   const strongest = categories[0];
   const weakest = categories[categories.length - 1];
@@ -184,12 +213,30 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
         zakladki={zakladki}
         active={tab}
         adres={(k) => (k === "zespol" ? "/app/zespol" : `/app/zespol?z=${k}`)}
-        liczniki={{ zespol: profiles.length, wyniki: insights.alerts.length || undefined, zarzadzanie: invitations.length || undefined }}
+        liczniki={{ zespol: profiles.length, wyniki: insights.alerts.length || undefined, oddzialy: oddzialy.lista.length || undefined, zarzadzanie: invitations.length || undefined }}
         etykieta="Sekcje zespołu"
       />
 
       {tab === "zespol" && (
         <div className="mb-8">
+          {oddzialy.lista.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-1.5" role="group" aria-label="Filtr oddziału">
+              {[{ id: "", name: "Wszystkie oddziały" }, ...oddzialy.lista].map((o) => {
+                const aktywny = (wybranyOddzial?.id ?? "") === o.id;
+                return (
+                  <Link
+                    key={o.id || "all"}
+                    href={o.id ? `/app/zespol?oddzial=${o.id}` : "/app/zespol"}
+                    replace
+                    aria-current={aktywny ? "page" : undefined}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${aktywny ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}
+                  >
+                    {o.name}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
           <p className="mb-4 text-sm text-slate-500">
             {isOwner
               ? "Kliknij osobę, żeby zobaczyć jej wyniki, cele i uprawnienia."
@@ -374,6 +421,17 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
         )}
       </div>
       </>
+      )}
+
+      {isOwner && tab === "oddzialy" && (
+        <div className="mb-8">
+          <OddzialyPanel
+            oddzialy={oddzialy.lista}
+            wyniki={wynikiOddzialow}
+            osoby={members.map((m) => ({ id: m.id, name: m.full_name ?? m.email ?? "Osoba", rola: ROLE_LABELS[m.role] ?? m.role, branch_id: m.branch_id ?? null }))}
+            kierownicy={members.filter((m) => ["owner", "director", "manager"].includes(m.role)).map((m) => ({ id: m.id, name: m.full_name ?? m.email ?? "Osoba" }))}
+          />
+        </div>
       )}
 
       {/* Zapraszanie + zarządzanie rolami - tylko CEO */}
