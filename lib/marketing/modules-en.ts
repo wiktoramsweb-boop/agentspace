@@ -129,7 +129,7 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug" | "shot" | "p
     faq: [
       {
         q: "Do you handle commission splits between agents?",
-        a: "Yes. Every deal carries the agent's percentage, and on in-house deals the commission can be split between two people.",
+        a: "Yes. The lead agent has their share, and you can add a co-agent, the other side's agent or the person who referred the client, each with their own percentage.",
       },
       {
         q: "Can a manager see the team's commission amounts?",

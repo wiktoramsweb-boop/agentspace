@@ -942,12 +942,14 @@ export const en: Dict = {
       {
         id: "biuro",
         name: "Agency",
-        tagline: "For larger agencies and teams with managers",
+        tagline: "For networks and multi-branch agencies",
         features: [
           "15 users included, 49 PLN/mo for each extra",
           "Everything in Pro",
           "Roles and permissions: nine job titles, access granted per person",
-          "Teams with managers, each sees their own agents",
+          "Branches with managers and side-by-side results",
+          "Commission tiers, manager overrides and monthly settlement",
+          "Migration of your database from your previous software",
           "1:1 rollout and team training",
           "Priority support",
         ],

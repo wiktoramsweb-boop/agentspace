@@ -942,12 +942,14 @@ export const pl = {
       {
         id: "biuro",
         name: "Biuro",
-        tagline: "Dla większych biur i zespołów z menedżerami",
+        tagline: "Dla sieci i biur z oddziałami",
         features: [
           "15 osób w cenie, każda kolejna 49 zł/mc",
           "Wszystko z Pro",
           "Role i uprawnienia: dziewięć stanowisk, dostęp nadawany per osoba",
-          "Zespoły z menedżerami, każdy widzi swoich agentów",
+          "Oddziały z kierownikami i porównaniem wyników",
+      "Progi prowizji, nadprowizja menedżera i rozliczenie miesiąca",
+      "Przeniesienie bazy z poprzedniego programu",
           "Wdrożenie 1:1 i szkolenie zespołu",
           "Priorytetowe wsparcie",
         ],

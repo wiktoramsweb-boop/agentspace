@@ -164,6 +164,14 @@ export const MODULES: ProductModule[] = [
         title: "Wypłaty dla agentów",
         body: "Księgowa albo właściciel oznacza wypłatę prowizji z kwotą i datą. Zaległe wypłaty z poprzednich miesięcy nie znikają z listy.",
       },
+      {
+        title: "Progi, menedżer i sieć",
+        body: "Udział agenta rośnie z jego wynikiem od początku roku, menedżer dostaje nadprowizję z transakcji swoich ludzi, a biuro we franczyzie widzi opłatę dla sieci.",
+      },
+      {
+        title: "Rozliczenie miesiąca",
+        body: "Z każdej transakcji: ile dostaje agent, współagent, menedżer i sieć, a ile zostaje biuru. Jednym kliknięciem do CSV dla księgowej.",
+      },
     ],
     forWhom:
       "Dla właściciela: kontrola nad rozliczeniami. Dla agenta: pewność, że prowizja jest policzona uczciwie.",
@@ -173,7 +181,7 @@ export const MODULES: ProductModule[] = [
     faq: [
       {
         q: "Czy obsługujecie podział prowizji między agentów?",
-        a: "Tak. Każda transakcja ma udział procentowy agenta, a przy transakcjach wewnętrznych da się rozdzielić prowizję między dwie osoby.",
+        a: "Tak. Prowadzący agent ma swój udział, a do transakcji dopiszesz współagenta, agenta drugiej strony albo osobę, która poleciła klienta, każdego z własnym procentem.",
       },
       {
         q: "Czy menedżer widzi kwoty prowizji zespołu?",
@@ -271,6 +279,14 @@ export const MODULES: ProductModule[] = [
       {
         title: "Role w zespole",
         body: "CEO, menedżer i agent widzą różne zakresy. Menedżer prowadzi swoich ludzi, nie widząc prowizji całego biura.",
+      },
+      {
+        title: "Biuro w skrócie i poniedziałkowy mail",
+        body: "Na pulpicie i w mailu co poniedziałek: prowizje, transakcje w toku i lista spraw, które się palą. Nie musisz wchodzić w moduły, żeby wiedzieć, co się dzieje.",
+      },
+      {
+        title: "Oddziały",
+        body: "Zespół podzielony na oddziały z kierownikami. Porównanie wyników oddziałów, pula leadów oddziału i podsumowanie tygodnia dla każdego kierownika.",
       },
     ],
     forWhom:
