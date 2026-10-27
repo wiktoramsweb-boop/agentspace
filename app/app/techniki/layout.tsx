@@ -15,7 +15,7 @@ export default async function TechnikiLayout({ children }: { children: React.Rea
     <TylkoAbonament
       demo={demo}
       tytul="Biblioteka technik jest dla klientów abonamentowych"
-      opis="Ponad 30 technik rozmowy, gotowe skrypty i struktura dobrej rozmowy, każda do przećwiczenia z klientem AI. W wersji próbnej możesz przetestować same rozmowy w AI Coach."
+      opis="46 technik rozmowy, skrypty z rozgałęzieniami, bank obiekcji i Akademia dla nowych, każda do przećwiczenia z klientem AI. W wersji próbnej możesz przetestować same rozmowy w AI Coach."
     >
       {children}
     </TylkoAbonament>

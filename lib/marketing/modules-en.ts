@@ -787,7 +787,7 @@ export const MODULES_EN: Record<string, Omit<ProductModule, "slug" | "shot" | "p
   "biblioteka-technik": {
     name: "Technique library",
     headline: "Conversation techniques and scripts you can practise right away",
-    lead: "Thirty-six negotiation, persuasion and objection techniques with Polish real estate examples, ten step-by-step call scripts and the structure of a good conversation. Practise any technique with the AI client in one click.",
+    lead: "Forty-six cold calling, negotiation, persuasion and objection techniques with Polish real estate examples, ten step-by-step call scripts and the structure of a good conversation. Practise any technique with the AI client in one click.",
     seoTitle: "Sales techniques and call scripts for real estate agents | AgentSpace",
     seoDescription: "A library of conversation techniques for real estate agents: SPIN, anchoring, objection isolation, Voss, Cialdini, with call scripts and AI practice.",
     problem: "Sales training ends after two days and on Monday the agent calls the same way as before. Knowledge only becomes habit through practice on a real, difficult conversation.",
