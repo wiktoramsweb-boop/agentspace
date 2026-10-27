@@ -86,7 +86,7 @@ const softwareApplicationSchema = {
     "Umowy rezerwacyjne generowane do PDF",
     "AI Coach - trening rozmów z klientem AI",
     "Panel właściciela z rankingiem i raportami",
-    "Role i uprawnienia: osiem stanowisk, dostęp nadawany per osoba",
+    "Role i uprawnienia: dziewięć stanowisk, dostęp nadawany per osoba",
   ],
   publisher: {
     "@type": "Organization",

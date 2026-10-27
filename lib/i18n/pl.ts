@@ -556,7 +556,7 @@ export const pl = {
           },
           {
             q: "Czy są koszty wdrożenia?",
-            a: "W pakietach Start i Pro nie ma opłaty wdrożeniowej. W pakiecie Biuro wdrożenie 1:1 i szkolenie zespołu wyceniamy indywidualnie, w zależności od liczby oddziałów.",
+            a: "W pakietach Start i Pro nie ma opłaty wdrożeniowej. W pakiecie Biuro wdrożenie 1:1 i szkolenie zespołu wyceniamy indywidualnie, w zależności od wielkości zespołu.",
           },
           {
             q: "Czy strona internetowa jest w cenie systemu?",
@@ -942,12 +942,12 @@ export const pl = {
       {
         id: "biuro",
         name: "Biuro",
-        tagline: "Dla sieci i biur wielooddziałowych",
+        tagline: "Dla większych biur i zespołów z menedżerami",
         features: [
           "15 osób w cenie, każda kolejna 49 zł/mc",
           "Wszystko z Pro",
-          "Role i uprawnienia: osiem stanowisk, dostęp nadawany per osoba",
-          "Wielooddziałowość i podział zespołów",
+          "Role i uprawnienia: dziewięć stanowisk, dostęp nadawany per osoba",
+          "Zespoły z menedżerami, każdy widzi swoich agentów",
           "Wdrożenie 1:1 i szkolenie zespołu",
           "Priorytetowe wsparcie",
         ],

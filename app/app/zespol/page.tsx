@@ -150,6 +150,7 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
               >
                 Dziennik zdarzeń
               </Link>
+              <ReportButton tygodniowy />
               <ReportButton />
             </div>
           ) : undefined

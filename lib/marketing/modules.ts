@@ -729,7 +729,7 @@ export const MODULES: ProductModule[] = [
     slug: "role-i-uprawnienia",
     name: "Role i uprawnienia",
     headline: "Każdy widzi dokładnie tyle, ile ma widzieć",
-    lead: "Osiem stanowisk z gotowymi zestawami dostępów i możliwość dołożenia albo odebrania pojedynczego modułu konkretnej osobie.",
+    lead: "Dziewięć stanowisk z gotowymi zestawami dostępów i możliwość dołożenia albo odebrania pojedynczego modułu konkretnej osobie.",
     seoTitle: "Role i uprawnienia w systemie dla biura nieruchomości | AgentSpace",
     seoDescription:
       "CEO, dyrektor, menedżer, agent, asystent biura, księgowość, koordynator ofert i stażysta. Dostęp nadawany per osoba i per moduł.",
@@ -737,7 +737,7 @@ export const MODULES: ProductModule[] = [
       "W większości systemów są trzy role, więc księgowa dostaje dostęp do bazy klientów, a stażysta widzi prowizje kolegów. Albo odwrotnie: ktoś nie może wejść tam, gdzie pracuje codziennie.",
     capabilities: [
       {
-        title: "Osiem stanowisk z biura, nie z instrukcji",
+        title: "Dziewięć stanowisk z biura, nie z instrukcji",
         body: "Od CEO po stażystę, z asystentką biura i księgowością. Każde ma zestaw dostępów dobrany pod to, co ta osoba faktycznie robi.",
       },
       {

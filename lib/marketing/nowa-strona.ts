@@ -224,7 +224,7 @@ function pl(dni: number): NowaStrona {
       ],
       lista: [
         { tytul: "Dziennik zdarzeń", tekst: "Kto usunął klienta, kto przepisał ofertę, kto pobrał eksport. Wpisów nie da się skasować z aplikacji." },
-        { tytul: "Uprawnienia i ukryte kontakty", tekst: "Osiem stanowisk, od stażysty po księgową. Agent nie spisze numerów cudzych klientów przed odejściem." },
+        { tytul: "Uprawnienia i ukryte kontakty", tekst: "Dziewięć stanowisk, od stażysty po doradcę kredytowego. Agent nie spisze numerów cudzych klientów przed odejściem." },
         { tytul: "Urlopy i zastępstwa", tekst: "Zastępca widzi klientów nieobecnego, a zadania z automatyzacji trafiają do niego, nie w próżnię." },
       ],
     },
@@ -481,7 +481,7 @@ function en(dni: number): NowaStrona {
       ],
       lista: [
         { tytul: "Event log", tekst: "Who deleted a client, who reassigned a listing, who downloaded an export. Entries can't be deleted from the app." },
-        { tytul: "Permissions and hidden contacts", tekst: "Eight roles, from intern to accountant. An agent can't copy other agents' client numbers before leaving." },
+        { tytul: "Permissions and hidden contacts", tekst: "Nine roles, from intern to mortgage advisor. An agent can't copy other agents' client numbers before leaving." },
         { tytul: "Leave and cover", tekst: "The covering agent sees the absent agent's clients, and automated tasks go to them, not into the void." },
       ],
     },

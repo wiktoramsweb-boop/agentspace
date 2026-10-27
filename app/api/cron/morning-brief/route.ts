@@ -11,6 +11,8 @@ import { przypomnijOZaleglychFakturach } from "@/lib/przypomnienia-faktury";
 import { wystawZaplanowaneFaktury } from "@/lib/faktury-cykliczne";
 import { zapiszBlad } from "@/lib/blad";
 import { uruchomAutomatyzacjeCzasowe } from "@/lib/automatyzacje";
+import { wyslijTydzienBiura } from "@/lib/raport-tygodniowy";
+import { todayPL } from "@/lib/datetime";
 
 export const maxDuration = 300;
 
@@ -93,5 +95,19 @@ export async function GET(request: Request) {
     await zapiszBlad("cron/automatyzacje", err);
   }
 
-  return Response.json({ ok: true, agents: agentIds.length, notified, cykliczne, przypomnienia, automatyzacje });
+  // Poniedziałek: „Tydzień w biurze” dla właścicieli. Każde biuro osobno,
+  // żeby błąd jednego nie zatrzymał reszty.
+  let tydzien = 0;
+  if (new Date(`${todayPL()}T12:00:00Z`).getUTCDay() === 1) {
+    const { data: biura } = await admin.from("agencies").select("id").or("is_demo.is.null,is_demo.eq.false");
+    for (const b of (biura ?? []) as { id: string }[]) {
+      try {
+        tydzien += await wyslijTydzienBiura(b.id);
+      } catch (err) {
+        await zapiszBlad("cron/tydzien-w-biurze", err, { agencyId: b.id });
+      }
+    }
+  }
+
+  return Response.json({ ok: true, agents: agentIds.length, notified, cykliczne, przypomnienia, automatyzacje, tydzien });
 }

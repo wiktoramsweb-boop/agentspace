@@ -9,6 +9,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { ROLE, oczyscUprawnienia, type Uprawnienia } from "@/lib/role";
 import { APP_URL } from "@/lib/supabase/config";
 import { sendAgencyMonthlyReport } from "@/lib/report";
+import { wyslijTydzienBiura } from "@/lib/raport-tygodniowy";
 import { type UserRole } from "@/lib/types";
 import { ROLE_LABELS } from "@/lib/role";
 import { zapiszZdarzenie } from "@/lib/dziennik";
@@ -31,6 +32,14 @@ export async function sendMonthlyReportNow(
   const ok = await sendAgencyMonthlyReport(owner.agency_id!);
   if (!ok) return { error: "Nie udało się wysłać raportu (sprawdź konfigurację email)." };
   return { success: `Raport wysłany na ${owner.email}.` };
+}
+
+/** Podgląd poniedziałkowego „Tygodnia w biurze” na email właściciela. */
+export async function sendWeeklyReportNow(_prev: ZespolResult, _formData: FormData): Promise<ZespolResult> {
+  const owner = await requireOwner();
+  const ile = owner.email ? await wyslijTydzienBiura(owner.agency_id!, owner.email) : 0;
+  if (!ile) return { error: "Nie udało się wysłać podsumowania (sprawdź konfigurację email)." };
+  return { success: `Tydzień w biurze wysłany na ${owner.email}.` };
 }
 
 /**
