@@ -601,17 +601,7 @@ export function nazwaAkademii(agencyId: string | null | undefined): { pelna: str
   return agencyId === SPECTRA ? { pelna: "Spectra Academy", krotka: "Spectra Academy" } : { pelna: "Akademia dla nowych", krotka: "Akademia" };
 }
 
-/**
- * Adres materiału do lekcji. Parametr `akademia` mówi stronie techniki albo
- * skryptu, że czytelnik przyszedł ze ścieżki: wtedy pokazuje pasek powrotu.
- */
-export function adresLekcji(l: Lekcja): string {
-  const z = `akademia=${l.id}`;
-  if (l.rodzaj === "technika") return `/app/techniki/${l.slug}?${z}`;
-  if (l.rodzaj === "skrypt") return `/app/techniki/skrypty/${l.slug}?${z}`;
-  if (l.rodzaj === "obiekcje") return `/app/techniki?widok=obiekcje&${z}`;
-  return `/app/techniki?widok=struktura&${z}`;
-}
+export { adresLekcji } from "./akademia-adresy";
 
 export function lekcja(id: string | null | undefined): Lekcja | undefined {
   return id ? WSZYSTKIE_LEKCJE.find((l) => l.id === id) : undefined;

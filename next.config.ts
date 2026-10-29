@@ -11,9 +11,18 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Mikrofon potrzebny do dyktowania (AI Coach, szybki wpis) tylko na naszej domenie.
   { key: "Permissions-Policy", value: "camera=(), geolocation=(), microphone=(self), payment=()" },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+  // Okno otwarte z obcej strony nie dostaje uchwytu do naszej karty (wycieki przez window.opener).
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
 ];
 
 const nextConfig: NextConfig = {
+  // Kod w przeglądarce zostaje zminifikowany i bez map źródeł: z narzędzi
+  // programisty nie da się odtworzyć plików projektu ani komentarzy.
+  productionBrowserSourceMaps: false,
+  // Bez nagłówka „X-Powered-By: Next.js”, który mówi, na czym stoi aplikacja.
+  poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

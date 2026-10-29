@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { KolorModulu, StanAkademii, StanLekcjiAkademii, StanModulu, StanSprawdzianu } from "@/lib/techniki/akademia";
-import { adresLekcji } from "@/lib/techniki/akademia";
+import { adresLekcji } from "@/lib/techniki/akademia-adresy";
 import { oznaczLekcje } from "./actions";
 
 type Wezel =
