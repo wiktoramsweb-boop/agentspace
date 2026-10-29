@@ -1,95 +1,128 @@
-# Eksport ofert na portale – maile do wysłania
+# Maile do portali w sprawie integracji AgentSpace
 
-Uzupełnij przed wysłaniem: [telefon], [nazwa firmy / NIP]. Wysyłaj z adresu w domenie agentspace.pl, nie z Gmaila (portale traktują to poważniej).
-
----
-
-## 1. Otodom + OLX (najważniejsze, tu możemy działać sami)
-
-**Najpierw zrób sam (bez czekania na odpowiedź):**
-1. Wejdź na https://developer.olxgroup.com i załóż konto dewelopera (to samo konto OLX Group obsługuje Otodom).
-2. Zarejestruj aplikację „AgentSpace CRM”, typ: partner CRM / integracja ogłoszeń nieruchomości.
-3. Dostaniesz dane do środowiska testowego (sandbox). Na nim możemy zbudować i przetestować eksport, zanim przyjdzie zgoda na produkcję.
-
-**Mail równolegle, żeby przyspieszyć akceptację:**
-
-Do: wspolpraca@otodom.pl
-Temat: AgentSpace CRM – prośba o dostęp partnerski do API Otodom/OLX (eksport ofert)
-
-> Dzień dobry,
->
-> nazywam się Wiktor Szostek, prowadzę biuro nieruchomości Spectra w Krakowie i rozwijam AgentSpace (agentspace.pl), system CRM dla biur nieruchomości. System działa produkcyjnie, a biura, którym go wdrażamy, oczekują publikacji ofert na Otodom i OLX prosto z systemu, tak jak w innych CRM-ach partnerskich.
->
-> Zarejestrowałem aplikację w OLX Group Developer Hub i proszę o:
-> 1. akceptację jej jako integracji partnerskiej CRM dla nieruchomości,
-> 2. dostęp do środowiska testowego oraz dokumentacji importu ogłoszeń,
-> 3. informację o warunkach umowy partnerskiej i ewentualnych opłatach.
->
-> Chętnie umówię się na krótką rozmowę w tym tygodniu.
->
-> Pozdrawiam
-> Wiktor Szostek
-> AgentSpace · agentspace.pl · [telefon]
-
-Telefon, jeśli mail milczy 3 dni robocze: **572 900 209** (Otodom, współpraca).
+Wspólna treść jest w każdym mailu. Zmienia się tylko adresat, nazwa portalu i jedno zdanie o tym, co portal pisze o eksporcie z programów.
+Podpis: uzupełnij numer telefonu. Wysyłaj z adresu w domenie agentspace.pl, nie z Gmaila.
 
 ---
 
-## 2. Nieruchomosci-online.pl
+## 1. Gratka.pl i Morizon.pl (Grupa Morizon-Gratka)
 
-Nie publikują adresu e-mail do integracji. Wyślij przez formularz kontaktowy na stronie i zadzwoń: **33 486 90 55**.
-Mają gotowy, publiczny format importu (XML „NOE”), więc to drugi najszybszy portal: zwykle wystarczy ich zgoda i dane do serwera FTP.
+**Do:** oferta@morizon-gratka.pl (Biuro Sprzedaży, „rozmowa o współpracy”)
+**DW:** bok@morizon-gratka.pl
+**Telefon (pn-pt 9-17):** +48 58 739 66 00
+**Temat:** Integracja programu CRM AgentSpace z serwisami Grupy Morizon-Gratka
 
-Treść do formularza:
+Dzień dobry,
 
-> Dzień dobry,
->
-> rozwijam AgentSpace (agentspace.pl), system CRM dla biur nieruchomości. Chcemy umożliwić naszym biurom eksport ofert do Nieruchomosci-online.pl w Waszym formacie XML (NOE v2.0).
->
-> Proszę o aktualną specyfikację formatu, dane do środowiska testowego (FTP) oraz informację, jak wygląda procedura dopisania nas do listy obsługiwanych programów.
->
-> Pozdrawiam
-> Wiktor Szostek, AgentSpace, [telefon]
+piszę w imieniu AgentSpace (agentspace.pl), programu CRM dla biur nieruchomości w Polsce. Biura prowadzą u nas klientów, oferty, transakcje i prowizje, a oferty publikują na portalach prosto z programu. Mamy już działające integracje z Otodom (oficjalne API Grupy OLX, aplikacja aktywowana produkcyjnie), Nieruchomosci-online.pl (format NOE 2.0) i TabelaOfert.pl.
 
----
+Na Państwa stronie dla biur widzę „integrację z popularnymi programami CRM” i konto eksportowe. Chcielibyśmy, żeby biura korzystające z AgentSpace mogły w ten sam sposób publikować oferty na Gratka.pl, Morizon.pl i w serwisach partnerskich grupy.
 
-## 3. Morizon + Gratka (jedna firma: Morizon-Gratka)
+Prosimy o informację:
+1. jak wygląda współpraca z dostawcą programu CRM i co jest potrzebne, żeby AgentSpace znalazł się na liście obsługiwanych programów,
+2. o specyfikację importu ofert (format pliku XML i słowniki, sposób dostarczenia: FTP albo API, eksport pełny czy przyrostowy, zasady dla zdjęć),
+3. czy jest konto albo środowisko testowe do sprawdzenia importu przed uruchomieniem,
+4. skąd biuro dostaje dane do eksportu (login i hasło FTP) i czy są z tym związane jakieś warunki.
 
-Adresu do integracji nie publikują. Użyj formularza kontaktowego na morizon.pl (dział Obsługa klienta / Współpraca) i poproś o przekazanie do działu integracji.
+Chętnie porozmawiamy telefonicznie albo na krótkim spotkaniu online.
 
-> Dzień dobry,
->
-> rozwijam AgentSpace (agentspace.pl), system CRM dla biur nieruchomości. Prosimy o specyfikację importu ofert (XML) dla Morizon i Gratka oraz o dane testowe, abyśmy mogli dodać eksport do naszego systemu. Proszę o kontakt osoby odpowiedzialnej za integracje z programami dla biur.
->
-> Pozdrawiam
-> Wiktor Szostek, AgentSpace, [telefon]
+Pozdrawiam
+Wiktor Szostek
+AgentSpace · agentspace.pl
+tel. [uzupełnij]
 
 ---
 
-## 4. Domiporta
+## 2. Domiporta.pl
 
-Do: bok@domiporta.pl
-Temat: Integracja CRM AgentSpace – import ofert do Domiporta
+**Do:** bok@domiporta.pl (Biuro obsługi klienta, pn-pt 9-17, +48 22 555 57 40)
+**Druga droga:** formularz „Kontakt w sprawie oferty” na https://www.domiporta.pl/oferta-dla-partnerow
+**Temat:** Integracja programu CRM AgentSpace z Domiporta.pl: specyfikacja importu ofert
 
-> Dzień dobry,
->
-> rozwijam AgentSpace (agentspace.pl), system CRM dla biur nieruchomości. Chcemy dodać automatyczny eksport ofert naszych biur do Domiporta. Proszę o specyfikację importu, dane testowe oraz kontakt do osoby odpowiedzialnej za integracje.
->
-> Pozdrawiam
-> Wiktor Szostek, AgentSpace, [telefon]
+Dzień dobry,
+
+piszę w imieniu AgentSpace (agentspace.pl), programu CRM dla biur nieruchomości w Polsce. Biura prowadzą u nas klientów, oferty, transakcje i prowizje, a oferty publikują na portalach prosto z programu. Mamy już działające integracje z Otodom (oficjalne API Grupy OLX, aplikacja aktywowana produkcyjnie), Nieruchomosci-online.pl (format NOE 2.0) i TabelaOfert.pl.
+
+Chcielibyśmy, żeby biura korzystające z AgentSpace mogły automatycznie publikować oferty na Domiporta.pl. Prosimy o przekazanie tej wiadomości do osoby odpowiedzialnej za współpracę z dostawcami programów i o informację:
+1. jak wygląda współpraca z dostawcą programu CRM i co jest potrzebne, żeby AgentSpace był obsługiwanym programem,
+2. o specyfikację importu ofert (format pliku XML i słowniki, sposób dostarczenia: FTP albo API, eksport pełny czy przyrostowy, zasady dla zdjęć),
+3. czy jest konto albo środowisko testowe do sprawdzenia importu,
+4. skąd biuro z abonamentem dostaje dane do eksportu i czy są z tym związane jakieś warunki.
+
+Chętnie porozmawiamy telefonicznie.
+
+Pozdrawiam
+Wiktor Szostek
+AgentSpace · agentspace.pl
+tel. [uzupełnij]
 
 ---
 
-## 5. Adresowo
+## 3. Adresowo.pl
 
-Nie znalazłem adresu do integracji. Na razie pomiń, mały ruch. Wrócimy, gdy będą działać pierwsze trzy.
+**Do:** kontakt@adresowo.pl (strona kontaktu kieruje tam także „propozycje współpracy”)
+**Temat:** Automatyczny eksport ofert z programu CRM AgentSpace do Adresowo.pl
+
+Dzień dobry,
+
+piszę w imieniu AgentSpace (agentspace.pl), programu CRM dla biur nieruchomości w Polsce. Biura prowadzą u nas klientów, oferty, transakcje i prowizje, a oferty publikują na portalach prosto z programu. Mamy już działające integracje z Otodom (oficjalne API Grupy OLX, aplikacja aktywowana produkcyjnie), Nieruchomosci-online.pl (format NOE 2.0) i TabelaOfert.pl.
+
+Na stronie dla biur wymieniają Państwo automatyczne eksporty z programów CRM (m.in. Galactica Virgo, EstiCRM, ASARI CRM, IMO). Chcielibyśmy dołączyć AgentSpace do tej listy. Prosimy o informację:
+1. jak wygląda współpraca z dostawcą programu CRM,
+2. o specyfikację importu ofert (format pliku XML i słowniki, dostarczenie przez FTP, eksport pełny czy przyrostowy, zasady dla zdjęć),
+3. czy jest konto testowe do sprawdzenia importu,
+4. jak biuro dostaje login i hasło do eksportu.
+
+Chętnie porozmawiamy telefonicznie.
+
+Pozdrawiam
+Wiktor Szostek
+AgentSpace · agentspace.pl
+tel. [uzupełnij]
 
 ---
 
-## Kolejność
+## 4. Sprzedajemy.pl
 
-1. Dziś: konto w OLX Group Developer Hub + mail do Otodom.
-2. Dziś: telefon do Nieruchomosci-online.
-3. W tym tygodniu: Morizon-Gratka i Domiporta.
+**Do:** biuro@sprzedajemy.pl (ten adres podają wprost „w celu uzyskania informacji niezbędnych do rozpoczęcia wprowadzania ofert lub autoryzacji programu do zamieszczania ogłoszeń”)
+**Temat:** Autoryzacja programu AgentSpace do zamieszczania ogłoszeń nieruchomości
 
-Jak dostaniesz dostęp testowy do Otodom albo specyfikację NOE, daj znać, zbuduję eksport od razu. Do tego czasu na stronie dalej nie piszemy, że eksport działa.
+Dzień dobry,
+
+piszę w imieniu AgentSpace (agentspace.pl), programu CRM dla biur nieruchomości w Polsce. Biura prowadzą u nas klientów, oferty, transakcje i prowizje, a oferty publikują na portalach prosto z programu. Mamy już działające integracje z Otodom (oficjalne API Grupy OLX, aplikacja aktywowana produkcyjnie), Nieruchomosci-online.pl (format NOE 2.0) i TabelaOfert.pl.
+
+Chcielibyśmy autoryzować AgentSpace jako program do zamieszczania ogłoszeń nieruchomości w Sprzedajemy.pl, tak jak programy z Państwa listy partnerów (m.in. asariWEB, Galactica Virgo, IMO). Prosimy o informacje potrzebne do rozpoczęcia: specyfikację formatu ofert i sposób dostarczenia (FTP albo API), konto testowe oraz zasady, na jakich biura uzyskują dostęp do eksportu.
+
+Pozdrawiam
+Wiktor Szostek
+AgentSpace · agentspace.pl
+tel. [uzupełnij]
+
+---
+
+## 5. Lento.pl
+
+**Do:** wspolpraca@lento.pl (na stronie kontaktu: „Współpraca”)
+**Temat:** Import ofert nieruchomości z programu CRM AgentSpace do Lento.pl
+
+Dzień dobry,
+
+piszę w imieniu AgentSpace (agentspace.pl), programu CRM dla biur nieruchomości w Polsce. Biura prowadzą u nas klientów, oferty, transakcje i prowizje, a oferty publikują na portalach prosto z programu. Mamy już działające integracje z Otodom (oficjalne API Grupy OLX, aplikacja aktywowana produkcyjnie), Nieruchomosci-online.pl (format NOE 2.0) i TabelaOfert.pl.
+
+Chcielibyśmy, żeby biura korzystające z AgentSpace mogły automatycznie publikować oferty nieruchomości na Lento.pl. Czy Lento przyjmuje import ofert z programów dla biur? Jeśli tak, prosimy o specyfikację formatu i sposobu dostarczenia (FTP albo API), konto testowe i informację, jak biuro dostaje dostęp do eksportu.
+
+Pozdrawiam
+Wiktor Szostek
+AgentSpace · agentspace.pl
+tel. [uzupełnij]
+
+---
+
+## 6. Domy.pl
+
+**Adresu e-mail na stronie nie ma.** Kontakt tylko przez formularz: https://domy.pl/kontakt
+**Temat w formularzu:** Integracja programu CRM AgentSpace z Domy.pl
+
+Treść (krótka, do formularza):
+
+Dzień dobry, piszę w imieniu AgentSpace (agentspace.pl), programu CRM dla biur nieruchomości. Mamy działające integracje z Otodom (API Grupy OLX), Nieruchomosci-online.pl i TabelaOfert.pl i chcielibyśmy, żeby nasze biura mogły automatycznie publikować oferty na Domy.pl. Prosimy o kontakt osoby odpowiedzialnej za współpracę z dostawcami programów i o specyfikację importu ofert (format, FTP albo API, konto testowe). Wiktor Szostek, AgentSpace, tel. [uzupełnij]
