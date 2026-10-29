@@ -8,7 +8,10 @@ import { adresAutoryzacji, konfiguracjaOtodom, stanAutoryzacji, PORTAL } from "@
 import { zapiszZdarzenie } from "@/lib/dziennik";
 import { odszyfruj, zaszyfruj } from "@/lib/szyfr";
 import { testujFtp } from "@/lib/ftp/klient";
-import { portalFtp } from "@/lib/ftp/portale";
+import { portalFtp, portalWPrzygotowaniu } from "@/lib/ftp/portale";
+import { Resend } from "resend";
+import { escapeHtml } from "@/lib/html";
+import { gosciaBlokujemy } from "@/lib/demo/straz";
 
 /** Start połączenia: CEO loguje się na Otodom kontem biura i zgadza na dostęp. */
 export async function polaczOtodom(): Promise<void> {
@@ -123,4 +126,35 @@ export async function wyslijFtpTeraz(formData: FormData): Promise<void> {
   const { wyslijNaPortalFtp } = await import("@/lib/ftp/eksport");
   const r = await wyslijNaPortalFtp(user.agency_id!, portal, user.id);
   wroc(r.ok ? "wyslano" : /już trwa/.test(r.blad) ? "trwa" : "blad-wysylki", portal);
+}
+
+/* ───────────── portale w przygotowaniu ───────────── */
+
+/**
+ * Biuro chce wystawiać na portalu, którego integracji jeszcze nie ma.
+ * Zapisujemy zgłoszenie i dajemy znać zespołowi AgentSpace mailem.
+ */
+export async function zglosPortal(formData: FormData): Promise<void> {
+  const user = await requireOwner();
+  const portal = String(formData.get("portal") ?? "");
+  const p = portalWPrzygotowaniu(portal);
+  if (!p) redirect("/app/ustawienia/portale");
+  const { error } = await createSupabaseAdmin()
+    .from("portal_requests")
+    .upsert({ agency_id: user.agency_id, portal, created_by: user.id }, { onConflict: "agency_id,portal", ignoreDuplicates: true });
+  if (error) redirect(`/app/ustawienia/portale?ftp=${/portal_requests/.test(error.message) ? "brak-tabeli-zgloszen" : "blad"}#kolejne`);
+  await zapiszZdarzenie({ agencyId: user.agency_id!, actorId: user.id, akcja: "portal_zgloszony", opis: `Zgłoszono chęć wystawiania na ${p!.nazwa}`, meta: { portal } });
+  const key = process.env.RESEND_API_KEY;
+  if (key && !(await gosciaBlokujemy())) {
+    await new Resend(key).emails
+      .send({
+        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
+        replyTo: user.email ?? undefined,
+        subject: `Portal: ${user.agency?.name ?? "biuro"} chce wystawiać na ${p!.nazwa}`,
+        html: `<p><b>${escapeHtml(user.agency?.name ?? "")}</b> (${escapeHtml(user.full_name ?? "")}, ${escapeHtml(user.email ?? "")}) chce wystawiać oferty na ${escapeHtml(p!.nazwa)}.</p>`,
+      })
+      .catch(() => null);
+  }
+  redirect(`/app/ustawienia/portale?ftp=zgloszono#kolejne`);
 }

@@ -3,8 +3,9 @@ import { requireOwner } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { konfiguracjaOtodom, stanPolaczenia, PORTAL } from "@/lib/otodom/klient";
 import { STATUSY } from "@/lib/otodom/ogloszenia";
-import { PORTALE_FTP } from "@/lib/ftp/portale";
-import { polaczOtodom, rozlaczOtodom, testujFtpAkcja, usunFtp, ustawTrybTestowy, wyslijFtpTeraz, zapiszFtp } from "./actions";
+import { PORTALE_FTP, PORTALE_W_PRZYGOTOWANIU, wiadomoscDoPortalu } from "@/lib/ftp/portale";
+import { WiadomoscDoPortalu } from "./kopiuj";
+import { polaczOtodom, rozlaczOtodom, testujFtpAkcja, usunFtp, ustawTrybTestowy, wyslijFtpTeraz, zapiszFtp, zglosPortal } from "./actions";
 
 // „Wyślij teraz” wgrywa zdjęcia wszystkich ofert, przy pierwszej wysyłce to potrafi potrwać.
 export const maxDuration = 300;
@@ -30,6 +31,8 @@ const KOMUNIKATY_FTP: Record<string, { ok: boolean; t: string }> = {
   "brak-hasla": { ok: false, t: "Podaj hasło do FTP." },
   "brak-tabeli": { ok: false, t: "Eksport przez FTP wymaga aktualizacji bazy: uruchom lib/SETUP-v51-portale-ftp.sql w Supabase." },
   nieznany: { ok: false, t: "Nieznany portal." },
+  zgloszono: { ok: true, t: "Zgłoszenie przyjęte. Damy znać, gdy eksport na ten portal będzie gotowy do połączenia." },
+  "brak-tabeli-zgloszen": { ok: false, t: "Zgłoszenia portali wymagają aktualizacji bazy: uruchom lib/SETUP-v57-portale-zgloszenia.sql w Supabase." },
   blad: { ok: false, t: "Nie udało się zapisać. Spróbuj jeszcze raz." },
 };
 
@@ -46,6 +49,22 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
     .eq("agency_id", user.agency_id);
   const ftpWpisy = new Map(((ftpDane as WpisFtp[] | null) ?? []).map((w) => [w.portal, w]));
   const pol = await stanPolaczenia(user.agency_id!);
+  const { data: zgl } = await createSupabaseAdmin().from("portal_requests").select("portal").eq("agency_id", user.agency_id);
+  const zgloszone = new Set(((zgl ?? []) as { portal: string }[]).map((z) => z.portal));
+  const biuro = user.agency?.name ?? "nasze biuro";
+  const kafle = [
+    { id: "otodom", nazwa: "Otodom", stan: pol.polaczone ? (pol.test ? "test" : "polaczone") : "do-polaczenia" },
+    ...PORTALE_FTP.map((p) => ({ id: `ftp-${p.id}`, nazwa: p.nazwa, stan: ftpWpisy.get(p.id)?.ostatni_test_ok ? "polaczone" : ftpWpisy.get(p.id) ? "do-sprawdzenia" : "do-polaczenia" })),
+    ...PORTALE_W_PRZYGOTOWANIU.map((p) => ({ id: `kolejny-${p.id}`, nazwa: p.nazwa, stan: zgloszone.has(p.id) ? "zgloszone" : "wkrotce" })),
+  ];
+  const STAN_KAFLA: Record<string, { t: string; k: string }> = {
+    polaczone: { t: "Połączone", k: "bg-emerald-100 text-emerald-800" },
+    test: { t: "Konto testowe", k: "bg-amber-100 text-amber-800" },
+    "do-sprawdzenia": { t: "Sprawdź połączenie", k: "bg-amber-100 text-amber-800" },
+    "do-polaczenia": { t: "Połącz", k: "bg-slate-100 text-slate-700" },
+    zgloszone: { t: "Zgłoszone", k: "bg-sky-100 text-sky-800" },
+    wkrotce: { t: "W przygotowaniu", k: "bg-slate-100 text-slate-500" },
+  };
   const konf = konfiguracjaOtodom();
   const { data: wpisy } = pol.tabele
     ? await createSupabaseAdmin()
@@ -66,7 +85,20 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
         </p>
       )}
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+      <section>
+        <h2 className="text-lg font-semibold text-slate-900">Portale</h2>
+        <p className="mt-1 max-w-2xl text-sm text-slate-600">Kliknij portal, żeby się zalogować albo wpisać dane od portalu. Oferty na połączone portale wybierasz w kreatorze oferty, w ostatnim kroku Publikacja.</p>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {kafle.map((k) => (
+            <a key={k.id} href={`#${k.id}`} className="flex min-h-[88px] flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+              <span className="font-semibold leading-snug text-slate-900">{k.nazwa}</span>
+              <span className={`mt-2 self-start rounded-full px-2.5 py-0.5 text-xs font-semibold ${STAN_KAFLA[k.stan].k}`}>{STAN_KAFLA[k.stan].t}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section id="otodom" className="scroll-mt-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-slate-900">Otodom</h2>
@@ -146,10 +178,11 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
         {PORTALE_FTP.map((p) => {
           const w = ftpWpisy.get(p.id);
           return (
-            <section key={p.id} id={`ftp-${p.id}`} className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+            <section key={p.id} id={`ftp-${p.id}`} className="scroll-mt-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h3 className="font-semibold text-slate-900">{p.nazwa}</h3>
+                  <p className="mt-0.5 text-sm text-slate-600">{p.zasieg}</p>
                   <p className="mt-0.5 text-xs text-slate-500">Format pliku: {p.format}</p>
                 </div>
                 {w && (
@@ -158,7 +191,36 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
                   </span>
                 )}
               </div>
-              {!w && <p className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">{p.jakZdobyc}</p>}
+              {!w && (
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Jak połączyć</p>
+                    <ol className="mt-2 space-y-2">
+                      {p.kroki.map((k, i) => (
+                        <li key={k} className="flex gap-3 text-sm leading-relaxed text-slate-700">
+                          <span className="grid h-6 w-6 flex-shrink-0 place-items-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800">{i + 1}</span>
+                          {k}
+                        </li>
+                      ))}
+                    </ol>
+                    <p className="mt-3 text-sm text-slate-600">
+                      Kontakt do portalu:{" "}
+                      {p.kontakt.email && (
+                        <a href={`mailto:${p.kontakt.email}`} className="font-semibold text-emerald-700 hover:underline">
+                          {p.kontakt.email}
+                        </a>
+                      )}
+                      {p.kontakt.email && p.kontakt.telefon && " · "}
+                      {p.kontakt.telefon && (
+                        <a href={`tel:${p.kontakt.telefon.replace(/\s/g, "")}`} className="font-semibold text-emerald-700 hover:underline">
+                          {p.kontakt.telefon}
+                        </a>
+                      )}
+                    </p>
+                  </div>
+                  <WiadomoscDoPortalu tekst={wiadomoscDoPortalu(p, biuro)} email={p.kontakt.email} temat={`Dane FTP do eksportu ofert z AgentSpace: ${biuro}`} />
+                </div>
+              )}
               {w?.ostatni_blad && <p className="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{w.ostatni_blad}</p>}
               {w?.ostatni_test_at && (
                 <p className="mt-2 text-xs text-slate-500">
@@ -233,6 +295,33 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
             </section>
           );
         })}
+      </section>
+
+      <section id="kolejne" className="scroll-mt-6 space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">Kolejne portale</h2>
+          <p className="mt-1 max-w-2xl text-sm text-slate-600">
+            Te portale udostępniają swój format importu dopiero po umowie z dostawcą programu. Zgłoś, na którym chcesz wystawiać: kolejność dołączania portali ustalamy według zgłoszeń biur.
+          </p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          {PORTALE_W_PRZYGOTOWANIU.map((p) => (
+            <div key={p.id} id={`kolejny-${p.id}`} className="flex scroll-mt-6 flex-col justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-5">
+              <div>
+                <h3 className="font-semibold text-slate-900">{p.nazwa}</h3>
+                <p className="mt-1 text-sm text-slate-600">{p.zasieg}</p>
+              </div>
+              {zgloszone.has(p.id) ? (
+                <p className="text-sm font-semibold text-sky-700">✓ Zgłoszone. Damy znać, gdy będzie można połączyć.</p>
+              ) : (
+                <form action={zglosPortal}>
+                  <input type="hidden" name="portal" value={p.id} />
+                  <button className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-emerald-500 hover:text-emerald-700">Chcę wystawiać na tym portalu</button>
+                </form>
+              )}
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

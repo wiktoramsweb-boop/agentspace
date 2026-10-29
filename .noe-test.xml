@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xml>
+  <export>
+    <version>2.0</version>
+    <type>full</type>
+    <softwareName>AgentSpace</softwareName>
+  </export>
+  <agents>
+    <agent>
+      <idAgent>412033849</idAgent>
+      <name>Jan</name>
+      <surname>Kowalski</surname>
+      <phone>+48600100200</phone>
+      <email>jan@biuro.pl</email>
+    </agent>
+  </agents>
+  <ads>
+    <ad>
+      <details>
+        <id>8b994ab8-babb-41c5-a894-88053c61727c</id>
+        <idCategory>1</idCategory>
+        <idAdType>1</idAdType>
+        <sign><![CDATA[DEMO-029]]></sign>
+        <action>insert</action>
+        <idRegion>6</idRegion>
+        <districtName>Kraków</districtName>
+        <communeName>Kraków</communeName>
+        <cityName>Kraków</cityName>
+        <quarterName><![CDATA[Krowodrza]]></quarterName>
+        <street><![CDATA[Wrocławska]]></street>
+        <inaccurateLocation>1</inaccurateLocation>
+        <idAgent>412033849</idAgent>
+        <idMarketType>1</idMarketType>
+        <area>57</area>
+        <price>950000</price>
+        <idCurrency>1</idCurrency>
+        <pricePM>16666.67</pricePM>
+        <rooms>3</rooms>
+        <floor>3</floor>
+        <totalFloors>3</totalFloors>
+        <isElevator>2</isElevator>
+        <idBuildingType>3</idBuildingType>
+        <yearBuilt>1958</yearBuilt>
+        <idConditionType>14</idConditionType>
+        <idAvailableFromType>3</idAvailableFromType>
+        <idOwnershipType>8</idOwnershipType>
+        <rent>650</rent>
+        <isBalcony>1</isBalcony>
+        <idBalconyType>1</idBalconyType>
+        <areaBalcony>4.5</areaBalcony>
+        <jKitchen><v>1</v></jKitchen>
+        <jEquipment><v>1</v><v>4</v></jEquipment>
+        <isFurnished>1</isFurnished>
+        <jWindows><v>5</v></jWindows>
+        <jHeatingType><v>6</v></jHeatingType>
+        <jSafety><v>2</v></jSafety>
+        <description><![CDATA[Słoneczne mieszkanie & balkon
+• 3 pokoje
+• blisko tramwaju ]]]]><![CDATA[> test]]></description>
+      </details>
+      <map>
+        <mapLatitude>50.07</mapLatitude>
+        <mapLongitude>19.92</mapLongitude>
+      </map>
+      <photos>
+        <photo><fileName>as_qf0huu3pcn0f.jpg</fileName></photo>
+      </photos>
+      <plans>
+        <plan><fileName>rzut.jpg</fileName></plan>
+      </plans>
+    </ad>
+  </ads>
+</xml>

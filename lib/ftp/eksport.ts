@@ -6,6 +6,9 @@ import { zapiszZdarzenie } from "../dziennik";
 import { opisBleduFtp, wyslijPlikFtp, wyslijPlikiFtp, type DaneFtp } from "./klient";
 import { portalFtp } from "./portale";
 import { dokumentNoe, nazwaZdjecia, polaOferty, type AgentNoe, type OfertaDoPliku, type OfertaNoe, type Urzedowe, type ZdjecieNoe } from "./noe";
+import { dokumentTo, ofertaTo, type OfertaTo } from "./tabelaofert";
+import { spakuj } from "../zip";
+import { todayPL } from "../datetime";
 
 /** Portale FTP, które biuro ma skonfigurowane (do kreatora oferty). Bez tabeli v51 pusto. */
 export async function portaleFtpBiura(agencyId: string | null | undefined): Promise<{ id: string; nazwa: string }[]> {
@@ -20,12 +23,12 @@ export type WynikWysylki = { ok: true; ofert: number; pominiete: { id: string; t
 export const naPortal = (portal: string, o: { status?: string | null; details?: Record<string, unknown> | null }) =>
   (o.status === "aktywna" || o.status === "zarezerwowana") && Array.isArray(o.details?.portale_ftp) && (o.details!.portale_ftp as unknown[]).includes(portal);
 
-async function zdjecieJpg(url: string): Promise<Buffer | null> {
+async function zdjecieJpg(url: string, bok = 1920): Promise<Buffer | null> {
   const r = await fetch(url, { signal: AbortSignal.timeout(20000) });
   if (!r.ok) return null;
   const wej = Buffer.from(await r.arrayBuffer());
   // Portal przyjmuje jpg, png i gif. Nasze zdjęcia bywają w webp, więc zawsze robimy jpg.
-  return sharp(wej).rotate().resize({ width: 1920, height: 1920, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer();
+  return sharp(wej).rotate().resize({ width: bok, height: bok, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer();
 }
 
 /**
@@ -72,21 +75,58 @@ export async function wyslijNaPortalFtp(agencyId: string, portal: string, kto: s
     const pominiete: { id: string; tytul: string; bledy: string[] }[] = [];
     const zdjeciaDoWyslania = new Map<string, string>();
     const prowadzacy = new Set<string>();
-    for (const o of oferty) {
+    // Jednostki ustalamy raz na ofertę i zapisujemy: Nominatim pozwala na jedno zapytanie na sekundę.
+    const urzedowe = async (o: Record<string, unknown> & { id: string; lat: number | null; lng: number | null }): Promise<Urzedowe> => {
       const det = (o.details ?? {}) as Record<string, unknown>;
-      let u: Urzedowe = { wojewodztwo: (det.adres_wojewodztwo as string) ?? null, powiat: (det.adres_powiat as string) ?? null, gmina: (det.adres_gmina as string) ?? null };
-      // Jednostki ustalamy raz na ofertę i zapisujemy: Nominatim pozwala na jedno zapytanie na sekundę.
-      if ((!u.wojewodztwo || !u.powiat || !u.gmina) && o.lat != null && o.lng != null) {
-        const j = await jednostkiUrzedowe(o.lat, o.lng).catch(() => null);
-        if (j) {
-          u = j;
-          await admin
-            .from("properties")
-            .update({ details: { ...det, adres_wojewodztwo: j.wojewodztwo, adres_powiat: j.powiat, adres_gmina: j.gmina } })
-            .eq("id", o.id);
+      const u: Urzedowe = { wojewodztwo: (det.adres_wojewodztwo as string) ?? null, powiat: (det.adres_powiat as string) ?? null, gmina: (det.adres_gmina as string) ?? null };
+      if ((u.wojewodztwo && u.powiat && u.gmina) || o.lat == null || o.lng == null) return u;
+      const j = await jednostkiUrzedowe(o.lat, o.lng).catch(() => null);
+      if (j) await admin.from("properties").update({ details: { ...det, adres_wojewodztwo: j.wojewodztwo, adres_powiat: j.powiat, adres_gmina: j.gmina } }).eq("id", o.id);
+      await new Promise((r) => setTimeout(r, 1100));
+      return j ?? u;
+    };
+
+    if (opis.paczka === "zip") {
+      const { data: ag } = await admin.from("agencies").select("name").eq("id", agencyId).maybeSingle();
+      const doPaczki: { dzial: { tab: string; typ: string }; xml: string }[] = [];
+      const pliki: { nazwa: string; dane: Uint8Array }[] = [];
+      const pominieteZip: { id: string; tytul: string; bledy: string[] }[] = [];
+      for (const o of oferty) {
+        const u = await urzedowe(o);
+        const g = agenci.get(o.agent_id as string);
+        // Portal sugeruje do 10 zdjęć i 10 rzutów na ofertę; mniejszy rozmiar trzyma paczkę w rozsądnej wadze.
+        const fotki = ((o.photos ?? []) as { url: string; export?: boolean; plan?: boolean }[]).filter((p) => p.url && p.export !== false);
+        const wybrane = [...fotki.filter((p) => !p.plan).slice(0, 10), ...fotki.filter((p) => p.plan).slice(0, 10)];
+        const zdj = wybrane.map((p) => ({ plik: nazwaZdjecia(p.url), rzut: Boolean(p.plan), url: p.url }));
+        const w = ofertaTo(o as OfertaTo, u, g ? { imie: g.imie, email: g.email, telefon: g.telefon } : null, zdj, todayPL());
+        if (!w.ok) {
+          pominieteZip.push({ id: o.id as string, tytul: (o.title as string) ?? "Oferta", bledy: w.bledy });
+          continue;
         }
-        await new Promise((r) => setTimeout(r, 1100));
+        doPaczki.push(w);
+        for (const z of zdj) {
+          const dane = await zdjecieJpg(z.url, 1600).catch(() => null);
+          if (dane) pliki.push({ nazwa: z.plik, dane: new Uint8Array(dane) });
+        }
       }
+      const teraz = new Date().toLocaleString("sv-SE", { timeZone: "Europe/Warsaw" }).slice(0, 19);
+      const xml = dokumentTo(doPaczki, (ag?.name as string) ?? "Biuro nieruchomości", teraz);
+      const paczka = spakuj([{ nazwa: "oferty.xml", dane: new TextEncoder().encode(xml) }, ...pliki]);
+      const znacznik = new Date().toISOString().replace(/[-:]/g, "").slice(0, 15);
+      await wyslijPlikFtp(ftp, `agentspace_${znacznik}.zip`, Buffer.from(paczka));
+      await zakoncz({ ostatnia_wysylka_at: new Date().toISOString(), ostatnio_ofert: doPaczki.length, ostatni_blad: null, ostatni_test_ok: true, ostatnie_bledy: pominieteZip });
+      await zapiszZdarzenie({
+        agencyId,
+        actorId: kto,
+        akcja: "portal_ftp_wysylka",
+        opis: `Wysłano ${doPaczki.length} ofert na ${opis.nazwa}${pominieteZip.length ? `, ${pominieteZip.length} pominiętych` : ""}`,
+        meta: { portal, ofert: doPaczki.length, zdjec: pliki.length, pominiete: pominieteZip.length },
+      });
+      return { ok: true, ofert: doPaczki.length, pominiete: pominieteZip };
+    }
+
+    for (const o of oferty) {
+      const u = await urzedowe(o);
       const g = agenci.get(o.agent_id as string);
       const w = polaOferty(o as OfertaNoe, u, Boolean(g?.telefon && g?.email));
       if (!w.ok) {
