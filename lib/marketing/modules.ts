@@ -322,7 +322,7 @@ export const MODULES: ProductModule[] = [
     capabilities: [
       {
         title: "Eksport na portale",
-        body: "Zaznaczasz w ofercie portale, a AgentSpace wysyła ją sam po każdym zapisie, ze zdjęciami. Dziś Nieruchomosci-online.pl i TabelaOfert.pl, Otodom przez oficjalne API w trakcie zatwierdzania, kolejne portale w przygotowaniu.",
+        body: "Zaznaczasz w ofercie portale, a AgentSpace wysyła ją sam po każdym zapisie, ze zdjęciami. Dziś Otodom (oficjalne API Grupy OLX), Nieruchomosci-online.pl i TabelaOfert.pl, kolejne portale w przygotowaniu.",
       },
       {
         title: "Widoczność dla zespołu",
@@ -357,7 +357,7 @@ export const MODULES: ProductModule[] = [
       },
       {
         q: "Czy da się wyeksportować oferty na portale?",
-        a: "Tak. Oferty wysyłasz na Nieruchomosci-online.pl i TabelaOfert.pl: w ustawieniach wpisujesz dane od portalu, a w ofercie zaznaczasz, gdzie ma się pojawić. Plik idzie sam po każdym zapisie oferty. Otodom łączymy przez oficjalne API Grupy OLX, które jest w trakcie zatwierdzania, a kolejne portale (m.in. Gratka i Morizon, Domiporta, Adresowo) dołączamy według zgłoszeń biur.",
+        a: "Tak. Otodom łączysz jednym kliknięciem przez oficjalne API Grupy OLX, logując się kontem biura. Na Nieruchomosci-online.pl i TabelaOfert.pl wpisujesz w ustawieniach dane od portalu. W ofercie zaznaczasz, gdzie ma się pojawić, a AgentSpace wysyła ją sam po każdym zapisie. Kolejne portale (m.in. Gratka i Morizon, Domiporta, Adresowo) dołączamy według zgłoszeń biur.",
       },
     ],
   },

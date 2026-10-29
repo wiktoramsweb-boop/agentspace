@@ -53,7 +53,7 @@ z wybranego wzoru. Klient edytuje wszystko w `/app/ustawienia/strona`. Wymaga mi
 - „Dzisiaj” zawsze `todayPL()` / `dateKeyPL()` z `lib/datetime.ts`, nigdy `toISOString().slice(0, 10)`.
 - Istnienie tabeli sprawdzamy zapytaniem GET (`select("id").limit(1)`), nigdy HEAD: brakująca tabela przy HEAD zwraca 204 bez błędu.
 - Ważne czynności (usunięcia, przepisania, eksporty, role, pieniądze) zapisujemy w `lib/dziennik.ts` (`zapiszZdarzenie`).
-- Strona www: bez gradientowego tekstu, poświat, szkła i karuzel; kolory z tokenów `--color-mk-*`; nie obiecujemy funkcji, których nie ma (eksport na portale działa dla Nieruchomosci-online i TabelaOfert; Otodom czeka na zatwierdzenie OLX, nie piszemy, że działa); opinie tylko prawdziwe (`lib/marketing/opinie.ts`).
+- Strona www: bez gradientowego tekstu, poświat, szkła i karuzel; kolory z tokenów `--color-mk-*`; nie obiecujemy funkcji, których nie ma (eksport na portale działa dla Otodom (OLX aktywował aplikację produkcyjnie 29.10.2026), Nieruchomosci-online i TabelaOfert; Gratka/Morizon, Domiporta, Adresowo dopiero w przygotowaniu); opinie tylko prawdziwe (`lib/marketing/opinie.ts`).
 
 ## Co to jest
 

@@ -133,7 +133,7 @@ export default async function PortalePage({ searchParams }: { searchParams: Prom
           <form action={ustawTrybTestowy} className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm">
             <input type="hidden" name="test" value={pol.test ? "0" : "1"} />
             <span className="flex-1 text-slate-600">
-              Konto testowe OLX: {pol.test ? <b>włączone</b> : "wyłączone"}. Tylko dla kont testowych od OLX, dodaje do tytułu [qatest-mercury] i opis testowy.
+              Tryb konta testowego OLX: {pol.test ? <b>włączony</b> : "wyłączony"}. {pol.test ? "Oferty idą z dopiskiem [qatest-mercury] i opisem testowym, czyli nie jako prawdziwe ogłoszenia. Wyłącz, jeśli połączyłeś prawdziwe konto biura." : "Oferty publikują się normalnie. Włączaj tylko dla kont testowych od OLX."}
             </span>
             <button className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700">{pol.test ? "Wyłącz" : "Włącz"}</button>
           </form>

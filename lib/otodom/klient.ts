@@ -102,9 +102,10 @@ async function zapiszTokeny(agencyId: string, t: Tokeny, extra: Record<string, u
 
 export async function polaczKodem(agencyId: string, userId: string, code: string): Promise<void> {
   const t = await zadanieTokenu({ grant_type: "authorization_code", code });
-  // Dopóki OLX nie zatwierdzi integracji, działa tylko konto testowe, a ono
-  // wymaga prefiksu [qatest-mercury]. Po zatwierdzeniu ustawiamy OTODOM_PRODUKCJA=1.
-  await zapiszTokeny(agencyId, t, { connected_by: userId, connected_at: new Date().toISOString(), test_mode: process.env.OTODOM_PRODUKCJA !== "1" });
+  // OLX aktywował integrację produkcyjnie (październik 2026), więc nowe
+  // połączenia publikują normalnie. Konto testowe od OLX (prefiks
+  // [qatest-mercury]) włącza się przełącznikiem w ustawieniach portali.
+  await zapiszTokeny(agencyId, t, { connected_by: userId, connected_at: new Date().toISOString(), test_mode: process.env.OTODOM_TRYB_TESTOWY === "1" });
 }
 
 export type Polaczenie = { polaczone: boolean; test: boolean; od: string | null; blad: string | null; tabele: boolean };
