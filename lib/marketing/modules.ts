@@ -321,6 +321,10 @@ export const MODULES: ProductModule[] = [
       "Oferty leżą w prywatnych folderach agentów. Klient kupujący z jednego biurka nigdy nie spotka nieruchomości z drugiego - i transakcja wewnętrzna nie ma jak powstać.",
     capabilities: [
       {
+        title: "Eksport na portale",
+        body: "Zaznaczasz w ofercie portale, a AgentSpace wysyła ją sam po każdym zapisie, ze zdjęciami. Dziś Nieruchomosci-online.pl i TabelaOfert.pl, Otodom przez oficjalne API w trakcie zatwierdzania, kolejne portale w przygotowaniu.",
+      },
+      {
         title: "Widoczność dla zespołu",
         body: "Cała baza dostępna dla biura. Kojarzenie kupującego z ofertą kolegi przestaje zależeć od tego, kto z kim rozmawia przy kawie.",
       },
@@ -353,7 +357,7 @@ export const MODULES: ProductModule[] = [
       },
       {
         q: "Czy da się wyeksportować oferty na portale?",
-        a: "Jeszcze nie. To pierwsza rzecz na liście, ale wymaga umowy z każdym portalem osobno, a nie samego kodu. Do tego czasu warto zostawić obecny system obok.",
+        a: "Tak. Oferty wysyłasz na Nieruchomosci-online.pl i TabelaOfert.pl: w ustawieniach wpisujesz dane od portalu, a w ofercie zaznaczasz, gdzie ma się pojawić. Plik idzie sam po każdym zapisie oferty. Otodom łączymy przez oficjalne API Grupy OLX, które jest w trakcie zatwierdzania, a kolejne portale (m.in. Gratka i Morizon, Domiporta, Adresowo) dołączamy według zgłoszeń biur.",
       },
     ],
   },

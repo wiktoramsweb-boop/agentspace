@@ -338,8 +338,8 @@ export const pl = {
           body: "AgentSpace pokazuje dane i daje narzędzia, ale nie zarządza za Ciebie. Jeśli nikt nie spojrzy w panel raz w tygodniu i nie porozmawia z agentem, który słabnie - żaden system tego nie naprawi.",
         },
         {
-          title: "Szukasz portalu z eksportem ofert",
-          body: "Nie jesteśmy systemem do masowego wystawiania na portale. Eksport do OtoDom jest na mapie drogowej, ale dziś AgentSpace jest systemem pracy biura, nie wystawiarką ogłoszeń.",
+          title: "Musisz dziś wystawiać na kilkunastu portalach",
+          body: "Eksport działa na Nieruchomosci-online.pl i TabelaOfert.pl, Otodom jest w trakcie zatwierdzania przez Grupę OLX, a kolejne portale dołączamy według zgłoszeń. Jeśli codziennie publikujesz na serwisach, których jeszcze nie ma, powiemy wprost, kiedy będą.",
         },
       ],
     },
@@ -355,7 +355,7 @@ export const pl = {
         {
           question: "Czy AgentSpace zastąpi mój obecny system?",
           answer:
-            "W większości biur tak - AgentSpace obejmuje CRM klientów, wspólną bazę nieruchomości, cele, prowizje, zadania i dokumenty. Jeśli korzystasz z systemu do masowego eksportu ofert na portale, na razie warto zostawić go obok. Na rozmowie sprawdzamy to konkretnie na Twoim przypadku.",
+            "W większości biur tak - AgentSpace obejmuje CRM klientów, wspólną bazę nieruchomości, cele, prowizje, zadania i dokumenty. Eksport ofert działa na Nieruchomosci-online.pl i TabelaOfert.pl, a Otodom jest w trakcie zatwierdzania. Jeśli wystawiasz na portalach, których jeszcze nie obsługujemy, warto na chwilę zostawić obecny system obok. Na rozmowie sprawdzamy to konkretnie na Twoim przypadku.",
         },
         {
           question: "Ile trwa wdrożenie i kto je robi?",
@@ -611,8 +611,9 @@ export const pl = {
         items: [
           { period: "Działa dziś", title: "CRM, oferty, cele i prowizje", body: "Wspólna baza klientów i nieruchomości, lejek celów od rocznego do dziennego, rozliczanie prowizji i panel właściciela." },
           { period: "Działa dziś", title: "AI Coach i strony www biur", body: "Trening rozmów z klientem AI w trzech kategoriach oraz strona internetowa biura połączona z bazą ofert." },
+          { period: "Działa dziś", title: "Eksport na portale i import z innych programów", body: "Oferty idą same na Nieruchomosci-online.pl i TabelaOfert.pl, a bazę z poprzedniego programu przenosisz importem ze zdjęciami." },
           { period: "W drodze", title: "Synchronizacja z kalendarzem Google", body: "Plan dnia agenta zgrany ze spotkaniami w obie strony, bez przepisywania terminów." },
-          { period: "W drodze", title: "Eksport na portale i import z systemów ofertowych", body: "Jedno kliknięcie zamiast wklejania tej samej oferty w pięciu miejscach." },
+          { period: "W drodze", title: "Otodom i kolejne portale", body: "Otodom przez oficjalne API Grupy OLX, potem Gratka i Morizon, Domiporta i Adresowo, w kolejności zgłoszeń biur." },
         ],
       },
       cta: { title: "Porozmawiajmy o Waszym biurze", lead: "Pokażemy system na Waszych danych i powiemy wprost, czy ma u Was sens. Wdrożenie zajmuje jeden dzień roboczy.", button: "Umów rozmowę →" },
@@ -937,6 +938,7 @@ export const pl = {
           "Asystent AI na każdym ekranie i pisanie follow-upów",
           "Raporty miesięczne na e-mail",
           "Karta transakcji i umowy rezerwacyjne (PDF)",
+          "Eksport ofert na portale ogłoszeniowe",
         ],
       },
       {

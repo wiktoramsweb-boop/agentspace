@@ -53,6 +53,7 @@ export const PLANS: Plan[] = [
       "Asystent AI na każdym ekranie i pisanie follow-upów",
       "Raporty miesięczne na e-mail",
       "Karta transakcji i umowy rezerwacyjne (PDF)",
+      "Eksport ofert na portale ogłoszeniowe",
     ],
   },
   {

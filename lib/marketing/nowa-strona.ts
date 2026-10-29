@@ -123,7 +123,7 @@ function pl(dni: number): NowaStrona {
       lead: "AgentSpace to CRM dla biur nieruchomości zbudowany wokół codziennej pracy agenta: od pierwszego telefonu, przez prezentację i umowę, po prowizję i wynik biura. Bez Excela, bez kartek, bez dokupowania osobnych narzędzi.",
       rzedy: [
         ["CRM klientów", "Priorytety na dziś", "Oferty na mapie", "Kalendarz", "Leady z reklam", "Poszukiwania", "Szybki wpis głosem", "Czat zespołu", "Asystent AI"],
-        ["AI Coach", "Biblioteka technik", "Umowy i PDF", "Świadectwa energetyczne", "Prowizje", "Wycena z RCN", "Portal klienta", "Doradca kredytowy", "Faktury", "Koszty i wynik", "Strona www biura"],
+        ["AI Coach", "Biblioteka technik", "Umowy i PDF", "Świadectwa energetyczne", "Prowizje", "Wycena z RCN", "Portal klienta", "Doradca kredytowy", "Eksport na portale", "Faktury", "Koszty i wynik", "Strona www biura"],
       ],
       punkty: [
         { tytul: "Jedna baza", tekst: "Klient, oferta, rozmowa, umowa i prowizja są połączone. Nic nie przepisujesz dwa razy." },
@@ -380,7 +380,7 @@ function en(dni: number): NowaStrona {
       lead: "AgentSpace is a CRM for real estate agencies built around an agent's daily work: from the first call, through viewings and contracts, to commissions and agency results. No spreadsheets, no paper, no extra tools to buy.",
       rzedy: [
         ["Client CRM", "Today's priorities", "Listings on a map", "Calendar", "Ad leads", "Buyer searches", "Voice notes", "Team chat", "AI assistant"],
-        ["AI Coach", "Technique library", "Contracts and PDF", "Commissions", "Valuation from deeds", "AI receptionist", "Invoices", "Costs and results", "Agency website"],
+        ["AI Coach", "Technique library", "Contracts and PDF", "Commissions", "Valuation from deeds", "Client portal", "Mortgage advisor", "Portal export", "Invoices", "Costs and results", "Agency website"],
       ],
       punkty: [
         { tytul: "One database", tekst: "Client, listing, call, contract and commission are linked. Nothing is typed twice." },

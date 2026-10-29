@@ -337,8 +337,8 @@ export const en: Dict = {
           body: "AgentSpace shows the data and hands you the tools, but it does not manage for you. If nobody opens the dashboard once a week and talks to the agent who is slipping, no system fixes that.",
         },
         {
-          title: "You are looking for a listing syndication tool",
-          body: "We are not a bulk portal publishing system. Portal export is on the roadmap, but today AgentSpace is the system an agency works in, not a listing distributor.",
+          title: "You must publish on a dozen portals today",
+          body: "Export already works for Nieruchomosci-online.pl and TabelaOfert.pl, Otodom is being approved by OLX Group, and further portals are added based on agency requests. If you publish daily on portals we do not support yet, we will tell you honestly when they arrive.",
         },
       ],
     },
@@ -354,7 +354,7 @@ export const en: Dict = {
         {
           question: "Will AgentSpace replace my current system?",
           answer:
-            "In most agencies, yes. AgentSpace covers the client CRM, a shared property database, goals, commissions, tasks and documents. If you use a dedicated tool for bulk listing syndication, keep it alongside for now. We check this against your specific setup on the call.",
+            "In most agencies, yes. AgentSpace covers the client CRM, a shared property database, goals, commissions, tasks and documents. Listing export works for Nieruchomosci-online.pl and TabelaOfert.pl, and Otodom is being approved. If you publish on portals we do not support yet, keep your current tool alongside for a while. We check this against your specific setup on the call.",
         },
         {
           question: "How long does onboarding take and who does it?",
@@ -610,8 +610,9 @@ export const en: Dict = {
         items: [
           { period: "Live today", title: "CRM, listings, goals and commissions", body: "A shared client and property database, a goal funnel from annual down to daily, commission settlements and the owner dashboard." },
           { period: "Live today", title: "AI Coach and agency websites", body: "Call practice with an AI client in three categories, plus an agency website wired into the listing database." },
+          { period: "Live today", title: "Portal export and import from other software", body: "Listings go to Nieruchomosci-online.pl and TabelaOfert.pl automatically, and your previous database moves in with photos." },
           { period: "In progress", title: "Google Calendar sync", body: "The agent's day lined up with their meetings in both directions, without retyping appointments." },
-          { period: "In progress", title: "Portal export and import from listing systems", body: "One click instead of pasting the same listing into five places." },
+          { period: "In progress", title: "Otodom and more portals", body: "Otodom via the official OLX Group API, then Gratka and Morizon, Domiporta and Adresowo, in order of agency requests." },
         ],
       },
       cta: { title: "Let us talk about your agency", lead: "We will show the system on your data and say plainly whether it makes sense for you. Onboarding takes one working day.", button: "Book a call →" },
@@ -937,6 +938,7 @@ export const en: Dict = {
           "AI assistant on every screen and follow-up drafting",
           "Monthly reports by e-mail",
           "Deal records and reservation agreements (PDF)",
+          "Listing export to property portals",
         ],
       },
       {
