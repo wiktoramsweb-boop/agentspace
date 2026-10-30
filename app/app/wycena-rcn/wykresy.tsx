@@ -71,38 +71,6 @@ export function WykresLiczby({ seria }: { seria: PunktSerii[] }) {
   );
 }
 
-/** Mapa porównań: pierścienie odległości i punkty transakcji, kolor według ceny za m². */
-export function MapaPorownan({ porownania, cenaM2 }: { porownania: Porownanie[]; cenaM2: number }) {
-  const S = 360, C = S / 2;
-  const zasieg = Math.max(300, ...porownania.map((p) => p.odleglosc)) * 1.1;
-  const skala = (C - 16) / zasieg;
-  const pierscienie = [0.25, 0.5, 0.75, 1].map((f) => Math.round((zasieg * f) / 100) * 100).filter((v, i, a) => v > 0 && a.indexOf(v) === i);
-  const kolor = (v: number) => (v > cenaM2 * 1.08 ? "#f43f5e" : v < cenaM2 * 0.92 ? "#0ea5e9" : "#10b981");
-  return (
-    <svg viewBox={`0 0 ${S} ${S}`} className="h-auto w-full max-w-[360px]" role="img" aria-label="Położenie porównywanych transakcji względem wycenianego mieszkania">
-      <rect width={S} height={S} rx={24} className="fill-slate-50" />
-      {pierscienie.map((r) => (
-        <g key={r}>
-          <circle cx={C} cy={C} r={r * skala} fill="none" className="stroke-slate-200" strokeDasharray="3 4" />
-          <text x={C + r * skala * 0.7071 + 3} y={C - r * skala * 0.7071 - 3} className="fill-slate-400 text-[9px]">
-            {r >= 1000 ? `${(r / 1000).toLocaleString("pl-PL")} km` : `${r} m`}
-          </text>
-        </g>
-      ))}
-      <text x={C} y={14} textAnchor="middle" className="fill-slate-400 text-[9px]">
-        N
-      </text>
-      {porownania.map((p) => (
-        <g key={p.id}>
-          <circle cx={C + p.dx * skala} cy={C - p.dy * skala} r={7} fill={kolor(p.cenaM2)} opacity={0.85} stroke="#fff" strokeWidth={1.5} />
-          <title>{`${p.adres}: ${p.cenaM2.toLocaleString("pl-PL")} zł/m²`}</title>
-        </g>
-      ))}
-      <circle cx={C} cy={C} r={9} fill="#0f172a" stroke="#fff" strokeWidth={3} />
-    </svg>
-  );
-}
-
 /** Wpływ standardu wykończenia na cenę tego mieszkania. */
 export function WplywStandardu({ warianty, wybrany }: { warianty: { stan: string; nazwa: string; cena: number }[]; wybrany: string }) {
   const max = Math.max(...warianty.map((w) => w.cena));

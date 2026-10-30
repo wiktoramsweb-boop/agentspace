@@ -14,14 +14,15 @@ import {
 import { WyborTerminu } from "../../components/wybor-terminu";
 import type { DzialaniePortalu } from "@/lib/wiadomosci-klientow";
 import { PODPOWIEDZI } from "./podpowiedzi";
+import { IkonaSprawy, type NazwaIkony } from "../../components/ikony-sprawy";
 import { Select } from "@/app/app/components/select";
 
-const RODZAJE: { v: RodzajDzialaniaPortalu; t: string; ikona: string; widoczneDomyslnie: boolean }[] = [
-  { v: "prezentacja", t: "Prezentacja", ikona: "🔑", widoczneDomyslnie: true },
-  { v: "telefon", t: "Telefon", ikona: "📞", widoczneDomyslnie: false },
-  { v: "spotkanie", t: "Spotkanie", ikona: "🤝", widoczneDomyslnie: true },
-  { v: "zadanie", t: "Zadanie", ikona: "✅", widoczneDomyslnie: false },
-  { v: "informacja", t: "Informacja", ikona: "📣", widoczneDomyslnie: true },
+const RODZAJE: { v: RodzajDzialaniaPortalu; t: string; ikona: NazwaIkony; widoczneDomyslnie: boolean }[] = [
+  { v: "prezentacja", t: "Prezentacja", ikona: "klucz", widoczneDomyslnie: true },
+  { v: "telefon", t: "Telefon", ikona: "telefon", widoczneDomyslnie: false },
+  { v: "spotkanie", t: "Spotkanie", ikona: "spotkanie", widoczneDomyslnie: true },
+  { v: "zadanie", t: "Zadanie", ikona: "zadanie", widoczneDomyslnie: false },
+  { v: "informacja", t: "Informacja", ikona: "informacja", widoczneDomyslnie: true },
 ];
 
 const terazPL = () => {
@@ -98,7 +99,7 @@ export function NoweDzialanie({ accessId, rodzajDostepu, nieruchomosci }: { acce
                 rodzaj === r.v ? "border-emerald-500 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
               }`}
             >
-              <span aria-hidden="true">{r.ikona}</span>
+              <IkonaSprawy nazwa={r.ikona} />
               {r.t}
             </button>
           ))}
@@ -129,7 +130,7 @@ export function NoweDzialanie({ accessId, rodzajDostepu, nieruchomosci }: { acce
         {!kupujacy && nieruchomosci.length > 1 && (
           <div>
             <p className={`${sekcja} mb-1.5`}>Nieruchomość</p>
-            <Select value={nier} onChange={(e) => setNier(e.target.value)} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">
+            <Select value={nier} onChange={(e) => setNier(e.target.value)}>
               {nieruchomosci.map((n) => (
                 <option key={n.id} value={n.id}>
                   {n.title}
@@ -156,52 +157,61 @@ export function NoweDzialanie({ accessId, rodzajDostepu, nieruchomosci }: { acce
         />
       </div>
 
-      <div className={`rounded-2xl border p-3 transition ${widoczne ? "border-emerald-200 bg-emerald-50/50" : "border-slate-200 bg-slate-50"}`}>
-        <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-800">
-          <input type="checkbox" checked={widoczne} onChange={(e) => setWidoczne(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
-          {kupujacy ? "Wyślij klientowi wiadomość" : "Pokaż klientowi w portalu"}
-        </label>
+      <section className={`overflow-hidden rounded-2xl border transition ${widoczne ? "border-emerald-300" : "border-slate-200"}`}>
+        <button type="button" role="switch" aria-checked={widoczne} onClick={() => setWidoczne(!widoczne)} className="flex w-full items-center gap-3 p-4 text-left">
+          <span className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl ${widoczne ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+            <IkonaSprawy nazwa="rozmowa" className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold text-slate-900">{kupujacy ? "Wyślij klientowi wiadomość" : "Pokaż klientowi w portalu"}</span>
+            <span className="block text-sm text-slate-500">{widoczne ? "Klient zobaczy to i dostanie powiadomienie." : "Działanie zostaje tylko w biurze."}</span>
+          </span>
+          <span className={`relative h-6 w-11 flex-shrink-0 rounded-full transition ${widoczne ? "bg-emerald-500" : "bg-slate-300"}`} aria-hidden="true">
+            <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${widoczne ? "left-[22px]" : "left-0.5"}`} />
+          </span>
+        </button>
         {widoczne && (
-          <div className="mt-3">
-            <div className="-mx-1 mb-2 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          <div className="border-t border-slate-200 p-4">
+            <p className={`${sekcja} mb-2`}>Gotowe teksty</p>
+            <div className="mb-3 flex flex-wrap gap-1.5">
               {grupy.map((g) => (
                 <button
                   key={g.nazwa}
                   type="button"
+                  aria-pressed={g.nazwa === aktywna?.nazwa}
                   onClick={() => setGrupa(g.nazwa)}
-                  className={`flex flex-shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
-                    g.nazwa === aktywna?.nazwa ? "border-emerald-500 bg-white text-emerald-800" : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${
+                    g.nazwa === aktywna?.nazwa ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
-                  <span aria-hidden="true">{g.ikona}</span>
+                  <IkonaSprawy nazwa={g.ikona} className="h-3.5 w-3.5" />
                   {g.nazwa}
                 </button>
               ))}
             </div>
-            <div className="mb-2 grid gap-1">
+            <ul className="mb-3 divide-y divide-slate-100 rounded-xl border border-slate-200">
               {aktywna?.wpisy.map((w) => (
-                <button
-                  key={w}
-                  type="button"
-                  onClick={() => setOpis(w)}
-                  className={`rounded-lg border px-3 py-1.5 text-left text-[13px] leading-snug transition ${opis === w ? "border-emerald-500 bg-white text-emerald-900" : "border-transparent bg-white/70 text-slate-700 hover:border-emerald-300"}`}
-                >
-                  {w}
-                </button>
+                <li key={w}>
+                  <button type="button" aria-pressed={opis === w} onClick={() => setOpis(w)} className={`flex w-full items-start gap-2.5 px-3 py-2.5 text-left text-[13px] leading-snug transition ${opis === w ? "bg-emerald-50 text-emerald-900" : "text-slate-700 hover:bg-slate-50"}`}>
+                    <span className={`mt-0.5 h-4 w-4 flex-shrink-0 rounded-full border-2 ${opis === w ? "border-[5px] border-emerald-600" : "border-slate-300"}`} aria-hidden="true" />
+                    {w}
+                  </button>
+                </li>
               ))}
-            </div>
+            </ul>
+            <p className={`${sekcja} mb-1.5`}>Treść dla klienta</p>
             <textarea
               value={opis}
               onChange={(e) => setOpis(e.target.value)}
-              rows={2}
+              rows={3}
               maxLength={kupujacy ? 2000 : 300}
-              placeholder="To przeczyta klient. Wybierz podpowiedź albo napisz własnymi słowami."
+              placeholder="Wybierz tekst powyżej albo napisz własnymi słowami."
               className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
             />
             {doUzupelnienia && <p className="mt-1 text-xs font-medium text-amber-700">Uzupełnij miejsca w [nawiasach] przed zapisaniem.</p>}
           </div>
         )}
-      </div>
+      </section>
 
       <div className="flex flex-wrap items-center gap-3">
         <button
@@ -220,7 +230,7 @@ export function NoweDzialanie({ accessId, rodzajDostepu, nieruchomosci }: { acce
   );
 }
 
-const IKONY: Record<string, string> = { spotkanie: "🔑", polaczenie: "📞", zadanie: "✅", wydarzenie: "📣" };
+const IKONY: Record<string, NazwaIkony> = { spotkanie: "klucz", polaczenie: "telefon", zadanie: "zadanie", wydarzenie: "informacja" };
 const kiedyKrotko = (iso: string | null) =>
   iso ? new Intl.DateTimeFormat("pl-PL", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" }).format(new Date(iso)) : "bez terminu";
 
@@ -270,7 +280,7 @@ function Wiersz({ accessId, d, zWidocznoscia }: { accessId: string; d: Dzialanie
     <li className={`rounded-xl border px-3 py-2.5 ${d.status === "anulowane" ? "border-slate-100 opacity-60" : "border-slate-200"}`}>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span aria-hidden="true" className="text-base">
-          {IKONY[d.kind] ?? "•"}
+          <IkonaSprawy nazwa={IKONY[d.kind] ?? "zadanie"} />
         </span>
         <Link href={`/app/dzialania/${d.id}`} className="min-w-0 flex-1 truncate text-sm font-medium text-slate-900 hover:text-emerald-700">
           {d.temat}

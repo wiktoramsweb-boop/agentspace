@@ -47,6 +47,8 @@ export default async function ZapisanaWycenaPage({ params }: { params: Promise<{
           ofertaId={w.property_id}
           cenaPorownania={w.cena_ogloszenia ? Number(w.cena_ogloszenia) : null}
           etykietaCeny="w ogłoszeniu"
+          lat={Number(w.parametry.lat) || null}
+          lng={Number(w.parametry.lng) || null}
         />
       </div>
     </>

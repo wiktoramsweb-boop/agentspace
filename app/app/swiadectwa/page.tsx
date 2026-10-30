@@ -26,7 +26,7 @@ export default async function SwiadectwaPage() {
 
       <section className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
         <div className="flex items-start gap-4">
-          <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl bg-emerald-100 text-xl">⚡</span>
+          <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-600"><svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M13 3 4 14h7l-1 7 9-11h-7l1-7Z" /></svg></span>
           <div>
             <h2 className="font-semibold text-slate-900">Wymagane prawnie przy sprzedaży i najmie</h2>
             <p className="mt-1 text-sm text-slate-600">

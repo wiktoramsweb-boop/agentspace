@@ -47,7 +47,7 @@ declare global {
 const LEAFLET_CSS = "/vendor/leaflet/leaflet.css";
 const LEAFLET_JS = "/vendor/leaflet/leaflet.js";
 
-function loadLeaflet(): Promise<any> {
+export function loadLeaflet(): Promise<any> {
   return new Promise((resolve) => {
     if (window.L) return resolve(window.L);
     if (!document.querySelector(`link[href="${LEAFLET_CSS}"]`)) {

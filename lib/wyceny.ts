@@ -27,6 +27,8 @@ export type WynikLiczenia = {
   raport: DaneRaportu | null;
   zapisanaId: string | null;
   powiazanaOferta: string | null;
+  lat: number | null;
+  lng: number | null;
 };
 
 export async function policzWycene(user: ProfileWithAgency, p: ParametryWyceny, oferta: OfertaDoWyceny | null, zapytano: boolean): Promise<WynikLiczenia> {
@@ -85,7 +87,7 @@ export async function policzWycene(user: ProfileWithAgency, p: ParametryWyceny, 
     zapisanaId = z?.id ?? null;
     powiazanaOferta = z?.propertyId ?? powiazanaOferta;
   }
-  return { adres, cel, proba, zablokowana, brak, wycena, raport, zapisanaId, powiazanaOferta };
+  return { adres, cel, proba, zablokowana, brak, wycena, raport, zapisanaId, powiazanaOferta, lat, lng };
 }
 
 /** Zapis po cichu: bez migracji v58 wycena działa jak dotąd, tylko bez historii. */

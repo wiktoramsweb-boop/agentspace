@@ -1,5 +1,6 @@
 "use client";
 
+import { IkonaSprawy } from "../components/ikony-sprawy";
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import { PageHeader } from "../components/page-header";
@@ -111,8 +112,8 @@ export function ProwizjePanel({
                 key={p.id}
                 className="flex flex-col gap-2 rounded-xl border border-amber-200 bg-white p-3 sm:flex-row sm:items-center"
               >
-                <span className="text-lg leading-none" aria-hidden="true">
-                  {p.rodzaj === "oferta" ? "🏠" : p.rodzaj === "klient" ? "🤝" : p.rodzaj === "termin" ? "⏰" : "📅"}
+                <span className="text-amber-600">
+                  <IkonaSprawy nazwa={p.rodzaj === "oferta" ? "dom" : p.rodzaj === "klient" ? "spotkanie" : "zadanie"} className="h-5 w-5" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-slate-900">{p.tytul}</p>

@@ -75,7 +75,7 @@ export default async function WycenaRcnPage({ searchParams }: Props) {
 
   const podglad = p("podglad") === "1";
   const zapytano = !podglad && Boolean(p("oferta") || p("address") || p("lat"));
-  const { adres, cel, proba, brak, wycena, raport: daneRaportu, zapisanaId, powiazanaOferta } = await policzWycene(user, parametry, oferta, zapytano);
+  const { adres, cel, proba, brak, wycena, raport: daneRaportu, zapisanaId, powiazanaOferta, lat, lng } = await policzWycene(user, parametry, oferta, zapytano);
   const w = wycena?.wynik ?? null;
   const cenaOferty = oferta?.deal_kind === "sprzedaz" ? oferta.price_pln : null;
   const cenaPorownania = cenaOferty ?? (Number(p("cena_ogl")) || null);
@@ -210,7 +210,7 @@ export default async function WycenaRcnPage({ searchParams }: Props) {
           ) : (
             <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">Tej wyceny nie zapisano. Zapisywanie wycen ruszy po uruchomieniu migracji v58.</p>
           )}
-          <WynikWidok w={w} promien={wycena.promien} raport={daneRaportu} adres={adres} stan={cel.stan ?? "standard"} ofertaId={oferta?.id ?? null} cenaPorownania={cenaPorownania} etykietaCeny={cenaOferty ? "w ofercie" : "w ogłoszeniu"} />
+          <WynikWidok w={w} promien={wycena.promien} raport={daneRaportu} adres={adres} stan={cel.stan ?? "standard"} ofertaId={oferta?.id ?? null} cenaPorownania={cenaPorownania} etykietaCeny={cenaOferty ? "w ofercie" : "w ogłoszeniu"} lat={lat} lng={lng} />
         </div>
       )}
       {w && (

@@ -3,7 +3,8 @@ import type { WynikWyceny } from "@/lib/rcn-wycena";
 import type { DaneRaportu } from "@/lib/wycena-pdf";
 import { formatPln } from "@/lib/format";
 import { formatDatePL } from "@/lib/datetime";
-import { MapaPorownan, WplywStandardu, WykresCen, WykresLiczby } from "./wykresy";
+import { WplywStandardu, WykresCen, WykresLiczby } from "./wykresy";
+import { MapaPorownan } from "./mapa-porownan";
 import { PobierzRaport } from "./pobierz-raport";
 
 const PEWNOSC = {
@@ -22,6 +23,8 @@ export function WynikWidok({
   ofertaId,
   cenaPorownania,
   etykietaCeny,
+  lat,
+  lng,
 }: {
   w: WynikWyceny;
   promien: number;
@@ -31,7 +34,12 @@ export function WynikWidok({
   ofertaId: string | null;
   cenaPorownania: number | null;
   etykietaCeny: string;
+  lat: number | null;
+  lng: number | null;
 }) {
+  // Rejestr uzupełniają powiaty, jedne co miesiąc, inne z dużym opóźnieniem.
+  const najnowszy = w.porownania.map((p) => p.data).sort().at(-1) ?? null;
+  const miesiecy = najnowszy ? Math.floor((Date.now() - Date.parse(najnowszy)) / (30 * 86_400_000)) : 0;
   const roznica = cenaPorownania ? Math.round(((cenaPorownania - w.szacunek) / w.szacunek) * 100) : null;
   return (
     <>
@@ -101,21 +109,27 @@ export function WynikWidok({
             </div>
           </section>
 
-          <section className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
-              <h2 className="mb-1 text-lg font-semibold text-slate-900">Wpływ standardu na cenę</h2>
-              <p className="mb-4 text-sm text-slate-500">Ta sama lokalizacja i metraż, różny stan wykończenia.</p>
-              <WplywStandardu warianty={w.warianty} wybrany={stan as "standard"} />
-            </div>
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+          {(miesiecy >= 6 || w.liczba < 15) && (
+            <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              {miesiecy >= 6 && najnowszy ? `Najnowszy akt w tej okolicy jest z ${formatDatePL(najnowszy)}: ten powiat aktualizuje rejestr z opóźnieniem. ` : ""}
+              {w.liczba < 15 ? `Tylko ${w.liczba} podobnych transakcji, więc traktuj wynik orientacyjnie.` : ""}
+            </p>
+          )}
+
+          {lat != null && lng != null && (
+            <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
               <h2 className="mb-1 text-lg font-semibold text-slate-900">Mapa porównań</h2>
               <p className="mb-4 text-sm text-slate-500">
-                <span className="text-emerald-600">●</span> blisko wyceny <span className="ml-2 text-rose-500">●</span> drożej <span className="ml-2 text-sky-500">●</span> taniej
+                Cena za m² każdej transakcji. Kliknij pinezkę, żeby zobaczyć adres. <span className="font-semibold text-emerald-600">zielone</span> blisko wyceny, <span className="font-semibold text-rose-600">czerwone</span> drożej, <span className="font-semibold text-sky-600">niebieskie</span> taniej.
               </p>
-              <div className="flex justify-center">
-                <MapaPorownan porownania={w.porownania} cenaM2={w.cenaM2} />
-              </div>
-            </div>
+              <MapaPorownan lat={lat} lng={lng} porownania={w.porownania} cenaM2={w.cenaM2} />
+            </section>
+          )}
+
+          <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+            <h2 className="mb-1 text-lg font-semibold text-slate-900">Wpływ standardu na cenę</h2>
+            <p className="mb-4 text-sm text-slate-500">Ta sama lokalizacja i metraż, różny stan wykończenia.</p>
+            <WplywStandardu warianty={w.warianty} wybrany={stan} />
           </section>
 
           <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">

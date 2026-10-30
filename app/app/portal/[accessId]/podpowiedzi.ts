@@ -1,3 +1,5 @@
+import type { NazwaIkony } from "../../components/ikony-sprawy";
+
 /**
  * Gotowe wpisy do portalu klienta, pogrupowane według etapu sprawy.
  *
@@ -6,12 +8,12 @@
  * nie zdradzają danych kupujących, a agent i tak może je poprawić przed wysłaniem.
  * Miejsca do uzupełnienia oznaczamy [nawiasem], żeby od razu było widać, co wpisać.
  */
-export type GrupaPodpowiedzi = { nazwa: string; ikona: string; dla: "sprzedajacy" | "kupujacy" | "oba"; wpisy: string[] };
+export type GrupaPodpowiedzi = { nazwa: string; ikona: NazwaIkony; dla: "sprzedajacy" | "kupujacy" | "oba"; wpisy: string[] };
 
 export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   {
     nazwa: "Po prezentacji",
-    ikona: "🔑",
+    ikona: "klucz",
     dla: "sprzedajacy",
     wpisy: [
       "Dziś odbyła się prezentacja. Kupujący byli zainteresowani i wracają z decyzją w ciągu kilku dni.",
@@ -23,7 +25,7 @@ export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   },
   {
     nazwa: "Klient się zastanawia",
-    ikona: "🤔",
+    ikona: "zastanawia",
     dla: "sprzedajacy",
     wpisy: [
       "Kupujący z ostatniej prezentacji wciąż się zastanawia. Odezwę się do niego [dzień], żeby poznać decyzję.",
@@ -34,7 +36,7 @@ export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   },
   {
     nazwa: "Negocjacje ceny",
-    ikona: "💬",
+    ikona: "rozmowa",
     dla: "sprzedajacy",
     wpisy: [
       "Otrzymaliśmy propozycję cenową od kupującego. Zadzwonię, żeby ją omówić.",
@@ -45,7 +47,7 @@ export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   },
   {
     nazwa: "Zainteresowanie ofertą",
-    ikona: "📈",
+    ikona: "wykres",
     dla: "sprzedajacy",
     wpisy: [
       "W tym tygodniu mieliśmy [liczba] zapytań o ofertę.",
@@ -56,7 +58,7 @@ export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   },
   {
     nazwa: "Marketing",
-    ikona: "📣",
+    ikona: "informacja",
     dla: "sprzedajacy",
     wpisy: [
       "Oferta trafiła na portale ogłoszeniowe.",
@@ -67,7 +69,7 @@ export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   },
   {
     nazwa: "Formalności",
-    ikona: "📄",
+    ikona: "dokument",
     dla: "sprzedajacy",
     wpisy: [
       "Kompletujemy dokumenty do umowy przedwstępnej.",
@@ -78,7 +80,7 @@ export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   },
   {
     nazwa: "Nowe oferty",
-    ikona: "🏠",
+    ikona: "dom",
     dla: "kupujacy",
     wpisy: [
       "Dodałem dla Pana/Pani nową ofertę, która pasuje do kryteriów. Proszę zerknąć i dać znać, czy umawiamy oglądanie.",
@@ -88,7 +90,7 @@ export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   },
   {
     nazwa: "Po oglądaniu",
-    ikona: "🔑",
+    ikona: "klucz",
     dla: "kupujacy",
     wpisy: [
       "Dziękuję za dzisiejsze oglądanie. Jak wrażenia? Chętnie odpowiem na pytania.",
@@ -98,7 +100,7 @@ export const PODPOWIEDZI: GrupaPodpowiedzi[] = [
   },
   {
     nazwa: "Finansowanie i decyzja",
-    ikona: "🏦",
+    ikona: "bank",
     dla: "kupujacy",
     wpisy: [
       "Mogę polecić doradcę kredytowego, który bezpłatnie sprawdzi zdolność kredytową.",
