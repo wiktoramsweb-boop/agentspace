@@ -194,7 +194,7 @@ async function wycen(user: ProfileWithAgency, w: Record<string, unknown>): Promi
   if (!wynik) return { tekst: r.wycena?.blad ? "Rejestr Cen Nieruchomości teraz nie odpowiada. Spróbuj za chwilę." : "Za mało podobnych transakcji w okolicy, żeby policzyć wycenę." };
   const href = r.zapisanaId ? `/app/wycena-rcn/${r.zapisanaId}` : `/app/wycena-rcn?${new URLSearchParams(parametry)}`;
   return {
-    tekst: JSON.stringify({ adres: r.adres, szacunek: wynik.szacunek, cena_m2: wynik.cenaM2, od: wynik.od, do: wynik.do, cena_ofertowa: wynik.cenaOfertowa, pewnosc: wynik.pewnosc, liczba_transakcji: wynik.liczba, cena_z_ogloszenia: parametry.cena_ogl ?? null, wycena_id: r.zapisanaId }),
+    tekst: JSON.stringify({ adres: r.adres, szacunek: wynik.szacunek, cena_m2: wynik.cenaM2, od: wynik.od, do: wynik.do, cena_ofertowa: wynik.cenaOfertowa, pewnosc: wynik.pewnosc, liczba_transakcji: wynik.liczba, cena_z_ogloszenia: parametry.cena_ogl ?? null }),
     przejdz: href,
     link: { etykieta: "Otwórz wycenę", href },
   };
