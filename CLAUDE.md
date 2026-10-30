@@ -12,7 +12,7 @@
 
 **⚠️ DO ZROBIENIA PRZEZ USERA:** uruchomić w Supabase SQL Editor pliki `lib/SETUP-*.sql` po kolei - v1 ✅ uruchomione; **v2 (platforma), v3 (kategorie+cele), v4 (łatwe scenariusze) prawdopodobnie do uruchomienia - POTWIERDZIĆ Z USEREM**. Kod odporny na brak tabel (puste, nie crashuje).
 
-**Migracje:** v36, v37, v38 ✅ uruchomione. v54 (oddziały, prowizje, import) ✅ uruchomiona. v55 (szkice) i v56 (Akademia) ✅ uruchomione. **v57 (`lib/SETUP-v57-portale-zgloszenia.sql`) DO URUCHOMIENIA** - zgłoszenia portali w przygotowaniu. **v49 (`lib/SETUP-v49-rozbudowa.sql`) DO URUCHOMIENIA** - czat, automatyzacje, urlopy, RODO, historia cen, koszty, dziennik, zadania AI Coach (szczegóły: PROJEKT-STATUS.md, „Wielka rozbudowa”). **Do uruchomienia: v39** (kolumny `kind` i `credits` w `subscription_orders` - doszły do v37 już po tym, jak została uruchomiona, a `create table if not exists` ich nie dokłada).
+**Migracje:** v36, v37, v38 ✅ uruchomione. v54 (oddziały, prowizje, import) ✅ uruchomiona. v55 (szkice) i v56 (Akademia) ✅ uruchomione. **v57 (`lib/SETUP-v57-portale-zgloszenia.sql`) DO URUCHOMIENIA** - zgłoszenia portali w przygotowaniu. **v58 (`lib/SETUP-v58-wyceny.sql`) DO URUCHOMIENIA** - zapisane wyceny (bez niej wycena działa, ale się nie zapisuje). **v49 (`lib/SETUP-v49-rozbudowa.sql`) DO URUCHOMIENIA** - czat, automatyzacje, urlopy, RODO, historia cen, koszty, dziennik, zadania AI Coach (szczegóły: PROJEKT-STATUS.md, „Wielka rozbudowa”). **Do uruchomienia: v39** (kolumny `kind` i `credits` w `subscription_orders` - doszły do v37 już po tym, jak została uruchomiona, a `create table if not exists` ich nie dokłada).
 
 **Env:** wszystko w Vercel ✅ (`ANTHROPIC_API_KEY` działa - portfel API osobny od claude.ai). Publiczne Supabase mają defaulty w `lib/supabase/config.ts`. **`CRON_SECRET` jest WYMAGANY** - bez niego crony odmawiają (`lib/cron-auth.ts`). Limity AI: system kredytów (v35, `lib/kredyty-cennik.ts`) - pula miesięczna biura z pakietu, plus dzienny bezpiecznik na osobę `AI_DAILY_CREDITS_USER` (domyślnie 120 kredytów).
 
@@ -21,6 +21,12 @@
 **Następne (omówione, NIE zbudowane):** PWA+powiadomienia (rekomendowane następne - pętla nawyku dla terenu), moduł Nieruchomości (oferty+zdjęcia), OtoDom eksport (bariera=dostęp/umowa nie kod), głos AI w Coach (ElevenLabs=koszty), płatności, Google Calendar.
 
 **Współpraca:** user chce autonomii ("rób sam bez pytania"), commituj+pushuj incrementalnie, tłumacz prosto po polsku. Klucze API były w czacie - do rotacji po testach.
+
+## Czytanie ogłoszeń, wyceny, asystent
+
+Jeden czytnik ogłoszeń: `lib/import-ogloszenia.ts` (pobieranie + AI) i `lib/ogloszenie-czytanie.ts` (bez AI, test `npm run test:ogloszenia`). Wszystko idzie przez typ `DaneOferty`, a `lib/ogloszenie-mapy.ts` tłumaczy go na pola wyceny i kreatora. Element UI: `app/app/components/wklej-link.tsx`. OLX odmawia pobierania z serwera i tego nie obchodzimy: tam wkleja się treść.
+Wycena liczy się w jednym miejscu, `policzWycene` w `lib/wyceny.ts` (strona i asystent), i zapisuje z raportem do `valuations`.
+Asystent ma narzędzia w `lib/asystent-narzedzia.ts`: działa uprawnieniami osoby, nic nie usuwa, oferty nie zapisuje sam (otwiera wypełniony kreator, bo zapis może wysłać ją na portale). Każdy krok modelu to 1 kredyt.
 
 ## Strony www dla biur (nowe)
 

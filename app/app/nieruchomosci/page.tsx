@@ -18,6 +18,8 @@ import { TablicaOfert } from "./tablica-ofert";
 import { PrzelacznikWidoku } from "../components/widok";
 import { FiltrOpiekuna } from "../components/filtr-opiekuna";
 import { kartyOfert } from "@/lib/data-tablica";
+import { wycenaPoId } from "@/lib/wyceny";
+import { ofertaZWyceny, szkicOferty } from "@/lib/ogloszenie-mapy";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -80,6 +82,11 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
   const sp = await searchParams;
   const query = parseListQuery(sp, { sort: "nowe", dateField: "zmiana" });
 
+  // Wejście „dodaj ofertę” z wyceny albo od asystenta: kreator otwiera się sam.
+  const link = typeof sp.link === "string" ? sp.link.slice(0, 600) : undefined;
+  const zWyceny = sp.nowa === "1" && typeof sp.wycena === "string" ? await wycenaPoId(user, sp.wycena) : null;
+  const start = sp.nowa === "1" ? { link, wycenaId: zWyceny?.id, szkic: zWyceny ? szkicOferty(ofertaZWyceny(zWyceny.parametry)) : undefined } : undefined;
+
   if (sp.widok === "tablica" && agencyId) {
     const agentFiltr = query.agent === "ja" ? user.id : query.agent || null;
     const [karty, agents, clients, settings] = await Promise.all([
@@ -101,6 +108,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
               canEditSettings={user.role === "owner"}
               otodom={otodom}
               portaleFtp={portaleFtp}
+              start={start}
             />
           }
         />
@@ -136,6 +144,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
             canEditSettings={user.role === "owner"}
             otodom={otodom}
             portaleFtp={portaleFtp}
+            start={start}
           />
         }
       />

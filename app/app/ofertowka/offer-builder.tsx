@@ -305,7 +305,7 @@ export function OfferBuilder({ agent, kolorBiura, mozeZmienicKolor }: { agent: A
             </button>
           </div>
           {importInfo && <p className={`mt-2 text-xs ${importInfo.ok ? "text-emerald-700" : "text-rose-600"}`}>{importInfo.tekst}</p>}
-          {!importInfo && <p className="mt-2 text-xs text-slate-500">Otodom, Morizon, Gratka, Nieruchomosci-online, Domiporta. Z OLX wklej treść.</p>}
+          {!importInfo && <p className="mt-2 text-xs text-slate-500">Otodom, Morizon, Gratka, Nieruchomosci-online, Domiporta, Adresowo. Z OLX wklej treść.</p>}
         </Section>
 
         <Section title="Kolor biura">

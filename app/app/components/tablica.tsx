@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 /**
@@ -85,6 +85,10 @@ export function Tablica<K extends KartaTablicy>({
   const poDragu = useRef(false);
   const start = useRef<{ id: string; x: number; y: number; el: HTMLDivElement } | null>(null);
   const raf = useRef<number | null>(null);
+  const wnetrze = useRef<HTMLDivElement>(null);
+  const pozycje = useRef(new Map<string, { x: number; y: number }>());
+  // Skąd leci upuszczona karta: z miejsca, w którym puszczono ją kursorem.
+  const lot = useRef<{ id: string; x: number; y: number } | null>(null);
 
   // Nowe dane z serwera (np. po odświeżeniu) zastępują lokalne, o ile nikt
   // właśnie nie przeciąga.
@@ -99,6 +103,38 @@ export function Tablica<K extends KartaTablicy>({
     for (const c of sortujKarty(karty)) m.get(c.kolumna)?.push(c);
     return m;
   }, [karty, kolumny]);
+
+  // Karty rozstępują się i wracają płynnie: po każdej zmianie układu mierzymy
+  // nowe miejsca i odgrywamy drogę ze starego. Pozycje liczymy względem wnętrza
+  // tablicy, żeby przewinięcie strony nie wyglądało jak ruch kart.
+  useLayoutEffect(() => {
+    const baza = wnetrze.current?.getBoundingClientRect();
+    if (!baza) return;
+    const spokojnie = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const nowe = new Map<string, { x: number; y: number }>();
+    for (const [id, el] of kartyRef.current) {
+      for (const a of el.getAnimations()) a.cancel();
+      const r = el.getBoundingClientRect();
+      const x = r.left - baza.left;
+      const y = r.top - baza.top;
+      nowe.set(id, { x, y });
+      const zLotu = lot.current?.id === id ? lot.current : null;
+      const stare = zLotu ?? pozycje.current.get(id);
+      if (!stare || spokojnie) continue;
+      const dx = stare.x - x;
+      const dy = stare.y - y;
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
+      el.style.zIndex = zLotu ? "20" : "";
+      el.animate([{ transform: `translate(${dx}px, ${dy}px)${zLotu ? " rotate(2deg) scale(1.02)" : ""}` }, { transform: "none" }], {
+        duration: zLotu ? 260 : 200,
+        easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      }).onfinish = () => {
+        el.style.zIndex = "";
+      };
+    }
+    if (lot.current && nowe.has(lot.current.id)) lot.current = null;
+    pozycje.current = nowe;
+  }, [karty, drag?.id, drag?.nad, drag?.indeks]);
 
   const gdzieUpuscic = useCallback(
     (x: number, y: number, przenoszonaId: string): { nad: string | null; indeks: number } => {
@@ -201,6 +237,8 @@ export function Tablica<K extends KartaTablicy>({
       if (d) {
         poDragu.current = true;
         setTimeout(() => (poDragu.current = false), 50);
+        const baza = wnetrze.current?.getBoundingClientRect();
+        if (baza) lot.current = { id: d.id, x: d.x - d.dx - baza.left, y: d.y - d.dy - baza.top };
         if (d.nad) void upusc(d.id, d.nad, d.indeks);
       }
     };
@@ -257,7 +295,7 @@ export function Tablica<K extends KartaTablicy>({
         </p>
       )}
       <div ref={scroller} className="-mx-5 overflow-x-auto px-5 pb-4 md:mx-0 md:px-0" style={{ scrollbarGutter: "stable" }}>
-        <div className="flex min-w-max gap-4">
+        <div ref={wnetrze} className="flex min-w-max items-stretch gap-4">
           {kolumny.map((kol) => {
             const lista = wKolumnie.get(kol.id) ?? [];
             const widoczne = lista.filter((k) => k.id !== drag?.id);
@@ -287,7 +325,7 @@ export function Tablica<K extends KartaTablicy>({
                   {kol.dopisek && <p className="mt-0.5 text-[11px] text-slate-400">{kol.dopisek}</p>}
                 </div>
 
-                <div className="flex min-h-[80px] flex-col gap-2">
+                <div className="flex min-h-[55vh] flex-col gap-2">
                   {widoczne.map((k, i) => (
                     <div key={k.id}>
                       {tu && drag?.indeks === i && <Miejsce h={drag.h} />}
@@ -393,10 +431,11 @@ export function Tablica<K extends KartaTablicy>({
           <div
             className="pointer-events-none fixed z-[90]"
             style={{
-              left: drag.x - drag.dx,
-              top: drag.y - drag.dy,
+              left: 0,
+              top: 0,
               width: drag.w,
-              transform: "rotate(2deg) scale(1.02)",
+              transform: `translate3d(${drag.x - drag.dx}px, ${drag.y - drag.dy}px, 0) rotate(2deg) scale(1.02)`,
+              willChange: "transform",
               filter: "drop-shadow(0 18px 30px rgba(15,23,42,0.25))",
             }}
           >
@@ -409,10 +448,16 @@ export function Tablica<K extends KartaTablicy>({
 }
 
 function Miejsce({ h }: { h: number }) {
+  const wys = Math.max(44, Math.min(h, 160));
   return (
     <div
-      className="mb-2 rounded-xl border-2 border-dashed border-emerald-500/60 bg-white"
-      style={{ height: Math.max(44, Math.min(h, 160)) }}
+      ref={(el) => {
+        if (el && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          el.animate([{ height: "0px", opacity: 0 }, { height: `${wys}px`, opacity: 1 }], { duration: 160, easing: "ease-out" });
+        }
+      }}
+      className="mb-2 rounded-xl border-2 border-dashed border-emerald-500/60 bg-emerald-50/50"
+      style={{ height: wys }}
       aria-hidden="true"
     />
   );

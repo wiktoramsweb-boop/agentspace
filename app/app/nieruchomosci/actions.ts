@@ -138,8 +138,11 @@ function detailsFromForm(formData: FormData, type: PropertyType, dealKind: Prope
   if (formData.get("portale_ftp_pole") === "1") {
     out.portale_ftp = formData.getAll("portal_ftp").map(String).filter((p) => portalFtp(p)).slice(0, 10);
   }
-  if (pole("street_name")) out.adres_ulica = pole("street_name");
-  if (pole("house_number")) out.adres_numer = pole("house_number");
+  // Ulica z ogłoszenia działa, gdy agent nie wybrał adresu z podpowiedzi.
+  const ulica = pole("street_name") || pole("szkic_ulica");
+  const numer = pole("house_number") || pole("szkic_numer");
+  if (ulica) out.adres_ulica = ulica;
+  if (numer) out.adres_numer = numer;
   if (pole("postcode")) out.adres_kod = pole("postcode");
   return out;
 }
@@ -350,8 +353,13 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
   await eksportPortali(user, nowaId, formData);
   eksportFtp(user.agency_id, user.id, formData);
   after(() => poNowejOfercie(user, nowaId));
+  // Oferta dodana z wyceny: wycena od razu trafia na jej kartę.
+  const wycenaId = String(formData.get("wycena_id") ?? "");
+  if (/^[0-9a-f-]{36}$/.test(wycenaId)) {
+    await admin.from("valuations").update({ property_id: nowaId }).eq("id", wycenaId).eq("agency_id", user.agency_id);
+  }
   revalidatePath("/app/nieruchomosci");
-  redirect(`/app/nieruchomosci/${nowaId}`);
+  redirect(formData.get("po_zapisie") === "wycena" ? `/app/wycena-rcn?oferta=${nowaId}` : `/app/nieruchomosci/${nowaId}`);
 }
 
 /**

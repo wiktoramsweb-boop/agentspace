@@ -9,6 +9,8 @@ import { Modal } from "../components/modal";
 import { SubmitButton } from "../components/submit-button";
 import { PROPERTY_ICONS } from "../components/icons";
 import { WizardNav, WizardSteps } from "../components/wizard-steps";
+import { WklejLink } from "../components/wklej-link";
+import { szkicOferty } from "@/lib/ogloszenie-mapy";
 import { PhotoManager } from "./photo-manager";
 import { ParamFields } from "./param-fields";
 import { OpisPola } from "./opis-pola";
@@ -52,6 +54,7 @@ export function PropertyWizard({
   property,
   otodom,
   portaleFtp = [],
+  start,
 }: {
   clients: ClientLite[];
   photoConfig: PhotoConfig;
@@ -63,16 +66,21 @@ export function PropertyWizard({
   otodom?: { polaczone: boolean; tabele: boolean; ceo: boolean; status: string | null; url: string | null; exact: boolean };
   /** Portale z eksportem przez FTP, które biuro ma skonfigurowane. */
   portaleFtp?: { id: string; nazwa: string }[];
+  /** Otwarcie od razu z danymi: z wyceny, linku od asystenta albo jednego i drugiego. */
+  start?: { link?: string; wycenaId?: string; szkic?: ReturnType<typeof szkicOferty> };
 }) {
   const editing = !!property;
   const router = useRouter();
   const initialPhotos = property?.photos ?? [];
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!!start && !property);
   const [step, setStep] = useState(0);
-  const [dealKind, setDealKind] = useState<PropertyDealKind>(property?.deal_kind ?? "sprzedaz");
-  const [type, setType] = useState<PropertyType>(property?.property_type ?? "mieszkanie");
-  const [features, setFeatures] = useState<Record<string, boolean>>(property?.features ?? {});
+  // Wstępne dane nowej oferty. Pola formularza czytają je jak dane edytowanej oferty.
+  const [szkic, setSzkic] = useState<ReturnType<typeof szkicOferty> | null>(start?.szkic ?? null);
+  const [zOgloszenia, setZOgloszenia] = useState(false);
+  const [dealKind, setDealKind] = useState<PropertyDealKind>(property?.deal_kind ?? (start?.szkic?.deal_kind as PropertyDealKind) ?? "sprzedaz");
+  const [type, setType] = useState<PropertyType>(property?.property_type ?? (start?.szkic?.property_type as PropertyType) ?? "mieszkanie");
+  const [features, setFeatures] = useState<Record<string, boolean>>(property?.features ?? start?.szkic?.features ?? {});
   const [exportWeb, setExportWeb] = useState(!!property?.export_to_web);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [photos, setPhotos] = useState<PropertyPhoto[]>(initialPhotos);
@@ -93,6 +101,16 @@ export function PropertyWizard({
     setStep(0);
     setSession((s) => s + 1);
     setOpen(true);
+  }
+
+  function zastosujOgloszenie(s: ReturnType<typeof szkicOferty>) {
+    setSzkic(s);
+    setDealKind(s.deal_kind as PropertyDealKind);
+    setType(s.property_type as PropertyType);
+    setFeatures(s.features);
+    setZOgloszenia(true);
+    setSession((n) => n + 1);
+    setStep(1);
   }
 
   function close() {
@@ -126,7 +144,8 @@ export function PropertyWizard({
     );
   }
 
-  const p = property;
+  // Szkic ma tylko pola znane z ogłoszenia, reszta zostaje pusta jak w nowej ofercie.
+  const p = property ?? (szkic as unknown as Property | null) ?? undefined;
 
   return (
     <Modal title={editing ? "Edycja oferty" : "Nowa oferta"} onClose={close} maxWidth="max-w-4xl">
@@ -161,6 +180,17 @@ export function PropertyWizard({
         <div className="flex-1 overflow-y-auto px-6 py-6">
           {/* ── KROK 1: rodzaj + typ ─────────────────────────────── */}
           <div hidden={step !== 0}>
+            {!editing && (
+              <div className="mx-auto mb-6 max-w-2xl">
+                <WklejLink
+                  tytul="Masz ogłoszenie? Wklej link"
+                  opis="Uzupełnimy adres, cenę, parametry i opis. Sprawdzisz wszystko przed zapisem."
+                  start={start?.link}
+                  auto={!!start?.link}
+                  onDane={(d) => zastosujOgloszenie(szkicOferty(d.oferta))}
+                />
+              </div>
+            )}
             <div className="mx-auto mb-7 flex max-w-sm rounded-2xl bg-slate-100 p-1">
               {PROPERTY_DEAL_KINDS.map((k) => (
                 <button
@@ -200,6 +230,10 @@ export function PropertyWizard({
 
           {/* ── KROK 2: adres ─────────────────────────────────────── */}
           <div hidden={step !== 1} className="space-y-4">
+            {zOgloszenia && <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800">Dane z ogłoszenia są już w formularzu. Sprawdź je w kolejnych krokach, zdjęcia dodaj swoje.</p>}
+            {szkic?.details.adres_ulica ? <input type="hidden" name="szkic_ulica" value={String(szkic.details.adres_ulica)} /> : null}
+            {szkic?.details.adres_numer ? <input type="hidden" name="szkic_numer" value={String(szkic.details.adres_numer)} /> : null}
+            {start?.wycenaId && <input type="hidden" name="wycena_id" value={start.wycenaId} />}
             {/* Nazwy oferty nie wpisuje się ręcznie: układamy ją z miasta i ulicy,
                 dzięki czemu lista ofert jest spójna i nikt nie nazwie oferty
                 „mieszkanie Nowak". */}
@@ -330,6 +364,16 @@ export function PropertyWizard({
 
             <EksportOtodom otodom={otodom} />
             <EksportFtp portale={portaleFtp} zaznaczone={(property?.details as Record<string, unknown> | null | undefined)?.portale_ftp} />
+
+            {!editing && type === "mieszkanie" && !start?.wycenaId && (
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-300 p-4 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+                <input type="checkbox" name="po_zapisie" value="wycena" className="mt-0.5 h-4 w-4 accent-emerald-500" />
+                <span>
+                  <span className="font-medium text-slate-900">Po zapisaniu zrób wycenę z RCN</span>
+                  <span className="block text-sm text-slate-500">Wycena zapisze się od razu przy tej nieruchomości.</span>
+                </span>
+              </label>
+            )}
 
             <p className="text-xs text-slate-400">
               {editing

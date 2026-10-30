@@ -1,10 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "./toast";
 
-type Wiadomosc = { role: "user" | "assistant"; content: string };
+type Wiadomosc = { role: "user" | "assistant"; content: string; linki?: { etykieta: string; href: string }[] };
 
 const KLIENT = /^\/app\/klienci\/[0-9a-f-]{36}/;
 const OFERTA = /^\/app\/nieruchomosci\/[0-9a-f-]{36}/;
@@ -23,8 +24,8 @@ function podpowiedzi(sciezka: string): { tytul: string; pytania: string[] } {
     };
   }
   return {
-    tytul: "Widzę Twoje sprawy na dziś",
-    pytania: ["Od czego zacząć dzień?", "Napisz wiadomość po prezentacji mieszkania", "Jak odpowiedzieć na „sprzedam sam”?"],
+    tytul: "Pytaj albo każ mi coś zrobić",
+    pytania: ["Od czego zacząć dzień?", "Dodaj klienta: Anna Nowak, 600 100 200, szuka 3 pokoi w Krakowie", "Wyceń mieszkanie z linku: wklej tu ogłoszenie"],
   };
 }
 
@@ -35,6 +36,7 @@ function podpowiedzi(sciezka: string): { tytul: string; pytania: string[] } {
  */
 export function AsystentAi({ userId }: { userId: string }) {
   const sciezka = usePathname();
+  const router = useRouter();
   const toast = useToast();
   const klucz = `as_asystent_${userId}`;
   const [otwarty, setOtwarty] = useState(false);
@@ -88,11 +90,17 @@ export function AsystentAi({ userId }: { userId: string }) {
       const r = await fetch("/api/assistant/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wiadomosci: nowe, sciezka }),
+        body: JSON.stringify({ wiadomosci: nowe.map(({ role, content }) => ({ role, content })), sciezka }),
       });
       const d = await r.json().catch(() => ({}));
       if (!r.ok || !d.text) throw new Error(d.error || "Nie udało się odpowiedzieć.");
-      setWiadomosci((w) => [...w, { role: "assistant", content: d.text }]);
+      setWiadomosci((w) => [...w, { role: "assistant", content: d.text, linki: d.linki }]);
+      if (d.przejdz) {
+        router.push(d.przejdz);
+        router.refresh();
+        // Na telefonie czat zasłania cały ekran, a wynik jest pod spodem.
+        if (window.innerWidth < 768) setOtwarty(false);
+      }
     } catch (e) {
       setBlad(e instanceof Error ? e.message : "Nie udało się odpowiedzieć.");
     } finally {
@@ -145,7 +153,7 @@ export function AsystentAi({ userId }: { userId: string }) {
           <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
             {wiadomosci.length === 0 && (
               <div className="space-y-2">
-                <p className="px-1 text-sm text-slate-500">Zapytaj o klienta, ofertę albo poproś o gotowy tekst.</p>
+                <p className="px-1 text-sm text-slate-500">Zapytaj albo każ coś zrobić: dodam klienta, wycenię mieszkanie z linku, dopiszę notatkę.</p>
                 {pytania.map((p) => (
                   <button
                     key={p}
@@ -166,6 +174,11 @@ export function AsystentAi({ userId }: { userId: string }) {
               ) : (
                 <div key={i} className="group max-w-[92%]">
                   <div className="rounded-2xl rounded-bl-md bg-slate-100 px-3.5 py-2.5 text-sm whitespace-pre-wrap text-slate-800">{m.content}</div>
+                  {m.linki?.map((l) => (
+                    <Link key={l.href} href={l.href} className="mt-1.5 mr-1.5 inline-block rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100">
+                      {l.etykieta} →
+                    </Link>
+                  ))}
                   <button
                     type="button"
                     onClick={() => navigator.clipboard?.writeText(m.content).then(() => toast("Skopiowano"))}
@@ -206,7 +219,7 @@ export function AsystentAi({ userId }: { userId: string }) {
               }}
               rows={1}
               maxLength={2000}
-              placeholder="Napisz pytanie…"
+              placeholder="Napisz albo wklej link do ogłoszenia…"
               className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
             />
             <button
@@ -217,7 +230,7 @@ export function AsystentAi({ userId }: { userId: string }) {
               Wyślij
             </button>
           </form>
-          <p className="px-4 pb-2 text-center text-[10px] text-slate-400 max-md:hidden">Jedna odpowiedź to 1 kredyt AI. Sprawdzaj fakty przed wysłaniem klientowi.</p>
+          <p className="px-4 pb-2 text-center text-[10px] text-slate-400 max-md:hidden">Każdy krok asystenta to 1 kredyt AI. Sprawdzaj fakty przed wysłaniem klientowi.</p>
         </div>
       )}
     </>

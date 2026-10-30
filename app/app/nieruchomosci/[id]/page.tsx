@@ -3,6 +3,8 @@ import { opisNaHtml } from "@/lib/opis-html";
 import { maskPhone } from "@/lib/format";
 import { mozeUsunac, ukryjKontakt } from "@/lib/uprawnienia";
 import Link from "next/link";
+import { wycenyOferty } from "@/lib/wyceny";
+import { WierszWyceny } from "../../wycena-rcn/lista-wycen";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import {
@@ -159,7 +161,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
     ),
   );
 
-  const [otodomPol, otodomOgl, portaleFtp] = await Promise.all([stanPolaczenia(user.agency_id ?? ""), ogloszenieOferty(property.id), portaleFtpBiura(user.agency_id)]);
+  const [otodomPol, otodomOgl, portaleFtp, wyceny] = await Promise.all([stanPolaczenia(user.agency_id ?? ""), ogloszenieOferty(property.id), portaleFtpBiura(user.agency_id), wycenyOferty(user.agency_id ?? "", property.id)]);
   const otodomHistoria = tab === "oferta" ? await historiaOtodom(otodomOgl?.advert_uuid) : [];
 
   const liczniki = {
@@ -202,7 +204,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
               href={`/app/wycena-rcn?oferta=${property.id}`}
               className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
             >
-              Ceny z RCN
+              Wyceń z RCN
             </Link>
           )}
           <PropertyWizard
@@ -320,6 +322,25 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
 
           {/* Prawa: właściciel i usuwanie oferty */}
           <div className="space-y-6">
+            {property.property_type === "mieszkanie" && (
+              <Card>
+                <div className="mb-1 flex items-center justify-between gap-3">
+                  <h2 className="text-sm font-medium uppercase tracking-wider text-slate-500">Wyceny z RCN</h2>
+                  <Link href={`/app/wycena-rcn?oferta=${property.id}`} className="text-sm font-semibold text-emerald-700 hover:underline">
+                    + Nowa wycena
+                  </Link>
+                </div>
+                {wyceny.length === 0 ? (
+                  <p className="pt-1 text-sm text-slate-500">Ta oferta nie ma jeszcze wyceny.</p>
+                ) : (
+                  <ul>
+                    {wyceny.map((w) => (
+                      <WierszWyceny key={w.id} w={{ ...w, properties: null }} />
+                    ))}
+                  </ul>
+                )}
+              </Card>
+            )}
             <Card>
               <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
                 {property.deal_kind === "wynajem" ? "Wynajmujący" : "Właściciel"}
