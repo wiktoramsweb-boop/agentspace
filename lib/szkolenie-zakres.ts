@@ -21,3 +21,10 @@ export async function ludzieSzkolenia(user: { id: string; agency_id: string | nu
     .filter((p) => p.role !== "credit_advisor" && p.role !== "accountant")
     .map((p) => ({ id: p.id, imie: p.full_name ?? p.email ?? "Osoba", rola: p.role, avatar: p.avatar_path, dolaczyl: p.created_at }));
 }
+
+/** Osoby, których wyniki ta osoba może oglądać, zawsze razem z nią samą. */
+export async function osobyWZakresie(user: { id: string; agency_id: string | null; role: string; permissions?: unknown; full_name?: string | null; avatar_path?: string | null }): Promise<{ id: string; name: string; avatar: string | null }[]> {
+  const inni = (await ludzieSzkolenia(user)).map((o) => ({ id: o.id, name: o.imie, avatar: o.avatar }));
+  if (inni.some((o) => o.id === user.id)) return inni;
+  return [{ id: user.id, name: user.full_name ?? "Ty", avatar: user.avatar_path ?? null }, ...inni];
+}

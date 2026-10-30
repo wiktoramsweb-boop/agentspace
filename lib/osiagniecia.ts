@@ -23,16 +23,19 @@ export type Liczniki = {
   asystentPisze: number;
   dopasowanieAi: number;
   zaproszenia: number;
+  sprawyKredytowe: number;
+  decyzjeKredytowe: number;
 };
 
-type Def = { id: string; tytul: string; opis: string; pkt: number; href: string; licznik: keyof Liczniki; prog: number; tylkoZarzad?: boolean };
-type Obszar = { id: string; nazwa: string; opis: string; zadania: Def[] };
+type Def = { id: string; tytul: string; opis: string; pkt: number; href: string; licznik: keyof Liczniki; prog: number; tylkoZarzad?: boolean; modul?: string };
+type Obszar = { id: string; nazwa: string; opis: string; modul?: string; zadania: Def[] };
 
 export const MAPA: Obszar[] = [
   {
     id: "klienci",
     nazwa: "Klienci",
     opis: "Baza, historia kontaktu i etapy.",
+    modul: "klienci",
     zadania: [
       { id: "klient-1", tytul: "Pierwszy klient", opis: "Dodaj klienta do bazy.", pkt: 10, href: "/app/klienci", licznik: "klienci", prog: 1 },
       { id: "notatka-1", tytul: "Notatka po rozmowie", opis: "Zapisz notatkę przy kliencie.", pkt: 10, href: "/app/klienci", licznik: "notatki", prog: 1 },
@@ -45,6 +48,7 @@ export const MAPA: Obszar[] = [
     id: "oferty",
     nazwa: "Oferty",
     opis: "Nieruchomości, zdjęcia i dopasowania.",
+    modul: "nieruchomosci",
     zadania: [
       { id: "oferta-1", tytul: "Pierwsza oferta", opis: "Dodaj nieruchomość do bazy biura.", pkt: 15, href: "/app/nieruchomosci", licznik: "oferty", prog: 1 },
       { id: "zdjecia-1", tytul: "Oferta ze zdjęciami", opis: "Wgraj zdjęcia do oferty.", pkt: 15, href: "/app/nieruchomosci", licznik: "ofertyZeZdjeciami", prog: 1 },
@@ -57,12 +61,12 @@ export const MAPA: Obszar[] = [
     nazwa: "Dzień pracy",
     opis: "Działania, kalendarz i AI pod ręką.",
     zadania: [
-      { id: "dzialanie-1", tytul: "Pierwsze działanie", opis: "Dodaj telefon, zadanie albo spotkanie.", pkt: 10, href: "/app/dzialania", licznik: "dzialania", prog: 1 },
-      { id: "telefony-10", tytul: "Telefony zapisane", opis: "Oznacz 10 rozmów jako wykonane.", pkt: 20, href: "/app/dzialania", licznik: "polaczeniaWykonane", prog: 10 },
-      { id: "spotkanie-1", tytul: "Spotkanie w kalendarzu", opis: "Umów spotkanie z klientem.", pkt: 15, href: "/app/kalendarz", licznik: "spotkania", prog: 1 },
-      { id: "wpis-1", tytul: "Szybki wpis głosem", opis: "Nagraj notatkę, program rozpisze ją sam.", pkt: 20, href: "/app/szybki-wpis", licznik: "szybkiWpis", prog: 1 },
+      { id: "dzialanie-1", tytul: "Pierwsze działanie", opis: "Dodaj telefon, zadanie albo spotkanie.", pkt: 10, href: "/app/dzialania", licznik: "dzialania", prog: 1, modul: "klienci" },
+      { id: "telefony-10", tytul: "Telefony zapisane", opis: "Oznacz 10 rozmów jako wykonane.", pkt: 20, href: "/app/dzialania", licznik: "polaczeniaWykonane", prog: 10, modul: "klienci" },
+      { id: "spotkanie-1", tytul: "Spotkanie w kalendarzu", opis: "Umów spotkanie z klientem.", pkt: 15, href: "/app/kalendarz", licznik: "spotkania", prog: 1, modul: "klienci" },
+      { id: "wpis-1", tytul: "Szybki wpis głosem", opis: "Nagraj notatkę, program rozpisze ją sam.", pkt: 20, href: "/app/szybki-wpis", licznik: "szybkiWpis", prog: 1, modul: "klienci" },
       { id: "asystent-1", tytul: "Zapytaj asystenta", opis: "Zadaj pytanie asystentowi AI (przycisk z iskrą).", pkt: 15, href: "/app", licznik: "asystentCzat", prog: 1 },
-      { id: "pisze-1", tytul: "AI pisze za Ciebie", opis: "Wygeneruj follow-up na karcie klienta.", pkt: 15, href: "/app/klienci", licznik: "asystentPisze", prog: 1 },
+      { id: "pisze-1", tytul: "AI pisze za Ciebie", opis: "Wygeneruj follow-up na karcie klienta.", pkt: 15, href: "/app/klienci", licznik: "asystentPisze", prog: 1, modul: "klienci" },
     ],
   },
   {
@@ -70,20 +74,32 @@ export const MAPA: Obszar[] = [
     nazwa: "Papiery i pieniądze",
     opis: "Dokumenty, transakcje i prowizje.",
     zadania: [
-      { id: "dokument-1", tytul: "Dokument w karcie", opis: "Dodaj dokument albo PDF umowy do karty.", pkt: 15, href: "/app/dokumenty", licznik: "dokumenty", prog: 1 },
-      { id: "transakcja-1", tytul: "Pierwsza transakcja", opis: "Załóż transakcję w Prowizjach.", pkt: 25, href: "/app/prowizje", licznik: "transakcje", prog: 1 },
-      { id: "zamknieta-1", tytul: "Zamknięta transakcja", opis: "Zamknij transakcję i zobacz zarobek.", pkt: 50, href: "/app/prowizje", licznik: "transakcjeZamkniete", prog: 1 },
+      { id: "dokument-1", tytul: "Dokument w karcie", opis: "Dodaj dokument albo PDF umowy do karty.", pkt: 15, href: "/app/dokumenty", licznik: "dokumenty", prog: 1, modul: "dokumenty" },
+      { id: "transakcja-1", tytul: "Pierwsza transakcja", opis: "Załóż transakcję w Prowizjach.", pkt: 25, href: "/app/prowizje", licznik: "transakcje", prog: 1, modul: "prowizje" },
+      { id: "zamknieta-1", tytul: "Zamknięta transakcja", opis: "Zamknij transakcję i zobacz zarobek.", pkt: 50, href: "/app/prowizje", licznik: "transakcjeZamkniete", prog: 1, modul: "prowizje" },
     ],
   },
   {
     id: "trening",
     nazwa: "Trening",
     opis: "AI Coach i cele.",
+    modul: "coach",
     zadania: [
       { id: "cel-1", tytul: "Cel na rok", opis: "Ustaw cel, a program rozpisze go na dzień.", pkt: 15, href: "/app/cele", licznik: "cel", prog: 1 },
       { id: "sesja-1", tytul: "Pierwszy trening", opis: "Porozmawiaj z klientem AI.", pkt: 20, href: "/app/trening", licznik: "sesje", prog: 1 },
       { id: "sesja-5", tytul: "Pięć rozmów", opis: "Ukończ 5 treningów.", pkt: 30, href: "/app/trening", licznik: "sesje", prog: 5 },
       { id: "ocena-8", tytul: "Rozmowa na 8", opis: "Zdobądź ocenę 8/10 lub wyższą.", pkt: 40, href: "/app/trening", licznik: "najlepszaOcena", prog: 8 },
+    ],
+  },
+  {
+    id: "kredyty",
+    nazwa: "Kredyty",
+    opis: "Sprawy klientów i decyzje banków.",
+    modul: "kredyty",
+    zadania: [
+      { id: "kredyt-1", tytul: "Pierwsza sprawa", opis: "Załóż sprawę kredytową klienta.", pkt: 15, href: "/app/kredyty", licznik: "sprawyKredytowe", prog: 1 },
+      { id: "kredyt-10", tytul: "Dziesięć spraw", opis: "Prowadź 10 spraw kredytowych.", pkt: 30, href: "/app/kredyty", licznik: "sprawyKredytowe", prog: 10 },
+      { id: "decyzja-1", tytul: "Pierwsza decyzja", opis: "Doprowadź sprawę do pozytywnej decyzji banku.", pkt: 40, href: "/app/kredyty", licznik: "decyzjeKredytowe", prog: 1 },
     ],
   },
   {
@@ -103,6 +119,9 @@ export type Mapa = {
   maksimum: number;
   procent: number;
   ranga: string;
+  /** Numer rangi od 0 i próg kolejnej w procentach, do ścieżki na ekranie. */
+  poziom: number;
+  rangi: { nazwa: string; od: number }[];
   nastepne: Zadanie | null;
 };
 
@@ -114,11 +133,13 @@ const RANGI: [number, string][] = [
   [90, "Mistrz programu"],
 ];
 
-export function policzMape(l: Liczniki, zarzad: boolean): Mapa {
-  const obszary = MAPA.map((o) => {
+/** `moduly`: zadania spoza stanowiska nie pojawiają się wcale. Doradca nie dostaje zadania „dodaj ofertę”. */
+export function policzMape(l: Liczniki, zarzad: boolean, moduly?: readonly string[]): Mapa {
+  const wolno = (m?: string) => !m || !moduly || moduly.includes(m);
+  const obszary = MAPA.filter((o) => wolno(o.modul)).map((o) => {
     const zadania = o.zadania
-      .filter((d) => !d.tylkoZarzad || zarzad)
-      .map(({ licznik, prog, tylkoZarzad: _, ...reszta }) => {
+      .filter((d) => (!d.tylkoZarzad || zarzad) && wolno(d.modul))
+      .map(({ licznik, prog, tylkoZarzad: _, modul: _m, ...reszta }) => {
         const teraz = Math.min(l[licznik], prog);
         return { ...reszta, zrobione: l[licznik] >= prog, postep: { teraz, cel: prog } };
       });
@@ -132,5 +153,6 @@ export function policzMape(l: Liczniki, zarzad: boolean): Mapa {
   const ranga = [...RANGI].reverse().find(([od]) => procent >= od)?.[1] ?? RANGI[0][1];
   // Podpowiadamy najtańsze niezrobione zadanie: szybka wygrana zachęca do następnej.
   const nastepne = [...wszystkie].filter((z) => !z.zrobione).sort((a, b) => a.pkt - b.pkt)[0] ?? null;
-  return { obszary, punkty, maksimum, procent, ranga, nastepne };
+  const poziom = RANGI.filter(([od]) => procent >= od).length - 1;
+  return { obszary, punkty, maksimum, procent, ranga, poziom, rangi: RANGI.map(([od, nazwa]) => ({ nazwa, od })), nastepne };
 }

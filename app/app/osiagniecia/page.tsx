@@ -2,44 +2,50 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { mapaProgramu } from "@/lib/data-osiagniecia";
 import { PageHeader } from "../components/page-header";
+import { IkonaObszaru, Medal } from "./medal";
 
 export const metadata = { title: "Osiągnięcia" };
 
 export default async function OsiagnieciaPage() {
   const user = await requireUser();
   const mapa = await mapaProgramu(user);
-  const r = 54;
-  const obwod = 2 * Math.PI * r;
+  const kolejna = mapa.rangi[mapa.poziom + 1];
 
   return (
     <>
       <PageHeader title="Osiągnięcia" subtitle="Mapa programu: zadania za punkty, które pokazują, co jeszcze AgentSpace potrafi." />
 
-      <section className="mb-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-        <div className="flex items-center gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5">
-          <span className="relative grid h-32 w-32 flex-shrink-0 place-items-center">
-            <svg viewBox="0 0 128 128" className="absolute inset-0 -rotate-90" aria-hidden="true">
-              <circle cx="64" cy="64" r={r} fill="none" strokeWidth="10" className="stroke-slate-100" />
-              <circle cx="64" cy="64" r={r} fill="none" strokeWidth="10" strokeLinecap="round" stroke="url(#osi-grad)" strokeDasharray={obwod} strokeDashoffset={obwod * (1 - mapa.procent / 100)} />
-              <defs>
-                <linearGradient id="osi-grad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#10b981" />
-                  <stop offset="1" stopColor="#06b6d4" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <span className="relative text-center">
-              <b className="block text-3xl font-bold tabular-nums text-slate-900">{mapa.procent}%</b>
-              <span className="text-xs text-slate-500">programu</span>
-            </span>
-          </span>
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-emerald-600">{mapa.ranga}</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-slate-900">
-              {mapa.punkty} <span className="text-base font-medium text-slate-400">/ {mapa.maksimum} pkt</span>
+      <section className="mb-8 grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5">
+          <div className="flex flex-wrap items-center gap-5">
+            <Medal poziom={mapa.poziom} rozmiar={92}>
+              {mapa.poziom + 1}
+            </Medal>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Twoja ranga</p>
+              <p className="text-3xl font-bold text-slate-900">{mapa.ranga}</p>
+              <p className="mt-1 text-sm text-slate-500">
+                {kolejna ? `Do rangi „${kolejna.nazwa}” brakuje ${kolejna.od - mapa.procent}% programu.` : "Najwyższa ranga. Znasz cały program."}
+              </p>
+            </div>
+            <p className="text-right">
+              <b className="block text-3xl font-bold tabular-nums text-slate-900">{mapa.punkty}</b>
+              <span className="text-sm text-slate-500">z {mapa.maksimum} pkt</span>
             </p>
-            <p className="mt-2 text-sm text-slate-500">Punkty liczą się same z tego, co robisz w programie. Nic nie trzeba odhaczać ręcznie.</p>
           </div>
+          <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-slate-100">
+            <div className="h-full rounded-full bg-gradient-to-r from-amber-400 via-emerald-400 to-violet-500" style={{ width: `${Math.max(3, mapa.procent)}%` }} />
+          </div>
+          <ol className="mt-5 grid grid-cols-5 gap-2">
+            {mapa.rangi.map((r, i) => (
+              <li key={r.nazwa} className="flex flex-col items-center gap-1.5 text-center">
+                <Medal poziom={i} zdobyty={i <= mapa.poziom} rozmiar={44}>
+                  {i <= mapa.poziom ? i + 1 : ""}
+                </Medal>
+                <span className={`text-[11px] leading-tight ${i === mapa.poziom ? "font-bold text-slate-900" : "text-slate-500"}`}>{r.nazwa}</span>
+              </li>
+            ))}
+          </ol>
         </div>
 
         {mapa.nastepne ? (
@@ -70,8 +76,9 @@ export default async function OsiagnieciaPage() {
           const pct = Math.round((o.zrobione / o.zadania.length) * 100);
           return (
             <section key={o.id} className="flex flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/5">
-              <div className="mb-3 flex items-start justify-between gap-3">
-                <div>
+              <div className="mb-3 flex items-start gap-3">
+                <IkonaObszaru id={o.id} />
+                <div className="min-w-0 flex-1">
                   <h2 className="text-lg font-semibold text-slate-900">{o.nazwa}</h2>
                   <p className="text-sm text-slate-500">{o.opis}</p>
                 </div>
@@ -80,7 +87,7 @@ export default async function OsiagnieciaPage() {
                 </span>
               </div>
               <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400" style={{ width: `${pct}%` }} />
+                <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
               </div>
               <ul className="space-y-2">
                 {o.zadania.map((z) => (
@@ -91,14 +98,9 @@ export default async function OsiagnieciaPage() {
                         z.zrobione ? "border-emerald-100 bg-emerald-50/60" : "border-slate-200 hover:border-emerald-300"
                       }`}
                     >
-                      <span
-                        className={`grid h-8 w-8 flex-shrink-0 place-items-center rounded-full text-xs font-bold ${
-                          z.zrobione ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-500"
-                        }`}
-                        aria-hidden="true"
-                      >
-                        {z.zrobione ? "✓" : `+${z.pkt}`}
-                      </span>
+                      <Medal poziom={z.pkt >= 40 ? 2 : z.pkt >= 20 ? 1 : 0} zdobyty={z.zrobione} rozmiar={34}>
+                        {z.zrobione ? "✓" : ""}
+                      </Medal>
                       <span className="min-w-0 flex-1">
                         <span className={`block text-sm font-semibold ${z.zrobione ? "text-slate-600" : "text-slate-900"}`}>{z.tytul}</span>
                         <span className="block text-xs text-slate-500">

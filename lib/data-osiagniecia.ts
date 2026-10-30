@@ -1,7 +1,8 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import { policzMape, type Liczniki, type Mapa } from "./osiagniecia";
+import { moduly, type Uprawnienia } from "./role";
 
-type Osoba = { id: string; role: string; agency_id: string | null };
+type Osoba = { id: string; role: string; agency_id: string | null; permissions?: Uprawnienia | null };
 
 /** Liczniki do mapy programu. Brak tabeli (stara migracja) daje po prostu zero. */
 export async function mapaProgramu(user: Osoba): Promise<Mapa> {
@@ -32,6 +33,12 @@ export async function mapaProgramu(user: Osoba): Promise<Mapa> {
       zarzad && user.agency_id ? ile(admin.from("invitations").select("id", { count: "exact", head: true }).eq("agency_id", user.agency_id)) : Promise.resolve(0),
     ]);
 
+  // Sprawy doradcy. Bez tabeli kredytów (stare biuro) zostaje zero.
+  const [sprawy, decyzje] = await Promise.all([
+    ile(admin.from("credit_cases").select("id", { count: "exact", head: true }).eq("advisor_id", id)),
+    ile(admin.from("credit_cases").select("id", { count: "exact", head: true }).eq("advisor_id", id).in("stage", ["decyzja", "umowa"])),
+  ]);
+
   const kluczeAi = (ai.data ?? []).map((r: { key: string }) => r.key);
   const zAi = (k: string) => kluczeAi.filter((x) => x === k).length;
 
@@ -57,6 +64,8 @@ export async function mapaProgramu(user: Osoba): Promise<Mapa> {
     asystentPisze: zAi("ai:asystent_pisze"),
     dopasowanieAi: zAi("ai:dopasowanie_ai"),
     zaproszenia,
+    sprawyKredytowe: sprawy,
+    decyzjeKredytowe: decyzje,
   };
-  return policzMape(l, zarzad);
+  return policzMape(l, zarzad, moduly(user as Parameters<typeof moduly>[0]));
 }
