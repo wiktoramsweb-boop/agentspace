@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Select } from "@/app/app/components/select";
 
 /**
  * Pobranie ewidencji sprzedaży za wybrany miesiąc.
@@ -43,7 +44,7 @@ export function EwidencjaSprzedazy() {
         Proformy nie wchodzą, bo nie są fakturami.
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <select
+        <Select
           value={miesiac}
           onChange={(e) => setMiesiac(e.target.value)}
           className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
@@ -54,7 +55,7 @@ export function EwidencjaSprzedazy() {
               {m.etykieta}
             </option>
           ))}
-        </select>
+        </Select>
         <a
           href={`/api/eksport/ewidencja?od=${od}&do=${doDnia}`}
           className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"

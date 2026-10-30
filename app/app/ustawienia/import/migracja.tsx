@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { zglosMigracje } from "./actions";
+import { Select } from "@/app/app/components/select";
 
 const pole = "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none";
 const SYSTEMY = ["ASARI", "Esti CRM", "Galactica Virgo", "IMO", "WebEstate", "Excel / Google Sheets", "Inny"];
@@ -45,14 +46,14 @@ export function ZgloszenieMigracji() {
         >
           <label className="text-sm text-slate-700">
             Z jakiego programu
-            <select name="system" required className={`${pole} mt-1`} defaultValue="">
+            <Select name="system" className="mt-1" defaultValue="">
               <option value="" disabled>
                 Wybierz
               </option>
               {SYSTEMY.map((s) => (
                 <option key={s}>{s}</option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="text-sm text-slate-700">
             Telefon do kontaktu

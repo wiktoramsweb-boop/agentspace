@@ -14,6 +14,7 @@ import {
 import { WyborTerminu } from "../../components/wybor-terminu";
 import type { DzialaniePortalu } from "@/lib/wiadomosci-klientow";
 import { PODPOWIEDZI } from "./podpowiedzi";
+import { Select } from "@/app/app/components/select";
 
 const RODZAJE: { v: RodzajDzialaniaPortalu; t: string; ikona: string; widoczneDomyslnie: boolean }[] = [
   { v: "prezentacja", t: "Prezentacja", ikona: "🔑", widoczneDomyslnie: true },
@@ -128,13 +129,13 @@ export function NoweDzialanie({ accessId, rodzajDostepu, nieruchomosci }: { acce
         {!kupujacy && nieruchomosci.length > 1 && (
           <div>
             <p className={`${sekcja} mb-1.5`}>Nieruchomość</p>
-            <select value={nier} onChange={(e) => setNier(e.target.value)} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">
+            <Select value={nier} onChange={(e) => setNier(e.target.value)} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">
               {nieruchomosci.map((n) => (
                 <option key={n.id} value={n.id}>
                   {n.title}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         )}
       </div>

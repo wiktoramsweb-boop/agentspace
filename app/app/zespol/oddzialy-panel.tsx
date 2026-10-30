@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { przypiszDoOddzialu, usunOddzial, zapiszOddzial } from "./oddzialy-actions";
 import { formatPln } from "@/lib/format";
+import { Select } from "@/app/app/components/select";
 
 export type OddzialWidok = {
   id: string;
@@ -62,14 +63,14 @@ export function OddzialyPanel({
       <input name="city" defaultValue={o?.city ?? ""} placeholder="Miasto" className={pole} />
       <input name="address" defaultValue={o?.address ?? ""} placeholder="Adres oddziału" className={pole} />
       <input name="phone" defaultValue={o?.phone ?? ""} placeholder="Telefon oddziału" className={pole} />
-      <select name="manager_id" defaultValue={o?.manager_id ?? ""} className={`${pole} sm:col-span-2`}>
+      <Select name="manager_id" defaultValue={o?.manager_id ?? ""} className="sm:col-span-2">
         <option value="">Kierownik oddziału: nie wybrano</option>
         {kierownicy.map((k) => (
           <option key={k.id} value={k.id}>
             Kierownik: {k.name}
           </option>
         ))}
-      </select>
+      </Select>
       <div className="flex gap-2 sm:col-span-2">
         <button type="submit" disabled={pending} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-50">
           {pending ? "Zapisuję…" : o ? "Zapisz oddział" : "Dodaj oddział"}
@@ -181,7 +182,7 @@ export function OddzialyPanel({
                   <span className="font-medium text-slate-900">{p.name}</span>
                   <span className="text-slate-400"> · {p.rola}</span>
                 </span>
-                <select
+                <Select
                   aria-label={`Oddział: ${p.name}`}
                   value={p.branch_id ?? ""}
                   disabled={pending}
@@ -194,7 +195,7 @@ export function OddzialyPanel({
                       {o.name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             ))}
           </div>

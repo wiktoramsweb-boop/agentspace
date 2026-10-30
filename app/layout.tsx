@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter_Tight, Geist_Mono, Sora, IBM_Plex_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono, Sora, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { ScrollProgress } from "./components/effects/scroll-progress";
 import { SchemaMarkup } from "./components/schema-markup";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const interTight = Inter_Tight({
-  variable: "--font-inter-tight",
+// Krój aplikacji: ciepły i czytelny, z pełnymi polskimi znakami.
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-app",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
@@ -106,7 +107,7 @@ export default function RootLayout({
       lang="pl"
       data-mk="dark"
       suppressHydrationWarning
-      className={`${interTight.variable} ${geistMono.variable} ${sora.variable} ${plex.variable} h-full antialiased`}
+      className={`${jakarta.variable} ${geistMono.variable} ${sora.variable} ${plex.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--color-mk-bg)]">
         <SchemaMarkup />

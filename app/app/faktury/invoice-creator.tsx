@@ -140,7 +140,7 @@ export function InvoiceCreator({
           </div>
           <div className="mt-3">
             <label className="mb-1 block text-xs font-medium text-slate-500">Status płatności</label>
-            <select
+            <Select
               value={d.paymentStatus ?? ""}
               onChange={(e) => set("paymentStatus", e.target.value || null)}
               className={inp}
@@ -148,7 +148,7 @@ export function InvoiceCreator({
               <option value="">Automatycznie (z kwoty i terminu)</option>
               <option value="zaplacona">Zapłacona</option>
               <option value="nieoplacona">Nieopłacona</option>
-            </select>
+            </Select>
             <p className="mt-1 text-xs text-slate-500">
               Automatycznie: zapłacona, gdy kwota zapłacona pokrywa całość, a po terminie,
               gdy minął termin płatności.
@@ -259,7 +259,7 @@ export function InvoiceCreator({
                   </div>
                   <div className="w-24">
                     <label className="mb-1 block text-[11px] font-medium text-slate-500">VAT</label>
-                    <select
+                    <Select
                       value={it.vat ?? "zw"}
                       onChange={(e) => setItem(i, { vat: e.target.value as StawkaVat })}
                       className={inp}
@@ -269,7 +269,7 @@ export function InvoiceCreator({
                           {s.etykieta}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                   {d.items.length > 1 && (
                     <button

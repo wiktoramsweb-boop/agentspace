@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { utworzHarmonogram, zatrzymajHarmonogram } from "./cykliczne-actions";
 import type { Harmonogram } from "@/lib/faktury-cykliczne";
+import { Select } from "@/app/app/components/select";
 
 const OKRESY = [
   { wartosc: 1, etykieta: "co miesiąc" },
@@ -40,7 +41,7 @@ export function UstawCykliczna({ invoiceId }: { invoiceId: string }) {
             pójdzie dopiero w następnym okresie, nie dziś.
           </p>
           <label className="mb-1 block text-xs font-medium text-slate-500">Jak często</label>
-          <select
+          <Select
             value={coMiesiecy}
             onChange={(e) => setCoMiesiecy(Number(e.target.value))}
             className="mb-3 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900"
@@ -50,7 +51,7 @@ export function UstawCykliczna({ invoiceId }: { invoiceId: string }) {
                 {o.etykieta}
               </option>
             ))}
-          </select>
+          </Select>
           <label className="mb-1 block text-xs font-medium text-slate-500">Dni na płatność</label>
           <input
             type="number"

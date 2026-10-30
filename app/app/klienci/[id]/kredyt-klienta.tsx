@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { przekazDoradcy } from "../../kredyty/actions";
 import { RODZAJE_KREDYTU } from "@/lib/kredyt-etapy";
+import { Select } from "@/app/app/components/select";
 
 /**
  * Karta „Kredyt” na karcie klienta: status sprawy u doradcy albo przekazanie
@@ -54,22 +55,22 @@ export function KredytKlienta({
       ) : (
         <div className="space-y-2 rounded-xl border border-slate-200 p-3">
           {doradcy.length > 1 && (
-            <select value={f.advisorId} onChange={ustaw("advisorId")} className={pole}>
+            <Select value={f.advisorId} onChange={ustaw("advisorId")} >
               {doradcy.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
                 </option>
               ))}
-            </select>
+            </Select>
           )}
           <div className="grid grid-cols-2 gap-2">
-            <select value={f.rodzaj} onChange={ustaw("rodzaj")} className={pole}>
+            <Select value={f.rodzaj} onChange={ustaw("rodzaj")} >
               {RODZAJE_KREDYTU.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.nazwa}
                 </option>
               ))}
-            </select>
+            </Select>
             <input value={f.kwota} onChange={ustaw("kwota")} inputMode="numeric" placeholder="Kwota (zł)" className={pole} />
           </div>
           <textarea value={f.notatka} onChange={ustaw("notatka")} rows={2} placeholder="Co doradca ma wiedzieć, np. wkład 20%, umowa o pracę, szuka do 600 tys." className={pole} />

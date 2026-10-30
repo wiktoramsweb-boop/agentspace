@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-inter-tight);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-app);
+  /* Liczby w aplikacji piszemy tym samym krojem, a tabular-nums trzyma kolumny równo. */
+  --font-mono: var(--font-app);
 
   /* Marketing (landing + podstrony).
      Aplikacja /app ma własną paletę (app-shell) i tych tokenów nie używa. */
@@ -181,7 +182,7 @@ html[data-mk="dark"] {
 html { background: var(--color-mk-bg, #08090b); }
 
 body {
-  font-family: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-app), system-ui, -apple-system, sans-serif;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -549,8 +550,16 @@ body {
 
 /* Zaznaczanie tekstu w kolorze marki */
 ::selection {
-  background: rgba(16, 185, 129, 0.28);
+  background: #a7f3d0;
+  color: #052e16;
+}
+html[data-theme="dark"] :is(.app-shell, .portal-dark) ::selection,
+html[data-mk="dark"] .mk ::selection {
+  background: #047857;
   color: #fff;
+}
+.font-mono {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Tło panelu aplikacji - ciemny grafit (jaśniejszy niż sidebar) z poświatami marki.

@@ -85,7 +85,7 @@ export function Logo({
       <span
         className="font-semibold"
         style={{
-          fontFamily: "var(--font-sora), var(--font-inter-tight), system-ui, sans-serif",
+          fontFamily: "var(--font-sora), var(--font-app), system-ui, sans-serif",
           fontSize: rozmiar * 0.64,
           letterSpacing: "-0.02em",
           lineHeight: 1,

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { dodajNotatke, zapiszDaneSprawy, zapiszDokumenty, zmienEtap } from "../actions";
 import { ETAPY_KREDYTU, RODZAJE_KREDYTU, type Dokument, type EtapKredytu } from "@/lib/kredyt-etapy";
+import { Select } from "@/app/app/components/select";
 
 /** Etapy jako klikalna ścieżka: kliknięcie przestawia sprawę i powiadamia agenta. */
 export function Etapy({ id, etap }: { id: string; etap: EtapKredytu }) {
@@ -86,13 +87,13 @@ export function DaneSprawy({
     <div className="grid gap-3 sm:grid-cols-2">
       <label>
         <span className={etykieta}>Rodzaj</span>
-        <select value={f.rodzaj} onChange={ustaw("rodzaj")} className={pole}>
+        <Select value={f.rodzaj} onChange={ustaw("rodzaj")} >
           {RODZAJE_KREDYTU.map((r) => (
             <option key={r.id} value={r.id}>
               {r.nazwa}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <label>
         <span className={etykieta}>Kwota kredytu (zł)</span>

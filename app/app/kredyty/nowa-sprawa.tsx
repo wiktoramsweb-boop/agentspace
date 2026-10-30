@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { nowaSprawaDoradcy } from "./actions";
 import { RODZAJE_KREDYTU } from "@/lib/kredyt-etapy";
+import { Select } from "@/app/app/components/select";
 
 /** Nowa sprawa z klientem spoza poleceń (np. doradca przyprowadził własnego klienta). */
 export function NowaSprawa({ doradcy, jestemDoradca }: { doradcy: { id: string; name: string }[]; jestemDoradca: boolean }) {
@@ -38,22 +39,22 @@ export function NowaSprawa({ doradcy, jestemDoradca }: { doradcy: { id: string; 
         <input value={f.imie} onChange={ustaw("imie")} placeholder="Imię i nazwisko klienta" className={pole} />
         <input value={f.telefon} onChange={ustaw("telefon")} placeholder="Telefon" inputMode="tel" className={pole} />
         <input value={f.email} onChange={ustaw("email")} placeholder="E-mail" inputMode="email" className={pole} />
-        <select value={f.rodzaj} onChange={ustaw("rodzaj")} className={pole}>
+        <Select value={f.rodzaj} onChange={ustaw("rodzaj")} >
           {RODZAJE_KREDYTU.map((r) => (
             <option key={r.id} value={r.id}>
               Kredyt: {r.nazwa.toLowerCase()}
             </option>
           ))}
-        </select>
+        </Select>
         <input value={f.kwota} onChange={ustaw("kwota")} placeholder="Kwota kredytu (zł)" inputMode="numeric" className={pole} />
         {!jestemDoradca && (
-          <select value={f.advisorId} onChange={ustaw("advisorId")} className={pole}>
+          <Select value={f.advisorId} onChange={ustaw("advisorId")} >
             {doradcy.map((d) => (
               <option key={d.id} value={d.id}>
                 Doradca: {d.name}
               </option>
             ))}
-          </select>
+          </Select>
         )}
         <textarea value={f.notatka} onChange={ustaw("notatka")} rows={2} placeholder="Notatka, np. szuka 3 pokoi, wkład 20%, umowa o pracę" className={`${pole} sm:col-span-3`} />
       </div>

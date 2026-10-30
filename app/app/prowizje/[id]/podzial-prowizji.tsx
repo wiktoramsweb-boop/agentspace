@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { dodajPodzial, usunPodzial } from "../actions";
 import { formatPln } from "@/lib/format";
 import type { PodzialWidok } from "@/lib/data-zasady-prowizji";
+import { Select } from "@/app/app/components/select";
 
 const ROLE: Record<string, string> = { wspolagent: "Współagent", polecajacy: "Polecający", inny: "Inny udział" };
 const pole = "rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none";
@@ -67,20 +68,20 @@ export function PodzialProwizji({
         <p className="text-sm text-slate-500">W biurze nie ma innych osób, z którymi można podzielić prowizję.</p>
       ) : (
         <div className="flex flex-wrap items-center gap-2">
-          <select aria-label="Osoba" value={f.profileId} onChange={(e) => setF((x) => ({ ...x, profileId: e.target.value }))} className={`${pole} min-w-0 flex-1`}>
+          <Select aria-label="Osoba" value={f.profileId} onChange={(e) => setF((x) => ({ ...x, profileId: e.target.value }))} className={`${pole} min-w-0 flex-1`}>
             {osoby.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.name}
               </option>
             ))}
-          </select>
-          <select aria-label="Rola w transakcji" value={f.rola} onChange={(e) => setF((x) => ({ ...x, rola: e.target.value }))} className={pole}>
+          </Select>
+          <Select aria-label="Rola w transakcji" value={f.rola} onChange={(e) => setF((x) => ({ ...x, rola: e.target.value }))} className={pole}>
             {Object.entries(ROLE).map(([k, v]) => (
               <option key={k} value={k}>
                 {v}
               </option>
             ))}
-          </select>
+          </Select>
           <label className="flex items-center gap-1 text-sm text-slate-500">
             <input aria-label="Procent prowizji netto" inputMode="decimal" value={f.pct} onChange={(e) => setF((x) => ({ ...x, pct: e.target.value }))} placeholder={String(Math.max(0, Math.min(20, zostalo)))} className={`${pole} w-20`} />%
           </label>
