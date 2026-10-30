@@ -2497,7 +2497,7 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-200 { border
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-white { border-color: #18181b !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-300 { border-color: #3f3f46 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-400 { border-color: #52525b !important; }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) .divide-slate-200 > * + * { border-color: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.divide-slate-100, .divide-slate-200) > * + * { border-color: #27272a !important; }
 
 /* Stany hover */
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:bg-slate-50:hover { background-color: rgba(39, 39, 42, 0.5) !important; }

@@ -78,7 +78,7 @@ export async function PulpitWlasciciela({ agencyId }: { agencyId: string }) {
           <div className="mt-6 flex h-28 items-end gap-2" aria-hidden="true">
             {miesiace.map((m, i) => (
               <div key={m.nazwa + i} className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
-                <div className={`w-full rounded-t-lg ${i === miesiace.length - 1 ? "bg-emerald-400" : "bg-white/15"}`} style={{ height: `${Math.max(6, (m.suma / szczyt) * 84)}px` }} title={formatPln(m.suma)} />
+                <div className="w-full rounded-t-lg" style={{ height: `${Math.max(6, (m.suma / szczyt) * 84)}px`, background: i === miesiace.length - 1 ? "#34d399" : "rgba(148, 163, 184, 0.35)" }} title={formatPln(m.suma)} />
                 <span className="text-[11px] text-slate-400">{m.nazwa}</span>
               </div>
             ))}
