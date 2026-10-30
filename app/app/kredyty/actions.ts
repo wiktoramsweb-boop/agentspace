@@ -9,6 +9,7 @@ import { powiadom } from "@/lib/powiadomienia";
 import { zapiszZdarzenie } from "@/lib/dziennik";
 import { zakresDanych } from "@/lib/role";
 import { sprawaKredytowa } from "@/lib/data-kredyty";
+import { BANKI, bankPoId, STATUSY_WNIOSKU, statusWniosku, type Finanse } from "@/lib/banki";
 import { domyslneDokumenty, etapKredytu, ETAPY_KREDYTU, RODZAJE_KREDYTU, type Dokument, type EtapKredytu } from "@/lib/kredyt-etapy";
 
 type Wynik = { ok: true; id?: string } | { ok: false; error: string };
@@ -27,7 +28,7 @@ async function wpis(caseId: string, agencyId: string, autor: string, kind: "etap
  * Agent przekazuje klienta doradcy kredytowemu biura. Doradca dostaje
  * powiadomienie, a sprawa startuje z listą dokumentów pod rodzaj kredytu.
  */
-export async function przekazDoradcy(d: { clientId: string; advisorId: string; rodzaj: string; kwota: string; propertyId?: string | null; notatka: string }): Promise<Wynik> {
+export async function przekazDoradcy(d: { clientId: string; advisorId: string; rodzaj: string; kwota: string; propertyId?: string | null; notatka: string; polecilId?: string | null }): Promise<Wynik> {
   const user = await requireModul("kredyty");
   if (!user.agency_id) return { ok: false, error: "Brak biura." };
   const admin = createSupabaseAdmin();
@@ -44,6 +45,12 @@ export async function przekazDoradcy(d: { clientId: string; advisorId: string; r
   }
   const rodzaj = RODZAJE_KREDYTU.some((r) => r.id === d.rodzaj) ? d.rodzaj : "hipoteczny";
   const suma = kwota(d.kwota);
+  // Polecający wskazany przez doradcę musi być z tego biura.
+  let polecil: { id: string; full_name: string | null } | null = null;
+  if (d.polecilId) {
+    const { data: p } = await admin.from("profiles").select("id, full_name").eq("id", d.polecilId).eq("agency_id", user.agency_id).maybeSingle();
+    polecil = p;
+  }
 
   const { data: sprawa, error } = await admin
     .from("credit_cases")
@@ -51,7 +58,7 @@ export async function przekazDoradcy(d: { clientId: string; advisorId: string; r
       agency_id: user.agency_id,
       client_id: klient.id,
       property_id: d.propertyId || null,
-      referred_by: user.role === "credit_advisor" ? null : user.id,
+      referred_by: polecil?.id ?? (user.role === "credit_advisor" ? null : user.id),
       advisor_id: doradca.id,
       stage: "nowe",
       rodzaj,
@@ -67,6 +74,9 @@ export async function przekazDoradcy(d: { clientId: string; advisorId: string; r
   }
 
   await wpis(sprawa.id, user.agency_id, user.id, "etap", `${user.full_name ?? "Agent"} przekazał(a) klienta doradcy${d.notatka.trim() ? `: ${d.notatka.trim()}` : "."}`);
+  if (polecil && polecil.id !== user.id) {
+    await powiadom(user.agency_id, [polecil.id], { rodzaj: "kredyt", tytul: `Twój klient jest u doradcy: ${klient.name}`, tresc: "Widzisz postęp kredytu w module Kredyty.", adres: `/app/kredyty/${sprawa.id}` });
+  }
   if (doradca.id !== user.id) {
     await powiadom(user.agency_id, [doradca.id], {
       rodzaj: "kredyt",
@@ -84,19 +94,21 @@ export async function przekazDoradcy(d: { clientId: string; advisorId: string; r
 }
 
 /** Doradca zakłada sprawę dla własnego klienta (spoza poleceń biura). */
-export async function nowaSprawaDoradcy(d: { imie: string; telefon: string; email: string; rodzaj: string; kwota: string; notatka: string; advisorId?: string }): Promise<Wynik> {
+export async function nowaSprawaDoradcy(d: { imie: string; telefon: string; email: string; rodzaj: string; kwota: string; notatka: string; advisorId?: string; polecilId?: string }): Promise<Wynik> {
   const user = await requireModul("kredyty");
   if (!user.agency_id) return { ok: false, error: "Brak biura." };
   const imie = d.imie.trim().slice(0, 120);
   if (imie.length < 2) return { ok: false, error: "Podaj imię i nazwisko klienta." };
   const admin = createSupabaseAdmin();
+  // Klient polecony zostaje u agenta, który go polecił: tak samo jak po przekazaniu z karty.
+  const { data: opiekun } = d.polecilId ? await admin.from("profiles").select("id").eq("id", d.polecilId).eq("agency_id", user.agency_id).maybeSingle() : { data: null };
   const { data: klient, error } = await admin
     .from("clients")
-    .insert({ agency_id: user.agency_id, agent_id: user.id, name: imie, phone: d.telefon.trim() || null, email: d.email.trim() || null, type: "kupujacy", status: "nowy" })
+    .insert({ agency_id: user.agency_id, agent_id: opiekun?.id ?? user.id, name: imie, phone: d.telefon.trim() || null, email: d.email.trim() || null, type: "kupujacy", status: "nowy" })
     .select("id")
     .single();
   if (error || !klient) return { ok: false, error: "Nie udało się zapisać klienta." };
-  return przekazDoradcy({ clientId: klient.id, advisorId: user.role === "credit_advisor" ? user.id : d.advisorId ?? "", rodzaj: d.rodzaj, kwota: d.kwota, notatka: d.notatka });
+  return przekazDoradcy({ clientId: klient.id, advisorId: user.role === "credit_advisor" ? user.id : d.advisorId ?? "", rodzaj: d.rodzaj, kwota: d.kwota, notatka: d.notatka, polecilId: opiekun?.id ?? null });
 }
 
 async function dostep(id: string) {
@@ -185,6 +197,94 @@ export async function dodajNotatke(id: string, tekst: string): Promise<Wynik> {
   await createSupabaseAdmin().from("credit_cases").update({ updated_at: new Date().toISOString() }).eq("id", id);
   const odbiorcy = [d.s.polecajacy?.id, d.s.doradca?.id].filter((x): x is string => Boolean(x) && x !== d.user.id);
   await powiadom(d.user.agency_id!, odbiorcy, { rodzaj: "kredyt", tytul: `Notatka w kredycie: ${d.s.client.name}`, tresc: t.slice(0, 140), adres: `/app/kredyty/${id}` });
+  revalidatePath(`/app/kredyty/${id}`);
+  return { ok: true };
+}
+
+const BRAK_V59 = "Uruchom w Supabase lib/SETUP-v59-kredyty-cele.sql.";
+const liczbaDz = (v: unknown): number | null => {
+  const n = Number(String(v ?? "").replace(/\s/g, "").replace(",", "."));
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
+
+/** Nowy wniosek: klik w bank. Ten sam bank drugi raz nie wchodzi. */
+export async function dodajWniosek(id: string, bank: string): Promise<Wynik> {
+  const d = await dostep(id);
+  if (!d) return { ok: false, error: "Brak dostępu." };
+  if (!BANKI.some((b) => b.id === bank)) return { ok: false, error: "Nieznany bank." };
+  const { error } = await createSupabaseAdmin().from("credit_applications").insert({ case_id: id, agency_id: d.user.agency_id, bank, amount_pln: d.s.amount_pln, created_by: d.user.id });
+  if (error) return { ok: false, error: error.code === "23505" ? "Ten bank jest już na liście." : BRAK_V59 };
+  await wpis(id, d.user.agency_id!, d.user.id, "etap", `Dodano bank: ${bankPoId(bank).nazwa}`);
+  if (d.s.stage === "nowe") await zmienEtap(id, "analiza");
+  revalidatePath(`/app/kredyty/${id}`);
+  return { ok: true };
+}
+
+export async function zmienWniosek(
+  id: string,
+  wniosekId: string,
+  f: { status?: string; kwota?: string; marza?: string; oprocentowanie?: string; rata?: string; prowizja?: string; notatka?: string },
+): Promise<Wynik> {
+  const d = await dostep(id);
+  if (!d) return { ok: false, error: "Brak dostępu." };
+  const admin = createSupabaseAdmin();
+  const { data: byl } = await admin.from("credit_applications").select("bank, status").eq("id", wniosekId).eq("case_id", id).maybeSingle();
+  if (!byl) return { ok: false, error: "Nie ma takiego wniosku." };
+  const teraz = new Date().toISOString();
+  const zmiana: Record<string, unknown> = { updated_at: teraz };
+  if (f.kwota !== undefined) zmiana.amount_pln = liczbaDz(f.kwota);
+  if (f.marza !== undefined) zmiana.margin_pct = liczbaDz(f.marza);
+  if (f.oprocentowanie !== undefined) zmiana.rate_pct = liczbaDz(f.oprocentowanie);
+  if (f.rata !== undefined) zmiana.installment_pln = liczbaDz(f.rata);
+  if (f.prowizja !== undefined) zmiana.commission_pln = liczbaDz(f.prowizja);
+  if (f.notatka !== undefined) zmiana.note = f.notatka.trim().slice(0, 500) || null;
+  const nowy = f.status && STATUSY_WNIOSKU.some((s) => s.id === f.status) ? f.status : null;
+  if (nowy) {
+    zmiana.status = nowy;
+    if (nowy === "zlozony") zmiana.submitted_at = teraz;
+    if (nowy === "pozytywna" || nowy === "negatywna") zmiana.decided_at = teraz;
+  }
+  const { error } = await admin.from("credit_applications").update(zmiana).eq("id", wniosekId).eq("case_id", id);
+  if (error) return { ok: false, error: BRAK_V59 };
+  if (nowy && nowy !== byl.status) {
+    await wpis(id, d.user.agency_id!, d.user.id, "etap", `${bankPoId(byl.bank).nazwa}: ${statusWniosku(nowy).nazwa}`);
+    // Etap sprawy idzie za wnioskami, żeby doradca nie klikał tego samego dwa razy.
+    const wczesniej = ["nowe", "analiza", "dokumenty"].includes(d.s.stage);
+    if (nowy === "pozytywna" && d.s.stage !== "umowa") await zmienEtap(id, "decyzja");
+    else if (["zlozony", "analiza", "dosylka"].includes(nowy) && wczesniej) await zmienEtap(id, "wniosek");
+    await admin.from("credit_cases").update({ updated_at: teraz, bank: nowy === "pozytywna" ? bankPoId(byl.bank).nazwa : d.s.bank }).eq("id", id);
+  }
+  revalidatePath(`/app/kredyty/${id}`);
+  return { ok: true };
+}
+
+export async function usunWniosek(id: string, wniosekId: string): Promise<Wynik> {
+  const d = await dostep(id);
+  if (!d) return { ok: false, error: "Brak dostępu." };
+  await createSupabaseAdmin().from("credit_applications").delete().eq("id", wniosekId).eq("case_id", id);
+  revalidatePath(`/app/kredyty/${id}`);
+  return { ok: true };
+}
+
+export async function zapiszFinanse(id: string, f: Record<keyof Finanse, string>): Promise<Wynik> {
+  const d = await dostep(id);
+  if (!d) return { ok: false, error: "Brak dostępu." };
+  const finanse = Object.fromEntries((["cena", "wklad", "dochod", "zobowiazania", "lat", "oprocentowanie"] as const).map((k) => [k, liczbaDz(f[k])]));
+  const { error } = await createSupabaseAdmin().from("credit_cases").update({ finanse, updated_at: new Date().toISOString() }).eq("id", id).eq("agency_id", d.user.agency_id!);
+  if (error) return { ok: false, error: BRAK_V59 };
+  revalidatePath(`/app/kredyty/${id}`);
+  return { ok: true };
+}
+
+export async function zapiszKrok(id: string, krok: string, data: string): Promise<Wynik> {
+  const d = await dostep(id);
+  if (!d) return { ok: false, error: "Brak dostępu." };
+  const { error } = await createSupabaseAdmin()
+    .from("credit_cases")
+    .update({ next_step: krok.trim().slice(0, 200) || null, next_step_at: /^\d{4}-\d{2}-\d{2}$/.test(data) ? data : null, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("agency_id", d.user.agency_id!);
+  if (error) return { ok: false, error: BRAK_V59 };
   revalidatePath(`/app/kredyty/${id}`);
   return { ok: true };
 }

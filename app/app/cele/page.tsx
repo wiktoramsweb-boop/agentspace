@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { requireUser, requireModul } from "@/lib/auth";
+import { widokCelow } from "@/lib/data-cele-rol";
+import { CeleRoli } from "./cele-roli";
 import { getGoal, getTodayLog, getRecentLogs, getYearClosedCommission } from "@/lib/data-platform";
 import { computeFunnel } from "@/lib/funnel";
 import { FUNNEL_STAGES } from "@/lib/types";
@@ -27,8 +30,32 @@ function mondayOf(d: Date): Date {
   return x;
 }
 
-export default async function CelePage() {
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+export default async function CelePage({ searchParams }: Props) {
   const user = await requireModul("coach");
+  const sp = await searchParams;
+  // Doradca, stażysta i szefowie mają cele swojego stanowiska. Szef, który sam
+  // sprzedaje, nadal może otworzyć swój lejek.
+  const widok = sp.widok === "lejek" && (user.role === "owner" || user.role === "director") ? null : await widokCelow(user);
+  if (widok) {
+    return (
+      <>
+        <PageHeader
+          title={widok.tytul}
+          subtitle={widok.opis}
+          action={
+            user.role === "owner" || user.role === "director" ? (
+              <Link href="/app/cele?widok=lejek" className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:text-emerald-700">
+                Mój lejek sprzedaży
+              </Link>
+            ) : undefined
+          }
+        />
+        <CeleRoli widok={widok} />
+      </>
+    );
+  }
   const goal = await getGoal(user.id);
 
   // Brak celu - pokaż setup

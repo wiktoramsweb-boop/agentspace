@@ -1,6 +1,7 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import { zakresDanych, type Uprawnienia } from "./role";
 import type { Dokument, EtapKredytu } from "./kredyt-etapy";
+import type { Finanse } from "./banki";
 
 /**
  * Sprawy kredytowe: klient przekazany przez agenta doradcy kredytowemu biura.
@@ -109,4 +110,29 @@ export async function doradcyBiura(agencyId: string | null): Promise<{ id: strin
   if (!agencyId) return [];
   const { data } = await createSupabaseAdmin().from("profiles").select("id, full_name, avatar_path").eq("agency_id", agencyId).eq("role", "credit_advisor");
   return ((data ?? []) as { id: string; full_name: string | null; avatar_path: string | null }[]).map((p) => ({ id: p.id, name: p.full_name ?? "Doradca", avatar: p.avatar_path }));
+}
+
+export type WniosekBankowy = {
+  id: string;
+  bank: string;
+  status: string;
+  amount_pln: number | null;
+  margin_pct: number | null;
+  rate_pct: number | null;
+  installment_pln: number | null;
+  commission_pln: number | null;
+  note: string | null;
+  submitted_at: string | null;
+  decided_at: string | null;
+};
+
+/** Wnioski, finanse i następny krok. Osobne zapytanie: bez migracji v59 reszta sprawy działa. */
+export async function pulpitSprawy(caseId: string): Promise<{ gotowe: boolean; wnioski: WniosekBankowy[]; finanse: Finanse; krok: string | null; krokData: string | null }> {
+  const admin = createSupabaseAdmin();
+  const [w, c] = await Promise.all([
+    admin.from("credit_applications").select("id, bank, status, amount_pln, margin_pct, rate_pct, installment_pln, commission_pln, note, submitted_at, decided_at").eq("case_id", caseId).order("created_at"),
+    admin.from("credit_cases").select("finanse, next_step, next_step_at").eq("id", caseId).maybeSingle(),
+  ]);
+  if (w.error || c.error) return { gotowe: false, wnioski: [], finanse: {}, krok: null, krokData: null };
+  return { gotowe: true, wnioski: (w.data ?? []) as WniosekBankowy[], finanse: (c.data?.finanse ?? {}) as Finanse, krok: c.data?.next_step ?? null, krokData: c.data?.next_step_at ?? null };
 }

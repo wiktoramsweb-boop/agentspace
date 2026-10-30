@@ -1,7 +1,8 @@
 "use server";
 
+import { celeStanowiska } from "@/lib/cele-rol";
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+import { requireModul, requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { todayPL } from "@/lib/datetime";
 
@@ -56,4 +57,17 @@ export async function saveTodayLog(formData: FormData): Promise<void> {
 
   revalidatePath("/app/cele");
   revalidatePath("/app");
+}
+
+/** Cel stanowiska na miesiąc. Klucz musi należeć do stanowiska tej osoby. */
+export async function zapiszCelRoli(klucz: string, wartosc: string): Promise<{ ok: boolean; blad?: string }> {
+  const user = await requireModul("coach");
+  const def = celeStanowiska(user.role);
+  const cel = Number(wartosc.replace(/\s/g, "").replace(",", "."));
+  if (!def?.mierniki.some((m) => m.klucz === klucz) || !user.agency_id) return { ok: false, blad: "Ten cel nie dotyczy Twojego stanowiska." };
+  if (!Number.isFinite(cel) || cel <= 0) return { ok: false, blad: "Podaj liczbę większą od zera." };
+  const { error } = await createSupabaseAdmin().from("role_targets").upsert({ profile_id: user.id, agency_id: user.agency_id, klucz, cel, updated_at: new Date().toISOString() }, { onConflict: "profile_id,klucz" });
+  if (error) return { ok: false, blad: "Zapis celu ruszy po uruchomieniu migracji v59." };
+  revalidatePath("/app/cele");
+  return { ok: true };
 }

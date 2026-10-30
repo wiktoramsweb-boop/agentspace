@@ -3,6 +3,7 @@ import { requireModul } from "@/lib/auth";
 import { sprawyKredytowe, doradcyBiura } from "@/lib/data-kredyty";
 import { ETAPY_KREDYTU, ETAPY_AKTYWNE } from "@/lib/kredyt-etapy";
 import { formatPln } from "@/lib/format";
+import { getAgencyAgents } from "@/lib/data-activities";
 import { PageHeader, Card } from "../components/ui";
 import { Avatar } from "../components/avatar";
 import { NowaSprawa } from "./nowa-sprawa";
@@ -18,7 +19,9 @@ const dni = (iso: string) => Math.max(0, Math.floor((Date.now() - new Date(iso).
  */
 export default async function KredytyPage() {
   const user = await requireModul("kredyty");
-  const [{ ready, sprawy }, doradcy] = await Promise.all([sprawyKredytowe(user), doradcyBiura(user.agency_id)]);
+  const [{ ready, sprawy }, doradcy, ludzie] = await Promise.all([sprawyKredytowe(user), doradcyBiura(user.agency_id), user.agency_id ? getAgencyAgents(user.agency_id) : Promise.resolve([])]);
+  const idDoradcow = new Set(doradcy.map((d) => d.id));
+  const agenci = ludzie.filter((l) => !idDoradcow.has(l.id));
   const jestemDoradca = user.role === "credit_advisor";
   const aktywne = sprawy.filter((s) => ETAPY_AKTYWNE.includes(s.stage));
   const zamkniete = sprawy.filter((s) => !ETAPY_AKTYWNE.includes(s.stage));
@@ -49,7 +52,7 @@ export default async function KredytyPage() {
             <Liczba wartosc={String(podpisane.length)} opis="podpisanych umów" />
           </div>
 
-          <NowaSprawa doradcy={doradcy} jestemDoradca={jestemDoradca} />
+          <NowaSprawa doradcy={doradcy} agenci={agenci} jestemDoradca={jestemDoradca} />
 
           {doradcy.length === 0 && !jestemDoradca && (
             <p className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
