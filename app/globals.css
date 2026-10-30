@@ -2497,7 +2497,7 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-200 { border
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-white { border-color: #18181b !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-300 { border-color: #3f3f46 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-400 { border-color: #52525b !important; }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.divide-slate-100, .divide-slate-200) > * + * { border-color: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.divide-slate-100, .divide-slate-200) > * { border-color: #27272a !important; }
 
 /* Stany hover */
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:bg-slate-50:hover { background-color: rgba(39, 39, 42, 0.5) !important; }
@@ -3140,7 +3140,7 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) .bg-zinc-200 { background-
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-zinc-100 { border-color: #27272a !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-zinc-200 { border-color: #27272a !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-zinc-300 { border-color: #3f3f46 !important; }
-html[data-theme="dark"] :is(.app-shell, .portal-dark) .divide-zinc-100 > * + * { border-color: #27272a !important; }
+html[data-theme="dark"] :is(.app-shell, .portal-dark) .divide-zinc-100 > * { border-color: #27272a !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .border-slate-100 { border-color: #27272a !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .hover\:border-slate-200:hover { border-color: #3f3f46 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) .group-hover\:border-slate-300:hover { border-color: #3f3f46 !important; }
@@ -3347,7 +3347,7 @@ html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print
 html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
   :is(.border-zinc-300, .border-slate-300, .border-gray-300) { border-color: #cbd5e1 !important; }
 html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
-  :is(.divide-zinc-100, .divide-slate-100) > * + * { border-color: #f1f5f9 !important; }
+  :is(.divide-zinc-100, .divide-slate-100) > * { border-color: #f1f5f9 !important; }
 
 /* Pola edytowalne wpisane w arkusz (np. dane stron w umowie) też są na papierze. */
 html[data-theme="dark"] :is(.app-shell, .portal-dark) :is(.invoice-sheet, .print-sheet, .sheet-a4, .contract-sheet)
