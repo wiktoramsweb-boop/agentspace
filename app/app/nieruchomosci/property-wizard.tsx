@@ -186,7 +186,7 @@ export function PropertyWizard({
                   tytul="Masz ogłoszenie? Wklej link"
                   opis="Uzupełnimy adres, cenę, parametry i opis. Sprawdzisz wszystko przed zapisem."
                   start={start?.link}
-                  auto={!!start?.link}
+                  auto={!!start?.link && !zOgloszenia}
                   onDane={(d) => zastosujOgloszenie(szkicOferty(d.oferta))}
                 />
               </div>
