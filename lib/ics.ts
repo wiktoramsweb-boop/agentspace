@@ -2,7 +2,7 @@
 
 export type ZdarzenieIcs = { id: string; tytul: string; start: string; sekundy: number | null; opis?: string | null; wykonane?: boolean };
 
-const tekst = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+const tekst = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
 const czas = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 /** Linie dłuższe niż 75 bajtów trzeba zawijać, inaczej Apple ucina tytuły. */
