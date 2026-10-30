@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireUser, requireModul } from "@/lib/auth";
 import { getAgencyAgents } from "@/lib/data-activities";
@@ -75,6 +76,11 @@ export default async function KalendarzPage({ searchParams }: Props) {
       <PageHeader
         title="Kalendarz"
         subtitle="Telefony, spotkania i zadania na osi czasu. Przeciągnij wpis, żeby zmienić termin."
+        action={
+          <Link href="/app/ustawienia/integracje#kalendarz" className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:text-emerald-700">
+            Podłącz swój kalendarz
+          </Link>
+        }
       />
       <CalendarApp
         view={view}

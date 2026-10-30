@@ -5,7 +5,10 @@ import { usePathname } from "next/navigation";
 
 type Item = { href: string; label: string };
 
-const PERSONAL: Item[] = [{ href: "/app/ustawienia", label: "Mój profil" }];
+const PERSONAL: Item[] = [
+  { href: "/app/ustawienia", label: "Mój profil" },
+  { href: "/app/ustawienia/integracje", label: "Integracje" },
+];
 
 const COMPANY: Item[] = [
   { href: "/app/ustawienia/firma", label: "Dane firmy" },

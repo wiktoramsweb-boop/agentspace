@@ -1,5 +1,6 @@
 // Test: cele stanowisk i obliczenia kredytowe. `npm run test:cele`
 import { celeStanowiska, tempo } from "./cele-rol.ts";
+import { plikIcs } from "./ics.ts";
 import { analizaFinansow, nastepnyKrok, rataKredytu } from "./banki.ts";
 
 let bledy = 0;
@@ -26,5 +27,10 @@ sprawdz("LTV 83% ostrzega", a.uwagi[0].ton, "uwaga");
 sprawdz("brak danych bez obliczeń", analizaFinansow(null, {}).rata, null);
 sprawdz("dosyłka wyprzedza resztę", nastepnyKrok("wniosek", 2, [{ status: "dosylka" }]).startsWith("Bank czeka"), true);
 sprawdz("wszystkie odmowy", nastepnyKrok("wniosek", 0, [{ status: "negatywna" }]).startsWith("Wszystkie banki"), true);
+const ics = plikIcs("AgentSpace", [{ id: "1", tytul: "Prezentacja, ul. Długa; test", start: "2026-11-02T10:00:00.000Z", sekundy: 1800 }]);
+sprawdz("ics: znaki specjalne", ics.includes(String.raw`SUMMARY:Prezentacja\, ul. Długa; test`), true);
+sprawdz("ics: czas końca", ics.includes("DTEND:20261102T103000Z"), true);
+sprawdz("ics: linie CRLF", ics.split("\r\n").length > 5, true);
+sprawdz("ics: zawijanie długich", plikIcs("x", [{ id: "2", tytul: "ą".repeat(100), start: "2026-11-02T10:00:00Z", sekundy: null }]).split("\r\n").every((l) => new TextEncoder().encode(l).length <= 75), true);
 console.log(bledy ? `\n${bledy} błędów` : "\nWszystko OK");
 process.exit(bledy ? 1 : 0);

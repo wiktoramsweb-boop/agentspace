@@ -42,3 +42,14 @@ create table if not exists public.role_targets (
   unique (profile_id, klucz)
 );
 alter table public.role_targets enable row level security;
+
+-- Prywatny adres kalendarza: każda osoba podłącza swój terminarz do Google,
+-- Apple albo Outlooka. Token jest losowy, a nowy unieważnia poprzedni.
+create table if not exists public.calendar_tokens (
+  profile_id uuid primary key references public.profiles(id) on delete cascade,
+  agency_id uuid not null references public.agencies(id) on delete cascade,
+  token text not null unique,
+  ostatnio_pobrany timestamptz,
+  created_at timestamptz not null default now()
+);
+alter table public.calendar_tokens enable row level security;
