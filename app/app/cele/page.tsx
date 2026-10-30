@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser, requireModul } from "@/lib/auth";
+import { requireModul } from "@/lib/auth";
 import { widokCelow } from "@/lib/data-cele-rol";
 import { CeleRoli } from "./cele-roli";
 import { getGoal, getTodayLog, getRecentLogs, getYearClosedCommission } from "@/lib/data-platform";
