@@ -83,6 +83,7 @@ export const SECTIONS: NavSection[] = [
       { href: "/app/portal", label: "Portal klienta", icon: <PhonePortalIcon />, color: "cyan", modul: "klienci" },
       { href: "/app/nieruchomosci", label: "Nieruchomości", icon: <BuildingIcon />, color: "blue", modul: "nieruchomosci" },
       { href: "/app/wycena-rcn", label: "Wycena z RCN", icon: <ScaleIcon />, color: "teal", modul: "nieruchomosci" },
+      { href: "/app/najem", label: "Zarządzanie najmem", icon: <KluczIcon />, color: "teal", modul: "najem" },
       { href: "/app/poszukiwania", label: "Poszukiwania", icon: <SearchIcon />, color: "sky", modul: "klienci" },
       { href: "/app/kredyty", label: "Kredyty", icon: <BankIcon />, color: "blue", modul: "kredyty" },
       { href: "/app/prowizje", label: "Prowizje", icon: <CashIcon />, color: "green", modul: "prowizje" },
@@ -164,6 +165,9 @@ export function aktywnaPozycja(item: NavItem, pathname: string): boolean {
   return [item.href, ...(item.aliasy ?? [])].some((h) => pathname === h || pathname.startsWith(h + "/"));
 }
 
+function KluczIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.03 5.91c-.56-.1-1.16.03-1.56.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.82c0-.6.24-1.17.66-1.59l6.5-6.5c.4-.4.53-1 .43-1.56A6 6 0 1 1 21.75 8.25Z" /></svg>;
+}
 function LejekIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5v15m6-15v15M4.5 19.5h15a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5h-15A1.5 1.5 0 0 0 3 6v12a1.5 1.5 0 0 0 1.5 1.5Z" /></svg>;
 }

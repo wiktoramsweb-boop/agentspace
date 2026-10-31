@@ -24,6 +24,7 @@ export type Modul =
   | "abonament"
   | "coach"
   | "kredyty"
+  | "najem"
   | "szkolenie";
 
 export type OpisModulu = { id: Modul; nazwa: string; opis: string };
@@ -40,6 +41,7 @@ export const MODULY: OpisModulu[] = [
   { id: "abonament", nazwa: "Abonament", opis: "Zakup i przedłużanie abonamentu." },
   { id: "coach", nazwa: "AI Coach i cele", opis: "Trening rozmów, historia sesji, cele osobiste." },
   { id: "kredyty", nazwa: "Kredyty", opis: "Sprawy kredytowe klientów: przekazanie doradcy, etap, dokumenty." },
+  { id: "najem", nazwa: "Zarządzanie najmem", opis: "Lokale w zarządzaniu, strony, umowy najmu, rozliczenia z właścicielami." },
   { id: "szkolenie", nazwa: "Szkolenie zespołu", opis: "Postępy ludzi w Akademii: przerobione lekcje, wyniki sprawdzianów i podejścia." },
 ];
 
@@ -61,7 +63,8 @@ export type UserRole =
   | "accountant"
   | "coordinator"
   | "trainee"
-  | "credit_advisor";
+  | "credit_advisor"
+  | "rental_manager";
 
 export type OpisRoli = {
   id: UserRole;
@@ -143,6 +146,13 @@ export const ROLE: OpisRoli[] = [
     opis: "Prowadzi kredyty klientów przekazanych przez agentów. Widzi tylko swoje sprawy kredytowe, bez bazy klientów i ofert biura.",
     moduly: ["kredyty", "coach"],
     zakres: "wlasne",
+  },
+  {
+    id: "rental_manager",
+    nazwa: "Zarządca najmu",
+    opis: "Prowadzi lokale w zarządzaniu: strony, umowy najmu, usterki i rozliczenia z właścicielami. Bez sprzedaży i prowizji biura.",
+    moduly: ["najem"],
+    zakres: "wszystko",
   },
 ];
 

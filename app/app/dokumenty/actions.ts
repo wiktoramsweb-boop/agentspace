@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+import { requireModul, requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { DOC_BUCKET } from "@/lib/storage";
 import { removeFiles, signUploads, signedDownloadUrl, type SignedUpload } from "@/lib/storage-server";
@@ -14,9 +14,11 @@ type Result<T = object> = ({ ok: true } & T) | { ok: false; error: string };
 
 /** Czy oferta albo klient należy do biura pytającego. */
 async function ownsEntity(agencyId: string, entity: DocEntity, id: string): Promise<boolean> {
+  // Umowy najmu widzą tylko osoby z modułem najmu, nie całe biuro.
+  if (entity === "najem") await requireModul("najem");
   const admin = createSupabaseAdmin();
   const { data } = await admin
-    .from(entity === "property" ? "properties" : "clients")
+    .from(entity === "property" ? "properties" : entity === "najem" ? "rental_units" : "clients")
     .select("id")
     .eq("id", id)
     .eq("agency_id", agencyId)
@@ -29,7 +31,7 @@ function pathFor(entity: DocEntity, entityId: string, agencyId: string) {
 }
 
 function revalidateEntity(entity: DocEntity, id: string) {
-  revalidatePath(entity === "property" ? `/app/nieruchomosci/${id}` : `/app/klienci/${id}`);
+  revalidatePath(entity === "property" ? `/app/nieruchomosci/${id}` : entity === "najem" ? `/app/najem/${id}` : `/app/klienci/${id}`);
 }
 
 /** Podpisane linki do wgrania dokumentów. Pliki lądują w folderze biura i konkretnej oferty/klienta. */
@@ -124,6 +126,7 @@ async function loadOwnDoc(id: string) {
     .eq("id", id)
     .eq("agency_id", user.agency_id)
     .maybeSingle();
+  if (data?.entity_type === "najem") await requireModul("najem");
   return { user, admin, doc: data };
 }
 

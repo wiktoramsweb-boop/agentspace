@@ -3,7 +3,7 @@
  * formatowanie rozmiaru. Bezpieczne w przeglądarce (bez dostępu do bazy).
  */
 
-export type DocEntity = "property" | "client";
+export type DocEntity = "property" | "client" | "najem";
 
 export type DocKind = { value: string; label: string };
 
@@ -26,8 +26,21 @@ export const CLIENT_DOC_KINDS: DocKind[] = [
   { value: "inne", label: "Inny dokument" },
 ];
 
+export const NAJEM_DOC_KINDS: DocKind[] = [
+  { value: "umowa_zarzadzania", label: "Umowa o zarządzanie" },
+  { value: "pelnomocnictwo", label: "Pełnomocnictwo" },
+  { value: "umowa_najmu", label: "Umowa najmu" },
+  { value: "aneks", label: "Aneks" },
+  { value: "protokol", label: "Protokół zdawczo-odbiorczy" },
+  { value: "notarialny", label: "Oświadczenie notarialne" },
+  { value: "zgloszenie_us", label: "Zgłoszenie do urzędu skarbowego" },
+  { value: "rozliczenie", label: "Rozliczenie" },
+  { value: "polisa", label: "Polisa" },
+  { value: "inne", label: "Inny dokument" },
+];
+
 export function docKinds(entity: DocEntity): DocKind[] {
-  return entity === "property" ? PROPERTY_DOC_KINDS : CLIENT_DOC_KINDS;
+  return entity === "property" ? PROPERTY_DOC_KINDS : entity === "najem" ? NAJEM_DOC_KINDS : CLIENT_DOC_KINDS;
 }
 
 export function docKindLabel(entity: DocEntity, kind: string): string {

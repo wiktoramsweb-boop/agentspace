@@ -18,7 +18,7 @@ export async function ludzieSzkolenia(user: { id: string; agency_id: string | nu
   if (ids) q = q.in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
   const { data } = await q;
   return ((data ?? []) as { id: string; full_name: string | null; email: string | null; role: string; avatar_path: string | null; created_at: string }[])
-    .filter((p) => p.role !== "credit_advisor" && p.role !== "accountant")
+    .filter((p) => !["credit_advisor", "rental_manager"].includes(p.role) && p.role !== "accountant")
     .map((p) => ({ id: p.id, imie: p.full_name ?? p.email ?? "Osoba", rola: p.role, avatar: p.avatar_path, dolaczyl: p.created_at }));
 }
 

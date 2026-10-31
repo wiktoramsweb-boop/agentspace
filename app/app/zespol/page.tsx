@@ -82,7 +82,7 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
   const funnelByAgent = await getTeamFunnelProgress(ranking.map((a) => a.id));
   // Doradca kredytowy nie dzwoni z celem telefonów, więc alerty o braku telefonów go nie dotyczą.
   const insights = await getTeamInsights(
-    ranking.filter((a) => a.role !== "credit_advisor").map((a) => ({ id: a.id, name: a.full_name ?? a.email ?? "Agent" })),
+    ranking.filter((a) => !["credit_advisor", "rental_manager"].includes(a.role)).map((a) => ({ id: a.id, name: a.full_name ?? a.email ?? "Agent" })),
   );
 
   // Dane tylko dla CEO.
@@ -146,7 +146,7 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
     const zaladunek = await getTeamWorkload(agencyId, members.map((m) => m.id));
     const grupy = [...oddzialy.lista.map((o) => ({ id: o.id as string | null, nazwa: o.name })), { id: null, nazwa: "Bez oddziału" }];
     for (const g of grupy) {
-      const ludzie = members.filter((m) => (m.branch_id ?? null) === g.id && m.role !== "credit_advisor");
+      const ludzie = members.filter((m) => (m.branch_id ?? null) === g.id && !["credit_advisor", "rental_manager"].includes(m.role));
       if (!g.id && ludzie.length === 0) continue;
       wynikiOddzialow.push({
         id: g.id,

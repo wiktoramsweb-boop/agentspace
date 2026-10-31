@@ -39,6 +39,7 @@
     "test:noe": "node --experimental-strip-types lib/sprawdz-noe.ts",
     "test:prowizje": "node --experimental-strip-types --no-warnings lib/sprawdz-prowizje.ts",
     "test:cele": "node --experimental-strip-types --no-warnings lib/sprawdz-cele-rol.ts",
+    "test:najem": "node --experimental-strip-types --no-warnings lib/sprawdz-najem.ts",
     "test:ogloszenia": "node --experimental-strip-types --no-warnings lib/sprawdz-ogloszenia.ts",
     "test:portale": "node --experimental-strip-types --no-warnings lib/sprawdz-portale.ts"
   },

@@ -57,7 +57,7 @@ export async function tydzienBiura(agencyId: string, now = new Date(), tylko?: s
   ]);
 
   const wZakresie = (id: string | null | undefined) => !tylko || (id != null && tylko.includes(id));
-  const zespol = ((prof.data ?? []) as Osoba[]).filter((p) => p.role !== "credit_advisor" && wZakresie(p.id));
+  const zespol = ((prof.data ?? []) as Osoba[]).filter((p) => !["credit_advisor", "rental_manager"].includes(p.role) && wZakresie(p.id));
   const ludzie = new Map(zespol.map((p) => [p.id, { id: p.id, imie: p.full_name ?? "Osoba", telefony: 0, prezentacje: 0, prowizje: 0 }]));
 
   for (const a of (dzialania.data ?? []) as { kind: string; assignee_ids: string[] | null; created_by: string | null }[]) {
