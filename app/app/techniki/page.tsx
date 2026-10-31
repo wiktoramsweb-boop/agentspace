@@ -216,7 +216,6 @@ async function Akademia({ user }: { user: Awaited<ReturnType<typeof requireModul
     <>
       <section className="mb-8 grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <div className="relative overflow-hidden rounded-[28px] bg-slate-900 p-6 text-white">
-          <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-amber-400/25 blur-3xl" aria-hidden="true" />
           <div className="relative">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-300">{nazwa.pelna}</p>
             <p className="mt-2 max-w-md text-lg font-semibold leading-snug">
@@ -225,7 +224,7 @@ async function Akademia({ user }: { user: Awaited<ReturnType<typeof requireModul
                 : "Sześć modułów od pierwszej rozmowy do negocjacji. Lekcja, krótki sprawdzian, następny moduł."}
             </p>
             <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/15">
-              <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-300 transition-all" style={{ width: `${procent}%` }} />
+              <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: `${procent}%` }} />
             </div>
             <p className="mt-2 text-sm text-slate-300">
               {stan.lekcjiZrobionych}/{stan.lekcjiWszystkich} lekcji · {stan.zaliczonych}/{stan.sprawdzianow} sprawdzianów

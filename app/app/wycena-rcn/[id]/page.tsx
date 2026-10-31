@@ -41,7 +41,7 @@ export default async function ZapisanaWycenaPage({ params }: { params: Promise<{
         <WynikWidok
           w={w.raport.wynik}
           promien={w.raport.promien}
-          raport={w.raport}
+          raport={{ ...w.raport, lat: Number(w.parametry.lat) || null, lng: Number(w.parametry.lng) || null }}
           adres={w.adres}
           stan={w.raport.wybranyStan ?? "standard"}
           ofertaId={w.property_id}

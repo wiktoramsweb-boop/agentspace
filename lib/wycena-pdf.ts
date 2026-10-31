@@ -19,6 +19,8 @@ export type DaneRaportu = {
   parametry: [string, string][];
   wybranyStan: string | null;
   wynik: WynikWyceny;
+  lat?: number | null;
+  lng?: number | null;
 };
 
 const A4 = { w: 595.28, h: 841.89 };
@@ -42,6 +44,54 @@ async function bajty(url: string): Promise<Uint8Array> {
   const r = await fetch(url);
   if (!r.ok) throw new Error(`Nie udało się pobrać ${url}`);
   return new Uint8Array(await r.arrayBuffer());
+}
+
+/**
+ * Wycinek mapy OpenStreetMap jako PNG. Skleja kafelki na płótnie w przeglądarce.
+ * Zwraca też, jak metry przeliczyć na piksele. Gdy kafelki się nie wczytają,
+ * raport wraca do mapy wektorowej z pierścieniami odległości.
+ */
+async function mapaOsm(lat: number, lng: number, zasiegM: number, szer: number, wys: number): Promise<{ png: Uint8Array; pxNaMetr: number } | null> {
+  if (typeof document === "undefined") return null;
+  const metrNaPxZ0 = (156543.03 * Math.cos((lat * Math.PI) / 180));
+  // Największy zoom, przy którym cały zasięg mieści się w połowie wysokości.
+  let z = 17;
+  while (z > 12 && zasiegM / (metrNaPxZ0 / 2 ** z) > wys / 2 - 20) z--;
+  const n = 256 * 2 ** z;
+  const px = ((lng + 180) / 360) * n;
+  const sin = Math.sin((lat * Math.PI) / 180);
+  const py = (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * n;
+  const lewo = px - szer / 2, gora = py - wys / 2;
+  const cv = document.createElement("canvas");
+  cv.width = szer;
+  cv.height = wys;
+  const cx = cv.getContext("2d");
+  if (!cx) return null;
+  const zadania: Promise<void>[] = [];
+  for (let tx = Math.floor(lewo / 256); tx <= Math.floor((lewo + szer) / 256); tx++) {
+    for (let ty = Math.floor(gora / 256); ty <= Math.floor((gora + wys) / 256); ty++) {
+      zadania.push(
+        new Promise((ok, zle) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => {
+            cx.drawImage(img, tx * 256 - lewo, ty * 256 - gora);
+            ok();
+          };
+          img.onerror = () => zle(new Error("kafelek"));
+          img.src = `https://tile.openstreetmap.org/${z}/${tx}/${ty}.png`;
+        }),
+      );
+    }
+  }
+  try {
+    await Promise.all(zadania);
+    const dane = await new Promise<Blob | null>((ok) => cv.toBlob(ok, "image/png"));
+    if (!dane) return null;
+    return { png: new Uint8Array(await dane.arrayBuffer()), pxNaMetr: 1 / (metrNaPxZ0 / 2 ** z) };
+  } catch {
+    return null;
+  }
 }
 
 export async function raportWycenyPdf(d: DaneRaportu): Promise<Uint8Array> {
@@ -92,7 +142,7 @@ export async function raportWycenyPdf(d: DaneRaportu): Promise<Uint8Array> {
     p.drawRectangle({ x: M, y: y - 4, width: 18, height: 18, color: ZIELEN_JASNA });
     p.drawCircle({ x: M + 9, y: y + 5, size: 3.5, color: ZIELEN });
     txt(p, tytul, M + 26, y, { size: 13, font: bold });
-    if (podpis) txt(p, podpis, M + 26, y - 13, { size: 7.5, kolor: CZERWONY });
+    if (podpis) txt(p, podpis, M + 26, y - 13, { size: 7.5, kolor: SZARY });
   };
 
   /* ── Strona 1 ── */
@@ -177,20 +227,26 @@ export async function raportWycenyPdf(d: DaneRaportu): Promise<Uint8Array> {
   const s2 = pdf.addPage([A4.w, A4.h]);
   y = A4.h - 60;
   naglowekSekcji(s2, "Porównywalne transakcje", y, `akty notarialne z RCN w promieniu ${d.promien >= 1000 ? `${d.promien / 1000} km` : `${d.promien} m`}, najbardziej podobne mieszkania`);
-  // Mapa porównań (wektorowa).
-  const mapaH = 230;
+  const mapaH = 270;
   const mx0 = M, my0 = y - 36 - mapaH;
-  s2.drawRectangle({ x: mx0, y: my0, width: SZER, height: mapaH, color: JASNY });
   const cx = mx0 + SZER / 2, cy = my0 + mapaH / 2;
   const zasieg = Math.max(300, ...w.porownania.map((p) => p.odleglosc)) * 1.1;
-  const skala = (mapaH / 2 - 14) / zasieg;
-  for (const f of [0.33, 0.66, 1]) {
-    const r = zasieg * f * skala;
-    s2.drawCircle({ x: cx, y: cy, size: r, borderColor: LINIA, borderWidth: 0.8 });
-    const metry = Math.round((zasieg * f) / 50) * 50;
-    txt(s2, metry >= 1000 ? `${(metry / 1000).toLocaleString("pl-PL")} km` : `${metry} m`, cx + r * 0.71 + 3, cy + r * 0.71, { size: 7, kolor: SZARY });
+  let skala = (mapaH / 2 - 14) / zasieg;
+  const tlo = d.lat && d.lng ? await mapaOsm(d.lat, d.lng, zasieg, Math.round(SZER), Math.round(mapaH)) : null;
+  if (tlo) {
+    s2.drawImage(await pdf.embedPng(tlo.png), { x: mx0, y: my0, width: SZER, height: mapaH });
+    skala = tlo.pxNaMetr;
+    txt(s2, "© OpenStreetMap", mx0 + SZER - 4, my0 + 4, { size: 6, kolor: SZARY, align: "right" });
+  } else {
+    s2.drawRectangle({ x: mx0, y: my0, width: SZER, height: mapaH, color: JASNY });
+    for (const f of [0.33, 0.66, 1]) {
+      const r = zasieg * f * skala;
+      s2.drawCircle({ x: cx, y: cy, size: r, borderColor: LINIA, borderWidth: 0.8 });
+      const metry = Math.round((zasieg * f) / 50) * 50;
+      txt(s2, metry >= 1000 ? `${(metry / 1000).toLocaleString("pl-PL")} km` : `${metry} m`, cx + r * 0.71 + 3, cy + r * 0.71, { size: 7, kolor: SZARY });
+    }
+    txt(s2, "N", cx, my0 + mapaH - 11, { size: 7, kolor: SZARY, align: "center" });
   }
-  txt(s2, "N", cx, my0 + mapaH - 11, { size: 7, kolor: SZARY, align: "center" });
   // Podpis ceny tylko tam, gdzie nie zasłoni innego: przy gęstych porównaniach napisy się zlewały.
   const zajete: { x: number; y: number; w: number }[] = [];
   for (const p of w.porownania) {
@@ -201,7 +257,8 @@ export async function raportWycenyPdf(d: DaneRaportu): Promise<Uint8Array> {
     const szerP = reg.widthOfTextAtSize(podpis, 6.5);
     const kolizja = zajete.some((z) => Math.abs(z.y - py) < 9 && px + 7 < z.x + z.w && px + 7 + szerP > z.x);
     if (!kolizja) {
-      txt(s2, podpis, px + 7, py - 3, { size: 6.5, kolor: NOC });
+      s2.drawRectangle({ x: px + 6, y: py - 5, width: szerP + 3, height: 9.5, color: rgb(1, 1, 1), opacity: 0.85 });
+      txt(s2, podpis, px + 7.5, py - 3, { size: 6.5, kolor: NOC });
       zajete.push({ x: px + 7, y: py, w: szerP });
     }
   }

@@ -33,8 +33,11 @@ export default async function OsiagnieciaPage() {
               <span className="text-sm text-slate-500">z {mapa.maksimum} pkt</span>
             </p>
           </div>
-          <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-slate-100">
-            <div className="h-full rounded-full bg-gradient-to-r from-amber-400 via-emerald-400 to-violet-500" style={{ width: `${Math.max(3, mapa.procent)}%` }} />
+          <div className="relative mt-6 h-2.5 rounded-full bg-slate-100">
+            <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.max(3, mapa.procent)}%` }} />
+            {mapa.rangi.slice(1).map((r) => (
+              <span key={r.nazwa} className="absolute top-0 h-full w-0.5 bg-white" style={{ left: `${r.od}%` }} aria-hidden="true" />
+            ))}
           </div>
           <ol className="mt-5 grid grid-cols-5 gap-2">
             {mapa.rangi.map((r, i) => (

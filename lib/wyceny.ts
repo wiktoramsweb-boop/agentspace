@@ -77,6 +77,8 @@ export async function policzWycene(user: ProfileWithAgency, p: ParametryWyceny, 
           parametry: opisParametrow(cel, ogrzewanie),
           wybranyStan: cel.stan ?? "standard",
           wynik: w,
+          lat,
+          lng,
         }
       : null;
 

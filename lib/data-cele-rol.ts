@@ -4,7 +4,7 @@ import { poczatekMiesiacaPL } from "./kredyty";
 import { todayPL } from "./datetime";
 import type { ProfileWithAgency } from "./types";
 
-export type WynikMiernika = Miernik & { cel: number; teraz: number; procent: number; zaPlanem: boolean };
+export type WynikMiernika = Miernik & { cel: number; teraz: number; procent: number; zaPlanem: boolean; plan: number };
 export type WidokCelow = Omit<CeleStanowiska, "mierniki"> & { mierniki: WynikMiernika[]; dzien: number; dniWMiesiacu: number };
 
 const ile = async (q: PromiseLike<{ count: number | null }>) => (await q).count ?? 0;
@@ -65,7 +65,7 @@ export async function widokCelow(user: ProfileWithAgency): Promise<WidokCelow | 
       const teraz = w[m.klucz] ?? 0;
       // Ocena to poziom, nie suma: nie rośnie z dniami, więc bez tempa miesiąca.
       const t = m.jednostka === "ocena" ? tempo(cel, teraz, dniWMiesiacu, dniWMiesiacu) : tempo(cel, teraz, dzien, dniWMiesiacu);
-      return { ...m, cel, teraz, ...t };
+      return { ...m, cel, teraz, ...t, plan: Math.round((dzien / dniWMiesiacu) * 100) };
     }),
   };
 }
