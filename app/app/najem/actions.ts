@@ -5,7 +5,9 @@ import { requireModul } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { zapiszZdarzenie } from "@/lib/dziennik";
 import { konfigBiura } from "@/lib/data-najem";
-import { ETAPY_NAJMU, FORMY_UMOWY, MODELE_ROZLICZEN, ROLE_STRON, TYPY_NAJMU, USLUGI, type Konfig } from "@/lib/najem-model";
+import { randomBytes } from "node:crypto";
+import { powiadomWlasciciela } from "@/lib/data-wlasciciel";
+import { ETAPY_NAJMU, FORMY_UMOWY, MODELE_ROZLICZEN, RODZAJE_OPLAT, ROLE_STRON, TYPY_NAJMU, USLUGI, type Konfig } from "@/lib/najem-model";
 
 type Wynik = { ok: true; id?: string } | { ok: false; error: string };
 
@@ -193,7 +195,14 @@ export async function dodajZdarzenie(id: string, f: Record<string, string>): Pro
   const d = await mojLokal(id);
   const tytul = txt(f.tytul, 200);
   if (!d || !tytul) return { ok: false, error: "Opisz zgłoszenie." };
-  await d.admin.from("rental_events").insert({ unit_id: id, agency_id: d.agencyId, rodzaj: ["usterka", "przeglad", "zdarzenie"].includes(f.rodzaj) ? f.rodzaj : "usterka", tytul, koszt: num(f.koszt), termin: data(f.termin), autor_id: d.user.id });
+  const koszt = num(f.koszt);
+  const { data: l } = await d.admin.from("rental_units").select("limit_napraw").eq("id", id).single();
+  // Koszt ponad limit z umowy czeka na decyzję właściciela w jego portalu.
+  const zgoda = koszt != null && l?.limit_napraw != null && koszt > Number(l.limit_napraw) ? "oczekuje" : "nie_dotyczy";
+  const pelny = { unit_id: id, agency_id: d.agencyId, rodzaj: ["usterka", "przeglad", "zdarzenie"].includes(f.rodzaj) ? f.rodzaj : "usterka", tytul, koszt, termin: data(f.termin), autor_id: d.user.id };
+  const { error } = await d.admin.from("rental_events").insert({ ...pelny, zgoda });
+  if (error) await d.admin.from("rental_events").insert(pelny);
+  if (zgoda === "oczekuje") await powiadomWlasciciela(id, `Koszt do akceptacji: ${tytul}`);
   odswiez(id);
   return { ok: true };
 }
@@ -228,5 +237,84 @@ export async function zapiszKonfig(k: Konfig): Promise<Wynik> {
   if (error) return { ok: false, error: BRAK };
   await zapiszZdarzenie({ agencyId, actorId: user.id, akcja: "najem_ustawienia", rodzaj: "ustawienia", opis: "Zmiana warunków zarządzania najmem" });
   revalidatePath("/app/najem");
+  return { ok: true };
+}
+
+const BRAK_V61 = "Uruchom w Supabase lib/SETUP-v61-najem-portal.sql.";
+
+/** Rachunek z danego miesiąca: każdy osobno, bo media co miesiąc są inne. */
+export async function dodajOplate(id: string, f: Record<string, string>): Promise<Wynik> {
+  const d = await mojLokal(id);
+  const kwota = num(f.kwota);
+  if (!d || !kwota || !/^\d{4}-\d{2}$/.test(f.miesiac ?? "")) return { ok: false, error: "Podaj miesiąc i kwotę." };
+  const { error } = await d.admin.from("rental_charges").insert({
+    unit_id: id,
+    agency_id: d.agencyId,
+    miesiac: f.miesiac,
+    okres_mies: Math.min(12, Math.max(1, num(f.okres_mies) ?? 1)),
+    rodzaj: RODZAJE_OPLAT.some((r) => r.id === f.rodzaj) ? f.rodzaj : "inne",
+    kwota,
+    najemca_placi: f.najemca_placi === "1",
+    biuro_oplaca: f.biuro_oplaca === "1",
+    odczyt: num(f.odczyt),
+    opis: txt(f.opis, 200),
+  });
+  if (error) return { ok: false, error: BRAK_V61 };
+  odswiez(id);
+  return { ok: true };
+}
+
+export async function usunOplate(id: string, oplataId: string): Promise<Wynik> {
+  const d = await mojLokal(id);
+  if (!d) return { ok: false, error: "Nie znaleziono lokalu." };
+  await d.admin.from("rental_charges").delete().eq("id", oplataId).eq("unit_id", id);
+  odswiez(id);
+  return { ok: true };
+}
+
+/** Właściciel widzi miesiąc dopiero po tym kliknięciu, żeby nie oglądał niegotowych liczb. */
+export async function opublikujMiesiac(id: string, miesiac: string, tak: boolean): Promise<Wynik> {
+  const d = await mojLokal(id);
+  if (!d || !/^\d{4}-\d{2}$/.test(miesiac)) return { ok: false, error: "Nie znaleziono lokalu." };
+  const { error } = await d.admin.from("rental_payments").upsert({ unit_id: id, agency_id: d.agencyId, miesiac, opublikowano: tak ? new Date().toISOString() : null }, { onConflict: "unit_id,miesiac" });
+  if (error) return { ok: false, error: BRAK_V61 };
+  if (tak) await powiadomWlasciciela(id, `Rozliczenie za ${miesiac.slice(5)}/${miesiac.slice(0, 4)} jest gotowe`);
+  odswiez(id);
+  return { ok: true };
+}
+
+/** Dostęp właściciela. Istniejący link tej osoby dostaje nowy lokal zamiast drugiego linku. */
+export async function wlaczPortal(id: string, nazwa: string): Promise<Wynik> {
+  const d = await mojLokal(id);
+  if (!d) return { ok: false, error: "Nie znaleziono lokalu." };
+  const nazwaCz = txt(nazwa, 120);
+  if (!nazwaCz) return { ok: false, error: "Dodaj właściciela w zakładce Strony." };
+  const { data: byl, error: e1 } = await d.admin.from("rental_owner_access").select("id, unit_ids").eq("agency_id", d.agencyId).eq("nazwa", nazwaCz).is("revoked_at", null).maybeSingle();
+  if (e1) return { ok: false, error: BRAK_V61 };
+  if (byl) await d.admin.from("rental_owner_access").update({ unit_ids: [...new Set([...(byl.unit_ids as string[]), id])] }).eq("id", byl.id);
+  else await d.admin.from("rental_owner_access").insert({ agency_id: d.agencyId, token: randomBytes(24).toString("base64url"), nazwa: nazwaCz, unit_ids: [id], created_by: d.user.id });
+  await zapiszZdarzenie({ agencyId: d.agencyId, actorId: d.user.id, akcja: "najem_portal", rodzaj: "oferta", id, opis: `Portal właściciela włączony: ${d.lokal.adres}` });
+  odswiez(id);
+  return { ok: true };
+}
+
+export async function wylaczPortal(id: string, dostepId: string): Promise<Wynik> {
+  const d = await mojLokal(id);
+  if (!d) return { ok: false, error: "Nie znaleziono lokalu." };
+  await d.admin.from("rental_owner_access").update({ revoked_at: new Date().toISOString() }).eq("id", dostepId).eq("agency_id", d.agencyId);
+  await zapiszZdarzenie({ agencyId: d.agencyId, actorId: d.user.id, akcja: "najem_portal_stop", rodzaj: "oferta", id, opis: `Portal właściciela wyłączony: ${d.lokal.adres}` });
+  odswiez(id);
+  return { ok: true };
+}
+
+export async function odpiszWlascicielowi(id: string, dostepId: string, tresc: string): Promise<Wynik> {
+  const d = await mojLokal(id);
+  const t = txt(tresc, 2000);
+  if (!d || !t) return { ok: false, error: "Napisz wiadomość." };
+  const { data: a } = await d.admin.from("rental_owner_access").select("id").eq("id", dostepId).eq("agency_id", d.agencyId).maybeSingle();
+  if (!a) return { ok: false, error: "Nie znaleziono dostępu." };
+  await d.admin.from("rental_owner_messages").insert({ access_id: dostepId, agency_id: d.agencyId, autor: "biuro", autor_id: d.user.id, tresc: t });
+  await d.admin.from("rental_owner_messages").update({ read_at: new Date().toISOString() }).eq("access_id", dostepId).eq("autor", "wlasciciel").is("read_at", null);
+  odswiez(id);
   return { ok: true };
 }

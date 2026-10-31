@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { Select, type SelectOption } from "../../components/select";
 import { pole, PrzyciskUsun } from "../../dokumenty-wzory/klocki";
 import { usunZadanie, zlecTrening } from "./actions";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 export type ZadanieWiersz = {
   id: string;
@@ -115,7 +116,7 @@ export function FormularzZadania({
       )}
       <div>
         <label className="mb-1.5 block text-sm text-slate-500" htmlFor="z-termin">Termin</label>
-        <input id="z-termin" name="due_on" type="date" className={pole} />
+        <PoleDaty id="z-termin" name="due_on" />
       </div>
       <div>
         <label className="mb-1.5 block text-sm text-slate-500" htmlFor="z-note">Wskazówka dla agenta</label>

@@ -6,6 +6,7 @@ import { useSpeechRecognition } from "@/lib/use-speech-recognition";
 import { CLIENT_STATUSES, CLIENT_TYPES, type ClientStatus, type ClientType } from "@/lib/types";
 import { createQuickEntry, type QuickEntryPayload } from "./actions";
 import { Select } from "@/app/app/components/select";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 type Rozpoznane = Omit<QuickEntryPayload, "existingId"> & { existing: { id: string; name: string; by: "telefon" | "nazwisko" } | null };
 
@@ -22,7 +23,7 @@ function Field({ label, value, onChange, placeholder, type = "text" }: { label: 
   return (
     <div>
       <label className={lbl}>{label}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />
+      {type === "date" ? <PoleDaty value={value} onChange={(e) => onChange(e.target.value)} /> : <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />}
     </div>
   );
 }
@@ -255,7 +256,7 @@ export function QuickEntry() {
               {form.tasks.map((t, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <input value={t.tytul} onChange={(e) => set("tasks", form.tasks.map((x, j) => (j === i ? { ...x, tytul: e.target.value } : x)))} placeholder="Co zrobić" className={`${inp} flex-1`} />
-                  <input type="date" value={t.termin} onChange={(e) => set("tasks", form.tasks.map((x, j) => (j === i ? { ...x, termin: e.target.value } : x)))} className={`${inp} w-[150px]`} />
+                  <PoleDaty value={t.termin} onChange={(e) => set("tasks", form.tasks.map((x, j) => (j === i ? { ...x, termin: e.target.value } : x)))} />
                   <button type="button" onClick={() => set("tasks", form.tasks.filter((_, j) => j !== i))} className="rounded-lg px-2 py-2 text-slate-400 hover:text-rose-600" aria-label="Usuń zadanie">
                     ✕
                   </button>

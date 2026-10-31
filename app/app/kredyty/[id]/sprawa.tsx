@@ -7,6 +7,7 @@ import { analizaFinansow, BANKI, bankPoId, STATUSY_WNIOSKU, statusWniosku, type 
 import type { WniosekBankowy } from "@/lib/data-kredyty";
 import { ETAPY_KREDYTU, RODZAJE_KREDYTU, type Dokument, type EtapKredytu } from "@/lib/kredyt-etapy";
 import { Select } from "@/app/app/components/select";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 /** Etapy jako klikalna ścieżka: kliknięcie przestawia sprawę i powiadamia agenta. */
 export function Etapy({ id, etap }: { id: string; etap: EtapKredytu }) {
@@ -456,7 +457,7 @@ export function NastepnyKrok({ id, podpowiedz, krok, data }: { id: string; podpo
       <p className="mt-1 text-lg font-semibold">{krok || podpowiedz}</p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <input value={t} onChange={(e) => setT(e.target.value)} placeholder="Twój krok, np. Oddzwonić po PIT" className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none" />
-        <input type="date" value={d} onChange={(e) => setD(e.target.value)} aria-label="Termin" className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white [color-scheme:dark] focus:border-emerald-400 focus:outline-none" />
+        <PoleDaty value={d} onChange={(e) => setD(e.target.value)} aria-label="Termin" />
         <button
           type="button"
           disabled={pending}

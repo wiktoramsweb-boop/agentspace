@@ -8,7 +8,8 @@ import { formatPln } from "@/lib/format";
 import { todayPL } from "@/lib/datetime";
 import { Wstecz } from "../../components/wstecz";
 import { DocumentsCard } from "../../dokumenty/documents-card";
-import { DaneLokalu, EtapyLokalu, ListaKrokow, Strony, UmowaNajmu, Wplaty, Zgloszenia } from "./karta";
+import { wiadomosciWlasciciela } from "@/lib/data-wlasciciel";
+import { DaneLokalu, EtapyLokalu, ListaKrokow, PortalBiuro, RaportLokalu, Strony, UmowaNajmu, Wplaty, Zgloszenia } from "./karta";
 
 export const metadata = { title: "Karta lokalu" };
 
@@ -19,6 +20,7 @@ const ZAKLADKI = [
   { id: "rozliczenia", nazwa: "Rozliczenia" },
   { id: "dokumenty", nazwa: "Dokumenty" },
   { id: "zgloszenia", nazwa: "Usterki i przeglądy" },
+  { id: "portal", nazwa: "Portal właściciela" },
 ];
 
 export default async function KartaLokaluPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -28,7 +30,7 @@ export default async function KartaLokaluPage({ params, searchParams }: { params
   if (!user.agency_id || !/^[0-9a-f-]{36}$/.test(id)) notFound();
   const [dane, k] = await Promise.all([kartaLokalu(user.agency_id, id), konfigBiura(user.agency_id)]);
   if (!dane) notFound();
-  const { lokal: l, najmy, strony, wplaty, zdarzenia } = dane;
+  const { lokal: l, najmy, strony, wplaty, zdarzenia, oplaty, portal } = dane;
   const z = ZAKLADKI.some((x) => x.id === sp.z) ? (sp.z as string) : "przeglad";
   const aktywny = najmy.find((n) => n.aktywny) ?? null;
   const etap = ETAPY_NAJMU.find((e) => e.id === l.etap);
@@ -47,10 +49,23 @@ export default async function KartaLokaluPage({ params, searchParams }: { params
     .map((m) => {
       const najem = najmy.find((n) => najemWMiesiacu(n, m)) ?? null;
       const wpl = wplaty.find((x) => x.miesiac === m) ?? null;
-      return { r: rozliczMiesiac(m, najem, wpl, w), wplata: wpl, kaucja: najem?.kaucja ?? 0 };
+      return { r: rozliczMiesiac(m, najem, wpl, w, oplaty), wplata: wpl, kaucja: najem?.kaucja ?? 0 };
     })
     .filter((x) => x.r.wynajety || x.wplata);
-  const teraz = rozliczMiesiac(miesiac, najmy.find((n) => najemWMiesiacu(n, miesiac)) ?? null, wplaty.find((x) => x.miesiac === miesiac) ?? null, w);
+  const teraz = rozliczMiesiac(miesiac, najmy.find((n) => najemWMiesiacu(n, miesiac)) ?? null, wplaty.find((x) => x.miesiac === miesiac) ?? null, w, oplaty);
+  const rok = Number(dzis.slice(0, 4));
+  const wierszeRaportu = Array.from({ length: 12 }, (_, i) => `${rok}-${String(i + 1).padStart(2, "0")}`)
+    .map((m) => {
+      const najem = najmy.find((n) => najemWMiesiacu(n, m)) ?? null;
+      const wpl = wplaty.find((x) => x.miesiac === m) ?? null;
+      const r = rozliczMiesiac(m, najem, wpl, w, oplaty);
+      const kwoty: Record<string, number> = {};
+      for (const o of oplaty.filter((x) => x.miesiac === m)) kwoty[o.rodzaj] = (kwoty[o.rodzaj] ?? 0) + o.kwota;
+      return { miesiac: m, czynsz: wpl?.czynsz ?? 0, kwoty, prowizja: r.prowizja, netto: r.wplaty - r.prowizja - r.koszty, jest: r.wynajety || Boolean(wpl) };
+    })
+    .filter((x) => x.jest);
+  const rodzajeRaportu = [...new Set(oplaty.filter((o) => o.miesiac.startsWith(String(rok))).map((o) => o.rodzaj))];
+  const wiadomosci = z === "portal" && portal.dostep ? await wiadomosciWlasciciela(portal.dostep.id) : [];
   const czynsz = aktywny?.czynsz ?? l.czynsz_oczekiwany;
   const zostaje = czynsz ? Math.round(Number(czynsz) * (1 - w.prowizjaPct / 100)) : null;
 
@@ -116,12 +131,17 @@ export default async function KartaLokaluPage({ params, searchParams }: { params
       {z === "strony" && <Strony id={l.id} strony={strony} />}
       {z === "umowa" && <UmowaNajmu id={l.id} najmy={najmy} k={k} oplatyAdmin={l.oplaty_admin} czynsz={l.czynsz_oczekiwany} />}
       {z === "rozliczenia" && (
+        <>
+        <RaportLokalu rok={rok} wiersze={wierszeRaportu} rodzaje={rodzajeRaportu} />
         <Wplaty
           id={l.id}
           dane={roz}
+          oplaty={oplaty}
           naglowek={{ adres: l.adres, wlasciciel: wlasciciel ?? "-", najemca: najemca ?? "-", model: l.model, modelNazwa: MODELE_ROZLICZEN.find((m) => m.id === l.model)?.nazwa ?? "", prowizjaPct: w.prowizjaPct, biuro: user.agency?.name ?? "Biuro", dniNaZastrzezenia: k.dniNaZastrzezenia }}
         />
+        </>
       )}
+      {z === "portal" && <PortalBiuro id={l.id} gotowy={portal.gotowy} dostep={portal.dostep} wlasciciel={wlasciciel} wiadomosci={wiadomosci} adresBazowy="https://www.agentspace.pl" />}
       {z === "dokumenty" && dokumenty && <DocumentsCard entity="najem" entityId={l.id} initial={dokumenty.docs} ready={dokumenty.ready} />}
       {z === "zgloszenia" && <Zgloszenia id={l.id} zdarzenia={zdarzenia} limit={l.limit_napraw != null ? Number(l.limit_napraw) : k.limitNapraw} przegladyRok={k.przegladyRok} />}
     </>

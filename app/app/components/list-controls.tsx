@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { PER_PAGE_OPTIONS, activeFilterCount, listHref, type ListQuery } from "@/lib/list-params";
 import { addDaysKey, todayPL } from "@/lib/datetime";
 import { Select } from "@/app/app/components/select";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 export type FilterOption = { value: string; label: string };
 
@@ -260,10 +261,10 @@ export function ListToolbar({
                       </Select>
                     </Field>
                     <Field label="Od">
-                      <input type="date" value={query.from} onChange={(e) => go({ from: e.target.value })} className={input} />
+                      <PoleDaty value={query.from} onChange={(e) => go({ from: e.target.value })} />
                     </Field>
                     <Field label="Do">
-                      <input type="date" value={query.to} onChange={(e) => go({ to: e.target.value })} className={input} />
+                      <PoleDaty value={query.to} onChange={(e) => go({ to: e.target.value })} />
                     </Field>
                     <div className="flex flex-wrap items-center gap-1.5 pb-1">
                       {quickRange(1, "dziś")}

@@ -30,6 +30,10 @@ export function AddressInput({
   const [city, setCity] = useState(defaultCity);
   const [street, setStreet] = useState("");
   const [szczegoly, setSzczegoly] = useState({ streetName: "", number: "", district: "", postcode: "" });
+  // Podpowiedzi często znają tylko ulicę. Wtedy numer budynku i lokalu dopisuje się obok.
+  const [wybrana, setWybrana] = useState<Suggestion | null>(null);
+  const [numer, setNumer] = useState("");
+  const [lokal, setLokal] = useState("");
   const [aktywny, setAktywny] = useState(-1);
   const [lat, setLat] = useState(defaultLat);
   const [lng, setLng] = useState(defaultLng);
@@ -74,9 +78,40 @@ export function AddressInput({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
+  /** Adres z numerem: „Zbożowa 2/1, Krowodrza, Kraków”. */
+  function zNumerem(s: Suggestion, nr: string, m: string) {
+    const pelny = [nr.trim(), m.trim()].filter(Boolean).join("/");
+    const ulica = [s.streetName, pelny].filter(Boolean).join(" ");
+    const dzielnica = s.district && s.district !== s.city ? s.district : null;
+    skipRef.current = true;
+    setQuery([ulica, dzielnica, s.city].filter(Boolean).join(", "));
+    setStreet(ulica);
+    setSzczegoly((v) => ({ ...v, number: nr.trim() }));
+  }
+
+  /** Po wpisaniu numeru dopytujemy o dokładny punkt, żeby pinezka stała na budynku. */
+  async function doprecyzuj(s: Suggestion, nr: string) {
+    if (!nr.trim()) return;
+    try {
+      const res = await fetch(`/api/geocode?q=${encodeURIComponent(`${s.streetName} ${nr.trim()} ${s.city ?? ""}`)}`);
+      const data = await res.json();
+      const r = ((data.results ?? []) as Suggestion[]).find((x) => x.number?.toLowerCase() === nr.trim().toLowerCase() && x.streetName === s.streetName);
+      if (r) {
+        setLat(String(r.lat));
+        setLng(String(r.lng));
+        if (r.postcode) setSzczegoly((v) => ({ ...v, postcode: r.postcode ?? v.postcode }));
+      }
+    } catch {
+      /* zostaje punkt ulicy */
+    }
+  }
+
   function pick(s: Suggestion) {
     skipRef.current = true;
     setQuery(s.label);
+    setWybrana(s.streetName && !s.number ? s : null);
+    setNumer(s.number ?? "");
+    setLokal("");
     setCity(s.city ?? "");
     setStreet(s.street ?? "");
     setSzczegoly({ streetName: s.streetName ?? "", number: s.number ?? "", district: s.district ?? "", postcode: s.postcode ?? "" });
@@ -89,6 +124,7 @@ export function AddressInput({
 
   function onType(v: string) {
     setQuery(v);
+    setWybrana(null);
     // Ręczna edycja adresu unieważnia poprzednie współrzędne i rozbicie adresu.
     setLat("");
     setLng("");
@@ -144,6 +180,36 @@ export function AddressInput({
             </li>
           ))}
         </ul>
+      )}
+      {wybrana && (
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          <label>
+            <span className="mb-1 block text-xs font-medium text-slate-500">Numer budynku</span>
+            <input
+              value={numer}
+              autoFocus
+              onChange={(e) => {
+                setNumer(e.target.value);
+                zNumerem(wybrana, e.target.value, lokal);
+              }}
+              onBlur={() => doprecyzuj(wybrana, numer)}
+              placeholder="np. 2"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
+            />
+          </label>
+          <label>
+            <span className="mb-1 block text-xs font-medium text-slate-500">Numer lokalu</span>
+            <input
+              value={lokal}
+              onChange={(e) => {
+                setLokal(e.target.value);
+                zNumerem(wybrana, numer, e.target.value);
+              }}
+              placeholder="np. 14"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none"
+            />
+          </label>
+        </div>
       )}
       {/* Ukryte pola przekazywane do server action */}
       <input type="hidden" name="address" value={query} />

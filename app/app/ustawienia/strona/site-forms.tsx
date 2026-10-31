@@ -22,6 +22,7 @@ import {
   checkSiteDomain,
   type SiteResult,
 } from "./actions";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 const input =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20";
@@ -659,7 +660,7 @@ export function PostsEditor({ posts }: { posts: PostRow[] }) {
               <label className={label} htmlFor="published_at">
                 Data
               </label>
-              <input id="published_at" name="published_at" type="date" defaultValue={current.published_at ?? ""} className={input} />
+              <PoleDaty id="published_at" name="published_at" defaultValue={current.published_at ?? ""} />
             </div>
           </div>
 

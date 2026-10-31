@@ -8,6 +8,7 @@ import { SparkIcon } from "../components/icons";
 import { buildReservation, type Party, type ReservationData, type ResMode, type PropType, type DepositType, type DocType } from "@/lib/reservation";
 import { generateReservationPdf } from "@/lib/reservation-pdf";
 import { Select } from "@/app/app/components/select";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 const PROP_OPTIONS: { value: PropType; label: string }[] = [
   { value: "mieszkanie", label: "Mieszkanie" },
@@ -472,7 +473,7 @@ function Field({
   return (
     <div>
       <label className={lbl}>{label}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />
+      {type === "date" ? <PoleDaty value={value} onChange={(e) => onChange(e.target.value)} /> : <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />}
     </div>
   );
 }

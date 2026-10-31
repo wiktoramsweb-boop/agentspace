@@ -8,6 +8,7 @@ import { useToast } from "../components/toast";
 import { pole } from "../dokumenty-wzory/klocki";
 import { RODZAJE_NIEOBECNOSCI, type Nieobecnosc } from "@/lib/zastepstwa-model";
 import { dodajNieobecnosc, usunNieobecnosc } from "./actions";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 type Osoba = { id: string; name: string };
 type Wiersz = Nieobecnosc & { created_by: string | null };
@@ -306,11 +307,11 @@ function FormularzNieobecnosci({
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm text-slate-500">Od</label>
-              <input type="date" value={od} onChange={(e) => { setOd(e.target.value); if (doD < e.target.value) setDo(e.target.value); }} className={pole} />
+              <PoleDaty value={od} onChange={(e) => { setOd(e.target.value); if (doD < e.target.value) setDo(e.target.value); }} />
             </div>
             <div>
               <label className="mb-1.5 block text-sm text-slate-500">Do (włącznie)</label>
-              <input type="date" value={doD} min={od} onChange={(e) => setDo(e.target.value)} className={pole} />
+              <PoleDaty value={doD} min={od} onChange={(e) => setDo(e.target.value)} />
             </div>
           </div>
           <div>

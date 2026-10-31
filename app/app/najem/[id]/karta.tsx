@@ -3,10 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Select } from "../../components/select";
-import { ETAPY_NAJMU, FORMY_UMOWY, MODELE_ROZLICZEN, ROLE_STRON, TYPY_NAJMU, type Konfig, type Krok, type Rozliczenie } from "@/lib/najem-model";
-import type { Lokal, NajemPelny, Strona, WplataPelna, Zdarzenie } from "@/lib/data-najem";
+import { ETAPY_NAJMU, FORMY_UMOWY, MODELE_ROZLICZEN, nazwaOplaty, RODZAJE_OPLAT, ROLE_STRON, TYPY_NAJMU, type Konfig, type Krok, type Rozliczenie } from "@/lib/najem-model";
+import type { Lokal, NajemPelny, Oplata, Strona, WplataPelna, Zdarzenie } from "@/lib/data-najem";
+import type { WiadomoscWlasciciela } from "@/lib/data-wlasciciel";
 import { formatPln } from "@/lib/format";
-import { dodajStrone, dodajZdarzenie, oznaczKrok, usunStrone, zapiszLokal, zapiszNajem, zapiszWplate, zmienEtapLokalu, zmienNajem, zmienZdarzenie } from "../actions";
+import { dodajOplate, dodajStrone, dodajZdarzenie, odpiszWlascicielowi, opublikujMiesiac, oznaczKrok, usunOplate, usunStrone, wlaczPortal, wylaczPortal, zapiszLokal, zapiszNajem, zapiszWplate, zmienEtapLokalu, zmienNajem, zmienZdarzenie } from "../actions";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 const POLE = "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/15";
 const ET = "mb-1 block text-xs font-medium text-slate-500";
@@ -301,7 +303,7 @@ export function UmowaNajmu({ id, najmy, k, oplatyAdmin, czynsz }: { id: string; 
             {[
               ["Czynsz", formatPln(aktywny.czynsz)],
               ["Parking", formatPln(aktywny.parking)],
-              ["Opłaty", formatPln(aktywny.oplaty)],
+              ["Stałe opłaty", formatPln(aktywny.oplaty)],
               ["Kaucja", formatPln(aktywny.kaucja)],
             ].map(([a, b]) => (
               <div key={a}>
@@ -318,7 +320,7 @@ export function UmowaNajmu({ id, najmy, k, oplatyAdmin, czynsz }: { id: string; 
             {aktywny.forma === "okazjonalny" && (
               <label>
                 <span className={ET}>Zgłoszono do urzędu skarbowego</span>
-                <input type="date" defaultValue={aktywny.us_zgloszono ?? ""} onChange={(e) => uruchom(() => zmienNajem(id, aktywny.id, { us: e.target.value }))} className={POLE} />
+                <PoleDaty defaultValue={aktywny.us_zgloszono ?? ""} onChange={(e) => uruchom(() => zmienNajem(id, aktywny.id, { us: e.target.value }))} />
               </label>
             )}
             <div>
@@ -353,7 +355,8 @@ export function UmowaNajmu({ id, najmy, k, oplatyAdmin, czynsz }: { id: string; 
               </button>
             ))}
           </div>
-          <p className="mb-3 text-sm text-slate-500">{forma?.opis}</p>
+          <p className="mb-1 text-sm text-slate-500">{forma?.opis}</p>
+          <p className="mb-3 text-sm text-slate-500">Stałe opłaty to np. ryczałt za czynsz administracyjny. Prąd, gaz i inne zmienne rachunki dopisujesz co miesiąc w zakładce Rozliczenia.</p>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {(
               [
@@ -361,7 +364,7 @@ export function UmowaNajmu({ id, najmy, k, oplatyAdmin, czynsz }: { id: string; 
                 ["do_dnia", "Koniec (puste: bezterminowo)", "date"],
                 ["czynsz", "Czynsz (zł)", "text"],
                 ["parking", "Parking (zł)", "text"],
-                ["oplaty", "Opłaty i media (zł)", "text"],
+                ["oplaty", "Stałe opłaty co miesiąc (zł)", "text"],
                 ["kaucja", "Kaucja (zł)", "text"],
                 ["dzien", "Dzień płatności", "text"],
               ] as const
@@ -403,7 +406,7 @@ export function UmowaNajmu({ id, najmy, k, oplatyAdmin, czynsz }: { id: string; 
 
 type NaglowekRozliczenia = { adres: string; wlasciciel: string; najemca: string; model: string; modelNazwa: string; prowizjaPct: number; biuro: string; dniNaZastrzezenia: number };
 
-export function Wplaty({ id, dane, naglowek }: { id: string; dane: { r: Rozliczenie; wplata: WplataPelna | null; kaucja: number }[]; naglowek: NaglowekRozliczenia }) {
+export function Wplaty({ id, dane, naglowek, oplaty }: { id: string; dane: { r: Rozliczenie; wplata: WplataPelna | null; kaucja: number }[]; naglowek: NaglowekRozliczenia; oplaty: Oplata[] }) {
   const [otwarty, setOtwarty] = useState<string | null>(null);
   if (!dane.length) return <p className={`${SEKCJA} text-sm text-slate-500`}>Rozliczenia pojawią się po dodaniu umowy najmu.</p>;
   return (
@@ -444,7 +447,7 @@ export function Wplaty({ id, dane, naglowek }: { id: string; dane: { r: Rozlicze
             otwarty === r.miesiac ? (
               <tr key={`${r.miesiac}-e`}>
                 <td colSpan={8} className="bg-slate-50 p-3">
-                  <EdycjaWplaty id={id} r={r} wplata={wplata} kaucja={kaucja} naglowek={naglowek} />
+                  <EdycjaWplaty id={id} r={r} wplata={wplata} kaucja={kaucja} naglowek={naglowek} oplaty={oplaty} />
                 </td>
               </tr>
             ) : null,
@@ -455,7 +458,7 @@ export function Wplaty({ id, dane, naglowek }: { id: string; dane: { r: Rozlicze
   );
 }
 
-function EdycjaWplaty({ id, r, wplata, kaucja, naglowek }: { id: string; r: Rozliczenie; wplata: WplataPelna | null; kaucja: number; naglowek: NaglowekRozliczenia }) {
+function EdycjaWplaty({ id, r, wplata, kaucja, naglowek, oplaty }: { id: string; r: Rozliczenie; wplata: WplataPelna | null; kaucja: number; naglowek: NaglowekRozliczenia; oplaty: Oplata[] }) {
   const { pending, info, uruchom } = useAkcja();
   const [f, setF] = useState({ czynsz: String(wplata?.czynsz ?? ""), oplaty: String(wplata?.oplaty ?? ""), koszty: String(wplata?.koszty ?? ""), koszty_opis: wplata?.koszty_opis ?? "", przekazano: wplata?.przekazano ?? "" });
   const [blad, setBlad] = useState<string | null>(null);
@@ -464,7 +467,7 @@ function EdycjaWplaty({ id, r, wplata, kaucja, naglowek }: { id: string; r: Rozl
     setBlad(null);
     try {
       const { rozliczeniePdf } = await import("@/lib/najem-pdf");
-      const b = await rozliczeniePdf({ ...naglowek, miesiac: r.miesiac, r, czynszWplata: wplata?.czynsz ?? 0, oplatyWplata: wplata?.oplaty ?? 0, kosztyOpis: wplata?.koszty_opis ?? null, kaucja });
+      const b = await rozliczeniePdf({ ...naglowek, miesiac: r.miesiac, r, czynszWplata: wplata?.czynsz ?? 0, oplatyWplata: wplata?.oplaty ?? 0, kosztyOpis: wplata?.koszty_opis ?? null, kaucja, pozycje: oplaty.filter((o) => o.miesiac === r.miesiac) });
       const url = URL.createObjectURL(new Blob([b as BlobPart], { type: "application/pdf" }));
       const a = document.createElement("a");
       a.href = url;
@@ -476,7 +479,10 @@ function EdycjaWplaty({ id, r, wplata, kaucja, naglowek }: { id: string; r: Rozl
     }
   }
   return (
-    <div>
+    <div className="space-y-4">
+      <RachunkiMiesiaca id={id} miesiac={r.miesiac} oplaty={oplaty} />
+      <div>
+      <p className="mb-2 text-sm font-semibold text-slate-900">Wpłaty najemcy</p>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <label>
           <span className={ET}>Czynsz wpłacony</span>
@@ -487,7 +493,7 @@ function EdycjaWplaty({ id, r, wplata, kaucja, naglowek }: { id: string; r: Rozl
           <input value={f.oplaty} onChange={ustaw("oplaty")} inputMode="decimal" className={POLE} />
         </label>
         <label>
-          <span className={ET}>Koszty i naprawy</span>
+          <span className={ET}>Inne koszty</span>
           <input value={f.koszty} onChange={ustaw("koszty")} inputMode="decimal" className={POLE} />
         </label>
         <label>
@@ -496,7 +502,7 @@ function EdycjaWplaty({ id, r, wplata, kaucja, naglowek }: { id: string; r: Rozl
         </label>
         <label>
           <span className={ET}>Data przelewu</span>
-          <input type="date" value={f.przekazano} onChange={ustaw("przekazano")} className={POLE} />
+          <PoleDaty value={f.przekazano} onChange={ustaw("przekazano")} />
         </label>
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -507,10 +513,239 @@ function EdycjaWplaty({ id, r, wplata, kaucja, naglowek }: { id: string; r: Rozl
           Wpłacono całość
         </button>
         <button type="button" onClick={pdf} className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-400">
-          Rozliczenie dla właściciela (PDF)
+          Rozliczenie (PDF)
+        </button>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => uruchom(() => opublikujMiesiac(id, r.miesiac, !wplata?.opublikowano))}
+          className={`rounded-xl px-4 py-2 text-sm font-semibold ${wplata?.opublikowano ? "bg-emerald-100 text-emerald-800" : "bg-slate-900 text-white hover:bg-slate-700"}`}
+        >
+          {wplata?.opublikowano ? "Widoczne dla właściciela, cofnij" : "Pokaż właścicielowi"}
         </button>
         {(info || blad) && <span className="text-sm text-rose-600">{info ?? blad}</span>}
       </div>
+      </div>
+    </div>
+  );
+}
+
+function RachunkiMiesiaca({ id, miesiac, oplaty }: { id: string; miesiac: string; oplaty: Oplata[] }) {
+  const { pending, info, uruchom } = useAkcja();
+  const pusta = { rodzaj: "prad", kwota: "", okres_mies: "1", kto: "najemca", biuro_oplaca: "0", odczyt: "", opis: "" };
+  const [f, setF] = useState(pusta);
+  const ustaw = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((v) => ({ ...v, [k]: e.target.value }));
+  const tu = oplaty.filter((o) => o.miesiac === miesiac);
+  const jednostka = RODZAJE_OPLAT.find((r) => r.id === f.rodzaj)?.jednostka;
+  // Zużycie: bieżący odczyt minus poprzedni tego samego licznika.
+  const zuzycie = (o: Oplata) => {
+    const poprzedni = oplaty.find((x) => x.rodzaj === o.rodzaj && x.miesiac < o.miesiac && x.odczyt != null);
+    return o.odczyt != null && poprzedni?.odczyt != null ? o.odczyt - poprzedni.odczyt : null;
+  };
+  return (
+    <div>
+      <p className="mb-2 text-sm font-semibold text-slate-900">Rachunki i media w tym miesiącu</p>
+      {tu.length > 0 && (
+        <ul className="mb-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+          {tu.map((o) => (
+            <li key={o.id} className="flex flex-wrap items-center gap-3 px-3 py-2 text-sm">
+              <span className="min-w-0 flex-1">
+                <b className="font-semibold text-slate-900">{nazwaOplaty(o.rodzaj)}</b>
+                {o.okres_mies > 1 && <span className="text-slate-500"> za {o.okres_mies} mies.</span>}
+                <span className="block text-xs text-slate-500">
+                  {o.najemca_placi ? "Płaci najemca" : "Płaci właściciel"}
+                  {o.biuro_oplaca ? " · opłaciło biuro" : ""}
+                  {o.odczyt != null ? ` · odczyt ${o.odczyt.toLocaleString("pl-PL")}` : ""}
+                  {zuzycie(o) != null ? ` · zużycie ${zuzycie(o)!.toLocaleString("pl-PL")}` : ""}
+                  {o.opis ? ` · ${o.opis}` : ""}
+                </span>
+              </span>
+              <b className="tabular-nums text-slate-900">{formatPln(o.kwota)}</b>
+              <button type="button" onClick={() => uruchom(() => usunOplate(id, o.id))} className="text-xs text-slate-400 hover:text-rose-600">
+                Usuń
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div>
+          <span className={ET}>Rodzaj</span>
+          <Select aria-label="Rodzaj opłaty" value={f.rodzaj} onChange={ustaw("rodzaj")} options={RODZAJE_OPLAT.map((r) => ({ value: r.id, label: r.nazwa }))} placeholder="" />
+        </div>
+        <label>
+          <span className={ET}>Kwota (zł)</span>
+          <input value={f.kwota} onChange={ustaw("kwota")} inputMode="decimal" className={POLE} />
+        </label>
+        <div>
+          <span className={ET}>Rachunek za</span>
+          <Select aria-label="Okres rachunku" value={f.okres_mies} onChange={ustaw("okres_mies")} options={[["1", "1 miesiąc"], ["2", "2 miesiące"], ["3", "3 miesiące"], ["6", "6 miesięcy"], ["12", "cały rok"]].map(([value, label]) => ({ value, label }))} placeholder="" />
+        </div>
+        <div>
+          <span className={ET}>Kto ponosi koszt</span>
+          <Select aria-label="Kto ponosi koszt" value={f.kto} onChange={ustaw("kto")} options={[{ value: "najemca", label: "Najemca" }, { value: "wlasciciel", label: "Właściciel" }]} placeholder="" />
+        </div>
+        {jednostka && (
+          <label>
+            <span className={ET}>Stan licznika ({jednostka})</span>
+            <input value={f.odczyt} onChange={ustaw("odczyt")} inputMode="decimal" className={POLE} />
+          </label>
+        )}
+        <label className={jednostka ? "lg:col-span-2" : "lg:col-span-3"}>
+          <span className={ET}>Opis, np. numer faktury</span>
+          <input value={f.opis} onChange={ustaw("opis")} className={POLE} />
+        </label>
+        <label className="flex items-end gap-2 pb-2.5 text-sm text-slate-700">
+          <input type="checkbox" checked={f.biuro_oplaca === "1"} onChange={(e) => setF((v) => ({ ...v, biuro_oplaca: e.target.checked ? "1" : "0" }))} className="h-4 w-4 accent-emerald-600" />
+          Biuro opłaciło rachunek
+        </label>
+      </div>
+      <div className="mt-2 flex items-center gap-3">
+        <button
+          type="button"
+          disabled={pending || !f.kwota.trim()}
+          onClick={() => {
+            uruchom(() => dodajOplate(id, { ...f, miesiac, najemca_placi: f.kto === "najemca" ? "1" : "0" }));
+            setF(pusta);
+          }}
+          className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-400 disabled:opacity-50"
+        >
+          + Dodaj rachunek
+        </button>
+        {info && <span className="text-sm text-rose-600">{info}</span>}
+      </div>
+    </div>
+  );
+}
+
+/** Raport roczny lokalu: każdy rodzaj opłaty miesiąc po miesiącu. */
+export function RaportLokalu({ rok, wiersze, rodzaje }: { rok: number; wiersze: { miesiac: string; czynsz: number; kwoty: Record<string, number>; prowizja: number; netto: number }[]; rodzaje: string[] }) {
+  if (!wiersze.length) return null;
+  const suma = (f: (w: (typeof wiersze)[number]) => number) => wiersze.reduce((a, w) => a + f(w), 0);
+  return (
+    <section className="mb-5 overflow-x-auto rounded-3xl border border-slate-200 bg-white p-5">
+      <h2 className="mb-3 font-semibold text-slate-900">Raport {rok}: opłaty miesiąc po miesiącu</h2>
+      <table className="w-full min-w-[640px] text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+            <th className="py-2 pr-3 font-medium">Miesiąc</th>
+            <th className="py-2 pr-3 text-right font-medium">Czynsz</th>
+            {rodzaje.map((r) => (
+              <th key={r} className="py-2 pr-3 text-right font-medium">
+                {nazwaOplaty(r)}
+              </th>
+            ))}
+            <th className="py-2 pr-3 text-right font-medium">Prowizja</th>
+            <th className="py-2 text-right font-medium">Dla właściciela</th>
+          </tr>
+        </thead>
+        <tbody>
+          {wiersze.map((w) => (
+            <tr key={w.miesiac} className="border-b border-slate-100">
+              <td className="py-2 pr-3 tabular-nums text-slate-900">{w.miesiac.slice(5)}</td>
+              <td className="py-2 pr-3 text-right tabular-nums">{formatPln(w.czynsz)}</td>
+              {rodzaje.map((r) => (
+                <td key={r} className="py-2 pr-3 text-right tabular-nums text-slate-600">
+                  {w.kwoty[r] ? formatPln(w.kwoty[r]) : "-"}
+                </td>
+              ))}
+              <td className="py-2 pr-3 text-right tabular-nums">{formatPln(w.prowizja)}</td>
+              <td className="py-2 text-right font-semibold tabular-nums">{formatPln(w.netto)}</td>
+            </tr>
+          ))}
+          <tr className="font-bold text-slate-900">
+            <td className="py-2 pr-3">Razem</td>
+            <td className="py-2 pr-3 text-right tabular-nums">{formatPln(suma((w) => w.czynsz))}</td>
+            {rodzaje.map((r) => (
+              <td key={r} className="py-2 pr-3 text-right tabular-nums">
+                {formatPln(suma((w) => w.kwoty[r] ?? 0))}
+              </td>
+            ))}
+            <td className="py-2 pr-3 text-right tabular-nums">{formatPln(suma((w) => w.prowizja))}</td>
+            <td className="py-2 text-right tabular-nums">{formatPln(suma((w) => w.netto))}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+export function PortalBiuro({ id, gotowy, dostep, wlasciciel, wiadomosci, adresBazowy }: { id: string; gotowy: boolean; dostep: { id: string; token: string; last_seen_at: string | null } | null; wlasciciel: string | null; wiadomosci: WiadomoscWlasciciela[]; adresBazowy: string }) {
+  const { pending, info, uruchom } = useAkcja();
+  const [tresc, setTresc] = useState("");
+  const [skopiowano, setSkopiowano] = useState(false);
+  if (!gotowy) return <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">Portal ruszy po uruchomieniu migracji lib/SETUP-v61-najem-portal.sql.</p>;
+  if (!dostep) {
+    return (
+      <section className={SEKCJA}>
+        <h2 className="font-semibold text-slate-900">Portal właściciela</h2>
+        <p className="mb-3 mt-1 max-w-xl text-sm text-slate-500">Właściciel dostaje swój link: rozliczenia, media, usterki, zgody na koszty, dokumenty i rozmowę z biurem. Bez zakładania konta. Kolejne jego lokale dołączą do tego samego linku.</p>
+        <button type="button" disabled={pending || !wlasciciel} onClick={() => uruchom(() => wlaczPortal(id, wlasciciel ?? ""))} className={PRZYCISK}>
+          {wlasciciel ? `Włącz portal dla: ${wlasciciel}` : "Najpierw dodaj właściciela w zakładce Strony"}
+        </button>
+        {info && <p className="mt-2 text-sm text-rose-600">{info}</p>}
+      </section>
+    );
+  }
+  const link = `${adresBazowy}/wlasciciel/${dostep.token}`;
+  return (
+    <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+      <section className={SEKCJA}>
+        <h2 className="font-semibold text-slate-900">Portal właściciela jest włączony</h2>
+        <p className="mt-1 text-sm text-slate-500">{dostep.last_seen_at ? `Ostatnio otwarty ${new Date(dostep.last_seen_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })}.` : "Właściciel jeszcze go nie otworzył."}</p>
+        <p className="mt-3 break-all rounded-xl bg-slate-100 px-3 py-2 text-xs text-slate-700">{link}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              navigator.clipboard?.writeText(link).then(() => {
+                setSkopiowano(true);
+                setTimeout(() => setSkopiowano(false), 2000);
+              })
+            }
+            className={PRZYCISK}
+          >
+            {skopiowano ? "Skopiowano" : "Kopiuj link"}
+          </button>
+          <a href={link} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-400">
+            Zobacz jak właściciel
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm("Wyłączyć portal? Link przestanie działać we wszystkich lokalach tego właściciela.")) uruchom(() => wylaczPortal(id, dostep.id));
+            }}
+            className="rounded-xl px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
+          >
+            Wyłącz
+          </button>
+        </div>
+      </section>
+      <section className={SEKCJA}>
+        <h2 className="mb-2 font-semibold text-slate-900">Wiadomości z właścicielem</h2>
+        <div className="max-h-80 space-y-2 overflow-y-auto">
+          {wiadomosci.length === 0 && <p className="text-sm text-slate-500">Brak wiadomości.</p>}
+          {wiadomosci.map((w) => (
+            <p key={w.id} className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${w.autor === "biuro" ? "ml-auto bg-emerald-600 text-white" : "bg-slate-100 text-slate-800"}`}>
+              {w.tresc}
+            </p>
+          ))}
+        </div>
+        <div className="mt-3 flex gap-2">
+          <input value={tresc} onChange={(e) => setTresc(e.target.value)} placeholder="Napisz do właściciela" className={POLE} />
+          <button
+            type="button"
+            disabled={pending || !tresc.trim()}
+            onClick={() => {
+              uruchom(() => odpiszWlascicielowi(id, dostep.id, tresc));
+              setTresc("");
+            }}
+            className={PRZYCISK}
+          >
+            Wyślij
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
@@ -546,7 +781,13 @@ export function Zgloszenia({ id, zdarzenia, limit, przegladyRok }: { id: string;
                   {z.rodzaj === "usterka" ? "Usterka" : z.rodzaj === "przeglad" ? "Przegląd" : "Zdarzenie"}
                   {z.termin ? ` · termin ${data(z.termin)}` : ""}
                   {z.koszt ? ` · ${formatPln(Number(z.koszt))}` : ""}
+                  {z.od_wlasciciela ? " · od właściciela" : ""}
                 </p>
+                {z.zgoda && z.zgoda !== "nie_dotyczy" && (
+                  <span className={`mt-1 inline-block rounded-md px-2 py-0.5 text-xs font-semibold ${z.zgoda === "zatwierdzona" ? "bg-emerald-100 text-emerald-700" : z.zgoda === "odrzucona" ? "bg-rose-100 text-rose-700" : "bg-amber-100 text-amber-700"}`}>
+                    {z.zgoda === "zatwierdzona" ? "Właściciel zatwierdził" : z.zgoda === "odrzucona" ? "Właściciel odrzucił" : "Czeka na zgodę właściciela"}
+                  </span>
+                )}
               </div>
               <div className="w-36">
                 <Select aria-label="Stan" value={z.stan} onChange={(e) => uruchom(() => zmienZdarzenie(id, z.id, e.target.value))} options={Object.entries(STANY).map(([value, label]) => ({ value, label }))} placeholder="" />
@@ -573,10 +814,10 @@ export function Zgloszenia({ id, zdarzenia, limit, przegladyRok }: { id: string;
             </label>
             <label>
               <span className={ET}>Termin</span>
-              <input type="date" value={f.termin} onChange={ustaw("termin")} className={POLE} />
+              <PoleDaty value={f.termin} onChange={ustaw("termin")} />
             </label>
           </div>
-          {ponadLimit && <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">Powyżej limitu {formatPln(limit)}: potrzebna zgoda właściciela, chyba że to awaria.</p>}
+          {ponadLimit && <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">Powyżej limitu {formatPln(limit)}: po dodaniu poprosimy właściciela o zgodę w jego portalu. Awarie usuwaj od razu i informuj go.</p>}
           <button
             type="button"
             disabled={pending || !f.tytul.trim()}

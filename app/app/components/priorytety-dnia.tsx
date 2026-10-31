@@ -13,6 +13,7 @@ import { ActivityModal } from "../dzialania/activity-modal";
 import { Modal } from "./modal";
 import { useToast } from "./toast";
 import { ChatIcon, MailIcon2, PhoneIcon } from "./icons";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 const TEMP: Record<Temperatura, { label: string; kolor: string; chip: string }> = {
   goracy: { label: "Gorący", kolor: "#f43f5e", chip: "bg-rose-100 text-rose-700" },
@@ -436,12 +437,11 @@ function OknoTerminu({ s, onClose, zapisz }: { s: SprawaDnia; onClose: () => voi
         </div>
         <label className="block text-sm font-medium text-slate-700">
           Albo konkretny dzień
-          <input
-            type="date"
+          <PoleDaty
+           
             value={data}
             min={todayPL()}
             onChange={(e) => setData(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-emerald-400"
           />
         </label>
         <div className="flex flex-wrap justify-between gap-2">

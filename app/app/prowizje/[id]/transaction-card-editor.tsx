@@ -9,6 +9,7 @@ import {
   docsProgress,
 } from "@/lib/transaction-card";
 import { updateTransactionCard } from "../actions";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 type Save = "idle" | "saving" | "saved" | "error";
 
@@ -348,7 +349,7 @@ function Text({
   return (
     <div>
       <label className="mb-1 block text-xs text-slate-500">{label}</label>
-      <input type={type} inputMode={inputMode} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />
+      {type === "date" ? <PoleDaty value={value} onChange={(e) => onChange(e.target.value)} /> : <input type={type} inputMode={inputMode} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={inp} />}
     </div>
   );
 }

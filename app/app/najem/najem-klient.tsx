@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { Modal } from "../components/modal";
 import { Select } from "../components/select";
 import { AddressInput } from "../components/address-input";
+import { WizardSteps } from "../components/wizard-steps";
 import { Tablica, type KolumnaTablicy, type Przeniesienie } from "../components/tablica";
 import { ETAPY_NAJMU, MODELE_ROZLICZEN, TYPY_NAJMU, type Konfig, type RodzajOkresu } from "@/lib/najem-model";
 import { formatPln } from "@/lib/format";
@@ -14,92 +15,127 @@ import { nowyLokal, przeniesLokal } from "./actions";
 const POLE = "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/15";
 const ETYKIETA = "mb-1 block text-sm font-medium text-slate-700";
 
+const KROKI = ["Lokal", "Właściciel", "Warunki"] as const;
+
+/** Trzy krótkie kroki zamiast jednej ściany pól. Wszystkie są w jednym formularzu. */
 export function NowyLokal({ k }: { k: Konfig }) {
   const router = useRouter();
   const [otwarte, setOtwarte] = useState(false);
+  const [krok, setKrok] = useState(0);
   const [typ, setTyp] = useState(k.typy[0]);
   const [model, setModel] = useState(k.modele[0]);
+  const [czynsz, setCzynsz] = useState("");
   const [blad, setBlad] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const kwota = Number(czynsz.replace(",", ".").replace(/\s/g, "")) || 0;
   return (
     <>
-      <button type="button" onClick={() => setOtwarte(true)} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-500">
+      <button
+        type="button"
+        onClick={() => {
+          setKrok(0);
+          setOtwarte(true);
+        }}
+        className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-500"
+      >
         + Dodaj lokal
       </button>
       {otwarte && (
         <Modal title="Nowy lokal w zarządzaniu" onClose={() => setOtwarte(false)} maxWidth="max-w-2xl">
           <form
-            className="space-y-5 overflow-y-auto px-6 py-5"
+            className="flex min-h-0 flex-1 flex-col text-left"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") e.preventDefault();
+            }}
             action={(fd) =>
               start(async () => {
                 setBlad(null);
                 const f = Object.fromEntries([...fd.entries()].map(([a, b]) => [a, String(b)]));
-                const w = await nowyLokal({ ...f, typ, model });
+                const w = await nowyLokal({ ...f, typ, model, czynsz });
                 if (!w.ok) return setBlad(w.error);
                 router.push(`/app/najem/${w.id}`);
               })
             }
           >
-            <section>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Lokal</h3>
-              <AddressInput label="Adres" />
-              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <label>
-                  <span className={ETYKIETA}>Metraż</span>
-                  <input name="pow" inputMode="decimal" className={POLE} />
-                </label>
-                <label>
-                  <span className={ETYKIETA}>Pokoje</span>
-                  <input name="pokoje" inputMode="numeric" className={POLE} />
-                </label>
-                <label>
-                  <span className={ETYKIETA}>Czynsz oczekiwany</span>
-                  <input name="czynsz" inputMode="numeric" className={POLE} />
-                </label>
-                <label>
-                  <span className={ETYKIETA}>Czynsz minimalny</span>
-                  <input name="czynszMin" inputMode="numeric" className={POLE} />
-                </label>
+            <WizardSteps steps={KROKI} step={krok} onStep={setKrok} />
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div hidden={krok !== 0} className="space-y-4">
+                <AddressInput label="Adres lokalu" placeholder="Zacznij pisać ulicę, np. Zbożowa" />
+                <p className="text-xs text-slate-500">Wybierz ulicę z listy, numer budynku i lokalu dopiszesz obok. Możesz też wpisać adres ręcznie.</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <label>
+                    <span className={ETYKIETA}>Metraż (m²)</span>
+                    <input name="pow" inputMode="decimal" placeholder="np. 52" className={POLE} />
+                  </label>
+                  <label>
+                    <span className={ETYKIETA}>Pokoje</span>
+                    <input name="pokoje" inputMode="numeric" placeholder="np. 2" className={POLE} />
+                  </label>
+                </div>
               </div>
-            </section>
-            <section>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Właściciel</h3>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <label>
-                  <span className={ETYKIETA}>Imię i nazwisko</span>
+              <div hidden={krok !== 1} className="space-y-4">
+                <label className="block">
+                  <span className={ETYKIETA}>Imię i nazwisko właściciela</span>
                   <input name="wlasciciel" className={POLE} />
                 </label>
-                <label>
-                  <span className={ETYKIETA}>Telefon</span>
-                  <input name="telefon" inputMode="tel" className={POLE} />
-                </label>
-                <label>
-                  <span className={ETYKIETA}>E-mail</span>
-                  <input name="email" inputMode="email" className={POLE} />
-                </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label>
+                    <span className={ETYKIETA}>Telefon</span>
+                    <input name="telefon" inputMode="tel" className={POLE} />
+                  </label>
+                  <label>
+                    <span className={ETYKIETA}>E-mail</span>
+                    <input name="email" inputMode="email" className={POLE} />
+                  </label>
+                </div>
               </div>
-            </section>
-            <section className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <span className={ETYKIETA}>Typ najmu</span>
-                <Select aria-label="Typ najmu" value={typ} onChange={(e) => setTyp(e.target.value)} options={TYPY_NAJMU.filter((t) => k.typy.includes(t.id)).map((t) => ({ value: t.id, label: t.nazwa }))} placeholder="" />
+              <div hidden={krok !== 2} className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <span className={ETYKIETA}>Typ najmu</span>
+                    <Select aria-label="Typ najmu" value={typ} onChange={(e) => setTyp(e.target.value)} options={TYPY_NAJMU.filter((t) => k.typy.includes(t.id)).map((t) => ({ value: t.id, label: t.nazwa }))} placeholder="" />
+                  </div>
+                  <div>
+                    <span className={ETYKIETA}>Model rozliczeń</span>
+                    <Select aria-label="Model rozliczeń" value={model} onChange={(e) => setModel(e.target.value)} options={MODELE_ROZLICZEN.filter((m) => k.modele.includes(m.id)).map((m) => ({ value: m.id, label: m.nazwa, hint: m.opis }))} placeholder="" />
+                  </div>
+                  <label>
+                    <span className={ETYKIETA}>Czynsz oczekiwany (zł)</span>
+                    <input value={czynsz} onChange={(e) => setCzynsz(e.target.value)} inputMode="numeric" className={POLE} />
+                  </label>
+                  <label>
+                    <span className={ETYKIETA}>Czynsz minimalny (zł)</span>
+                    <input name="czynszMin" inputMode="numeric" className={POLE} />
+                  </label>
+                </div>
+                <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-50 p-3 text-center">
+                  {[
+                    [`Prowizja ${k.prowizjaPct}%`, formatPln((kwota * k.prowizjaPct) / 100)],
+                    ["Dla właściciela", formatPln(kwota * (1 - k.prowizjaPct / 100))],
+                    ["Opłata startowa", formatPln(k.oplataStartowa)],
+                  ].map(([e, w]) => (
+                    <div key={e}>
+                      <p className="font-bold tabular-nums text-slate-900">{w}</p>
+                      <p className="text-[11px] text-slate-500">{e}</p>
+                    </div>
+                  ))}
+                </div>
+                {blad && <p className="text-sm text-rose-600">{blad}</p>}
               </div>
-              <div>
-                <span className={ETYKIETA}>Model rozliczeń</span>
-                <Select aria-label="Model rozliczeń" value={model} onChange={(e) => setModel(e.target.value)} options={MODELE_ROZLICZEN.filter((m) => k.modele.includes(m.id)).map((m) => ({ value: m.id, label: m.nazwa }))} placeholder="" />
-              </div>
-            </section>
-            <p className="text-xs text-slate-500">
-              Warunki startowe: prowizja {k.prowizjaPct}%, opłata startowa {formatPln(k.oplataStartowa)}. Zmienisz je na karcie lokalu.
-            </p>
-            {blad && <p className="text-sm text-rose-600">{blad}</p>}
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setOtwarte(false)} className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">
-                Anuluj
+            </div>
+            <div className="flex flex-shrink-0 items-center justify-between gap-2 border-t border-slate-200 px-6 py-4">
+              <button type="button" onClick={() => (krok ? setKrok(krok - 1) : setOtwarte(false))} className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">
+                {krok ? "Wstecz" : "Anuluj"}
               </button>
-              <button type="submit" disabled={pending} className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:opacity-50">
-                {pending ? "Zapisuję…" : "Dodaj lokal"}
-              </button>
+              {krok < KROKI.length - 1 ? (
+                <button type="button" onClick={() => setKrok(krok + 1)} className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500">
+                  Dalej
+                </button>
+              ) : (
+                <button type="submit" disabled={pending} className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:opacity-50">
+                  {pending ? "Zapisuję…" : "Dodaj lokal"}
+                </button>
+              )}
             </div>
           </form>
         </Modal>

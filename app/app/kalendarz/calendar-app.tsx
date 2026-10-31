@@ -15,6 +15,7 @@ import { MonthGrid } from "./month-grid";
 import { CallInsightsPanel } from "./call-insights";
 import { KIND_ORDER, KIND_STYLE, WEEKDAYS_LONG, dayMonth, hhmm, monthTitle, type CalView } from "./shared";
 import { Select } from "@/app/app/components/select";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 type Lite = { id: string; name: string };
 
@@ -481,11 +482,10 @@ function EventDrawer({
           <div className="rounded-2xl border border-slate-200 p-4">
             <p className="mb-3 text-sm font-semibold text-slate-900">Zmień termin</p>
             <div className="grid grid-cols-[1fr_110px] gap-2">
-              <input
-                type="date"
+              <PoleDaty
+               
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
               />
               <input
                 type="time"

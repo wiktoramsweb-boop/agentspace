@@ -8,6 +8,7 @@ import type { Deal, DealStatus } from "@/lib/types";
 import { formatPln } from "@/lib/format";
 import { Modal } from "../components/modal";
 import { useToast } from "../components/toast";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 /** Oferta do wyboru w formularzu. Pola poza id/tytułem są opcjonalne (np. karta oferty podaje mniej). */
 export type OfertaDoWyboru = {
@@ -463,7 +464,7 @@ function FormularzTransakcji({
           </div>
 
           <Labeled label="Planowane zamknięcie (wchodzi do prognozy)">
-            <input name="expectedClose" type="date" defaultValue={edycja?.deal.expected_close?.slice(0, 10) ?? ""} className={POLE} />
+            <PoleDaty name="expectedClose" defaultValue={edycja?.deal.expected_close?.slice(0, 10) ?? ""} />
           </Labeled>
         </div>
 

@@ -6,6 +6,7 @@ import { type InvoiceItem, type Seller } from "@/lib/invoice";
 import { InvoiceSheet, type SheetData } from "./invoice-sheet";
 import { createInvoice, updateInvoice } from "./actions";
 import { Select } from "@/app/app/components/select";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 export function InvoiceCreator({
   initial,
@@ -349,7 +350,7 @@ function Field({
   return (
     <div>
       <label className="mb-1.5 block text-sm text-slate-500">{label}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={inp} />
+      {type === "date" ? <PoleDaty value={value} onChange={(e) => onChange(e.target.value)} /> : <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={inp} />}
     </div>
   );
 }

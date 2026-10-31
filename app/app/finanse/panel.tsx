@@ -9,6 +9,7 @@ import type { Koszt, StalyKoszt, WynikMiesiaca, Wyplata } from "@/lib/data-finan
 import {
   dodajKoszt, dodajStalyKoszt, oplacKoszt, oznaczWyplate, przelaczStalyKoszt, usunKoszt, usunStalyKoszt,
 } from "./actions";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 export type Widok = "koszty" | "stale" | "wyplaty";
 
@@ -208,7 +209,7 @@ function FormularzKosztu({ staly, dzis, miesiac, onGotowe }: { staly?: boolean; 
         ) : (
           <div className="sm:col-span-1">
             <label className="mb-1 block text-xs text-slate-500" htmlFor="k-date">Data</label>
-            <input id="k-date" name="cost_date" type="date" defaultValue={domyslnaData} className={pole} />
+            <PoleDaty id="k-date" name="cost_date" defaultValue={domyslnaData} />
           </div>
         )}
         <div className="sm:col-span-2">

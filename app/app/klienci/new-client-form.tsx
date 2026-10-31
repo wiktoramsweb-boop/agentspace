@@ -9,6 +9,7 @@ import { Modal } from "../components/modal";
 import { WizardNav, WizardSteps } from "../components/wizard-steps";
 import { CLIENT_TYPE_ICONS } from "../components/icons";
 import { Select as SelectBox } from "@/app/app/components/select";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 type ExistingPhone = { phone: string | null; owner: string | null };
 
@@ -416,7 +417,7 @@ function Field({
   return (
     <div>
       <label className={lbl}>{label}</label>
-      <input name={name} type={type} required={required} placeholder={placeholder} inputMode={inputMode} className={inp} />
+      {type === "date" ? <PoleDaty name={name} /> : <input name={name} type={type} required={required} placeholder={placeholder} inputMode={inputMode} className={inp} />}
     </div>
   );
 }

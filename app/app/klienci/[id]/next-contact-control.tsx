@@ -4,6 +4,7 @@ import { addDaysKey, todayPL } from "@/lib/datetime";
 import { useState } from "react";
 import { setNextContact, markClientContacted } from "../actions";
 import { useToast } from "../../components/toast";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 function isoInDays(days: number): string {
   return addDaysKey(todayPL(), days);
@@ -27,11 +28,10 @@ export function NextContactControl({
 
   return (
     <div className="space-y-3">
-      <input
-        type="date"
+      <PoleDaty
+       
         value={value}
         onChange={(e) => set(e.target.value)}
-        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none"
       />
       <div className="flex flex-wrap gap-2">
         <Quick label="Jutro" onClick={() => set(isoInDays(1))} />

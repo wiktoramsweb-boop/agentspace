@@ -141,6 +141,8 @@ export function krokiLokalu(etap: string, forma: string | null, k: Konfig): Krok
 
 export type Najem = { id: string; forma: string; od: string; do_dnia: string | null; czynsz: number; parking: number; oplaty: number; kaucja: number; aktywny: boolean };
 export type Wplata = { miesiac: string; czynsz: number; oplaty: number; koszty: number };
+/** Jeden rachunek: prąd za 2 miesiące, gaz, wyrównanie ze wspólnoty. */
+export type Naliczenie = { miesiac: string; rodzaj: string; kwota: number; okres_mies: number; najemca_placi: boolean; biuro_oplaca: boolean };
 export type WarunkiLokalu = { model: string; prowizjaPct: number; parkingWPodstawie: boolean };
 
 const grosze = (n: number) => Math.round(n * 100) / 100;
@@ -168,14 +170,17 @@ export type Rozliczenie = {
  * Prowizja jest liczona od czynszu faktycznie wpłaconego, nigdy od opłat i mediów.
  * Model A: biuro potrąca prowizję i koszty, resztę przekazuje.
  * Modele B i C: pieniądze są u właściciela, więc to on płaci prowizję.
+ * Rachunki z danego miesiąca dokładają się do należności najemcy, a te, które
+ * opłaciło biuro, zmniejszają wypłatę.
  */
-export function rozliczMiesiac(miesiac: string, najem: Najem | null, wplata: Wplata | null, w: WarunkiLokalu): Rozliczenie {
+export function rozliczMiesiac(miesiac: string, najem: Najem | null, wplata: Wplata | null, w: WarunkiLokalu, naliczenia: Naliczenie[] = []): Rozliczenie {
   const wynajety = Boolean(najem);
   const czynszNalezny = najem ? najem.czynsz + najem.parking : 0;
-  const oplatyNalezne = najem?.oplaty ?? 0;
+  const zMiesiaca = naliczenia.filter((n) => n.miesiac === miesiac);
+  const oplatyNalezne = grosze((najem?.oplaty ?? 0) + zMiesiaca.filter((n) => n.najemca_placi).reduce((a, n) => a + n.kwota, 0));
   const wplaconyCzynsz = wplata?.czynsz ?? 0;
   const wplaconeOplaty = wplata?.oplaty ?? 0;
-  const koszty = wplata?.koszty ?? 0;
+  const koszty = grosze((wplata?.koszty ?? 0) + zMiesiaca.filter((n) => n.biuro_oplaca).reduce((a, n) => a + n.kwota, 0));
   const wplaty = grosze(wplaconyCzynsz + wplaconeOplaty);
   // Z wpłaty odejmujemy parking, gdy nie wchodzi do podstawy prowizji.
   const podstawa = najem ? (w.parkingWPodstawie ? wplaconyCzynsz : Math.max(0, wplaconyCzynsz - najem.parking)) : 0;
@@ -194,6 +199,20 @@ export function rozliczMiesiac(miesiac: string, najem: Najem | null, wplata: Wpl
     doZaplatyPrzezWlasciciela: w.model === "A" ? 0 : grosze(prowizja + koszty),
   };
 }
+
+export const RODZAJE_OPLAT = [
+  { id: "czynsz_admin", nazwa: "Czynsz administracyjny", jednostka: null },
+  { id: "prad", nazwa: "Prąd", jednostka: "kWh" },
+  { id: "gaz", nazwa: "Gaz", jednostka: "m³" },
+  { id: "woda", nazwa: "Woda", jednostka: "m³" },
+  { id: "ogrzewanie", nazwa: "Ogrzewanie", jednostka: null },
+  { id: "smieci", nazwa: "Śmieci", jednostka: null },
+  { id: "internet", nazwa: "Internet i TV", jednostka: null },
+  { id: "ubezpieczenie", nazwa: "Ubezpieczenie", jednostka: null },
+  { id: "rozliczenie", nazwa: "Rozliczenie roczne wspólnoty", jednostka: null },
+  { id: "inne", nazwa: "Inne", jednostka: null },
+];
+export const nazwaOplaty = (id: string) => RODZAJE_OPLAT.find((r) => r.id === id)?.nazwa ?? id;
 
 export type RodzajOkresu = "miesiac" | "kwartal" | "polrocze" | "rok";
 

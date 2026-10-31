@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, type ReactNode } from "react";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 /** Wspólne klocki formularzy dokumentów: protokołu, aneksu i kolejnych. */
 
@@ -22,6 +23,7 @@ export function Pole({
   return (
     <div>
       <label htmlFor={id} className="mb-1.5 block text-sm text-slate-500">{label}</label>
+      {type === "date" ? <PoleDaty id={id} value={value} onChange={(e) => onChange(e.target.value)} /> : (
       <input
         id={id}
         type={type}
@@ -31,6 +33,7 @@ export function Pole({
         placeholder={placeholder}
         className={pole}
       />
+      )}
       {hint && <p className="mt-1.5 text-xs text-slate-400">{hint}</p>}
     </div>
   );

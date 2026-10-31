@@ -9,6 +9,7 @@ import {
   ACTIVITY_STATUSES,
 } from "@/lib/types";
 import { Select } from "@/app/app/components/select";
+import { PoleDaty } from "@/app/app/components/pole-daty";
 
 /**
  * Panel filtrów raportu. Stan trzymamy w adresie strony, więc wynik da się
@@ -57,10 +58,10 @@ export function ReportFilterForm({
 
       <div className="grid grid-cols-2 gap-2">
         <Field label="Termin od">
-          <input type="date" name="from" defaultValue={current.from ?? ""} className={inp} />
+          <PoleDaty name="from" defaultValue={current.from ?? ""} />
         </Field>
         <Field label="Termin do">
-          <input type="date" name="to" defaultValue={current.to ?? ""} className={inp} />
+          <PoleDaty name="to" defaultValue={current.to ?? ""} />
         </Field>
       </div>
 

@@ -39,5 +39,12 @@ sprawdz("inne biuro nie dostaje warunków Spectry", konfiguracja("inne").prowizj
 sprawdz("zapis biura wygrywa", konfiguracja("fe78fb77-98e3-4e3e-831b-067c2fc4cc9e", { prowizjaPct: 12 }).prowizjaPct, 12);
 sprawdz("kroki notariusza tylko przy okazjonalnym", [krokiLokalu("formalnosci", "zwykly", KONFIG_OGOLNY).some((k) => k.id === "notariusz"), krokiLokalu("formalnosci", "okazjonalny", KONFIG_OGOLNY).some((k) => k.id === "notariusz")], [false, true]);
 sprawdz("wyłączona usługa znika z kroków", krokiLokalu("przygotowanie", null, { ...KONFIG_OGOLNY, uslugi: [] }).map((k) => k.id), ["czynsz"]);
+const prad = { miesiac: "2026-05", rodzaj: "prad", kwota: 240, okres_mies: 2, najemca_placi: true, biuro_oplaca: false };
+const zPradem = rozliczMiesiac("2026-05", najem, { miesiac: "2026-05", czynsz: 3000, oplaty: 1140, koszty: 0 }, A, [prad]);
+sprawdz("rachunek za prąd zwiększa należność", [zPradem.oplatyNalezne, zPradem.zaleglosc], [1140, 0]);
+sprawdz("prąd nie wchodzi do prowizji", zPradem.prowizja, 390);
+sprawdz("rachunek z innego miesiąca się nie liczy", rozliczMiesiac("2026-06", najem, null, A, [prad]).oplatyNalezne, 900);
+const zaplacone = rozliczMiesiac("2026-05", najem, { miesiac: "2026-05", czynsz: 3000, oplaty: 900, koszty: 0 }, A, [{ ...prad, najemca_placi: false, biuro_oplaca: true }]);
+sprawdz("rachunek opłacony przez biuro zmniejsza wypłatę", zaplacone.doPrzekazania, 3270);
 console.log(bledy ? `\n${bledy} błędów` : "\nWszystko OK");
 process.exit(bledy ? 1 : 0);
