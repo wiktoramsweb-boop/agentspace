@@ -130,7 +130,23 @@ export function TablicaNajmu({ karty }: { karty: Karta[] }) {
     if (!blad) router.refresh();
     return blad;
   }
+  const szczyt = Math.max(1, ...ETAPY_NAJMU.map((e) => karty.filter((k) => k.kolumna === e.id).length));
   return (
+    <>
+      <ol className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-8">
+        {ETAPY_NAJMU.map((e) => {
+          const ile = karty.filter((k) => k.kolumna === e.id).length;
+          return (
+            <li key={e.id} className="rounded-2xl border border-slate-200 bg-white p-3">
+              <p className="text-2xl font-bold tabular-nums text-slate-900">{ile}</p>
+              <p className="h-8 text-[11px] leading-tight text-slate-500">{e.nazwa}</p>
+              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div className={`h-full rounded-full ${e.kolor}`} style={{ width: `${(ile / szczyt) * 100}%` }} />
+              </div>
+            </li>
+          );
+        })}
+      </ol>
     <Tablica
       kolumny={kolumny}
       karty={karty}
@@ -148,6 +164,7 @@ export function TablicaNajmu({ karty }: { karty: Karta[] }) {
         </Link>
       )}
     />
+    </>
   );
 }
 
