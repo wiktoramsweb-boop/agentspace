@@ -7,7 +7,7 @@ import { ETAPY_NAJMU, FORMY_UMOWY, MODELE_ROZLICZEN, nazwaOplaty, RODZAJE_OPLAT,
 import type { Lokal, NajemPelny, Oplata, Strona, WplataPelna, Zdarzenie } from "@/lib/data-najem";
 import type { WiadomoscWlasciciela } from "@/lib/data-wlasciciel";
 import { formatPln } from "@/lib/format";
-import { dodajOplate, dodajStrone, dodajZdarzenie, odpiszWlascicielowi, opublikujMiesiac, oznaczKrok, usunOplate, usunStrone, wlaczPortal, wylaczPortal, zapiszLokal, zapiszNajem, zapiszWplate, zmienEtapLokalu, zmienNajem, zmienZdarzenie } from "../actions";
+import { prosOAkceptacje, dodajOplate, dodajStrone, dodajZdarzenie, odpiszWlascicielowi, opublikujMiesiac, oznaczKrok, usunOplate, usunStrone, wlaczPortal, wylaczPortal, zapiszLokal, zapiszNajem, zapiszWplate, zmienEtapLokalu, zmienNajem, zmienZdarzenie } from "../actions";
 import { PoleDaty } from "@/app/app/components/pole-daty";
 
 const POLE = "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/15";
@@ -406,7 +406,7 @@ export function UmowaNajmu({ id, najmy, k, oplatyAdmin, czynsz }: { id: string; 
 
 type NaglowekRozliczenia = { adres: string; wlasciciel: string; najemca: string; model: string; modelNazwa: string; prowizjaPct: number; biuro: string; dniNaZastrzezenia: number };
 
-export function Wplaty({ id, dane, naglowek, oplaty }: { id: string; dane: { r: Rozliczenie; wplata: WplataPelna | null; kaucja: number }[]; naglowek: NaglowekRozliczenia; oplaty: Oplata[] }) {
+export function Wplaty({ id, dane, naglowek, oplaty, zaakceptowane = {} }: { id: string; dane: { r: Rozliczenie; wplata: WplataPelna | null; kaucja: number }[]; naglowek: NaglowekRozliczenia; oplaty: Oplata[]; zaakceptowane?: Record<string, string> }) {
   const [otwarty, setOtwarty] = useState<string | null>(null);
   if (!dane.length) return <p className={`${SEKCJA} text-sm text-slate-500`}>Rozliczenia pojawią się po dodaniu umowy najmu.</p>;
   return (
@@ -437,6 +437,9 @@ export function Wplaty({ id, dane, naglowek, oplaty }: { id: string; dane: { r: 
               <td className="py-2.5 pr-3 text-right font-semibold tabular-nums">{formatPln(naglowek.model === "A" ? r.doPrzekazania : r.doZaplatyPrzezWlasciciela)}</td>
               <td className="py-2.5 pr-3">
                 <span className={`rounded-md px-2 py-0.5 text-xs font-semibold ${r.zaleglosc > 0 ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{r.zaleglosc > 0 ? `Brakuje ${formatPln(r.zaleglosc)}` : "Rozliczone"}</span>
+                {wplata?.opublikowano && (
+                  <span className="ml-1 rounded-md bg-sky-100 px-2 py-0.5 text-xs font-semibold text-sky-700">{zaakceptowane[(wplata as WplataPelna & { id?: string }).id ?? ""] ? "Zaakceptował" : "U właściciela"}</span>
+                )}
               </td>
               <td className="py-2.5 text-right">
                 <button type="button" aria-expanded={otwarty === r.miesiac} onClick={() => setOtwarty(otwarty === r.miesiac ? null : r.miesiac)} className="text-sm font-semibold text-emerald-700 hover:underline">
@@ -670,7 +673,7 @@ export function RaportLokalu({ rok, wiersze, rodzaje }: { rok: number; wiersze: 
   );
 }
 
-export function PortalBiuro({ id, gotowy, dostep, wlasciciel, wiadomosci, adresBazowy }: { id: string; gotowy: boolean; dostep: { id: string; token: string; last_seen_at: string | null } | null; wlasciciel: string | null; wiadomosci: WiadomoscWlasciciela[]; adresBazowy: string }) {
+export function PortalBiuro({ id, gotowy, dostep, wlasciciel, wiadomosci, adresBazowy, dokumenty, zaakceptowane }: { id: string; gotowy: boolean; dostep: { id: string; token: string; last_seen_at: string | null } | null; wlasciciel: string | null; wiadomosci: WiadomoscWlasciciela[]; adresBazowy: string; dokumenty: { id: string; name: string; do_akceptacji: boolean }[]; zaakceptowane: Record<string, string> }) {
   const { pending, info, uruchom } = useAkcja();
   const [tresc, setTresc] = useState("");
   const [skopiowano, setSkopiowano] = useState(false);
@@ -720,6 +723,29 @@ export function PortalBiuro({ id, gotowy, dostep, wlasciciel, wiadomosci, adresB
             Wyłącz
           </button>
         </div>
+      </section>
+      <section className={`${SEKCJA} lg:col-span-2`}>
+        <h2 className="font-semibold text-slate-900">Dokumenty do akceptacji</h2>
+        <p className="mb-3 text-sm text-slate-500">Właściciel potwierdza w portalu, że zapoznał się z dokumentem. Zapisujemy datę i urządzenie. To nie jest kwalifikowany podpis elektroniczny.</p>
+        {dokumenty.length === 0 ? (
+          <p className="text-sm text-slate-500">Dodaj dokument w zakładce Dokumenty, a pojawi się tutaj.</p>
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {dokumenty.map((d) => (
+              <li key={d.id} className="flex flex-wrap items-center gap-3 py-2.5 text-sm">
+                <span className="min-w-0 flex-1 truncate font-medium text-slate-900">{d.name}</span>
+                {zaakceptowane[d.id] ? (
+                  <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Zaakceptowany {new Date(zaakceptowane[d.id]).toLocaleDateString("pl-PL")}</span>
+                ) : (
+                  <label className="flex items-center gap-2 text-slate-700">
+                    <input type="checkbox" checked={d.do_akceptacji} onChange={(e) => uruchom(() => prosOAkceptacje(id, d.id, e.target.checked))} className="h-4 w-4 accent-emerald-600" />
+                    Poproś o akceptację
+                  </label>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
       <section className={SEKCJA}>
         <h2 className="mb-2 font-semibold text-slate-900">Wiadomości z właścicielem</h2>

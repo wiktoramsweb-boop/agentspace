@@ -114,6 +114,7 @@ export async function kartaLokalu(agencyId: string, id: string) {
     zdarzenia: (z.data ?? []) as Zdarzenie[],
     oplaty: ((o.data ?? []) as Oplata[]).map((x) => ({ ...x, kwota: Number(x.kwota), odczyt: x.odczyt != null ? Number(x.odczyt) : null })),
     portal: { gotowy: !d.error && !o.error, dostep: (d.data ?? null) as { id: string; token: string; nazwa: string; unit_ids: string[]; last_seen_at: string | null } | null },
+    ...(await akceptacjeLokalu(agencyId, id, ((p.data ?? []) as { id: string }[]).map((x) => x.id))),
   };
 }
 
@@ -143,4 +144,17 @@ export function alertyNajmu(lokale: LokalNaLiscie[], k: Konfig): Alert[] {
     if (r.zaleglosc > 0 && dzien > n.dzien_platnosci) wyniki.push({ tekst: `${l.adres}: brakuje ${r.zaleglosc.toLocaleString("pl-PL")} zł za ten miesiąc`, href, pilne: true });
   }
   return wyniki.sort((a, b) => Number(b.pilne) - Number(a.pilne));
+}
+
+/** Dokumenty lokalu z prośbą o akceptację i to, co właściciel już zaakceptował (v62). */
+async function akceptacjeLokalu(agencyId: string, unitId: string, platnosci: string[]) {
+  const admin = createSupabaseAdmin();
+  const { data: docs, error } = await admin.from("documents").select("id, name, do_akceptacji").eq("agency_id", agencyId).eq("entity_type", "najem").eq("entity_id", unitId).order("created_at", { ascending: false }).limit(100);
+  if (error) return { dokumentyPortalu: [] as { id: string; name: string; do_akceptacji: boolean }[], zaakceptowane: {} as Record<string, string> };
+  const ids = [...((docs ?? []) as { id: string }[]).map((x) => x.id), ...platnosci];
+  const { data: a } = ids.length ? await admin.from("rental_acceptances").select("ref_id, accepted_at").in("ref_id", ids) : { data: [] };
+  return {
+    dokumentyPortalu: (docs ?? []) as { id: string; name: string; do_akceptacji: boolean }[],
+    zaakceptowane: Object.fromEntries(((a ?? []) as { ref_id: string; accepted_at: string }[]).map((x) => [x.ref_id, x.accepted_at])),
+  };
 }

@@ -8,6 +8,7 @@ import { mozeUsunac } from "@/lib/uprawnienia";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { tylkoPodglad } from "@/lib/role";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { maV49 } from "@/lib/schemat";
 import { zapiszZdarzenie } from "@/lib/dziennik";
@@ -278,6 +279,7 @@ async function saveDetails(
 
 export async function createProperty(formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) return { ok: false, error: "Stażysta może tylko przeglądać oferty." };
   const fields = propertyFromForm(formData);
   fields.title = buildTitle(fields, String(formData.get("street") ?? "").trim());
   if (!fields.title) {
@@ -368,6 +370,7 @@ export async function createProperty(formData: FormData): Promise<SaveResult> {
  */
 export async function updateProperty(id: string, formData: FormData): Promise<SaveResult> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) return { ok: false, error: "Stażysta może tylko przeglądać oferty." };
   if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
   const fields = propertyFromForm(formData);
   fields.title = buildTitle(fields, String(formData.get("street") ?? "").trim());
@@ -465,6 +468,7 @@ export async function setPropertyStatus(
   status: PropertyStatus,
 ): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać oferty.");
   const admin = createSupabaseAdmin();
   const { data: zmieniona } = await admin
     .from("properties")
@@ -485,6 +489,7 @@ export async function setPropertyStatus(
 
 export async function deleteProperty(id: string): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać oferty.");
   const admin = createSupabaseAdmin();
 
   // Zdjęcia oferty kasujemy razem z nią, inaczej zostałyby w magazynie na zawsze.
@@ -515,6 +520,7 @@ export async function setPropertyOwner(
   clientId: string | null,
 ): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać oferty.");
   const admin = createSupabaseAdmin();
   if (clientId && !(await idZBiura(admin, "clients", clientId, user.agency_id))) return;
   await admin
@@ -551,6 +557,7 @@ export async function addPropertyInterest(
   clientId: string,
 ): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać oferty.");
   if (!clientId) return;
   const admin = createSupabaseAdmin();
   if (!(await ownsProperty(admin, propertyId, user.agency_id))) return;
@@ -569,6 +576,7 @@ export async function removePropertyInterest(
   clientId: string,
 ): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać oferty.");
   const admin = createSupabaseAdmin();
   if (!(await ownsProperty(admin, propertyId, user.agency_id))) return;
   await admin
@@ -582,6 +590,7 @@ export async function removePropertyInterest(
 /** Rola powiązanego klienta: właściciel przy sprzedaży, wynajmujący przy najmie. */
 export async function setPropertyOwnerRole(propertyId: string, role: string): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać oferty.");
   const admin = createSupabaseAdmin();
   await admin
     .from("properties")
@@ -600,6 +609,7 @@ export async function attachNewOwner(
   formData: FormData,
 ): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać oferty.");
   const name = String(formData.get("owner_name") ?? "").trim();
   if (!name) return;
   const phone = String(formData.get("owner_phone") ?? "").trim() || null;
@@ -635,6 +645,7 @@ export async function attachNewOwner(
 /** Etap procesu obsługi oferty (pasek na karcie). */
 export async function setProcessStage(propertyId: string, stage: string): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać oferty.");
   const admin = createSupabaseAdmin();
   const { error } = await admin
     .from("properties")

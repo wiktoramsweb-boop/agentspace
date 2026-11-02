@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { dokumentyWlasciciela, dostepWlasciciela, lokaleWlasciciela } from "@/lib/data-wlasciciel";
+import { akceptacje, dokumentyWlasciciela, dostepWlasciciela, lokaleWlasciciela } from "@/lib/data-wlasciciel";
 import { docKindLabel } from "@/lib/documents-shared";
-import { KARTA, PobierzDokument } from "../widok";
+import { AkceptujDokument, KARTA, PobierzDokument } from "../widok";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,8 @@ export default async function Dokumenty({ params }: { params: Promise<{ token: s
   const d = await dostepWlasciciela(token);
   if (!d) notFound();
   const lokale = await lokaleWlasciciela(d);
-  const lista = await dokumentyWlasciciela(lokale, d.agency_id);
+  const [lista, zgody] = await Promise.all([dokumentyWlasciciela(lokale, d.agency_id), akceptacje(d.id)]);
+  lista.sort((a, b) => Number(b.doAkceptacji && !zgody.has(b.id)) - Number(a.doAkceptacji && !zgody.has(a.id)));
   return (
     <>
       <div className="portal-top">
@@ -23,6 +24,7 @@ export default async function Dokumenty({ params }: { params: Promise<{ token: s
           <small className="block truncate text-[var(--t2)]">
             {docKindLabel("najem", x.rodzaj)} · {x.lokal}
           </small>
+          {x.doAkceptacji && <AkceptujDokument token={token} id={x.id} zaakceptowano={zgody.get(x.id) ?? null} />}
         </section>
       ))}
     </>

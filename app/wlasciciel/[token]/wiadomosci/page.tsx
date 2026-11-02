@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { dostepWlasciciela, wiadomosciWlasciciela } from "@/lib/data-wlasciciel";
 import { Rozmowa } from "../widok";
+import { PrzelacznikPowiadomien } from "../../../klient/[token]/powiadomienia";
+import { wlaczPushWlasciciela, wylaczPushWlasciciela } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +18,7 @@ export default async function Wiadomosci({ params }: { params: Promise<{ token: 
       <div className="portal-top">
         <h1>Wiadomości</h1>
       </div>
+      <PrzelacznikPowiadomien token={token} zacheta="Włącz powiadomienia, żeby od razu wiedzieć o rozliczeniu i odpowiedzi biura." wlacz={wlaczPushWlasciciela} wylacz={wylaczPushWlasciciela} />
       <Rozmowa token={token} lista={lista} />
     </>
   );

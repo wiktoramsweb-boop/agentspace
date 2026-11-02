@@ -1,5 +1,6 @@
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireAktywny } from "@/lib/auth";
+import { maModul } from "@/lib/role";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { maskPhone } from "@/lib/format";
 import { getActivityStats, getAgencyAgents } from "@/lib/data-activities";
@@ -29,7 +30,8 @@ export default async function DzialaniaPage({
       ? getActivityStats(agencyId, user.id)
       : Promise.resolve({ planned: 0, callsToday: 0, doneToday: 0, today: 0, overdue: 0, doneWeek: 0 }),
     agencyId ? getAgencyAgents(agencyId) : Promise.resolve([]),
-    agencyId ? getAgencyClientsLite(agencyId) : Promise.resolve([]),
+    // Bez modułu klientów (np. stażysta) lista do wyboru zostaje pusta.
+    agencyId && maModul(user, "klienci") ? getAgencyClientsLite(agencyId) : Promise.resolve([]),
     agencyId ? getAgencyProperties(agencyId) : Promise.resolve([]),
     getGoal(user.id),
     getAgencySettings(agencyId, user.agency?.name),

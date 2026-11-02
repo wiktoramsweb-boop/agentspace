@@ -17,6 +17,7 @@ export default async function CzatPage({ searchParams }: Props) {
 
   return (
     <Czat
+      ceo={user.role === "owner"}
       ja={user.id}
       agencyId={user.agency_id!}
       startowyKanal={k ?? null}

@@ -209,3 +209,30 @@ export async function powiadomKlientowONieruchomosci(
     await wyslijPushDoKlienta(d.id, { ...payload, url: `/klient/${d.token}`, icon: `/klient/${d.token}/ikona?r=192` });
   }
 }
+
+/** Subskrypcje właścicieli w portalu najmu: osobna tabela, bo dostęp daje token, nie konto. */
+export async function zapiszSubskrypcjeWlasciciela(accessId: string, sub: WebPushSubscription): Promise<boolean> {
+  const { error } = await createSupabaseAdmin().from("rental_owner_push").upsert({ access_id: accessId, endpoint: sub.endpoint, p256dh: sub.keys.p256dh, auth: sub.keys.auth }, { onConflict: "endpoint" });
+  return !error;
+}
+
+export async function usunSubskrypcjeWlasciciela(endpoint: string): Promise<void> {
+  await createSupabaseAdmin().from("rental_owner_push").delete().eq("endpoint", endpoint);
+}
+
+export async function wyslijPushDoWlasciciela(accessId: string, payload: PushPayload): Promise<number> {
+  if (!ensureConfigured()) return 0;
+  const admin = createSupabaseAdmin();
+  const { data } = await admin.from("rental_owner_push").select("id, endpoint, p256dh, auth").eq("access_id", accessId);
+  let wyslane = 0;
+  for (const s of (data ?? []) as SubRow[]) {
+    try {
+      await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, JSON.stringify(payload));
+      wyslane += 1;
+    } catch (err) {
+      const kod = (err as { statusCode?: number })?.statusCode;
+      if (kod === 404 || kod === 410) await admin.from("rental_owner_push").delete().eq("id", s.id);
+    }
+  }
+  return wyslane;
+}

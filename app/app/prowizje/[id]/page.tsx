@@ -2,7 +2,7 @@ import { Wstecz } from "@/app/app/components/wstecz";
 import { mozeEdytowacTransakcje } from "@/lib/uprawnienia";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { requireUser , requireModul} from "@/lib/auth";
 import { getDeal } from "@/lib/data-platform";
 import { mergeCard } from "@/lib/transaction-card";
 import { DEAL_STATUSES } from "@/lib/types";
@@ -18,7 +18,7 @@ import { PodzialProwizji } from "./podzial-prowizji";
 type Props = { params: Promise<{ id: string }> };
 
 export default async function DealDetailPage({ params }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("prowizje");
   const { id } = await params;
 
   const deal = await getDeal(id);

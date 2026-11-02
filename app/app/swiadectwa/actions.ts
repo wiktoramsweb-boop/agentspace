@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { tylkoPodglad } from "@/lib/role";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { DOC_BUCKET } from "@/lib/storage";
@@ -34,6 +35,7 @@ const folder = (agencyId: string, numer: string) => `${agencyId}/swiadectwa/${nu
 /** Krok 1: numer zamówienia i podpisane linki do wgrania zdjęć. */
 export async function przygotujZamowienie(pliki: { grupa: GrupaPlikow; nazwa: string; rozmiar: number }[]): Promise<Wynik<{ numer: string; uploads: SignedUpload[] }>> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
   for (const g of Object.keys(GRUPY_PLIKOW) as GrupaPlikow[]) {
     if (pliki.filter((p) => p.grupa === g).length > MAX_PLIKOW) return { ok: false, error: `${GRUPY_PLIKOW[g].nazwa}: maksymalnie ${MAX_PLIKOW} plików.` };
@@ -55,6 +57,7 @@ export async function zlozZamowienie(
   pliki: { grupa: GrupaPlikow; path: string; nazwa: string; rozmiar: number }[],
 ): Promise<Wynik<{ wyslano: boolean }>> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
   if (!/^SW-\d{8}-[0-9A-F]{6}$/.test(numer)) return { ok: false, error: "Złe zamówienie." };
 
@@ -135,6 +138,7 @@ export async function zlozZamowienie(
 /** Link do karty PDF zamówienia z własnego biura. */
 export async function linkDoKarty(numer: string): Promise<string | null> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id || !/^SW-\d{8}-[0-9A-F]{6}$/.test(numer)) return null;
   const { data } = await createSupabaseAdmin().storage.from(DOC_BUCKET).createSignedUrl(`${folder(user.agency_id, numer)}/zamowienie.pdf`, 120, { download: `${numer}.pdf` });
   return data?.signedUrl ?? null;

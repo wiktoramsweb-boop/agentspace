@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { requireUser , requireModul} from "@/lib/auth";
 import { watekKlienta, watkiKlientow } from "@/lib/wiadomosci-klientow";
 import { PageHeader, Card } from "../components/ui";
 import { Rozmowa } from "./rozmowa";
@@ -18,7 +18,7 @@ const kiedy = (iso: string) => {
  * na telefonie najpierw lista, a po wyborze sama rozmowa.
  */
 export default async function WiadomosciKlientow({ searchParams }: { searchParams: Promise<{ w?: string }> }) {
-  const user = await requireUser();
+  const user = await requireModul("klienci");
   const { w } = await searchParams;
   const { ready, watki } = await watkiKlientow(user);
   const wybrany = w ? await watekKlienta(user, w) : null;

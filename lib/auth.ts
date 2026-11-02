@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "./supabase/server";
 import { createSupabaseAdmin } from "./supabase/admin";
 import type { ProfileWithAgency } from "./types";
-import { maModul, zakresDanych, type Modul, type Zakres } from "./role";
+import { maModul, zakresDanych, type Modul, type Zakres, tylkoPodglad } from "./role";
 import { stanDostepu } from "./abonament-cennik";
 
 /**
@@ -118,6 +118,13 @@ export async function requireModul(modul: Modul): Promise<ProfileWithAgency> {
     const dostep = stanDostepu(user.agency ?? null);
     if (!dostep.aktywne) redirect("/app");
   }
+  return user;
+}
+
+/** Zmiana danych biura: stażysta dostaje komunikat zamiast zapisu. */
+export async function requireZapis(modul: Modul): Promise<ProfileWithAgency> {
+  const user = await requireModul(modul);
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać. Poproś opiekuna o zmianę.");
   return user;
 }
 

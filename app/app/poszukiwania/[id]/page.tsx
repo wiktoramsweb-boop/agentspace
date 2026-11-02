@@ -1,7 +1,7 @@
 import { Wstecz } from "@/app/app/components/wstecz";
 import { mozeUsunac } from "@/lib/uprawnienia";
 import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { requireUser , requireModul} from "@/lib/auth";
 import { getSearch, getActiveProperties, getMatchStatuses } from "@/lib/data-searches";
 import { findMatches } from "@/lib/matching";
 import { getAgencySettings, matchTolerance } from "@/lib/agency-settings";
@@ -34,7 +34,7 @@ function range(min: number | null, max: number | null, unit = "", money = false)
 type Props = { params: Promise<{ id: string }> };
 
 export default async function SearchDetailPage({ params }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("klienci");
   const { id } = await params;
   const agencyId = user.agency_id;
   if (!agencyId) notFound();

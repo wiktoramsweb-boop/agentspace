@@ -202,7 +202,7 @@ export async function dodajZdarzenie(id: string, f: Record<string, string>): Pro
   const pelny = { unit_id: id, agency_id: d.agencyId, rodzaj: ["usterka", "przeglad", "zdarzenie"].includes(f.rodzaj) ? f.rodzaj : "usterka", tytul, koszt, termin: data(f.termin), autor_id: d.user.id };
   const { error } = await d.admin.from("rental_events").insert({ ...pelny, zgoda });
   if (error) await d.admin.from("rental_events").insert(pelny);
-  if (zgoda === "oczekuje") await powiadomWlasciciela(id, `Koszt do akceptacji: ${tytul}`);
+  if (zgoda === "oczekuje") await powiadomWlasciciela(id, `Koszt do akceptacji: ${tytul}`, "/usterki");
   odswiez(id);
   return { ok: true };
 }
@@ -278,7 +278,7 @@ export async function opublikujMiesiac(id: string, miesiac: string, tak: boolean
   if (!d || !/^\d{4}-\d{2}$/.test(miesiac)) return { ok: false, error: "Nie znaleziono lokalu." };
   const { error } = await d.admin.from("rental_payments").upsert({ unit_id: id, agency_id: d.agencyId, miesiac, opublikowano: tak ? new Date().toISOString() : null }, { onConflict: "unit_id,miesiac" });
   if (error) return { ok: false, error: BRAK_V61 };
-  if (tak) await powiadomWlasciciela(id, `Rozliczenie za ${miesiac.slice(5)}/${miesiac.slice(0, 4)} jest gotowe`);
+  if (tak) await powiadomWlasciciela(id, `Rozliczenie za ${miesiac.slice(5)}/${miesiac.slice(0, 4)} jest gotowe`, "/rozliczenia");
   odswiez(id);
   return { ok: true };
 }
@@ -315,6 +315,17 @@ export async function odpiszWlascicielowi(id: string, dostepId: string, tresc: s
   if (!a) return { ok: false, error: "Nie znaleziono dostępu." };
   await d.admin.from("rental_owner_messages").insert({ access_id: dostepId, agency_id: d.agencyId, autor: "biuro", autor_id: d.user.id, tresc: t });
   await d.admin.from("rental_owner_messages").update({ read_at: new Date().toISOString() }).eq("access_id", dostepId).eq("autor", "wlasciciel").is("read_at", null);
+  odswiez(id);
+  return { ok: true };
+}
+
+/** Prośba do właściciela o akceptację dokumentu w portalu. */
+export async function prosOAkceptacje(id: string, docId: string, tak: boolean): Promise<Wynik> {
+  const d = await mojLokal(id);
+  if (!d) return { ok: false, error: "Nie znaleziono lokalu." };
+  const { data: doc, error } = await d.admin.from("documents").update({ do_akceptacji: tak }).eq("id", docId).eq("agency_id", d.agencyId).eq("entity_type", "najem").eq("entity_id", id).select("name").maybeSingle();
+  if (error) return { ok: false, error: "Uruchom w Supabase lib/SETUP-v62-portal-wlasciciela.sql." };
+  if (tak && doc) await powiadomWlasciciela(id, `Dokument do akceptacji: ${doc.name}`, "/dokumenty");
   odswiez(id);
   return { ok: true };
 }

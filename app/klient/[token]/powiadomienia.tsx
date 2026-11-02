@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { wlaczPowiadomienia, wylaczPowiadomienia } from "./actions";
 
+type Wynik = { ok: true } | { ok: false; error: string };
+
 /**
  * Włączenie powiadomień w portalu klienta.
  *
@@ -11,7 +13,18 @@ import { wlaczPowiadomienia, wylaczPowiadomienia } from "./actions";
  * mówimy wprost, co trzeba zrobić: klient, który nie wie dlaczego nie działa,
  * uzna, że aplikacja jest zepsuta.
  */
-export function PrzelacznikPowiadomien({ token, zacheta }: { token: string; zacheta?: string }) {
+export function PrzelacznikPowiadomien({
+  token,
+  zacheta,
+  wlacz: zapisz = wlaczPowiadomienia,
+  wylacz: usun = wylaczPowiadomienia,
+}: {
+  token: string;
+  zacheta?: string;
+  /** Portal właściciela podaje własne akcje: subskrypcje trzyma w innej tabeli. */
+  wlacz?: (token: string, sub: { endpoint: string; keys: { p256dh: string; auth: string } }) => Promise<Wynik>;
+  wylacz?: (token: string, endpoint: string) => Promise<Wynik>;
+}) {
   const [stan, setStan] = useState<"sprawdzam" | "brak" | "wylaczone" | "wlaczone" | "odmowa">("sprawdzam");
   const [pracuje, setPracuje] = useState(false);
   const [blad, setBlad] = useState<string | null>(null);
@@ -58,7 +71,7 @@ export function PrzelacznikPowiadomien({ token, zacheta }: { token: string; zach
         applicationServerKey: klucz,
       });
 
-      const w = await wlaczPowiadomienia(token, JSON.parse(JSON.stringify(sub)));
+      const w = await zapisz(token, JSON.parse(JSON.stringify(sub)));
       if (w.ok) setStan("wlaczone");
       else setBlad(w.error);
     } catch {
@@ -74,7 +87,7 @@ export function PrzelacznikPowiadomien({ token, zacheta }: { token: string; zach
       const rej = await navigator.serviceWorker.getRegistration();
       const sub = await rej?.pushManager.getSubscription();
       if (sub) {
-        await wylaczPowiadomienia(token, sub.endpoint);
+        await usun(token, sub.endpoint);
         await sub.unsubscribe();
       }
       setStan("wylaczone");

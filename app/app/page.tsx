@@ -29,6 +29,8 @@ import { DostepWstrzymany } from "./dostep-wstrzymany";
 import { getAgencySettings } from "@/lib/agency-settings";
 import { ZastepstwoKarta } from "./zastepstwo-karta";
 import { PulpitWlasciciela } from "./components/pulpit-wlasciciela";
+import { PlanStazu } from "./components/plan-stazu";
+import { tylkoPodglad } from "@/lib/role";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -46,6 +48,9 @@ export default async function DashboardPage() {
   if (!dostep.aktywne && !user.agency?.is_demo) {
     return <DostepWstrzymany probny={dostep.probny} czyCeo={user.role === "owner"} />;
   }
+
+  // Stażysta: plan pierwszych dni zamiast klientów i prowizji, których nie ma.
+  if (tylkoPodglad(user)) return <PlanStazu user={user} />;
 
   // Zupełnie puste biuro kierujemy prosto do przewodnika. Nowa osoba widzi
   // inaczej pusty pulpit i nie wie, od czego zacząć. Po zrobieniu czegokolwiek

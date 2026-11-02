@@ -6,7 +6,8 @@ import Link from "next/link";
 import { wycenyOferty } from "@/lib/wyceny";
 import { WierszWyceny } from "../../wycena-rcn/lista-wycen";
 import { notFound, redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { requireModul } from "@/lib/auth";
+import { tylkoPodglad } from "@/lib/role";
 import {
   getProperty,
   getClient,
@@ -66,11 +67,13 @@ type Props = {
 };
 
 export default async function PropertyDetailPage({ params, searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("nieruchomosci");
   const { id } = await params;
   const { z, t } = await searchParams;
+  // Stażysta widzi samą ofertę: bez właściciela, dokumentów, działań i transakcji.
+  const podglad = tylkoPodglad(user);
   // Zakładka z adresu; cokolwiek nieznanego traktujemy jak wejście na Ofertę.
-  const tab: TabKey = (TABS.find((x) => x.key === z)?.key ?? "oferta") as TabKey;
+  const tab: TabKey = podglad ? "oferta" : ((TABS.find((x) => x.key === z)?.key ?? "oferta") as TabKey);
 
   const property = await getProperty(id);
   if (!property) notFound();
@@ -171,6 +174,63 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
     dokumenty: documents.docs.length,
     transakcja: deals.length,
   };
+
+  if (podglad) {
+    return (
+      <>
+        <div className="mb-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-emerald-600">{kind?.label}</p>
+          <h1 className="text-2xl font-semibold text-slate-900">{property.title}</h1>
+          {(property.address || property.city) && <p className="text-slate-500">{property.address ?? property.city}</p>}
+          <p className="mt-2 inline-block rounded-lg bg-sky-50 px-3 py-1.5 text-sm text-sky-800">Podgląd dla stażysty: oferta bez danych właściciela i dokumentów.</p>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          <div className="space-y-6">
+            {(property.photos?.length ?? 0) > 0 && (
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {property.photos!.slice(0, 12).map((f, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={f.url} src={f.url} alt={f.caption ?? `Zdjęcie ${i + 1}`} loading="lazy" className={`w-full rounded-xl object-cover ${i === 0 ? "col-span-2 row-span-2 aspect-[4/3]" : "aspect-square"}`} />
+                ))}
+              </div>
+            )}
+            <Card>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {specs.map((sp) => (
+                  <div key={sp.label}>
+                    <p className="text-xs uppercase tracking-wider text-slate-500">{sp.label}</p>
+                    <p className="mt-0.5 font-semibold text-slate-900">{sp.value}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            <DetailsCard property={property} />
+            {property.description && (
+              <Card>
+                <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">Opis</h2>
+                <div className="opis-tresc text-sm leading-relaxed text-slate-700" dangerouslySetInnerHTML={{ __html: opisNaHtml(property.description) }} />
+              </Card>
+            )}
+          </div>
+          <div className="space-y-6">
+            {property.lat != null && property.lng != null && (
+              <>
+                <Card className="!p-0 !overflow-hidden">
+                  <MiniMap lat={property.lat} lng={property.lng} title={property.title} />
+                </Card>
+                <NearbyCard lat={property.lat} lng={property.lng} />
+              </>
+            )}
+            {property.property_type === "mieszkanie" && (
+              <Link href={`/app/wycena-rcn?oferta=${property.id}`} className="block rounded-2xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:text-emerald-700">
+                Przećwicz wycenę tej oferty z RCN →
+              </Link>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

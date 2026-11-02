@@ -136,7 +136,7 @@ export const ROLE: OpisRoli[] = [
   {
     id: "trainee",
     nazwa: "Stażysta",
-    opis: "Uczy się na AI Coachu i podgląda bazę ofert. Bez klientów i pieniędzy.",
+    opis: "Pierwsze dni w biurze: plan stażu, Akademia, AI Coach i podgląd ofert bez danych właścicieli. Niczego nie zmienia, bez klientów i pieniędzy.",
     moduly: ["nieruchomosci", "coach"],
     zakres: "wlasne",
   },
@@ -193,6 +193,14 @@ export function zakresDanych(osoba: OsobaZUprawnieniami): Zakres {
 }
 
 /** Pełna lista modułów, do których osoba ma dostęp. Do budowania menu. */
+/**
+ * Stażysta ogląda bazę ofert, ale niczego w niej nie zmienia i nie widzi
+ * danych właścicieli: przez pierwsze dni uczy się na AI Coachu i w Akademii.
+ */
+export function tylkoPodglad(osoba: Pick<OsobaZUprawnieniami, "role">): boolean {
+  return osoba.role === "trainee";
+}
+
 export function moduly(osoba: OsobaZUprawnieniami): Modul[] {
   return WSZYSTKIE.filter((m) => maModul(osoba, m));
 }

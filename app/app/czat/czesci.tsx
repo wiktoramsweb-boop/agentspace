@@ -121,12 +121,15 @@ function Zalaczniki({ lista }: { lista: Zalacznik[] }) {
 export function ListaWiadomosci({
   lista,
   ja,
+  ceo = false,
   osoba,
   onZmiana,
   onOdpowiedz,
 }: {
   lista: Wiadomosc[];
   ja: string;
+  /** CEO usuwa też cudze wiadomości. */
+  ceo?: boolean;
   osoba: Map<string, Osoba>;
   onZmiana: () => void;
   onOdpowiedz: (w: Wiadomosc) => void;
@@ -223,10 +226,10 @@ export function ListaWiadomosci({
                 <div className="absolute -top-3 right-2 hidden gap-0.5 rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm group-hover:flex">
                   <Akcja onClick={() => onOdpowiedz(w)}>Odpowiedz</Akcja>
                   {moja && <Akcja onClick={() => setEdycja({ id: w.id, tekst: w.body })}>Edytuj</Akcja>}
-                  {moja && (
+                  {(moja || ceo) && (
                     <Akcja
                       onClick={() => {
-                        if (!confirm("Usunąć wiadomość?")) return;
+                        if (!confirm(moja ? "Usunąć wiadomość?" : "Usunąć wiadomość tej osoby? Wpis trafi do dziennika biura.")) return;
                         startTransition(async () => {
                           const r = await usun(w.id);
                           if (!r.ok) toast(r.error, "error");

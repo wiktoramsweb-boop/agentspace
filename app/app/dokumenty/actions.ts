@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireModul, requireUser } from "@/lib/auth";
+import { tylkoPodglad } from "@/lib/role";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { DOC_BUCKET } from "@/lib/storage";
 import { removeFiles, signUploads, signedDownloadUrl, type SignedUpload } from "@/lib/storage-server";
@@ -41,6 +42,7 @@ export async function signDocumentUploads(
   files: { name: string; size: number }[],
 ): Promise<Result<{ uploads: SignedUpload[] }>> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
   if (!(await ownsEntity(user.agency_id, entity, entityId))) return { ok: false, error: "Nie znaleziono." };
   if (files.length === 0) return { ok: false, error: "Nie wybrano plików." };
@@ -64,6 +66,7 @@ export async function registerDocuments(
   items: { path: string; name: string; size: number; mime: string; kind: string }[],
 ): Promise<Result<{ docs: DocumentItem[] }>> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
   if (!(await ownsEntity(user.agency_id, entity, entityId))) return { ok: false, error: "Nie znaleziono." };
 
@@ -119,6 +122,7 @@ export async function registerDocuments(
 
 async function loadOwnDoc(id: string) {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   const admin = createSupabaseAdmin();
   const { data } = await admin
     .from("documents")

@@ -30,7 +30,7 @@ export default async function KartaLokaluPage({ params, searchParams }: { params
   if (!user.agency_id || !/^[0-9a-f-]{36}$/.test(id)) notFound();
   const [dane, k] = await Promise.all([kartaLokalu(user.agency_id, id), konfigBiura(user.agency_id)]);
   if (!dane) notFound();
-  const { lokal: l, najmy, strony, wplaty, zdarzenia, oplaty, portal } = dane;
+  const { lokal: l, najmy, strony, wplaty, zdarzenia, oplaty, portal, dokumentyPortalu, zaakceptowane } = dane;
   const z = ZAKLADKI.some((x) => x.id === sp.z) ? (sp.z as string) : "przeglad";
   const aktywny = najmy.find((n) => n.aktywny) ?? null;
   const etap = ETAPY_NAJMU.find((e) => e.id === l.etap);
@@ -137,11 +137,12 @@ export default async function KartaLokaluPage({ params, searchParams }: { params
           id={l.id}
           dane={roz}
           oplaty={oplaty}
+          zaakceptowane={zaakceptowane}
           naglowek={{ adres: l.adres, wlasciciel: wlasciciel ?? "-", najemca: najemca ?? "-", model: l.model, modelNazwa: MODELE_ROZLICZEN.find((m) => m.id === l.model)?.nazwa ?? "", prowizjaPct: w.prowizjaPct, biuro: user.agency?.name ?? "Biuro", dniNaZastrzezenia: k.dniNaZastrzezenia }}
         />
         </>
       )}
-      {z === "portal" && <PortalBiuro id={l.id} gotowy={portal.gotowy} dostep={portal.dostep} wlasciciel={wlasciciel} wiadomosci={wiadomosci} adresBazowy="https://www.agentspace.pl" />}
+      {z === "portal" && <PortalBiuro id={l.id} gotowy={portal.gotowy} dostep={portal.dostep} wlasciciel={wlasciciel} wiadomosci={wiadomosci} adresBazowy="https://www.agentspace.pl" dokumenty={dokumentyPortalu} zaakceptowane={zaakceptowane} />}
       {z === "dokumenty" && dokumenty && <DocumentsCard entity="najem" entityId={l.id} initial={dokumenty.docs} ready={dokumenty.ready} />}
       {z === "zgloszenia" && <Zgloszenia id={l.id} zdarzenia={zdarzenia} limit={l.limit_napraw != null ? Number(l.limit_napraw) : k.limitNapraw} przegladyRok={k.przegladyRok} />}
     </>

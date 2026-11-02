@@ -5,6 +5,7 @@ import { portaleFtpBiura } from "@/lib/ftp/eksport";
 export const maxDuration = 300;
 import { bezCudzychTelefonow } from "@/lib/uprawnienia";
 import { requireUser, requireModul } from "@/lib/auth";
+import { tylkoPodglad } from "@/lib/role";
 import { queryProperties } from "@/lib/data-lists";
 import { getAgencyAgents } from "@/lib/data-activities";
 import { getAgencyClientsLite } from "@/lib/data-platform";
@@ -101,7 +102,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
           title="Nieruchomości"
           subtitle={`${karty.filter((k) => k.status === "aktywna").length} aktywnych w procesie · przeciągnij kartę, żeby zmienić etap obsługi`}
           action={
-            <PropertyWizard
+            tylkoPodglad(user) ? undefined : <PropertyWizard
               clients={bezCudzychTelefonow(clients, user, settings.options.hide_contacts)}
               photoConfig={photoConfigFrom(settings)}
               offerPrefix={settings.options.offer_prefix}
@@ -137,7 +138,7 @@ export default async function NieruchomosciPage({ searchParams }: Props) {
         title="Nieruchomości"
         subtitle={`${map.activeCount} aktywnych · ${map.allCount} w biurze`}
         action={
-          <PropertyWizard
+          tylkoPodglad(user) ? undefined : <PropertyWizard
             clients={bezCudzychTelefonow(clients, user, settings.options.hide_contacts)}
             photoConfig={photoConfigFrom(settings)}
             offerPrefix={settings.options.offer_prefix}

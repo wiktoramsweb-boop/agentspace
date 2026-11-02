@@ -15,7 +15,7 @@ export type Osoba = { id: string; name: string; avatar: string | null; stanowisk
 
 
 
-export function Czat({ ja, agencyId, ludzie, startowyKanal }: { ja: string; agencyId: string; ludzie: Osoba[]; startowyKanal: string | null }) {
+export function Czat({ ja, agencyId, ludzie, startowyKanal, ceo = false }: { ja: string; agencyId: string; ludzie: Osoba[]; startowyKanal: string | null; ceo?: boolean }) {
   const router = useRouter();
   const toast = useToast();
   const [kanaly, setKanaly] = useState<Kanal[] | null>(null);
@@ -283,7 +283,7 @@ export function Czat({ ja, agencyId, ludzie, startowyKanal }: { ja: string; agen
                   <p className="mt-1 text-sm text-slate-500">Napisz coś albo wklej ofertę przyciskiem obok pola wiadomości.</p>
                 </div>
               )}
-              <ListaWiadomosci lista={lista} ja={ja} osoba={osoba} onZmiana={() => aktywny && void wczytaj(aktywny)} onOdpowiedz={(w) => setOdpowiedz(w)} />
+              <ListaWiadomosci lista={lista} ja={ja} ceo={ceo} osoba={osoba} onZmiana={() => aktywny && void wczytaj(aktywny)} onOdpowiedz={(w) => setOdpowiedz(w)} />
             </div>
 
             <Pisanie

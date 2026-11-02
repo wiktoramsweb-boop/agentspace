@@ -9,7 +9,7 @@ import { etapKredytu } from "@/lib/kredyt-etapy";
 import { maModul } from "@/lib/role";
 import { BellIcon } from "../../components/icons";
 import { notFound, redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { requireUser , requireModul} from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import {
   getClient,
@@ -82,7 +82,7 @@ function reminderState(next: string | null): { due: boolean; label: string } | n
 }
 
 export default async function ClientDetailPage({ params, searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireModul("klienci");
   const { id } = await params;
   const { z } = await searchParams;
   const tab = ZAKLADKI.find((x) => x.key === z)?.key ?? "przeglad";

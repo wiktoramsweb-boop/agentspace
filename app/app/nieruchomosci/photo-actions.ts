@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { tylkoPodglad } from "@/lib/role";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PHOTO_BUCKET } from "@/lib/storage";
@@ -19,6 +20,7 @@ export async function signPhotoUploads(
   count: number,
 ): Promise<{ uploads: SignedUpload[]; error: string | null }> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return { uploads: [], error: "Konto nie jest przypisane do biura." };
   const n = Math.max(0, Math.min(MAX_BATCH * 2, Math.floor(count)));
   const month = new Date().toISOString().slice(0, 7);
@@ -44,6 +46,7 @@ export async function savePropertyPhotos(
   photos: PropertyPhoto[],
 ): Promise<{ ok: boolean; error?: string }> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return { ok: false, error: "Konto nie jest przypisane do biura." };
 
   const admin = createSupabaseAdmin();
@@ -80,6 +83,7 @@ export async function savePropertyPhotos(
  */
 export async function discardPhotoUploads(paths: string[]): Promise<void> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return;
   const own = paths.filter((p) => typeof p === "string" && p.startsWith(`${user.agency_id}/`));
   await removeFiles(PHOTO_BUCKET, own);

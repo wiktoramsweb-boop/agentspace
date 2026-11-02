@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { LokalWlasciciela, MiesiacWlasciciela, WiadomoscWlasciciela, ZgloszenieWlasciciela } from "@/lib/data-wlasciciel";
 import { nazwaOplaty } from "@/lib/najem-model";
-import { decyzjaKoszt, linkDokumentu, napiszDoBiura, zglosUsterke } from "./actions";
+import { akceptuj, decyzjaKoszt, linkDokumentu, napiszDoBiura, zglosUsterke } from "./actions";
 
 const zl = (v: number) => `${v.toLocaleString("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
 export const KARTA = "mb-3 rounded-2xl border border-[var(--linia)] bg-white p-4";
@@ -20,8 +20,10 @@ function Wiersz({ e, v, mocny }: { e: string; v: string; mocny?: boolean }) {
   );
 }
 
-export function KartaMiesiaca({ m, biuro, wlasciciel, najemca, dni }: { m: MiesiacWlasciciela; biuro: string; wlasciciel: string; najemca: string; dni: number }) {
+export function KartaMiesiaca({ token, m, biuro, wlasciciel, najemca, dni, zaakceptowano }: { token: string; m: MiesiacWlasciciela; biuro: string; wlasciciel: string; najemca: string; dni: number; zaakceptowano: string | null }) {
+  const router = useRouter();
   const [otwarty, setOtwarty] = useState(false);
+  const [pending, start] = useTransition();
   const netto = m.r.wplaty - m.r.prowizja - m.r.koszty;
   async function pdf() {
     const { rozliczeniePdf } = await import("@/lib/najem-pdf");
@@ -50,15 +52,34 @@ export function KartaMiesiaca({ m, biuro, wlasciciel, najemca, dni }: { m: Miesi
           <Wiersz e="Czynsz najmu wpłacony" v={zl(m.czynsz)} />
           <Wiersz e="Opłaty i media wpłacone" v={zl(m.oplatyWplata)} />
           {m.pozycje.map((p) => (
-            <Wiersz key={p.id} e={`${nazwaOplaty(p.rodzaj)}${p.okres_mies > 1 ? ` za ${p.okres_mies} mies.` : ""}${p.biuro_oplaca ? " (opłaciło biuro)" : p.najemca_placi ? " (płaci najemca)" : " (po Twojej stronie)"}`} v={zl(p.kwota)} />
+            <Wiersz key={p.id} e={`${nazwaOplaty(p.rodzaj)}${p.okres_mies > 1 ? ` za ${p.okres_mies} mies.` : ""}${p.odczyt != null ? `, licznik ${p.odczyt.toLocaleString("pl-PL")}` : ""}${p.biuro_oplaca ? " (opłaciło biuro)" : p.najemca_placi ? " (płaci najemca)" : " (po Twojej stronie)"}`} v={zl(p.kwota)} />
           ))}
           <Wiersz e={`Prowizja ${m.prowizjaPct}%`} v={`- ${zl(m.r.prowizja)}`} />
           {m.r.koszty > 0 && <Wiersz e={`Koszty i naprawy${m.kosztyOpis ? `: ${m.kosztyOpis}` : ""}`} v={`- ${zl(m.r.koszty)}`} />}
           <Wiersz e={m.model === "A" ? "Przelew do Ciebie" : "Prowizja i koszty do zapłaty"} v={zl(m.model === "A" ? m.r.doPrzekazania : m.r.doZaplatyPrzezWlasciciela)} mocny />
           {m.przekazano && <p className="text-xs text-[var(--t2)]">Przelew wykonano {m.przekazano.split("-").reverse().join(".")}</p>}
-          <button type="button" onClick={pdf} className="mt-2 text-sm font-semibold text-[var(--akcent)]">
-            Pobierz PDF
-          </button>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {zaakceptowano ? (
+              <small className="font-semibold text-[var(--zielen)]">Zaakceptowane {new Date(zaakceptowano).toLocaleDateString("pl-PL")}</small>
+            ) : (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() =>
+                  start(async () => {
+                    await akceptuj(token, "rozliczenie", m.id);
+                    router.refresh();
+                  })
+                }
+                className={PRZYCISK}
+              >
+                Akceptuję rozliczenie
+              </button>
+            )}
+            <button type="button" onClick={pdf} className="text-sm font-semibold text-[var(--akcent)]">
+              Pobierz PDF
+            </button>
+          </div>
         </div>
       )}
     </section>
@@ -175,6 +196,44 @@ export function ListaZgloszen({ token, lista }: { token: string; lista: Zgloszen
         </section>
       ))}
     </>
+  );
+}
+
+export function AkceptujDokument({ token, id, zaakceptowano }: { token: string; id: string; zaakceptowano: string | null }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  if (zaakceptowano) return <small className="mt-2 block font-semibold text-[var(--zielen)]">Zaakceptowany {new Date(zaakceptowano).toLocaleDateString("pl-PL")}</small>;
+  return (
+    <div className="mt-2 rounded-xl bg-[var(--akcent-tlo)] p-3">
+      <p className="text-sm">Biuro prosi o zapoznanie się i akceptację.</p>
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() =>
+          start(async () => {
+            await akceptuj(token, "dokument", id);
+            router.refresh();
+          })
+        }
+        className={`${PRZYCISK} mt-2`}
+      >
+        Zapoznałem się i akceptuję
+      </button>
+    </div>
+  );
+}
+
+export function WykresRoku({ miesiace }: { miesiace: { m: string; netto: number }[] }) {
+  const szczyt = Math.max(1, ...miesiace.map((x) => x.netto));
+  return (
+    <div className="mt-4 flex h-24 items-end gap-1" aria-hidden="true">
+      {miesiace.map((x) => (
+        <div key={x.m} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+          <div className="w-full rounded-t" style={{ height: `${Math.max(3, (x.netto / szczyt) * 70)}px`, background: x.netto > 0 ? "#34d399" : "rgba(255,255,255,0.2)" }} />
+          <span className="text-[9px] opacity-70">{x.m.slice(5)}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 

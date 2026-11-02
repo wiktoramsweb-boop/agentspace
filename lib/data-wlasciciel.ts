@@ -1,5 +1,7 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import { powiadom } from "./powiadomienia";
+import { brandingBiura } from "./data-portal";
+import { publicAssetUrl } from "./storage";
 import { konfigBiura, warunki, type Lokal, type NajemPelny, type Oplata, type WplataPelna } from "./data-najem";
 import { najemWMiesiacu, rozliczMiesiac, type Rozliczenie } from "./najem-model";
 
@@ -20,7 +22,7 @@ export async function dostepWlasciciela(token: string): Promise<DostepWlasciciel
   return data as DostepWlasciciela;
 }
 
-export type MiesiacWlasciciela = { lokal: string; lokalId: string; r: Rozliczenie; czynsz: number; oplatyWplata: number; koszty: number; kosztyOpis: string | null; pozycje: Oplata[]; kaucja: number; model: string; prowizjaPct: number; przekazano: string | null };
+export type MiesiacWlasciciela = { id: string; lokal: string; lokalId: string; r: Rozliczenie; czynsz: number; oplatyWplata: number; koszty: number; kosztyOpis: string | null; pozycje: Oplata[]; kaucja: number; model: string; prowizjaPct: number; przekazano: string | null };
 
 export type LokalWlasciciela = {
   id: string;
@@ -67,7 +69,7 @@ export async function lokaleWlasciciela(d: DostepWlasciciela): Promise<LokalWlas
         .map((x) => {
           const wpl = { ...x, czynsz: Number(x.czynsz), oplaty: Number(x.oplaty), koszty: Number(x.koszty) };
           const najem = moje.find((n) => najemWMiesiacu(n, x.miesiac)) ?? null;
-          return { lokal: l.adres, lokalId: l.id, r: rozliczMiesiac(x.miesiac, najem, wpl, w, moOplaty), czynsz: wpl.czynsz, oplatyWplata: wpl.oplaty, koszty: wpl.koszty, kosztyOpis: x.koszty_opis, pozycje: moOplaty.filter((a) => a.miesiac === x.miesiac), kaucja: najem?.kaucja ?? 0, model: w.model, prowizjaPct: w.prowizjaPct, przekazano: x.przekazano };
+          return { id: (x as unknown as { id: string }).id, lokal: l.adres, lokalId: l.id, r: rozliczMiesiac(x.miesiac, najem, wpl, w, moOplaty), czynsz: wpl.czynsz, oplatyWplata: wpl.oplaty, koszty: wpl.koszty, kosztyOpis: x.koszty_opis, pozycje: moOplaty.filter((a) => a.miesiac === x.miesiac), kaucja: najem?.kaucja ?? 0, model: w.model, prowizjaPct: w.prowizjaPct, przekazano: x.przekazano };
         }),
     };
   });
@@ -80,11 +82,14 @@ export async function zgloszeniaWlasciciela(d: DostepWlasciciela, lokale: { id: 
   return ((data ?? []) as (Omit<ZgloszenieWlasciciela, "lokal" | "lokalId"> & { unit_id: string })[]).map((z) => ({ ...z, lokalId: z.unit_id, lokal: lokale.find((l) => l.id === z.unit_id)?.adres ?? "" }));
 }
 
-export type DokumentWlasciciela = { id: string; nazwa: string; rodzaj: string; lokal: string; data: string };
+export type DokumentWlasciciela = { id: string; nazwa: string; rodzaj: string; lokal: string; data: string; doAkceptacji: boolean };
 
 export async function dokumentyWlasciciela(lokale: { id: string; adres: string }[], agencyId: string): Promise<DokumentWlasciciela[]> {
-  const { data } = await createSupabaseAdmin().from("documents").select("id, name, kind, entity_id, created_at").eq("agency_id", agencyId).eq("entity_type", "najem").in("entity_id", lokale.map((l) => l.id)).neq("kind", "inne").order("created_at", { ascending: false }).limit(300);
-  return ((data ?? []) as { id: string; name: string; kind: string; entity_id: string; created_at: string }[]).map((x) => ({ id: x.id, nazwa: x.name, rodzaj: x.kind, lokal: lokale.find((l) => l.id === x.entity_id)?.adres ?? "", data: x.created_at }));
+  const admin = createSupabaseAdmin();
+  // Kolumna do_akceptacji przychodzi z v62. Bez niej lista działa jak wcześniej.
+  let { data, error }: { data: unknown[] | null; error: unknown } = await admin.from("documents").select("id, name, kind, entity_id, created_at, do_akceptacji").eq("agency_id", agencyId).eq("entity_type", "najem").in("entity_id", lokale.map((l) => l.id)).neq("kind", "inne").order("created_at", { ascending: false }).limit(300);
+  if (error) ({ data, error } = await admin.from("documents").select("id, name, kind, entity_id, created_at").eq("agency_id", agencyId).eq("entity_type", "najem").in("entity_id", lokale.map((l) => l.id)).neq("kind", "inne").order("created_at", { ascending: false }).limit(300));
+  return ((data ?? []) as { id: string; name: string; kind: string; entity_id: string; created_at: string; do_akceptacji?: boolean }[]).map((x) => ({ id: x.id, nazwa: x.name, rodzaj: x.kind, lokal: lokale.find((l) => l.id === x.entity_id)?.adres ?? "", data: x.created_at, doAkceptacji: Boolean(x.do_akceptacji) }));
 }
 
 export type WiadomoscWlasciciela = { id: string; autor: string; tresc: string; created_at: string; read_at: string | null };
@@ -100,9 +105,49 @@ export async function powiadomOpiekuna(unitId: string, agencyId: string, tytul: 
   await powiadom(agencyId, [data?.opiekun_id], { tytul, tresc: tresc ?? null, adres: `/app/najem/${unitId}?z=portal`, pilne: true });
 }
 
-/** Wiadomość systemowa w portalu właściciela: nowe rozliczenie albo koszt do akceptacji. */
-export async function powiadomWlasciciela(unitId: string, tekst: string) {
+/**
+ * Wiadomość do właściciela: nowe rozliczenie, koszt do akceptacji, dokument.
+ * Trafia trzema drogami: do rozmowy w portalu, na telefon (gdy włączył
+ * powiadomienia) i mailem (gdy biuro ma jego adres przy lokalu).
+ */
+export async function powiadomWlasciciela(unitId: string, tekst: string, sciezka = "") {
   const admin = createSupabaseAdmin();
-  const { data } = await admin.from("rental_owner_access").select("id, agency_id").contains("unit_ids", [unitId]).is("revoked_at", null).maybeSingle();
-  if (data) await admin.from("rental_owner_messages").insert({ access_id: data.id, agency_id: data.agency_id, autor: "biuro", tresc: tekst });
+  const { data } = await admin.from("rental_owner_access").select("id, agency_id, token").contains("unit_ids", [unitId]).is("revoked_at", null).maybeSingle();
+  if (!data) return;
+  await admin.from("rental_owner_messages").insert({ access_id: data.id, agency_id: data.agency_id, autor: "biuro", tresc: tekst });
+  const baza = `/wlasciciel/${data.token}`;
+  const { wyslijPushDoWlasciciela } = await import("./push");
+  await wyslijPushDoWlasciciela(data.id, { title: "Twoje mieszkanie", body: tekst, url: `${baza}${sciezka}`, tag: `wl-${unitId}`, icon: `${baza}/ikona?r=192` }).catch(() => 0);
+  const [{ data: strona }, biuro] = await Promise.all([
+    admin.from("rental_parties").select("email").eq("unit_id", unitId).eq("rola", "wlasciciel").not("email", "is", null).limit(1).maybeSingle(),
+    brandingBiura(data.agency_id),
+  ]);
+  if (strona?.email) {
+    const { wyslijMail } = await import("./mail");
+    await wyslijMail({
+      do: strona.email,
+      temat: `${biuro.nazwa}: ${tekst}`,
+      naglowek: tekst,
+      akapity: [`${biuro.nazwa} ma dla Ciebie nową informację w portalu właściciela.`],
+      przycisk: { tekst: "Otwórz portal", adres: `https://www.agentspace.pl${baza}${sciezka}` },
+      stopka: "Link jest prywatny, nie przekazuj go dalej.",
+    }).catch(() => false);
+  }
+}
+
+export type DoAkceptacji = { id: string; rodzaj: "dokument" | "rozliczenie"; nazwa: string; lokal: string; zaakceptowano: string | null };
+
+export async function akceptacje(accessId: string): Promise<Map<string, string>> {
+  const { data } = await createSupabaseAdmin().from("rental_acceptances").select("ref_id, accepted_at").eq("access_id", accessId);
+  return new Map(((data ?? []) as { ref_id: string; accepted_at: string }[]).map((a) => [a.ref_id, a.accepted_at]));
+}
+
+export async function opiekunLokalu(unitId: string | undefined): Promise<{ imie: string; telefon: string | null; zdjecie: string | null } | null> {
+  if (!unitId) return null;
+  const admin = createSupabaseAdmin();
+  const { data: l } = await admin.from("rental_units").select("opiekun_id").eq("id", unitId).maybeSingle();
+  if (!l?.opiekun_id) return null;
+  const { data: p } = await admin.from("profiles").select("full_name, phone, avatar_path").eq("id", l.opiekun_id).maybeSingle();
+  if (!p) return null;
+  return { imie: p.full_name ?? "Opiekun", telefon: p.phone ?? null, zdjecie: p.avatar_path ? publicAssetUrl("agency-assets", p.avatar_path) : null };
 }

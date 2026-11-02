@@ -1,3 +1,4 @@
+import { maModul } from "@/lib/role";
 import { getCurrentUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { getAgencySettings } from "@/lib/agency-settings";
@@ -33,7 +34,8 @@ export async function GET(request: Request) {
   const digits = q.replace(/\D/g, "");
   const isPhone = digits.length >= 3;
 
-  const [clients, properties, activities, searches, settings] = await Promise.all([
+  const bezKlientow = !maModul(user, "klienci");
+  const [clientsRaw, properties, activitiesRaw, searchesRaw, settings] = await Promise.all([
     admin
       .from("clients")
       .select("id, name, phone, phone_digits, email, company, type, agent_id")
@@ -68,7 +70,11 @@ export async function GET(request: Request) {
       .or(`title.ilike.${like},search_no.ilike.${like}`)
       .limit(4),
     getAgencySettings(agency, user.agency?.name),
-  ]);
+  ]);  // Bez modułu klientów wyszukiwarka zwraca tylko oferty.
+  const clients = bezKlientow ? { ...clientsRaw, data: [] } : clientsRaw;
+  const activities = bezKlientow ? { ...activitiesRaw, data: [] } : activitiesRaw;
+  const searches = bezKlientow ? { ...searchesRaw, data: [] } : searchesRaw;
+
 
   // Ukrywanie kontaktów (Ustawienia → Pozostałe): agent nie widzi pełnych
   // numerów cudzych klientów. Dodatkowo cudzy klient pokazuje się po numerze

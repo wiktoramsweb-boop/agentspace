@@ -1,6 +1,7 @@
 "use server";
 
 import { requireUser } from "@/lib/auth";
+import { zapiszZdarzenie } from "@/lib/dziennik";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { brakTabeli } from "@/lib/migracja";
 import { powiadom } from "@/lib/powiadomienia";
@@ -318,13 +319,22 @@ export async function edytuj(id: string, body: string): Promise<Wynik> {
 
 export async function usun(id: string): Promise<Wynik> {
   const user = await uzytkownik();
+  const admin = createSupabaseAdmin();
+  // CEO porządkuje czat całego biura, więc może usunąć każdą wiadomość, ale tylko
+  // ze swojego biura. Pozostali usuwają wyłącznie własne.
+  const ceo = user.role === "owner";
+  let q = admin.from("chat_messages").update({ body: "", refs: [], attachments: [], deleted_at: new Date().toISOString() }).eq("id", id);
+  if (ceo) {
+    const { data: w } = await admin.from("chat_messages").select("author_id, channel:chat_channels(agency_id)").eq("id", id).maybeSingle();
+    const biuro = (w?.channel as { agency_id?: string } | null)?.agency_id;
+    if (!w || biuro !== user.agency_id) return { ok: false, error: "Nie znaleziono wiadomości." };
+    if (w.author_id !== user.id) await zapiszZdarzenie({ agencyId: user.agency_id!, actorId: user.id, akcja: "czat_usunieta", rodzaj: "osoba", id, opis: "CEO usunął wiadomość z czatu zespołu" });
+  } else {
+    q = q.eq("author_id", user.id);
+  }
   // Wiadomość znika z rozmowy, ale wiersz zostaje z pustą treścią: odpowiedzi
   // na nią nie tracą kontekstu, widać tylko, że została usunięta.
-  const { error } = await createSupabaseAdmin()
-    .from("chat_messages")
-    .update({ body: "", refs: [], attachments: [], deleted_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("author_id", user.id);
+  const { error } = await q;
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 

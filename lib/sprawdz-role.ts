@@ -12,6 +12,7 @@ import {
   ROLE_LABELS,
   ZAKRESY,
   maModul,
+  tylkoPodglad,
   moduly,
   mozeZarzadzacRolami,
   oczyscUprawnienia,
@@ -75,6 +76,10 @@ sprawdz("stażysta ma AI Coacha", maModul(osoba("trainee"), "coach"));
 sprawdz("doradca kredytowy ma kredyty", maModul(osoba("credit_advisor"), "kredyty"));
 sprawdz("doradca kredytowy nie ma bazy klientów", !maModul(osoba("credit_advisor"), "klienci"));
 sprawdz("doradca kredytowy nie ma prowizji biura", !maModul(osoba("credit_advisor"), "prowizje"));
+sprawdz("stażysta nie ma klientów", !maModul(osoba("trainee"), "klienci"));
+sprawdz("stażysta nie ma prowizji ani dokumentów", !maModul(osoba("trainee"), "prowizje") && !maModul(osoba("trainee"), "dokumenty"));
+sprawdz("stażysta trenuje i ogląda oferty", maModul(osoba("trainee"), "coach") && maModul(osoba("trainee"), "nieruchomosci"));
+sprawdz("stażysta tylko przegląda", tylkoPodglad(osoba("trainee")) && !tylkoPodglad(osoba("agent")));
 sprawdz("nieznana rola nie dostaje kredytów", !maModul(osoba("nieznana"), "kredyty"));
 sprawdz("agent nie wchodzi w zespół", !maModul(osoba("agent"), "zespol"));
 sprawdz("agent nie ma faktur", !maModul(osoba("agent"), "faktury"));

@@ -2,6 +2,7 @@
 
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
+import { tylkoPodglad } from "@/lib/role";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { maV49 } from "@/lib/schemat";
@@ -32,6 +33,7 @@ async function zapiszKolejnosc(tabela: "clients" | "properties", agencyId: strin
 
 export async function przeniesKlienta(id: string, status: string, kolejnosc: Kolejnosc): Promise<string | null> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return "Konto nie jest przypisane do biura.";
   if (!CLIENT_STATUSES.some((s) => s.value === status)) return "Nieznany status.";
   const admin = createSupabaseAdmin();
@@ -59,6 +61,7 @@ export async function przeniesKlienta(id: string, status: string, kolejnosc: Kol
 
 export async function przeniesOferte(id: string, etap: string, kolejnosc: Kolejnosc): Promise<string | null> {
   const user = await requireUser();
+  if (tylkoPodglad(user)) throw new Error("Stażysta może tylko przeglądać.");
   if (!user.agency_id) return "Konto nie jest przypisane do biura.";
   if (!PROCESS_STAGES.some((s) => s.value === etap)) return "Nieznany etap.";
   const admin = createSupabaseAdmin();

@@ -8,7 +8,7 @@ import { policzWycene, type OfertaDoWyceny } from "./wyceny";
 import { poNowymKliencie } from "./zdarzenia";
 import { zapiszBlad } from "./blad";
 import { zapiszZdarzenie } from "./dziennik";
-import { maModul } from "./role";
+import { maModul, tylkoPodglad } from "./role";
 import { zakresUzytkownika } from "./auth";
 import { todayPL } from "./datetime";
 import type { ProfileWithAgency } from "./types";
@@ -139,7 +139,8 @@ const NARZEDZIA: (Anthropic.Tool & { modul?: "klienci" | "nieruchomosci"; zapis?
 
 export function narzedziaDla(user: ProfileWithAgency): Anthropic.Tool[] {
   // Konto demo jest wspólne, więc nic w nim nie zapisujemy.
-  const demo = Boolean(user.agency?.is_demo);
+  // Stażysta tylko przegląda, więc dostaje narzędzia bez zapisu.
+  const demo = Boolean(user.agency?.is_demo) || tylkoPodglad(user);
   return NARZEDZIA.filter((n) => (!n.modul || maModul(user, n.modul)) && !(demo && n.zapis)).map(({ name, description, input_schema }) => ({ name, description, input_schema }));
 }
 

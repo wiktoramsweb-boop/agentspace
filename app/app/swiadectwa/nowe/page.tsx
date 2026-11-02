@@ -1,3 +1,5 @@
+import { tylkoPodglad } from "@/lib/role";
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { PageHeader } from "../../components/page-header";
@@ -7,6 +9,7 @@ export const metadata = { title: "Zamów świadectwo energetyczne" };
 
 export default async function NoweSwiadectwoPage({ searchParams }: { searchParams: Promise<{ oferta?: string }> }) {
   const user = await requireUser();
+  if (tylkoPodglad(user)) redirect("/app/swiadectwa");
   const sp = await searchParams;
   const { data } = await createSupabaseAdmin()
     .from("properties")

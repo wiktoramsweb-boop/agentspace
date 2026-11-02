@@ -36,6 +36,12 @@ export async function PulpitWlasciciela({ agencyId }: { agencyId: string }) {
   const zmiana = poprzedni > 0 ? Math.round(((tenMiesiac - poprzedni) / poprzedni) * 100) : null;
   const wTokuLista = (wToku.data ?? []) as { commission_pln: number | null }[];
   const uwaga = doUwagi(tydzien);
+  // Staż trwa kilka dni. Po trzech przypominamy o zmianie roli, żeby nikt nie został w podglądzie na stałe.
+  const { data: stazysci } = await admin.from("profiles").select("full_name, created_at").eq("agency_id", agencyId).eq("role", "trainee").lt("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString());
+  for (const p of (stazysci ?? []) as { full_name: string | null; created_at: string }[]) {
+    const dni = Math.floor((Date.now() - Date.parse(p.created_at)) / 86_400_000);
+    uwaga.push({ tekst: `${p.full_name ?? "Stażysta"} jest stażystą od ${dni} dni: zmień rolę na agenta`, href: "/app/zespol?z=zarzadzanie" });
+  }
 
   const miesiace = Array.from({ length: 6 }, (_, i) => {
     const od = new Date(teraz.getFullYear(), teraz.getMonth() - 5 + i, 1);
