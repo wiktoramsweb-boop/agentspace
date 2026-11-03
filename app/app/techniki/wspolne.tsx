@@ -46,14 +46,15 @@ export function Sila({ wartosc }: { wartosc: number }) {
   );
 }
 
-export function Zakladki({ aktywna, nazwaAkademii = "Akademia dla nowych" }: { aktywna: "techniki" | "skrypty" | "obiekcje" | "struktura" | "akademia"; nazwaAkademii?: string }) {
+export function Zakladki({ aktywna, nazwaAkademii = "Akademia dla nowych", teoria = false }: { aktywna: "techniki" | "skrypty" | "obiekcje" | "struktura" | "akademia" | "teoria"; nazwaAkademii?: string; teoria?: boolean }) {
   const z = [
     { id: "akademia", href: "/app/techniki?widok=akademia", nazwa: nazwaAkademii },
+    ...(teoria ? [{ id: "teoria", href: "/app/techniki?widok=teoria", nazwa: "Teoria" }] : []),
     { id: "techniki", href: "/app/techniki", nazwa: "Techniki" },
     { id: "skrypty", href: "/app/techniki?widok=skrypty", nazwa: "Skrypty rozmów" },
     { id: "obiekcje", href: "/app/techniki?widok=obiekcje", nazwa: "Bank obiekcji" },
     { id: "struktura", href: "/app/techniki?widok=struktura", nazwa: "Struktura rozmowy" },
-  ] as const;
+  ];
   return (
     <nav className="mb-6 flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
       {z.map((x) => (

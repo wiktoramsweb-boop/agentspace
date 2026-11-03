@@ -30,6 +30,10 @@
 
 Rola `trainee` ma tylko podgląd (`tylkoPodglad` w `lib/role.ts`, `requireZapis` w `lib/auth.ts`): pulpit to plan 3 dni (`app/app/components/plan-stazu.tsx`), oferta bez właściciela i dokumentów, akcje zapisu ofert i dokumentów rzucają błąd. Nowa strona z danymi klientów musi sprawdzać `requireModul`, bo stażysta nie ma modułu `klienci`.
 
+## Teoria (tylko Spectra)
+
+Zakładka „Teoria” w Bibliotece technik (`?widok=teoria`, `/app/techniki/teoria/*`) widoczna tylko dla Spectry (`maTeorie`). Treść, 50 pytań i losowanie w `lib/techniki/teoria.ts` (test `npm run test:teoria`, pilnuje też, żeby dobra odpowiedź nie była najdłuższa). Postęp w `academy_progress` z przedrostkiem `teoria-` (bez nowej migracji), lista pytań do powtórki w `last_answers` wiersza `teoria-bledy`. Treść poprawiona względem PDF-u ze szkolenia tam, gdzie był niezgodny z przepisami.
+
 ## Stanowiska, kalendarz
 
 Cele: agent i menedżer pracują lejkiem (`lib/funnel`), doradca, CEO, dyrektor i stażysta mają mierniki z `lib/cele-rol.ts` liczone w `lib/data-cele-rol.ts` (test `npm run test:cele`). Zadania w Osiągnięciach filtruje moduł stanowiska. Kalendarz podłącza się przez prywatny adres iCalendar (`/api/kalendarz/[token]`, `lib/ics.ts`): działa w jedną stronę, z AgentSpace do Google, Apple i Outlooka, bez OAuth. Listy wyboru w aplikacji tylko przez `app/app/components/select.tsx`, nigdy natywny `<select>`.

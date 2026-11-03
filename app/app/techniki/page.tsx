@@ -11,6 +11,8 @@ import { PageHeader } from "../components/page-header";
 import { KOLOR, POZIOM, Sila, Zakladki } from "./wspolne";
 import { OBIEKCJE } from "@/lib/techniki/obiekcje";
 import { BankObiekcji } from "./bank-obiekcji";
+import { maTeorie } from "@/lib/techniki/teoria";
+import { PrzegladTeorii } from "./teoria/przeglad";
 
 export const metadata = { title: "Biblioteka technik" };
 
@@ -21,7 +23,8 @@ const bezOgonkow = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-
 export default async function TechnikiPage({ searchParams }: Props) {
   const user = await requireModul("coach");
   const sp = await searchParams;
-  const widok = sp.widok === "skrypty" || sp.widok === "struktura" || sp.widok === "obiekcje" || sp.widok === "akademia" ? sp.widok : "techniki";
+  const teoria = maTeorie(user.agency_id);
+  const widok = sp.widok === "skrypty" || sp.widok === "struktura" || sp.widok === "obiekcje" || sp.widok === "akademia" || (sp.widok === "teoria" && teoria) ? sp.widok : "techniki";
   const kat = sp.k && sp.k in KATEGORIE ? (sp.k as Kategoria) : null;
   const q = (sp.q ?? "").trim().slice(0, 60);
 
@@ -47,7 +50,7 @@ export default async function TechnikiPage({ searchParams }: Props) {
         ))}
       </section>
 
-      <Zakladki aktywna={widok} nazwaAkademii={nazwaAkademii(user.agency_id).pelna} />
+      <Zakladki aktywna={widok} nazwaAkademii={nazwaAkademii(user.agency_id).pelna} teoria={teoria} />
 
       {widok === "techniki" && (
         <>
@@ -119,6 +122,7 @@ export default async function TechnikiPage({ searchParams }: Props) {
       )}
 
       {widok === "akademia" && <Akademia user={user} />}
+      {widok === "teoria" && <PrzegladTeorii user={user} />}
       {(widok === "obiekcje" || widok === "struktura") && <PowrotDoAkademii user={user} lekcjaId={sp.akademia} />}
 
       {widok === "obiekcje" && <BankObiekcji lista={OBIEKCJE} nazwyTechnik={Object.fromEntries(TECHNIKI.map((t) => [t.slug, t.nazwa]))} />}

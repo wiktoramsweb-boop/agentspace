@@ -2,6 +2,8 @@ import Link from "next/link";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { postepAkademii } from "@/lib/data-akademia";
 import { nazwaAkademii, stanAkademii } from "@/lib/techniki/akademia";
+import { postepTeorii } from "@/lib/data-teoria";
+import { maTeorie } from "@/lib/techniki/teoria";
 import { PageHeader } from "./page-header";
 
 type Krok = { tytul: string; opis: string; href: string; zrobione: boolean };
@@ -13,8 +15,9 @@ type Krok = { tytul: string; opis: string; href: string; zrobione: boolean };
  */
 export async function PlanStazu({ user }: { user: { id: string; agency_id: string | null; full_name: string | null; created_at?: string | null } }) {
   const admin = createSupabaseAdmin();
-  const [akademia, sesje, oceny, wyceny] = await Promise.all([
+  const [akademia, teoria, sesje, oceny, wyceny] = await Promise.all([
     postepAkademii(user.agency_id, user.id),
+    maTeorie(user.agency_id) ? postepTeorii(user.agency_id, user.id) : null,
     admin.from("training_sessions").select("id", { count: "exact", head: true }).eq("agent_id", user.id).eq("status", "completed"),
     admin.from("session_scores").select("overall").eq("agent_id", user.id).order("overall", { ascending: false }).limit(1),
     admin.from("valuations").select("id", { count: "exact", head: true }).eq("agent_id", user.id),
@@ -49,6 +52,9 @@ export async function PlanStazu({ user }: { user: { id: string; agency_id: strin
         { tytul: `${nazwa}: moduły 4, 5 i 6`, opis: "Spotkanie, negocjacje, zamknięcie.", href: "/app/techniki", zrobione: modul(4) && modul(5) && modul(6) },
         { tytul: "Egzamin końcowy", opis: "Podsumowanie całej ścieżki.", href: "/app/techniki", zrobione: a.egzamin.zaliczony },
         { tytul: "Rozmowa na 7 lub więcej", opis: "Pokaż, że umiesz przeprowadzić rozmowę do końca.", href: "/app/trening", zrobione: najlepsza >= 7 },
+        ...(teoria
+          ? [{ tytul: "Teoria: egzamin próbny", opis: "Prawo nieruchomości przed egzaminem po szkoleniu.", href: "/app/techniki?widok=teoria", zrobione: Boolean(teoria.testy["teoria-egzamin"]?.zaliczony) }]
+          : []),
       ],
     },
   ];

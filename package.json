@@ -41,6 +41,7 @@
     "test:cele": "node --experimental-strip-types --no-warnings lib/sprawdz-cele-rol.ts",
     "test:najem": "node --experimental-strip-types --no-warnings lib/sprawdz-najem.ts",
     "test:ogloszenia": "node --experimental-strip-types --no-warnings lib/sprawdz-ogloszenia.ts",
+    "test:teoria": "node --experimental-strip-types --no-warnings lib/sprawdz-teoria.ts",
     "test:portale": "node --experimental-strip-types --no-warnings lib/sprawdz-portale.ts"
   },
   "dependencies": {
