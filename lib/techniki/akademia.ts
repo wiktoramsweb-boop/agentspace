@@ -601,8 +601,6 @@ export function nazwaAkademii(agencyId: string | null | undefined): { pelna: str
   return agencyId === SPECTRA ? { pelna: "Spectra Academy", krotka: "Spectra Academy" } : { pelna: "Akademia dla nowych", krotka: "Akademia" };
 }
 
-export { adresLekcji } from "./akademia-adresy";
-
 export function lekcja(id: string | null | undefined): Lekcja | undefined {
   return id ? WSZYSTKIE_LEKCJE.find((l) => l.id === id) : undefined;
 }
