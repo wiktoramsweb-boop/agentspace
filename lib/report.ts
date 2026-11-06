@@ -10,6 +10,7 @@ import {
 import { getAgencyCommissionByAgent } from "./data-platform";
 import { formatPln } from "./format";
 import { oprawaMaila } from "@/lib/mail";
+import { NADAWCA } from "./mail";
 
 /**
  * Buduje i wysyła miesięczny raport dla właściciela agencji.
@@ -107,7 +108,7 @@ export async function sendAgencyMonthlyReport(agencyId: string): Promise<boolean
   try {
     const resend = new Resend(resendKey);
     await resend.emails.send({
-      from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+      from: NADAWCA,
       to: ownerEmail,
       subject: `Raport miesięczny - ${agency.name} (${monthName})`,
       html,

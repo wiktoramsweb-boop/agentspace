@@ -4,7 +4,7 @@ import { ROLE } from "@/lib/role";
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { inviteAgent } from "./actions";
-import { CopyLink } from "./copy-link";
+import { KodZaproszenia } from "./zaproszenie-qr";
 import { Select } from "@/app/app/components/select";
 
 export type ManagerOption = { id: string; label: string };
@@ -70,12 +70,9 @@ export function InviteForm({ managers }: { managers: ManagerOption[] }) {
 
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.success && (
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] p-3">
-          <p className="mb-2 text-sm text-emerald-700">{state.success}</p>
-          {state.link && <CopyLink link={state.link} label="Kopiuj link" />}
-          <p className="mt-2 text-xs text-slate-500">
-            Wyślij ten link zaproszonej osobie (WhatsApp, SMS, mail). Po kliknięciu założy konto z nadaną rolą.
-          </p>
+        <div className={`rounded-2xl border p-4 ${state.emailSent ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>
+          <p className={`mb-4 text-sm font-medium ${state.emailSent ? "text-emerald-800" : "text-amber-900"}`}>{state.success}</p>
+          {state.link && state.qr && <KodZaproszenia link={state.link} qr={state.qr} />}
         </div>
       )}
     </div>

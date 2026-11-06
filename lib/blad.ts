@@ -1,6 +1,6 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import { escapeHtml } from "./html";
-import { oprawaMaila } from "./mail";
+import { oprawaMaila, NADAWCA } from "./mail";
 
 /**
  * Zapis błędu do dziennika (v41).
@@ -66,7 +66,7 @@ async function powiadomOAwarii(gdzie: string, wiadomosc: string): Promise<void> 
 
     const { Resend } = await import("resend");
     await new Resend(klucz).emails.send({
-      from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+      from: NADAWCA,
       to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
       subject: `AgentSpace: awaria w ${gdzie}`,
       html: oprawaMaila(`

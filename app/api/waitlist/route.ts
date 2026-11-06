@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase";
-import { oprawaMaila } from "@/lib/mail";
+import { oprawaMaila, NADAWCA } from "@/lib/mail";
 
 const VALID_TEAM_SIZES = ["1-3", "4-10", "11-25", "25+"] as const;
 type TeamSize = (typeof VALID_TEAM_SIZES)[number];
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     try {
       const resend = new Resend(resendKey);
       await resend.emails.send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        from: NADAWCA,
         to: notifyEmail,
         subject: `🎉 Nowy zapis na waitlist: ${agencyName}`,
         html: oprawaMaila(`

@@ -12,6 +12,7 @@ import { portalFtp, portalWPrzygotowaniu } from "@/lib/ftp/portale";
 import { Resend } from "resend";
 import { escapeHtml } from "@/lib/html";
 import { gosciaBlokujemy } from "@/lib/demo/straz";
+import { NADAWCA } from "@/lib/mail";
 
 /** Start połączenia: CEO loguje się na Otodom kontem biura i zgadza na dostęp. */
 export async function polaczOtodom(): Promise<void> {
@@ -148,7 +149,7 @@ export async function zglosPortal(formData: FormData): Promise<void> {
   if (key && !(await gosciaBlokujemy())) {
     await new Resend(key).emails
       .send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        from: NADAWCA,
         to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
         replyTo: user.email ?? undefined,
         subject: `Portal: ${user.agency?.name ?? "biuro"} chce wystawiać na ${p!.nazwa}`,

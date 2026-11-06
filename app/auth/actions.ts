@@ -8,7 +8,7 @@ import { hitLimit, visitorKey } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/html";
 import { zapiszBlad } from "@/lib/blad";
 import { WERSJA_POWIERZENIA } from "@/lib/powierzenie";
-import { oprawaMaila } from "@/lib/mail";
+import { oprawaMaila, NADAWCA } from "@/lib/mail";
 import { saveAgencySettings } from "@/lib/agency-settings";
 
 export type AuthResult = { error: string } | undefined;
@@ -31,7 +31,7 @@ async function powiadomONowymBiurze(dane: {
   try {
     const { Resend } = await import("resend");
     await new Resend(klucz).emails.send({
-      from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+      from: NADAWCA,
       to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
       subject: `Nowe biuro w AgentSpace: ${dane.agencyName}`,
       html: oprawaMaila(`

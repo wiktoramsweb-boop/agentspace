@@ -9,6 +9,7 @@ import { pobierzPartieZdjec } from "@/lib/import-zdjec";
 import { gosciaBlokujemy } from "@/lib/demo/straz";
 import { escapeHtml } from "@/lib/html";
 import { Resend } from "resend";
+import { NADAWCA } from "@/lib/mail";
 
 /**
  * Zapis zaimportowanych rekordów.
@@ -259,7 +260,7 @@ export async function zglosMigracje(fd: FormData): Promise<{ ok: true } | { ok: 
   if (key && doNas && !(await gosciaBlokujemy())) {
     await new Resend(key).emails
       .send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        from: NADAWCA,
         to: doNas,
         replyTo: user.email ?? undefined,
         subject: `Migracja bazy: ${user.agency?.name ?? "biuro"} z ${system}`,

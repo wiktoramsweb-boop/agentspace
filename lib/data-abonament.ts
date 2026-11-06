@@ -12,7 +12,7 @@ import {
 } from "./abonament-cennik";
 import { SITE_ADDON } from "./site/addon";
 import { escapeHtml } from "./html";
-import { oprawaMaila } from "./mail";
+import { oprawaMaila, NADAWCA } from "./mail";
 
 export { PLANS, planForAgents, cenaPakietu };
 export type { Plan };
@@ -288,7 +288,7 @@ export async function powiadomOZamowieniu(orderId: string, agencyId: string): Pr
     const { Resend } = await import("resend");
     const resend = new Resend(klucz);
     await resend.emails.send({
-      from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+      from: NADAWCA,
       to: process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
       subject: `Nowe zamówienie: ${biuro?.name ?? "biuro"}`,
       html: oprawaMaila(`

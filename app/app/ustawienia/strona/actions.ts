@@ -10,7 +10,7 @@ import { ASSET_BUCKET } from "@/lib/storage";
 import { removeFiles, signUploads, type SignedUpload } from "@/lib/storage-server";
 import { slugify, type SiteBrand, type SiteContact, type SiteContent } from "@/lib/site/config";
 import { WZORY } from "@/lib/wzory/themes";
-import { oprawaMaila } from "@/lib/mail";
+import { oprawaMaila, NADAWCA } from "@/lib/mail";
 
 export type SiteResult = { ok: true } | { ok: false; error: string };
 
@@ -306,7 +306,7 @@ export async function requestSiteAddon(): Promise<SiteResult> {
       const { Resend } = await import("resend");
       const resend = new Resend(key);
       await resend.emails.send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        from: NADAWCA,
         to: process.env.NOTIFICATION_EMAIL ?? "wiktor.amsweb@gmail.com",
         subject: `Zapytanie o stronę www: ${owner.agency?.name ?? "biuro"}`,
         html: oprawaMaila(`<p><strong>${escapeHtml(owner.agency?.name ?? "Biuro")}</strong> chce stronę internetową.</p>

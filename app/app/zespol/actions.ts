@@ -13,12 +13,13 @@ import { wyslijTydzienBiura } from "@/lib/raport-tygodniowy";
 import { type UserRole } from "@/lib/types";
 import { ROLE_LABELS } from "@/lib/role";
 import { zapiszZdarzenie } from "@/lib/dziennik";
-import { oprawaMaila } from "@/lib/mail";
+import { oprawaMaila, NADAWCA } from "@/lib/mail";
+import { kodQrSvg } from "@/lib/qr";
 
 const VALID_ROLES = ROLE.map((r) => r.id);
 
 export type ZespolResult =
-  | { error?: string; success?: string; link?: string; emailSent?: boolean }
+  | { error?: string; success?: string; link?: string; qr?: string; emailSent?: boolean }
   | undefined;
 
 /**
@@ -110,50 +111,77 @@ export async function inviteAgent(
 
   const link = `${APP_URL}/zaproszenie/${invitation.token}`;
 
-  // Spróbuj wysłać email (jeśli Resend skonfigurowany). Bez zweryfikowanej domeny
-  // Resend dostarcza tylko na adres właściciela konta - dlatego zawsze zwracamy
-  // też link do ręcznego wysłania.
-  let emailSent = false;
-  const resendKey = process.env.RESEND_API_KEY;
-  if (resendKey) {
-    try {
-      const resend = new Resend(resendKey);
-      const { error: sendError } = await resend.emails.send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
-        to: email,
-        subject: `${owner.full_name ?? "Twój szef"} zaprasza Cię do AgentSpace`,
-        html: oprawaMaila(`
-          <div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
-            <h2 style="color:#10b981;">Zaproszenie do zespołu</h2>
-            <p style="color:#3f3f46;font-size:15px;line-height:1.6;">
-              <strong>${escapeHtml(owner.full_name ?? "Właściciel biura")}</strong> zaprasza Cię do
-              <strong>${escapeHtml(owner.agency?.name ?? "biura")}</strong> w AgentSpace - platformie do
-              treningu sprzedaży nieruchomości z AI, w roli <strong>${ROLE_LABELS[role]}</strong>.
-            </p>
-            <p style="margin:28px 0;">
-              <a href="${link}" style="background:#10b981;color:#09090b;padding:12px 24px;border-radius:12px;text-decoration:none;font-weight:600;">
-                Dołącz do zespołu →
-              </a>
-            </p>
-            <p style="color:#71717a;font-size:13px;">Link ważny 14 dni. Jeśli to pomyłka - zignoruj tę wiadomość.</p>
-          </div>
-        `),
-      });
-      emailSent = !sendError;
-      if (sendError) console.error("Invite email error:", sendError);
-    } catch (err) {
-      console.error("Invite email error:", err);
-    }
-  }
+  const mail = await wyslijZaproszenie({ email, link, role, zapraszajacy: owner.full_name, biuro: owner.agency?.name ?? null });
 
   revalidatePath("/app/zespol");
   return {
-    success: emailSent
-      ? `Zaproszenie wysłane mailem do ${email}. Link masz też poniżej.`
-      : `Zaproszenie utworzone. Mail nie wyszedł - skopiuj link poniżej i wyślij agentowi.`,
+    success: mail.ok
+      ? `Zaproszenie wysłane mailem do ${email}. Możesz też pokazać kod QR albo wysłać link.`
+      : `Zaproszenie utworzone, ale mail nie wyszedł: ${mail.powod} Pokaż kod QR albo wyślij link.`,
     link,
-    emailSent,
+    qr: await kodQrSvg(link),
+    emailSent: mail.ok,
   };
+}
+
+/** Ponowne wysłanie maila z oczekującym zaproszeniem (np. po naprawie poczty). */
+export async function wyslijPonownieZaproszenie(invitationId: string): Promise<{ ok: boolean; komunikat: string }> {
+  const owner = await requireOwner();
+  const { data: inv } = await createSupabaseAdmin()
+    .from("invitations")
+    .select("email, role, token")
+    .eq("id", invitationId)
+    .eq("agency_id", owner.agency_id!)
+    .eq("status", "pending")
+    .maybeSingle();
+  if (!inv) return { ok: false, komunikat: "Nie ma takiego zaproszenia." };
+  const mail = await wyslijZaproszenie({
+    email: inv.email,
+    link: `${APP_URL}/zaproszenie/${inv.token}`,
+    role: (inv.role ?? "agent") as UserRole,
+    zapraszajacy: owner.full_name,
+    biuro: owner.agency?.name ?? null,
+  });
+  return mail.ok ? { ok: true, komunikat: `Wysłane ponownie do ${inv.email}.` } : { ok: false, komunikat: `Mail nie wyszedł: ${mail.powod}` };
+}
+
+/**
+ * Mail z zaproszeniem. Zwraca powód porażki po ludzku, bo „nie wyszło” bez
+ * przyczyny kończyło się ręcznym kopiowaniem linków bez wiedzy, co naprawić.
+ */
+async function wyslijZaproszenie({ email, link, role, zapraszajacy, biuro }: { email: string; link: string; role: UserRole; zapraszajacy: string | null; biuro: string | null }): Promise<{ ok: boolean; powod: string }> {
+  const klucz = process.env.RESEND_API_KEY;
+  if (!klucz) return { ok: false, powod: "poczta nie jest skonfigurowana (brak klucza Resend)." };
+  try {
+    const { error } = await new Resend(klucz).emails.send({
+      from: NADAWCA,
+      to: email,
+      subject: `${zapraszajacy ?? "Twoje biuro"} zaprasza Cię do AgentSpace`,
+      html: oprawaMaila(`
+          <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;color:#14171a;font-weight:600;">Zaproszenie do zespołu</h1>
+          <p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#3d4349;">
+            <strong>${escapeHtml(zapraszajacy ?? "Właściciel biura")}</strong> zaprasza Cię do
+            <strong>${escapeHtml(biuro ?? "biura")}</strong> w AgentSpace, w roli <strong>${escapeHtml(ROLE_LABELS[role])}</strong>.
+          </p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+            <tr><td style="border-radius:12px;background:#0b7a55;">
+              <a href="${link}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">Dołącz do zespołu</a>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#64748b;">Jeśli przycisk nie działa, skopiuj ten adres do przeglądarki:</p>
+          <p style="margin:0 0 14px;font-size:13px;line-height:1.5;word-break:break-all;"><a href="${link}" style="color:#0b7a55;">${link}</a></p>
+          <p style="margin:0;font-size:13px;line-height:1.6;color:#94a3b8;">Link działa 14 dni. Jeśli to pomyłka, zignoruj tę wiadomość.</p>
+      `),
+    });
+    if (!error) return { ok: true, powod: "" };
+    console.error("Invite email error:", error);
+    if (/domain is not verified/i.test(error.message)) return { ok: false, powod: "domena wysyłająca maile nie jest zweryfikowana w Resend (rekord DKIM w DNS)." };
+    if (/rate|limit|quota/i.test(error.message)) return { ok: false, powod: "przekroczony limit wysyłki maili, spróbuj za chwilę." };
+    return { ok: false, powod: `${error.message}.` };
+  } catch (err) {
+    console.error("Invite email error:", err);
+    return { ok: false, powod: "błąd połączenia z pocztą." };
+  }
 }
 
 /**

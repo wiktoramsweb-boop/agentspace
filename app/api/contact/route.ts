@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase";
-import { oprawaMaila } from "@/lib/mail";
+import { oprawaMaila, NADAWCA } from "@/lib/mail";
 
 type Payload = {
   name?: string;
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
     try {
       const resend = new Resend(resendKey);
       await resend.emails.send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        from: NADAWCA,
         to: notifyEmail,
         replyTo: email,
         subject: `📩 Wiadomość kontaktowa: ${name}`,

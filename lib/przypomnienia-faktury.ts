@@ -10,7 +10,7 @@ import {
   pozostaloDoZaplaty,
   statusPlatnosci,
 } from "./invoice";
-import { oprawaMaila } from "./mail";
+import { oprawaMaila, NADAWCA } from "./mail";
 
 /**
  * Przypomnienie o fakturach po terminie.
@@ -124,7 +124,7 @@ export async function przypomnijOZaleglychFakturach(): Promise<number> {
       );
 
       const { error: bladWysylki } = await resend.emails.send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        from: NADAWCA,
         to: owner.email as string,
         subject: `${faktury.length} ${faktury.length === 1 ? "faktura" : "faktur"} po terminie - ${formatMoney(suma)} zł`,
         html: oprawaMaila(`

@@ -16,6 +16,9 @@ const ADRES_APLIKACJI = "https://agentspace.pl";
 // Obrazki prosto z www: część programów pocztowych nie podąża za przekierowaniem.
 const ADRES_GRAFIK = "https://www.agentspace.pl";
 
+/** Jeden nadawca dla wszystkich maili. Domena musi być zweryfikowana w Resend (DKIM w DNS). */
+export const NADAWCA = process.env.RESEND_FROM ?? "AgentSpace <powiadomienia@agentspace.pl>";
+
 export type Mail = {
   do: string;
   temat: string;
@@ -91,7 +94,7 @@ export async function wyslijMail(m: Mail): Promise<boolean> {
   try {
     const { Resend } = await import("resend");
     const { error } = await new Resend(klucz).emails.send({
-      from: process.env.RESEND_FROM ?? "AgentSpace <powiadomienia@agentspace.pl>",
+      from: NADAWCA,
       to: m.do,
       subject: m.temat,
       html: szablon(m),

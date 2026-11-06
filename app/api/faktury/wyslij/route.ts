@@ -3,6 +3,7 @@ import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { escapeHtml } from "@/lib/html";
 import { zapiszBlad } from "@/lib/blad";
 import { formatMoney, opisRodzaju } from "@/lib/invoice";
+import { NADAWCA } from "@/lib/mail";
 
 /**
  * Wysyłka faktury mailem do nabywcy.
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
   try {
     const { Resend } = await import("resend");
     const { error } = await new Resend(klucz).emails.send({
-      from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+      from: NADAWCA,
       to: email,
       replyTo: user.email ?? undefined,
       subject: `${rodzaj.tytul} nr ${faktura.number}`,

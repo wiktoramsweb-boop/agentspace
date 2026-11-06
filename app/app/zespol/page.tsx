@@ -22,6 +22,8 @@ import { InviteForm, type ManagerOption } from "./invite-form";
 import { cancelInvitation } from "./actions";
 import { ReportButton } from "./report-button";
 import { CopyLink } from "./copy-link";
+import { AkcjeZaproszenia } from "./zaproszenie-qr";
+import { kodQrSvg } from "@/lib/qr";
 import { TeamRoles, type TeamMember } from "./team-roles";
 import { ManagerTeams } from "./manager-teams";
 import { TeamProfiles, type TeamProfile } from "./team-profiles";
@@ -95,6 +97,9 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
         getAgencyMembers(agencyId),
       ])
     : [null, [], [], {} as Record<string, number>, []];
+  const kodyQr: Record<string, string> = Object.fromEntries(
+    await Promise.all(invitations.map(async (inv: { id: string; token: string }) => [inv.id, await kodQrSvg(`${APP_URL}/zaproszenie/${inv.token}`)] as const)),
+  );
 
   // Karty zespołu: CEO widzi całe biuro, menedżer swoich agentów.
   const wybranyOddzial = oddzialy.lista.find((o) => o.id === oddzial) ?? null;
@@ -456,7 +461,7 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
                   </p>
                   <div className="space-y-2">
                     {invitations.map((inv) => (
-                      <div key={inv.id} className="flex items-center justify-between gap-4 text-sm">
+                      <div key={inv.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm">
                         <span className="min-w-0 truncate text-slate-700">
                           {inv.email}
                           <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
@@ -468,6 +473,9 @@ export default async function ZespolPage({ searchParams }: { searchParams: Promi
                           <form action={cancelInvitation.bind(null, inv.id)}>
                             <button className="text-xs text-slate-500 transition hover:text-red-600">Anuluj</button>
                           </form>
+                        </div>
+                        <div className="flex w-full flex-wrap items-center gap-4">
+                          <AkcjeZaproszenia id={inv.id} link={`${APP_URL}/zaproszenie/${inv.token}`} qr={kodyQr[inv.id] ?? ""} />
                         </div>
                       </div>
                     ))}

@@ -1,7 +1,7 @@
 import { createSupabaseAdmin } from "./supabase/admin";
 import { DOC_BUCKET } from "./storage";
 import { escapeHtml } from "./html";
-import { oprawaMaila } from "./mail";
+import { oprawaMaila, NADAWCA } from "./mail";
 import { zapiszBlad } from "./blad";
 import { CENY_OBIEKTU, GRUPY_PLIKOW, TRYBY, adresZamowienia, type GrupaPlikow, type Zamowienie } from "./swiadectwa";
 
@@ -53,7 +53,7 @@ export async function przekazDoRealizatora(agencyId: string, numer: string): Pro
         .join("");
       const { Resend } = await import("resend");
       await new Resend(klucz).emails.send({
-        from: process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>",
+        from: NADAWCA,
         to: process.env.SWIADECTWA_EMAIL ?? process.env.NOTIFICATION_EMAIL ?? "nieruchomoscispectra@gmail.com",
         replyTo: z.email,
         subject: `Świadectwo energetyczne ${numer} (opłacone): ${adresZamowienia(z)} (${TRYBY[z.tryb].nazwa})`,

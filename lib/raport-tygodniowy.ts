@@ -3,7 +3,7 @@ import { gosciaBlokujemy } from "./demo/straz";
 import { createSupabaseAdmin } from "./supabase/admin";
 import { escapeHtml } from "./html";
 import { formatPln } from "./format";
-import { oprawaMaila } from "./mail";
+import { oprawaMaila, NADAWCA } from "./mail";
 import { APP_URL } from "./supabase/config";
 import { oddzialOsob, oddzialyBiura } from "./oddzialy";
 
@@ -230,7 +230,7 @@ export async function wyslijTydzienBiura(agencyId: string, tylkoDo?: string): Pr
   const adresy = tylkoDo ? [tylkoDo] : osoby.filter((o) => o.role === "owner").map((o) => o.email).filter((e): e is string => Boolean(e));
 
   const resend = new Resend(key);
-  const nadawca = process.env.RESEND_FROM ?? "AgentSpace <onboarding@resend.dev>";
+  const nadawca = NADAWCA;
   const temat = (prefiks: string, nazwa: string, t: TydzienBiura) =>
     `${prefiks}: ${nazwa}${doUwagi(t).length ? ` · ${ile(doUwagi(t).length, ["sprawa", "sprawy", "spraw"])} do uwagi` : ""}`;
   let wyslane = 0;
